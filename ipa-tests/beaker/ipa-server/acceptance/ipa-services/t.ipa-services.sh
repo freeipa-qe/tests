@@ -57,9 +57,6 @@ user1="user1"
 user2="user2"
 userpw="Secret123"
 
-PACKAGE1="ipa-admintools"
-PACKAGE2="ipa-client"
-
 TMP_KEYTAB="/opt/krb5.keytab"
 SERVICE=vpn
 
@@ -67,8 +64,7 @@ TESTHOST=dummy.$DOMAIN
 
 setup() {
 rlPhaseStartTest "Setup for ipa service tests"
-        rlAssertRpm $PACKAGE1
-        rlAssertRpm $PACKAGE2
+        rlDistroDiff ipa_pkg_check
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
@@ -95,7 +91,13 @@ rlPhaseStartTest "service_add_002: ipa service-add : add service for $SERVICE wi
 	rlAssertGrep "Added service \"$SERVICE\/$HOSTNAME@$RELM\"" "$TmpDir/service_add_002.out"
 	rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_002.out"
 	rlAssertGrep "Managed by: $HOSTNAME" "$TmpDir/service_add_002.out"
+
+if [ -f /etc/fedora-release ] ; then
+	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_add_002.out"
+else
 	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_add_002.out"
+fi
+
 	rlRun "cat $TmpDir/service_add_002.out"
 
 	# Deleting this service for future test cases
@@ -280,7 +282,12 @@ rlPhaseStartTest "service_add_host_003: ipa service-add-host : add host to manag
         rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_add_host_003.out 2>&1"
         rlAssertGrep "Managed by: $HOSTNAME, $TESTHOST" "$TmpDir/service_add_host_003.out"
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_add_host_003.out"
+
+if [ -f /etc/fedora-release ] ; then
+        rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_add_host_003.out"
+else
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_add_host_003.out"
+fi
         rlAssertGrep "Number of members added 1" "$TmpDir/service_add_host_003.out"
         rlRun "cat $TmpDir/service_add_host_003.out"
 
@@ -503,7 +510,11 @@ service_find_003() {
         # ipa service-find with --principal and --all options
 rlPhaseStartTest "service_find_003: ipa service-find with --principal and --all options."
         rlRun "ipa service-find --principal=$SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_find_003.out 2>&1"
+if [ -f /etc/fedora-release ] ; then
+        rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_find_003.out"
+else
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_find_003.out"
+fi
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_find_003.out"
         rlAssertGrep "Keytab:" "$TmpDir/service_find_003.out"
         rlRun "cat $TmpDir/service_find_003.out"
@@ -519,11 +530,15 @@ rlPhaseStartTest "service_find_004: ipa service-find with --not-man-by-host opti
         rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_find_004.out 2>&1"
         rlRun "ipa service-find --not-man-by-hosts=$TESTHOST > $TmpDir/service_find_004.out 2>&1"
         rlRun "cat $TmpDir/service_find_004.out"
+if [ -f /etc/fedora-release ] ; then
+	rlAssertGrep "Number of entries returned 3" "$TmpDir/service_find_004.out"
+else
 	if [[ "$SLAVE" = "" ]] ; then
         	rlAssertGrep "Number of entries returned 4" "$TmpDir/service_find_004.out"
 	else
 		rlAssertGrep "Number of entries returned 8" "$TmpDir/service_find_004.out"
 	fi
+fi
 rlPhaseEnd
 }
 
@@ -559,11 +574,20 @@ rlPhaseStartTest "service_find_007: ipa service-find with --timelimit option"
         result=`cat $TmpDir/service_find_007.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
 	if [[ "$SLAVE" = "" ]] ; then
-        	if [ $number -eq 5 ] ; then
-                	rlPass "Number of 5 services returned as expected with time limit of 0"
-        	else
-                	rlFail "Number of services returned is not as expected.  GOT: $number EXP: 5"
-        	fi
+
+		if [ -f /etc/fedora-release ] ; then
+			if [ $number -eq 4 ] ; then
+				rlPass "Number of 4 services returned as expected with time limit of 0"
+			else
+				rlFail "Number of services returned is not as expected.  GOT: $number EXP: 4"
+			fi
+		else
+	        	if [ $number -eq 5 ] ; then
+        	        	rlPass "Number of 5 services returned as expected with time limit of 0"
+        		else
+                		rlFail "Number of services returned is not as expected.  GOT: $number EXP: 5"
+	        	fi
+		fi
 	else
                 if [ $number -eq 9 ] ; then
                         rlPass "Number of 9 services returned as expected with time limit of 0"
@@ -634,8 +658,13 @@ rlPhaseStartTest "service_mod_002: ipa service-mod --rights, to display the righ
        rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIIDmDCCAoCgAwIBAgIBATANBgkqhkiG9w0BAQsFADA3MRUwEwYDVQQKEwxURVNUUkVMTS5DT00xHjAcBgNVBAMTFUNlcnRpZmljYXRlIEF1dGhvcml0eTAeFw0xMjAyMDIxNTQzMjJaFw0yMDAyMDIxNTQzMjJaMDcxFTATBgNVBAoTDFRFU1RSRUxNLkNPTTEeMBwGA1UEAxMVQ2VydGlmaWNhdGUgQXV0aG9yaXR5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAox29UcpdSpeCQuthJ/IAA5V59xRUcY3Oio3JYxgC5D/fUIMKV/Qwmd0EvaMNZXncfmcUsX5YrfAUSiKb2rfaSOLluR5NJ3QcNVVyw0O0hYbwWILjnMTUYilYeA7HsuVYigLxw0uHf23b49IuUDPCb13tot8m0wboN0XX+TiUsvchtRuKzlB2xr1Ix0apevs2pTeZkTmV1aUMcM6GfgkVKLpoX2OeIQMFUCgdeoca9Yjo8fUDjhQ+LrpC0UWUp4jRyjmCKCQ/m9+bUIpQBFXcW3z+CixyybBkOkWuLkXNYI2iWXajkVwSqBw86d3vXQZXfQYtsdwYpKl79leaRh9mawIDAQABo4GuMIGrMB8GA1UdIwQYMBaAFL5+6T4HKYVSPkm5zfIANFd5JvHdMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgHGMB0GA1UdDgQWBBS+fuk+BymFUj5Juc3yADRXeSbx3TBIBggrBgEFBQcBAQQ8MDowOAYIKwYBBQUHMAGGLGh0dHA6Ly9yaGVsNjItc2VydmVyLnRlc3RyZWxtLmNvbTo4MC9jYS9vY3NwMA0GCSqGSIb3DQEBCwUAA4IBAQBDXwR7r4jH79fIUtqChyDCrqMfAt1qVGQweKhF8Mcm7W1WotbUvYXG3O7Xq5nlwUHKrYRhpqOAKshLQ/O8eSY+BOzoYYqT40zgxNodKXFpmj0IdQ5Bk0D/kergRX69V1ZEEsyeKqEQqC8V2f40+vUvp2QLjJZmMVXT5i/AB+7wDvCgdzKfmb8iUqfVayRtIWcMkcHU8XnV/D1HTuAgAmfkFApxXShGFaINXJ5jrCj+QzQWPp+DvazpJVdstYWjj4TbCxIfDVbSx79xdogquLA1ja3M6+psyOx6fIqM6NMuUYau8hFTi6GwIIcCZNgh1jph8GrQyC8qwnicgGaDTreb --rights --all > $TmpDir/service_mod_002.out"
 	rlRun "cat $TmpDir/service_mod_002.out"
 	rlAssertGrep "Modified service \"$SERVICE/$HOSTNAME@$RELM\"" "$TmpDir/service_mod_002.out"
+if [ -f /etc/fedora-release ] ; then
+	rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'ipakrbprincipalalias': u'rscwo', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'krbmaxticketlife': u'rscwo', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'ipauniqueid': u'rsc'}" "$TmpDir/service_mod_002.out"
+	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_mod_002.out"
+else
 	rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'krbmaxticketlife': u'rscwo', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'ipauniqueid': u'rsc'}" "$TmpDir/service_mod_002.out"
 	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_mod_002.out"
+fi
 
 	#deleting for the added service for the next test case
         ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
@@ -793,7 +822,11 @@ rlPhaseStartTest "service_remove_host_003: ipa service-remove-host for services 
         rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_remove_host_003.out 2>&1"
         rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_remove_host_003.out"
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_remove_host_003.out"
+if [ -f /etc/fedora-release ] ; then
+        rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_remove_host_003.out"
+else
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_remove_host_003.out"
+fi
         rlAssertGrep "Number of members removed 1" "$TmpDir/service_remove_host_003.out"
         rlRun "cat $TmpDir/service_remove_host_003.out"
 rlPhaseEnd
@@ -849,7 +882,11 @@ rlPhaseStartTest "service_show_002: ipa service-show with --all option"
         rlRun "ipa service-show http/$MASTER@$RELM  --all > $TmpDir/service_show_002.out 2>&1"
         rlAssertGrep "Principal: http/$MASTER@$RELM" "$TmpDir/service_show_002.out" -i 
         rlAssertGrep "Keytab: True" "$TmpDir/service_show_002.out"
+if [ -f /etc/fedora-release ] ; then
+        rlAssertGrep "objectclass: ipaobject, top, ipaservice, pkiuser, ipakrbprincipal, krbprincipal, krbprincipalaux, krbTicketPolicyAux" "$TmpDir/service_show_002.out"
+else
         rlAssertGrep "objectclass: ipaobject, top, ipaservice, pkiuser, krbprincipal, krbprincipalaux, krbTicketPolicyAux" "$TmpDir/service_show_002.out"
+fi
         #rlAssertGrep "valid_not_after:" "$TmpDir/service_show_002.out"
         #rlAssertGrep "valid_not_before:" "$TmpDir/service_show_002.out"
         rlAssertGrep "Not Before:" "$TmpDir/service_show_002.out"
@@ -889,7 +926,11 @@ service_show_005() {
         # ipa service-show with --rights options (requires --all)
 rlPhaseStartTest "service_show_005: ipa service-show with --rights options (requires --all)"
         rlRun "ipa service-show http/$MASTER@$RELM --rights --all > $TmpDir/service_show_005.out 2>&1"
+if [ -f /etc/fedora-release ] ; then
+        rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'ipakrbprincipalalias': u'rscwo', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'ipauniqueid': u'rsc', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'krbmaxticketlife': u'rscwo'}" "$TmpDir/service_show_005.out" -i
+else
         rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'ipauniqueid': u'rsc', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'krbmaxticketlife': u'rscwo'}" "$TmpDir/service_show_005.out" -i
+fi
         rlRun "cat $TmpDir/service_show_005.out"
 rlPhaseEnd
 }
