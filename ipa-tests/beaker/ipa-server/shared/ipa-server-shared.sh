@@ -1094,6 +1094,8 @@ rlDistroDiff() {
 
                 ipa_pkg_check)
                         rlAssertRpm freeipa-server
+                        rlAssertRpm freeipa-admintools
+                        rlAssertRpm freeipa-client
                         ;;
                 esac
                 }
@@ -1107,6 +1109,8 @@ rlDistroDiff() {
 
                 ipa_pkg_check)
                         rlAssertRpm ipa-server
+                        rlAssertRpm ipa-admintools
+                        rlAssertRpm ipa-client
                         ;;
                 esac
                 }
