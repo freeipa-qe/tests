@@ -32,7 +32,11 @@ chmod 755 $RPM_BUILD_ROOT/etc/beaker/hammer.config
 
 %clean
 
+%pre 
+rm -f ~/.beaker_client/config-hammer
+
 %post 
+ln -s /etc/beaker/hammer.config ~/.beaker_client/config-hammer
 echo "run bkr-hammer to use this script"
 
 %files
