@@ -1,21 +1,24 @@
 package com.redhat.qe.ipa.sahi.pages;
 
 import java.util.ArrayList;
+
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.internal.matchers.CombinableMatcher;
 
-import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
-import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
+import com.redhat.qe.ipa.sahi.tasks.*;
 import com.sun.mail.imap.protocol.SearchSequence;
 
-public class IPAWebPage implements StandardTest{
+public class IPAWebPage implements StandardTest,NonStandardTest{
 
 	protected SahiTasks browser;
+	protected CommonTasks commonTasks;
 	protected String url;
 	protected Hashtable<String,ArrayList<String>> testQueues;
 	protected String backLink;
+	protected String testAccount;
 	protected String duplicateErrorMsgStartsWith;
 	protected String duplicateErrorMsgEndsWith ="already exists";
 	
@@ -29,6 +32,25 @@ public class IPAWebPage implements StandardTest{
 	protected String modifyNegativePage;
 	protected String delPage;
 	protected String searchPage;
+	protected String addUserPage;
+	protected String addGroupPage;
+	protected String addUserDelegationPage;
+	protected String loginUser;
+	protected String loginOldPassword;
+	protected String loginNewPassword;
+	protected String memberuserToMemberGroupPage;
+	protected String userToGroupPage;
+	protected String editDelegatedUserNegative;
+	protected String editDelegatedUserDisplayName;
+	protected String editDelegatedUserEmail;
+	protected String checkDisplayName;
+	protected String checkEmail1;
+	protected String checkEmail2;
+	protected String checkEmail3;
+	protected String deleteDelegationNonstandard;
+	protected String deleteUserNonStandard;
+	protected String deleteGroupNonStandard;
+	protected String EditUndelegatedUser;
 	
 	protected TestDataFactory factory;
 	private static Logger log = Logger.getLogger(IPAWebPage.class.getName());
@@ -64,6 +86,11 @@ public class IPAWebPage implements StandardTest{
 		this.registerTestCases("modify", standardModTestCases);
 		this.registerTestCases("search", standardSearchTestCases);
 		this.registerTestCases("delete", standardDelTestCases);
+	}
+	
+	protected void registerNonStandardTestCases()
+	{
+		this.registerTestCases("nonStandardUserDelegation", EditUserDelegationTestCases);
 	}
 	
 	protected void registerTestCases(String queueName, String[] testCases)
@@ -257,7 +284,7 @@ public class IPAWebPage implements StandardTest{
 			return monitor;
 		}
 		
-		String testAccount = factory.getModifyTestAccount(pageName);
+		testAccount = factory.getModifyTestAccount(pageName);
 		if (testAccount != null && browser.link(testAccount).exists())
 		{
 			browser.link(testAccount).click();
@@ -318,24 +345,22 @@ public class IPAWebPage implements StandardTest{
 					monitor.fail("after 'Update', new value not assigned to element, test failed");
 			}
 		} 
-		if(browser.span("Collapse All").exists()){
+		
 			browser.span("Collapse All").click();
-			String testAccount = factory.getModifyTestAccount(pageName);
-			if (testAccount != null){
-				if(browser.table("section-table").exists() &&  browser.label(testAccount).exists())
-					monitor.fail("Collapse All Failed");
-				else
-					monitor.pass("Collapse All Passed");
-			}
-		}
-		if(browser.span("Expand All").exists()){
+			browser.waitFor(1000);
+			if(browser.table("section-table").exists())
+				monitor.fail("Collapse All Failed");
+			else
+				monitor.pass("Collapse All Passed");
+			
 			browser.span("Expand All").click();
+			browser.waitFor(1000);
 			if(browser.table("section-table").exists())
 				monitor.pass("Expand All Passed");
 			else
 				monitor.fail("Expand All Failed");
-		}
-		browser.link(backLink).click();
+			
+		browser.link(backLink).near(browser.span(testAccount)).click();
 		if (browser.span("Unsaved Changes").exists())
 		{
 			monitor.fail("there is 'Unsaved Changes', it is not suppose to happen, need find out why");
@@ -352,7 +377,7 @@ public class IPAWebPage implements StandardTest{
 			return monitor;
 		}
 		
-		String testAccount = factory.getModifyTestAccount(pageName);
+		testAccount = factory.getModifyTestAccount(pageName);
 		if (testAccount != null && browser.link(testAccount).exists())
 		{
 			browser.link(testAccount).click();
@@ -377,34 +402,34 @@ public class IPAWebPage implements StandardTest{
 			// test 'Cancel' 
 			setElementValue(monitor, pageName,tag,id,value);
 			monitor.setCurrentTestData(pageName, "{" + tag + ":" + id + ":" + value + " 'Cancel'}");
-			if(browser.link(backLink).exists()){
-				browser.link(backLink).click();
-				if(browser.button("Cancel").exists()){
-					browser.button("Cancel").click();
-					if (browser.link(backLink).exists())
-						monitor.pass("after Cancel, Page remains Unchanged, Test Passed");
-					else
-						monitor.fail("after Cancel, Page Changed. Test Failed");
-				}
-			}
-			
+			browser.link(backLink).near(browser.span(testAccount)).click();
+			browser.button("Cancel").click();
+			if (browser.link(backLink).near(browser.span(testAccount)).exists())
+				monitor.pass("after Cancel, Page remains Unchanged, Test Passed");
+			else
+				monitor.fail("after Cancel, Page Changed. Test Failed");
+				
 			// test 'Reset'
 			setElementValue(monitor, pageName,tag,id,value);
 			monitor.setCurrentTestData(pageName, "{" + tag + ":" + id + ":" + value + " 'Reset'}");
-			if(browser.link(backLink).exists()){
-				browser.link(backLink).click();
-				browser.button("Reset").click();
-				if (browser.link(backLink).exists())
-					monitor.fail("after Reset, Page remains Unchanged, Test Failed");
-				else
-					monitor.pass("after Reset, Page Changed. Test Passed");
-			}
+			browser.link(backLink).near(browser.span(testAccount)).click();
+			browser.button("Reset").click();
+			if (browser.link(backLink).near(browser.span(testAccount)).exists())
+				monitor.fail("after Reset, Page remains Unchanged, Test Failed");
+			else
+				monitor.pass("after Reset, Page Changed. Test Passed");
+			
 			// test 'Update'
+			testAccount = factory.getModifyTestAccount(pageName);
+			if (testAccount != null && browser.link(testAccount).exists())
+			{
+				browser.link(testAccount).click();
+			}
+			
 			setElementValue(monitor, pageName,tag,id,value);
-			//String afterUpdate = readElementValue(monitor, pageName,tag,id,value); // reread to confirm the update result
 			monitor.setCurrentTestData(pageName,  "{" + tag + ":" + id + ":" + value + " 'Update'}");
-			if(browser.link(backLink).exists()){
-				browser.link(backLink).click();
+			if(browser.link(backLink).near(browser.span(testAccount)).exists()){
+				browser.link(backLink).near(browser.span(testAccount)).click();
 				browser.button("Update").click();
 				
 				if (browser.div("error_dialog").exists())
@@ -414,31 +439,14 @@ public class IPAWebPage implements StandardTest{
 					browser.button("Cancel").click();
 					browser.span("undo").click();
 				}else{ 
-					if (browser.link(backLink).exists())
+					if (browser.link(backLink).near(browser.span(testAccount)).exists())
 						monitor.fail("after Update, Page remains Unchanged, Test Failed");
 					else
 						monitor.pass("after Update, Page Changed. Test Passed");
 				}
 			}
 		} 
-		browser.span("Collapse All").click();
-		if(browser.table("section-table").exists())
-			monitor.fail("Collapse All Failed");
-		else
-			monitor.pass("Collapse All Passed");
 		
-		browser.span("Expand All").click();
-		if(browser.table("section-table").exists())
-			monitor.pass("Expand All Passed");
-		else
-			monitor.fail("Expand All Failed");
-		
-		browser.link(backLink).click();
-		if (browser.span("Unsaved Changes").exists())
-		{
-			monitor.fail("there is 'Unsaved Changes', it is not suppose to happen, need find out why");
-			browser.button("Reset").click();
-		} 
 		return monitor;
 	}
 	
@@ -451,7 +459,7 @@ public class IPAWebPage implements StandardTest{
 			return monitor;
 		}
 		
-		String testAccount = factory.getModifyTestAccount(pageName);
+		testAccount = factory.getModifyTestAccount(pageName);
 		if (testAccount != null && browser.link(testAccount).exists())
 		{
 			browser.link(testAccount).click();
@@ -509,17 +517,17 @@ public class IPAWebPage implements StandardTest{
 		try {
 			for(int i=0;i<numofEntries;i++){
 				searchSingle(monitor, pageName);
-				if(browser.link(browser.textbox("filter").getValue()).exists()){
+				String searchString=browser.textbox("filter").getValue().toString().toLowerCase();
+				if(browser.link(searchString).exists()){
 					monitor.pass("Search single passed");
 				}
 				else{
 					monitor.fail("Search Failed");
 				}
-				browser.textbox("filter").setValue("");
-				browser.span("icon search-icon").click(); 
-				monitor.pass("Search all passed");
 			}
-			
+			browser.textbox("filter").setValue("");
+			browser.span("icon search-icon").click(); 
+			monitor.pass("Search all passed");
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -586,6 +594,184 @@ public class IPAWebPage implements StandardTest{
 		} catch (Exception e){
 			monitor.fail(e);
 		}
+		return monitor;
+	}
+	
+	public IPAWebTestMonitor deleteNonStandard(IPAWebTestMonitor monitor){ 
+		try {
+			CommonTasks.formauth(browser, "admin", "Secret123");
+			browser.navigateTo(commonTasks.delegationPage, true);
+			String pageName = deleteDelegationNonstandard;
+			if (pageName == null)
+				return monitor;
+		
+			deleteSingleEntry(monitor, pageName);
+			monitor.pass("Delegation Deleted");
+			
+			browser.navigateTo(commonTasks.userPage, true);
+			pageName=deleteUserNonStandard;
+			deleteMultipleEntry(monitor, pageName, 3);
+			monitor.pass("Users Deleted");
+			
+			browser.navigateTo(commonTasks.groupPage, true);
+			pageName=deleteGroupNonStandard;
+			deleteMultipleEntry(monitor, pageName, 2);
+			monitor.pass("Groups Deleted");
+			
+			browser.navigateTo(commonTasks.delegationPage, true);
+			
+		} catch (IPAWebAutomationException e) { 
+			e.printStackTrace();
+			monitor.fail(e);
+		} 
+		return monitor;
+	}
+	
+	@Override
+	public IPAWebTestMonitor addUserDelegation(IPAWebTestMonitor monitor){
+		try {
+			String pageName = addUserDelegationPage;
+			if (pageName == null)
+				return monitor;
+		
+			CommonTasks.formauth(browser, "admin", "Secret123");
+			browser.navigateTo(commonTasks.delegationPage,true);
+			addSingleNewEntry(monitor, pageName);
+			monitor.pass("New Delegation Added");
+			pageName=loginUser;
+			String userName=factory.getModifyTestAccount(pageName);
+			pageName=loginOldPassword;
+			String password=factory.getModifyTestAccount(pageName);
+			CommonTasks.formauth(browser, userName, password);
+			browser.link("Users").under(browser.div("Users")).click();
+			pageName=editDelegatedUserDisplayName;
+			testAccount=factory.getModifyTestAccount(pageName);
+			if(browser.link(testAccount).exists()){
+				browser.link(testAccount).click();		
+				fillDataIntoPage(monitor, pageName);
+				pageName=editDelegatedUserEmail;
+				fillEmail(monitor, pageName);
+				browser.span("Update").click();
+				pageName=editDelegatedUserNegative;
+				browser.link("Reset Password").click();
+				resetPasswordNegative(monitor, pageName);
+				browser.link("Users").under(browser.div("Users")).click();
+				pageName=editDelegatedUserDisplayName;
+				testAccount=factory.getModifyTestAccount(pageName);
+				browser.link(testAccount).click();
+				pageName=checkDisplayName;
+				testAccount=factory.getModifyTestAccount(pageName);
+				if(browser.textbox("displayname").getText().equals(testAccount)){
+					monitor.pass("Display Name Update Passed");
+				}
+				pageName=checkEmail1;
+				testAccount=factory.getModifyTestAccount(pageName);
+				if(browser.textbox("mail-0").getText().equals(testAccount)){
+					monitor.pass("" + testAccount + " Email Update Passed");
+				}
+				pageName=checkEmail2;
+				testAccount=factory.getModifyTestAccount(pageName);
+				if(browser.textbox("mail-1").getText().equals(testAccount)){
+					monitor.pass("" + testAccount + " Email Update Passed");
+				}
+				pageName=checkEmail3;
+				testAccount=factory.getModifyTestAccount(pageName);
+				if(browser.textbox("mail-2").getText().equals(testAccount)){
+					monitor.pass("" + testAccount + " Email Update Passed");
+				}
+			}
+			int textboxCount=4;
+			if(browser.textbox(textboxCount).exists()){
+				monitor.fail("Attributes without permission are uneditable: Test Failed");
+			}
+			browser.link("Users").under(browser.div("Users")).click();
+			pageName=EditUndelegatedUser;
+			testAccount=factory.getModifyTestAccount(pageName);
+			if(browser.link(testAccount).exists()){
+				browser.link(testAccount).click();
+				if(browser.textbox(0).exists()){
+					monitor.fail("User without Delegation is not editable: Test Failed");
+				}
+			}
+			
+		} catch (IPAWebAutomationException e) { 
+			e.printStackTrace();
+			monitor.fail(e);
+		}
+		return monitor;
+	}
+	
+	@Override
+	public IPAWebTestMonitor addUserGroup(IPAWebTestMonitor monitor){
+		try {
+			String pageName = addUserPage;
+			int numofEntries=3;
+			if (pageName == null)
+				return monitor;
+			browser.navigateTo(commonTasks.userPage,true);
+			for(int i=0;i<numofEntries;i++){
+				addSingleNewEntry(monitor, pageName);
+				monitor.pass();
+			}
+			pageName=addGroupPage;
+			if (pageName == null)
+				return monitor;
+			browser.navigateTo(commonTasks.groupPage,true);
+			numofEntries=2;
+			for(int i=0;i<numofEntries;i++){
+				addSingleNewEntry(monitor, pageName);
+				monitor.pass();
+			}
+			pageName=userToGroupPage;
+			if (pageName == null)
+				return monitor;
+			testAccount=factory.getModifyTestAccount(pageName);
+			if(browser.link(testAccount).exists()){
+				browser.link(testAccount).click();
+				browser.link("member_user").click();
+				assignUserToGroup(monitor, pageName);
+			}
+			browser.navigateTo(commonTasks.groupPage, true);
+			pageName=memberuserToMemberGroupPage;
+			if (pageName == null)
+				return monitor;
+			testAccount=factory.getModifyTestAccount(pageName);
+			if(browser.link(testAccount).exists()){
+				browser.link(testAccount).click();
+				browser.link("member_user").click();
+				assignUserToGroup(monitor, pageName);
+			}
+			browser.navigateTo(commonTasks.delegationPage, true);
+			
+		} catch (IPAWebAutomationException e) { 
+			e.printStackTrace();
+			monitor.fail(e);
+		}
+		return monitor;
+	}
+	
+	@Override
+	public IPAWebTestMonitor delegationNotAdded(IPAWebTestMonitor monitor){
+		String pageName=loginUser;
+		String userName=factory.getModifyTestAccount(pageName);
+		pageName=loginOldPassword;
+		String oldPassword=factory.getModifyTestAccount(pageName);
+		pageName=loginNewPassword;
+		String newPassword=factory.getModifyTestAccount(pageName);
+		CommonTasks.kinitAsNewUserFirstTime(userName, oldPassword, newPassword);
+		CommonTasks.formauth(browser, userName, newPassword);
+		browser.link("Users").under(browser.div("Users")).click();
+		pageName=editDelegatedUserNegative;
+		testAccount=factory.getModifyTestAccount(pageName);
+		if(browser.link(testAccount).exists()){
+			browser.link(testAccount).click();
+			browser.link("Reset Password").click();
+			resetPasswordNegative(monitor, pageName);
+			if(browser.textbox(0).exists()){
+				monitor.fail("User without Delegation is not editable: Test Failed");
+			}
+		}
+		monitor.pass();
 		return monitor;
 	}
 	
@@ -688,6 +874,14 @@ public class IPAWebPage implements StandardTest{
 			browser.button("Add").click();
 	}
 	
+	protected void assignUserToGroup(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+	{  
+			browser.span("Add").click();
+			fillDataIntoPage(monitor,pageName);
+			browser.span(">>").click();
+			browser.button("Add").click();
+	}
+	
 	protected void addSingleNewEntryNegative(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
 	{  
 		browser.span("Add").click();
@@ -755,6 +949,36 @@ public class IPAWebPage implements StandardTest{
 		closeDialog(); 
 	}
 	
+	protected void resetPasswordNegative(IPAWebTestMonitor monitor, String pageName){ 
+		StringBuffer testData = new StringBuffer();
+		ArrayList<String> expectedErrorMsgs = new ArrayList<String>();
+		ArrayList<String> uiElements = factory.getUIELements(pageName);
+		for (String uiElement:uiElements)
+		{
+			String[] elementID = uiElement.split(":"); 
+			String tag = elementID[0];
+			String id = elementID[1]; 
+			String valueAndExpectedErrorMsg = factory.getValue(pageName, tag, id);
+			String[] combined = factory.extractValues(valueAndExpectedErrorMsg); 
+			String value = combined[0];
+			String expectedErrorMsg = combined[1];
+			String errortype=combined[2];
+			setElementValue(monitor, pageName,tag,id,value); 
+			testData.append(value + " & ");
+			if (expectedErrorMsg != null)
+				expectedErrorMsgs.add(expectedErrorMsg);
+		}
+		monitor.setCurrentTestData(pageName,  "{" + testData.substring(0,testData.length()-3)+ "}");
+		browser.button("Reset Password").click();
+		boolean matches = verifyExpectedErrorMsg(expectedErrorMsgs);
+		if (matches){
+			monitor.pass("error message matches with expected");
+		}else{
+			monitor.fail("error message does NOT match with expected");
+		}
+		closeDialog(); 
+	}
+	
 	protected void addMultipleNewEntries(IPAWebTestMonitor monitor, String pageName, int numOfEntries) throws IPAWebAutomationException
 	{ 
 		browser.span("Add").click(); 
@@ -813,6 +1037,23 @@ public class IPAWebPage implements StandardTest{
 		
 	}
 	
+	protected void fillEmail(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationActionNotDefinedException
+	{
+		ArrayList<String> uiElements = factory.getUIELements(pageName);
+		StringBuffer testData = new StringBuffer();
+		for (String uiElement:uiElements)
+		{
+			browser.link("Add").under(browser.heading2("Contact Settings")).click();
+			String[] elementID = uiElement.split(":"); 
+			String tag = elementID[0];
+			String id = elementID[1]; 
+			String value = factory.getValue(pageName, tag, id);
+			testData.append(value + " & ");
+			fillDataInElement(monitor, pageName,tag,id,value);
+		}
+		monitor.setCurrentTestData(pageName,"{" + testData.substring(0,testData.length()-3) + "}");
+		
+	}
 	protected String[] fillDataInElement(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value) throws IPAWebAutomationActionNotDefinedException 
 	{
 		String before = null;

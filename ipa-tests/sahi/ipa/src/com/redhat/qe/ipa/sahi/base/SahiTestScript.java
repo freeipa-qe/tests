@@ -41,7 +41,7 @@ public abstract class SahiTestScript extends TestScript {
 	
 	@BeforeSuite(groups={"setup"})
 	public static void openBrowser() {
-		CommonTasks.formauth(sahiTasks);			
+		CommonTasks.formauth(sahiTasks,"admin","Secret123");			
 	}
 
 	

@@ -113,7 +113,7 @@ public class CommonTasks {
     // form based auth
 	//kdestroy
 	//recorded actions 
-	public static void formauth(SahiTasks sahiTasks){
+	public static void formauth(SahiTasks sahiTasks, String userName, String password){
 		try{
 			
 			//OutputStream stdin = process.getOutputStream ();    
@@ -135,11 +135,11 @@ public class CommonTasks {
 				}
 			}
 			sahiTasks.link("form-based authentication").click();
-			sahiTasks.textbox("username").setValue("admin");
-			sahiTasks.password("password").setValue("Secret123");
+			sahiTasks.textbox("username").setValue(userName);
+			sahiTasks.password("password").setValue(password);
 			
 			sahiTasks.button("Login").click();
-			com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as Admin");
+			com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsUser(userName, password), "Logged in successfully as " + userName);
 			
 			
 		}

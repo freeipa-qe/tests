@@ -3,11 +3,12 @@
 	<test name="Delegation Tests">
 		<groups>
 			<run> 
-				<include name="init" />
+				<!--<include name="init" />-->
 				<include name="add" /> 
 				<include name="modify" />
 				<include name="search" />
 				<include name="delete" />
+				<include name="nonStandardUserDelegation" />
 				<!--<include name="report" />-->
 			</run>
 		</groups>
