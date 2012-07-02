@@ -22,7 +22,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/beaker
 mkdir -p $RPM_BUILD_ROOT/bin
 
 echo '#!/bin/bash
-BEAKER_CLIENT_CONF=~/.beaker_client/config-hammer bkr "$@"' > $RPM_BUILD_ROOT/bin/bkr-hammer
+BEAKER_CLIENT_CONF=/etc/beaker/hammer.config bkr "$@"' > $RPM_BUILD_ROOT/bin/bkr-hammer
 echo 'HUB_URL = "http://hammer1.dsdev.sjc.redhat.com/bkr"
 # Hub authentication method. Example: krbv, password, worker_key
 AUTH_METHOD = "krbv"' > $RPM_BUILD_ROOT/etc/beaker/hammer.config
@@ -33,10 +33,8 @@ chmod 755 $RPM_BUILD_ROOT/etc/beaker/hammer.config
 %clean
 
 %pre 
-rm -f ~/.beaker_client/config-hammer
 
 %post 
-ln -s /etc/beaker/hammer.config ~/.beaker_client/config-hammer
 echo "run bkr-hammer to use this script"
 
 %files
@@ -45,6 +43,6 @@ echo "run bkr-hammer to use this script"
 /etc/beaker/hammer.config
 
 %changelog
-* Mon May 14 2012 Micahel Gregg <mgregg@redhat.com>
+* Mon May 14 2012 Michael Gregg <mgregg@redhat.com>
 - Created first spec file
 
