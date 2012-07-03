@@ -41,9 +41,9 @@
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="STAR1">
 #
 
-MASTER=MASTER1
-SLAVE="REPLICA1 thru REPLICAN"
-CLIENT=CLIENT1
+#MASTER=MASTER1
+#SLAVE="REPLICA1 thru REPLICAN"
+#CLIENT=CLIENT1
 
 ipa_install_envcleanup() {
 	for i in $(seq 1 10); do
@@ -84,45 +84,57 @@ ipa_install_parse_servers_default() {
 
 ipa_install_parse_servers_1() {
 	# MASTER
-	MASTER=$(echo $MASTER|awk '{print $1}')
-	BEAKERMASTER=$MASTER
-	BEAKERMASTER_IP=$(dig +short $MASTER)
+	export MASTER=$(echo $MASTER|awk '{print $1}')
+	export BEAKERMASTER=$MASTER
+	if [ -n "$MASTER" ]; then
+		export BEAKERMASTER_IP=$(dig +short $MASTER)
+	fi
 	if [ "$(hostname -s)" = "$(echo $MASTER|cut -f1 -d.)" ]; then 
-		MYROLE=MASTER
+		export MYROLE=MASTER
 	fi
 
 	# REPLICA(S)
 	I=0
+	export SLAVE="$SLAVE"
+	export REPLICA="$SLAVE"
 	for s in $SLAVE; do
 		I=$(( I += 1 ))
 		export SLAVE${I}=$s
 		export BEAKERSLAVE${I}=$s
-		export BEAKERSLAVE${I}_IP=$(dig +short $s)
+		if [ -n "$s" ]; then
+			export BEAKERSLAVE${I}_IP=$(dig +short $s)
+		fi
 
 		export REPLICA${I}=$s
 		export BEAKERREPLICA${I}=$s
-		export BEAKERREPLICA${I}_IP=$(dig +short $s)
+		if [ -n "$s" ]; then
+			export BEAKERREPLICA${I}_IP=$(dig +short $s)
+		fi
 		
 		if [ "$(hostname -s)" = "$(echo $SLAVE${I}|cut -f1 -d.)" ]; then 
-			MYROLE=SLAVE${I}	
+			export MYROLE=SLAVE${I}	
 		fi
 	done
-	BEAKERSLAVE=$BEAKERSLAVE1
-	BEAKERSLAVE_IP=$BEAKERSLAVE1_IP
+	export BEAKERSLAVE=$BEAKERSLAVE1
+	export BEAKERSLAVE_IP=$BEAKERSLAVE1_IP
 
 	# CLIENT(S)
-	CLIENT=$(echo $CLIENT|awk '{print $1}')
-	BEAKERCLIENT=$CLIENT
-	BEAKERCLIENT_IP=$(dig +short $CLIENT)
+	export CLIENT=$(echo $CLIENT|awk '{print $1}')
+	export BEAKERCLIENT=$CLIENT
+	if [ -n "$CLIENT" ]; then
+		export BEAKERCLIENT_IP=$(dig +short $CLIENT)
+	fi
 	if [ "$(hostname -s)" = "$(echo $CLIENT|cut -f1 -d.)" ]; then 
-		MYROLE=CLIENT
+		export MYROLE=CLIENT
 	fi
 	
-	CLIENT2=$(echo $CLIENT2|awk '{print $1}')
-	BEAKERCLIENT2=$CLIENT2
-	BEAKERCLIENT2_IP=$(dig +short $CLIENT2)
+	export CLIENT2=$(echo $CLIENT2|awk '{print $1}')
+	export BEAKERCLIENT2=$CLIENT2
+	if [ -n "$CLIENT2" ]; then
+		export BEAKERCLIENT2_IP=$(dig +short $CLIENT2)
+	fi
 	if [ "$(hostname -s)" = "$(echo $CLIENT2|cut -f1 -d.)" ]; then 
-		MYROLE=CLIENT2
+		export MYROLE=CLIENT2
 	fi
 	
 	echo "export MASTER=$MASTER" >> /dev/shm/env.sh
@@ -142,22 +154,30 @@ ipa_install_parse_servers_2() {
 	# MASTER
 	export MASTER=$(echo $MASTER|awk '{print $1}')
 	export BEAKERMASTER=$MASTER
-	export BEAKERMASTER_IP=$(dig +short $MASTER)
+	if [ -n "$MASTER" ]; then
+		export BEAKERMASTER_IP=$(dig +short $MASTER)
+	fi
 	if [ "$(hostname -s)" = "$(echo $MASTER|cut -f1 -d.)" ]; then 
 		MYROLE=MASTER
 	fi
 
 	# REPLICA(S)
 	I=0
+	export SLAVE="$REPLICA"
+	export REPLICA="$REPLICA"
 	for r in "$REPLICA"; do
 		I=$(( I += 1 ))
 		export REPLICA${I}=$r
 		export BEAKERREPLICA${I}=$r
-		export BEAKERREPLICA${I}_IP=$(dig +short $r)
+		if [ -n "$r" ]; then
+			export BEAKERREPLICA${I}_IP=$(dig +short $r)
+		fi
 
 		export SLAVE${I}=$r
 		export BEAKERSLAVE${I}=$r
-		export BEAKERSLAVE${I}_IP=$(dig +short $r)
+		if [ -n "$r" ]; then
+			export BEAKERSLAVE${I}_IP=$(dig +short $r)
+		fi
 		if [ "$(hostname -s)" = "$(echo $REPLICA${I}|cut -f1 -d.)" ]; then
 			MYROLE=REPLICA${I}
 		fi
@@ -172,9 +192,11 @@ ipa_install_parse_servers_2() {
 		I=$(( I += 1 ))
 		export CLIENT${I}=$(echo $c|awk '{print $1}')
 		export BEAKERCLIENT${I}=$c
-		export BEAKERCLIENT${I}_IP=$(dig +short $c)
+		if [ -n "$c" ]; then 
+			export BEAKERCLIENT${I}_IP=$(dig +short $c)
+		fi
 		if [ "$(hostname -s)" = "$(echo $CLIENT${I}|cut -f1 -d.)" ]; then
-			MYROLE=CLIENT${I}
+			export MYROLE=CLIENT${I}
 		fi
 	done
 
@@ -193,26 +215,35 @@ ipa_install_parse_servers_2() {
 ### # support multiple domains
 
 ipa_install_parse_servers_3() {
-	I=0
+	I=1
 	while test -n "$(eval echo $(echo \$MASTER${I}))"; do
-		I=$(( I += 1 ))
+		echo "ENVIRONMENT ${I}"
 
 		# MASTER
-		export MASTER${I}=$(echo $MASTER|awk '{print $1}')
-		export BEAKERMASTER${I}=$MASTER
-		export BEAKERMASTER${I}_IP=$(dig +short $MASTER)
+		M=$(eval echo $(echo \$MASTER${I})|awk '{print $1}')
+		export MASTER${I}=$M
+		export BEAKERMASTER${I}=$M
+		if [ -n "$MASTER${I}" ]; then
+			export BEAKERMASTER${I}_IP=$(dig +short $M)
+		fi
 
 		# REPLICA(S)
 		J=0
-		for r in $REPLICA${I}; do
+		export SLAVE="$REPLICA1"
+		export REPLICA="$REPLICA1"
+		for r in $(eval echo $(echo \$REPLICA${I})); do
 			J=$(( J += 1 ))
 			export REPLICA${I}_${J}=$r
 			export BEAKERREPLICA${I}_${J}=$r
-			export BEAKERREPLICA${I}_${J}_IP=$(dig +short $r)
+			if [ -n "$r" ]; then
+				export BEAKERREPLICA${I}_${J}_IP=$(dig +short $r)
+			fi
 
 			export SLAVE${I}_${J}=$r
 			export BEAKERSLAVE${I}_${J}=$r
-			export BEAKERSLAVE${I}_${J}_IP=$(dig +short $r)
+			if [ -n "$r" ]; then
+				export BEAKERSLAVE${I}_${J}_IP=$(dig +short $r)
+			fi
 		done
 		# May need to uncomment this for backwards compatibility
 		#export BEAKERSLAVE=$BEAKERSLAVE1
@@ -220,16 +251,19 @@ ipa_install_parse_servers_3() {
 
 		# CLIENT(S)
 		J=0
-		for c in $CLIENT; do
+		for c in $(eval echo $(echo \$CLIENT${I})); do
 			J=$(( J += 1 ))
 			export CLIENT${I}_${J}=$(echo $c|awk '{print $1}')
 			export BEAKERCLIENT${I}_${J}=$c
-			export BEAKERCLIENT${I}_${J}_IP=$(dig +short $c)
+			if [ -n "$c" ]; then
+				export BEAKERCLIENT${I}_${J}_IP=$(dig +short $c)
+			fi
 		done
+		I=$(( I += 1 ))
 	done	
 
 	echo "export MASTER=$MASTER1" >> /dev/shm/env.sh
-	echo "export SLAVE=\"$SLAVE1\"" >> /dev/shm/env.sh
+	echo "export SLAVE=\"$REPLICA1\"" >> /dev/shm/env.sh
 	echo "export REPLICA=\"$REPLICA1\"" >> /dev/shm/env.sh
 	echo "export CLIENT=\"$CLIENT1\""  >> /dev/shm/env.sh
 }
