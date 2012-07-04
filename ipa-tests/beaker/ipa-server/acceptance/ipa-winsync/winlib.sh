@@ -40,9 +40,11 @@
 
 ADuser_ldif() {
 # $1 first name # $2 Surname # $3 Username # $4 changetype (add, modify, delete)
-
+[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,DC=adrelm,DC=com"
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,DC=adrelm,DC=com"
+[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
 cat > ADuser.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+dn: $DN
 changetype: $4
 objectClass: top
 objectClass: person
@@ -51,20 +53,41 @@ objectClass: user
 cn: $1 $2
 sn: $2
 givenName: $1
-distinguishedName: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+distinguishedName: $DN
 name: $1 $2
 sAMAccountName: $3
 displayName: $1 $2
-userPrincipalName: $3@adrelm.com
+EOF
+}
+
+ADuserdel_ldif() {
+[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,DC=adrelm,DC=com"
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,DC=adrelm,DC=com"
+[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
+cat > ADuserdel.ldif << EOF
+dn: $DN
+changetype: delete
 EOF
 }
 
 # Microsoft stores a quoted password in little endian UTF16 base64 encoded. Hence to generate the password, use the command:
 #echo -n "\"Secret123\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0
+#ADuser_passwd_ldif() {
+#PASSWD=`echo -n "\"$3\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
+#cat > ADuser_passwd.ldif << EOF
+#dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+#changetype: modify
+#replace: unicodePwd
+#unicodePwd::$PASSWD
+#EOF
+#}
 ADuser_passwd_ldif() {
 PASSWD=`echo -n "\"$3\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,DC=adrelm,DC=com"
+[ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,DC=adrelm,DC=com"
+[ $# -eq 3 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
 cat > ADuser_passwd.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+dn: $DN
 changetype: modify
 replace: unicodePwd
 unicodePwd::$PASSWD
@@ -73,8 +96,11 @@ EOF
 
 # Modify userAccountControl
 ADuser_cntrl_ldif() {
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,DC=adrelm,DC=com"
+[ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,DC=adrelm,DC=com"
+[ $# -eq 3 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
 cat > ADuser_cntrl.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+dn: $DN
 changetype: modify
 replace: userAccountControl
 userAccountControl: $3
@@ -85,7 +111,7 @@ syncinterval_ldif() {
 cat > syncinterval.ldif << EOF
 dn: cn=meTo$ADhost,cn=replica,cn=dc\3Dtestrelm\2Cdc\3Dcom,cn=mapping tree,cn=config
 changetype: modify
-add: winSyncInterval
+$2: winSyncInterval
 winSyncInterval: $1
 EOF
 }
@@ -122,7 +148,7 @@ employeetype_ldif() {
 cat > employeetype.ldif << EOF
 dn: cn=ipa-winsync,cn=plugins,cn=config
 changetype: modify
-add: ipaWinSyncUserAttr
+$1: ipaWinSyncUserAttr
 ipaWinSyncUserAttr: employeetype unknown
 EOF
 }
@@ -136,18 +162,40 @@ employeetype: $3
 EOF
 }
 
-sshlogin_exp() {
-#!/usr/bin/expect
+uidNumber_ldif() {
+cat > uidNumber.ldif << EOF
+dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+changetype: modify
+add: uidNumber
+uidNumber: $3
+EOF
+}
 
-set username [lrange $argv 0 0]
-set password [lrange $argv 1 1]
-#set newpw    [lindex $argv 2]
+deleteuser_ldif() {
+cat > deleteuser.ldif << EOF
+dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+changetype: delete
+EOF
+}
 
-set timeout 5
-#set send_slow {1 .1}
-spawn ssh $username@wheeljack.testrelm.com whoami
-expect "*?assword:*"
-send -- "$password\r"
-send -- "\r"
-expect eof
+addOU_ldif() {
+cat > addOU.ldif << EOF
+dn: OU=$1,DC=adrelm,DC=com
+changetype: $2
+ou: $1
+objectClass: top
+objectClass: organizationalUnit
+distinguishedName: OU=$1,DC=adrelm,DC=com
+EOF
+}
+
+addsubOU_ldif() {
+cat > addsubOU.ldif << EOF
+dn: OU=$1,OU=$2,DC=adrelm,DC=com
+changetype: $3
+ou: $1
+objectClass: top
+objectClass: organizationalUnit
+distinguishedName: OU=$1,OU=$2,DC=adrelm,DC=com
+EOF
 }

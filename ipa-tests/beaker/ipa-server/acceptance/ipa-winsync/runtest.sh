@@ -56,33 +56,35 @@ PACKAGE="ipa-server"
 #########################################
 
 	winsync_connect() {
-#		"winsync_test_0001"
+		"winsync_test_0001"
 		"winsync_test_0002"
-#		"winsync_test_0003"
-#		"winsync_test_0004"
-#		"winsync_test_0005"
-	}
-
-	#TODO tests
-
-	winsync_disconnect() {
-		""
+		"winsync_test_0003"
+		"winsync_test_0004"
+		"winsync_test_0005"
+		"winsync_test_0006"
+		"winsync_test_0007"
+		"winsync_test_0008"
+		"winsync_test_0009"
+		"winsync_test_0010"
+		"winsync_test_0011"
+		"winsync_test_0012"
+		"winsync_test_0013"
+		"winsync_test_0014"
+		"winsync_test_0015"
 	}
 
 rlJournalStart
 
     rlPhaseStartSetup "ipa-winsync-startup: Check for admintools package, setup certificates."
-		#rlRun "setup"
+		rlRun "setup"
     rlPhaseEnd
 
 	# tests start...
 winsync_connect
-#TODO
-#winsync_disconnect
-	# tests end.
+	# tests end...
 
     rlPhaseStartCleanup "ipa-winsync-cleanup: Destroying admin credentials & removing certificates."
-#		rlRun "cleanup"
+		rlRun "cleanup"
     rlPhaseEnd
 
 
