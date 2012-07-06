@@ -44,6 +44,7 @@
 . ./t.ipafunctionalservices_ldap.sh
 
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
+FEDLIST="freeipa-admintools freeipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
 
 ##########################################
@@ -59,6 +60,10 @@ rlJournalStart
         echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
                 if [ $rc -eq 0 ] ; then
+
+		if [ -f /etc/fedora-release ] ; then
+			rlRun "rpm -q $FEDLIST"
+		else
                		for item in $PACKAGELIST ; do
                         	rpm -qa | grep $item
                         	if [ $? -eq 0 ] ; then
@@ -67,6 +72,7 @@ rlJournalStart
                                 	rlFail "$item package NOT found!"
                         	fi
                 	done
+		fi
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
 			ipafunctionalservices_http
 			ipafunctionalservices_ldap
