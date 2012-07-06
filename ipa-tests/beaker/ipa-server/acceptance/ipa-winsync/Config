@@ -1,4 +1,5 @@
 ADdomain="adrelm.com"
 ADhost="squab.$ADdomain"
 ADip="10.65.207.213"
-ADpasswd="Secret123"
+ADpswd="Secret123"
+ADdc="DC=adrelm,DC=com"

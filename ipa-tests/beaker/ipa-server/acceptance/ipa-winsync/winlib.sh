@@ -35,14 +35,13 @@
 # AD values
 . ./Config
 
-
 # Commonly used routines
 
 ADuser_ldif() {
 # $1 first name # $2 Surname # $3 Username # $4 changetype (add, modify, delete)
-[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,DC=adrelm,DC=com"
-[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,DC=adrelm,DC=com"
-[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
+[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,$ADdc"
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,$ADdc"
+[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,$ADdc"
 cat > ADuser.ldif << EOF
 dn: $DN
 changetype: $4
@@ -61,9 +60,9 @@ EOF
 }
 
 ADuserdel_ldif() {
-[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,DC=adrelm,DC=com"
-[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,DC=adrelm,DC=com"
-[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
+[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,$ADdc"
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,$ADdc"
+[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,$ADdc"
 cat > ADuserdel.ldif << EOF
 dn: $DN
 changetype: delete
@@ -75,7 +74,7 @@ EOF
 #ADuser_passwd_ldif() {
 #PASSWD=`echo -n "\"$3\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
 #cat > ADuser_passwd.ldif << EOF
-#dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+#dn: CN=$1 $2,CN=Users,$ADdc
 #changetype: modify
 #replace: unicodePwd
 #unicodePwd::$PASSWD
@@ -83,9 +82,9 @@ EOF
 #}
 ADuser_passwd_ldif() {
 PASSWD=`echo -n "\"$3\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
-[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,DC=adrelm,DC=com"
-[ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,DC=adrelm,DC=com"
-[ $# -eq 3 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,$ADdc"
+[ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,$ADdc"
+[ $# -eq 3 ] && DN="CN=$1 $2,CN=Users,$ADdc"
 cat > ADuser_passwd.ldif << EOF
 dn: $DN
 changetype: modify
@@ -96,9 +95,9 @@ EOF
 
 # Modify userAccountControl
 ADuser_cntrl_ldif() {
-[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,DC=adrelm,DC=com"
-[ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,DC=adrelm,DC=com"
-[ $# -eq 3 ] && DN="CN=$1 $2,CN=Users,DC=adrelm,DC=com"
+[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,$ADdc"
+[ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,$ADdc"
+[ $# -eq 3 ] && DN="CN=$1 $2,CN=Users,$ADdc"
 cat > ADuser_cntrl.ldif << EOF
 dn: $DN
 changetype: modify
@@ -137,7 +136,7 @@ EOF
 # Modify telephoneNumber
 telephoneNumber_ldif() {
 cat > telephoneNumber.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+dn: CN=$1 $2,CN=Users,$ADdc
 changetype: modify
 replace: telephoneNumber
 telephoneNumber: $3
@@ -155,7 +154,7 @@ EOF
 
 AD_employeetype_ldif() {
 cat > AD_employeetype.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+dn: CN=$1 $2,CN=Users,$ADdc
 changetype: modify
 replace: employeetype
 employeetype: $3
@@ -164,7 +163,7 @@ EOF
 
 uidNumber_ldif() {
 cat > uidNumber.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+dn: CN=$1 $2,CN=Users,$ADdc
 changetype: modify
 add: uidNumber
 uidNumber: $3
@@ -173,29 +172,29 @@ EOF
 
 deleteuser_ldif() {
 cat > deleteuser.ldif << EOF
-dn: CN=$1 $2,CN=Users,DC=adrelm,DC=com
+dn: CN=$1 $2,CN=Users,$ADdc
 changetype: delete
 EOF
 }
 
 addOU_ldif() {
 cat > addOU.ldif << EOF
-dn: OU=$1,DC=adrelm,DC=com
+dn: OU=$1,$ADdc
 changetype: $2
 ou: $1
 objectClass: top
 objectClass: organizationalUnit
-distinguishedName: OU=$1,DC=adrelm,DC=com
+distinguishedName: OU=$1,$ADdc
 EOF
 }
 
 addsubOU_ldif() {
 cat > addsubOU.ldif << EOF
-dn: OU=$1,OU=$2,DC=adrelm,DC=com
+dn: OU=$1,OU=$2,$ADdc
 changetype: $3
 ou: $1
 objectClass: top
 objectClass: organizationalUnit
-distinguishedName: OU=$1,OU=$2,DC=adrelm,DC=com
+distinguishedName: OU=$1,OU=$2,$ADdc
 EOF
 }
