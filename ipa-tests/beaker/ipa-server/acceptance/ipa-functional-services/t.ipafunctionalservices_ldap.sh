@@ -142,8 +142,9 @@ setup_ldap()
 		# set the KRB5_KTNAME in /etc/sysconfig/dirsrv
 		echo "KRB5_KTNAME=$LDAPKEYTAB ; export KRB5_KTNAME" >> /etc/sysconfig/dirsrv
 		# restart the directory server
-		rlRun "service dirsrv restart" 0 "Restarting the directory server for changes to take effect"
+		rlDistroDiff dirsrv_svc_restart
 
+		sleep 5
 		# add directory server user
 		echo "dn: uid=ldapuser1,$BASEDN" > $USERLDIF
 		echo "userPassword: Secret123" >> $USERLDIF
@@ -155,6 +156,8 @@ setup_ldap()
 		echo "sn: user1" >> $USERLDIF
 
 		cat $USERLDIF
+		rlDistroDiff dirsrv_svc_restart
+		sleep 10
 	
 		rlRun "/usr/bin/ldapmodify -a -x -h $HOSTNAME -p $LDAPPORT -D \"cn=Directory Manager\" -w $ADMINPW -c -f $USERLDIF" 0 "Add user to directory server"
 
@@ -239,8 +242,10 @@ EOF
 		cd /etc/dirsrv/$INSTANCE
 		echo "Internal (Software) Token:Secret123" > pin.txt
 
+		sleep 10
 		# restart the directory server
-		rlRun "service dirsrv restart" 0 "Restart LDAP server after SSL configuration"
+		rlDistroDiff dirsrv_svc_restart
+		sleep 5
 
 		# set up open ldap configuration file
 		cp /etc/openldap/ldap.conf /etc/openldap/ldap.conf.orig
@@ -253,8 +258,9 @@ ldap_tests()
 	rlPhaseStartTest "ipa-functionalservices-ldap-001: Access LDAP service with valid credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
 		klist
+		klist -ekt $LDAPKEYTAB
 		rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
-		rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
+		rlRun "ldapsearch -d1 -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-functionalservices-ldap-002: Access LDAP service with out credentials"
