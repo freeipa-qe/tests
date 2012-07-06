@@ -1,334 +1,273 @@
 #!/bin/bash
 ### WORK IN PROGRESS...NOT READY FOR USE YET
 
-# ROLE=STAR1
-# ROLE=STAR2
-# ROLE=TREEA1
-# ROLE=TREEB1
-# ROLE=TREEC1
-# ROLE=TREEC2
-# ROLE=CHAIN1
-# ROLE=SQUARE1
-# ROLE=TRIANGLE1
 # ROLE=MASTER, SLAVE
-# ROLE=MASTER1, REPLICA1, REPLICA2
-#      REPLICA1_1, REPLICA1_2
+# ROLE=MASTER1, REPLICA1, REPLICA1
 # ROLE=MASTER2, REPLICA2, REPLICA2
-#      REPLICA2_1, REPLICA2_2
 #  
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="MASTER1">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="MASTER">
 #   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA1_1">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
 #   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA1_2">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
 #   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA1_3">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
 #   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA1_4">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
 #   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA1_5">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
 #   <params> <param name="TOPO" value="star"/> <param name="DOM" value="chicago.testrelm.com"/> </params>
 #
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="MASTER2">
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA2_1">
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA2_2">
-#
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="STAR1">
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="STAR1">
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="STAR1">
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="STAR1">
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="STAR1">
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="STAR1">
-#
-
-#MASTER=MASTER1
-#SLAVE="REPLICA1 thru REPLICAN"
-#CLIENT=CLIENT1
 
 ipa_install_envcleanup() {
 	for i in $(seq 1 10); do
-		unset BEAKERSLAVE$i
-		unset BEAKERSLAVE${i}_IP
-		unset BEAKERREPLICA$i
-		unset BEAKERREPLICA${i}_IP
-		unset SLAVE$i
-		unset REPLICA$i
-		unset MASTER
-		unset BEAKERMASTER_IP
+		unset ${!BEAKERSLAVE*}
+		unset ${!BEAKERREPLICA*}
+		unset ${!SLAVE*}
+		unset ${!REPLICA*}
+		unset ${!MASTER*}
+		unset ${!BEAKERMASTER*}
+		unset ${!MYROLE*}
+		unset ${!MYENV*}
 	done
 }
 
 ipa_install_parse_servers() {
-	# Figure out which method to use for parsing servers lists
-	if   [ -n "$MASTER" -a -n "$SLAVE" ]; then
-		ipa_install_parse_servers_1
-	elif [ -n "$MASTER" -a -n "$REPLICA" ]; then
-		ipa_install_parse_servers_2
-	elif [ -n "$MASTER1" -a -n "$REPLICA1" ]; then
-		ipa_install_parse_servers_3
-	else
-		ipa_install_parse_servers_default
-	fi
-}
 
-ipa_install_parse_servers_default() {
-	ipa_install_parse_servers_1
-}
-
-############ ipa_install_parse_servers_1 ##################
-### Supports the following ROLE types:
-### MASTER - only 1...if more, it will strip and keep only the first.
-### SLAVE - supports multiple in a list.  Will create SLAVE# and BEAKERSLAVE# vars.
-### CLIENT - only 1...if more, it will strip and keep only the first.
-### CLIENT2 - only 1...if more, it will strip and keep only the first.
-
-ipa_install_parse_servers_1() {
-	# MASTER
-	export MASTER=$(echo $MASTER|awk '{print $1}')
-	export BEAKERMASTER=$MASTER
-	if [ -n "$MASTER" ]; then
-		export BEAKERMASTER_IP=$(dig +short $MASTER)
-	fi
-	if [ "$(hostname -s)" = "$(echo $MASTER|cut -f1 -d.)" ]; then 
-		export MYROLE=MASTER
-	fi
-
-	# REPLICA(S)
-	I=0
-	export SLAVE="$SLAVE"
-	export REPLICA="$SLAVE"
-	for s in $SLAVE; do
-		I=$(( I += 1 ))
-		export SLAVE${I}=$s
-		export BEAKERSLAVE${I}=$s
-		if [ -n "$s" ]; then
-			export BEAKERSLAVE${I}_IP=$(dig +short $s)
-		fi
-
-		export REPLICA${I}=$s
-		export BEAKERREPLICA${I}=$s
-		if [ -n "$s" ]; then
-			export BEAKERREPLICA${I}_IP=$(dig +short $s)
-		fi
-		
-		if [ "$(hostname -s)" = "$(echo $SLAVE${I}|cut -f1 -d.)" ]; then 
-			export MYROLE=SLAVE${I}	
-		fi
-	done
-	export BEAKERSLAVE=$BEAKERSLAVE1
-	export BEAKERSLAVE_IP=$BEAKERSLAVE1_IP
-
-	# CLIENT(S)
-	export CLIENT=$(echo $CLIENT|awk '{print $1}')
-	export BEAKERCLIENT=$CLIENT
-	if [ -n "$CLIENT" ]; then
-		export BEAKERCLIENT_IP=$(dig +short $CLIENT)
-	fi
-	if [ "$(hostname -s)" = "$(echo $CLIENT|cut -f1 -d.)" ]; then 
-		export MYROLE=CLIENT
-	fi
+	# First let's normalize the data to use <ROLE>_env<NUM> variables:
+	[ -n "$MASTER"  -a -z "$MASTER_env1"  ] && export MASTER_env1="$MASTER"
+	[ -n "$SLAVE"   -a -z "$REPLICA_env1" ] && export REPLICA_env1="$SLAVE"
+	[ -n "$REPLICA" -a -z "$REPLICA_env1" ] && export REPLICA_env1="$REPLICA"
+	[ -n "$CLIENT"  -a -z "$CLIENT_env1"  ] && export CLIENT_env1="$CLIENT"
+	[ -n "$CLIENT2" -a -n "$SLAVE" -a -z "$CLIENT2_env1" ] \\
+		&& export CLIENT_env1=$(echo $CLIENT_env1 $CLIENT2)
 	
-	export CLIENT2=$(echo $CLIENT2|awk '{print $1}')
-	export BEAKERCLIENT2=$CLIENT2
-	if [ -n "$CLIENT2" ]; then
-		export BEAKERCLIENT2_IP=$(dig +short $CLIENT2)
-	fi
-	if [ "$(hostname -s)" = "$(echo $CLIENT2|cut -f1 -d.)" ]; then 
-		export MYROLE=CLIENT2
-	fi
-	
-	echo "export MASTER=$MASTER" >> /dev/shm/env.sh
-	echo "export SLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
-	echo "export REPLICA=\"$SLAVE\"" >> /dev/shm/env.sh
-	echo "export CLIENT=$CLIENT"  >> /dev/shm/env.sh
-	echo "export CLIENT2=$CLIENT2" >> /dev/shm/env.sh
-}
-
-############ ipa_install_parse_servers_2 ##################
-### Supports the following ROLE types:
-### MASTER - only 1...if more, it will strip and keep only the first.
-### REPLICA - supports multiple in a list.  Will create SLAVE# and BEAKERSLAVE# vars.
-### CLIENT - supports multiple in a list.  Will create CLIENT# and BEAKERCLIENT# vars.
-
-ipa_install_parse_servers_2() {
-	# MASTER
-	export MASTER=$(echo $MASTER|awk '{print $1}')
-	export BEAKERMASTER=$MASTER
-	if [ -n "$MASTER" ]; then
-		export BEAKERMASTER_IP=$(dig +short $MASTER)
-	fi
-	if [ "$(hostname -s)" = "$(echo $MASTER|cut -f1 -d.)" ]; then 
-		MYROLE=MASTER
-	fi
-
-	# REPLICA(S)
-	I=0
-	export SLAVE="$REPLICA"
-	export REPLICA="$REPLICA"
-	for r in "$REPLICA"; do
-		I=$(( I += 1 ))
-		export REPLICA${I}=$r
-		export BEAKERREPLICA${I}=$r
-		if [ -n "$r" ]; then
-			export BEAKERREPLICA${I}_IP=$(dig +short $r)
-		fi
-
-		export SLAVE${I}=$r
-		export BEAKERSLAVE${I}=$r
-		if [ -n "$r" ]; then
-			export BEAKERSLAVE${I}_IP=$(dig +short $r)
-		fi
-		if [ "$(hostname -s)" = "$(echo $REPLICA${I}|cut -f1 -d.)" ]; then
-			MYROLE=REPLICA${I}
-		fi
-	done
-	# May need to uncomment this for backwards compatibility
-	#export BEAKERSLAVE=$BEAKERSLAVE1
-	#export BEAKERSLAVE_IP=$BEAKERSLAVE1_IP
-
-	# CLIENT(S)
-	I=0
-	for c in $CLIENT; do
-		I=$(( I += 1 ))
-		export CLIENT${I}=$(echo $c|awk '{print $1}')
-		export BEAKERCLIENT${I}=$c
-		if [ -n "$c" ]; then 
-			export BEAKERCLIENT${I}_IP=$(dig +short $c)
-		fi
-		if [ "$(hostname -s)" = "$(echo $CLIENT${I}|cut -f1 -d.)" ]; then
-			export MYROLE=CLIENT${I}
-		fi
-	done
-
-	echo "export MASTER=$MASTER" >> /dev/shm/env.sh
-	echo "export SLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
-	echo "export REPLICA=\"$REPLICA\"" >> /dev/shm/env.sh
-	echo "export CLIENT=\"$CLIENT\""  >> /dev/shm/env.sh
-}
-
-############ ipa_install_parse_servers_3 ##################
-### Supports the following ROLE types:
-### MASTER# - only 1...if more, it will strip and keep only the first.
-### REPLICA# - supports multiple in a list.  Will create SLAVE# and BEAKERSLAVE# vars.
-### CLIENT# - supports multiple in a list.  Will create CLIENT# and BEAKERCLIENT# vars.
-### # above used to represent number for Environment.  This is the format that will
-### # support multiple domains
-
-ipa_install_parse_servers_3() {
+	# Process MASTER variables
 	I=1
-	while test -n "$(eval echo $(echo \$MASTER${I}))"; do
-		echo "ENVIRONMENT ${I}"
-
-		# MASTER
-		M=$(eval echo $(echo \$MASTER${I})|awk '{print $1}')
-		export MASTER${I}=$M
-		export BEAKERMASTER${I}=$M
-		if [ -n "$MASTER${I}" ]; then
-			export BEAKERMASTER${I}_IP=$(dig +short $M)
+	while test -n "$(eval echo \$MASTER_env${I})"; do
+		echo "Parsing MASTER Variables for Environment ${I}"
+		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
+		export MASTER_env${I}=$M
+		export BEAKERMASTER_env${I}=$M
+		export BEAKERMASTER_IP_env${I}=$(dig +short $M)
+		if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
+			export MYROLE=MASTER_env${I}
+			export MYENV=${I}
 		fi
+		I=$(( I += 1 ))
+	done
 
-		# REPLICA(S)
-		J=0
-		export SLAVE="$REPLICA1"
-		export REPLICA="$REPLICA1"
-		for r in $(eval echo $(echo \$REPLICA${I})); do
+	# Process REPLICA variables
+	I=1
+	while test -n "$(eval echo \$REPLICA_env${I})"; do
+		J=1
+		echo "Parsing REPLICA Variables for Environment ${I}"
+		export BEAKERREPLICA_env${I}=$(eval echo \$REPLICA_env${I})
+		for R in $(eval echo \$REPLICA_env${I}); do
+			export REPLICA${J}_env${I}=$R
+			export BEAKERREPLICA${J}_env${I}=$R
+			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R)
+			if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
+				export MYROLE=REPLICA${J}_env${I}
+				export MYENV=${I}
+			fi
 			J=$(( J += 1 ))
-			export REPLICA${I}_${J}=$r
-			export BEAKERREPLICA${I}_${J}=$r
-			if [ -n "$r" ]; then
-				export BEAKERREPLICA${I}_${J}_IP=$(dig +short $r)
-			fi
-
-			export SLAVE${I}_${J}=$r
-			export BEAKERSLAVE${I}_${J}=$r
-			if [ -n "$r" ]; then
-				export BEAKERSLAVE${I}_${J}_IP=$(dig +short $r)
-			fi
-		done
-		# May need to uncomment this for backwards compatibility
-		#export BEAKERSLAVE=$BEAKERSLAVE1
-		#export BEAKERSLAVE_IP=$BEAKERSLAVE1_IP
-
-		# CLIENT(S)
-		J=0
-		for c in $(eval echo $(echo \$CLIENT${I})); do
-			J=$(( J += 1 ))
-			export CLIENT${I}_${J}=$(echo $c|awk '{print $1}')
-			export BEAKERCLIENT${I}_${J}=$c
-			if [ -n "$c" ]; then
-				export BEAKERCLIENT${I}_${J}_IP=$(dig +short $c)
-			fi
 		done
 		I=$(( I += 1 ))
-	done	
+	done
 
-	echo "export MASTER=$MASTER1" >> /dev/shm/env.sh
-	echo "export SLAVE=\"$REPLICA1\"" >> /dev/shm/env.sh
-	echo "export REPLICA=\"$REPLICA1\"" >> /dev/shm/env.sh
-	echo "export CLIENT=\"$CLIENT1\""  >> /dev/shm/env.sh
+	# Process CLIENT variables
+	I=1
+	while test -n "$(eval echo \$CLIENT_env${I})"; do
+		J=1
+		echo "Parsing CLIENT Variables for Environment ${I}"
+		export BEAKERCLIENT_env${I}=$(eval echo \$CLIENT_env${I})
+		for C in $(eval echo \$CLIENT_env${I}); do
+			export CLIENT${J}_env${I}=$C
+			export BEAKERCLIENT${J}_env${I}=$C
+			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C)
+			if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
+				export MYROLE=CLIENT${J}_env${I}
+				export MYENV=${I}
+			fi
+			J=$(( J += 1 ))
+		done
+		I=$(( I += 1 ))
+	done
+
+	# Make sure Simple Vars are set in env.sh for simplicity and
+    # backwards compatibility with older tests.  This means no
+    # _env<NUM> suffix.
+	echo "export MASTER=$MASTER_env1" >> /dev/shm/env.sh
+	echo "export SLAVE=$REPLICA_env1" >> /dev/shm/env.sh
+	echo "export REPLICA=$REPLICA_env1" >> /dev/shm/env.sh
+	echo "export CLIENT=$CLIENT_env1" >> /dev/shm/env.sh
+	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
 }
 
-ipa_install_topo_star() {
-	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "ipa_install_topo_star_master - "
-		if [ "$MYROLE" = "MASTER" ]; then
-			ipa_install_master
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.0' -m $BEAKERMASTER"
-		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.0' $BEAKERMASTER"
-		fi
-	rlPhaseEnd
-	
-	rlPhaseStartTest "ipa_install_topo_star_replica1 - "
-		if [ "$MYROLE" = "REPLICA" ]; then
-			ipa_install_replica $MASTER
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.1' -m $BEAKERREPLICA1"
-		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.1' $BEAKERREPLICA1"
-		fi
-	rlPhaseEnd
-	
-	rlPhaseStartTest "ipa_install_topo_star_replica2 - "
-		if [ "$MYROLE" = "REPLICA2" ]; then
-			ipa_install_replica $MASTER
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.2' -m $BEAKERREPLICA2"
-		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.2' $BEAKERREPLICA2"
-		fi
-	rlPhaseEnd
-	
-	rlPhaseStartTest "ipa_install_topo_star_replica3 - "
-		if [ "$MYROLE" = "REPLICA3" ]; then
-			ipa_install_replica $MASTER
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.3' -m $BEAKERREPLICA3"
-		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.3' $BEAKERREPLICA3"
-		fi
-	rlPhaseEnd
-	
-	rlPhaseStartTest "ipa_install_topo_star_replica4 - "
-		if [ "$MYROLE" = "REPLICA4" ]; then
-			ipa_install_replica $MASTER
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.4' -m $BEAKERREPLICA4"
-		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.4' $BEAKERREPLICA4"
-		fi
-	rlPhaseEnd
-	
-	rlPhaseStartTest "ipa_install_topo_star_replica5 - "
-		if [ "$MYROLE" = "REPLICA5" ]; then
-			ipa_install_replica $MASTER
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.5' -m $BEAKERREPLICA5"
-		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.5' $BEAKERREPLICA5"
-		fi
-	rlPhaseEnd
-}
 
-ipa_install_master() 
+######################################################################
+# ipa_install_topo_default
+#         RN R1 R2
+#          \ | /
+#       R7-- M --R3
+#          / | \
+#         R6 R5 R4
+# The thing to note here is that this supports a variable number of
+# Replicas.  All replicas created from and connected to MASTER.
+######################################################################
+ipa_install_topo_default()
 {
-	rlPhaseStartTest "ipa_install_master - "
-		rlRun "env"
+	TESTORDER=$(( TESTORDER += 1 ))
+	if [ -z "$MYENV" ]; then
+		export MYENV=1
+	fi
+
+	rlPhaseStartTest "ipa_install_topo_default_envsetup - Make sure enough Replicas are defined"
+		rlLog
+		MYBM1=$(eval echo \$BEAKERMASTER_env${MYENV})
+		MYBRS=$(eval echo \$BEAKERREPLICA_env${MYENV})
+		MYBCS=$(eval echo \$BEAKERCLIENT_env${MYENV})
 	rlPhaseEnd	
+	
+	rlPhaseStartTest "ipa_install_topo_default_master - install Master in Default Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
+			ipa_install_master
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBM1.0'  $MYBM1"	
+		fi
+	rlPhaseEnd
+	
+	for MYBR1 in $MYBRS; do
+		rlPhaseStartTest "ipa_install_topo_star_replica1 - install Replica1 in Default Topology"
+			if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
+				ipa_install_replica $MYBM1
+				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
+			else
+				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"
+			fi
+		rlPhaseEnd
+	done
 }
 
+######################################################################
+# ipa_install_topo_star
+#            R1
+#            |
+#        R5--M--R2
+#           / \
+#          R4  R3
+# This REQUIRES 5 replicas
+######################################################################
+ipa_install_topo_star()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	if [ -z "$MYENV" ]; then
+		export MYENV=1
+	fi
+
+	rlPhaseStartTest "ipa_install_topo_star_envsetup - Make sure enough Replicas are defined"
+		if [ $(eval echo \$REPLICA_env${$MYENV}|wc -w) -lt 5 ]; then
+			rlFail "Not enough Replicas defined for star topology...skipping"
+			rlPhaseEnd
+			return 1
+		else
+			rlPass "Enough Replicas defined for star topology...continuing"
+			MYBM1=$(eval echo \$BEAKERMASTER_env${MYENV})
+			MYBR1=$(eval echo \$BEAKERREPLICA1_env${MYENV})
+			MYBR2=$(eval echo \$BEAKERREPLICA2_env${MYENV})
+			MYBR3=$(eval echo \$BEAKERREPLICA3_env${MYENV})
+			MYBR4=$(eval echo \$BEAKERREPLICA4_env${MYENV})
+			MYBR5=$(eval echo \$BEAKERREPLICA5_env${MYENV})
+			MYBC1=$(eval echo \$BEAKERCLIENT1_env${MYENV})
+			MYBC2=$(eval echo \$BEAKERCLIENT2_env${MYENV})
+		fi
+	rlPhaseEnd	
+	
+	rlPhaseStartTest "ipa_install_topo_star_master - install Master in Star Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
+			ipa_install_master
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBM1.0'  $MYBM1"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_star_replica1 - install Replica1 in Star Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_star_replica2 - install Replica2 in Star Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR2.2' -m $MYBR2"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR2.2'  $MYBR2"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_star_replica3 - install Replica3 in Star Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR3.3' -m $MYBR3"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR3.3'  $MYBR3"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_star_replica4 - install Replica4 in Star Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR4.0' -m $MYBR4"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR4.0'  $MYBR4"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_star_replica5 - install Replica5 in Star Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR5.0' -m $MYBR5"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR5.0'  $MYBR5"	
+		fi
+	rlPhaseEnd
+}
+
+ipa_install_envs()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	I=1
+	rlPhaseStartTest "ipa_install_envs - Install IPA in all defined Environments sequentially"
+		while test -n "$(eval echo \$BEAKERMASTER_env${I})"; do
+			RUNMASTER=$(eval echo \$BEAKERMASTER_env${I})
+			if [ "$MYENV" != "$I" ]; then
+				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYENV.0' $RUNMASTER"
+			else
+				ipa_install_topo
+			fi
+			if [ "$(hostname -s)" = "$(echo $RUNMASTER|cut -f1 -d.)" ]; then
+				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYENV.0' -m $RUNMASTER"
+			fi
+		done
+	rlPhaseEnd
+}
+
+ipa_install_topo()
+{
+	case TOPO${MYENV} in 
+	star*|STAR*) 
+		ipa_install_topo_star
+		;;
+	*)
+		ipa_install_topo_default
+		;;
+	esac
+
+}
