@@ -62,7 +62,7 @@ ipa_install_set_vars() {
 	while test -n "$(eval echo \$REPLICA_env${I})"; do
 		J=1
 		echo "Parsing REPLICA Variables for Environment ${I}"
-		export BEAKERREPLICA_env${I}=$(eval echo \$REPLICA_env${I})
+		export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
 		for R in $(eval echo \$REPLICA_env${I}); do
 			export REPLICA${J}_env${I}=$R
 			export BEAKERREPLICA${J}_env${I}=$R
