@@ -576,7 +576,7 @@ public class HBACTasks {
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
 
-	
+	//mvarun
 	public static void createRuleWithRequiredField(SahiTasks sahiTasks,	String cn, String expectedError) {		
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue(cn);
@@ -838,4 +838,348 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
 	}*/
 	
+	
+	/*****************************************************************************************
+	 *********************** 		Tasks for HBAC Test				********************** 
+	 *****************************************************************************************/
+	/*
+	 * @param sahiTask
+	 * @param cn : adding rule name
+	 * @param uid : adding user to who section
+	 * @param hostname : adding host in accessing section
+	 * @param service : adding service in via-service section
+	 * @param fqdn :  adding source host in from section
+	 */
+	public static void addAndEditHBACRuleHost(SahiTasks sahiTasks, String cn, String uid, String hostName, String service, String fqdn) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("cn").setValue(cn);
+		sahiTasks.button("Add and Edit").click();
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
+		//Click to Add Users from "Who" section
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Who"))).click();
+		sahiTasks.checkbox(uid).click();
+		sahiTasks.link(">>").click();
+		sahiTasks.button("Add").click();
+		//Click to add Host from "Accessing" section
+	    sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).click();
+		sahiTasks.checkbox(hostName).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Add").click();
+		
+		//Click to add HBAC Service from "Via Service" Section
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).click();
+		sahiTasks.checkbox(service).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Add").click();
+		
+		//Click to add HBAC Service from "From" Section
+		sahiTasks.span("Add").under(sahiTasks.heading2(("From"))).click();
+		sahiTasks.checkbox(fqdn).click();
+		sahiTasks.span(">>").click();
+		sahiTasks.button("Add").click();
+		
+		
+		//Update and go back to HBAC Rules list
+		sahiTasks.link("Update").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();		
+	}
+	
+	/*
+	 * @param sahiTasks
+	 * @param rule : modifying 
+	 */
+	public static void modifyHBACMemberList(SahiTasks sahiTasks, String rule)
+	{
+		sahiTasks.link(rule).click();
+		sahiTasks.radio("hostcategory-3-0").click();
+		sahiTasks.radio("servicecategory-4-0").click();
+		sahiTasks.radio("sourcehostcategory-5-0").click();
+		sahiTasks.span("Update").click();
+		
+	}
+	
+	/*
+	 * check if empty
+	 */
+	public static boolean checkIfEmptyString(String value)
+	{
+		if(!value.equals(""))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+			}
+	}
+	
+
+	/*
+	 * @param sahiTasks
+	 * @param user : selecting user to user login (for Who)
+	 * @param hostname : selecting host for Accessing
+	 * @param service : selecting HBAC service for Via-Service
+	 * @param fqdn0 : selecting host for From
+	 * @param rules : selecting HBAC rule for Rules 
+	 * @param expectedResult : for RunTest result
+	 */
+	
+	public static void testHBACRunTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String rules, String expectedResult )
+	{
+		sahiTasks.radio(user).click();
+		sahiTasks.span("Next").click();
+		sahiTasks.radio(hostname).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
+		sahiTasks.radio(service).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
+		sahiTasks.radio(fqdn0).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
+		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
+		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rules);
+		sahiTasks.span("New Test").click();
+	}
+	
+	/* @param sahitasks
+	 * @param user : selecting user to user login (for Who)
+	 * @param hostname1 : selecting target host
+	 * @param service : selecting HBAC service for Via-Service
+	 * @param hostname2 : selecting source host
+	 * @param rules : selecting HBAC rule for Rules 
+	 * @param expectedError : for RunTest result
+	 */
+	
+	public static void createRunTestWithRequiredField (SahiTasks sahiTasks, String user, String hostname1, String service, String hostname2, String rules, String expectedError )
+	{
+		if(checkIfEmptyString(user))
+		{
+			sahiTasks.radio(user).click();
+		}
+		
+		sahiTasks.span("Next").click();
+		
+		if(checkIfEmptyString(hostname1))
+		{
+			sahiTasks.radio(hostname1).click();
+		}		
+		
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
+		
+		if(checkIfEmptyString(service))
+		{
+			sahiTasks.radio(service).click();
+		}
+		
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
+		
+		if(checkIfEmptyString(hostname2))
+		{
+			sahiTasks.radio(hostname2).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
+		}
+		
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
+		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();		
+		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when running test");
+		sahiTasks.button("OK").click();
+	}
+	
+	/*@param sahitasks
+	 * @param user : selecting user to user login (for Who)
+	 * @param hostname : selecting target host
+	 * @param service : selecting HBAC service for Via-Service
+	 * @param fqdn0 : selecting source host
+	 * @param rules : selecting HBAC rule for Rules 
+	 * @param rules1 : selecting HBAC rule for Rules
+	 * @param fqdn10 : selecting source host 
+	 * @param service1 : selecting HBAC service for Via-Service
+	 * @param hostname1 : selecting target host
+	 * @param user1 : selecting user to user login (for Who)
+	 * @param expectedError : for RunTest result
+	 */
+	
+	public static void createModifyRunTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String rules, String rules1, String fqdn10, String service1,String hostname1, String user1, String expectedResult )
+	{
+		sahiTasks.radio(user).click();
+		sahiTasks.span("Next").click();
+		sahiTasks.radio(hostname).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
+		sahiTasks.radio(service).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
+		sahiTasks.radio(fqdn0).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
+		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Prev").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules").under(sahiTasks.div("hbac-test-button-panel")))).click();
+		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.checkbox(rules1).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Prev").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.radio(fqdn10).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
+		sahiTasks.span("Prev").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
+		sahiTasks.radio(service1).click();
+		sahiTasks.span("Prev").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
+		sahiTasks.radio(hostname1).click();
+		sahiTasks.span("Prev").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
+		sahiTasks.radio(user1).click();
+		sahiTasks.link("Run Test").click();
+		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
+		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rules1);
+		sahiTasks.span("New Test").click();
+	}
+	
+	
+	/*
+	 * 
+	 */
+
+	public static void searchTest (SahiTasks sahiTasks,String user, String targethost, String service, String sourcehost,String multipleResult)
+	{
+		if(checkIfEmptyString(user))
+		{
+		sahiTasks.link("Who").click();
+		sahiTasks.textbox("filter").near(sahiTasks.span("Who")).setValue(user);
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Who"))).click();
+		Assert.assertTrue(sahiTasks.link(user).under(sahiTasks.tableHeader("User login").under(sahiTasks.span("Who"))).exists(), "Searched and found user " + user + "  successfully");
+		if (!multipleResult.equals(""))
+			Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another user " + multipleResult + "  successfully");
+		sahiTasks.textbox("filter").near(sahiTasks.span("Who")).setValue("");
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Who"))).click();
+		}
+		
+		if(checkIfEmptyString(targethost))
+		{
+		sahiTasks.link("Accessing").click();
+		sahiTasks.textbox("filter").near(sahiTasks.span("Accessing")).setValue(targethost);
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Accessing"))).click();
+		Assert.assertTrue(sahiTasks.link(targethost).under(sahiTasks.tableHeader("Host name").under(sahiTasks.span("Accessing"))).exists(), "Searched and found Target Host " + targethost + "  successfully");
+		if (!multipleResult.equals(""))
+			Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another Target Host " + multipleResult + "  successfully");
+		sahiTasks.textbox("filter").near(sahiTasks.span("Accessing")).setValue("");
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Accessing"))).click();
+		}
+		
+
+		if(checkIfEmptyString(service))
+		{
+		sahiTasks.link("Via Service").click();
+		sahiTasks.textbox("filter").near(sahiTasks.span("Via Service")).setValue(service);
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Via Service"))).click();
+		Assert.assertTrue(sahiTasks.link(service).under(sahiTasks.tableHeader("Service name").under(sahiTasks.span("Via Service"))).exists(), "Searched and found Service " + service + "  successfully");
+		if (!multipleResult.equals(""))
+			Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another Service " + multipleResult + "  successfully");
+		sahiTasks.textbox("filter").near(sahiTasks.span("Via Service")).setValue("");
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Via Service"))).click();
+		}
+		
+		if(checkIfEmptyString(sourcehost))
+		{
+		sahiTasks.link("From").click();
+		sahiTasks.textbox("filter").near(sahiTasks.span("From")).setValue(sourcehost);
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("From"))).click();
+		Assert.assertTrue(sahiTasks.link(sourcehost).under(sahiTasks.tableHeader("Host name").under(sahiTasks.span("From"))).exists(), "Searched and found Source Host " + sourcehost + "  successfully");
+		if (!multipleResult.equals(""))
+			Assert.assertTrue(sahiTasks.link(multipleResult).exists(), "Searched and found another Source Host " + multipleResult + "  successfully");
+		sahiTasks.textbox("filter").near(sahiTasks.span("From")).setValue("");
+		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("From"))).click();
+		}
+		
+	}
+/*
+ * Es
+ */
+	public static void externalSpecificationTest (SahiTasks sahiTasks,String user, String targethost, String service, String sourcehost, String rule, String expectedResult)
+	{	
+		sahiTasks.textbox("hbactest-user-external").near(sahiTasks.label("Specify external User:")).setValue(user);
+		sahiTasks.span("Next").click();
+		sahiTasks.textbox("hbactest-targethost-external").near(sahiTasks.label("Specify external Host:")).setValue(targethost);
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
+		sahiTasks.textbox("hbactest-service-external").near(sahiTasks.label("Specify external HBAC Service:")).setValue(service);
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
+		sahiTasks.textbox("hbactest-sourcehost-external").setValue(sourcehost);
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
+		sahiTasks.checkbox(rule).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
+		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rule);
+		sahiTasks.span("New Test").click();	
+	}
+	
+	/*
+	 * 
+	 */
+	public static void testRuleIncludeTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String include,String rule1,String rule2,String rule3, String expectedResult )
+	{
+		sahiTasks.radio(user).click();
+		sahiTasks.span("Next").click();
+		sahiTasks.radio(hostname).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
+		sahiTasks.radio(service).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
+		sahiTasks.radio(fqdn0).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
+		//selecting enable or disable checkbox
+		sahiTasks.checkbox(include).near(sahiTasks.label("Include Enabled")).click();
+		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
+		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult);
+		if(include.equals("enabled"))
+		{
+			//verifying rules in list
+			Assert.assertTrue(sahiTasks.link(rule1).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rule1+" is listed");
+			Assert.assertTrue(sahiTasks.link(rule2).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rule2+" is listed");
+			Assert.assertTrue(sahiTasks.link(rule3).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rule3+" is listed");
+		
+		}
+		
+		if(include.equals("disabled"))
+		{
+			Assert.assertTrue(sahiTasks.span(rule1).exists(), "Verified No rules is listed");
+		}
+		
+		sahiTasks.span("New Test").click();
+	}
+	
+	/*
+	 * 
+	 */
+
+	public static void testRuleMatchTest (SahiTasks sahiTasks, String user, String hostname,String service, String fqdn0, String match, String unmatch, String rulename1, String rulename2,String rulename3,  String expectedResult)
+	{
+		sahiTasks.radio(user).click();
+		sahiTasks.span("Next").click();
+		sahiTasks.radio(hostname).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
+		sahiTasks.radio(service).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
+		sahiTasks.radio(fqdn0).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
+		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
+		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
+		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult);
+		//unchecked unmatched checkbox
+		sahiTasks.checkbox(unmatch).click();
+		//verifying rules in list
+		Assert.assertTrue(sahiTasks.link(rulename1).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rulename1+" is Matched");
+		Assert.assertTrue(sahiTasks.link(rulename2).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rulename2+" is Matched");
+		//unchecked matched checkbox
+		sahiTasks.checkbox(match).click();
+		//checked unmached checkbox
+		sahiTasks.checkbox(unmatch).click();
+		Assert.assertTrue(sahiTasks.link(rulename3).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rulename3+" is Unmatched");
+		sahiTasks.span("New Test").click();
+	}
+
+
 }
+
+
+
+
