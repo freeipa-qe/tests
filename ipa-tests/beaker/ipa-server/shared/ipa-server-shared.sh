@@ -1097,6 +1097,10 @@ rlDistroDiff() {
                         rlAssertRpm freeipa-admintools
                         rlAssertRpm freeipa-client
                         ;;
+
+                keyctl)
+                        rlRun "keyctl purge user"
+                        ;;
                 esac
                 }
 
