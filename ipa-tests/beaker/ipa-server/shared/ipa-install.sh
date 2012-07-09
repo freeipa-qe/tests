@@ -29,6 +29,7 @@ ipa_install_envcleanup() {
 		unset ${!BEAKERMASTER*}
 		unset ${!MYROLE*}
 		unset ${!MYENV*}
+		unset ${!TOPO*}
 	done
 }
 
@@ -123,7 +124,7 @@ ipa_install_topo_default()
 		export MYENV=1
 	fi
 
-	rlPhaseStartTest "ipa_install_topo_default_envsetup - Make sure enough Replicas are defined"
+	rlPhaseStartTest "ipa_install_topo_default_envsetup - Set some base variables"
 		rlLog
 		MYBM1=$(eval echo \$BEAKERMASTER_env${MYENV})
 		MYBRS=$(eval echo \$BEAKERREPLICA_env${MYENV})
@@ -361,7 +362,7 @@ ipa_install_envs()
 
 ipa_install_topo()
 {
-	case TOPO${MYENV} in 
+	case $(eval echo \$TOPO${MYENV}) in 
 	star*|STAR*) 
 		ipa_install_topo_star
 		;;
@@ -395,13 +396,13 @@ ipa_install_master()
 ipa_install_replica()
 {
 	local MYMASTER=$1
-	echo "$FUNCNAME $MYMASTER"
+	rlLog "$FUNCNAME $MYMASTER"
 }
 
 ipa_install_client()
 {
 	local MYMASTER=$1
-	echo "$FUNCNAME $MYMASTER"
+	rlLog "$FUNCNAME $MYMASTER"
 }
 
 ipa_connect_replica()
