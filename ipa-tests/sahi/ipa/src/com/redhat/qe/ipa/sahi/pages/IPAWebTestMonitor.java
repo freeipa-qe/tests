@@ -1,7 +1,11 @@
 package com.redhat.qe.ipa.sahi.pages;
 
 import java.util.ArrayList;
+import com.redhat.qe.auto.testng.Assert;
+import com.redhat.qe.auto.testng.TestNGUtils;
 import java.util.Hashtable;
+
+//import org.testng.Assert;
 
 public class IPAWebTestMonitor {
 	private long startTime;

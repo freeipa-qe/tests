@@ -76,10 +76,10 @@ public abstract class IPAWebAutomation extends TestScript {
 				String treeReport = reporter.produceTreeReport();
 				System.out.println(treeReport);
 				
-				String emailServer = "smtp.corp.redhat.com";
+				/*String emailServer = "smtp.corp.redhat.com";
 				String to="nsoman@redhat.com";
 				String from="ipaqa@redhat.com";
-				String subject="test automation result";
+				String subject="test automation result";*/
 				//EmailTool postman = new EmailTool(emailServer, from, to, subject, treeReport);
 				//postman.deliver();
 			}else{
@@ -92,9 +92,9 @@ public abstract class IPAWebAutomation extends TestScript {
 		// place holder: for now, I don't have anything.
 	}
 	 
-	protected void executeQueue(String testPage, String testQueue, String testDataFile)
+	
+	protected void executeQueue(String testPage, String testQueue, String testDataFile) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, IllegalArgumentException, SecurityException, InstantiationException 
 	{
-		try{ 
 			Class<?> c = Class.forName(packageName + testPage);  
 			Constructor<?> constructor = c.getConstructor(new Class[] {SahiTasks.class,String.class});
 			IPAWebPage page = (IPAWebPage)(constructor.newInstance(browser, testDataFile));  
@@ -116,22 +116,14 @@ public abstract class IPAWebAutomation extends TestScript {
 				m.invoke(page, monitor);
 				reporter.addIPAWebTestResult(monitor);
 				log.info("leaving method:[" + methodName + "]");
-			} 
-		} catch (ClassNotFoundException x) {
-		    x.printStackTrace();
-		} catch (NoSuchMethodException x) {
-		    x.printStackTrace();
-		} catch (IllegalAccessException x) {
-		    x.printStackTrace();
-		} catch (InvocationTargetException x) {
-		    x.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		}
+				int test=monitor.getResultStatusCode();
+				if(test<1){
+					Assert.assertTrue(false, "" + methodName + " failed");
+				}
+				else{
+					Assert.assertTrue(true, "" + methodName +" passed");
+				}
+			}
 	}
 	
 }

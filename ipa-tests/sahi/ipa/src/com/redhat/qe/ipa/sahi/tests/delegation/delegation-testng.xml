@@ -9,7 +9,7 @@
 				<include name="search" />
 				<include name="delete" />
 				<include name="nonStandardUserDelegation" />
-				<!--<include name="report" />-->
+				<include name="report" />
 			</run>
 		</groups>
 		<classes>

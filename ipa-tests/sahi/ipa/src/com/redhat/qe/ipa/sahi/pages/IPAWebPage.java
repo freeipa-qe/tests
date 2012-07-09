@@ -499,6 +499,9 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 				browser.span("undo").click();
 			}else{ 
 				monitor.fail("error dialog does not appear, expect[" + expectedErrorMsg + "]");
+				if(browser.button("OK").exists()){
+					browser.button("OK").click();
+				}
 			}
 		} 
 		browser.link(backLink).in(browser.span("back-link")).click();
