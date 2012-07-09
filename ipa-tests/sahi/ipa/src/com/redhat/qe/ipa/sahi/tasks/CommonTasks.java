@@ -36,6 +36,7 @@ public class CommonTasks {
 	public static String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public static String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
 	public static String hbacServiceGroupPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
+	public static String hbacTest =  serverUrl + "/ipa/ui/#hbac=hbactest&policy=hbac&navigation=policy";
 	public static String sudoRulePage =  serverUrl + "/ipa/ui/#sudo=sudorule&policy=sudo&navigation=policy";
 	public static String sudoPage=sudoRulePage;
 	public static String sudoCommandPage =  serverUrl + "/ipa/ui/#sudo=sudocmd&policy=sudo&navigation=policy";
