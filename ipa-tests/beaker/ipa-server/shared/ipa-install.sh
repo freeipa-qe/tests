@@ -1,10 +1,10 @@
 #!/bin/bash
 ### WORK IN PROGRESS...NOT READY FOR USE YET
 
-# ROLE=MASTER, SLAVE
-# ROLE=MASTER1, REPLICA1, REPLICA1
-# ROLE=MASTER2, REPLICA2, REPLICA2
 #  
+# ROLE=MASTER, SLAVE, CLIENT, CLIENT2
+# ROLE=MASTER_env2, REPLICA_env2, CLIENT_env2
+# 
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="MASTER">
 #   <params> <param name="TOPO" value="star"/> </params>
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
@@ -32,7 +32,7 @@ ipa_install_envcleanup() {
 	done
 }
 
-ipa_install_parse_servers() {
+ipa_install_set_vars() {
 
 	# First let's normalize the data to use <ROLE>_env<NUM> variables:
 	[ -n "$MASTER"  -a -z "$MASTER_env1"  ] && export MASTER_env1="$MASTER"
@@ -140,7 +140,7 @@ ipa_install_topo_default()
 	rlPhaseEnd
 	
 	for MYBR1 in $MYBRS; do
-		rlPhaseStartTest "ipa_install_topo_star_replica1 - install Replica1 in Default Topology"
+		rlPhaseStartTest "ipa_install_topo_default_replica - install Replica1 in Default Topology - $MYBR1"
 			if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 				ipa_install_replica $MYBM1
 				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
@@ -240,6 +240,104 @@ ipa_install_topo_star()
 	rlPhaseEnd
 }
 
+######################################################################
+# ipa_install_topo_tree1
+#            M
+#           / \
+#          R1  R2
+#         /    /\
+#        R3   R4-R5
+# This REQUIRES 5 replicas
+######################################################################
+ipa_install_topo_tree1()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	if [ -z "$MYENV" ]; then
+		export MYENV=1
+	fi
+
+	rlPhaseStartTest "ipa_install_topo_tree1_envsetup - Make sure enough Replicas are defined"
+		if [ $(eval echo \$REPLICA_env${$MYENV}|wc -w) -lt 5 ]; then
+			rlFail "Not enough Replicas defined for tree1 topology...skipping"
+			rlPhaseEnd
+			return 1
+		else
+			rlPass "Enough Replicas defined for star topology...continuing"
+			MYBM1=$(eval echo \$BEAKERMASTER_env${MYENV})
+			MYBR1=$(eval echo \$BEAKERREPLICA1_env${MYENV})
+			MYBR2=$(eval echo \$BEAKERREPLICA2_env${MYENV})
+			MYBR3=$(eval echo \$BEAKERREPLICA3_env${MYENV})
+			MYBR4=$(eval echo \$BEAKERREPLICA4_env${MYENV})
+			MYBR5=$(eval echo \$BEAKERREPLICA5_env${MYENV})
+			MYBC1=$(eval echo \$BEAKERCLIENT1_env${MYENV})
+			MYBC2=$(eval echo \$BEAKERCLIENT2_env${MYENV})
+		fi
+	rlPhaseEnd	
+	
+	rlPhaseStartTest "ipa_install_topo_tree1_master - install Master in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
+			ipa_install_master
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBM1.0'  $MYBM1"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_tree1_replica1 - install Replica1 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_tree1_replica2 - install Replica2 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR2.2' -m $MYBR2"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR2.2'  $MYBR2"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_tree1_replica3 - install Replica3 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBR1
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR3.3' -m $MYBR3"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR3.3'  $MYBR3"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_tree1_replica4 - install Replica4 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBR2
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR4.4' -m $MYBR4"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR4.4'  $MYBR4"	
+		fi
+	rlPhaseEnd
+	
+	rlPhaseStartTest "ipa_install_topo_tree1_replica5 - install Replica5 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBR2
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR5.5' -m $MYBR5"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR5.5'  $MYBR5"	
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa_install_topo_tree1_connect_rep4_and_rep5 - Create replication agreement between Replica4 and Replica5"
+		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
+			ipa_connect_replica $MYBR4 $MYBR5
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR4.6' -m $MYBR4"	
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR4.6'  $MYBR4"	
+		fi
+	rlPhaseEnd
+}
+
 ipa_install_envs()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
@@ -252,9 +350,11 @@ ipa_install_envs()
 			else
 				ipa_install_topo
 			fi
+			# Now, if we're the MASTER for ENV $I, rhts-sync-set to unblock others...
 			if [ "$(hostname -s)" = "$(echo $RUNMASTER|cut -f1 -d.)" ]; then
 				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYENV.0' -m $RUNMASTER"
 			fi
+			I=$(( I += 1 ))
 		done
 	rlPhaseEnd
 }
@@ -265,9 +365,49 @@ ipa_install_topo()
 	star*|STAR*) 
 		ipa_install_topo_star
 		;;
+	tree1|TREE1|tree|TREE)
+		ipa_install_topo_tree1
+		;;
 	*)
 		ipa_install_topo_default
 		;;
 	esac
 
 }
+
+ipa_install_master() 
+{
+	tmpout=/tmp/error_msg.out
+	rlLog "$FUNCNAME"
+	#yum clean all
+	#yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap
+	#yum -y install --disablerepo=updates-testing* '*ipa-server'
+	#yum -y update		
+	#
+	#rpm -qa | grep ipa-server > $tmpout 2>&1
+	#
+	#if [ $(rpm -qa | grep ipa-server | wc -l) -eq 0 ]; then
+	#	rlFail "No ipa-server packages found"
+	#fi
+		
+}
+
+ipa_install_replica()
+{
+	local MYMASTER=$1
+	echo "$FUNCNAME $MYMASTER"
+}
+
+ipa_install_client()
+{
+	local MYMASTER=$1
+	echo "$FUNCNAME $MYMASTER"
+}
+
+ipa_connect_replica()
+{
+	local REP1=$1
+	local REP2=$2
+	
+	rlLog "$FUNNAME $REP1 $REP2"
+}	
