@@ -1,6 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAHBACTestSuite">	
 
+	
 	<test name="HBAC Rule Tests">
 		<packages>
 		    <package name="com.redhat.qe.ipa.sahi.*" />
@@ -8,12 +9,12 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-			    <include name="hbacRuleAddTests" />
-		        <include name="invalidhbacRuleAddTests" />
+			  <include name="hbacRuleAddTests" />
+		       <include name="invalidhbacRuleAddTests" /> 
 			    <include name="hbacRuleRequiredFieldAddTests" />
 			    <include name="hbacRuleCancelAddTests" />
 			    <include name="hbacRuleAddAndEditTests" />
-			    <include name="hbacRuleCancelDeleteTests" />
+			   <include name="hbacRuleCancelDeleteTests" />
 			    <include name="hbacRuleAddAndAddAnotherTests" />
 			    <include name="hbacRuleInvalidGeneralSettingsTests" />
 			    <include name="hbacRuleGeneralSettingsTests" /> 
@@ -28,7 +29,7 @@
 	            <include name="hbacRuleExpandCollapseTests"/>
 		        <include name="hbacRuleSearchTests" />
 			    <include name="hbacRuleDeleteTests" />			   
-			    <include name="hbacRuleMultipleDeleteTests" />
+			    <include name="hbacRuleMultipleDeleteTests" /> 
 			</run>
 		</groups>		
 		<classes>
@@ -60,7 +61,7 @@
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceTests" />
 		</classes>
-	</test>
+	</test> 
 
 
 
@@ -90,6 +91,26 @@
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACServiceGroupTests" />
+		</classes>
+	</test>
+		
+		
+		<test name="HBAC Run Tests">
+		<groups>
+			<run>
+			
+			<include name="setup" />
+		 	<include name="hbacRunTests" />
+			<include name="hbacRequiredFieldRunTests" />
+			<include name="hbacModifyRunTests" />
+			<include name="hbacSearchTests" />
+			<include name="hbacExternalSpecificationTests" />
+			<include name="hbacRuleIncludeTests" />
+			<include name="hbacRuleMatchTests" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACRunTests" />
 		</classes>
 	</test>
 		
