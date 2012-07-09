@@ -169,7 +169,7 @@ ipa_install_topo_star()
 	fi
 
 	rlPhaseStartTest "ipa_install_topo_star_envsetup - Make sure enough Replicas are defined"
-		if [ $(eval echo \$REPLICA_env${$MYENV}|wc -w) -lt 5 ]; then
+		if [ $(eval echo \$REPLICA_env${MYENV}|wc -w) -lt 5 ]; then
 			rlFail "Not enough Replicas defined for star topology...skipping"
 			rlPhaseEnd
 			return 1
@@ -258,7 +258,7 @@ ipa_install_topo_tree1()
 	fi
 
 	rlPhaseStartTest "ipa_install_topo_tree1_envsetup - Make sure enough Replicas are defined"
-		if [ $(eval echo \$REPLICA_env${$MYENV}|wc -w) -lt 5 ]; then
+		if [ $(eval echo \$REPLICA_env${MYENV}|wc -w) -lt 5 ]; then
 			rlFail "Not enough Replicas defined for tree1 topology...skipping"
 			rlPhaseEnd
 			return 1
