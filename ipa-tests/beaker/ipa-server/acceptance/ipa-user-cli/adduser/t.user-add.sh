@@ -27,7 +27,8 @@ addusertests()
 addsetup()
 {
     rlPhaseStartTest "ipa-user-cli-add-setup: kinit as admin"
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as administrator"
+       rlRun "rlDistroDiff keyctl" 
+       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as administrator"
     rlPhaseEnd
 }
 
@@ -69,7 +70,9 @@ adduser()
 
     rlPhaseStartTest "ipa-user-cli-add-031: Add user with --password"
         rlRun "addUserWithPassword Jenny Galipeau jennyg newpassword" 0 "Adding user with initial password assigned."
+        rlRun "rlDistroDiff keyctl" 
         rlRun "FirstKinitAs jennyg newpassword fo0m4nchU" 0 "Testing kerberos authentication"
+        rlRun "rlDistroDiff keyctl" 
         kinitAs $ADMINID $ADMINPW
         # delete the user
         ipa user-del jennyg
@@ -78,12 +81,14 @@ adduser()
     rlPhaseStartTest "ipa-user-cli-add-036: test of random password generation with user-add"
         rusr="36user"
         newpassword=$(ipa user-add --first fnaml --last lastn --random $rusr | grep Random\ password | cut -d: -f2 | sed s/\ //g)
+        rlRun "rlDistroDiff keyctl" 
         FirstKinitAs $rusr $newpassword fo0m4nchU
         if [ $? -ne 0 ]; then
             rlFail "ERROR - kinit failed to kinit as $rusr using password $newpassword"
         else
             rlPass "Success - kinit at first time with password [$newpassword] success"
         fi
+        rlRun "rlDistroDiff keyctl" 
         kinitAs $ADMINID $ADMINPW
         ipa user-del $rusr&
     rlPhaseEnd
@@ -99,6 +104,7 @@ lockuser()
         # set initial password, and we change it right away
         initialpw="thisjunk10"
         rlRun "echo $initialpw | ipa user-mod --password $lusr" 0 "set initial pasword"
+        rlRun "rlDistroDiff keyctl" 
         FirstKinitAs $lusr $initialpw $lusrpw
         if [ $? -ne 0 ]; then
             rlFail "ERROR - kinit failed "
@@ -106,12 +112,14 @@ lockuser()
             rlPass "Success - kinit at first time with password [$lusrpw] success"
         fi
 
+        rlRun "rlDistroDiff keyctl" 
         kinitAs $ADMINID $ADMINPW
         rlRun "ipa user-disable $lusr" 0 "perform user account locking"
         if [ $? -ne 0 ];then
             rlFail "ERROR - ipa user-disable failed "
         else
             rlRun "verifyUserAttr $lusr \"Account disabled\" True" 0 "Verify user's account disabled status"
+            rlRun "rlDistroDiff keyctl" 
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then
                 rlPass "kinit as $lusr failed as expected"
@@ -122,6 +130,7 @@ lockuser()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-005: Lock a locked user"
+        rlRun "rlDistroDiff keyctl"
 	kinitAs $ADMINID $ADMINPW
         command="ipa user-disable $lusr"
         expmsg="ipa: ERROR: This entry is already disabled"
@@ -134,6 +143,7 @@ lockuser()
             rlFail "ERROR - ipa user-enable failed "
         else
 	    rlRun "verifyUserAttr $lusr \"Account disabled\" False" 0 "Verify user's account disabled status"
+            rlRun "rlDistroDiff keyctl"
             kinitAs $lusr $lusrpw
             if [ $? -ne 0 ];then
                 rlFail "ERROR - kinit as $lusr failed after unlock. expect success "
@@ -145,7 +155,7 @@ lockuser()
 
     rlPhaseStartTest "ipa-user-cli-add-007: user find --whoami"
 	tmpfile=/tmp/whoami.txt
-	ipa user-find --whoami > $tmpfile
+	rlRun "ipa user-find --whoami > $tmpfile"
 	rlRun "cat $tmpfile | grep \"User login: $lusr\"" 0 "Verify User login"
 	rlRun "cat $tmpfile | grep \"First name: $superuserfirst\"" 0 "Verify First name"
 	rlRun "cat $tmpfile | grep \"Last name: $superuserlast\"" 0 "Verify Last name"
@@ -155,6 +165,7 @@ lockuser()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-add-008: Unlock an unlocked user"
+        rlRun "rlDistroDiff keyctl"
 	kinitAs $ADMINID $ADMINPW
         command="ipa user-enable $lusr"
         expmsg="ipa: ERROR: This entry is already enabled"
@@ -573,11 +584,13 @@ bugzillas()
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=801451"
         rlLog "also verifies https://bugzilla.redhat.com/show_bug.cgi?id=805108"
+        rlRun "rlDistroDiff keyctl" 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "kinit as admin"
         myuser="user801451"
         rlRun "create_ipauser $myuser $myuser $myuser Secret_123"
         sleep 5
         ssh_auth_success $myuser Secret_123 $MASTER
+        rlRun "rlDistroDiff keyctl" 
 	rlRun "kinitAs $myuser Secret_123" 0 "kinit as $myuser"
         rlLog "Disabling user via ldapmodify  ............................................."
 cat > disableuser.ldif << disableuser.ldif_EOF
@@ -597,6 +610,7 @@ disableuser.ldif_EOF
 	sed -i 's/debug_level \= 9//g' $sssdcfg
 	sed -i '/cache_credentials/,$ b; /^$/d;' $sssdcfg
 	rlRun "service sssd restart"
+        rlRun "rlDistroDiff keyctl" 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "kinit as admin"
         ipa user-del $myuser
     rlPhaseEnd
@@ -670,7 +684,8 @@ disableuser.ldif_EOF
         sleep 10
         cat $domain_log
         rlAssertGrep "\[ipa_migration_flag_connect_done\] (0x0400): Assuming Kerberos password is missing, starting password migration." "$domain_log"
-        rlAssertGrep "\[simple_bind_done\] (0x0080): Bind result: Inappropriate authentication(48), no errmsg set" "$domain_log"
+        #rlAssertGrep "\[simple_bind_done\] (0x0080): Bind result: Inappropriate authentication(48), no errmsg set" "$domain_log"
+        rlAssertGrep "\[simple_bind_done\] (0x0400): Bind result: Inappropriate authentication(48), no errmsg set" "$domain_log"
 
 	# Case where migration is disabled.
         rlRun "ipa config-mod --enable-migration=False"
