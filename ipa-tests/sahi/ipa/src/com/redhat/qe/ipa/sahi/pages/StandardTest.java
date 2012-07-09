@@ -4,7 +4,7 @@ public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
 	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative"};
-	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative"}; ;
+	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative","modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","setDefaultGroup"}; //xdong for the last 4
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
 	
@@ -22,6 +22,13 @@ public interface StandardTest {
 	public IPAWebTestMonitor modify(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor modifyUpdateResetCancel(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor modifyNegative(IPAWebTestMonitor monitor);
+	
+	public IPAWebTestMonitor modifyConditionInclusiveAdd(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionInclusiveDelete(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionExclusiveAdd(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionExclusiveDelete(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor setDefaultGroup(IPAWebTestMonitor monitor);//xdong
+	
 	
 	public IPAWebTestMonitor searchPositive(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor searchNegative(IPAWebTestMonitor monitor);
