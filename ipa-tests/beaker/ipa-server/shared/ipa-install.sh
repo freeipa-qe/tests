@@ -39,8 +39,8 @@ ipa_install_set_vars() {
 	[ -n "$SLAVE"   -a -z "$REPLICA_env1" ] && export REPLICA_env1="$SLAVE"
 	[ -n "$REPLICA" -a -z "$REPLICA_env1" ] && export REPLICA_env1="$REPLICA"
 	[ -n "$CLIENT"  -a -z "$CLIENT_env1"  ] && export CLIENT_env1="$CLIENT"
-	[ -n "$CLIENT2" -a -n "$SLAVE" -a -z "$CLIENT2_env1" ] \\
-		&& export CLIENT_env1=$(echo $CLIENT_env1 $CLIENT2)
+	[ -n "$CLIENT2" -a -n "$SLAVE" -a -z "$CLIENT2_env1" ] && \
+		export CLIENT_env1=$(echo $CLIENT_env1 $CLIENT2)
 	
 	# Process MASTER variables
 	I=1
