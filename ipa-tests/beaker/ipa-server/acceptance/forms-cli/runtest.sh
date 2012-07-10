@@ -40,8 +40,6 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
-PACKAGE="ipa-server"
-
 # Init master var
 export master=0;
 
@@ -59,7 +57,7 @@ fi
 
 rlJournalStart
     rlPhaseStartSetup "forms-cli startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
+        rlDistroDiff ipa_pkg_check
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
