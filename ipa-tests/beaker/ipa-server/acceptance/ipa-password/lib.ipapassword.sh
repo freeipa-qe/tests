@@ -62,6 +62,7 @@ read_pwpolicy()
     else
         keyword="$attr"
     fi
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 2>&1 >/dev/null
     ipa pwpolicy-show $pwpolicy > $out
     result=`grep -i "$keyword" $out | cut -d":" -f2 | xargs echo`
@@ -72,6 +73,7 @@ read_pwpolicy()
 
 read_default_policy_setting()
 {
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     local out=$TmpDir/defaultvalues.$RANDOM.txt
     rlRun "ipa pwpolicy-show > $out" 0 "read global password policy"
@@ -92,6 +94,7 @@ reset_global_pwpolicy()
     echo "reset password policy"
     echo "maxlife [$globalpw_maxlife] days , minlife [$globalpw_minlife] hours"
     echo "history [$globalpw_history], classes [$globalpw_classes], length [$globalpw_length]"
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
     echo "set global password policy back to default"
     ipa pwpolicy-mod --maxlife=$globalpw_maxlife \
@@ -113,6 +116,7 @@ reset_group_pwpolicy()
     if [ $? = 0 ];then
         del_grppw $testgrp
     fi
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
     ipa pwpolicy-add $testgrp \
                      --maxlife=$grouppw_maxlife\
@@ -152,6 +156,7 @@ reset_nestedgroup_pwpolicy()
     if [ $? = 0 ];then
         del_grppw $nestedgrp 
     fi
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
     ipa pwpolicy-add $nestedgrp\
                      --maxlife=$nestedpw_maxlife\
@@ -194,6 +199,7 @@ util_pwpolicy_createnew()
         thisarg="--${arg}"
         argstring="$argstring $thisarg"
     done
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     rlRun "ipa pwpolicy-add $policyname $argstring" \
           0 "create password policy: [$policyname]"
@@ -204,6 +210,7 @@ del_grppw()
 {
     local grp=$1
     local out=$TmpDir/grpwpexist.$RANDOM.out
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     if ipa pwpolicy-find | grep -i $grp  2>&1 >/dev/null
     then
@@ -221,6 +228,7 @@ grppw_exist()
 # return 1 if group pw policy NOT exist
     local grp=$1
     local out=$TmpDir/grpwpexist.$RANDOM.out
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     if ipa pwpolicy-find | grep -i $grp  2>&1 >/dev/null
     then
@@ -253,6 +261,7 @@ add_test_ac()
         del_test_ac 
     fi
     rlRun "$kdestroy"
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     echo "[add_test_ac] set up test account with inital pw: [$initialpw]"
  
@@ -261,6 +270,7 @@ add_test_ac()
         --last  $testacLast\
     # set test account password 
     echo "[add_test_ac] set initialpw [$initialpw] then change to [$password], by calling FirstKinitAs"
+    rlRun "rlDistroDiff keyctl"
     Local_FirstKinitAs $testac $initialpw $password
     rc=$?    
     rlRun "$kdestroy"
@@ -274,6 +284,7 @@ del_test_ac()
 #    then
 #        echo "test account found, now delete it"
         echo "[del_test_ac] delete user: [$testac]"
+        rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         ipa user-del $testac
 #	rc=$?
@@ -294,6 +305,7 @@ user_exist()
     local out=$TmpDir/userexist.$RANDOM.out
     if [ ! -z "$userlogin" ]
     then
+        rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         ipa user-find $userlogin > $out
         rlRun "$kdestroy"
@@ -349,6 +361,7 @@ add_grp(){
     local grpname=$1
     local desc=$2
     if [ ! -z "$grpname" ];then
+        rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         rlRun "ipa group-add $grpname --desc \"$desc\"" 0 "create group [$grpname]"
         rlRun "$kdestroy"
@@ -360,6 +373,7 @@ add_grp(){
 del_grp(){
     local grpname=$1
     if [ ! -z "$grpname" ];then
+        rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         rlRun "ipa group-del $grpname" 0 "delete group: [$grpname]"
         rlRun "$kdestroy"
@@ -374,6 +388,7 @@ grp_exist()
     local out=$TmpDir/grpexist.$RANDOM.out
     if [ ! -z "$grp" ]
     then
+        rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         ipa group-find $grp > $out
         rlRun "$kdestroy"
@@ -395,6 +410,7 @@ grp_exist()
 append_test_member()
 {
     local out=$TmpDir/appendtestmember.$RANDOM.out
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     ipa group-show $testgrp > $out
     if grep "Member users" $out | grep -i "$testac" $out 2>&1 > /dev/null
@@ -411,6 +427,7 @@ append_test_member()
 append_test_grp()
 {
     local out=$TmpDir/appendgrouptogroup.$RANDOM.out
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     ipa group-show $testgrp > $out
     if grep "Member groups" $out | grep -i $nestedgrp 2>&1 > /dev/null
@@ -427,6 +444,7 @@ append_test_grp()
 append_test_nested_ac()
 {
     local out=$TmpDir/appendnestedac.$RANDOM.out
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
 
     # test account should not be member of top group
@@ -455,6 +473,7 @@ append_test_nested_ac()
 remove_test_member()
 {
     local out=$TmpDir/removetestmember.$RANDOM.out
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     ipa group-show $testgrp > $out
     if grep "Member users" $out | grep -i "$testac" $out 2>&1 > /dev/null
@@ -473,6 +492,7 @@ kinit_aftermaxlife()
     local pw=$2
     local newpw=$3
     local exp=$TmpDir/kinitaftermaxlife.$RANDOM.exp
+    rlRun "rlDistroDiff keyctl"
     echo "set timeout 10" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .01}" >> $exp
@@ -500,6 +520,7 @@ kinit_aftermaxlife()
     ipactl status
     echo "=============================================="
 
+    rlRun "rlDistroDiff keyctl"
     rlRun "echo $newpw | kinit $username" 0 "[kinit_aftermaxlife] after password change prompt, try with the new password [$newpw]"
     # clean up
     rm $exp
@@ -512,6 +533,7 @@ Local_KinitAsAdmin()
     local out=$TmpDir/kinitasadmin.$RANDOM.txt
     local exp
     local temppw
+    rlRun "rlDistroDiff keyctl"
     echo "[Local_KinitAsAdmin] kinit with password: [$pw]"
     echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
@@ -520,11 +542,13 @@ Local_KinitAsAdmin()
         echo "[Local_KinitAsAdmin] kinit as admin with [$pw] failed"
         echo "[Local_KinitAsAdmin] check ipactl status"
         ipactl status
+        rlRun "rlDistroDiff keyctl"
         if echo $pw | kinit $ADMINID | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
         then
             echo "[Local_KinitAsAdmin] got kinit: Generic error, restart ipa and try same password again"
             ipactl restart
             rlRun "$kdestroy"
+            rlRun "rlDistroDiff keyctl"
             echo $pw | kinit $ADMINID 2>&1 > $out
             if [ $? = 0 ];then
                 rlPass "[Local_KinitAsAdmin] kinit as admin with [$pw] success at second attemp -- after restart ipa"
@@ -542,6 +566,7 @@ Local_KinitAsAdmin()
             echo "admin password exipred, do reset process"
             exp=$TmpDir/resetadminpassword.$RANDOM.exp
             temppw="New_$pw"
+            rlRun "rlDistroDiff keyctl"
             kinit_aftermaxlife "$ADMINID" "$ADMINPW" $temppw
             # set password policy to allow admin change password right away
             min=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2`
@@ -568,6 +593,7 @@ Local_KinitAsAdmin()
             rm $exp
             # after reset password, test the new password
             $kdestroy
+            rlRun "rlDistroDiff keyctl"
             echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
                 rlFail "[Local_KinitAsAdmin] reset password back to original [$pw] failed"
@@ -603,6 +629,7 @@ change_password()
     then
         echo "[change_password] found kerberos for user [$userlogin], test continue"
     else
+        rlRun "rlDistroDiff keyctl"
         Local_kinit $userlogin $currentpw
         if klist | grep -i "Default principal: $userlogin" 2>&1 >/dev/null
         then
@@ -782,6 +809,7 @@ minlife_default()
     local length
     local classes
     local out=$TmpDir/minlifedefault.$RANDOM.out
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     echo "check global pw policy"
     echo "------------------------------------------"
@@ -804,6 +832,7 @@ minlife_default()
         echo "set system time 2 minute before minlife"
         set_systime "+ 2*60*60 - 2*60"
         # before minlife, change password should fail
+        rlRun "rlDistroDiff keyctl"
         rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work [$testacPW]"
         change_password $testac $testacPW "dummy123"
         if [ $? = 0 ];then
@@ -816,6 +845,7 @@ minlife_default()
 
         # after minlife, change passwod should success
         set_systime "+ 2*60"  # setsystime 2 minutes after
+        rlRun "rlDistroDiff keyctl"
         rlRun "echo $currentPW | kinit $testac" 0 "make sure currentPW work [$currentPW]"
         newpw=`random_password`
         change_password $testac $currentPW "$newpw"
@@ -838,6 +868,7 @@ minlife_lowerbound()
         local lowbound=0
         local out=$TmpDir/minlifelowbound.$RANDOM.out
         echo "The lower bound of minlife time is [$lowbound] for group pw [$grp]"
+        rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         echo "set all other password constrains to 0"
         ipa pwpolicy-mod $grp --maxlife=$globalpw_maxlife --history=0 --minlength=0 --minclasses=1 
@@ -866,6 +897,7 @@ minlife_lowerbound()
             for offset in 0 1 2 4 8 16 32
             do
                 set_systime "+ $offset"
+                rlRun "rlDistroDiff keyctl"
                 rlRun "echo $oldpw | kinit $testac" 0 "make sure currentPW work [$oldpw]"
                 change_password $testac $oldpw $newpw
                 if [ $? = 0 ];then
@@ -910,6 +942,7 @@ util_pwpolicy_removeall()
     local out=$TmpDir/uitl.pwpolicy.removeall.out
     local i=0
     local list=""
+    rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     #ipa pwpolicy-find | grep -i "group" | grep -v -i "GLOBAL" > $out <<< might trigger error
     ipa pwpolicy-find | grep -i "group" | grep -v -i "global_policy" > $out
@@ -1049,6 +1082,7 @@ Local_FirstKinitAs()
 	echo "expect \"Enter New Password again to verify: \"" >> $expfile
 	echo "send -s -- $password\r" >> $expfile
 	echo "expect eof" >> $expfile
+        rlRun "rlDistroDiff keyctl"
 	Local_KinitAsAdmin
     echo ""
 	echo "---- assign initial password [$password] to [$username] as admin -------"
@@ -1073,6 +1107,7 @@ Local_FirstKinitAs()
 	cat $expfile
 	echo "------------------------------------------------------------------------"
     kdestroy
+    rlRun "rlDistroDiff keyctl"
     /usr/bin/expect $expfile
     rm $expfile
     # verify credentials
@@ -1103,6 +1138,7 @@ Local_kinit()
     echo "send -s -- $password\r" >> $expfile
     echo "expect eof" >> $expfile
     $kdestroy 2>&1 > /dev/null
+    rlRun "rlDistroDiff keyctl"
     /usr/bin/expect $expfile 2>&1 > $out
     if klist | grep "Default principal: $user"
     then
