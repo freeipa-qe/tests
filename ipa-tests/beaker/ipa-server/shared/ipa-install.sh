@@ -104,6 +104,19 @@ ipa_install_set_vars() {
 	echo "export REPLICA=$REPLICA_env1" >> /dev/shm/env.sh
 	echo "export CLIENT=$CLIENT_env1" >> /dev/shm/env.sh
 	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
+
+	### Set OS/YUM/RPM related variables here
+	if [ $(grep Fedora /etc/redhat-release|wc -l) -gt 0 ]; then
+		export DISTRO="Fedora"
+		export IPA_SERVER_PACKAGES="freeipa-server"
+		export IPA_CLIENT_PACKAGES="freeipa-admintools freeipa-client"
+		export YUM_OPTIONS="--disablerepo=updates-testing"
+	else
+		export DISTRO="RedHat"
+		export IPA_SERVER_PACKAGES="ipa-server"
+		export IPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
+		export YUM_OPTIONS=""
+	fi
 }
 
 
@@ -376,33 +389,115 @@ ipa_install_topo()
 
 }
 
-ipa_install_master() 
+ipa_install_prep() 
 {
 	tmpout=/tmp/error_msg.out
 	rlLog "$FUNCNAME"
-	#yum clean all
-	#yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap
-	#yum -y install --disablerepo=updates-testing* '*ipa-server'
-	#yum -y update		
-	#
-	#rpm -qa | grep ipa-server > $tmpout 2>&1
-	#
+
+	if [ -z "$IPA_SERVER_PACKAGES" ]; then
+		rlFail "IPA_SERVER_PACKAGES variable not set.  Run ipa_install_set_vars first"
+		return 1
+	fi
+
+	rlRun "yum clean all"
+	rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
+	if [ $(echo $MYROLE|grep CLIENT|wc -l) -gt 0 ]; then
+		rlRun "yum -y install $YUM_OPTIONS $IPA_CLIENT_PACKAGES"
+	else
+		rlRun "yum -y install $YUM_OPTIONS $IPA_SERVER_PACKAGES"
+	fi
+	rlRun "yum -y update"
+
+	# Set time
+	rlLog "Stopping ntpd service"
+	rlRun "service ntpd stop"
+	rlLog "Synchronizing time to $NTPSERVER"
+	rlRun "ntpdate $NTPSERVER"
+
+	# Fix /etc/hosts and IPv6 fixes
+	if [[ "$IPv6SETUP" != "TRUE" ]] ; then
+		rlRun "fixHostFile" 0 "Set up /etc/hosts"
+	else
+		rlRun "fixHostFileIPv6" 0 "Set up /etc/hosts"
+		rlRun "fixForwarderIPv6"
+		rlRun "rmIPv4addr"
+	fi
+
+	# Fix hostname
+	rlRun "fixhostname" 0 "Fix hostname"
+	
+	# Fix /etc/resolv.conf
+	if [ ! -f /etc/resolv.conf.ipabackup ]; then
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
+	fi
+	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) ]; then
+		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+		rlRun "echo \"nameserver $MASTER_IP\" >> /etc/resolv.conf"
+		rlRun "echo \"nameserver $SLAVE_IP\" >> /etc/resolv.conf"
+		rlRun "cat /etc/resolv.conf"
+	fi
+		
+	# Disable Firewall
+	rlRun "service iptables stop"
+	rlRun "chkconfig iptables off"
+	rlRun "service ip6tables stop"
+	rlRun "chkconfig ip6tables off"
+
 	#if [ $(rpm -qa | grep ipa-server | wc -l) -eq 0 ]; then
 	#	rlFail "No ipa-server packages found"
 	#fi
 		
 }
 
+ipa_install_master()
+{
+	tmpout=/tmp/error_msg.out
+	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
+		rlLog "$FUNCNAME"
+	
+		ipa_install_prep
+		
+		for PKG in $IPA_SERVER_PACKAGES; do
+			rlAssertRpm $PKG
+		done
+		
+		rlLog "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+	rlPhaseEnd
+}
+
 ipa_install_replica()
 {
 	local MYMASTER=$1
-	rlLog "$FUNCNAME $MYMASTER"
+	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
+		rlLog "$FUNCNAME $MYMASTER"
+
+		ipa_install_prep
+
+		for PKG in $IPA_SERVER_PACKAGES; do
+			rlAssertRpm $PKG
+		done
+	
+		rlLog "RUN ipa-replica-prepare on MASTER"
+		rlLog "RUN sftp to get gpg file"
+		rlLog "RUN ipa-replica-install"
+	rlPhaseEnd
 }
 
 ipa_install_client()
 {
 	local MYMASTER=$1
-	rlLog "$FUNCNAME $MYMASTER"
+	rlPhaseStartTest "ipa_install_client - Install IPA Client"
+		rlLog "$FUNCNAME $MYMASTER"
+
+		ipa_install_prep
+
+		for PKG in $IPA_CLIENT_PACKAGES; do
+			rlAssertRpm $PKG
+		done
+
+		rlRun "RUN ipa dns-add for client?"
+		rlRun "RUN ipa-client-install"
+	rlPhaseEnd
 }
 
 ipa_connect_replica()
@@ -410,5 +505,10 @@ ipa_connect_replica()
 	local REP1=$1
 	local REP2=$2
 	
-	rlLog "$FUNNAME $REP1 $REP2"
+	rlPhaseStartTest "ipa_connect_replica - Create Replication Agreement between two servers"
+		rlLog "$FUNCNAME $REP1 $REP2"
+	
+		rlLog "RUN ipa-replica-manage connect $REP1 $REP2"
+	rlPhaseEnd
+	
 }	
