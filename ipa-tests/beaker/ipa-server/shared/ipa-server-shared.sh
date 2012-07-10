@@ -1101,6 +1101,10 @@ rlDistroDiff() {
                 keyctl)
                         rlRun "keyctl purge user"
                         ;;
+
+ 		dirsrv_svc_restart)
+ 			rlRun "systemctl restart dirsrv.target"
+ 			;;
                 esac
                 }
 
@@ -1116,6 +1120,9 @@ rlDistroDiff() {
                         rlAssertRpm ipa-admintools
                         rlAssertRpm ipa-client
                         ;;
+                 dirsrv_svc_restart)
+                         rlRun "service dirsrv restart"
+                         ;;
                 esac
                 }
 
