@@ -284,7 +284,8 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-user-cli-mod-035: setattr and addattr krbPrincipalName"
         command="ipa user-mod --setattr krbPrincipalName=test $superuser"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPrincipalName' attribute of entry 'uid=$superuser,cn=users,cn=accounts,$BASEDN'."
+        #expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPrincipalName' attribute of entry 'uid=$superuser,cn=users,cn=accounts,$BASEDN'."
+        expmsg="ipa: ERROR: invalid 'krbprincipalname': attribute is not configurable"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa user-mod --setattr krbPrincipalName=test $superuser"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
