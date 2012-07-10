@@ -107,12 +107,20 @@ EOF
 }
 
 syncinterval_ldif() {
+if [ $1 = delete ]; then
+cat > syncinterval.ldif << EOF
+dn: cn=meTo$ADhost,cn=replica,cn=dc\3Dtestrelm\2Cdc\3Dcom,cn=mapping tree,cn=config
+changetype: modify
+$1: winSyncInterval
+EOF
+else
 cat > syncinterval.ldif << EOF
 dn: cn=meTo$ADhost,cn=replica,cn=dc\3Dtestrelm\2Cdc\3Dcom,cn=mapping tree,cn=config
 changetype: modify
 $2: winSyncInterval
 winSyncInterval: $1
 EOF
+fi
 }
 
 errorlog_ldif() {
@@ -178,6 +186,12 @@ EOF
 }
 
 addOU_ldif() {
+if [ $2 = delete ]; then
+cat > addOU.ldif << EOF
+dn: OU=$1,$ADdc
+changetype: $2
+EOF
+else
 cat > addOU.ldif << EOF
 dn: OU=$1,$ADdc
 changetype: $2
@@ -186,9 +200,16 @@ objectClass: top
 objectClass: organizationalUnit
 distinguishedName: OU=$1,$ADdc
 EOF
+fi
 }
 
 addsubOU_ldif() {
+if [ $3 = delete ]; then
+cat > addsubOU.ldif << EOF
+dn: OU=$1,OU=$2,$ADdc
+changetype: $3
+EOF
+else
 cat > addsubOU.ldif << EOF
 dn: OU=$1,OU=$2,$ADdc
 changetype: $3
@@ -197,4 +218,5 @@ objectClass: top
 objectClass: organizationalUnit
 distinguishedName: OU=$1,OU=$2,$ADdc
 EOF
+fi
 }

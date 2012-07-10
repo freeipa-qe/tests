@@ -48,7 +48,6 @@
 ########################################################################
 
 RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
-
 ########################################################################
 
 ######################
@@ -80,6 +79,8 @@ sub1user="sub1user"
 sub2user="sub2user"
 phn_1="22334455"
 phn_2="66778899"
+phn_3="888-999-111"
+phn_4="001788788001"
 new_UID="88228822"
 OU1="level1"
 sub_OU1="sub-level1"
@@ -120,6 +121,7 @@ pushd .
 popd
 	# Adding a same user in IPA that will be added in AD before winsync"
 	rlRun "create_ipauser 456 ads 456 $userpw2"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa user-mod 456 --phone $phn_1" 0 "Adding telephone number of user 456"
 
 	# Adding conditional forwarder
@@ -153,8 +155,8 @@ rlPhaseStartTest "winsync_test_0001: Creating winsync agreement"
 	rlRun "certutil -d $TmpDir -N -f passwd_certdb"
 	rlRun "certutil -S -n \"$slfcrt\" -s \"cn=Self-Signed-CAcer\" -x -t \"CT,,C\" -m 1000 -v 120 -d $TmpDir -f passwd_certdb -z noise_certdb"
 	rlRun "certutil -d $TmpDir -L -n \"$slfcrt\" -a > $slfcer"
-	rlRun "certutil -d $slapd_dir -A -i \"$slfcer\" -t \"CT,,C\" -a"
-	rlRun "certutil -L -d $slapd_dir | grep \"$slfcrt\"" "Verifying $slfcrt is imported in db"
+	rlRun "certutil -d $slapd_dir -A -n \"$slfcrt\" -i \"$slfcer\" -t \"CT,,C\" -a"
+	rlRun "certutil -L -d $slapd_dir | grep \"$slfcrt\"" 0 "Verifying $slfcrt is imported in db"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$slfcer $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd" 1 "Winsync Agreement with $slfcrt failed as expected"
 	rlRun "certutil -d $slapd_dir -D -n \"$slfcrt\""
 
@@ -170,7 +172,7 @@ rlPhaseStartTest "winsync_test_0001: Creating winsync agreement"
 	rlRun "certutil -d $slapd_dir -D -n \"Invalid cert\""
 
 	# Using valid AD cert
-	rlRun "certutil -A -i $ADcrt -d $slapd_dir -n \"AD cert\" -t \"CT,,C\" -a"
+	rlRun "certutil -A -i $ADcrt -d $slapd_dir -n \"AD cert\" -t \"CT,C,C\" -a"
 	rlRun "certutil -L -d $slapd_dir | grep \"AD cert\"" 0 "Verifying AD cert is imported in db"
 
 	# Verify you can connect via TLS to ADS server
@@ -182,8 +184,8 @@ rlPhaseStartTest "winsync_test_0001: Creating winsync agreement"
         rlRun "ADuser_cntrl_ldif $ADfn $ADsn 512" 0 "Generate ldif file to enable $ADln"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD before winsync $ADln"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $ADln passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $ADln"
-	rlRun "telephoneNumber_ldif $ADfn $ADsn 001788788001"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $ADln"
+	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_4"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $ADln"
 
 	# Creating the Agreement
@@ -202,28 +204,29 @@ rlPhaseEnd
 
 winsync_test_0002() {
 
-rlPhaseStartTest "winsync_test_0002: Change Winsync Interval from default 300 seconds"
+rlPhaseStartTest "winsync_test_0002: bz820258 - Modify Winsync Interval (default 300 seconds)"
 	rlRun "errorlog_ldif 8192"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f errorlog.ldif" 0 "Setting the error log level"
+	rlRun "sleep 300" 0 "Waiting for winsync interval to log in logfile"
 	rlRun "syncinterval_ldif $sec add"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval to $sec seconds"
-	sleep $sec
+	rlRun "sleep $sec" 0 "Waiting for new interval logs"
 	rlRun "sleep 30"
 	x=`grep "Running Dirsync" $error_log | tail -n2 | head -1| awk -F: '{print $3}'`
 	y=`grep "Running Dirsync" $error_log | tail -n1 | awk -F: '{print $3}'`
 	rlRun "z=`expr $y - $x | awk -F- '{print $NF}'`"
 	if [ $z -ge 5 ]; then
-	 rlRun "echo \"SyncInterval is unchanged: $z mins\"" 0 "Winsync interval change to $sec sec failed as expected: Bug 820258"
+	 rlRun "echo \"SyncInterval is unchanged: $z mins\"" 0 "bz820258: Winsync interval change to $sec sec failed as expected"
 	 rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=820258"
 	 rlRun "service dirsrv restart" 0 "Restarting dirsrv for winsync interval change to take effect"
+	 rlRun "sleep 30" 0 "Waiting for new interval logs"
 	 sleep $sec
-	 rlRun "sleep 30"
 	fi
 	 x=`grep "Running Dirsync" /var/log/dirsrv/slapd-TESTRELM-COM/errors | tail -n2 | head -1| awk -F: '{print $4}' | cut -f1 -d+`
 	 y=`grep "Running Dirsync" /var/log/dirsrv/slapd-TESTRELM-COM/errors | tail -n1 | head -1| awk -F: '{print $4}' | cut -f1 -d+`
 	 rlRun "z=`expr $y - $x | awk -F- '{print $NF}'`"
-	 if [ $z -le $sec ]; then
-	  rlRun "echo \"Winsync Interval successfully modified to $z Seconds\""
+	 if [ $z -le 35 ]; then
+	  rlRun "echo \"Winsync Interval successfully modified to $sec Seconds\""
 	 else
 	  rlFail "Winsync interval change to $sec seconds did not take effect"
 	 fi
@@ -242,7 +245,7 @@ rlPhaseStartTest "winsync_test_0003: Create users(numeric/alphanumeric) in AD an
 	rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $aduser"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser passwd"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $aduser"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
 
 	rlRun "ADuser_ldif 456 ads 456 add" 0 "Generate ldif file to add user 456"
 	rlRun "ADuser_passwd_ldif 456 ads $userpw" 0 "Generate ldif file for setting passwd for 456"
@@ -250,7 +253,7 @@ rlPhaseStartTest "winsync_test_0003: Create users(numeric/alphanumeric) in AD an
 	rlRun "telephoneNumber_ldif 456 ads $phn_2" 0 "Generate ldif file to add phone number of user 456"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD "456""
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting 456 passwd"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling user 456"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable user 456"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Add phone number of user 456"
 	rlRun "sleep $sec" 0 "Sleeping $sec sec for sync"
 
@@ -287,16 +290,16 @@ rlPhaseStartTest "winsync_test_0005: Synchronization behaviour of account lock s
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Setting disabled account to sync to both AD and IPA server"
 	# To disable account set userAccountControl to 514
 	rlRun "ADuser_cntrl_ldif $aduser ads 514"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "$aduser disable on AD"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Disable $aduser on AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
-	rlRun "ipa user-find $aduser | grep \"Account disabled: True\"" 0 "User disabled on IPA as well"
+	rlRun "ipa user-find $aduser | grep \"Account disabled: True\"" 0 "$aduser disabled on IPA as well"
 	rlRun "ipa user-enable $aduser"
 
 	rlRun "acctdisable_ldif none" 0 "Creating ldif file to set ipawinsyncacctdisable to none"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Setting disabled account to not sync to IPA"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "$aduser disable on AD"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Disable $aduser on AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
-        rlRun "ipa user-find $aduser | grep \"Account disabled: False\"" 0 "User is enabled on IPA"
+        rlRun "ipa user-find $aduser | grep \"Account disabled: False\"" 0 "$aduser is enabled on IPA"
 	
 	rlRun "acctdisable_ldif both" 0 "Creating ldif file to reset ipawinsyncacctdisable to both"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Resetting disabled account to sync to both servers"
@@ -305,7 +308,7 @@ rlPhaseEnd
 
 winsync_test_0006() {
 
-rlPhaseStartTest "winsync_test_0006: winsync doesn't sync the employeeType attribute - Bug 765986"
+rlPhaseStartTest "winsync_test_0006: bz765986 - winsync doesn't sync the employeeType attribute"
 	rlRun "employeetype_ldif add" 0 "Set employeetype attribute"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f employeetype.ldif"
 	rlRun "ADuser_ldif $aduser2 ads $aduser2 add" 0 "Generate ldif file to add user $aduser2"
@@ -313,9 +316,9 @@ rlPhaseStartTest "winsync_test_0006: winsync doesn't sync the employeeType attri
         rlRun "ADuser_cntrl_ldif $aduser2 ads 512" 0 "Generate ldif file to enable user $aduser2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $aduser2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser2 passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $aduser2"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser2"
 	sleep 30
-	rlRun "ipa user-find $aduser2 --all | grep \"employeetype: unknown\"" 0 "employeetype attribute set to unknown"
+	rlRun "ipa user-find $aduser2 --all | grep -i \"employeeType: unknown\"" 0 "employeetype attribute set to unknown in IPA"
 	rlRun "AD_employeetype_ldif $aduser2 ads staff"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f AD_employeetype.ldif"
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\" | grep \"employeeType: staff\"" 0 "Set employeetype to staff in AD for $aduser2"
@@ -340,16 +343,17 @@ winsync_test_0008() {
 
 rlPhaseStartTest "winsync_test_0008: Modify user attributes after replication setup"
 	rlLog "Modify user attributes for user existing before winsync"
-	rlRun "telephoneNumber_ldif $ADfn $ADsn 888-999-111"
+	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_3"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
 	rlRun "sleep 30" 0 "Waiting for sync"
-	rlRun "ipa user-find $ADln | grep \"Telephone Number: 888-999-111\"" 0 "Attribute modify for user existing before winsync"
+	rlRun "ipa user-find $ADln | grep \"Telephone Number: $phn_3\"" 0 "Attribute modify for user existing before winsync"
+	rlRun "ipa user-del $ADln" 0 "Delete $ADln"
 
 	rlLog "Modify user attributes for user created after winsync"
-	rlRun "telephoneNumber_ldif $aduser ads 001788788001"
+	rlRun "telephoneNumber_ldif $aduser ads $phn_4"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $aduser"
 	rlRun "sleep 30" 0 "Waiting for sync"
-	rlRun "ipa user-find $aduser | grep \"Telephone Number: 001788788001\"" 0 "Attribute modify for user created after winsync"
+	rlRun "ipa user-find $aduser | grep \"Telephone Number: $phn_4\"" 0 "Attribute modify for user created after winsync"
 rlPhaseEnd
 }
 
@@ -359,14 +363,13 @@ rlPhaseStartTest "winsync_test_0009: Update Password"
 	rlLog "Update password in AD"
 	rlRun "ADuser_passwd_ldif $aduser ads $userpw2"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Reset $aduser passwd from AD"
-	rlLog "$aduser login in IPA server with new password"
-	rlRun "ssh_auth_success $aduser $userpw2 $IPAhost"
+	sleep 10
+	rlRun "ssh_auth_success $aduser $userpw2 $IPAhost" 0 "$aduser login in IPA server with new password"
 
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
-
-	rlLog "$aduser2 login with in AD with new password"
-	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2"
+	sleep 10
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
 
 rlPhaseEnd
 }
@@ -393,7 +396,7 @@ rlPhaseEnd
 
 winsync_test_0011() {
 
-rlPhaseStartTest "winsync_test_0011: sync uidNumber from AD - Bug 755436"
+rlPhaseStartTest "winsync_test_0011: bz755436 - sync uidNumber from AD"
 	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=755436"
 	rlRun "uidNumber_ldif $aduser ads $new_UID"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f uidNumber.ldif" 0 "Setting UID for $aduser"
@@ -404,7 +407,7 @@ rlPhaseStartTest "winsync_test_0011: sync uidNumber from AD - Bug 755436"
 	if [ $x -eq $new_UID ]; then
 	 rlPass "UID from AD synced to IPA"
 	else
-	 rlPass "Sync of UID from AD failed as expected - Bug 755436"
+	 rlPass "bz755436 - Sync of UID from AD failed as expected"
 	fi
 
 rlPhaseEnd
@@ -416,15 +419,19 @@ rlPhaseStartTest "winsync_test_0012: Delete User"
 	rlLog "Delete user from AD"
 	rlRun "deleteuser_ldif $aduser ads"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete $aduser from AD"
+	rlRun "deleteuser_ldif 456 ads"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete user 456 from AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
-	rlRun "ipa user-show $aduser" 2 "User not found in IPA as expected"
+	rlRun "ipa user-show $aduser" 2 "User $aduser not found in IPA as expected"
+	rlRun "ipa user-show 456" 2 "User 456 not found in IPA as expected"
 
 	rlLog "Delete user from IPA"
 	rlRun "ipa user-del $aduser2" 0 "Delete $aduser2 from IPA"
-	rlRun "ipa user-del 456" 0 "Delete user 456 from IPA"
+#	rlRun "ipa user-del 456" 0 "Delete user 456 from IPA"
 	sleep 10
-	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $aduser2 not found in AD as expected"
-	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User 456not found in AD as expected"
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $aduser2 deleted in AD"
+#	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User 456 deleted in AD"
+#	ipa user-del 456
 
 rlPhaseEnd
 }
@@ -441,7 +448,7 @@ winsync_test_0014() {
 
 rlPhaseStartTest "winsync_test_0014: Using options force-sync, re-initialize, disconnect and del"
 	
-	rlRun "syncinterval_ldif 300 replace"
+	rlRun "syncinterval_ldif delete"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to 5 mins"
 	rlRun "service dirsrv restart" 0 "Restarting to make winsync interval change effective"
 	sleep 10
@@ -451,24 +458,28 @@ rlPhaseStartTest "winsync_test_0014: Using options force-sync, re-initialize, di
         rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser in AD to test options"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $aduser"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
+	sleep 10
 
 	rlRun "ipa-replica-manage force-sync --from $ADhost" 0 "Using force-sync option"
+	sleep 15
 	rlRun "ipa user-show $aduser" 0 "$aduser added in AD, synced to IPA using force-sync option"
 
-	sleep 15
 	rlRun "ADuser_ldif $aduser2 ads $aduser2 add" 0 "Generate ldif file to add user $aduser2"
         rlRun "ADuser_passwd_ldif $aduser2 ads $userpw" 0 "Generate ldif file for setting passwd for $aduser2"
         rlRun "ADuser_cntrl_ldif $aduser2 ads 512" 0 "Generate ldif file to enable user $aduser2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser2 in AD to test options"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser2 passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $aduser2"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser2"
 	sleep 20
 
 	rlRun "ipa-replica-manage re-initialize --from $ADhost" 0 "Using re-initialize option"
+	sleep 5
 	rlRun "ipa user-show $aduser2" 0 "$aduser2 added in AD, synced to IPA with reinitialize option"
 
-	sleep 5
+	# Test clean up
+	rlRun "ipa user-del $aduser $aduser2"
+
 	rlRun "ipa-replica-manage disconnect $ADhost" 0 "Disconnecting replica agreement"
 	sleep 15
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd" 0 "Re-connecting for next test"
@@ -498,16 +509,16 @@ rlPhaseStartTest "winsync_test_0015: Winsync with --win-subtree"
         rlRun "ADuser_cntrl_ldif $l1user ads 512 $OU1" 0 "Generate ldif file to enable user $l1user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l1user in OU $OU1"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $l1user passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $l1user"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $l1user"
 
 	rlRun "ADuser_ldif $sub1user ads $sub1user add $OU1 $sub_OU1" 0 "Generate ldif file to add user $sub1user"
         rlRun "ADuser_passwd_ldif $sub1user ads $userpw $OU1 $sub_OU1" 0 "Generate ldif file for setting passwd for $sub1user"
         rlRun "ADuser_cntrl_ldif $sub1user ads 512 $OU1 $sub_OU1" 0 "Generate ldif file to enable user $sub1user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub1user in OU $OU1"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $sub1user passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $sub1user"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $sub1user"
 
-	rlLog "Winsync with OU with existing users"
+	rlLog "Winsync OU with existing users"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd --win-subtree=\"OU=$OU1,$ADdc\"" 0 "Creating winsync agreement with OU $OU1 win-subtree"
 	sleep 10
 
@@ -524,10 +535,17 @@ rlPhaseStartTest "winsync_test_0015: Winsync with --win-subtree"
         rlRun "ipa user-show $sub1user| grep \"Account disabled: False\"" 0 "$sub1user from sub OU $sub_OU1 synced and enabled in IPA"
         rlRun "ipa user-show $sub1user | grep \"Password: True\"" 0 "Password in sync for $sub1user of sub OU $sub_OU1"
 
+	# Test clean up
+	rlRun "ipa user-del $l1user $sub1user"
+	sleep 20
+	rlRun "addsubOU_ldif $sub_OU1 $OU1 delete"
+        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Delete sub OU $sub_OU1"
+	rlRun "addOU_ldif $OU1 delete"
+        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Delete OU $OU1"
 	rlRun "ipa-replica-manage del $ADhost" 0 "Deleting agreement with OU $OU1"
 	sleep 20
 
-	rlLog "Winsync with OU without existing users"
+	rlLog "Winsync OU without existing users"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd --win-subtree=\"OU=$OU2,$ADdc\"" 0 "Creating winsync agreement with OU $OU2 win-subtree"
 	sleep 10
 
@@ -539,7 +557,7 @@ rlPhaseStartTest "winsync_test_0015: Winsync with --win-subtree"
         rlRun "net rpc service start PassSync -I $ADhost -U administrator%$ADpswd" 0 "Restarting PassSync Service"
 	sleep 10
 
-	rlRun "syncinterval_ldif $sec replace"
+	rlRun "syncinterval_ldif $sec add"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to $sec sec"
         rlRun "service dirsrv restart" 0 "Restarting to make winsync interval change effective"
 	sleep 10
@@ -549,20 +567,29 @@ rlPhaseStartTest "winsync_test_0015: Winsync with --win-subtree"
         rlRun "ADuser_cntrl_ldif $l2user ads 512 $OU2" 0 "Generate ldif file to enable user $l2user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l2user in OU $OU2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $l2user passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $l2user"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $l2user"
 
         rlRun "ADuser_ldif $sub2user ads $sub2user add $OU2 $sub_OU2" 0 "Generate ldif file to add user $sub2user"
         rlRun "ADuser_passwd_ldif $sub2user ads $userpw $OU2 $sub_OU2" 0 "Generate ldif file for setting passwd for $sub2user"
         rlRun "ADuser_cntrl_ldif $sub2user ads 512 $OU2 $sub_OU2" 0 "Generate ldif file to enable user $sub2user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub2user in OU $OU2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $sub2user passwd"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enabling $sub2user"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $sub2user"
 	rlRun "sleep $sec" 0 "Waiting for sync"
 	
 	rlRun "ipa user-show $l2user | grep \"Account disabled: False\"" 0 "$l2user from OU $OU2 synced and enabled in IPA"
 	rlRun "ipa user-show $l2user | grep \"Password: True\"" 0 "Password in sync for $l2user of OU $OU2"
         rlRun "ipa user-show $sub2user| grep \"Account disabled: False\"" 0 "$sub2user from sub OU $sub_OU2 synced and enabled in IPA"
 	rlRun "ipa user-show $sub2user | grep \"Password: True\"" 0 "Password in sync for $sub2user of sub OU $sub_OU2"
+
+	# Test clean up
+	rlRun "ipa user-del $l2user $sub2user"
+	sleep 20
+        rlRun "addsubOU_ldif $sub_OU2 $OU2 delete"
+        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Delete sub OU $sub_OU2"
+        rlRun "addOU_ldif $OU2 delete"
+        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Delete OU $OU2"
+	rlRun "ipa-replica-manage del $ADhost" 0 "Deleting agreement with OU $OU2"
 
 rlPhaseEnd
 }
@@ -572,20 +599,18 @@ cleanup() {
 rlPhaseStartTest "Clean up for winsync sanity tests"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
-	sleep 5
-	rlRun "ipa-replica-manage del $ADhost"
-	rlrun "ipa user-del $l1user $l2user $sub1user $sub2user $aduser $aduser2"
-	rlRun "addsubOU_ldif $sub_OU1 delete"
-	rlRun "addsubOU_ldif $sub_OU2 delete"
-	rlRun "addOU_ldif $OU1 delete"
-	rlRun "addOU_ldif $OU2 delete"
+
 	rlRun "certutil -D -n \"AD cert\" -d /etc/dirsrv/slapd-TESTRELM-COM"
+
 	rlRun "rm -f /etc/named.conf && cp -p /etc/named.conf.winsync /etc/named.conf" 0 "Replacing named.conf file from backup"
 	rlRun "service named restart"
+
 	rlRun "rm -f *.ldif"
 	rlRun "rm -fr $TmpDir"
+
 	rlRun "sed -i \"/^TLS_CACERTDIR.*/d\" /etc/openldap/ldap.conf"
 	rlRun "rm -fr /tmp/krb5cc_1*"
+
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 
 rlPhaseEnd

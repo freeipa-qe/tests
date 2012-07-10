@@ -24,7 +24,7 @@ The command should report that zone IPA.Domain was successfully added.
 
 3. Fill-up the AD details in Config file placed in this directory
 
-4. From AD copy the cert in the current directory. Name the cert file "ADcert.cer"
+4. From AD copy the cert in the current directory replacing cert file "ADcert.cer"
 
 5. Make IPA CA trusted by importing IPA cert in the AD server's database. Follow the steps below.
  
