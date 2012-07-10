@@ -898,9 +898,11 @@ user_status()
 		rlRun "create_ipauser $user4 $user4 $user4 Secret123" 0 "Creating a test $user4"
 #		rlRun "create_ipauser $user5 $user5 $user5 Secret123" 0 "Creating a test $user5"
 		if [ "$SLAVE" == "" ]; then
-			rlFail "ERROR - This test will only pass when run on a host with at least one master and one slave"
+			rlLog "NOTICE - Running in single host mode. Many tests dissabled."
+			export multi=0
 		else
 			rlPass "PASS - This test appears to contain at least one slave server"
+			export multi=1
 		fi
 	rlPhaseEnd
 
@@ -949,6 +951,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
+	if [ $multi -eq 1 ]; then
 	rlPhaseStartTest "Make sure that the last login time is in a valid time frame on other server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
@@ -965,7 +968,8 @@ user_status()
 			rlFail "FAIL - last login time for $user1 on $otherhost is not between $now and $later. It is $lastgoodlogin"
 		fi
 	rlPhaseEnd
-
+	fi
+	
 	rlPhaseStartTest "Create failed logins on this host for user1"
 		kdestroy
 		kinitAs $user1 dsfr
@@ -981,6 +985,7 @@ user_status()
 		fi
 	rlPhaseEnd
 	
+	if [ $multi -eq 1 ]; then
 	rlPhaseStartTest "Create failed logins for user1 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user1"
 		ssh root@$otherhost "echo mostblarg | kinit $user1"
@@ -993,6 +998,7 @@ user_status()
 			rlPass "PASS - Failed logins on $failedthere is correct at 2 failed"
 		fi
 	rlPhaseEnd
+	fi
 
 	rlPhaseStartTest "Create failed logins on this host for user2"
 		kinitAs $user2 dsfr
@@ -1009,6 +1015,7 @@ user_status()
 		fi
 	rlPhaseEnd
 	
+	if [ $multi -eq 1 ]; then
 	rlPhaseStartTest "Create failed logins for user2 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user2"
 		ssh root@$otherhost "echo mostblarg | kinit $user2"
@@ -1022,6 +1029,7 @@ user_status()
 			rlPass "PASS - Failed logins on $failedthere is correct at 2 failed"
 		fi
 	rlPhaseEnd
+	fi
 
 	rlPhaseStartTest "Make sure that the last failed login time is in a valid time frame on this server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
@@ -1039,6 +1047,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
+	if [ $multi -eq 1 ]; then
 	rlPhaseStartTest "Make sure that the last failed login time is in a valid time frame on other server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
@@ -1133,7 +1142,8 @@ rlPhaseEnd
 			rlFail "FAIL - last login time for $user3 on $otherhost is not between $now and $later. It is $lastgoodlogin"
 		fi
 	rlPhaseEnd
-
+	fi
+	
 	rlPhaseStartTest "Create lockout logins for user4 on this host."
 		kdestroy
 		kinitAs $user4 dsfr
@@ -1185,6 +1195,7 @@ rlPhaseEnd
 		fi
 	rlPhaseEnd	
 
+	if [ $multi -eq 1 ]; then
 	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user4"
 		echo "Other host is $otherhost"
 		failedhere=$(ipa user-status  $user4 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
@@ -1206,6 +1217,7 @@ rlPhaseEnd
 			rlFail "FAIL - last login time for $user4 on $hostname is not between $now and $later. It is $lastgoodlogin"
 		fi
 	rlPhaseEnd
+	fi
 
 	# Cleanup
 	kinitAs $ADMINID $ADMINPW
