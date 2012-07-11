@@ -45,6 +45,7 @@ selfservice_bz_cleanup()
 selfservice_bz_772106()
 {
 	rlPhaseStartTest "selfservice_bz_772106 ipa selfservice-add --raw returns internal error message"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local testID="selfservice_bz_772106"
 		local tmpout=$TmpDir/selfservice_bz_772106.$RANDOM.out
@@ -69,6 +70,7 @@ selfservice_bz_772106()
 selfservice_bz_772675()
 {
 	rlPhaseStartTest "selfservice_bz_772675 ipa selfservice-mod --raw returns internal error message"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local testID="selfservice_bz_772675"
 		local tmpout=$TmpDir/selfservice_bz_772675.$RANDOM.out
@@ -96,6 +98,7 @@ selfservice_bz_772675()
 selfservice_bz_747730()
 {
 	rlPhaseStartTest "selfservice_bz_747730 ipa selfservice-mod edit address --permissions=\"\" delete a selfservice permission"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local testID="selfservice_bz_747730"
 		local tmpout=$TmpDir/selfservice_bz_747730.$RANDOM.out
@@ -123,6 +126,7 @@ selfservice_bz_747730()
 selfservice_bz_747741()
 {
 	rlPhaseStartTest "selfservice_bz_747741 ipa selfservice-mod provide wrong attr for --attrs delete a selfservice permission"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local testID="selfservice_bz_747741"
 		local tmpout=$TmpDir/selfservice_bz_747741.$RANDOM.out
@@ -152,6 +156,7 @@ selfservice_bz_747741()
 selfservice_bz_747693()
 {
 	rlPhaseStartTest "selfservice_bz_747693 ipa selfservice-find --raw returns internal error"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local testID="selfservice_bz_747693"
 		local tmpout=$TmpDir/selfservice_bz_747693.$RANDOM.out
@@ -179,6 +184,7 @@ selfservice_bz_747693()
 selfservice_bz_747720()
 {
 	rlPhaseStartTest "selfservice_bz_747720 ipa selfservice-find --permission=\"\" returns internal error"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local testID="selfservice_bz_747720"
 		local tmpout=$TmpDir/selfservice_bz_747720.$RANDOM.out
@@ -201,6 +207,7 @@ selfservice_bz_747720()
 selfservice_bz_747722()
 {
 	rlPhaseStartTest "selfservice_bz_747722 ipa selfservice-find --attrs=\"\" returns internal error"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local testID="selfservice_bz_747722"
 		local tmpout=$TmpDir/selfservice_bz_747722.$RANDOM.out

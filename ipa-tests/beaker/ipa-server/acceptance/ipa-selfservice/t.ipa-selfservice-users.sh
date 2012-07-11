@@ -19,6 +19,7 @@ selfservice_usertest()
 selfservice_usertest_envsetup()
 {
 	rlPhaseStartTest "selfservice-usertest-envsetup Setup users for tests"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		create_ipauser user0001 Test User0001 passw0rd1
 		rlRun "mkdir /home/user0001"
@@ -39,10 +40,12 @@ selfservice_usertest_envcleanup()
 {
 
 	rlPhaseStartTest "selfservice-usertest-envcleanup Cleanup users and rules created by tests"
+                rlRun "rlDistroDiff keyctl"
 		delete_ipauser user0001
 		delete_ipauser user0002
 		delete_ipauser good_manager
 		delete_ipauser bad_manager
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin             # this is needed because delete_ipauser does a kdestroy...
 		rlRun "rm -rf /home/user0001"
 		rlRun "rm -rf /home/user0002"
@@ -56,6 +59,7 @@ selfservice_usertest_envcleanup()
 selfservice_usertest_1001() 
 {
 	rlPhaseStartTest "selfservice-usertest-1001 Set all parameters allowed by default"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0001 passw0rd1	
 		rlRun "ipa user-mod user0001  --first=Good"
 		rlRun "ipa user-mod user0001  --last=User"
@@ -82,6 +86,7 @@ selfservice_usertest_1001()
 selfservice_usertest_1002()
 {
 	rlPhaseStartTest "selfservice-usertest-1002 Test that default disallowed are rejected"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-mod user0001  --uid=9999"                1 "By default a user should not be able to user-mod --uid"
 		rlRun "ipa user-mod user0001  --gidnumber=9999"          1 "By default a user should not be able to user-mod --gidnumber"
@@ -93,9 +98,11 @@ selfservice_usertest_1002()
 selfservice_usertest_1003()
 {
 	rlPhaseStartTest "selfservice-usertest-1003 Delete default rule User Self service and test params can no longer be set"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-del \"User Self service\"" 0 "Delete the default rule User Self service"
 
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-mod user0001  --first=Bad"                        1 "Should no longer be able to user-mod --first"
 		rlRun "ipa user-mod user0001  --last=LUser"                       1 "Should no longer be able to user-mod --last"
@@ -122,9 +129,11 @@ selfservice_usertest_1003()
 selfservice_usertest_1004()
 {
 	rlPhaseStartTest "selfservice-usertest-1004 create new rule and test write access"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-add rule0001 --attrs=\"mobile, pager, facsimiletelephonenumber, telephonenumber\"" 
 
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-mod user0001  --phone=777-777-7777"
 		rlRun "ipa user-mod user0001  --mobile=777-777-7777"
@@ -137,6 +146,7 @@ selfservice_usertest_1005()
 {
 	rlPhaseStartTest "selfservice-usertest-1005 check the user's attribute settings"
 		tmpout=$TmpDir/selfservice_usertest.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-find user0001  --first=Good"
 		rlRun "ipa user-find user0001  --last=User"
@@ -168,6 +178,7 @@ selfservice_usertest_1005()
 selfservice_usertest_1006()
 {
 	rlPhaseStartTest "selfservice-usertest-1006 su to user and change allowed settings"
+                rlRun "rlDistroDiff keyctl"
 		rlRun "su - user0001 -c \"echo passw0rd1|kinit user0001; ipa user-mod user0001 --mobile=888-888-8888\"" \
 			0 "Su to user, kinit, and run user-map against allowed attribute"
 	rlPhaseEnd
@@ -177,6 +188,7 @@ selfservice_usertest_1007()
 {
 	rlPhaseStartTest "selfservice-usertest-1007 su to user and test that disallowed params cannot be set"
 		tmpout=$TmpDir/selfservice_usertest.out
+                rlRun "rlDistroDiff keyctl"
 		rlRun "su - user0001 -c \"echo passw0rd1|kinit user0001; ipa user-mod user0001 --title=Dr\" > $tmpout 2>&1" \
 			1 "Su to user, kinit, and confirm user-map against disallowed attribute fails"
 		rlAssertGrep "ipa: ERROR: Insufficient access:.*write.*title.*user0001" $tmpout
@@ -188,6 +200,7 @@ selfservice_usertest_1008()
 {
 	rlPhaseStartTest "selfservice-usertest-1008 confirm user-mod fails with one of multiple params is disallowed"
 		tmpout=$TmpDir/selfservice_usertest.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0001 passw0rd1
 		rlRun "ipa user-mod user0001 --title=notgonnawork --phone=999-999-9990 > $tmpout 2>&1" \
 			1 "confirm user-mod fails with one of multiple params is disallowed"
@@ -200,13 +213,16 @@ selfservice_usertest_1008()
 selfservice_usertest_1009()
 {
 	rlPhaseStartTest "selfservice-usertest-1009 confirm user can change their password"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local minLifeOrig=$(ipa pwpolicy-show|grep "Min lifetime (hours):"|awk '{print $4}')
 		rlRun "ipa pwpolicy-mod --minlife=0" 0 "Set Minimum (in hrs) time between password changes to zero (0)"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0001 passw0rd1
 		rlRun "echo mynewp@55 | ipa user-mod user0001 --password" 0 "changing user's own password with ipa user-mod"
 		rlRun "echo -ne \"mynewp@55\\\nMyN3wP@55\\\nMyN3wP@55\\\n\"|ipa passwd user0001" 0 "changing user's own password with ipa password"
 		if [ $minLifeOrig -ne 0 ]; then
+                        rlRun "rlDistroDiff keyctl"
 			KinitAsAdmin
 			rlRun "ipa pwpolicy-mod --minlife=$minLifeOrig" 0 "Set Minimum (in hrs) time between password changes to $minLifeOrig"
 		fi
@@ -217,6 +233,7 @@ selfservice_usertest_1010()
 {
 	rlPhaseStartTest "selfservice-usertest-1010 confirm user cannot change another user's attributes"
 		tmpout=$TmpDir/selfservice_usertest.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsUser user0002 passw0rd2
 		rlRun "ipa user-mod user0001 --mobile=867-5309 > $tmpout 2>&1" 1 "Confirm user cannot change another user's attributes"
 		rlAssertGrep "ipa: ERROR: Insufficient access:.*write.*mobile.*user0001" $tmpout

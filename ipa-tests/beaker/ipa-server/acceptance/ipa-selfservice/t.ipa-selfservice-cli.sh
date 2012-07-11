@@ -45,6 +45,7 @@ selfservice_add_envcleanup()
 {
 	rlPhaseStartCleanup "selfservice_add_envcleanup"
 		#environment cleanup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in 1004 1006; do
 			rlRun "ipa selfservice-del selfservice_add_$i" 0  "selfservice-del selfservice_add_$i rule used for test"
@@ -59,6 +60,7 @@ selfservice_add_1001() ### prompts for input...not a valid non-interactive test.
 	rlPhaseStartTest "selfservice_add_1001 [positive test] --all"
 		local testID="selfservice_add_1001"
 		local tmpout=$TmpDir/selfservice_add_1001.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-add $testID --all " 0 "test options: " 
 		Kcleanup
@@ -71,6 +73,7 @@ selfservice_add_1002()
 	rlPhaseStartTest "selfservice_add_1002 [negative test] --all --attrs;negative;LIST --permissions;positive;LIST --raw"
 		local testID="selfservice_add_1002"
 		local tmpout=$TmpDir/selfservice_add_1002.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue_Negative="badattr" #attrs;negative;LIST 
 		local permissions_TestValue="write" #permissions;positive;LIST 
@@ -87,6 +90,7 @@ selfservice_add_1003()
 	rlPhaseStartTest "selfservice_add_1003 [negative test] --all --attrs;positive;LIST --permissions;negative;LIST --raw"
 		local testID="selfservice_add_1003"
 		local tmpout=$TmpDir/selfservice_add_1003.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="telephonenumber,mobile,pager,facsimiletelephonenumber" #attrs;positive;LIST 
 		local permissions_TestValue_Negative="badperm" #permissions;negative;LIST 
@@ -103,6 +107,7 @@ selfservice_add_1004() #BZ 772106 -- ipa selfservice-add --raw returns "internal
 	rlPhaseStartTest "selfservice_add_1004 [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw"
 		local testID="selfservice_add_1004"
 		local tmpout=$TmpDir/selfservice_add_1004.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="telephonenumber,mobile,pager,facsimiletelephonenumber" #attrs;positive;LIST 
 		local permissions_TestValue="write" #permissions;positive;LIST 
@@ -126,6 +131,7 @@ selfservice_add_1005()
 	rlPhaseStartTest "selfservice_add_1005 [negative test] --attrs;negative;LIST"
 		local testID="selfservice_add_1005"
 		local tmpout=$TmpDir/selfservice_add_1005.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue_Negative="badattrs" #attrs;negative;LIST
 		local expectedErrMsg="ipa: ERROR: targetattr \"badattrs\" does not exist in schema."
@@ -141,6 +147,7 @@ selfservice_add_1006()
 	rlPhaseStartTest "selfservice_add_1006 [positive test] --attrs;positive;LIST"
 		local testID="selfservice_add_1006"
 		local tmpout=$TmpDir/selfservice_add_1006.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="telephonenumber,mobile,pager,facsimiletelephonenumber" #attrs;positive;LIST
 		rlRun "ipa selfservice-add $testID  --attrs=$attrs_TestValue " 0 "test options:  [attrs]=[$attrs_TestValue]" 
@@ -154,6 +161,7 @@ selfservice_add_1007() ### prompts for input...not a valid non-interactive test.
 	rlPhaseStartTest "selfservice_add_1007 [negative test] --permissions;negative;LIST"
 		local testID="selfservice_add_1007"
 		local tmpout=$TmpDir/selfservice_add_1007.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local permissions_TestValue_Negative="badperm" #permissions;negative;LIST
 		local expectedErrMsg=replace_me
@@ -169,6 +177,7 @@ selfservice_add_1008() ### prompts for input...not a valid non-interactive test.
 	rlPhaseStartTest "selfservice_add_1008 [positive test] --permissions;positive;LIST"
 		local testID="selfservice_add_1008"
 		local tmpout=$TmpDir/selfservice_add_1008.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local permissions_TestValue="replace_me" #permissions;positive;LIST
 		rlRun "ipa selfservice-add $testID  --permissions=$permissions_TestValue " 0 "test options:  [permissions]=[$permissions_TestValue]" 
@@ -182,6 +191,7 @@ selfservice_add_1009() ### prompts for input...not a valid non-interactive test.
 	rlPhaseStartTest "selfservice_add_1009 [positive test] --raw"
 		local testID="selfservice_add_1009"
 		local tmpout=$TmpDir/selfservice_add_1009.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-add $testID --raw " 0 "test options: " 
 		Kcleanup
@@ -206,6 +216,7 @@ selfservice_del_envsetup()
 {
 	rlPhaseStartSetup "selfservice_del_envsetup"
 		#environment setup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in $(seq 1001 1001); do   ### yes this should be 1001 1001 so it only creates one user.
 			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_del_$i" 0 "selfservice-add selfservice_del_$i rule needed for test"
@@ -228,6 +239,7 @@ selfservice_del_1001()
 	rlPhaseStartTest "selfservice_del_1001 [positive test]"
 		local testID="selfservice_del_1001"
 		local tmpout=$TmpDir/selfservice_find_1001.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-del $testID" 0 "test options: (delete existing rule)"
 		Kcleanup
@@ -240,6 +252,7 @@ selfservice_del_1002()
 	rlPhaseStartTest "selfservice_del_1002 [negative test] "
 		local testID="selfservice_del_1002"
 		local tmpout=$TmpDir/selfservice_del_1002.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local name_TestValue_Negative="badname" 
 		local expectedErrMsg="ipa: ERROR: ACI with name \"badname\" not found"
@@ -278,6 +291,7 @@ selfservice_find_envsetup()
 {
 	rlPhaseStartSetup "selfservice_find_envsetup"
 		#environment setup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in $(seq 1001 1012); do
 			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_find_$i" 0 "selfservice-add selfservice_find_$i rule needed for test"
@@ -291,6 +305,7 @@ selfservice_find_envcleanup()
 {
 	rlPhaseStartCleanup "selfservice_find_envcleanup"
 		#environment cleanup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in $(seq 1001 1012); do
 			rlRun "ipa selfservice-del selfservice_find_$i" 0 "selfservice-del selfservice_find_$i rule used for test"
@@ -305,6 +320,7 @@ selfservice_find_1001()
 	rlPhaseStartTest "selfservice_find_1001 [positive test] --all"
 		local testID="selfservice_find_1001"
 		local tmpout=$TmpDir/selfservice_find_1001.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-find $testID --all " 0 "test options: " 
 		Kcleanup
@@ -317,6 +333,7 @@ selfservice_find_1002()
 	rlPhaseStartTest "selfservice_find_1002 [negative test] --all --attrs;negative;LIST --name;positive;STR --permissions;positive;LIST --raw"
 		local testID="selfservice_find_1002"
 		local tmpout=$TmpDir/selfservice_find_1002.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue_Negative="badattrs" #attrs;negative;LIST 
 		local name_TestValue="$testID" #name;positive;STR 
@@ -336,6 +353,7 @@ selfservice_find_1003()
 	rlPhaseStartTest "selfservice_find_1003 [negative test] --all --attrs;positive;LIST --name;negative;STR --permissions;positive;LIST --raw"
 		local testID="selfservice_find_1003"
 		local tmpout=$TmpDir/selfservice_find_1003.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="l" #attrs;positive;LIST 
 		local name_TestValue_Negative="badname" #name;negative;STR 
@@ -354,6 +372,7 @@ selfservice_find_1004() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 	rlPhaseStartTest "selfservice_find_1004 [negative test] --all --attrs;positive;LIST --name;positive;STR --permissions;negative;LIST --raw"
 		local testID="selfservice_find_1004"
 		local tmpout=$TmpDir/selfservice_find_1004.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="l" #attrs;positive;LIST 
 		local name_TestValue="$testID" #name;positive;STR 
@@ -374,6 +393,7 @@ selfservice_find_1005() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 	rlPhaseStartTest "selfservice_find_1005 [positive test] --all --attrs;positive;LIST --name;positive;STR --permissions;positive;LIST --raw"
 		local testID="selfservice_find_1005"
 		local tmpout=$TmpDir/selfservice_find_1005.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="l" #attrs;positive;LIST 
 		local name_TestValue="$testID" #name;positive;STR 
@@ -396,6 +416,7 @@ selfservice_find_1006()
 	rlPhaseStartTest "selfservice_find_1006 [negative test] --attrs;negative;LIST"
 		local testID="selfservice_find_1006"
 		local tmpout=$TmpDir/selfservice_find_1006.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue_Negative="mobile" #attrs;negative;LIST
 		local expectedErrMsg="Number of entries returned 0"
@@ -414,6 +435,7 @@ selfservice_find_1007()
 	rlPhaseStartTest "selfservice_find_1007 [positive test] --attrs;positive;LIST"
 		local testID="selfservice_find_1007"
 		local tmpout=$TmpDir/selfservice_find_1007.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="l" #attrs;positive;LIST
 		rlRun "ipa selfservice-find $testID  --attrs=$attrs_TestValue " 0 "test options:  (with arg of name) [attrs]=[$attrs_TestValue]" 
@@ -428,6 +450,7 @@ selfservice_find_1008()
 	rlPhaseStartTest "selfservice_find_1008 [negative test] --name;negative;STR"
 		local testID="selfservice_find_1008"
 		local tmpout=$TmpDir/selfservice_find_1008.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local name_TestValue_Negative="badname" #name;negative;STR
 		local expectedErrMsg="Number of entries returned 0"
@@ -444,6 +467,7 @@ selfservice_find_1009()
 	rlPhaseStartTest "selfservice_find_1009 [positive test] --name;positive;STR"
 		local testID="selfservice_find_1009"
 		local tmpout=$TmpDir/selfservice_find_1009.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local name_TestValue="$testID" #name;positive;STR
 		rlRun "ipa selfservice-find $testID  --name=$name_TestValue " 0 "test options:  [name]=[$name_TestValue]" 
@@ -457,6 +481,7 @@ selfservice_find_1010()
 	rlPhaseStartTest "selfservice_find_1010 [negative test] --permissions;negative;LIST"
 		local testID="selfservice_find_1010"
 		local tmpout=$TmpDir/selfservice_find_1010.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local permissions_TestValue_Negative="badperm" #permissions;negative;LIST
 		local expectedErrMsg="Number of entries returned 0"
@@ -472,6 +497,7 @@ selfservice_find_1011()
 	rlPhaseStartTest "selfservice_find_1011 [positive test] --permissions;positive;LIST"
 		local testID="selfservice_find_1011"
 		local tmpout=$TmpDir/selfservice_find_1011.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local permissions_TestValue="write" #permissions;positive;LIST
 		rlRun "ipa selfservice-find $testID  --permissions=$permissions_TestValue " 0 "test options:  (with arg of name) [permissions]=[$permissions_TestValue]" 
@@ -486,6 +512,7 @@ selfservice_find_1012() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 	rlPhaseStartTest "selfservice_find_1012 [positive test] --raw"
 		local testID="selfservice_find_1012"
 		local tmpout=$TmpDir/selfservice_find_1012.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		#rlRun "ipa selfservice-find $testID --raw " 0 "test options: " 
 		local expectedErrMsg="selfservice:$testID"
@@ -502,6 +529,7 @@ selfservice_find_1012() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 selfservice_find_1013()
 {
 	rlPhaseStartTest "selfservice_find_1013 --pkey-only [positive test]"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		attrs_TestValue="telephonenumber,mobile,pager,facsimiletelephonenumber" #attrs;positive;LIST
 		ipa_command_to_test="selfservice"
@@ -542,6 +570,7 @@ selfservice_mod_envsetup()
 {
 	rlPhaseStartSetup "selfservice_mod_envsetup"
 		#environment setup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in $(seq 1001 1009); do
 			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_mod_$i" 0 "selfservice-add selfservice_mod_$i rule needed for test"
@@ -555,6 +584,7 @@ selfservice_mod_envcleanup()
 {
 	rlPhaseStartCleanup "selfservice_mod_envcleanup"
 		#environment cleanup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in $(seq 1001 1009); do
 			rlRun "ipa selfservice-del selfservice_mod_$i" 0 "selfservice-del selfservice_mod_$i rule used for test"
@@ -569,6 +599,7 @@ selfservice_mod_1001() ### prompts for input...not a valid non-interactive test.
 	rlPhaseStartTest "selfservice_mod_1001 [positive test] --all"
 		local testID="selfservice_mod_1001"
 		local tmpout=$TmpDir/selfservice_mod_1001.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-mod $testID --all " 0 "test options: " 
 		Kcleanup
@@ -581,6 +612,7 @@ selfservice_mod_1002()
 	rlPhaseStartTest "selfservice_mod_1002 [negative test] --all --attrs;negative;LIST --permissions;positive;LIST --raw"
 		local testID="selfservice_mod_1002"
 		local tmpout=$TmpDir/selfservice_mod_1002.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue_Negative="badattr" #attrs;negative;LIST 
 		local permissions_TestValue="write" #permissions;positive;LIST 
@@ -597,6 +629,7 @@ selfservice_mod_1003()
 	rlPhaseStartTest "selfservice_mod_1003 [negative test] --all --attrs;positive;LIST --permissions;negative;LIST --raw"
 		local testID="selfservice_mod_1003"
 		local tmpout=$TmpDir/selfservice_mod_1003.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="l" #attrs;positive;LIST 
 		local permissions_TestValue_Negative="badperm" #permissions;negative;LIST 
@@ -616,6 +649,7 @@ selfservice_mod_1004() # BZ 772675 -- ipa selfservice-mod --raw returns "interna
 	rlPhaseStartTest "selfservice_mod_1004 [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw"
 		local testID="selfservice_mod_1004"
 		local tmpout=$TmpDir/selfservice_mod_1004.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="mobile" #attrs;positive;LIST 
 		local permissions_TestValue="write" #permissions;positive;LIST 
@@ -635,6 +669,7 @@ selfservice_mod_1005() # BZ 747741 -- command: ipa selfservice-mod : provide wro
 {
 	rlPhaseStartTest "selfservice_mod_1005 [negative test] --attrs;negative;LIST"
 		local testID="selfservice_mod_1005"
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local tmpout=$TmpDir/selfservice_mod_1005.$RANDOM.out.1
 		local attrs_TestValue_Negative="badattrs" #attrs;negative;LIST
@@ -654,6 +689,7 @@ selfservice_mod_1006()
 	rlPhaseStartTest "selfservice_mod_1006 [positive test] --attrs;positive;LIST"
 		local testID="selfservice_mod_1006"
 		local tmpout=$TmpDir/selfservice_mod_1006.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local attrs_TestValue="mobile" #attrs;positive;LIST
 		rlRun "ipa selfservice-mod $testID  --attrs=$attrs_TestValue " 0 "test options:  (change attrs) [attrs]=[$attrs_TestValue]" 
@@ -669,6 +705,7 @@ selfservice_mod_1007()
 	rlPhaseStartTest "selfservice_mod_1007 [negative test] --permissions;negative;LIST"
 		local testID="selfservice_mod_1007"
 		local tmpout=$TmpDir/selfservice_mod_1007.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local permissions_TestValue_Negative="badperm" #permissions;negative;LIST
 		local expectedErrMsg="ipa: ERROR: invalid 'permissions': \"badperm\" is not a valid permission"
@@ -687,6 +724,7 @@ selfservice_mod_1008()
 	rlPhaseStartTest "selfservice_mod_1008 [positive test] --permissions;positive;LIST"
 		local testID="selfservice_mod_1008"
 		local tmpout=$TmpDir/selfservice_mod_1008.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		local permissions_TestValue="read" #permissions;positive;LIST
 		rlRun "ipa selfservice-mod $testID  --permissions=$permissions_TestValue " 0 "test options:  (change perms) [permissions]=[$permissions_TestValue]" 
@@ -702,6 +740,7 @@ selfservice_mod_1009() ### prompts for input...not a valid non-interactive test.
 	rlPhaseStartTest "selfservice_mod_1009 [positive test] --raw"
 		local testID="selfservice_mod_1009"
 		local tmpout=$TmpDir/selfservice_mod_1009.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-mod $testID --raw " 0 "test options: " 
 		Kcleanup
@@ -727,6 +766,7 @@ selfservice_show_envsetup()
 {
 	rlPhaseStartSetup "selfservice_show_envsetup"
 		#environment setup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in $(seq 1001 1003); do
 			rlRun "ipa selfservice-add --attrs=l --permissions=write selfservice_show_$i" 0 "selfservice-add selfservice_show_$i rule needed for test"
@@ -740,6 +780,7 @@ selfservice_show_envcleanup()
 {
 	rlPhaseStartCleanup "selfservice_show_envcleanup"
 		#environment cleanup starts here
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		for i in $(seq 1001 1003); do
 			rlRun "ipa selfservice-del selfservice_show_$i" 0 "selfservice-del selfservice_show_$i rule used for test"
@@ -754,6 +795,7 @@ selfservice_show_1001()
 	rlPhaseStartTest "selfservice_show_1001 [positive test] --all"
 		local testID="selfservice_show_1001"
 		local tmpout=$TmpDir/selfservice_show_1001.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-show $testID --all " 0 "test options: " 
 		Kcleanup
@@ -766,6 +808,7 @@ selfservice_show_1002()
 	rlPhaseStartTest "selfservice_show_1002 [positive test] --all --raw"
 		local testID="selfservice_show_1002"
 		local tmpout=$TmpDir/selfservice_show_1002.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-show $testID --all --raw " 0 "test options: " 
 		Kcleanup
@@ -778,6 +821,7 @@ selfservice_show_1003()
 	rlPhaseStartTest "selfservice_show_1003 [positive test] --raw"
 		local testID="selfservice_show_1003"
 		local tmpout=$TmpDir/selfservice_show_1003.$RANDOM.out
+                rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		rlRun "ipa selfservice-show $testID --raw " 0 "test options: " 
 		Kcleanup
