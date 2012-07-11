@@ -1,0 +1,79 @@
+#!/usr/bin/expect
+
+set action [lrange $argv 0 0]
+set username [lrange $argv 1 1]
+set password  [lrange $argv 2 2]
+set adhost [lrange $argv 3 3]
+set ipahost [lrange $argv 4 4]
+set ipacrt [lrange $argv 5 5]
+set msifile [lrange $argv 6 6]
+set paswd password
+
+set timeout 5
+
+if { [string compare $action add ] == 0 } {
+puts "true";
+# Install and configure PassSync
+spawn ssh $username@$adhost;
+expect "*?assword:*";
+send -- "$password\r";
+expect "*Desktop>";
+send -- "cd ../downloads\r";
+expect "*Downloads>";
+send -- "msiexec /i $msifile /qn /l logfile.txt hostname=\"$ipahost\" portnum=\"636\" user=\"uid=passsync,cn=sysaccounts,cn=etc,dc=testrelm,dc=com\" password=\"password\" certtoken=\"Secret123\" srchbase=\"cn=users,cn=accounts,dc=testrelm,dc=com\"\r";
+send -- "exit\r";
+sleep 10
+
+# Upload the IPA certificate
+spawn sftp $username@$adhost;
+expect "*?assword:*";
+send -- "$password\r";
+expect ">";
+send -- "put $ipacrt\r";
+expect ">";
+send -- "bye\r";
+sleep 5
+
+# Import the certificate in the certdb for Passsync
+spawn ssh $username@$adhost;
+expect "*?assword:*";
+send -- "$password\r";
+expect "*Desktop>";
+send -- "cd c\:\\Program Files\\Red Hat Directory Password Synchronization\r";
+expect "*Synchronization>";
+send -- "certutil -d . -N\r";
+expect "*?assword*:*"
+send -- "$paswd\r";
+expect "*Enter new password: ";
+send -- "$paswd\r";
+expect "Re-enter password: ";
+send -- "$paswd\r";
+send -- "certutil -d . -A -i $ipacrt -n \"IPA Cert\" -t CT,, -a\r";
+send -- "shutdown /r /f /c \"Rebooting for winsync tests\"\r"
+expect eof
+
+} elseif { [string compare $action "delete"] == 0 } {
+puts "false";
+# Delete IPAcert file
+spawn sftp $username@$adhost;
+expect "*?assword:*";
+send -- "$password\r";
+expect ">";
+send -- "rm $ipacrt\r";
+expect ">";
+send -- "bye\r";
+sleep 5
+
+# Uninstall PassSync
+spawn ssh $username@$adhost;
+expect "*?assword:*";
+send -- "$password\r";
+expect "*Desktop>";
+send -- "cd ../downloads\r";
+expect "*Downloads>";
+send -- "msiexec /x $msifile /qn\r";
+send -- "exit\r";
+expect eof;
+} else {
+  puts "Usage: $argv0 add/delete ADadmin ADpswd ADhost IPAhost ipacrt msifile"
+}

@@ -90,6 +90,8 @@ IPAhost=`hostname`
 #aduser_ln="ads"
 slapd_dir="/etc/dirsrv/slapd-TESTRELM-COM"
 ldap_conf="/etc/openldap/ldap.conf"
+crt_file="/etc/ipa/ca.crt"
+ipacrt="IPAcrt.cer"
 named_conf="/etc/named.conf"
 named_conf_bkp="/etc/named.conf.winsync"
 error_log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
@@ -132,6 +134,17 @@ popd
 	rlServiceStart "named"
 	sleep 30
 	rlRun "host $ADhost"
+
+	# Uploading the IPA certificate in AD and importing it for passync
+	rlRun "cp $crt_file $ipacrt"
+	. ./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $IPAhost $ipacrt $msifile
+	rlLog "AD server is being rebooted"
+	while true; do
+	  ping -c 1 $ADhost
+	  [ $? -eq 0 ] && break
+	done
+	sleep 300
+	ping -c 4 10.65.207.213 && rlPass "AD server has rebooted"
 rlPhaseEnd
 }
 
@@ -606,6 +619,7 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 	rlRun "service named restart"
 
 	rlRun "rm -f *.ldif"
+	rlRun "rm -f $ipacrt"
 	rlRun "rm -fr $TmpDir"
 
 	rlRun "sed -i \"/^TLS_CACERTDIR.*/d\" /etc/openldap/ldap.conf"

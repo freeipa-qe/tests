@@ -42,13 +42,27 @@ The command should report that zone IPA.Domain was successfully added.
     Cert Token: Secret123
     search base: cn=users,cn=accounts,dc=testrelm,dc=com
 
- d. Make IPA CA trusted
+ d. Download freeSSHd from the link below or use the one in the current directory
+    http://www.freesshd.com/freeSSHd.exe
+    # Note : Steps e and f are not required to be performed for automation
+
+  i. While installing freesSSHd on the AD server, take all the default settings except for using it as a service.
+ ii. Run the FreeSSHd shortcut from the desktop and configure and start the server
+
+iii. Add user "administrator" from the "Users" tab and allow it to have SSH cmd line access.
+
+ iv. Test the administrator ssh login from a linux machine
+
+  v. Next on the AD server open FreeSSHd shortcut again and set the home path in SFTP tab to "C:\Program Files\Red Hat Directory Password Synchronization"
+
+
+ e. Make IPA CA trusted
     From command prompt
     > cd C:\Program Files\Red Hat Directory Password Synchronization
     > certutil -d . -N (this will ask for password. Give "password")
     > certutil -d . -A -n "IPA CA" -t CT,, -a -i c:\path\to\ipaca.crt
  
- e. Restart AD Server
+ f. Restart AD Server
 
 6. Make sure time is synchronized between both servers
 
