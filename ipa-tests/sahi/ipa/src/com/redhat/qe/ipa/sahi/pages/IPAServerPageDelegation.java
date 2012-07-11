@@ -27,7 +27,7 @@ public class IPAServerPageDelegation extends IPAWebPage{
 		addNegativePage="Add Negative Delegation";
 		modifySettingsPage="Modify Delegation Settings";
 		modifyUpdateResetCancelPage="Modify Delegation UpdateResetCancel";
-		//modifyNegativePage="Modify Delegation Negative";
+		modifyNegativePage="Modify Delegation Negative";
 		searchPage="Search Delegation";
 		delPage = "Delete Delegation"; 
 		addUserPage="Add User";
@@ -50,7 +50,7 @@ public class IPAServerPageDelegation extends IPAWebPage{
 		loginOldPassword="Login Old Password";
 		loginNewPassword="Login New Password";
 		registerStandardTestCases();
-		registerNonStandardTestCases();
+		registerTestCases("nonStandardUserDelegation", EditUserDelegationTestCases);
 		System.out.println("New instance of " + IPAServerPageDelegation.class.getName() + " is ready");
 	}
 
