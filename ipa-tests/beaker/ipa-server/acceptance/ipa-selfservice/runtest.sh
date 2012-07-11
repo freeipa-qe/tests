@@ -59,7 +59,12 @@ satrtEpoch=`date "+%s"`
 
 rlJournalStart
     rlPhaseStartSetup "ipa-selfservice startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
+        rpm -qa | grep $PACKAGE
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-server package is installed"
+        else
+                rlFail "ipa-server package NOT found!"
+        fi
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
