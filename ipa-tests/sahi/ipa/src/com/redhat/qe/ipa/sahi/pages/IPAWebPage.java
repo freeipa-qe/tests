@@ -51,6 +51,7 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 	protected String deleteUserNonStandard;
 	protected String deleteGroupNonStandard;
 	protected String EditUndelegatedUser;
+	protected ArrayList<String> testAccounts= new ArrayList<String>();
 	protected String modifyConditionInclusiveAddPage;//xdong
 	protected String modifyConditionInclusiveDeletePage;//xdong
 	protected String modifyConditionExclusiveAddPage;//xdong
@@ -124,11 +125,17 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 	@Override
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor){
 		String pageName = addPage;
+		testAccounts.clear();
 		if (pageName == null)
 			return monitor;
 		try {
 			addSingleNewEntry(monitor, pageName);
-			monitor.pass();
+			if(browser.link(testAccounts.get(0)).exists()){
+				monitor.pass("Added and Verified Successfully");
+			}
+			else{
+				monitor.fail("Add Failed");
+			}
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -139,11 +146,18 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 	@Override
 	public IPAWebTestMonitor addSpecial(IPAWebTestMonitor monitor){
 		String pageName = addSpecialPage;
+		testAccounts.clear();
 		if (pageName == null)
 			return monitor;
 		try {
 			addSingleNewEntry(monitor, pageName);
-			monitor.pass();
+			if(browser.link(testAccounts.get(0)).exists()){
+				monitor.pass("Added and Verified Successfully");
+			}
+			else{
+				monitor.fail("Add Failed");
+			}
+
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -154,11 +168,17 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 	@Override
 	public IPAWebTestMonitor addLong(IPAWebTestMonitor monitor){
 		String pageName = addLongPage;
+		testAccounts.clear();
 		if (pageName == null)
 			return monitor;
 		try {
 			addSingleNewEntry(monitor, pageName);
-			monitor.pass();
+			if(browser.link(testAccounts.get(0)).exists()){
+				monitor.pass("Added and Verified Successfully");
+			}
+			else{
+				monitor.fail("Add Failed");
+			}
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -171,10 +191,19 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 		String pageName = addPage;
 		if (pageName == null)
 			return monitor;
+		testAccounts.clear();
 		int numOfEntries = 3;
 		try {
 			addMultipleNewEntries(monitor, pageName, numOfEntries);
-			monitor.pass();
+			for(int i=0;i<numOfEntries;i++){
+				if(browser.link(testAccounts.get(i)).exists()){
+					monitor.pass("Added and Verified Successfully");
+				}
+				else{
+					monitor.fail("Add Failed");
+				}
+			}	
+
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -203,11 +232,17 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 	@Override
 	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor monitor){
 		String pageName = addPage;
+		testAccounts.clear();
 		if (pageName == null)
 			return monitor;
 		try {
 			addNewEntryThenCancelOperation(monitor, pageName);
-			monitor.pass();
+			if(browser.link(testAccounts.get(0)).exists()){
+				monitor.fail("Add Failed");
+			}
+			else{
+				monitor.pass("Added and Verified Successfully");
+			}
 		} catch (IPAWebAutomationException e) {
 			e.printStackTrace();
 			monitor.fail(e);
@@ -574,11 +609,18 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 	@Override
 	public IPAWebTestMonitor deleteSingle(IPAWebTestMonitor monitor){ 
 		String pageName = delPage;
+		testAccounts.clear();
 		if (pageName == null)
 			return monitor;
 		try {
 			deleteSingleEntry(monitor, pageName);
-			monitor.pass();
+			if(browser.link(testAccounts.get(0)).exists()){
+				monitor.fail("Delete Failed");
+			}
+			else{
+				monitor.pass("Delete Passed");
+			}
+
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -589,13 +631,22 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 	@Override
 	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor monitor){
 		String pageName = delPage;
+		testAccounts.clear();
 		if (pageName == null)
 			return monitor;
 		
 		int numOfEntries = 7;
 		try {
 			deleteMultipleEntry(monitor, pageName, numOfEntries);
-			monitor.pass();
+			for(int i=0;i<numOfEntries;i++){
+				if(browser.link(testAccounts.get(i)).exists()){
+					monitor.fail("Delete Failed");
+				}
+				else{
+					monitor.pass("Delete Passed");
+				}
+			}
+
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -612,20 +663,40 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 			String pageName = deleteDelegationNonstandard;
 			if (pageName == null)
 				return monitor;
-		
+			testAccounts.clear();
 			deleteSingleEntry(monitor, pageName);
-			monitor.pass("Delegation Deleted");
+			if(browser.link(testAccounts.get(0)).exists()){
+				monitor.fail("Delete Failed");
+			}
+			else{
+				monitor.pass("Delete Passed");
+			}
+			testAccounts.clear();
+
 			
 			browser.navigateTo(commonTasks.userPage, true);
 			pageName=deleteUserNonStandard;
 			deleteMultipleEntry(monitor, pageName, 3);
-			monitor.pass("Users Deleted");
-			
+			for(int i=0;i<3;i++){
+				if(browser.link(testAccounts.get(i)).exists()){
+					monitor.fail("Delete Failed");
+				}
+				else{
+					monitor.pass("Delete Passed");
+				}
+			}
+
 			browser.navigateTo(commonTasks.groupPage, true);
 			pageName=deleteGroupNonStandard;
 			deleteMultipleEntry(monitor, pageName, 2);
-			monitor.pass("Groups Deleted");
-			
+			for(int i=0;i<2;i++){
+				if(browser.link(testAccounts.get(i)).exists()){
+					monitor.fail("Delete Failed");
+				}
+				else{
+					monitor.pass("Delete Passed");
+				}
+			}
 			browser.navigateTo(commonTasks.delegationPage, true);
 			
 		} catch (IPAWebAutomationException e) { 
@@ -641,11 +712,17 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 			String pageName = addUserDelegationPage;
 			if (pageName == null)
 				return monitor;
-		
+			testAccounts.clear();
 			CommonTasks.formauth(browser, "admin", "Secret123");
 			browser.navigateTo(commonTasks.delegationPage,true);
 			addSingleNewEntry(monitor, pageName);
-			monitor.pass("New Delegation Added");
+			if(browser.link(testAccounts.get(0)).exists()){
+				monitor.pass("Added and Verified Successfully");
+			}
+			else{
+				monitor.fail("Add and Verify Failed");
+			}
+
 			pageName=loginUser;
 			String userName=factory.getModifyTestAccount(pageName);
 			pageName=loginOldPassword;
@@ -718,36 +795,69 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 				return monitor;
 			browser.navigateTo(commonTasks.userPage,true);
 			for(int i=0;i<numofEntries;i++){
+				testAccounts.clear();
 				addSingleNewEntry(monitor, pageName);
-				monitor.pass();
+				if(browser.link(testAccounts.get(0)).exists()){
+					monitor.pass("Added and Verified Successfully");
+				}
+				else{
+					monitor.fail("Add and Verify Failed");
+				}
 			}
+
 			pageName=addGroupPage;
 			if (pageName == null)
 				return monitor;
 			browser.navigateTo(commonTasks.groupPage,true);
 			numofEntries=2;
 			for(int i=0;i<numofEntries;i++){
+				testAccounts.clear();
 				addSingleNewEntry(monitor, pageName);
-				monitor.pass();
+				if(browser.link(testAccounts.get(0)).exists()){
+					monitor.pass("Added and Verified Successfully");
+				}
+				else{
+					monitor.fail("Add and Verify Failed");
+				}
 			}
+
 			pageName=userToGroupPage;
 			if (pageName == null)
 				return monitor;
 			testAccount=factory.getModifyTestAccount(pageName);
+			testAccounts.clear();
 			if(browser.link(testAccount).exists()){
 				browser.link(testAccount).click();
 				browser.link("member_user").click();
 				assignUserToGroup(monitor, pageName);
+				for(int i=0;i<testAccounts.size();i++){
+					if(browser.link(testAccounts.get(i)).exists()){
+						monitor.pass("Added and Verified Successfully");
+					}
+					else{
+						monitor.fail("Add and Verify Failed");
+					}
+				}
+
 			}
 			browser.navigateTo(commonTasks.groupPage, true);
 			pageName=memberuserToMemberGroupPage;
 			if (pageName == null)
 				return monitor;
+			testAccounts.clear();
 			testAccount=factory.getModifyTestAccount(pageName);
 			if(browser.link(testAccount).exists()){
 				browser.link(testAccount).click();
 				browser.link("member_user").click();
 				assignUserToGroup(monitor, pageName);
+				for(int i=0;i<testAccounts.size();i++){
+					if(browser.link(testAccounts.get(i)).exists()){
+						monitor.pass("Added and Verified Successfully");
+					}
+					else{
+						monitor.fail("Add and Verify Failed");
+					}
+				}
 			}
 			browser.navigateTo(commonTasks.delegationPage, true);
 			
@@ -1024,22 +1134,34 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 		ArrayList<String> uiElements = factory.getUIELements(pageName);
 		ArrayList<String> expectedErrorMsgs = new ArrayList<String>();
 		StringBuffer testData = new StringBuffer();
+		int countelements=0;
 		for (String uiElement:uiElements)
 		{
 			String[] elementID = uiElement.split(":"); 
 			String tag = elementID[0];
 			String id = elementID[1]; 
 			String value = factory.getValue(pageName, tag, id);
-			if(value.charAt(value.length()-1)=='l'){
-				value=value.substring(0,value.length()-1);
-				value=" " + value;
+			if(countelements==0){
+				if(tag.equals("checkbox")){
+					testAccounts.add(id);
+				}
+				else{
+					testAccounts.add(value);
+				}
 			}
-			else if(value.charAt(value.length()-1)=='t'){
-				value=value.substring(0,value.length()-1);
-				value=value + " ";
+			if(pageName.equals("addNegativePage")){
+				if(value.charAt(value.length()-1)=='l'){
+					value=value.substring(0,value.length()-1);
+					value=" " + value;
+				}
+				else if(value.charAt(value.length()-1)=='t'){
+					value=value.substring(0,value.length()-1);
+					value=value + " ";
+				}
 			}
 			testData.append(value + " & ");
 			fillDataInElement(monitor, pageName,tag,id,value);
+			countelements++;
 		}
 		monitor.setCurrentTestData(pageName,"{" + testData.substring(0,testData.length()-3) + "}");
 		
@@ -1117,10 +1239,6 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 					before="uncheck";
 					after="uncheck";
 				}
-			}else if (id.equals("automemberinclusiveregex")){ //xdong for automember condition delete all
-				browser.checkbox("automemberinclusiveregex").check();//xdong for automember condition delete all
-			}else if (id.equals("automemberexclusiveregex")){ //xdong for automember condition delete all
-				browser.checkbox("automemberexclusiveregex").check(); //xdong for automember condition delete all
 			}else
 			{
 				browser.checkbox(value).check(); // default behave
@@ -1143,14 +1261,8 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 			if (browser.textbox(id).exists()){
 				before = browser.textbox(id).getValue();
 				browser.textbox(id).click();
-				browser.span("icon search-icon").near(browser.textbox("automemberdefaultgroup")).click();//xdong for set default group/hostgroup
 				browser.select("list").choose(value);
 				after = browser.textbox(id).getValue();
-			}else if (browser.select(id).exists()) {//xdong for automember rule condition add
-				before = browser.select(id).getValue();
-				browser.select(id).click();
-				browser.select("key").choose(value);
-				after = browser.select(id).getValue();
 			}else
 				throw new IPAWebAutomationActionNotDefinedException(pageName, tag, id);
 		}
@@ -1159,6 +1271,8 @@ public class IPAWebPage implements StandardTest,NonStandardTest{
 		}
 		return new String[] {before, after};
 	}
+	
+	
 	
 	protected String readElementValue(IPAWebTestMonitor monitor,String pageName,String tag, String id, String value)
 	{ 
