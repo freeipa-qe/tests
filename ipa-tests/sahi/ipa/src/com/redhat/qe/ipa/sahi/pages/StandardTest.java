@@ -4,7 +4,8 @@ public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
 	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative"};
-	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative","modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","setDefaultGroup"}; //xdong for the last 4
+	//public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative","modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","setDefaultGroup"}; //xdong for the last 4
+	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative"};
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
 	
