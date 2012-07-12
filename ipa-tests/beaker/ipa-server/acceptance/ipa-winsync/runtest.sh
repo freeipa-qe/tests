@@ -40,13 +40,18 @@
 . /dev/shm/env.sh
 
 # Install samba-common package if not already installed
-rpm="samba-common"
+rpm1="samba-common"
+rpm2="rdesktop"
 
-   rlCheckRpm "$rpm"
+   rlCheckRpm "$rpm1"
 	if [ $? -ne 0 ]; then
-           rlRun "yum install -y $rpm"
+           rlRun "yum install -y $rpm1"
         fi
 
+   rlCheckRpm "$rpm2"
+        if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm2"
+        fi
 # Include test case file
 . ./t.ipa-winsync.sh
 

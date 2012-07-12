@@ -1,79 +1,117 @@
 #!/usr/bin/expect
+# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Author: Steeve Goveas <stv@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
+#
+#   This copyrighted material is made available to anyone wishing
+#   to use, modify, copy, or redistribute it subject to the terms
+#   and conditions of the GNU General Public License version 2.
+#
+#   This program is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public
+#   License along with this program; if not, write to the Free
+#   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+#   Boston, MA 02110-1301, USA.
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 set action [lrange $argv 0 0]
 set username [lrange $argv 1 1]
 set password  [lrange $argv 2 2]
 set adhost [lrange $argv 3 3]
-set ipahost [lrange $argv 4 4]
-set ipacrt [lrange $argv 5 5]
-set msifile [lrange $argv 6 6]
+set msifile [lrange $argv 4 4]
+set ipahost [lrange $argv 5 5]
+set ipacrt [lrange $argv 6 6]
 set paswd password
+#set adpath "c:\\Windows\\System32\\CertSrv\\CertEnroll"
+#set adcrt "$adhost*.crt"
+set passsync_dir "c:\\Program Files\\Red Hat Directory Password Synchronization"
+set ipapath "c:\\IPA"
 
 set timeout 5
 
 if { [string compare $action add ] == 0 } {
-puts "true";
+
+# Upload PassSync Installer
+spawn sftp $username@$adhost;
+expect "*?assword:*";
+send -- "$password\r";
+expect ">";
+send -- "rmdir /S /Q IPA\r";
+send -- "mkdir IPA\r";
+send -- "cd IPA\r";
+send -- "put $msifile\r";
+send -- "bye\r";
+sleep 5;
+
 # Install and configure PassSync
 spawn ssh $username@$adhost;
 expect "*?assword:*";
 send -- "$password\r";
-expect "*Desktop>";
-send -- "cd ../downloads\r";
-expect "*Downloads>";
+expect "*>";
+send -- "cd $ipapath\r";
+expect "*IPA>";
 send -- "msiexec /i $msifile /qn /l logfile.txt hostname=\"$ipahost\" portnum=\"636\" user=\"uid=passsync,cn=sysaccounts,cn=etc,dc=testrelm,dc=com\" password=\"password\" certtoken=\"Secret123\" srchbase=\"cn=users,cn=accounts,dc=testrelm,dc=com\"\r";
 send -- "exit\r";
-sleep 10
+sleep 10;
 
 # Upload the IPA certificate
 spawn sftp $username@$adhost;
 expect "*?assword:*";
 send -- "$password\r";
 expect ">";
+send -- "cd IPA\r";
 send -- "put $ipacrt\r";
-expect ">";
 send -- "bye\r";
-sleep 5
+sleep 5;
 
 # Import the certificate in the certdb for Passsync
 spawn ssh $username@$adhost;
 expect "*?assword:*";
 send -- "$password\r";
-expect "*Desktop>";
-send -- "cd c\:\\Program Files\\Red Hat Directory Password Synchronization\r";
+expect "*>";
+send -- "cd $passsync_dir\r";
 expect "*Synchronization>";
 send -- "certutil -d . -N\r";
-expect "*?assword*:*"
-send -- "$paswd\r";
+#expect "*?assword*:*"
+#send -- "$paswd\r";
 expect "*Enter new password: ";
 send -- "$paswd\r";
 expect "Re-enter password: ";
 send -- "$paswd\r";
-send -- "certutil -d . -A -i $ipacrt -n \"IPA Cert\" -t CT,, -a\r";
-send -- "shutdown /r /f /c \"Rebooting for winsync tests\"\r"
-expect eof
+send -- "certutil -d . -A -i $ipapath\\$ipacrt -n \"IPA Cert\" -t CT,, -a\r";
+send -- "shutdown /r /f\r";
+expect eof;
 
-} elseif { [string compare $action "delete"] == 0 } {
-puts "false";
-# Delete IPAcert file
-spawn sftp $username@$adhost;
-expect "*?assword:*";
-send -- "$password\r";
-expect ">";
-send -- "rm $ipacrt\r";
-expect ">";
-send -- "bye\r";
-sleep 5
-
+} elseif { [string compare $action delete ] == 0 } {
 # Uninstall PassSync
 spawn ssh $username@$adhost;
 expect "*?assword:*";
 send -- "$password\r";
-expect "*Desktop>";
-send -- "cd ../downloads\r";
-expect "*Downloads>";
+expect "*>";
+send -- "cd $ipapath\r";
+expect "*IPA>";
 send -- "msiexec /x $msifile /qn\r";
+sleep 5;
+send -- "del $msifile\r";
+send -- "cd ..\r";
+sleep 10;
+expect "*>";
+send -- "rmdir /S /Q IPA\r";
 send -- "exit\r";
 expect eof;
+
 } else {
   puts "Usage: $argv0 add/delete ADadmin ADpswd ADhost IPAhost ipacrt msifile"
 }

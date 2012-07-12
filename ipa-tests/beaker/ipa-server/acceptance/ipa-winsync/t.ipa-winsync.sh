@@ -61,6 +61,7 @@ userpw2="Dec3yp12"
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
 PACKAGE3="samba-common"
+PACKAGE4="rdesktop"
 
 sec="30"
 DMpswd="Secret123"
@@ -87,6 +88,7 @@ sub_OU1="sub-level1"
 OU2="level2"
 sub_OU2="sub-level2"
 IPAhost=`hostname`
+IPAlog="IPAcert_install.log"
 #aduser_ln="ads"
 slapd_dir="/etc/dirsrv/slapd-TESTRELM-COM"
 ldap_conf="/etc/openldap/ldap.conf"
@@ -104,7 +106,7 @@ rlPhaseStartTest "Setup for winsync sanity tests"
 
 	# check for packages
 pushd .
-	for item in $PACKAGE1 $PACKAGE2 $PACKAGE3; do
+	for item in $PACKAGE1 $PACKAGE2 $PACKAGE3 $PACKAGE4; do
         	rpm -qa | grep $item
         	if [ $? -eq 0 ] ; then
                 	rlPass "$item package is installed"
@@ -129,22 +131,24 @@ popd
 	# Adding conditional forwarder
 	rlRun "cp -p $named_conf $named_conf_bkp" 0 "Backup $named_conf before adding conditional forwarder for AD"
 	echo -e "\nzone \"$ADdomain\" IN {\n\ttype forward;\n\tforwarders { $ADip; };\n\tforward only;\n};" >> $named_conf
-#	rlRun "service named restart"
 	rlServiceStop "named"
 	rlServiceStart "named"
 	sleep 30
 	rlRun "host $ADhost"
 
 	# Uploading the IPA certificate in AD and importing it for passync
+	rm -f $ipacrt
 	rlRun "cp $crt_file $ipacrt"
-	. ./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $IPAhost $ipacrt $msifile
+	./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt > $IPAlog 2>&1
 	rlLog "AD server is being rebooted"
+	sleep 300
 	while true; do
 	  ping -c 1 $ADhost
 	  [ $? -eq 0 ] && break
 	done
-	sleep 300
 	ping -c 4 10.65.207.213 && rlPass "AD server has rebooted"
+	sleep 120
+	#rdesktop $ADhost -u $ADadmin -p $ADpswd -d $ADdomain &
 rlPhaseEnd
 }
 
@@ -618,6 +622,10 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 	rlRun "rm -f /etc/named.conf && cp -p /etc/named.conf.winsync /etc/named.conf" 0 "Replacing named.conf file from backup"
 	rlRun "service named restart"
 
+	# Removing IPA cert from AD
+	./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile >> $IPAlog 2>&1
+
+#	rlRun "kill -15 `pidof rdesktop`"
 	rlRun "rm -f *.ldif"
 	rlRun "rm -f $ipacrt"
 	rlRun "rm -fr $TmpDir"
