@@ -139,7 +139,7 @@ popd
 	# Uploading the IPA certificate in AD and importing it for passync
 	rm -f $ipacrt
 	rlRun "cp $crt_file $ipacrt"
-	./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt > $IPAlog 2>&1
+	./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt > /dev/null 2>&1
 	rlLog "AD server is being rebooted"
 	sleep 300
 	while true; do
@@ -623,7 +623,7 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 	rlRun "service named restart"
 
 	# Removing IPA cert from AD
-	./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile >> $IPAlog 2>&1
+	./IPAcert_install.exp delete $ADadmin $ADpswd $ADhost $msifile > /dev/null 2>&1
 
 #	rlRun "kill -15 `pidof rdesktop`"
 	rlRun "rm -f *.ldif"
