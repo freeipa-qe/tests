@@ -448,8 +448,8 @@ ipa_install_prep()
 	fi
 
 	# Fix hostname
-	if [ ! -f /etc/sysconfig/network.ipabackup ]; then
-		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.ipabackup"
+	if [ ! -f /etc/sysconfig/network-ipabackup ]; then
+		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
 	fi
 	rlRun "hostname $hostname_s.$DOMAIN"
 	rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
