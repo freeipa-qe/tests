@@ -8,6 +8,7 @@ public interface StandardTest {
 	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative"};
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
+	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard"};
 	
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addSpecial(IPAWebTestMonitor monitor);
@@ -36,4 +37,9 @@ public interface StandardTest {
 	
 	public IPAWebTestMonitor deleteSingle(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor monitor);
+	
+	public IPAWebTestMonitor addUserDelegation(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor addUserGroup(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor delegationNotAdded(IPAWebTestMonitor monitor);
+	public IPAWebTestMonitor deleteNonStandard(IPAWebTestMonitor monitor);
 }

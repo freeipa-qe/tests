@@ -11,7 +11,7 @@ import org.junit.internal.matchers.CombinableMatcher;
 import com.redhat.qe.ipa.sahi.tasks.*;
 import com.sun.mail.imap.protocol.SearchSequence;
 
-public class IPAWebPage implements StandardTest,NonStandardTest{
+public class IPAWebPage implements StandardTest{
 
 	protected SahiTasks browser;
 	protected CommonTasks commonTasks;
