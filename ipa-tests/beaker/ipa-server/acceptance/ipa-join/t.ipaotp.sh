@@ -82,8 +82,8 @@ ipa_otp_1004()
         local tmpout=$TmpDir/ipa_otp_1004.$RANDOM.out
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
-        local expectedErrMsg="Host is already joined"
-        local expectedErrCode=13
+        local expectedErrMsg="Incorrect password"
+        local expectedErrCode=15
         qaRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$OTP" "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$OTP]" 
         rm $tmpout
     rlPhaseEnd

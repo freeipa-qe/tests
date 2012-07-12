@@ -49,6 +49,7 @@ PACKAGE2="ipa-client"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
+TmpDir=`mktemp -d`
 ##########################################
 #   test main 
 #########################################
