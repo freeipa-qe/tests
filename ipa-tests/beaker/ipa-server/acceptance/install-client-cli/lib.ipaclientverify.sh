@@ -85,7 +85,8 @@ install_fornexttest()
            rlLog "Install for next test"
            # an existing install is required to begin this test.
            rlLog "Executing: ipa-client-install -p $ADMINID -w $ADMINPW -U" 
-           rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U" 0 "Installing ipa client for next test"
+           #rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U" 0 "Installing ipa client for next test"
+           rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER"
        fi
 }
 
@@ -195,8 +196,15 @@ verify_krb5()
 {
     rlLog "Verify krb5.conf"
 
-    testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
-    ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
+	klist -ekt /etc/krb5.keytab | grep $HOSTNAME
+	if [ $? -ne 0 ] ; then
+		if [ -f /etc/fedora-release ] ; then
+			rlAssertGrep "# default_realm = $RELM" $KRB5
+		else
+			testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
+	    		ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
+		fi
+	fi
     testrdns=`grep "rdns" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "rdns " "$rdns" "$testrdns" "$1" 
     #testticketlifetime=`grep "ticket_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 

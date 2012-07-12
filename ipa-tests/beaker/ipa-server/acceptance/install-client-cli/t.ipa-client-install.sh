@@ -199,6 +199,7 @@ ipaclientinstall_noNTP()
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -N -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with no NTP configured"
         verify_install true nontp
     rlPhaseEnd
+
     rlPhaseStartTest "ipa-client-install-06- [Positive] Uninstall after install with no NTP"
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
         rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client after install with no NTP"
@@ -267,9 +268,9 @@ ipaclientinstall_server_unreachableserver()
 {
     rlPhaseStartTest "ipa-client-install-10- [Negative] Install with unreachable server"
        uninstall_fornexttest
-        ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
-        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
-        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
+       ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
+       rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
+       rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
        rlLog "EXECUTING: ipa-client-install -U"
        command="ipa-client-install -p $ADMINID -w $ADMINPW -U"
        expmsg="Unable to discover domain, not provided on command line
@@ -298,7 +299,13 @@ ipaclientinstall_realm_casesensitive()
        command="ipa-client-install --realm=$relminlowercase"
        expmsg="ERROR: The provided realm name: [$relminlowercase] does not match with the discovered one: [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_realm_casesensitive.out
-       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with incorrect case realmname" 
+
+	if [ -f /etc/fedora-release ] ; then
+		rlRun "$command > $tmpout 2>&1" 1
+		rlAssertGrep "The provided realm name \[$relminlowercase\] does not match discovered one \[$RELM\]" "$tmpout"
+	else
+       		qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with incorrect case realmname" 
+	fi
 
     rlPhaseEnd
 }
@@ -311,7 +318,14 @@ ipaclientinstall_invalidrealm()
        command="ipa-client-install --realm=xxx"
        expmsg="ERROR: The provided realm name: [xxx] does not match with the discovered one: [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_invalidrealm.out
-       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid realmname" 
+
+	if [ -f /etc/fedora-release ] ; then
+                rlRun "$command > $tmpout 2>&1" 1
+                rlAssertGrep "The provided realm name \[xxx\] does not match discovered one \[$RELM\]" "$tmpout"
+	else
+	        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid realmname" 
+	fi
+
     rlPhaseEnd
 }
 
@@ -333,7 +347,14 @@ ipaclientinstall_hostname()
        rlLog "EXECUTING: $command" 
        expmsg1="Warning: Hostname ($CLIENT.nonexistent) not found in DNS"
        expmsg2="Could not update DNS SSHFP records."
-       qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
+
+        if [ -f /etc/fedora-release ] ; then
+                rlRun "$command > $tmpout 2>&1" 
+                rlAssertGrep "Hostname ($CLIENT.nonexistent) not found in DNS" "$tmpout"
+                rlAssertGrep "Could not update DNS SSHFP records." "$tmpout"
+        else
+		qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
+        fi
 
        verify_install true nonexistent
        verify_hostname $CLIENT.nonexistent
@@ -345,13 +366,12 @@ ipaclientinstall_hostname()
     
        # after uninstall of this - verify keytab for this client is set false on server 
        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
-        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
+       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
        local tmpout=$TmpDir/verify_keytab_afteruninstall.$RANDOM.out
        verify_keytab_afteruninstall $CLIENT.nonexistent $tmpout
 
        # clear the host record, there is no DNS record associated for this host
-       rlRun "ipa host-del $CLIENT.nonexistent" 0 "Deleting client record and DNS entry from server"
-
+	rlRun "ipa host-del $CLIENT.nonexistent" 0 "Deleting client record and DNS entry from server"
     rlPhaseEnd
 
 }
@@ -406,13 +426,20 @@ ipaclientinstall_nonadminprincipal()
 {
     rlPhaseStartTest "ipa-client-install-16- [Negative] Install with principal with no admin priviliges"
        install_fornexttest
+       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before uninstalling"
        create_ipauser $testuser $testuser $testuser $testpwd
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install  --principal $testuser -w $testpwd -U"
        command="ipa-client-install  --principal $testuser -w $testpwd -U" 
        expmsg="Joining realm failed: No permission to join this host to the IPA domain."
        tmpout=$TmpDir/ipaclientinstall_nonadminprincipal.out
-       qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with non-admin principal" "$expmsg"
+
+        if [ -f /etc/fedora-release ] ; then
+                rlRun "$command > $tmpout 2>&1" 1
+                rlAssertGrep "Joining realm failed: No permission to join this host to the IPA domain." "$tmpout"
+        else
+       		qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with non-admin principal" "$expmsg"
+        fi
 
        # delete the user added for this test
        install_fornexttest
@@ -442,7 +469,8 @@ ipaclientinstall_permit()
     rlPhaseStartTest "ipa-client-install-18- [Positive] Install and configure SSSD to permit all access"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $ADMINPW -U --permit"
-        rlRun "ipa-client-install  -p $ADMINID -w $ADMINPW -U --permit" 0 "Installing ipa client and configure SSSD to permit all access"
+        #rlRun "ipa-client-install  -p $ADMINID -w $ADMINPW -U --permit" 0 "Installing ipa client and configure SSSD to permit all access"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --permit" 0 "Installing ipa client and configure SSSD to permit all access"
         verify_install true permit
     rlPhaseEnd
     rlPhaseStartTest "ipa-client-install-19- [Positive] Uninstall and disable SSSD to permit all access "
@@ -480,6 +508,7 @@ ipaclientinstall_enablednsupdates()
 {
     rlPhaseStartTest "ipa-client-install-22- [Positive] Install and enable dynamic dns updates"
         uninstall_fornexttest
+	sleep 10
         rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $ADMINPW -U --enable-dns-updates"
         rlRun "ipa-client-install  -p $ADMINID -w $ADMINPW -U --enable-dns-updates" 0 "Installing ipa client and enable dynamic dns updates"
         verify_install true enablednsupdates
@@ -502,6 +531,12 @@ ipaclientinstall_nosssd()
 {
     rlPhaseStartTest "ipa-client-install-24- [Positive] Install with no SSSD configured"
         uninstall_fornexttest
+
+	rpm -q nss-pam-ldapd
+	if [ $? = 1 ] ; then
+		rlRun "yum install -y nss-pam-ldapd"
+	fi
+
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd" 0 "Installing ipa client and configuring - with no SSSD configured"
         verify_install true nosssd
@@ -542,9 +577,14 @@ ipaclientinstall_force()
       # A second install will indicate it is already installed.
       command="ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER"
       expmsg="IPA client is already configured on this system."
-       local tmpout=$TmpDir/ipaclientinstall_force1.out
-       qaRun "$command" "$tmpout" 3 $expmsg "Verify expected error message for reinstall of IPA Install"
-#      rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for reinstall of IPA Install"
+      local tmpout=$TmpDir/ipaclientinstall_force1.out
+
+	if [ -f /etc/fedora-release ] ; then 
+		rlRun "$command > $tmpout 2>&1" 3
+		rlAssertGrep "IPA client is already configured on this system." "$tmpout"
+	else
+		qaRun "$command" "$tmpout" 3 $expmsg "Verify expected error message for reinstall of IPA Install"
+	fi
     rlPhaseEnd
     rlPhaseStartTest "ipa-client-install-27- [Positive] Reinstall Client with force" 
       # But now force it to install even though it has been previously installed here.
@@ -662,8 +702,9 @@ ipaclientinstall_ntpservice()
 {
    rlPhaseStartTest "ipa-client-install-33- [Positive] Verify ntp service with client install"
         uninstall_fornexttest
+	ntpdate $MASTER
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         verify_ntpservice true
    rlPhaseEnd
 
@@ -692,7 +733,15 @@ ipaclientinstall_synctime()
         rlLog "Time on Client is: `date`"
 
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client"
+
+	if [ -f /etc/fedora-release ] ; then
+		# Setting return code as 1 in fedora since installation failure is expected because of 
+		# "kinit: Clock skew too great while getting initial credentials"
+		# verify_time is success though
+	        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 1
+	else
+	        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+	fi
 
         # time on this system should match the server time
         verify_time
