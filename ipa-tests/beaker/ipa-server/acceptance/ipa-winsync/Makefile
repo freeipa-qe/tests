@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-winsync.sh ADcert.cer invalidAD.cer README Setup_Doc winlib.sh IPAcert_install.exp freeSSHd.exe
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-winsync.sh ADcert.cer invalidAD.cer README Setup_Doc winlib.sh IPAcert_install.exp freeSSHd.exe RedHat-PassSync-1.1.4-x86_64.msi Config
 
 .PHONY: all install download clean
 
