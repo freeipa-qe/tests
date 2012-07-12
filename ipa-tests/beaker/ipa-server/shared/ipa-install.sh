@@ -100,8 +100,8 @@ ipa_install_set_vars() {
     # backwards compatibility with older tests.  This means no
     # _env<NUM> suffix.
 	echo "export MASTER=$MASTER_env1" >> /dev/shm/env.sh
-	echo "export SLAVE=$REPLICA_env1" >> /dev/shm/env.sh
-	echo "export REPLICA=$REPLICA_env1" >> /dev/shm/env.sh
+	echo "export SLAVE=\"$REPLICA_env1\"" >> /dev/shm/env.sh
+	echo "export REPLICA=\"$REPLICA_env1\"" >> /dev/shm/env.sh
 	echo "export CLIENT=$CLIENT_env1" >> /dev/shm/env.sh
 	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
 
@@ -116,6 +116,10 @@ ipa_install_set_vars() {
 		export IPA_SERVER_PACKAGES="ipa-server"
 		export IPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
 		export YUM_OPTIONS=""
+	fi
+
+	if [ -n "${IPADEBUG}" -o -f /tmp/IPADEBUG ]; then 
+		IPADEBUG=1
 	fi
 }
 
@@ -391,12 +395,24 @@ ipa_install_topo()
 
 ipa_install_prep() 
 {
-	tmpout=/tmp/error_msg.out
 	rlLog "$FUNCNAME"
-
 	if [ -z "$IPA_SERVER_PACKAGES" ]; then
 		rlFail "IPA_SERVER_PACKAGES variable not set.  Run ipa_install_set_vars first"
 		return 1
+	fi
+
+	tmpout=/tmp/error_msg.out
+	currenteth=$(route | grep ^default | awk '{print $8}')
+	ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+	ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | head -1)
+	hostname=$(hostname)
+	hostname_s=$(hostname -s)
+	if [ "$IPv6SETUP" = "TRUE" ]; then 
+		rrtype="AAAA"
+		netaddr="$ipv6addr"
+	else	
+		rrtype=""
+		netaddr="$ipaddr"
 	fi
 
 	rlRun "yum clean all"
@@ -414,27 +430,44 @@ ipa_install_prep()
 	rlLog "Synchronizing time to $NTPSERVER"
 	rlRun "ntpdate $NTPSERVER"
 
-	# Fix /etc/hosts and IPv6 fixes
-	if [[ "$IPv6SETUP" != "TRUE" ]] ; then
-		rlRun "fixHostFile" 0 "Set up /etc/hosts"
-	else
-		rlRun "fixHostFileIPv6" 0 "Set up /etc/hosts"
-		rlRun "fixForwarderIPv6"
-		rlRun "rmIPv4addr"
+	# Fix /etc/hosts
+	cp -af /etc/hosts /etc/hosts.ipabackup
+	rlRun "sed -i s/$hostname//g    /etc/hosts"
+	rlRun "sed -i s/$hostname_s//g  /etc/hosts"
+	rlRun "sed -i /$ipaddr/d    /etc/hosts"
+	if [ -n "$ipv6addr" ]; then 
+		rlRun "sed -i '/$ipv6addr/d'  /etc/hosts"
+	fi
+	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+	
+	# Other IPv6 fixes
+	if [ "$IPv6SETUP" = "TRUE" ] ; then
+		rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /dev/shm/env.sh"
+		. /dev/shm/env.sh
+		rlRun "/sbin/ip -4 addr del $ipaddr dev $currenteth"
 	fi
 
 	# Fix hostname
-	rlRun "fixhostname" 0 "Fix hostname"
+	if [ ! -f /etc/sysconfig/network.ipabackup ]; then
+		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network.ipabackup"
+	fi
+	rlRun "hostname $hostname_s.$DOMAIN"
+	rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
+	. /etc/sysconfig/network
 	
 	# Fix /etc/resolv.conf
+	# we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
 	if [ ! -f /etc/resolv.conf.ipabackup ]; then
 		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
 	fi
-	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) ]; then
+	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
+		for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
+			nsaddr=$(dig +short $ns $rrtype)
+			rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
+		done
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
-		rlRun "echo \"nameserver $MASTER_IP\" >> /etc/resolv.conf"
-		rlRun "echo \"nameserver $SLAVE_IP\" >> /etc/resolv.conf"
-		rlRun "cat /etc/resolv.conf"
+		rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
+		rlRun "rm -f /etc/resolv.conf.new"
 	fi
 		
 	# Disable Firewall
@@ -446,7 +479,21 @@ ipa_install_prep()
 	#if [ $(rpm -qa | grep ipa-server | wc -l) -eq 0 ]; then
 	#	rlFail "No ipa-server packages found"
 	#fi
-		
+
+	# setup SSH keys
+	## Adding code from SetUpAuthKeys
+	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
+	diff -q /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa > /dev/null 2>&1
+	if [ $? -eq 1 ]; then	
+		cp /dev/shm/id_rsa_global /root/.ssh/id_rsa
+		cp /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa.pub
+		for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
+			for server in $(eval echo \$$var); do
+				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
+				AddToKnownHosts $server
+			done
+		done
+	fi
 }
 
 ipa_install_master()
@@ -461,7 +508,33 @@ ipa_install_master()
 			rlAssertRpm $PKG
 		done
 		
-		rlLog "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+
+		if [ $IPADEBUG ]; then
+			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
+				rlLog "Forcing debug logging in named.conf template"
+				sed -i 's/severity dynamic/severity debug 10/' /usr/share/ipa/bind.named.conf.template
+			fi
+			DATE=$(date +%Y%m%d-%H%M%S)	
+			INSTANCE=$(echo $RELM|sed 's/\./-/g')
+			rlLog "DEBUG selected.  submitting logs"
+			if [ -f /var/log/ipaserver-install.log ]; then
+				cp /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
+				rhts-submit-log -l /var/log/ipaserver-install.log.$DATE	
+			fi
+			if [ -f /var/log/ipaclient-install.log ]; then
+				cp /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$DATE
+				rhts-submit-log -l /var/log/ipaclient-install.log.$DATE	
+			fi
+			if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
+				cp /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+				rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+			fi
+			if [ -f /var/log/dirsrv/slapd-$INSTANCE/access ]; then
+				cp /var/log/dirsrv/slapd-$INSTANCE/access /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
+				rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
+			fi
+		fi	
 	rlPhaseEnd
 }
 
@@ -478,8 +551,14 @@ ipa_install_replica()
 		done
 	
 		rlLog "RUN ipa-replica-prepare on MASTER"
+		ssh root@$MYMASTER "echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN"
+
 		rlLog "RUN sftp to get gpg file"
+		sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/
+
+		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
+		ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
 	rlPhaseEnd
 }
 
