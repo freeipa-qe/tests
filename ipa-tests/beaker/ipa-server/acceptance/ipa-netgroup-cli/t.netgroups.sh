@@ -50,6 +50,7 @@ netgroups()
 setup()
 {
 	rlPhaseStartSetup "ipa-netgroup setup: Add users, groups, hosts and hostgroups for testing"
+                rlRun "rlDistroDiff keyctl"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "kiniting as admin"
 		# Adding users for use later
 		ipa user-add --first=aa --last=bb $user1
@@ -902,11 +903,13 @@ netgroup_mod_negative()
 #### ipauniqueid
 	rlPhaseStartTest "netgroup_mod_negative_007: Invalid modify with setattr and addattr on ipauniqueid"
 		command="ipa netgroup-mod --setattr ipauniqueid=mynew-unique-id $ngroup1"
-		expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
+		#expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
+		expmsg="ipa: ERROR: invalid 'ipauniqueid': attribute is not configurable"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		command="ipa netgroup-mod --addattr ipauniqueid=another-new-unique-id $ngroup1"
-		expmsg="ipa: ERROR: ipauniqueid: Only one value allowed."
+		#expmsg="ipa: ERROR: ipauniqueid: Only one value allowed."
+		expmsg="ipa: ERROR: invalid 'ipauniqueid': attribute is not configurable"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	rlPhaseEnd
 
@@ -1073,7 +1076,7 @@ netgroup_mod_negative()
 	rlPhaseStartTest "netgroup_mod_negative_025: Invalid setattr and addattr for externalhost with invalid characters (BZ 813325)"
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=externalhost=badhost? > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
-		rlAssertGrep "NEED Error message here...should not work" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'externalhost': only letters, numbers, _, and - are allowed. DNS label may not start or end with -" $tmpout
 		if [ $(grep "badhost\?" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 813325 Found...ipa netgroup-mod addattr and setattr allow invalid characters for externalHost"
 			rlLog  "deleting invalid entry"
@@ -1082,7 +1085,7 @@ netgroup_mod_negative()
 
 		rlRun "ipa netgroup-mod $ngroup1 --addattr=externalhost=anotherbadhost\!\@\#\$\%\^\&\*\\(\\) > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
-		rlAssertGrep "NEED Error message here...should not work" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'externalhost': only letters, numbers, _, and - are allowed. DNS label may not start or end with -" $tmpout
 		if [ $(grep "anotherbadhost\!\@\#\$\%\^\&\*\\(\\)" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 813325 Found...ipa netgroup-mod addattr and setattr allow invalid characters for externalHost"
 			rlLog  "deleting invalid entry"
