@@ -17,11 +17,19 @@ public class IdentityPageUserGroups extends IPAWebPage{
 		duplicateErrorMsgStartsWith = "user with name"; 
 		backLink="User Groups";
 		addPage = "Add User Group";
+		addOnePage = "Add One User Group";
 		duplicatePage = "Add Duplicate User Group";
 		modifySettingsPage = "Modify User Group";
 		delPage = "Delete User Group"; 
 		
 		registerStandardTestCases();
+		//registerTestCases("add","addSingle");//xdong for automember init use
+		//registerTestCases("add","addAndAddAnother");//xdong for automember use
+		//registerTestCases("add","addThenEdit");//xdong for automember use
+		//registerTestCases("add","addThenCancel");//xdong for automember use
+		//registerTestCases("add","addOne");//xdong for automember use
+		//registerTestCases("delete","deleteSingle");//xdong for automember use
+		//registerTestCases("delete","deleteMultiple");//xdong for automember use
 		System.out.println("New instance of "+ IdentityPageUserGroups.class.getName() + " is ready"); 
 	}   
 
