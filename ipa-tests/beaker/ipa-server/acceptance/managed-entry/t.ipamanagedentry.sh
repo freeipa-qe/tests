@@ -52,7 +52,7 @@ userprivategroups()
 
    rlPhaseStartTest "Disable User Private Groups Plugin"
 	rlRun "ipa-managed-entries -e \"$USRMGD\" disable" 0 "Disable UPG Plugin"
-	rlRun "service dirsrv restart" 0 "Required directory server restart"
+	rlDistroDiff dirsrv_svc_restart
 	rlRun "ipa-managed-entries -e \"$USRMGD\" status > /tmp/upgstatus.out 2>&1" 0 "Get the status of the plugin"
 	rlAssertGrep "Plugin Disabled" "/tmp/upgstatus.out"
    rlPhaseEnd
@@ -76,7 +76,7 @@ userprivategroups()
 
    rlPhaseStartTest "Re-Enable User Private Groups Plugin"
         rlRun "ipa-managed-entries -e \"$USRMGD\" enable" 0 "Re-enable UPG Plugin"
-	rlRun "service dirsrv restart" 0 "Required directory server restart"
+	rlDistroDiff dirsrv_svc_restart
         rlRun "ipa-managed-entries -e \"$USRMGD\" status > /tmp/upgstatus.out 2>&1" 0 "Get the status of the plugin"
         rlAssertGrep "Plugin Enabled" "/tmp/upgstatus.out"
    rlPhaseEnd
@@ -98,7 +98,7 @@ managednetgroups()
 
    rlPhaseStartTest "Disable Netgroups Plugin"
         rlRun "ipa-managed-entries -e \"$NETMGD\" disable" 0 "Disable NGP Plugin"
-        rlRun "service dirsrv restart" 0 "Required directory server restart"
+        rlDistroDiff dirsrv_svc_restart
         rlRun "ipa-managed-entries -e \"$NETMGD\" status > /tmp/upgstatus.out 2>&1" 0 "Get the status of the plugin"
         rlAssertGrep "Plugin Disabled" "/tmp/upgstatus.out"
    rlPhaseEnd
@@ -111,7 +111,7 @@ managednetgroups()
 
    rlPhaseStartTest "Re-Enable Netgroups Plugin"
         rlRun "ipa-managed-entries -e \"$NETMGD\" enable" 0 "Re-enable UPG Plugin"
-        rlRun "service dirsrv restart" 0 "Required directory server restart"
+        rlDistroDiff dirsrv_svc_restart
         rlRun "ipa-managed-entries -e \"$NETMGD\" status > /tmp/upgstatus.out 2>&1" 0 "Get the status of the plugin"
         rlAssertGrep "Plugin Enabled" "/tmp/upgstatus.out"
    rlPhaseEnd
