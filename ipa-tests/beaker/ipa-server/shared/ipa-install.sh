@@ -558,7 +558,7 @@ ipa_install_replica()
 
 		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
-		ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		ipa-replica-install -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
 	rlPhaseEnd
 }
 
