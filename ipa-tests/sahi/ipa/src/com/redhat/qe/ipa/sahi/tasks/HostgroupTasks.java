@@ -156,8 +156,8 @@ public class HostgroupTasks {
 		}
 		
 		sahiTasks.radio("direct").click();
-		sahiTasks.link("Add").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
-		//sahiTasks.link("Add").click();
+		//sahiTasks.link("Add").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
+		sahiTasks.link("Add").click();
 		
 		for (String name : names) {
 			sahiTasks.checkbox(name).click();

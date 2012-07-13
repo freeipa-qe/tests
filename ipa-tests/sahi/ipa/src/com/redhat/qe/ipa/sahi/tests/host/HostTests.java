@@ -3,6 +3,7 @@ package com.redhat.qe.ipa.sahi.tests.host;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -18,10 +19,12 @@ import com.redhat.qe.ipa.sahi.tasks.DNSTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.ServiceTasks;
+import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
 
 public class HostTests extends SahiTestScript{
-
+	private static Logger log = Logger.getLogger(HostTests.class.getName());
+	
 	private String domain = "";
 	private String reversezone = "";
 	
@@ -403,16 +406,21 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"hostGetKeytabTests"}, dataProvider="getHostGetKeytabTestObjects")	
 	public void testgetHostKeytab(String testName ) throws Exception {
-		String fqdn = testhost + "." + domain;
-		String keytabfile = "/tmp/" + testhost + ".keytab";
-		// verify host does not have a keytab
-		HostTasks.verifyHostKeytab(sahiTasks, fqdn, false);
+		if (System.getProperty("os.name").startsWith("Windows")) {
+    		log.info("Skipping test - not valid test for Windows");
+    	} else {
+    		String fqdn = testhost + "." + domain;
+    		String keytabfile = "/tmp/" + testhost + ".keytab";
+    		// verify host does not have a keytab
+    		HostTasks.verifyHostKeytab(sahiTasks, fqdn, false);
+    		
+    		//  provision a keytab for the service
+    		CommonTasks.getPrincipalKeytab(testprincipal, keytabfile);
+    		
+    		// verify service has a keytab
+    		HostTasks.verifyHostKeytab(sahiTasks, fqdn, true);
+    	}
 		
-		//  provision a keytab for the service
-		CommonTasks.getPrincipalKeytab(testprincipal, keytabfile);
-		
-		// verify service has a keytab
-		HostTasks.verifyHostKeytab(sahiTasks, fqdn, true);
 	}
 	
 	/*
@@ -420,11 +428,16 @@ public class HostTests extends SahiTestScript{
 	 */
 	@Test (groups={"hostRemoveKeytabTests"}, dataProvider="getHostRemoveKeytabTestObjects", dependsOnGroups="hostGetKeytabTests" )	
 	public void testremoveHostKeytab(String testName ) throws Exception {
-		String fqdn = testhost + "." + domain;
-		//  unprovision keytab
-		HostTasks.deleteHostKeytab(sahiTasks, fqdn, "Unprovision");
-		// verify service has a keytab
-		HostTasks.verifyHostKeytab(sahiTasks, fqdn, false);
+		if (System.getProperty("os.name").startsWith("Windows")) {
+    		log.info("Skipping test - not valid test for Windows");
+    	} else {
+    		String fqdn = testhost + "." + domain;
+    		//  unprovision keytab
+    		HostTasks.deleteHostKeytab(sahiTasks, fqdn, "Unprovision");
+    		// verify service has a keytab
+    		HostTasks.verifyHostKeytab(sahiTasks, fqdn, false);
+    	}
+		
 	}
 	
 	
