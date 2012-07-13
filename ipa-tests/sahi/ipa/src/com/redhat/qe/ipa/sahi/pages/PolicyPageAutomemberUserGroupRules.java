@@ -24,11 +24,25 @@ public class PolicyPageAutomemberUserGroupRules extends IPAWebPage {
 		modifyConditionInclusiveDeletePage ="Modify Automember Condition User Inclusive Delete";
 		modifyConditionExclusiveAddPage ="Modify Automember Condition User Exclusive Add";
 		modifyConditionExclusiveDeletePage ="Modify Automember Condition User Exclusive Delete";
+		modifyUpdateResetCancelPage ="Modify Clicking Backlink User";
+	    searchPage = "Search Automember Rule User";	
 		setDefaultGroupPage = "Set Default User Group";
 		delPage = "Delete Automember User"; 
 	
 		
-		registerStandardTestCases();
+		//registerStandardTestCases();
+		registerTestCases("add","addSingle");//xdong for automember use
+		registerTestCases("add","addAndAddAnother");//xdong for automember use
+		registerTestCases("add","addThenEdit");//xdong for automember use
+		registerTestCases("add","addThenCancel");//xdong for automember use
+		registerTestCases("modify","modifyConditionInclusiveAdd");//xdong for automember use
+		registerTestCases("modify","modifyConditionInclusiveDelete");//xdong for automember use
+		registerTestCases("modify","modifyConditionExclusiveAdd");//xdong for automember use
+		registerTestCases("modify","modifyConditionExclusiveDelete");//xdong for automember use
+		registerTestCases("modify","setDefaultGroup");//xdong for automember use
+		registerTestCases("modify","modifyUpdateResetCancel");//xdong for automember use
+		registerTestCases("delete","deleteSingle");//xdong for automember use
+		registerTestCases("delete","deleteMultiple");//xdong for automember use
 		System.out.println("New instance of " + PolicyPageAutomemberUserGroupRules.class.getName() + " is ready");
 	}
 
