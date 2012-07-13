@@ -145,7 +145,7 @@ netgroup_bz_788625()
 		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0,2
 		rlRun "echo $ADMINPW | ipa-nis-manage enable" 0,2
 		rlRun "service rpcbind restart"
-		rlRun "service dirsrv restart"
+		rlRun "rlDistroDiff dirsrv_svc_restart"
 		rlRun "yum -y install yp-tools"
 		if [ $(ypcat -d $DOMAIN -h localhost -k netgroup|grep "^netgroup_bz_788625_test $"|wc -l) -gt 0 ]; then
 			rlFail "BZ 788625 found ...IPA nested netgroups not seen from ypcat"
@@ -239,7 +239,7 @@ netgroup_bz_767372()
 		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0,2
 		rlRun "echo $ADMINPW | ipa-nis-manage enable" 0,2
 		rlRun "service rpcbind restart"
-		rlRun "service dirsrv restart"
+		rlRun "rlDistroDiff dirsrv_svc_restart"
 		rlRun "ipa user-add bzuser1 --first=First --last=Last"
 		rlRun "ipa user-add bzuser2 --first=First --last=Last"
 		rlRun "ipa user-add bzuser3 --first=First --last=Last"
@@ -292,9 +292,10 @@ netgroup_bz_772163()
 		rlRun "date"
 		rlRun "ipa netgroup-add-member ${ngname} --users=${userpre}1"
 		rlRun "date"
+		rlRun "sleep 10"
 		rlRun "(time getent netgroup ${ngname} > $tmpout 2>&1) 2>&1 | tee $timeout"
 		rlRun "cat $tmpout"
-		if [ $(grep ", ${userpre}1," $tmpout|wc -l) -gt 0 ]; then
+		if [ $(grep ${userpre}1 $tmpout|wc -l) -gt 0 ]; then
 			rlPass "BZ 772163 not found...added user seen in netgroup"
 		else
 			rlFail "New user not found in netgroup.  Appears that SSSD used cached entry."
@@ -309,9 +310,10 @@ netgroup_bz_772163()
 		rlRun "date"
 		rlRun "ipa netgroup-add-member ${ngname} --users=${userpre}2"
 		rlRun "date"
+		rlRun "sleep 10"
 		rlRun "(time getent netgroup ${ngname} > $tmpout 2>&1) 2>&1 | tee $timeout"
 		rlRun "cat $tmpout"
-		if [ $(grep ", ${userpre}2," $tmpout|wc -l) -gt 0 ]; then
+		if [ $(grep ${userpre}2 $tmpout|wc -l) -gt 0 ]; then
 			rlPass "BZ 772163 not found...added user seen in netgroup"
 		else
 			rlFail "New user not found in netgroup.  Appears that SSSD used cached entry."
@@ -476,7 +478,7 @@ netgroup_bz_813325()
 		KinitAsAdmin
 		#### test1	
 		rlRun "ipa netgroup-add netgroup_bz_813325_1 --desc=desc1"
-		rlRun "ipa netgroup-mod netgroup_bz_813325_1 --setattr=externalhost=anotherbadhost? > $tmpout 2>&1"
+		rlRun "ipa netgroup-mod netgroup_bz_813325_1 --setattr=externalhost=anotherbadhost? > $tmpout 2>&1" 1
 		if [ $(grep "anotherbadhost\?" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 813325 Found...ipa netgroup-add-member --hosts should not allow invalid characters"
 		else
