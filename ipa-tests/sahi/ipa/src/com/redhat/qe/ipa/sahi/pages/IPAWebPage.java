@@ -57,6 +57,7 @@ public class IPAWebPage implements StandardTest{
 	protected String modifyConditionExclusiveAddPage;//xdong
 	protected String modifyConditionExclusiveDeletePage;//xdong
 	protected String setDefaultGroupPage;//xdong
+	protected String addOnePage;//xdong
 	
 	protected TestDataFactory factory;
 	private static Logger log = Logger.getLogger(IPAWebPage.class.getName());
@@ -192,7 +193,7 @@ public class IPAWebPage implements StandardTest{
 		if (pageName == null)
 			return monitor;
 		testAccounts.clear();
-		int numOfEntries = 3;
+		int numOfEntries = 2;
 		try {
 			addMultipleNewEntries(monitor, pageName, numOfEntries);
 			for(int i=0;i<numOfEntries;i++){
@@ -1239,6 +1240,10 @@ public class IPAWebPage implements StandardTest{
 					before="uncheck";
 					after="uncheck";
 				}
+			}else if (id.equals("automemberinclusiveregex")){ //xdong for automember condition delete all
+				browser.checkbox("automemberinclusiveregex").check();//xdong for automember condition delete all
+			}else if (id.equals("automemberexclusiveregex")){ //xdong for automember condition delete all
+				browser.checkbox("automemberexclusiveregex").check(); //xdong for automember condition delete all
 			}else
 			{
 				browser.checkbox(value).check(); // default behave
@@ -1261,12 +1266,21 @@ public class IPAWebPage implements StandardTest{
 			if (browser.textbox(id).exists()){
 				before = browser.textbox(id).getValue();
 				browser.textbox(id).click();
+				if(browser.textbox("automemberdefaultgroup").exists()){//xdong for set default group/hostgroup
+				
+					browser.span("icon search-icon").near(browser.textbox("automemberdefaultgroup")).click();
+				}
 				browser.select("list").choose(value);
 				after = browser.textbox(id).getValue();
+			}else if (browser.select(id).exists()) {//xdong for automember rule condition add
+				before = browser.select(id).getValue();
+				browser.select(id).click();
+				browser.select("key").choose(value);
+				after = browser.select(id).getValue();
 			}else
 				throw new IPAWebAutomationActionNotDefinedException(pageName, tag, id);
-		}
-		else{
+		
+		}else{
 			throw new IPAWebAutomationActionNotDefinedException(pageName, tag, id);
 		}
 		return new String[] {before, after};
@@ -1324,7 +1338,8 @@ public class IPAWebPage implements StandardTest{
 	
 	@Override 
 	public IPAWebTestMonitor modifyConditionInclusiveAdd(IPAWebTestMonitor monitor) {
-		String pageName = modifyConditionInclusiveAddPage ;;
+		String pageName = modifyConditionInclusiveAddPage ;
+		testAccounts.clear();
 		if (pageName == null){
 			monitor.fail("modify test page not defined:");
 			return monitor;
@@ -1346,7 +1361,13 @@ protected IPAWebTestMonitor executeModifyConditionInclusiveAdd(IPAWebTestMonitor
 		
 		try {
 			inclusiveAdd(monitor, pageName);
-			monitor.pass();
+			if(browser.div(testAccounts.get(0)).exists()){
+				monitor.pass("Added and Verified Successfully");
+			}
+			else{
+				monitor.fail("Add Failed");
+			}
+			
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -1367,7 +1388,8 @@ protected void inclusiveAdd(IPAWebTestMonitor monitor, String pageName) throws I
 
 @Override 
 public IPAWebTestMonitor modifyConditionInclusiveDelete(IPAWebTestMonitor monitor) {
-	String pageName = modifyConditionInclusiveDeletePage ;;
+	String pageName = modifyConditionInclusiveDeletePage ;
+	testAccounts.clear();
 	if (pageName == null){
 		monitor.fail("modify test page not defined:");
 		return monitor;
@@ -1389,7 +1411,13 @@ protected IPAWebTestMonitor executeModifyConditionInclusiveDelete(IPAWebTestMoni
 	
 	try {
 		inclusiveDelete(monitor, pageName);
-		monitor.pass();
+		if(browser.div(testAccounts.get(0)).exists()){
+			monitor.fail("Delete Failed");
+		}
+		else{
+			monitor.pass("Deleted and Verified Successfully");
+		}
+		
 	} catch (IPAWebAutomationException e) { 
 		e.printStackTrace();
 		monitor.fail(e);
@@ -1409,7 +1437,8 @@ protected void inclusiveDelete(IPAWebTestMonitor monitor, String pageName) throw
 
 @Override 
 public IPAWebTestMonitor modifyConditionExclusiveAdd(IPAWebTestMonitor monitor) {
-	String pageName = modifyConditionExclusiveAddPage ;;
+	String pageName = modifyConditionExclusiveAddPage ;
+	testAccounts.clear();
 	if (pageName == null){
 		monitor.fail("modify test page not defined:");
 		return monitor;
@@ -1431,7 +1460,13 @@ protected IPAWebTestMonitor executeModifyConditionExclusiveAdd(IPAWebTestMonitor
 	
 	try {
 		exclusiveAdd(monitor, pageName);
-		monitor.pass();
+		if(browser.div(testAccounts.get(0)).exists()){
+			monitor.pass("Added and Verified Successfully");
+		}
+		else{
+			monitor.fail("Add Failed");
+		}
+		
 	} catch (IPAWebAutomationException e) { 
 		e.printStackTrace();
 		monitor.fail(e);
@@ -1451,7 +1486,8 @@ protected void exclusiveAdd(IPAWebTestMonitor monitor, String pageName) throws I
 
 @Override 
 public IPAWebTestMonitor modifyConditionExclusiveDelete(IPAWebTestMonitor monitor) {
-	String pageName = modifyConditionExclusiveDeletePage ;;
+	String pageName = modifyConditionExclusiveDeletePage ;
+	testAccounts.clear();
 	if (pageName == null){
 		monitor.fail("modify test page not defined:");
 		return monitor;
@@ -1473,7 +1509,13 @@ protected IPAWebTestMonitor executeModifyConditionExclusiveDelete(IPAWebTestMoni
 	
 	try {
 		exclusiveDelete(monitor, pageName);
-		monitor.pass();
+		if(browser.div(testAccounts.get(0)).exists()){
+			monitor.fail("Delete Failed");
+		}
+		else{
+			monitor.pass("Deleted and Verified Successfully");
+		}
+		
 	} catch (IPAWebAutomationException e) { 
 		e.printStackTrace();
 		monitor.fail(e);
@@ -1494,12 +1536,20 @@ protected void exclusiveDelete(IPAWebTestMonitor monitor, String pageName) throw
 
 @Override 
 public IPAWebTestMonitor setDefaultGroup(IPAWebTestMonitor monitor) {
-	String pageName = setDefaultGroupPage ;;
+	String pageName = setDefaultGroupPage ;
+	testAccounts.clear();
 	if (pageName == null)
 		return monitor;
 	try {
 		setDefault(monitor, pageName);
-		monitor.pass();
+		if(browser.textbox(testAccounts.get(0)).exists()){
+			monitor.pass("Set and Verified Successfully");
+			
+		}
+		else{
+			monitor.fail("Set Failed");
+		}
+		
 	} catch (IPAWebAutomationException e) { 
 		e.printStackTrace();
 		monitor.fail(e);
@@ -1516,6 +1566,37 @@ protected void setDefault(IPAWebTestMonitor monitor, String pageName) throws IPA
 	
 }	
 
+@Override 
+public IPAWebTestMonitor addOne(IPAWebTestMonitor monitor) {//xdong use for adding one automember group/hostgroup
+	String pageName = addOnePage ;
+	testAccounts.clear();
+	if (pageName == null)
+		return monitor;
+	try {
+		executeAddOne(monitor, pageName);
+		if(browser.link(testAccounts.get(0)).exists()){
+			monitor.pass("Added and Verified Successfully");
+			
+		}
+		else{
+			monitor.fail("Add Failed");
+		}
+	} catch (IPAWebAutomationException e) { 
+		e.printStackTrace();
+		monitor.fail(e);
+	}
+	return monitor;
+}
+
+
+
+protected void executeAddOne(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+{  
+	browser.span("Add").click();
+	fillDataIntoPage(monitor,pageName);
+	browser.button("Add").click();
+	
+}	
 
 }
 
