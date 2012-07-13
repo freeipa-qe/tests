@@ -39,7 +39,13 @@ public class AutomemberTests extends IPAWebAutomation {
 		executeQueue(testPage, "modify", testDataFile);
 	}
 	
-	@Test (groups={"delete"}, dataProvider="deleteData", dependsOnGroups = "modify",
+	@Test (groups={"search"}, dataProvider="searchData", dependsOnGroups = "add",
+		description = "execute test cases in search queue")
+	public void test_search(String scenario, String testPage, String testDataFile) throws Exception { 
+		executeQueue(testPage, "search", testDataFile);
+	}
+	
+	@Test (groups={"delete"}, dataProvider="deleteData", dependsOnGroups = {"modify", "add"},
 		description = "execute test cases in delete queue")
 	public void test_delete(String scenario, String testPage, String testDataFile) throws Exception { 
 		executeQueue(testPage, "delete", testDataFile);
@@ -53,21 +59,24 @@ public class AutomemberTests extends IPAWebAutomation {
 	
 	private String[] PolicyPageAutomemberUserGroupRules = {"simple add and delete","PolicyPageAutomemberUserGroupRules", AutomemberTestDataFile};
 	private String[] PolicyPageAutomemberHostGroupRules = {"simple add and delete","PolicyPageAutomemberHostGroupRules", AutomemberTestDataFile};
-	private String[] IdentityPageUsers = {"simple add and delete","IdentityPageUsers", AutomemberTestDataFile};
 	private String[] IdentityPageUserGroups = {"simple add and delete","IdentityPageUserGroups", AutomemberTestDataFile};
 	private String[] IdentityPageHostGroups = {"simple add and delete", "IdentityPageHostGroups", AutomemberTestDataFile};
 	
-	private String[][] testdataAdd = {};
-	//private String[][] testdataAdd    = {IdentityPageUsers,IdentityPageUserGroups,IdentityPageHostGroups,PolicyPageAutomemberUserGroupRules,PolicyPageAutomemberHostGroupRules};
+	//private String[][] testdataAdd = {};
+	private String[][] testdataAdd    = {IdentityPageUserGroups,IdentityPageHostGroups,PolicyPageAutomemberUserGroupRules,PolicyPageAutomemberHostGroupRules};
 	private String[][] testdataModify = {PolicyPageAutomemberUserGroupRules,PolicyPageAutomemberHostGroupRules};
-	//private String[][] testdataDelete = {IdentityPageUsers,IdentityPageUserGroups,IdentityPageHostGroups,PolicyPageAutomemberUserGroupRules,PolicyPageAutomemberHostGroupRules};
-	private String[][] testdataDelete = {};
+	private String[][] testdataSearch = {PolicyPageAutomemberUserGroupRules,PolicyPageAutomemberHostGroupRules};
+	private String[][] testdataDelete = {IdentityPageUserGroups,IdentityPageHostGroups,PolicyPageAutomemberUserGroupRules,PolicyPageAutomemberHostGroupRules};
+	//private String[][] testdataDelete = {};
 	
 	@DataProvider(name="addData")
 	public Object[][] getAddData(){return testdataAdd; }
 
 	@DataProvider(name="modifyData")
 	public Object[][] getModifyData(){return testdataModify;}
+	
+	@DataProvider(name="searchData")
+	public Object[][] getSearchData(){return testdataSearch;}
 
 	@DataProvider(name="deleteData")
 	public Object[][] getDeleteData(){return testdataDelete;}
