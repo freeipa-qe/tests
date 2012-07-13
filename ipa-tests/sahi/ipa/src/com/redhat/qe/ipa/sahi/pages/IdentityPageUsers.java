@@ -23,8 +23,15 @@ public class IdentityPageUsers extends IPAWebPage{
 		modifyNegativePage = "Modify User Negative";
 		delPage = "Delete User";
 
+		
 		//registerStandardTestCases();
-		registerTestCases("add", "addNegative");
+		registerTestCases("add","addSingle");//xdong for automember init use
+		registerTestCases("add","addAndAddAnother");//xdong for automember use
+		registerTestCases("add","addThenEdit");//xdong for automember use
+		registerTestCases("add","addThenCancel");//xdong for automember use
+		registerTestCases("delete","deleteSingle");//xdong for automember use
+		registerTestCases("delete","deleteMultiple");//xdong for automember use
+		
 		System.out.println("New instance of " + IdentityPageUsers.class.getName() + " is ready"); 
 	}
 
