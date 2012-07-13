@@ -143,8 +143,7 @@ popd
 	# Uploading the IPA certificate in AD and importing it for passync
 	rm -f $ipacrt
 	rlRun "cp $crt_file $ipacrt"
-	rlLog "Installing PassSync and IPA cert in AD"
-	./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt > /dev/null 2>&1
+	rlRun "./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt > /dev/null 2>&1" 0 "Installing PassSync and IPA cert in AD"
 	rlLog "AD server is being rebooted"
 	sleep 300
 	while true; do

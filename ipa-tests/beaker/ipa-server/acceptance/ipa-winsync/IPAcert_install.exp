@@ -44,7 +44,7 @@ set timeout 5
 if { [string compare $action add ] == 0 } {
 
 # Upload PassSync Installer
-spawn sftp $username@$adhost;
+spawn sftp -o StrictHostKeychecking=no $username@$adhost;
 expect "*?assword:*";
 send -- "$password\r";
 expect ">";
@@ -96,7 +96,7 @@ expect eof;
 
 } elseif { [string compare $action delete ] == 0 } {
 # Uninstall PassSync
-spawn ssh $username@$adhost;
+spawn ssh -o StrictHostKeychecking=no $username@$adhost;
 expect "*?assword:*";
 send -- "$password\r";
 expect "*>";
