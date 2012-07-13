@@ -3,9 +3,9 @@ package com.redhat.qe.ipa.sahi.pages;
 public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
-	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative"};
-	//public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative","modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","setDefaultGroup"}; //xdong for the last 4
-	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative"};
+	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative","addOne"};
+	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative","modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","setDefaultGroup"}; //xdong last 5 for last 5
+	//public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative"};
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
 	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard"};
@@ -16,7 +16,8 @@ public interface StandardTest {
 	public IPAWebTestMonitor addAndAddAnother(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addThenEdit(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor monitor);
-		
+	public IPAWebTestMonitor addOne(IPAWebTestMonitor monitor);//xdong
+	
 	public IPAWebTestMonitor addNegative(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addNegativeDuplicate(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addNegativeRequiredFields(IPAWebTestMonitor monitor);
