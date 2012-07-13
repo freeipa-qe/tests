@@ -41,7 +41,7 @@
 
 # Install samba-common package if not already installed
 rpm1="samba-common"
-rpm2="rdesktop"
+rpm2="expect"
 
    rlCheckRpm "$rpm1"
 	if [ $? -ne 0 ]; then

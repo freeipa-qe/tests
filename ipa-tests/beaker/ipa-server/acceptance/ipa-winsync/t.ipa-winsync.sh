@@ -61,7 +61,7 @@ userpw2="Dec3yp12"
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
 PACKAGE3="samba-common"
-PACKAGE4="rdesktop"
+PACKAGE4="expect"
 
 sec="30"
 DMpswd="Secret123"
@@ -136,9 +136,14 @@ popd
 	sleep 30
 	rlRun "host $ADhost"
 
+	# Removing IPA cert from AD
+	rlLog "Cleanup AD before PassSync Install"
+	./IPAcert_install.exp delete $ADadmin $ADpswd $ADhost $msifile > /dev/null 2>&1
+
 	# Uploading the IPA certificate in AD and importing it for passync
 	rm -f $ipacrt
 	rlRun "cp $crt_file $ipacrt"
+	rlLog "Installing PassSync and IPA cert in AD"
 	./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt > /dev/null 2>&1
 	rlLog "AD server is being rebooted"
 	sleep 300
@@ -148,7 +153,6 @@ popd
 	done
 	ping -c 4 10.65.207.213 && rlPass "AD server has rebooted"
 	sleep 120
-	#rdesktop $ADhost -u $ADadmin -p $ADpswd -d $ADdomain &
 rlPhaseEnd
 }
 
@@ -621,9 +625,6 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 
 	rlRun "rm -f /etc/named.conf && cp -p /etc/named.conf.winsync /etc/named.conf" 0 "Replacing named.conf file from backup"
 	rlRun "service named restart"
-
-	# Removing IPA cert from AD
-	./IPAcert_install.exp delete $ADadmin $ADpswd $ADhost $msifile > /dev/null 2>&1
 
 #	rlRun "kill -15 `pidof rdesktop`"
 	rlRun "rm -f *.ldif"
