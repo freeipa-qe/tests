@@ -498,6 +498,13 @@ ipa_install_prep()
 
 ipa_install_master()
 {
+	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
+		rlLog "$FUNCNAME"
+	rlPhaseEnd
+}
+
+ipa_install_master_new()
+{
 	tmpout=/tmp/error_msg.out
 	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
 		rlLog "$FUNCNAME"
@@ -540,6 +547,13 @@ ipa_install_master()
 
 ipa_install_replica()
 {
+	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
+		rlLog "$FUNCNAME $MYMASTER"
+	rlPhaseEnd
+}
+
+ipa_install_replica_new()
+{
 	local MYMASTER=$1
 	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
 		rlLog "$FUNCNAME $MYMASTER"
@@ -563,6 +577,13 @@ ipa_install_replica()
 }
 
 ipa_install_client()
+{
+	rlPhaseStartTest "ipa_install_client - Install IPA Client"
+		rlLog "$FUNCNAME $MYMASTER"
+	rlPhaseEnd
+}
+
+ipa_install_client_new()
 {
 	local MYMASTER=$1
 	rlPhaseStartTest "ipa_install_client - Install IPA Client"
