@@ -88,6 +88,7 @@ sub_OU1="sub-level1"
 OU2="level2"
 sub_OU2="sub-level2"
 IPAhost=`hostname`
+IPAhostIP="`host $IPAhost | awk '{print $NF}'`"
 IPAlog="IPAcert_install.log"
 #aduser_ln="ads"
 slapd_dir="/etc/dirsrv/slapd-TESTRELM-COM"
@@ -143,14 +144,14 @@ popd
 	# Uploading the IPA certificate in AD and importing it for passync
 	rm -f $ipacrt
 	rlRun "cp $crt_file $ipacrt"
-	rlRun "./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt > /dev/null 2>&1" 0 "Installing PassSync and IPA cert in AD"
-	rlLog "AD server is being rebooted"
+	rlRun "./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt $IPAhostIP > /dev/null 2>&1" 0 "Installing PassSync, forwarder and IPA cert in AD"
+	rlLog "AD server is being rebooted. Waiting 5 mins"
 	sleep 300
 	while true; do
 	  ping -c 1 $ADhost
 	  [ $? -eq 0 ] && break
 	done
-	ping -c 4 10.65.207.213 && rlPass "AD server has rebooted"
+	ping -c 4 $ADhost && rlPass "AD server has rebooted"
 	sleep 120
 rlPhaseEnd
 }
@@ -213,11 +214,9 @@ rlPhaseStartTest "winsync_test_0001: Creating winsync agreement"
 
 	# Restart PassSync after winsync agreement is established
 	net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
-	sleep 10
-	net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
-	sleep 10
-	rlRun "net rpc service start PassSync -I $ADhost -U administrator%$ADpswd" 0 "Restarting PassSync Service"
 	sleep 5
+	net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
+	rlRun "net rpc service start PassSync -I $ADhost -U administrator%$ADpswd" 0 "Restarting PassSync Service"
 
 rlPhaseEnd
 }
@@ -227,23 +226,26 @@ winsync_test_0002() {
 rlPhaseStartTest "winsync_test_0002: bz820258 - Modify Winsync Interval (default 300 seconds)"
 	rlRun "errorlog_ldif 8192"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f errorlog.ldif" 0 "Setting the error log level"
-	rlRun "sleep 300" 0 "Waiting for winsync interval to log in logfile"
+	rlRun "sleep 540" 0 "Waiting for winsync interval to log in logfile"
 	rlRun "syncinterval_ldif $sec add"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval to $sec seconds"
 	rlRun "sleep $sec" 0 "Waiting for new interval logs"
 	rlRun "sleep 30"
 	x=`grep "Running Dirsync" $error_log | tail -n2 | head -1| awk -F: '{print $3}'`
 	y=`grep "Running Dirsync" $error_log | tail -n1 | awk -F: '{print $3}'`
+	if [ $x -gt $y ]; then
+	 $y=`expr $y + 60`
+	fi
 	rlRun "z=`expr $y - $x | awk -F- '{print $NF}'`"
 	if [ $z -ge 5 ]; then
 	 rlRun "echo \"SyncInterval is unchanged: $z mins\"" 0 "bz820258: Winsync interval change to $sec sec failed as expected"
 	 rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=820258"
 	 rlRun "service dirsrv restart" 0 "Restarting dirsrv for winsync interval change to take effect"
-	 rlRun "sleep 30" 0 "Waiting for new interval logs"
+	 rlRun "sleep 120" 0 "Waiting for new interval logs"
 	 sleep $sec
 	fi
-	 x=`grep "Running Dirsync" /var/log/dirsrv/slapd-TESTRELM-COM/errors | tail -n2 | head -1| awk -F: '{print $4}' | cut -f1 -d+`
-	 y=`grep "Running Dirsync" /var/log/dirsrv/slapd-TESTRELM-COM/errors | tail -n1 | head -1| awk -F: '{print $4}' | cut -f1 -d+`
+	 x=`grep "Running Dirsync" $error_log | tail -n2 | head -1| awk -F: '{print $4}' | awk '{print $1}'`
+	 y=`grep "Running Dirsync" $error_log | tail -n1 | head -1| awk -F: '{print $4}' | awk '{print $1}'`
 	 rlRun "z=`expr $y - $x | awk -F- '{print $NF}'`"
 	 if [ $z -le 35 ]; then
 	  rlRun "echo \"Winsync Interval successfully modified to $sec Seconds\""
@@ -276,6 +278,7 @@ rlPhaseStartTest "winsync_test_0003: Create users(numeric/alphanumeric) in AD an
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable user 456"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Add phone number of user 456"
 	rlRun "sleep $sec" 0 "Sleeping $sec sec for sync"
+	sleep 30
 
 	# Verify Users have synced to IPA Server
 	rlRun "ipa user-find $aduser" 0 "$aduser is synced to IPA"
@@ -312,14 +315,16 @@ rlPhaseStartTest "winsync_test_0005: Synchronization behaviour of account lock s
 	rlRun "ADuser_cntrl_ldif $aduser ads 514"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Disable $aduser on AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
-	rlRun "ipa user-find $aduser | grep \"Account disabled: True\"" 0 "$aduser disabled on IPA as well"
+	sleep 30
+	rlRun "ipa user-show $aduser | grep \"Account disabled: True\"" 0 "$aduser disabled on IPA as well"
 	rlRun "ipa user-enable $aduser"
 
 	rlRun "acctdisable_ldif none" 0 "Creating ldif file to set ipawinsyncacctdisable to none"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Setting disabled account to not sync to IPA"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Disable $aduser on AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
-        rlRun "ipa user-find $aduser | grep \"Account disabled: False\"" 0 "$aduser is enabled on IPA"
+	sleep 30
+        rlRun "ipa user-show $aduser | grep \"Account disabled: False\"" 0 "$aduser is enabled on IPA"
 	
 	rlRun "acctdisable_ldif both" 0 "Creating ldif file to reset ipawinsyncacctdisable to both"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Resetting disabled account to sync to both servers"
@@ -338,7 +343,7 @@ rlPhaseStartTest "winsync_test_0006: bz765986 - winsync doesn't sync the employe
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser2 passwd"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser2"
 	sleep 30
-	rlRun "ipa user-find $aduser2 --all | grep -i \"employeeType: unknown\"" 0 "employeetype attribute set to unknown in IPA"
+	rlRun "ipa user-show $aduser2 --all | grep -i \"employeeType: unknown\"" 0 "employeetype attribute set to unknown in IPA"
 	rlRun "AD_employeetype_ldif $aduser2 ads staff"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f AD_employeetype.ldif"
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\" | grep \"employeeType: staff\"" 0 "Set employeetype to staff in AD for $aduser2"
@@ -366,14 +371,14 @@ rlPhaseStartTest "winsync_test_0008: Modify user attributes after replication se
 	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_3"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
 	rlRun "sleep 30" 0 "Waiting for sync"
-	rlRun "ipa user-find $ADln | grep \"Telephone Number: $phn_3\"" 0 "Attribute modify for user existing before winsync"
+	rlRun "ipa user-show $ADln | grep \"Telephone Number: $phn_3\"" 0 "Attribute modify for user existing before winsync"
 	rlRun "ipa user-del $ADln" 0 "Delete $ADln"
 
 	rlLog "Modify user attributes for user created after winsync"
 	rlRun "telephoneNumber_ldif $aduser ads $phn_4"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $aduser"
 	rlRun "sleep 30" 0 "Waiting for sync"
-	rlRun "ipa user-find $aduser | grep \"Telephone Number: $phn_4\"" 0 "Attribute modify for user created after winsync"
+	rlRun "ipa user-show $aduser | grep \"Telephone Number: $phn_4\"" 0 "Attribute modify for user created after winsync"
 rlPhaseEnd
 }
 
@@ -382,13 +387,15 @@ winsync_test_0009() {
 rlPhaseStartTest "winsync_test_0009: Update Password"
 	rlLog "Update password in AD"
 	rlRun "ADuser_passwd_ldif $aduser ads $userpw2"
+	rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Reset $aduser passwd from AD"
-	sleep 10
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
+	sleep 90
 	rlRun "ssh_auth_success $aduser $userpw2 $IPAhost" 0 "$aduser login in IPA server with new password"
 
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
-	sleep 10
+	sleep 20
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
 
 rlPhaseEnd
@@ -442,13 +449,14 @@ rlPhaseStartTest "winsync_test_0012: Delete User"
 	rlRun "deleteuser_ldif 456 ads"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete user 456 from AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
+	sleep 30
 	rlRun "ipa user-show $aduser" 2 "User $aduser not found in IPA as expected"
 	rlRun "ipa user-show 456" 2 "User 456 not found in IPA as expected"
 
 	rlLog "Delete user from IPA"
 	rlRun "ipa user-del $aduser2" 0 "Delete $aduser2 from IPA"
-#	rlRun "ipa user-del 456" 0 "Delete user 456 from IPA"
-	sleep 10
+#       rlRun "ipa user-del 456" 0 "Delete user 456 from IPA"
+	sleep 20
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $aduser2 deleted in AD"
 #	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User 456 deleted in AD"
 #	ipa user-del 456
@@ -544,9 +552,8 @@ rlPhaseStartTest "winsync_test_0015: Winsync with --win-subtree"
 
 	 # Restart PassSync after winsync agreement is established
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
-	sleep 10
+	sleep 5
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
-	sleep 10
         rlRun "net rpc service start PassSync -I $ADhost -U administrator%$ADpswd" 0 "Restarting PassSync Service"
 	sleep 10
 
@@ -571,11 +578,10 @@ rlPhaseStartTest "winsync_test_0015: Winsync with --win-subtree"
 
 	 # Restart PassSync after winsync agreement is established
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
-	sleep 10
+	sleep 5
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
-	sleep 10
         rlRun "net rpc service start PassSync -I $ADhost -U administrator%$ADpswd" 0 "Restarting PassSync Service"
-	sleep 10
+	sleep 5
 
 	rlRun "syncinterval_ldif $sec add"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to $sec sec"

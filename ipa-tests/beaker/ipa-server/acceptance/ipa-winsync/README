@@ -4,9 +4,9 @@
 
 1. Setup AD server if it does not already exist
 
-2. While configuring AD Install DNS and add a conditional forwarder for "testrelm.com". Make sure IPA server is resolvable from AD server.
+2. While configuring AD Install DNS (a conditional forwarder for "testrelm.com" is added during automation on the AD)
 
-* Adding a conditional forwarder on the AD side
+* Adding a conditional forwarder on the AD side manually (not required as its done now through autmation scripts)
 
     Open Start->Administrative Tools->DNS
     make a right-click on 'Conditional Forwarders' in the left column of the window
@@ -26,8 +26,27 @@ The command should report that zone IPA.Domain was successfully added.
 
 4. From AD copy the cert in the current directory replacing cert file "ADcert.cer"
 
-5. Make IPA CA trusted by importing IPA cert in the AD server's database. Follow the steps below.
- 
+5. Make sure time is synchronized between both servers
+
+6. Download freeSSHd from the link below or use the one in the current directory
+    http://www.freesshd.com/freeSSHd.exe
+    # Note : Steps e and f are not required to be performed for automation
+
+  i. While installing freesSSHd on the AD server, take all the default settings except for using it as a service.
+
+ ii. Run the FreeSSHd shortcut from the desktop and configure and start the server
+
+iii. Add user "administrator" from the "Users" tab and allow it to have SSH cmd line access.
+
+ iv. Test the administrator ssh login from a linux machine
+
+  v. Next on the AD server open FreeSSHd shortcut again and set the home path in SFTP tab to c drive "C:\"
+
+ vi. FreeSSHd has issues running as service on windows 2008 R2. From program files pick up the installed executable of freeSSHd and place it in user administrator's startup. This will make sshd service start automatically once administrator does a login on the server console. It will not start on a reboot unless administrator has done a login.
+
+7. Make IPA CA trusted by importing IPA cert in the AD server's database. Follow the steps below.
+(Note: These steps are now performed through the automation scripts)
+
  a. Copy the cert file /etc/ipa/ca.crt to a location in AD server
 
  b. Download passync from below link on to the AD server
@@ -42,28 +61,12 @@ The command should report that zone IPA.Domain was successfully added.
     Cert Token: Secret123
     search base: cn=users,cn=accounts,dc=testrelm,dc=com
 
- d. Download freeSSHd from the link below or use the one in the current directory
-    http://www.freesshd.com/freeSSHd.exe
-    # Note : Steps e and f are not required to be performed for automation
-
-  i. While installing freesSSHd on the AD server, take all the default settings except for using it as a service.
- ii. Run the FreeSSHd shortcut from the desktop and configure and start the server
-
-iii. Add user "administrator" from the "Users" tab and allow it to have SSH cmd line access.
-
- iv. Test the administrator ssh login from a linux machine
-
-  v. Next on the AD server open FreeSSHd shortcut again and set the home path in SFTP tab to "C:\Program Files\Red Hat Directory Password Synchronization"
-
-
- e. Make IPA CA trusted
+ d. Make IPA CA trusted
     From command prompt
     > cd C:\Program Files\Red Hat Directory Password Synchronization
     > certutil -d . -N (this will ask for password. Give "password")
     > certutil -d . -A -n "IPA CA" -t CT,, -a -i c:\path\to\ipaca.crt
  
- f. Restart AD Server
+ e. Restart AD Server
 
-6. Make sure time is synchronized between both servers
-
-7. The automation script will restart the PassSync service again after winsync agreement is established. No need of any manual intervention from this point onwards.
+8. The automation script will restart the PassSync service again after winsync agreement is established. No need of any manual intervention from this point onwards.
