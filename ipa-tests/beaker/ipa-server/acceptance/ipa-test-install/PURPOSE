@@ -1,3 +1,3 @@
-PURPOSE of /CoreOS/tests/Regression/ipa-test-template
-Description: IPA test template
+PURPOSE of /CoreOS/tests/Regression/ipa-test-install
+Description: IPA test install
 Author: Scott Poore <spoore@redhat.com>
