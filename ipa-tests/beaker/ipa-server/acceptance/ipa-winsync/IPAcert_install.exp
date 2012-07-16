@@ -36,14 +36,22 @@ set ipacrt [lrange $argv 6 6]
 set ipahostip [lrange $argv 7 7]
 set paswd password
 set ipadomain testrelm.com
-#set adpath "c:\\Windows\\System32\\CertSrv\\CertEnroll"
-#set adcrt "$adhost*.crt"
 set passsync_dir "c:\\Program Files\\Red Hat Directory Password Synchronization"
 set ipapath "c:\\IPA"
 
 set timeout 30
 
 if { [string compare $action add ] == 0 } {
+# Add forwarder for testrelm.com
+spawn telnet $adhost;
+expect "login: ";
+send -- "$username\r";
+expect "*?assword:*";
+send -- "$password\r";
+expect "*>";
+send -- "dnscmd /zoneadd $ipadomain /forwarder $ipahostip\r";
+sleep 5;
+send -- "exit\r";
 
 # Upload PassSync Installer and IPA certificate
 spawn sftp -o StrictHostKeychecking=no $username@$adhost;
@@ -91,7 +99,6 @@ spawn ssh -o StrictHostKeychecking=no $username@$adhost;
 expect "*?assword:*";
 send -- "$password\r";
 expect "*>";
-send -- "dnscmd /zonedelete $ipadomain /f\r";
 send -- "cd $ipapath\r";
 expect "*IPA>";
 send -- "msiexec /x $msifile /qn\r";
@@ -101,8 +108,18 @@ send -- "cd ..\r";
 expect "*>";
 send -- "rmdir /S /Q IPA\r";
 send -- "exit\r";
+# Delete Forwarder for testrelm.com
+spawn telnet $adhost;
+expect "login: ";
+send -- "$username\r";
+expect "*?assword:*";
+send -- "$password\r";
+expect "*>";
+send -- "dnscmd /zonedelete $ipadomain /f\r";
+sleep 5;
+send -- "exit\r";
 expect eof;
 
 } else {
-  puts "Usage: $argv0 add/delete ADadmin ADpswd ADhost msifile IPAhost ipacrt"
+  puts "Usage: $argv0 add/delete ADadmin ADpswd ADhost msifile IPAhost ipacrt IPAhostIP"
 }
