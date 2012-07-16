@@ -36,6 +36,7 @@ public class CommonTasks {
 	public static String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
 	public static String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
 	public static String hbacServiceGroupPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
+	public static String hbacTest =  serverUrl + "/ipa/ui/#hbac=hbactest&policy=hbac&navigation=policy";
 	public static String sudoRulePage =  serverUrl + "/ipa/ui/#sudo=sudorule&policy=sudo&navigation=policy";
 	public static String sudoPage=sudoRulePage;
 	public static String sudoCommandPage =  serverUrl + "/ipa/ui/#sudo=sudocmd&policy=sudo&navigation=policy";
@@ -47,6 +48,9 @@ public class CommonTasks {
 	public static String privilegePage = serverUrl + "/ipa/ui/#rolebased=privilege&ipaserver=rolebased&navigation=ipaserver";
 	public static String permissionPage = serverUrl + "/ipa/ui/#rolebased=permission&ipaserver=rolebased&navigation=ipaserver";
 	public static String delegationPage = serverUrl + "/ipa/ui/#ipaserver=delegation&navigation=ipaserver";
+	public static String automemberUserGroupPage = serverUrl + "/ipa/ui/#automember=amgroup&policy=automember&navigation=policy&automember-facet=searchgroup";//xdong ,have to add"automember-facet=searchgroup" otherwise there will be a problem for automation test
+	public static String automemberHostGroupPage = serverUrl + "/ipa/ui/#automember=amhostgroup&policy=automember&navigation=policy&automember-facet=searchhostgroup";//xdong,same above
+	
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";
@@ -113,7 +117,7 @@ public class CommonTasks {
     // form based auth
 	//kdestroy
 	//recorded actions 
-	public static void formauth(SahiTasks sahiTasks){
+	public static void formauth(SahiTasks sahiTasks, String userName, String password){
 		try{
 			sahiTasks.open();
 			if (!System.getProperty("os.name").startsWith("Windows"))
@@ -133,11 +137,11 @@ public class CommonTasks {
 				}
 			}
 			sahiTasks.link("form-based authentication").click();
-			sahiTasks.textbox("username").setValue("admin");
-			sahiTasks.password("password").setValue("Secret123");
+			sahiTasks.textbox("username").setValue(userName);
+			sahiTasks.password("password").setValue(password);
 			
 			sahiTasks.button("Login").click();
-			com.redhat.qe.auto.testng.Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as Admin");			
+			Assert.assertTrue(CommonTasks.kinitAsUser(userName, password), "Logged in successfully as " + userName);			
 		}
 		catch (IOException e) {
 			e.printStackTrace();
