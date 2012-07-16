@@ -6,17 +6,17 @@
 # ROLE=MASTER_env2, REPLICA_env2, CLIENT_env2
 # 
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="MASTER">
-#   <params> <param name="TOPO" value="star"/> </params>
+#   <params> <param name="TOPO1" value="star"/> </params>
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
+#   <params> <param name="TOPO1" value="star"/> </params>
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
+#   <params> <param name="TOPO1" value="star"/> </params>
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
+#   <params> <param name="TOPO1" value="star"/> </params>
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
+#   <params> <param name="TOPO1" value="star"/> </params>
 # <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> <param name="DOM" value="chicago.testrelm.com"/> </params>
+#   <params> <param name="TOPO1" value="star"/> </params>
 #
 
 ipa_install_envcleanup() {
@@ -496,14 +496,14 @@ ipa_install_prep()
 	fi
 }
 
-ipa_install_master()
+ipa_install_master_tester()
 {
 	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
 		rlLog "$FUNCNAME"
 	rlPhaseEnd
 }
 
-ipa_install_master_new()
+ipa_install_master()
 {
 	tmpout=/tmp/error_msg.out
 	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
@@ -545,14 +545,14 @@ ipa_install_master_new()
 	rlPhaseEnd
 }
 
-ipa_install_replica()
+ipa_install_replica_tester()
 {
 	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
 		rlLog "$FUNCNAME $MYMASTER"
 	rlPhaseEnd
 }
 
-ipa_install_replica_new()
+ipa_install_replica()
 {
 	local MYMASTER=$1
 	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
@@ -576,14 +576,14 @@ ipa_install_replica_new()
 	rlPhaseEnd
 }
 
-ipa_install_client()
+ipa_install_client_tester()
 {
 	rlPhaseStartTest "ipa_install_client - Install IPA Client"
 		rlLog "$FUNCNAME $MYMASTER"
 	rlPhaseEnd
 }
 
-ipa_install_client_new()
+ipa_install_client()
 {
 	local MYMASTER=$1
 	rlPhaseStartTest "ipa_install_client - Install IPA Client"
