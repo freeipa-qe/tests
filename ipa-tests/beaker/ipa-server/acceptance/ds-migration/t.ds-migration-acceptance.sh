@@ -36,7 +36,7 @@ setup()
 		# turn off compat plugin and restart directory server
 		rlLog "EXECUTING: echo $ADMINPW | ipa-compat-manage disable"
 		rlRun "echo $ADMINPW | ipa-compat-manage disable" 0
-		rlRun "service dirsrv restart" 0 "Restarting directory server"
+		rlDistroDiff dirsrv_svc_restart
         rlPhaseEnd
 }
 
@@ -80,24 +80,25 @@ migratecmd()
 	rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-002 Invalid User Container"
+                rlDistroDiff dirsrv_svc_restart
 		rlLog "EXECUTING: ipa migrate-ds --user-container=\"ou=bad\" --group-container=\"$GROUPCONTAINER\" ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"ou=bad\" ldap://$CLIENT:389" 2 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="ou=bad" --group-container="$GROUPCONTAINER" ldap://$CLIENT:389 > /tmp/error.out 2>&1
-                rlAssertGrep "ipa: ERROR: Container for user not found" "/tmp/error.out"
+		rlAssertGrep "ipa: ERROR: user LDAP search did not return any result (search base: ou=bad,dc=example,dc=com, objectclass: person)" "/tmp/error.out"
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-003 Invalid Group Container"
 		rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"ou=bad\" ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --group-container=\"ou=bad\" ldap://$CLIENT:389" 2 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="ou=bad" ldap://$CLIENT:389 > /tmp/error.out 2>&1
-                rlAssertGrep "ipa: ERROR: Container for group not found" "/tmp/error.out"
+                rlAssertGrep "ipa: ERROR: group LDAP search did not return any result (search base: ou=bad,dc=example,dc=com, objectclass: groupofuniquenames, groupofnames)" "/tmp/error.out"
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-004 Invalid User Object Class"
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-objectclass=badclass ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --user-objectclass=badclass ldap://$CLIENT:389" 2 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="$GROUPCONTAINER" --user-objectclass=badclass ldap://$CLIENT:389 > /tmp/error.out 2>&1
-                rlAssertGrep "ipa: ERROR: Objectclass for user not found" "/tmp/error.out"
+                rlAssertGrep "ipa: ERROR: user LDAP search did not return any result (search base: ou=People,dc=example,dc=com, objectclass: badclass)" "/tmp/error.out"
 		rlLog "Related Bugzilla :: https://bugzilla.redhat.com/show_bug.cgi?id=768510"
         rlPhaseEnd
 
@@ -105,7 +106,7 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-objectclass=badclass ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --group-objectclass=badclass ldap://$CLIENT:389" 2 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="$GROUPCONTAINER" --group-objectclass=badclass ldap://$CLIENT:389 > /tmp/error.out 2>&1
-                rlAssertGrep "ipa: ERROR: Objectclass for group not found" "/tmp/error.out"
+                rlAssertGrep "ipa: ERROR: group LDAP search did not return any result (search base: ou=groups,dc=example,dc=com, objectclass: badclass)" "/tmp/error.out"
 		rlLog "Related Bugzilla :: https://bugzilla.redhat.com/show_bug.cgi?id=768510"
         rlPhaseEnd
 
@@ -362,12 +363,15 @@ bugzillas()
 	rlPhaseEnd
 
         rlPhaseStartTest "bz783270 Warn if compat plugin is enabled"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 rlLog "EXECUTING: echo $ADMINPW | ipa-compat-manage enable"
                 rlRun "echo $ADMINPW | ipa-compat-manage enable" 0
-                rlRun "service dirsrv restart" 0 "Restarting directory server"
+                rlDistroDiff dirsrv_svc_restart
+		sleep 10
                 rlLog "EXECUTING : echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds ldap://$CLIENT:389 > /tmp/compatenabled.out 2>&1" 1
                 rlAssertGrep "The compat plug-in is enabled." "/tmp/compatenabled.out"
+		rlRun "cat /tmp/compatenabled.out"
         rlPhaseEnd
 
         rlPhaseStartTest "bz783270 Migrate with compat plugin enabled"
@@ -428,7 +432,10 @@ nsUniqueId: 42598c8d-1dd211b2-8f88fe1c-fcc30004
 addgroup.ldif_EOF
 
 		rlRun "/usr/bin/ldapmodify -a -x -h $CLIENT -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -c -f addgroup.ldif" 0 "Add group with duplicate GID to existing ldap group"
+		rlRun "/usr/bin/ldapsearch -x -h $CLIENT -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -b cn=Group2,ou=groups,dc=example,dc=com"
+		rlRun "/usr/bin/ldapsearch -x -h $CLIENT -p 389 -D \"cn=Directory Manager\" -w $ADMINPW -b cn=Group3,ou=groups,dc=example,dc=com"
 		rlLog "EXECUTING: ipa migrate-ds --with-compat --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldap://$CLIENT:389"
+		rlRun "echo $ADMINPW | ipa migrate-ds --with-compat --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldap://$CLIENT:389"
 		rlAssertGrep "WARNING: GID number 1002 of migrated user puser2 should match 1 group, but it matched 2 groups" "/var/log/httpd/error_log"
 
 		cat > delgroup.ldif << delgroup.ldif_EOF
