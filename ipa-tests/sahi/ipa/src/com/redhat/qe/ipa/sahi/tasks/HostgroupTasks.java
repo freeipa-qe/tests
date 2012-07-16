@@ -129,8 +129,8 @@ public class HostgroupTasks {
 		}
 		
 		sahiTasks.radio("direct").click();
-		//sahiTasks.link("Add").click();
-		sahiTasks.link("Add").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
+		sahiTasks.link("Add").click();
+		//sahiTasks.link("Add").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
 		sahiTasks.checkbox(name).click();
 		
 		sahiTasks.span(">>").click();
@@ -350,8 +350,8 @@ public class HostgroupTasks {
 		sahiTasks.radio("direct").click();
 		sahiTasks.checkbox(name).click();
 
-		//sahiTasks.span("Delete").click();
-		sahiTasks.link("Delete").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
+		sahiTasks.span("Delete").click();
+		//sahiTasks.link("Delete").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
 		sahiTasks.button(button).click();
 		if (button.equals("Cancel"))
 			sahiTasks.checkbox(name).click();
@@ -378,8 +378,8 @@ public class HostgroupTasks {
 		for (String name : names) {
 			sahiTasks.checkbox(name).click();
 		}
-		//sahiTasks.span("Delete").click();
-		sahiTasks.link("Delete").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
+		sahiTasks.span("Delete").click();
+		//sahiTasks.link("Delete").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
 	}

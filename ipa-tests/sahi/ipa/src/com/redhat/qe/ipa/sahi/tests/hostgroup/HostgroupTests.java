@@ -70,7 +70,7 @@ public class HostgroupTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		for (String hostname : hostnames_short) {
 			HostTasks.addHost(sahiTasks, hostname, commonTasks.getIpadomain(), "");
-		}
+		} 
 		
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 	}
@@ -78,7 +78,7 @@ public class HostgroupTests extends SahiTestScript{
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
 		// delete the hosts added for testing
-		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		sahiTasks.navigateTo(commonTasks.hostPage, true); 
 		HostTasks.deleteHost(sahiTasks, hostnames);
 		
 		//delete the host groups added for testing
@@ -184,7 +184,7 @@ public class HostgroupTests extends SahiTestScript{
 	/*
 	 * Add and edit host group settings
 	 */
-	@Test (groups={"addAndEditHostGroupSettingsTest"}, dataProvider="getAddAndEditHostGroupTestObjects")	
+	@Test (groups={"addAndEditHostGroupSettingsTest"}, dataProvider="getAddAndEditHostGroupTestObjects", dependsOnGroups="deleteMultipleHostGroupTests")	
 	public void testHostGroupAddAndEdit(String testName, String groupName, String description1, String description2) throws Exception {
 		//verify host group doesn't exist
 		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify host group " + groupName + " doesn't already exist");
