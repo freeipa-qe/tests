@@ -2,6 +2,7 @@ package com.redhat.qe.ipa.sahi.tests.delegation;
 
 import java.util.logging.Logger;
 
+
 import org.testng.annotations.*; 
 
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
@@ -11,7 +12,7 @@ import com.redhat.qe.ipa.sahi.*;
 
 public class DelegationTests extends IPAWebAutomation {
 	private static String packageName ="com.redhat.qe.ipa.sahi.pages.";  
-	private static Logger log = Logger.getLogger(GroupTests.class.getName()); 
+	private static Logger log = Logger.getLogger(GroupTests.class.getName());
 	
 	@AfterMethod (alwaysRun=true)
 	public void checkPossibleError(){
@@ -33,26 +34,26 @@ public class DelegationTests extends IPAWebAutomation {
 
 	@Test (groups={"modify"}, dataProvider="modifyData", dependsOnGroups = "add",
 		description = "execute test cases in modify queue")
-	public void test_modify(String scenario, String testPage, String testDataFile) throws Exception { 
+	public void test_modify(String scenario, String testPage, String testDataFile) throws Exception {
 		executeQueue(testPage, "modify", testDataFile);
 	}
 	
 	
 	@Test (groups={"search"}, dataProvider="searchData", dependsOnGroups = "add",
 			description = "execute test cases in search queue")
-		public void test_search(String scenario, String testPage, String testDataFile) throws Exception { 
+		public void test_search(String scenario, String testPage, String testDataFile) throws Exception {
 			executeQueue(testPage, "search", testDataFile);
 	}
 	
-	@Test (groups={"delete"}, dataProvider="deleteData", dependsOnGroups = {"modify","add","search"},
+	@Test (groups={"delete"}, dataProvider="deleteData", dependsOnGroups = {"add","search"},
 		description = "execute test cases in delete queue")
-	public void test_delete(String scenario, String testPage, String testDataFile) throws Exception { 
+	public void test_delete(String scenario, String testPage, String testDataFile) throws Exception {
 		executeQueue(testPage, "delete", testDataFile);
 	}
 	
-	@Test (groups={"nonStandardUserDelegation"}, dataProvider="UserDelegationdata", dependsOnGroups = {"modify","add","search","delete"},
-			description = "execute test cases in delete queue")
-		public void test_UserDelegation(String scenario, String testPage, String testDataFile) throws Exception { 
+	@Test (groups={"nonStandardUserDelegation"}, dataProvider="UserDelegationdata",
+			description = "execute test cases in NonStandardDelegation queue")
+		public void test_UserDelegation(String scenario, String testPage, String testDataFile) throws Exception {
 			executeQueue(testPage, "nonStandardUserDelegation", testDataFile);
 		}
 	
@@ -61,7 +62,7 @@ public class DelegationTests extends IPAWebAutomation {
 	 *****************************************************************************/
 	
 	private String DelegationTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
-	private String[] IPAServerPageDelegation = {"simple add and delete","IPAServerPageDelegation", DelegationTestDataFile};
+	private String[] IPAServerPageDelegation = {"Delegation Tests","IPAServerPageDelegation", DelegationTestDataFile};
 
 	private String[][] testdataAdd    = {IPAServerPageDelegation};
 	private String[][] testdataModify = {IPAServerPageDelegation};
