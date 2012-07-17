@@ -1,5 +1,6 @@
 #!/bin/bash
-### WORK IN PROGRESS...NOT READY FOR USE YET
+### WORK IN PROGRESS...NOT READY FOR USE YET...
+### almost ready for basic testing...07/17/2012
 
 #  
 # ROLE=MASTER, SLAVE, CLIENT, CLIENT2
