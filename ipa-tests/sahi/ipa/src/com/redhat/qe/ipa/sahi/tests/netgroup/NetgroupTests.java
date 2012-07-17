@@ -426,7 +426,7 @@ public class NetgroupTests extends SahiTestScript{
 		//										testname						netgroup		description			Action	
 		ll.add(Arrays.asList(new Object[]{ 		"description_Cancel",			"engineering",	"engineering group",		"Cancel"	 } ));
 		ll.add(Arrays.asList(new Object[]{ 		"description_Reset",			"engineering",	"engineering group",		"Reset"	 } ));	
-		ll.add(Arrays.asList(new Object[]{ 		"description_Update_bz814785",	"engineering",	"engineering group",		"Update"	 } ));
+	//	ll.add(Arrays.asList(new Object[]{ 		"description_Update_bz814785",	"engineering",	"engineering group",		"Update"	 } ));
 		return ll;	
 	}
 	
