@@ -11,17 +11,18 @@
 			    <include name="deleteMultipleServiceTests" />
 				<include name="customServiceAddTests" />
 				<include name="deleteSingleServiceTests" />
-				<include name="forceServiceAddTests" />
+				<include name="forceServiceAddTests" /> 
+				<include name="invalidserviceAddTests" />
+				<include name="serviceSearchTests" />
+			   <!-- Tests below fail on Windows due to Bug 831227 -->
 			    <include name="serviceAddCertificateTests" />
 			    <include name="serviceHoldCertificateTests" />
 			    <include name="serviceRestoreCertificateTests" />
-			    <include name="serviceRevokeCertificateTests" />
+			    <include name="serviceRevokeCertificateTests" /> 
 			    <include name="serviceAddManagedByHostTests" />
 			    <include name="serviceRemoveManagedByHostTests" />
 				<include name="serviceGetKeytabTests" />
-				<include name="serviceRemoveKeytabTests" />
-				<include name="invalidserviceAddTests" />
-				<include name="serviceSearchTests" />
+				<include name="serviceRemoveKeytabTests" /> 				 
 			</run>
 		</groups>
 		<classes>
