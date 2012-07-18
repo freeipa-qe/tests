@@ -98,7 +98,10 @@ public class IPAWebPage implements StandardTest{
 	protected void registerNonStandardTestCases()
 	{
 		this.registerTestCases("nonStandardUserDelegation", EditUserDelegationTestCases);
+		this.registerTestCases("nonStandardAutomember", AutomemberTestCases);
 	}
+	
+	
 	
 	protected void registerTestCases(String queueName, String[] testCases)
 	{
@@ -1259,7 +1262,7 @@ public class IPAWebPage implements StandardTest{
 		else if (tag.equals("radio") && value.equals("uncheck")){
 			browser.radio(id).uncheck(); //FIXME: not sure if we have "uncheck" for radio button
 			browser.radio(id).click();;
-			after = "unchedk";
+			after = "uncheck";
 		}
 		else if (tag.equals("select"))
 		{
