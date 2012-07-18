@@ -138,18 +138,19 @@ public class HBACRunTests extends SahiTestScript {
 	}
 	
 	/*
-	 * HBAC Run Test  - for positive test	
+	 * HBAC Run Test  - for positive and Negative tests	
 	 */
-	@Test (groups={"hbacRunTests"}, description="Positive Test for HBAC Test", dataProvider="getHBACRunTestObjects")
-	public void testHBACTest(String testName, String user,String servicename, String rules, String expectedResult) throws Exception 
+	@Test (groups={"hbacRunTests"}, description="Run based on Positive and Negative Tests for HBAC Test", dataProvider="getHBACRunTestObjects")
+	public void testHBACTest(String testName, String user,String servicename, String rules,String mrule1, String mrule2,String mrule3,
+							 String unmrule1, String unmrule2,String unmrule3,String expectedResult) throws Exception 
 	{
 		if(testName.equals("wrong_accessing"))
 		{
-			HBACTasks.testHBACRunTest(sahiTasks,user,fqdn0,servicename,fqdn0,rules,expectedResult);
+			HBACTasks.testHBACRunTest(sahiTasks,user,fqdn0,servicename,fqdn0,rules,mrule1,mrule2,mrule3,unmrule1,unmrule2,unmrule3,expectedResult);
 		}
 		else
 		{
-			HBACTasks.testHBACRunTest(sahiTasks,user,fqdn1,servicename,fqdn0,rules,expectedResult);
+			HBACTasks.testHBACRunTest(sahiTasks,user,fqdn1,servicename,fqdn0,rules,mrule1,mrule2,mrule3,unmrule1,unmrule2,unmrule3,expectedResult);
 		}
 		
 		sahiTasks.navigateTo(commonTasks.hbacTest, true);
@@ -170,9 +171,9 @@ public class HBACRunTests extends SahiTestScript {
 	 */
 	
 	@Test (groups={"hbacModifyRunTests"}, description="HBAC Run Test - missing required field", dataProvider="getHBACModifyRunTestObjects")
-	public void testModifyRunTest(String testName, String user,String servicename, String rules, String rules1, String servicename1, String user1, String expectedResult) throws Exception 
+	public void testModifyRunTest(String testName, String user,String servicename, String rules, String rules1, String servicename1, String user1,String mrule1, String mrule2,String mrule3, String expectedResult) throws Exception 
 		{
-			HBACTasks.createModifyRunTest (sahiTasks,user,fqdn0,servicename,fqdn1,rules,rules1,fqdn0,servicename1,fqdn1,user1,expectedResult);
+			HBACTasks.createModifyRunTest (sahiTasks,user,fqdn0,servicename,fqdn1,rules,rules1,fqdn0,servicename1,fqdn1,user1,mrule1,mrule2,mrule3,expectedResult);
 			
 			sahiTasks.navigateTo(commonTasks.hbacTest, true);
 		}
@@ -194,20 +195,22 @@ public class HBACRunTests extends SahiTestScript {
 	 */
 	
 	@Test (groups={"hbacExternalSpecificationTests"}, description="HBAC External Specification Test - Adding specify external user,host,service", dataProvider="getHBACExternalSpecificationObjects")
-	public void testExternalSpecificationTest(String testName, String user, String targethost, String service, String sourcehost,String rule, String expectedResult) throws Exception 
+	public void testExternalSpecificationTest(String testName, String user, String targethost, String service, String sourcehost,String rule,String mrule1, String mrule2,String mrule3,
+			 String unmrule1, String unmrule2,String unmrule3, String expectedResult) throws Exception 
 		{
-			HBACTasks.externalSpecificationTest (sahiTasks, user, targethost, service, sourcehost, rule, expectedResult);
+			HBACTasks.externalSpecificationTest (sahiTasks, user, targethost, service, sourcehost, rule,mrule1,mrule2,mrule3,unmrule1,unmrule2,unmrule3, expectedResult);
 			
 			sahiTasks.navigateTo(commonTasks.hbacTest, true);
 		}
 	/*
 	 * HBAC Rule include Enable and Disable Test
 	 */
-	@Test (groups={"hbacRuleIncludeTests"}, description="Positive Test for rule enable and disable", dataProvider="getHBACRuleIncludeTestObjects")
-	public void testHBACRuleTest(String testName, String user,String servicename, String include,String rule1,String rule2, String rule3, String expectedResult) throws Exception 
+	@Test (groups={"hbacRuleIncludeTests"}, description="Rune based on Positive and Negative Tests for rule enable and disable", dataProvider="getHBACRuleIncludeTestObjects")
+	public void testHBACRuleTest(String testName, String user,String servicename, String include,String rule,String rule1,String mrule1, String mrule2,String mrule3,
+			 String unmrule1, String unmrule2,String unmrule3, String expectedResult) throws Exception 
 	{
 		
-			HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,include,rule1,rule2,rule3,expectedResult);
+			HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,include,rule,rule1,mrule1,mrule2,mrule3,unmrule1,unmrule2,unmrule3, expectedResult);
 			sahiTasks.navigateTo(commonTasks.hbacTest, true);
 	}
 		
@@ -216,10 +219,10 @@ public class HBACRunTests extends SahiTestScript {
 	 */
 	
 	@Test (groups={"hbacRuleMatchTests"}, description="Positive Test for Matching and unmatching", dataProvider="getHBACRuleMatchObjects")
-	public void testHBACRuleMatchTest(String testName, String user,String servicename, String match, String unmatch, String rulename1, String rulename2,String rulename3,  String expectedResult) throws Exception 
+	public void testHBACRuleMatchTest(String testName, String user,String servicename, String match, String unmatch, String mrule1, String mrule2,String mrule3,String unmrule1, String unmrule2,String unmrule3,String expectedResult) throws Exception 
 	{
 		
-			HBACTasks.testRuleMatchTest(sahiTasks,user,fqdn1,servicename,fqdn0,match,unmatch,rulename1,rulename2,rulename3,expectedResult);
+			HBACTasks.testRuleMatchTest(sahiTasks,user,fqdn1,servicename,fqdn0,match,unmatch,mrule1,mrule2,mrule3,unmrule1,unmrule2,unmrule3,expectedResult);
 			sahiTasks.navigateTo(commonTasks.hbacTest, true);
 	}
 	
@@ -238,12 +241,12 @@ public class HBACRunTests extends SahiTestScript {
 	protected List<List<Object>> createHBACRunTestObjects(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-		//                                  testName			  user		  	service   rules	     expectedResult
-		ll.add(Arrays.asList(new Object[]{"positive_test",   "hbacrunuser945",   "smtp",  "smtp",   "Access Granted"}));
-		ll.add(Arrays.asList(new Object[]{"wrong_who",       "hbacrunuser6348",  "smtp",  "smtp",   "Access Denied"}));
-		ll.add(Arrays.asList(new Object[]{"wrong_accessing", "hbacrunuser945",   "smtp",  "smtp",   "Access Denied"}));
-		ll.add(Arrays.asList(new Object[]{"wrong_viaservice","hbacrunuser945",   "ftp",   "smtp",   "Access Denied"}));
-		ll.add(Arrays.asList(new Object[]{"wrong_rule",      "hbacrunuser945",   "smtp",  "denial", "Access Denied"}));
+		//                                  testName			  user		  	service   rules	    mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3      expectedResult
+		ll.add(Arrays.asList(new Object[]{"positive_test",   "hbacrunuser945",   "smtp",  "smtp",   "smtp",			   "",			"",			"",				"",				"",		 "Access Granted"}));
+		ll.add(Arrays.asList(new Object[]{"wrong_who",       "hbacrunuser6348",  "smtp",  "smtp", 	  "",			 	"",			"",			"",				"",				"smtp",  "Access Denied"}));
+		ll.add(Arrays.asList(new Object[]{"wrong_accessing", "hbacrunuser945",   "smtp",  "smtp", 	  "",				"",			"",			"",				"",				"smtp",  "Access Denied"}));
+		ll.add(Arrays.asList(new Object[]{"wrong_viaservice","hbacrunuser945",   "ftp",   "smtp", 	  "",				"",			"",			"",				"",				"smtp",  "Access Denied"}));
+		ll.add(Arrays.asList(new Object[]{"wrong_rule",      "hbacrunuser945",   "smtp",  "denial",	  "",				"",			"",			"",				"",				"denial", "Access Denied"}));
 		return ll;
 	}
 	
@@ -259,10 +262,10 @@ public class HBACRunTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
 		//                                  testName			    user          	       hostName1  						service           hostName2  				  rules	            				   expectedError
-		ll.add(Arrays.asList(new Object[]{"deselect_who",  	         "",         		"banana.lab.eng.pnq.redhat.com",    "smtp",     "apple.lab.eng.pnq.redhat.com",   "smtp",     "Input form contains invalid or missing values.Missing values: User name"}));
-    	ll.add(Arrays.asList(new Object[]{"deselect_accessing",  "hbacrunuser945",              "",     				    "smtp",     "apple.lab.eng.pnq.redhat.com",   "smtp",     "Input form contains invalid or missing values.Missing values: Target host"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_viaservices","hbacrunuser945",      "banana.lab.eng.pnq.redhat.com",     "",        "apple.lab.eng.pnq.redhat.com",   "smtp",     "Input form contains invalid or missing values.Missing values: Service"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_from",       "hbacrunuser945",      "banana.lab.eng.pnq.redhat.com",    "smtp",        "",               			  "smtp",     "Input form contains invalid or missing values.Missing values: Source host"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_who",  	         "",         		"banana."+domain,   				 "smtp",     "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values.Missing values: User name"}));
+    	ll.add(Arrays.asList(new Object[]{"deselect_accessing",  "hbacrunuser945",              "",     				    "smtp",      "apple."+domain, 				 "smtp",     "Input form contains invalid or missing values.Missing values: Target host"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_viaservices","hbacrunuser945",      "banana."+domain,    				 "",         "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values.Missing values: Service"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_from",       "hbacrunuser945",      "banana."+domain,   				 "smtp",        "",               			 "smtp",     "Input form contains invalid or missing values.Missing values: Source host"}));
 		ll.add(Arrays.asList(new Object[]{"deselect_all",           "",  		 		        "",   						 "",           "",        				      "smtp",     "Input form contains invalid or missing values.Missing values: User nameTarget hostServiceSource host"}));
 		return ll;
 	}
@@ -278,8 +281,8 @@ public class HBACRunTests extends SahiTestScript {
 	protected List<List<Object>> createHBACModifyRunTestObjects(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-		//                                  testName			  			user		  	service    rules	  rules    service      user        expectedResult
-		ll.add(Arrays.asList(new Object[]{"prev_button_positive_test",   "hbacrunuser6348",   "ftp",  "denial",  "smtp",   "smtp", "hbacrunuser945", "Access Granted"}));
+		//                                  testName			  			user		  	service    rules	  rules    service      user        mrule1   		 mrule2 	 mrule3		expectedResult
+		ll.add(Arrays.asList(new Object[]{"prev_button_positive_test",   "hbacrunuser6348",   "ftp",  "denial",  "smtp",   "smtp", "hbacrunuser945","smtp",			   "",			"",    "Access Granted"}));
 		
 		return ll;
 	}
@@ -296,9 +299,9 @@ public class HBACRunTests extends SahiTestScript {
 		
         //										testname				user       			 target_host 					service			 source_host				multiple_result1	       		
 		ll.add(Arrays.asList(new Object[]{ "search_who",			  "hbacrunuser945",			"" , 						   "",				"",							""		} ));
-		ll.add(Arrays.asList(new Object[]{ "search_accessing",		      "",				"banana.lab.eng.pnq.redhat.com",   "",				"",    						""		} ));
+		ll.add(Arrays.asList(new Object[]{ "search_accessing",		      "",				"banana."+domain,   "",				"",    						""		} ));
 		ll.add(Arrays.asList(new Object[]{ "search_viaservice",	          "",					"",							  "smtp",			"",			      		    "smtp1" } ));
-		ll.add(Arrays.asList(new Object[]{ "search_from",				  "",				    "",								"",	         "apple.lab.eng.pnq.redhat.com", ""     } ));     
+		ll.add(Arrays.asList(new Object[]{ "search_from",				  "",				    "",								"",	         "apple."+domain, ""     } ));     
 		return ll;	
 	}
 	
@@ -312,8 +315,9 @@ public class HBACRunTests extends SahiTestScript {
 	protected List<List<Object>> createHBACExternalSpecificationObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									    testname											user       					 target_host 					service			    source_host				  rule  			expected_result	       		
-		ll.add(Arrays.asList(new Object[]{ "specify_external_user_hosts,service",			    "redhatuser",			"zeta.lab.eng.pnq.redhat.com" , 		 "ftpd",	"tera.lab.eng.pnq.redhat.com",	"allow_all",   	    "Access Granted"	} ));
+        //									    testname											user       					 target_host 					service			    source_host				  rule 	    mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3 			expected_result	       		
+		ll.add(Arrays.asList(new Object[]{ "positive_specify_external_user_hosts,service",	    "redhatuser",			       "zeta."+domain , 				 "ftpd",	    "tera."+domain,	          "allow_all", "allow_all",		   "",			"",			"",				"",				"",		    	    "Access Granted"	} ));
+		ll.add(Arrays.asList(new Object[]{ "negative_specify_external_user_hosts,service",	    "fedorauser",			       "yotta."+domain , 				 "ftpd",	    "peta."+domain,	          "denial",        "",			   "",			"",	     "denial",    		"",				"",		   	        "Access Denied"	} ));
 		return ll;	
 	}
 	
@@ -330,9 +334,10 @@ public class HBACRunTests extends SahiTestScript {
 	protected List<List<Object>> createHBACRuleIncludeTestObjects(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 			
-		//                                  testName				  user		  		service   include       rule1	     rule2	  rule3     expectedResult
-		ll.add(Arrays.asList(new Object[]{"Include_enable_test",   "hbacrunuser945",  	 "smtp",  "enabled",  "allow_all",	"denial", "smtp",  "Access Granted"}));
-		ll.add(Arrays.asList(new Object[]{"Include_disable_test",   "hbacrunuser945", 	  "smtp",  "disabled", "No entries.",			"", 	"",	     "Access Denied"}));
+		//                                  testName						  user		  		service   	include    	rule   		rule1	      	    mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3     	 expectedResult
+        ll.add(Arrays.asList(new Object[]{"positive_Include_enable_test",   "hbacrunuser945",  	 "smtp",  	"enabled",   "", 	      "",	    "allow_all",		 "smtp",     	"",		 "denial",			"",				"",	      "Access Granted"}));
+		ll.add(Arrays.asList(new Object[]{"positive_Include_disabled_test", "hbacrunuser945",  	 "smtp",    "disabled",  "smtp",	"smtp",		       "smtp",		       "",		  	"",			"",				"",				"",	      "Access Granted"}));
+		ll.add(Arrays.asList(new Object[]{"negative_Include_disable_test",  "hbacrunuser945", 	 "smtp",    "disabled",	  "",	 "No entries.",    	      "",		       "",			"",			"",				"",				"",	      "Access Denied"}));
 		return ll;
 	}
 	
@@ -347,8 +352,9 @@ public class HBACRunTests extends SahiTestScript {
 	protected List<List<Object>> createHBACRuleMatchObjects(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 			
-		//                                  testName				 		   user		    service     match    	un_match      rulename1    rulename2  rulename3     expectedResult
-		ll.add(Arrays.asList(new Object[]{"Rule_Matched_and_Unmatched_test",  "admin",  	 "smtp",  "matched",   "unmatched",   "allow_all",	"denial",    "smtp",  "Access Granted"}));
+		//                                  testName				 		   user		    service     match    	un_match      mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3    expectedResult
+		ll.add(Arrays.asList(new Object[]{"Rule_Matched_and_Unmatched_test",  "admin",  	 "smtp",  "matched",   "unmatched",   "allow_all",	"denial",     "",		  "smtp",	        "",		    	"",     "Access Granted"}));
+
 		return ll;
 	}
 	
