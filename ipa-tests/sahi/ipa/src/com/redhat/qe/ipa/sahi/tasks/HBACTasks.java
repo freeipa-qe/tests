@@ -905,9 +905,9 @@ public class HBACTasks {
 	}
 	
 	/*
-	 * check if empty
+	 * check if not empty
 	 */
-	public static boolean checkIfEmptyString(String value)
+	public static boolean checkIfNotEmptyString(String value)
 	{
 		if(!value.equals(""))
 		{
@@ -927,10 +927,16 @@ public class HBACTasks {
 	 * @param service : selecting HBAC service for Via-Service
 	 * @param fqdn0 : selecting host for From
 	 * @param rules : selecting HBAC rule for Rules 
+	 * @param mrule1 : matched rule
+	 * @param mrule2 : matched rule
+	 * @param mrule3 : matched rule
+	 * @param unmrule1 : Unmatched rule
+	 * @param unmrule2 : Unmatched rule
+	 * @param unmrule3 : Unmatched rule 
 	 * @param expectedResult : for RunTest result
 	 */
 	
-	public static void testHBACRunTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String rules, String expectedResult )
+	public static void testHBACRunTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String rules,String mrule1, String mrule2,String mrule3,String unmrule1, String unmrule2,String unmrule3, String expectedResult )
 	{
 		sahiTasks.radio(user).click();
 		sahiTasks.span("Next").click();
@@ -944,6 +950,8 @@ public class HBACTasks {
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rules);
+		HBACTasks.isMatchedRule(sahiTasks, mrule1, mrule2, mrule3);
+		HBACTasks.isUnmatchedRule(sahiTasks, unmrule1, unmrule2, unmrule3);
 		sahiTasks.span("New Test").click();
 	}
 	
@@ -958,28 +966,28 @@ public class HBACTasks {
 	
 	public static void createRunTestWithRequiredField (SahiTasks sahiTasks, String user, String hostname1, String service, String hostname2, String rules, String expectedError )
 	{
-		if(checkIfEmptyString(user))
+		if(checkIfNotEmptyString(user))
 		{
 			sahiTasks.radio(user).click();
 		}
 		
 		sahiTasks.span("Next").click();
 		
-		if(checkIfEmptyString(hostname1))
+		if(checkIfNotEmptyString(hostname1))
 		{
 			sahiTasks.radio(hostname1).click();
 		}		
 		
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
 		
-		if(checkIfEmptyString(service))
+		if(checkIfNotEmptyString(service))
 		{
 			sahiTasks.radio(service).click();
 		}
 		
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
 		
-		if(checkIfEmptyString(hostname2))
+		if(checkIfNotEmptyString(hostname2))
 		{
 			sahiTasks.radio(hostname2).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
 		}
@@ -1003,10 +1011,14 @@ public class HBACTasks {
 	 * @param service1 : selecting HBAC service for Via-Service
 	 * @param hostname1 : selecting target host
 	 * @param user1 : selecting user to user login (for Who)
+	 * @param mrule1 : matched rule
+	 * @param mrule2 : matched rule
+	 * @param mrule3 : matched rule
 	 * @param expectedError : for RunTest result
 	 */
 	
-	public static void createModifyRunTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String rules, String rules1, String fqdn10, String service1,String hostname1, String user1, String expectedResult )
+	public static void createModifyRunTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String rules, String rules1, String fqdn10,
+			String service1,String hostname1, String user1,String mrule1, String mrule2,String mrule3, String expectedResult )
 	{
 		sahiTasks.radio(user).click();
 		sahiTasks.span("Next").click();
@@ -1032,17 +1044,21 @@ public class HBACTasks {
 		sahiTasks.link("Run Test").click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rules1);
+		HBACTasks.isMatchedRule(sahiTasks, mrule1, mrule2, mrule3);
 		sahiTasks.span("New Test").click();
 	}
 	
-	
-	/*
-	 * 
+	/*@param sahitasks
+	 * @param user : selecting user to user login (for Who)
+	 * @param targethost : selecting target host
+	 * @param service : selecting HBAC service for Via-Service
+	 * @param sourcehost : selecting source host
+	 * @param multipleResult : for additional result
 	 */
 
 	public static void searchTest (SahiTasks sahiTasks,String user, String targethost, String service, String sourcehost,String multipleResult)
 	{
-		if(checkIfEmptyString(user))
+		if(checkIfNotEmptyString(user))
 		{
 		sahiTasks.link("Who").click();
 		sahiTasks.textbox("filter").near(sahiTasks.span("Who")).setValue(user);
@@ -1054,7 +1070,7 @@ public class HBACTasks {
 		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Who"))).click();
 		}
 		
-		if(checkIfEmptyString(targethost))
+		if(checkIfNotEmptyString(targethost))
 		{
 		sahiTasks.link("Accessing").click();
 		sahiTasks.textbox("filter").near(sahiTasks.span("Accessing")).setValue(targethost);
@@ -1067,7 +1083,7 @@ public class HBACTasks {
 		}
 		
 
-		if(checkIfEmptyString(service))
+		if(checkIfNotEmptyString(service))
 		{
 		sahiTasks.link("Via Service").click();
 		sahiTasks.textbox("filter").near(sahiTasks.span("Via Service")).setValue(service);
@@ -1079,7 +1095,7 @@ public class HBACTasks {
 		sahiTasks.span("icon search-icon").near(sahiTasks.textbox("filter").near(sahiTasks.span("Via Service"))).click();
 		}
 		
-		if(checkIfEmptyString(sourcehost))
+		if(checkIfNotEmptyString(sourcehost))
 		{
 		sahiTasks.link("From").click();
 		sahiTasks.textbox("filter").near(sahiTasks.span("From")).setValue(sourcehost);
@@ -1092,10 +1108,23 @@ public class HBACTasks {
 		}
 		
 	}
-/*
- * Es
- */
-	public static void externalSpecificationTest (SahiTasks sahiTasks,String user, String targethost, String service, String sourcehost, String rule, String expectedResult)
+	
+	/*@param sahitasks
+	 * @param user : selecting user to user login (for Who)
+	 * @param targethost : selecting target host
+	 * @param service : selecting HBAC service for Via-Service
+	 * @param sourcehost : selecting source host
+	 * @param rules : selecting HBAC rule for Rules
+	 * @param mrule1 : matched rule
+	 * @param mrule2 : matched rule
+	 * @param mrule3 : matched rule
+	 * @param unmrule1 : Unmatched rule
+	 * @param unmrule2 : Unmatched rule
+	 * @param unmrule3 : Unmatched rule  
+	 * @param expectedResult : for RunTest result
+	 */
+	public static void externalSpecificationTest (SahiTasks sahiTasks,String user, String targethost, String service, String sourcehost, String rule,String mrule1, String mrule2,String mrule3,
+			 String unmrule1, String unmrule2,String unmrule3, String expectedResult)
 	{	
 		sahiTasks.textbox("hbactest-user-external").near(sahiTasks.label("Specify external User:")).setValue(user);
 		sahiTasks.span("Next").click();
@@ -1109,13 +1138,28 @@ public class HBACTasks {
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rule);
+		HBACTasks.isMatchedRule(sahiTasks, mrule1, mrule2, mrule3);
+		HBACTasks.isUnmatchedRule(sahiTasks, unmrule1, unmrule2, unmrule3);
 		sahiTasks.span("New Test").click();	
 	}
 	
-	/*
-	 * 
+	/*@param sahitasks
+	 * @param user : selecting user to user login (for Who)
+	 * @param hostname : selecting target host
+	 * @param service : selecting HBAC service for Via-Service
+	 * @param fqdn0 : selecting source host
+	 * @param include : selecting IncludeEnable or IncludeDisable checkbox
+	 * @param rules : selecting HBAC rule for Rules
+	 * @param mrule1 : matched rule
+	 * @param mrule2 : matched rule
+	 * @param mrule3 : matched rule
+	 * @param unmrule1 : Unmatched rule
+	 * @param unmrule2 : Unmatched rule
+	 * @param unmrule3 : Unmatched rule  
+	 * @param expectedResult : for RunTest result
 	 */
-	public static void testRuleIncludeTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String include,String rule1,String rule2,String rule3, String expectedResult )
+	public static void testRuleIncludeTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String include,String rule,String rule1,String mrule1, String mrule2,String mrule3,
+			 String unmrule1, String unmrule2,String unmrule3, String expectedResult )
 	{
 		sahiTasks.radio(user).click();
 		sahiTasks.span("Next").click();
@@ -1127,31 +1171,61 @@ public class HBACTasks {
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
 		//selecting enable or disable checkbox
 		sahiTasks.checkbox(include).near(sahiTasks.label("Include Enabled")).click();
+		sahiTasks.checkbox(rule).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		if(rule.equals("")){
+			sahiTasks.checkbox("cn").in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+			
+		}
+		
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult);
 		if(include.equals("enabled"))
 		{
 			//verifying rules in list
-			Assert.assertTrue(sahiTasks.link(rule1).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rule1+" is listed");
-			Assert.assertTrue(sahiTasks.link(rule2).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rule2+" is listed");
-			Assert.assertTrue(sahiTasks.link(rule3).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rule3+" is listed");
+			HBACTasks.isMatchedRule(sahiTasks, mrule1, mrule2, mrule3);
+			HBACTasks.isUnmatchedRule(sahiTasks, unmrule1, unmrule2, unmrule3);
+		
 		
 		}
 		
 		if(include.equals("disabled"))
 		{
-			Assert.assertTrue(sahiTasks.span(rule1).exists(), "Verified No rules is listed");
-		}
+			if(rule1.equals("smtp"))
+			{
+				HBACTasks.isMatchedRule(sahiTasks, mrule1, mrule2, mrule3);
+				HBACTasks.isUnmatchedRule(sahiTasks, unmrule1, unmrule2, unmrule3);
+				
+			}
+			else
+			{
+				Assert.assertTrue(sahiTasks.span(rule1).exists(), "Verified No rules is listed");
+			}
+			
+		}	
 		
 		sahiTasks.span("New Test").click();
 	}
 	
-	/*
-	 * 
+	/*@param sahitasks
+	 * @param user : selecting user to user login (for Who)
+	 * @param hostname : selecting target host
+	 * @param service : selecting HBAC service for Via-Service
+	 * @param fqdn0 : selecting source host
+	 * @param match : selecting Matched checkbox
+	 * @param unmatch : selecting Unmatched checkbox
+	 * @param rules : selecting HBAC rule for Rules
+	 * @param mrule1 : matched rule
+	 * @param mrule2 : matched rule
+	 * @param mrule3 : matched rule
+	 * @param unmrule1 : Unmatched rule
+	 * @param unmrule2 : Unmatched rule
+	 * @param unmrule3 : Unmatched rule  
+	 * @param expectedResult : for RunTest result
 	 */
 
-	public static void testRuleMatchTest (SahiTasks sahiTasks, String user, String hostname,String service, String fqdn0, String match, String unmatch, String rulename1, String rulename2,String rulename3,  String expectedResult)
+	public static void testRuleMatchTest (SahiTasks sahiTasks, String user, String hostname,String service, String fqdn0, String match, String unmatch,
+			String mrule1, String mrule2,String mrule3,String unmrule1, String unmrule2,String unmrule3,  String expectedResult)
 	{
 		sahiTasks.radio(user).click();
 		sahiTasks.span("Next").click();
@@ -1164,18 +1238,59 @@ public class HBACTasks {
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult);
-		//unchecked unmatched checkbox
-		sahiTasks.checkbox(unmatch).click();
-		//verifying rules in list
-		Assert.assertTrue(sahiTasks.link(rulename1).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rulename1+" is Matched");
-		Assert.assertTrue(sahiTasks.link(rulename2).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rulename2+" is Matched");
-		//unchecked matched checkbox
-		sahiTasks.checkbox(match).click();
-		//checked unmached checkbox
-		sahiTasks.checkbox(unmatch).click();
-		Assert.assertTrue(sahiTasks.link(rulename3).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+rulename3+" is Unmatched");
+		HBACTasks.isMatchedRule(sahiTasks, mrule1, mrule2, mrule3);
+		HBACTasks.isUnmatchedRule(sahiTasks, unmrule1, unmrule2, unmrule3);
 		sahiTasks.span("New Test").click();
 	}
+	
+	/*
+	 *@param sahiTasks
+	 *@param mrule1 : matched rule
+	 *@param mrule2 : matched rule
+	 *@param mrule3 : matched rule 
+	 */
+public static void isMatchedRule (SahiTasks sahiTasks, String mrule1, String mrule2,String mrule3)
+{
+	//unchecked unmatched checkbox
+	sahiTasks.checkbox("unmatched").click();
+	if(checkIfNotEmptyString(mrule1))
+		{
+			Assert.assertTrue(sahiTasks.link(mrule1).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+mrule1+" is listed under rule Matched");
+		}
+	if(checkIfNotEmptyString(mrule2))
+	{
+		Assert.assertTrue(sahiTasks.link(mrule2).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+mrule2+" is listed under rule Matched");
+	}
+	if(checkIfNotEmptyString(mrule3))
+	{
+		Assert.assertTrue(sahiTasks.link(mrule3).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+mrule3+" is listed under rule Matched");
+	}
+}
+/*
+ * @param sahiTasks
+ * @param unmrule1 : Unmatched rule
+ * @param unmrule2 : Unmatched rule
+ * @param unmrule3 : Unmatched rule
+ */
+public static void isUnmatchedRule (SahiTasks sahiTasks, String unmrule1, String unmrule2,String unmrule3)
+{
+	//unchecked matched checkbox
+	sahiTasks.checkbox("matched").click();
+	//checked unmached checkbox
+	sahiTasks.checkbox("unmatched").click();
+	if(checkIfNotEmptyString(unmrule1))
+		{
+			Assert.assertTrue(sahiTasks.link(unmrule1).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+unmrule1+" is listed under rule Unmatched");
+		}
+	if(checkIfNotEmptyString(unmrule2))
+	{
+		Assert.assertTrue(sahiTasks.link(unmrule2).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+unmrule2+" is listed under rule Unmatched");
+	}
+	if(checkIfNotEmptyString(unmrule3))
+	{
+		Assert.assertTrue(sahiTasks.link(unmrule3).under(sahiTasks.tableHeader("Rule name").near(sahiTasks.tableHeader("Matched"))).exists(), "Verified "+unmrule3+" is listed under rule Unmatched");
+	}
+}
 
 
 }
