@@ -6,6 +6,8 @@
          				<include name="add" />
 						<include name="modify" />
 						<include name="delete" />
+						<include name="search" />
+						<include name="nonStandardAutomember" />
 						<!-- <include name="report" />-->
             	    </run>
             	</groups>
