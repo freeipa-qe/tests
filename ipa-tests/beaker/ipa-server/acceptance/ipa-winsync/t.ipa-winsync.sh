@@ -140,6 +140,7 @@ popd
 	# Removing IPA cert from AD
 	rlLog "Cleanup AD before PassSync Install"
 	./IPAcert_install.exp delete $ADadmin $ADpswd $ADhost $msifile > /dev/null 2>&1
+	sleep 10
 
 	# Uploading the IPA certificate in AD and importing it for passync
 	rm -f $ipacrt
@@ -158,7 +159,7 @@ rlPhaseEnd
 
 winsync_test_0001() {
 
-rlPhaseStartTest "winsync_test_0001: Creating winsync agreement"
+rlPhaseStartTest "0001 Creating winsync agreement"
 	# Specifying TLS_CACERTDIR
 	grep -q "TLS_CACERTDIR" $ldap_conf
 	if [ $? -eq 0 ]; then
@@ -223,7 +224,7 @@ rlPhaseEnd
 
 winsync_test_0002() {
 
-rlPhaseStartTest "winsync_test_0002: bz820258 - Modify Winsync Interval (default 300 seconds)"
+rlPhaseStartTest "0002 bz820258 - Modify Winsync Interval (default 300 seconds)"
 	rlRun "errorlog_ldif 8192"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f errorlog.ldif" 0 "Setting the error log level"
 	rlRun "sleep 540" 0 "Waiting for winsync interval to log in logfile"
@@ -259,7 +260,7 @@ rlPhaseEnd
 
 winsync_test_0003() {
 
-rlPhaseStartTest "winsync_test_0003: Create users(numeric/alphanumeric) in AD and verify it is synced to IPA and overwrites existing IPA users"
+rlPhaseStartTest "0003 Create users(numeric/alphanumeric) in AD and verify it is synced to IPA and overwrites existing IPA users"
 
 	# Creating user in AD
 	rlRun "ADuser_ldif $aduser ads $aduser add" 0 "Generate ldif file to add user $aduser"
@@ -293,7 +294,7 @@ rlPhaseEnd
 
 winsync_test_0004() {
 
-rlPhaseStartTest "winsync_test_0004: User added in IPA is not replicated on AD"
+rlPhaseStartTest "0004 User added in IPA is not replicated on AD"
 	rlRun "create_ipauser $firstname $surname $firstname $userpw"
 	sleep 5
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -308,7 +309,7 @@ rlPhaseEnd
 
 winsync_test_0005() {
 
-rlPhaseStartTest "winsync_test_0005: Synchronization behaviour of account lock status"
+rlPhaseStartTest "0005 Synchronization behaviour of account lock status"
 	rlRun "acctdisable_ldif both" 0 "Creating ldif file to set ipawinsyncacctdisable to both"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Setting disabled account to sync to both AD and IPA server"
 	# To disable account set userAccountControl to 514
@@ -333,7 +334,7 @@ rlPhaseEnd
 
 winsync_test_0006() {
 
-rlPhaseStartTest "winsync_test_0006: bz765986 - winsync doesn't sync the employeeType attribute"
+rlPhaseStartTest "0006 bz765986 - winsync doesn't sync the employeeType attribute"
 	rlRun "employeetype_ldif add" 0 "Set employeetype attribute"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f employeetype.ldif"
 	rlRun "ADuser_ldif $aduser2 ads $aduser2 add" 0 "Generate ldif file to add user $aduser2"
@@ -358,7 +359,7 @@ rlPhaseEnd
 
 winsync_test_0007() {
 
-rlPhaseStartTest "winsync_test_0007: ipa-replica-manage list"
+rlPhaseStartTest "0007 ipa-replica-manage list"
 	rlRun "ipa-replica-manage list | grep winsync" 0 "Listing winsync in Replica agreement"
 	rlRun "ipa-replica-manage list | grep master" 0 "Listing master in Replica agreement"
 rlPhaseEnd
@@ -366,7 +367,7 @@ rlPhaseEnd
 
 winsync_test_0008() {
 
-rlPhaseStartTest "winsync_test_0008: Modify user attributes after replication setup"
+rlPhaseStartTest "0008 Modify user attributes after replication setup"
 	rlLog "Modify user attributes for user existing before winsync"
 	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_3"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
@@ -384,7 +385,7 @@ rlPhaseEnd
 
 winsync_test_0009() {
 
-rlPhaseStartTest "winsync_test_0009: Update Password"
+rlPhaseStartTest "0009 Update Password"
 	rlLog "Update password in AD"
 	rlRun "ADuser_passwd_ldif $aduser ads $userpw2"
 	rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
@@ -403,7 +404,7 @@ rlPhaseEnd
 
 winsync_test_0010() {
 
-rlPhaseStartTest "winsync_test_0010: \"ipausers\" group is a non-posix group (without gid number)"
+rlPhaseStartTest "0010 \"ipausers\" group is a non-posix group (without gid number)"
 	rlLog "Synced users must have a GID which is that same as thier UID. This GID is a UPG GID"
 	x=`ipa user-show $aduser | grep UID | awk '{print $NF}'`
 	y=`ipa user-show $aduser | grep GID | awk '{print $NF}'`
@@ -423,7 +424,7 @@ rlPhaseEnd
 
 winsync_test_0011() {
 
-rlPhaseStartTest "winsync_test_0011: bz755436 - sync uidNumber from AD"
+rlPhaseStartTest "0011 bz755436 - sync uidNumber from AD"
 	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=755436"
 	rlRun "uidNumber_ldif $aduser ads $new_UID"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f uidNumber.ldif" 0 "Setting UID for $aduser"
@@ -442,7 +443,7 @@ rlPhaseEnd
 
 winsync_test_0012() {
 
-rlPhaseStartTest "winsync_test_0012: Delete User"
+rlPhaseStartTest "0012 Delete User"
 	rlLog "Delete user from AD"
 	rlRun "deleteuser_ldif $aduser ads"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete $aduser from AD"
@@ -466,7 +467,7 @@ rlPhaseEnd
 
 winsync_test_0013() {
 
-rlPhaseStartTest "winsync_test_0013: Error adding the agreement over existing agreement"
+rlPhaseStartTest "0013 Error adding the agreement over existing agreement"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd" 1 "Error on attempting to add agreement over existing agreement"
 
 rlPhaseEnd
@@ -474,7 +475,7 @@ rlPhaseEnd
 
 winsync_test_0014() {
 
-rlPhaseStartTest "winsync_test_0014: Using options force-sync, re-initialize, disconnect and del"
+rlPhaseStartTest "0014 Using options force-sync, re-initialize, disconnect and del"
 	
 	rlRun "syncinterval_ldif delete"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to 5 mins"
@@ -521,7 +522,7 @@ rlPhaseEnd
 
 winsync_test_0015() {
 
-rlPhaseStartTest "winsync_test_0015: Winsync with --win-subtree"
+rlPhaseStartTest "0015 Winsync with --win-subtree"
 	rlRun "addOU_ldif $OU1 add"
 	rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Adding OU $OU1"
 	rlRun "addsubOU_ldif $sub_OU1 $OU1 add"

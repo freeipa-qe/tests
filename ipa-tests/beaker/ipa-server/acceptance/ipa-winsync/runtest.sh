@@ -42,6 +42,7 @@
 # Install samba-common package if not already installed
 rpm1="samba-common"
 rpm2="expect"
+rpm3="telnet"
 
    rlCheckRpm "$rpm1"
 	if [ $? -ne 0 ]; then
@@ -52,6 +53,12 @@ rpm2="expect"
         if [ $? -ne 0 ]; then
            rlRun "yum install -y $rpm2"
         fi
+   
+   rlCheckRpm "$rpm3"
+	if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm3"
+        fi
+
 # Include test case file
 . ./t.ipa-winsync.sh
 
