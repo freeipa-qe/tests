@@ -3,12 +3,12 @@ package com.redhat.qe.ipa.sahi.pages;
 public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
-	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative","addOne"};
-	public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative","modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","setDefaultGroup"}; //xdong last 5 for last 5
-	//public static final String[] standardModTestCases = {"modify", "modifyUpdateResetCancel", "modifyNegative"};
+	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative"};
+	public static final String[] standardModTestCases = {"modify", "modifyNegative"};
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
-	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard"};
+	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard","modifyUpdateResetCancel"};
+	public static final String[] AutomemberTestCases = {"modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","modifyUpdateResetCancel","setDefaultGroup"};//xdong
 	
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addSpecial(IPAWebTestMonitor monitor);
