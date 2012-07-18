@@ -30,18 +30,18 @@ public class PolicyPageAutomemberHostGroupRules extends IPAWebPage {
 		delPage = "Delete Automember Host"; 
 	
 		//registerStandardTestCases();
-		registerTestCases("add","addSingle");//xdong for automember use
-		registerTestCases("add","addAndAddAnother");//xdong for automember use
-		registerTestCases("add","addThenEdit");//xdong for automember use
-		registerTestCases("add","addThenCancel");//xdong for automember use
-		registerTestCases("modify","modifyConditionInclusiveAdd");//xdong for automember use
-		registerTestCases("modify","modifyConditionInclusiveDelete");//xdong for automember use
-		registerTestCases("modify","modifyConditionExclusiveAdd");//xdong for automember use
-		registerTestCases("modify","modifyConditionExclusiveDelete");//xdong for automember use
-		registerTestCases("modify","setDefaultGroup");//xdong for automember use
-		registerTestCases("modify","modifyUpdateResetCancel");//xdong for automember use
-		registerTestCases("delete","deleteSingle");//xdong for automember use
-		registerTestCases("delete","deleteMultiple");//xdong for automember use
+		registerTestCases("add","addSingle");
+		registerTestCases("add","addAndAddAnother");
+		registerTestCases("add","addThenEdit");
+		registerTestCases("add","addThenCancel");
+		registerTestCases("nonStandardAutomember", AutomemberTestCases);
+		registerTestCases("modify","modify");
+		registerTestCases("search","searchPositive");
+		registerTestCases("search","searchNegative");
+		registerTestCases("delete","deleteSingle");
+		registerTestCases("delete","deleteMultiple");
+
+	
 		System.out.println("New instance of " + PolicyPageAutomemberHostGroupRules.class.getName() + " is ready");
 	}
 
