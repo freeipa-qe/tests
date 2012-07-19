@@ -5,11 +5,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.internal.matchers.CombinableMatcher;
-
 import com.redhat.qe.ipa.sahi.tasks.*;
-import com.sun.mail.imap.protocol.SearchSequence;
 
 public class IPAWebPage implements StandardTest{
 
@@ -94,14 +90,6 @@ public class IPAWebPage implements StandardTest{
 		this.registerTestCases("search", standardSearchTestCases);
 		this.registerTestCases("delete", standardDelTestCases);
 	}
-	
-	protected void registerNonStandardTestCases()
-	{
-		this.registerTestCases("nonStandardUserDelegation", EditUserDelegationTestCases);
-		this.registerTestCases("nonStandardAutomember", AutomemberTestCases);
-	}
-	
-	
 	
 	protected void registerTestCases(String queueName, String[] testCases)
 	{
@@ -242,10 +230,10 @@ public class IPAWebPage implements StandardTest{
 		try {
 			addNewEntryThenCancelOperation(monitor, pageName);
 			if(browser.link(testAccounts.get(0)).exists()){
-				monitor.fail("Add Failed");
+				monitor.fail("Add and Cancel Failed");
 			}
 			else{
-				monitor.pass("Added and Verified Successfully");
+				monitor.pass("Add and Cancel Passed");
 			}
 		} catch (IPAWebAutomationException e) {
 			e.printStackTrace();
@@ -634,12 +622,12 @@ public class IPAWebPage implements StandardTest{
 	
 	@Override
 	public IPAWebTestMonitor deleteMultiple(IPAWebTestMonitor monitor){
-		String pageName = delPage;
+		String pageName=delPage;
 		testAccounts.clear();
 		if (pageName == null)
 			return monitor;
 		
-		int numOfEntries = 7;
+		int numOfEntries = 6;
 		try {
 			deleteMultipleEntry(monitor, pageName, numOfEntries);
 			for(int i=0;i<numOfEntries;i++){
@@ -824,7 +812,7 @@ public class IPAWebPage implements StandardTest{
 					monitor.fail("Add and Verify Failed");
 				}
 			}
-
+			
 			pageName=userToGroupPage;
 			if (pageName == null)
 				return monitor;
@@ -1153,7 +1141,7 @@ public class IPAWebPage implements StandardTest{
 					testAccounts.add(value);
 				}
 			}
-			if(pageName.equals("addNegativePage")){
+			if(pageName.equals("addNegativePage") || pageName.equals("searchPage")){
 				if(value.charAt(value.length()-1)=='l'){
 					value=value.substring(0,value.length()-1);
 					value=" " + value;

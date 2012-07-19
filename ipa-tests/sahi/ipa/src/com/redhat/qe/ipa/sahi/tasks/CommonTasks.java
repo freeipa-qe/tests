@@ -136,7 +136,9 @@ public class CommonTasks {
 					}
 				}
 			}
-			sahiTasks.link("form-based authentication").click();
+			if(sahiTasks.link("form-based authentication").exists()){
+				sahiTasks.link("form-based authentication").click();
+			}
 			sahiTasks.textbox("username").setValue(userName);
 			sahiTasks.password("password").setValue(password);
 			

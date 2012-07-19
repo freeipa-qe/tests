@@ -4,10 +4,10 @@ public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
 	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative"};
-	public static final String[] standardModTestCases = {"modify", "modifyNegative"};
+	public static final String[] standardModTestCases = {"modify", "modifyNegative","modifyUpdateResetCancel"};
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
-	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard","modifyUpdateResetCancel"};
+	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard"};
 	public static final String[] AutomemberTestCases = {"modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","modifyUpdateResetCancel","setDefaultGroup"};//xdong
 	
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor);
