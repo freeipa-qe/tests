@@ -598,6 +598,7 @@ ipa_install_client()
 
 		rlRun "RUN ipa dns-add for client?"
 		rlRun "RUN ipa-client-install"
+		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER"
 	rlPhaseEnd
 }
 
