@@ -88,10 +88,12 @@ run_selinuxusermap_add_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-cli-002: Modify ipa config selinuxuser map order"
-        new_selinuxusermap_order_config=\"guest_u:s0$xguest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023\"
+        new_selinuxusermap_order_config=\"xguest_u:s0$guest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023\"
+
+        expected_selinuxusermap_order_config_entry=\"SELinux user map order: xguest_u:s0$guest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023\"
         rlRun "ipa config-mod --ipaselinuxusermaporder=$new_selinuxusermap_order_config" 0 "Modify ipa config selinuxuser map order"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_neworder.out" 0 "Show ipa config"
-        rlAssertGrep "SELinux user map order: $new_selinuxusermap_order_config" "$TmpDir/selinuxusermap_neworder.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_neworder.out"
         rlRun "ipa config-mod --ipaselinuxusermaporder=$default_selinuxusermap_order_config" 0 "Cleanup: back on default ipa config selinuxuser map order"
     rlPhaseEnd
 
@@ -104,56 +106,82 @@ run_selinuxusermap_add_tests(){
         rlRun "ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser" 0 "Cleanup: back on default ipa config default selinuxuser"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-002: Add a selinuxuser map"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-004: Modify ipa config selinuxuser map order with non existing selinux user"
+        new_selinuxusermap_order_config=\"guest_u:s0$xguest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023$unkown_u:s0\"
+	command="ipa config-mod --ipaselinuxusermaporder=$new_selinuxusermap_order_config"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Default SELinux user map not in order list"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-005: Modify ipa config default selinuxuser with non existing selinux user"
+        new_selinuxuser=\"unknown_u:s0\"
+	command="ipa config-mod --ipaselinuxusermapdefault=$new_selinuxuser"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Default SELinux user map default user not in order list"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-006: Modify ipa config selinuxuser map order with existing order"
+        command="ipa config-mod --ipaselinuxusermaporder=$default_selinuxusermap_order_config"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-007: Modify ipa config default selinuxuser with existing selinux user"
+        command="ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser"
+        expmsg="ipa: ERROR: no modifications to be performed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-008: Add a selinuxuser map"
         rlRun "addSelinuxusermap \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap1" 0 "Add a selinuxusermap"
 	rlRun "findSelinuxusermap $selinuxusermap1" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
 	rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap1" 0 "Verifying selinuxusermap was added with given selinuxuser"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-003: Add a duplicate selinuxusermap"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-009: Add a duplicate selinuxusermap"
         command="ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap1"
         expmsg="ipa: ERROR: SELinux User Map rule with name $selinuxusermap1 already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for duplicate selinuxusermap"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-004: Add a new selinux user type to existing selinuxusermap"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-010: Add a new selinux user type to existing selinuxusermap"
         command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser $selinuxusermap1"
         expmsg="ipa: ERROR: SELinux User Map rule with name $selinuxusermap1 already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for new selinux user type with existing selinuxusermap"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-005: selinuxuser type Required - give empty string"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-011: selinuxuser type Required - give empty string"
         command="ipa selinuxusermap-add --selinuxuser=\"\" $selinuxusermap2"
         expmsg="ipa: ERROR: 'selinuxuser' is required"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for empty selinuxuser type"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-006: selinuxuser option - unknown"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-012: selinuxuser option - unknown"
 	command="ipa selinuxusermap-add --selinuxuser=unknown $selinuxusermap2"
         expmsg="ipa: ERROR: SELinux user unknown not found in ordering list (in config)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for unknown selinuxuser type"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-007: Add a  selinuxuser map with User Category 'all'"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-013: Add a  selinuxuser map with User Category 'all'"
         rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --usercat=all $selinuxusermap2 > $TmpDir/selinuxusermap_usercat_all.out" 0 "Add a selinuxusermap with User Category all"
         rlRun "findSelinuxusermap $selinuxusermap2" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
 	rlAssertGrep "User category: all" "$TmpDir/selinuxusermap_usercat_all.out"
         rlRun "findSelinuxusermapByOption usercat all $selinuxusermap2" 0 "Verifying selinuxusermap was added with user category all"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-008: Users cannot be added when user category='all' "
+    rlPhaseStartTest "ipa-selinuxusermap-cli-014: Users cannot be added when user category='all' "
         command="ipa selinuxusermap-add-user --user=$user1 $selinuxusermap2"
         expmsg="ipa: ERROR: users cannot be added when user category='all'"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding users to selinuxusermap  when user category=\'all\'"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding users to selinuxusermap  when user category='all'"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-009: Groups cannot be added when user category='all' "
+    rlPhaseStartTest "ipa-selinuxusermap-cli-015: Groups cannot be added when user category='all' "
         command="ipa selinuxusermap-add-user --groups=$usergroup1 $selinuxusermap2"
         expmsg="ipa: ERROR: users cannot be added when user category='all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding groups to selinuxusermap when user category='all'"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-010: Add a  selinuxuser map with User Category 'all' while there are allowed users"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-016: Add a  selinuxuser map with User Category 'all' while there are allowed users"
         rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap3" 0 "Add a selinuxusermap with allowed user"
 	rlRun "ipa selinuxusermap-add-user --user=$user1 $selinuxusermap3 > $TmpDir/selinuxusermap_user.out"
         rlRun "findSelinuxusermap $selinuxusermap3" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
@@ -163,7 +191,7 @@ run_selinuxusermap_add_tests(){
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding user category='all' while there are allowed users"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-011: selinuxuser User Category - unknown"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-017: selinuxuser User Category - unknown"
         command="ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --usercat=unknown $selinuxusermap4"
         expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for unknown user category"
