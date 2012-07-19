@@ -81,7 +81,7 @@ EOF
 #EOF
 #}
 ADuser_passwd_ldif() {
-PASSWD=`echo -n "\"$3\"" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
+PASSWD=`echo -n \"$3\" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
 [ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,$ADdc"
 [ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,$ADdc"
 [ $# -eq 3 ] && DN="CN=$1 $2,CN=Users,$ADdc"

@@ -87,7 +87,7 @@ OU1="level1"
 sub_OU1="sub-level1"
 OU2="level2"
 sub_OU2="sub-level2"
-IPAhost=`hostname`
+IPAhost="`hostname`"
 IPAhostIP="`host $IPAhost | awk '{print $NF}'`"
 IPAlog="IPAcert_install.log"
 #aduser_ln="ads"
@@ -104,7 +104,7 @@ DS_binddn="CN=Directory Manager"
 
 setup() {
 rlPhaseStartTest "Setup for winsync sanity tests"
-
+	rm -f /tmp/krb5cc_*
 	# check for packages
 pushd .
 	for item in $PACKAGE1 $PACKAGE2 $PACKAGE3 $PACKAGE4; do
@@ -282,11 +282,11 @@ rlPhaseStartTest "0003 Create users(numeric/alphanumeric) in AD and verify it is
 	sleep 30
 
 	# Verify Users have synced to IPA Server
-	rlRun "ipa user-find $aduser" 0 "$aduser is synced to IPA"
+	rlRun "ipa user-show $aduser" 0 "$aduser is synced to IPA"
 
 	# Check if the users details merge as per AD user settings
-	rlRun "ipa user-find 456" 0 "456 is synced to IPA"
-	rlRun "ipa user-find 456 | grep -q $phn_2" 0 "AD user overwrites on a IPA existing user"
+	rlRun "ipa user-show 456" 0 "456 is synced to IPA"
+	rlRun "ipa user-show 456 | grep -q $phn_2" 0 "AD user overwrites on a IPA existing user"
 
 rlPhaseEnd
 }
@@ -327,6 +327,7 @@ rlPhaseStartTest "0005 Synchronization behaviour of account lock status"
 	sleep 30
         rlRun "ipa user-show $aduser | grep \"Account disabled: False\"" 0 "$aduser is enabled on IPA"
 	
+	# Test Cleanup
 	rlRun "acctdisable_ldif both" 0 "Creating ldif file to reset ipawinsyncacctdisable to both"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Resetting disabled account to sync to both servers"
 rlPhaseEnd
@@ -638,9 +639,9 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 	rlRun "rm -fr $TmpDir"
 
 	rlRun "sed -i \"/^TLS_CACERTDIR.*/d\" /etc/openldap/ldap.conf"
-	rlRun "rm -fr /tmp/krb5cc_1*"
 
 	rlRun "kdestroy" 0 "Destroying admin credentials."
+	rlRun "rm -fr /tmp/krb5cc_*"
 
 rlPhaseEnd
 }

@@ -43,6 +43,8 @@
 rpm1="samba-common"
 rpm2="expect"
 rpm3="telnet"
+rpm4="coreutils"
+rpm5="glibc-common"
 
    rlCheckRpm "$rpm1"
 	if [ $? -ne 0 ]; then
@@ -57,6 +59,16 @@ rpm3="telnet"
    rlCheckRpm "$rpm3"
 	if [ $? -ne 0 ]; then
            rlRun "yum install -y $rpm3"
+        fi
+
+   rlCheckRpm "$rpm4"
+	if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm4"
+        fi
+
+   rlCheckRpm "$rpm5"
+	if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm5"
         fi
 
 # Include test case file
@@ -96,7 +108,7 @@ winsync_connect
 	# tests end...
 
     rlPhaseStartCleanup "ipa-winsync-cleanup: Destroying admin credentials & removing certificates."
-		rlRun "cleanup"
+#		rlRun "cleanup"
     rlPhaseEnd
 
 

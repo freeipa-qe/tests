@@ -22,13 +22,15 @@ Alternatively you can use command line utility dnscmd to configure the forwarder
 
 The command should report that zone IPA.Domain was successfully added. 
 
-3. Fill-up the AD details in Config file placed in this directory
+3. Go to Add feature and install Telnet server on the AD
 
-4. From AD copy the cert in the current directory replacing cert file "ADcert.cer"
+4. Fill-up the AD details in Config file placed in this directory
 
-5. Make sure time is synchronized between both servers
+5. From AD copy the cert in the current directory replacing cert file "ADcert.cer"
 
-6. Download freeSSHd from the link below or use the one in the current directory
+6. Make sure time is synchronized between both servers
+
+7. Download freeSSHd from the link below or use the one in the current directory
     http://www.freesshd.com/freeSSHd.exe
     # Note : Steps e and f are not required to be performed for automation
 
@@ -44,7 +46,7 @@ iii. Add user "administrator" from the "Users" tab and allow it to have SSH cmd 
 
  vi. FreeSSHd has issues running as service on windows 2008 R2. From program files pick up the installed executable of freeSSHd and place it in user administrator's startup. This will make sshd service start automatically once administrator does a login on the server console. It will not start on a reboot unless administrator has done a login.
 
-7. Make IPA CA trusted by importing IPA cert in the AD server's database. Follow the steps below.
+8. Make IPA CA trusted by importing IPA cert in the AD server's database. Follow the steps below.
 (Note: These steps are now performed through the automation scripts)
 
  a. Copy the cert file /etc/ipa/ca.crt to a location in AD server
@@ -69,4 +71,4 @@ iii. Add user "administrator" from the "Users" tab and allow it to have SSH cmd 
  
  e. Restart AD Server
 
-8. The automation script will restart the PassSync service again after winsync agreement is established. No need of any manual intervention from this point onwards.
+9. The automation script will restart the PassSync service again after winsync agreement is established. No need of any manual intervention from this point onwards.
