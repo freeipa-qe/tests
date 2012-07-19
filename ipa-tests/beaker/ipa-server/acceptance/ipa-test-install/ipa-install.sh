@@ -516,7 +516,7 @@ ipa_install_master()
 			rlAssertRpm $PKG
 		done
 		
-		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+		rlRun "ipa-server-install $IPAOPTIONS --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
 		if [ $IPADEBUG ]; then
 			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
@@ -566,14 +566,14 @@ ipa_install_replica()
 		done
 	
 		rlLog "RUN ipa-replica-prepare on MASTER"
-		ssh root@$MYMASTER "echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN"
+		rlRun "ssh root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\""
 
 		rlLog "RUN sftp to get gpg file"
-		sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/
+		rlRun "sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/"
 
 		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
-		ipa-replica-install -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		rlRun "ipa-replica-install $IPAOPTIONS -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 	rlPhaseEnd
 }
 
