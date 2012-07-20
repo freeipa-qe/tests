@@ -100,6 +100,7 @@ named_conf_bkp="/etc/named.conf.winsync"
 error_log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
 AD_binddn="CN=Administrator,CN=Users,$ADdc"
 DS_binddn="CN=Directory Manager"
+SyncPlugin="cn=ipa-winsync,cn=plugins,cn=config"
 
 
 setup() {
@@ -309,26 +310,55 @@ rlPhaseEnd
 winsync_test_0005() {
 
 rlPhaseStartTest "0005 Synchronization behaviour of account lock status"
-	rlRun "acctdisable_ldif both" 0 "Creating ldif file to set ipawinsyncacctdisable to both"
-	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Setting disabled account to sync to both AD and IPA server"
+	
+syncaccntboth() {  
+	rlLog "Testing with Winsync account disable set to\"both\""
 	# To disable account set userAccountControl to 514
 	rlRun "ADuser_cntrl_ldif $aduser ads 514"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Disable $aduser on AD"
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,CN=Users,$ADdc\" | grep \"userAccountControl: 514\"" 0 "$aduser disabled in AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
-	sleep 30
-	rlRun "ipa user-show $aduser | grep \"Account disabled: True\"" 0 "$aduser disabled on IPA as well"
+	sleep 15
+	rlRun "ipa user-show $aduser | grep \"Account disabled: True\"" 0 "After sync $aduser disabled on IPA as well"
 	rlRun "ipa user-enable $aduser"
+	rlRun "ipa user-show $aduser | grep \"Account disabled: False\"" 0 "Re-enabled $aduser from IPA"
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,CN=Users,$ADdc\" | grep \"userAccountControl: 512\"" 0 "$aduser is enabled in AD as well"
+	sleep 10
+}
 
+syncaccntnone() {
+	rlLog "Testing with Winsync account disable set to \"none\""
 	rlRun "acctdisable_ldif none" 0 "Creating ldif file to set ipawinsyncacctdisable to none"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Setting disabled account to not sync to IPA"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Disable $aduser on AD"
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,CN=Users,$ADdc\" | grep \"userAccountControl: 514\"" 0 "$aduser disabled in AD"
 	rlRun "sleep $sec" 0 "Waiting for sync"
-	sleep 30
-        rlRun "ipa user-show $aduser | grep \"Account disabled: False\"" 0 "$aduser is enabled on IPA"
-	
+	sleep 15
+        rlRun "ipa user-show $aduser | grep \"Account disabled: False\"" 0 "$aduser is not disabled on IPA"
+
 	# Test Cleanup
-	rlRun "acctdisable_ldif both" 0 "Creating ldif file to reset ipawinsyncacctdisable to both"
+	rlRun "acctdisable_ldif both" 0 "Creating ldif file to reset ipawinsyncacctdisable to \"both\""
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Resetting disabled account to sync to both servers"
+	
+	# Re-enable user on AD	
+	rlRun "ADuser_cntrl_ldif $aduser ads 512"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Re-enable $aduser on AD"
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,CN=Users,$ADdc\" | grep \"userAccountControl: 512\"" 0 "$aduser re-enabled in AD"
+	rlRun "sleep $sec" 0 "Waiting for sync"
+	rlRun "ipa user-show $aduser | grep \"Account disabled: False\"" 0 "$aduser is enabled in IPA"
+	sleep 10
+}
+	
+	ldapsearch -x -h $IPAhost -D "$DS_binddn" -w $DMpswd -b "$SyncPlugin" | grep -q "ipawinsyncacctdisable: both"
+	if [ $? -eq 0 ]; then
+	  rlPass "Winsync account disable set to \"both\" by default"
+	  syncaccntboth
+	  syncaccntnone
+	else
+	  rlFail "Winsync account disable not set to \"both\" by default"
+	  syncaccntnone
+	  syncaccntboth
+	fi
 rlPhaseEnd
 }
 
