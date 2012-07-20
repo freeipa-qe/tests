@@ -109,15 +109,19 @@ echo "{
     \"id\":1
 }" > $jsonfile
 
+#Remove few fields as these are not supported.
 echo "{
     \"method\":\"group_add\",
-\"params\":[[],{\"cn\":\"$nfgroup\",\"givenname\":\"newgg\",\"sn\":\"group\",\"krbprincipalname\":\"$nfgroup@$DOMAIN\",\"gid\":\"7765\",\"description\":\"test-desc\",\"all\":true}
-    ],
-    \"id\":1}" >$jsonfilegrp
 
+\"params\":[[],{\"cn\":\"$nfgroup\",\"description\":\"test-desc\",\"all\":true}
+    ],
+    \"id\":1
+}" >$jsonfilegrp
+
+#Remove few fields as these are not supported.
 echo "{
     \"method\":\"group_del\",
-\"params\":[[],{\"cn\":\"$nfgroup\",\"all\":true}
+\"params\":[[],{\"cn\":\"$nfgroup\"}
     ],
     \"id\":1}" >$jsonfilegrpdel
 
@@ -198,7 +202,7 @@ set_systime()
 	rlPhaseEnd
 
 	rlPhaseStartTest "forms-cli-06: Create a new user with the aquired session id. ie, retry forms-cli-02 with valid credentials."
-		echo "url -v -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\"  -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json"
+		echo "curl -v -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\"  -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json"
 		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
 		rlLog "grep tim\ user $outputf" 0 "make sure that the users name is in the output of the test command"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -208,7 +212,10 @@ set_systime()
 
 	rlPhaseStartTest "forms-cli-07: Create a new group with the aquired session id. ie, retry forms-cli-03 with valid credentials."
 		kdestroy
-		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfilegrp -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+                #Added echo for command to be run
+		echo "curl -v -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\"  -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsonfilegrp -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json" 
+		rlRun "curl -v -H \"Content-Type:application/json\" -H \"Referer: https://$MASTER/ipa/xml\" -H \"Accept:application/json\"  -H \"Accept-Language:en\" --cacert /etc/ipa/ca.crt -d  @$jsonfilegrp -X POST -b \"ipa_session=$sessionid; httponly; Path=/ipa; secure\" https://$MASTER/ipa/session/json &> $outputf" 0 "Passed"
+                rlRun "cat $outputf" #Output of http response
 		rlLog "cat $outputf | grep Added\ group | grep $nfgroup" 0 "make sure that the groups name is in the output of the test command"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa group-find $nfgroup" 0 "Make sure that admin is able to find the new group $nfgroup"
@@ -217,6 +224,7 @@ set_systime()
 	rlPhaseStartTest "forms-cli-08: Delete the group created in the last step using valid credentials in a form."
 		kdestroy
 		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfilegrpdel -X POST -b "ipa_session=$sessionid; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
+                rlRun "cat $outputf" #Output of http response
 		rlLog "cat $outputf | grep Deleted group | grep $nfgroup" 0 "make sure that the groups name is listed as deleted in the output of the test command"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa group-find $nfgroup" 1 "Make sure that admin is not able to find the new group $nfgroup"
@@ -286,10 +294,10 @@ date
 		responsefile=/dev/shm/r2
 		echo "curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile"
 		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile
-		rlRun "grep ipa_session= $responsefile" 0 "Make sure that the response header contains a session id in it"
-		sessionid=$(cat $responsefile | grep ipa_session | cut -d\  -f2 | cut -d\= -f2 | sed s/\;//g)
-		export sessionid
-		rlLog "new session ID is $sessionid"
+		rlRun "grep password-expired $responsefile" 0 "Make sure that the response header message that password has been expired" #Added correct error message to be verified as per bug.
+		#sessionid=$(cat $responsefile | grep ipa_session | cut -d\  -f2 | cut -d\= -f2 | sed s/\;//g)
+		#export sessionid
+		#rlLog "new session ID is $sessionid"
 		
 		/etc/init.d/ntpd stop
 		ntpdate clock.redhat.com
