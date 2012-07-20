@@ -108,7 +108,7 @@ winsync_connect
 	# tests end...
 
     rlPhaseStartCleanup "ipa-winsync-cleanup: Destroying admin credentials & removing certificates."
-#		rlRun "cleanup"
+		rlRun "cleanup"
     rlPhaseEnd
 
 

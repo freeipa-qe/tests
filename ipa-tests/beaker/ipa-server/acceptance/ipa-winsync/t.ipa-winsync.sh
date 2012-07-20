@@ -65,9 +65,9 @@ PACKAGE4="expect"
 
 sec="30"
 DMpswd="Secret123"
-ADfn="test"
-ADsn="user"
-ADln="tuser"
+ADfn="Frank"
+ADsn="Slade"
+ADln="frank"
 ADcrt="ADcert.cer"
 invldcrt="invalidAD.cer"
 slfcrt="Self-Signed-CA Certificate"
@@ -104,7 +104,6 @@ DS_binddn="CN=Directory Manager"
 
 setup() {
 rlPhaseStartTest "Setup for winsync sanity tests"
-	rm -f /tmp/krb5cc_*
 	# check for packages
 pushd .
 	for item in $PACKAGE1 $PACKAGE2 $PACKAGE3 $PACKAGE4; do
@@ -374,7 +373,6 @@ rlPhaseStartTest "0008 Modify user attributes after replication setup"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
 	rlRun "sleep 30" 0 "Waiting for sync"
 	rlRun "ipa user-show $ADln | grep \"Telephone Number: $phn_3\"" 0 "Attribute modify for user existing before winsync"
-	rlRun "ipa user-del $ADln" 0 "Delete $ADln"
 
 	rlLog "Modify user attributes for user created after winsync"
 	rlRun "telephoneNumber_ldif $aduser ads $phn_4"
@@ -388,12 +386,13 @@ winsync_test_0009() {
 
 rlPhaseStartTest "0009 Update Password"
 	rlLog "Update password in AD"
-	rlRun "ADuser_passwd_ldif $aduser ads $userpw2"
-	rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Reset $aduser passwd from AD"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
-	sleep 90
-	rlRun "ssh_auth_success $aduser $userpw2 $IPAhost" 0 "$aduser login in IPA server with new password"
+	rlRun "ADuser_passwd_ldif $ADfn $ADsn $userpw2"
+#	rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Reset $ADfn passwd from AD"
+#	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
+	sleep 40
+	rm -f /tmp/krb5cc_*_*
+	rlRun "ssh_auth_success $ADln $userpw2 $IPAhost" 0 "$ADln login in IPA server with new password"
 
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
@@ -457,6 +456,7 @@ rlPhaseStartTest "0012 Delete User"
 
 	rlLog "Delete user from IPA"
 	rlRun "ipa user-del $aduser2" 0 "Delete $aduser2 from IPA"
+	rlRun "ipa user-del $ADln" 0 "Delete $ADln from IPA"
 #       rlRun "ipa user-del 456" 0 "Delete user 456 from IPA"
 	sleep 20
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $aduser2 deleted in AD"
