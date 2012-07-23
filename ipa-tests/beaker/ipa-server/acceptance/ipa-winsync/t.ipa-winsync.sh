@@ -401,13 +401,15 @@ rlPhaseStartTest "0008 Modify user attributes after replication setup"
 	rlLog "Modify user attributes for user existing before winsync"
 	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_3"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
-	rlRun "sleep 30" 0 "Waiting for sync"
+	rlRun "sleep 10" 0 "Waiting for sync"
+	sleep $sec
 	rlRun "ipa user-show $ADln | grep \"Telephone Number: $phn_3\"" 0 "Attribute modify for user existing before winsync"
 
 	rlLog "Modify user attributes for user created after winsync"
 	rlRun "telephoneNumber_ldif $aduser ads $phn_4"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $aduser"
-	rlRun "sleep 30" 0 "Waiting for sync"
+	rlRun "sleep 10" 0 "Waiting for sync"
+	sleep $sec
 	rlRun "ipa user-show $aduser | grep \"Telephone Number: $phn_4\"" 0 "Attribute modify for user created after winsync"
 rlPhaseEnd
 }
@@ -427,7 +429,7 @@ rlPhaseStartTest "0009 Update Password"
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
 	sleep 20
-	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep -i \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
 
 rlPhaseEnd
 }
