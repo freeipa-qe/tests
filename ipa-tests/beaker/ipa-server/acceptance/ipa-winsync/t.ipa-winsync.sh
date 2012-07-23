@@ -426,7 +426,7 @@ rlPhaseStartTest "0009 Update Password"
 
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
-	sleep 20
+	sleep 10
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
 
 rlPhaseEnd
@@ -488,7 +488,7 @@ rlPhaseStartTest "0012 Delete User"
 	rlRun "ipa user-del $aduser2" 0 "Delete $aduser2 from IPA"
 	rlRun "ipa user-del $ADln" 0 "Delete $ADln from IPA"
 #       rlRun "ipa user-del 456" 0 "Delete user 456 from IPA"
-	sleep 20
+	sleep 10
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $aduser2 deleted in AD"
 #	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User 456 deleted in AD"
 #	ipa user-del 456
@@ -596,13 +596,13 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 
 	# Test clean up
 	rlRun "ipa user-del $l1user $sub1user"
-	sleep 20
+	sleep 10
 	rlRun "addsubOU_ldif $sub_OU1 $OU1 delete"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Delete sub OU $sub_OU1"
 	rlRun "addOU_ldif $OU1 delete"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Delete OU $OU1"
 	rlRun "ipa-replica-manage del $ADhost" 0 "Deleting agreement with OU $OU1"
-	sleep 20
+	sleep 10
 
 	rlLog "Winsync OU without existing users"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd --win-subtree=\"OU=$OU2,$ADdc\"" 0 "Creating winsync agreement with OU $OU2 win-subtree"
@@ -633,7 +633,8 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub2user in OU $OU2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $sub2user passwd"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $sub2user"
-	rlRun "sleep $sec" 0 "Waiting for sync"
+	rlRun "sleep 15" 0 "Waiting for sync"
+	sleep $sec
 	
 	rlRun "ipa user-show $l2user | grep \"Account disabled: False\"" 0 "$l2user from OU $OU2 synced and enabled in IPA"
 	rlRun "ipa user-show $l2user | grep \"Password: True\"" 0 "Password in sync for $l2user of OU $OU2"
@@ -642,7 +643,7 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 
 	# Test clean up
 	rlRun "ipa user-del $l2user $sub2user"
-	sleep 20
+	sleep 10
         rlRun "addsubOU_ldif $sub_OU2 $OU2 delete"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Delete sub OU $sub_OU2"
         rlRun "addOU_ldif $OU2 delete"
