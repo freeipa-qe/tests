@@ -53,6 +53,7 @@
 . /dev/shm/env.sh
 
 # Include test case file
+. ./ipa-selinuxusermap-config.sh
 . ./ipa-selinuxusermap-add.sh
 ########################################################################
 
@@ -70,6 +71,8 @@ rlJournalStart
     rlPhaseEnd
 
 
+# Execute ipa config tests for SELinux user map
+  run_selinuxusermap_config_tests
 # Execute create a new SELinux user map tests
   run_selinuxusermap_add_tests
 
