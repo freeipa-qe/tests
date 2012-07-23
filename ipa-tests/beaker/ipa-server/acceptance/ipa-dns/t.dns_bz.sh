@@ -33,6 +33,7 @@ dnsbugs()
    bz701677
    bz804572
    bz772301
+   bz818933
    dnsbugcleanup
 }
 
@@ -502,6 +503,21 @@ bz772301()
         service named restart
         sleep 5
     rlPhaseEnd
+}
+
+bz818933()
+{
+
+    # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=818933
+    rlPhaseStartTest "818933 bind-dyndb-ldap doesn't escape non-ASCII characters correctly"
+
+	rlRun "dig foo,bar.$DOMAIN"
+	rlAssertGrep "bug in handle_connection_error" "/var/log/messages"
+
+        service named restart
+        sleep 5
+    rlPhaseEnd
+
 }
 
 dnsbugcleanup()
