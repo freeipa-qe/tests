@@ -885,6 +885,10 @@ rlJournalStart
 	# hbac hbactest --sizemimit tests
 		hbactest_master_sizelimit_1
 		hbactest_master_sizelimit_2
+
+	# hbacsvc_master_bug771706
+		hbacsvc_master_bug771706
+
 	rlPhaseEnd
 
 

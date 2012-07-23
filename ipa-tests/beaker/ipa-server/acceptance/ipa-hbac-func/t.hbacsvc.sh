@@ -2895,3 +2895,47 @@ hbacsvc_master_bug801769() {
         rlPhaseEnd
 }
 
+
+hbacsvc_master_bug771706() {
+
+	# kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser user771706 user771706 user771706 $userpw
+		sleep 5
+		export user771706=user771706	
+
+        rlPhaseStartTest "ipa-hbacsvc-771706: Bug 771706 - sssd_be crashes during auth when there exists empty service group or hostgroup in an hbacrule."
+
+		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=771706"
+		rlLog "closed https://engineering.redhat.com/trac/ipa-tests/ticket/284"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+                rlRun "ipa hbacrule-disable allow_all"
+		rlRun "ipa hbacrule-find"
+
+		rlRun "ipa hbacrule-add --hostcat=all --srchostcat=all rule771706"
+		rlRun "ipa hbacrule-add-user rule771706 --users=$user771706"
+		rlRun "ipa hbacsvcgroup-add svcgroup1 --desc=svcgroup1"
+		rlRun "ipa hbacrule-add-service rule771706 --hbacsvcgroups=svcgroup1"
+
+		rlRun "ssh_auth_failure user771706 $userpw $MASTER"
+
+		rlRun "ipa hbacrule-del rule771706"
+
+		rlRun "ipa hostgroup-add --desc=\"test host group 1\" testhostgroup1"
+		rlRun "ipa hostgroup-add-member testhostgroup1 --hosts=$MASTER"
+		rlRun "ipa hbacrule-add rule771706"
+		rlRun "ipa hbacrule-add-user rule771706 --users=$user771706"
+		rlRun "ipa hbacrule-add-service rule771706 --hbacsvcs=sshd"
+		rlRun "ipa hbacrule-add-host rule771706 --hosts=$MASTER"
+		rlRun "ipa hbacrule-add-sourcehost rule771706 --hostgroups=testhostgroup1"
+
+		rlRun "ssh_auth_success user771706 $userpw $MASTER"
+		rlRun "ipa hostgroup-del testhostgroup1"
+		rlRun "ipa hbacrule-add-sourcehost rule771706 --hosts=$MASTER"
+		rlRun "ssh_auth_success user771706 $userpw $MASTER"
+
+        rlPhaseEnd
+}
+
