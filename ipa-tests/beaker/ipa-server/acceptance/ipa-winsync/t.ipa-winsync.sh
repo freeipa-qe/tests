@@ -426,7 +426,7 @@ rlPhaseStartTest "0009 Update Password"
 
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
-	sleep 10
+	sleep 20
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
 
 rlPhaseEnd
