@@ -556,6 +556,7 @@ ipa_install_replica_tester()
 ipa_install_replica()
 {
 	local MYMASTER=$1
+	local MYREVNET=$(hostname -i|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
 		rlLog "$FUNCNAME $MYMASTER"
 
@@ -565,8 +566,8 @@ ipa_install_replica()
 			rlAssertRpm $PKG
 		done
 	
-		rlLog "RUN ipa-replica-prepare on MASTER"
-		rlRun "ssh root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\""
+		rlLog "RUN ipa-replica-prepare on $MYMASTER"
+		rlRun "ssh root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\" ; service named restart"
 
 		rlLog "RUN sftp to get gpg file"
 		rlRun "sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/"
@@ -596,9 +597,9 @@ ipa_install_client()
 			rlAssertRpm $PKG
 		done
 
-		rlRun "RUN ipa dns-add for client?"
-		rlRun "RUN ipa-client-install"
-		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER"
+		rlLog "RUN ipa dns-add for client?"
+		rlLog "RUN ipa-client-install"
+		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
 	rlPhaseEnd
 }
 
