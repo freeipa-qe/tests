@@ -592,9 +592,13 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 	sleep 10
 
 	rlRun "ipa user-show $l1user | grep \"Account disabled: False\"" 0 "$l1user from OU $OU1 synced and enabled in IPA"
+	sleep 5
         rlRun "ipa user-show $l1user | grep \"Password: True\"" 0 "Password in sync for $l1user of OU $OU1"
+	sleep 5
         rlRun "ipa user-show $sub1user| grep \"Account disabled: False\"" 0 "$sub1user from sub OU $sub_OU1 synced and enabled in IPA"
+	sleep 5
         rlRun "ipa user-show $sub1user | grep \"Password: True\"" 0 "Password in sync for $sub1user of sub OU $sub_OU1"
+	sleep 5
 
 	# Test clean up
 	rlRun "ipa user-del $l1user $sub1user"
@@ -639,8 +643,11 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 	sleep $sec
 	
 	rlRun "ipa user-show $l2user | grep \"Account disabled: False\"" 0 "$l2user from OU $OU2 synced and enabled in IPA"
+	sleep 5
 	rlRun "ipa user-show $l2user | grep \"Password: True\"" 0 "Password in sync for $l2user of OU $OU2"
+	sleep 5
         rlRun "ipa user-show $sub2user| grep \"Account disabled: False\"" 0 "$sub2user from sub OU $sub_OU2 synced and enabled in IPA"
+	sleep 5
 	rlRun "ipa user-show $sub2user | grep \"Password: True\"" 0 "Password in sync for $sub2user of sub OU $sub_OU2"
 
 	# Test clean up
