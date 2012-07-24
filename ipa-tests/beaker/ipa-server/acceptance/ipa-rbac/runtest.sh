@@ -66,7 +66,8 @@ PACKAGE="ipa-server"
 
 rlJournalStart
     rlPhaseStartSetup "ipa rbac startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
+	# The following check is not required as this is run post quickinstall.
+        # rlAssertRpm $PACKAGE
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd

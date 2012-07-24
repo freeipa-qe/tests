@@ -90,7 +90,7 @@ test01()
       adminLogin="admin"
       newPwd="Secret456"
       command="echo $newPwd | ipa passwd $adminLogin"
-      expmsg="ipa: ERROR: Insufficient access: Insufficient access rights"
+      expmsg="ipa: ERROR: Insufficient access"
       rlRun "$command > $TmpDir/ipaRBAC_test01_1.log 2>&1" 1 "Verify error message when $login updates $adminLogin's password (bug 773759)"  
      rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test01_1.log"
    rlPhaseEnd
@@ -276,7 +276,7 @@ test06()
       # change user password - cannot
       newPwd="oneone"
       command="echo $newPwd | ipa passwd $newLogin"
-      expmsg="ipa: ERROR: Insufficient access: Insufficient access rights"
+      expmsg="ipa: ERROR: Insufficient access"
       rlRun "$command > $TmpDir/ipaRBAC_test06_2.log 2>&1" 1 "Verify error message when $login updates $newLogin's password" 
      rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test06_2.log"
    rlPhaseEnd

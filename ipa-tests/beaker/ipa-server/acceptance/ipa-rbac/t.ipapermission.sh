@@ -584,32 +584,32 @@ ipapermission_add_missingaddsetattr()
     permissionLocalAttr="carlicense"
     permissionAddAttr="--addattr"
 
-   rlPhaseStartTest "ipa-permission-cli-1032 - add permission with missing addattr value" 
+   rlPhaseStartTest "ipa-permission-cli-1032 - add permission with missing addattr value (bug 816574)" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 
      expmsg="ipa: error: --addattr option requires an argument"
      rlRun "$command > $TmpDir/ipapermission_missingaddattr1.log 2>&1" 2 "Verify error message for missing addattr" 
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingaddattr1.log"
    rlPhaseEnd
-   rlPhaseStartTest "ipa-permission-cli-1033 - add permission with missing addattr value (bug 816574)" 
-     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr=" 
-     expmsg="ipa: error: --addattr option requires an argument"
-     rlRun "$command > $TmpDir/ipapermission_missingaddattr2.log 2>&1" 2 "Verify error message for missing  addattr"
-     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingaddattr2.log"
+#   rlPhaseStartTest "ipa-permission-cli-1033 - add permission with missing addattr value (bug 816574)" 
+#     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr"
+#     expmsg="ipa: error: --addattr option requires an argument"
+#     rlRun "$command > $TmpDir/ipapermission_missingaddattr2.log 2>&1" 2 "Verify error message for missing  addattr"
+#     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingaddattr2.log"
    rlPhaseEnd
 
    permissionSetAttr="--setattr"
 
-   rlPhaseStartTest "ipa-permission-cli-1034 - add permission with missing setattr value" 
+   rlPhaseStartTest "ipa-permission-cli-1034 - add permission with missing setattr value (bug 816574)" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionSetAttr" 
      expmsg="ipa: error: --setattr option requires an argument"
      rlRun "$command > $TmpDir/ipapermission_missingsetattr1.log 2>&1" 2 "Verify error message for missing setattr" 
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingsetattr1.log"
    rlPhaseEnd
-   rlPhaseStartTest "ipa-permission-cli-1035 - add permission with missing addattr value (bug 816574)" 
-     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr=" 
-     expmsg="ipa: error: --setattr option requires an argument"
-     rlRun "$command > $TmpDir/ipapermission_missingsetattr2.log 2>&1" 2 "Verify error message for missing setattr"
-     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingsetattr2.log"
+#   rlPhaseStartTest "ipa-permission-cli-1035 - add permission with missing addattr value (bug 816574)" 
+#     command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget $permissionLocalAttr $permissionSetAttr"
+#     expmsg="ipa: error: --setattr option requires an argument"
+#     rlRun "$command > $TmpDir/ipapermission_missingsetattr2.log 2>&1" 2 "Verify error message for missing setattr"
+#     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_missingsetattr2.log"
    rlPhaseEnd
 }
 
@@ -749,9 +749,10 @@ ipapermission_find_name()
     value="\ "
     rlPhaseStartTest "ipa-permission-cli-1042 - find permission using invalid --name (bug 785251)"
       command="findPermissionByOption $option $value \"all\" $permissions"
-      expmsg="ipa: ERROR : Verify new error"
-      rlRun "$command > $TmpDir/ipapermission_invalidname.log 2>&1" 1 "Verify error message for invalid $option"
+      expmsg="Number of entries returned 0"
+      rlRun "ipa permission-find --name=\  --all > $TmpDir/ipapermission_invalidname.log 2>&1" 1 "Verify error message for invalid $option"
       rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidname.log"
+      rlRun "cat $TmpDir/ipapermission_invalidname.log"
     rlPhaseEnd
 }
 
@@ -771,10 +772,12 @@ ipapermission_find_permissions()
 
     value="xyz"
     rlPhaseStartTest "ipa-permission-cli-1044 - find permission using invalid --permissions (bug 785257)"
-      command="findPermissionByOption $option $value \"all\" $permissions"
-      expmsg="ipa: ERROR"
-      rlRun "$command > $TmpDir/ipapermission_invalidpermission.log 2>&1" 1 "Verify error message for invalid $option"
-      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidpermission.log"
+      #command="findPermissionByOption $option $value \"all\" $permissions"
+      command="ipa permission-find --permissions=$value --all"
+      expmsg="Number of entries returned 0"
+      rlRun "$command > $TmpDir/ipapermission_invalidpermission-1044.log 2>&1" 1 "Verify return message for invalid $option"
+      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidpermission-1044.log"
+      rlRun "cat $TmpDir/ipapermission_invalidpermission-1044.log"
     rlPhaseEnd
 }
 
@@ -852,10 +855,16 @@ ipapermission_find_subtree()
 {
     option="subtree"
     value="cn=computers,cn=accounts,dc=testrelm,dc=com"
+    local value2="ldap:///fqdn=*,cn=computers,cn=accounts,dc=testrelm,dc=com"
     permissions="ManageHost1"
 
     rlPhaseStartTest "ipa-permission-cli-1049 - find permission - --subtree (bug 785254)"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
+      # Note that we don't do validation on search terms so we aren't going to report whether a subtree is valid or not, 
+      # just which entries match.	
+      rlRun "findPermissionByOption $option $value \"all\" $permissions" 1 "No permissions matched - as expected."
+      #rlRun "findPermissionByOption $option $value2 \"all\" $permissions" 0 "Verify permissions are found for --subtree=$value2"
+      rlRun "ipa permission-find --subtree=ldap:///fqdn=*,cn=computers,cn=accounts,dc=testrelm,dc=com --all" 0 "Verify permissions are found for --subtree=$value2"
+      rlRun "ipa permission-find --subtree=$value2"
     rlPhaseEnd
 }
 
@@ -979,6 +988,7 @@ ipapermission_mod_positive()
      attr="permissions"
      value="add,write"
      restOfRequiredCommand="--attrs="
+     rlRun "ipa permission-add \"Add Automount Keys\" --permissions=write --type=user --attr=description"
      rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
    rlPhaseEnd 
@@ -1015,8 +1025,8 @@ ipapermission_mod_positive()
      attr="rename"
      value="ABCPermission"
      restOfRequiredCommand="--attrs= --permissions=write --type=user"
-     rlRun "modifyPermission \"$permissionName\" $attr $value \"$restOfRequiredCommand\""
-     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permission name\" \"ABCPermission\"" 0 "Verify Permissions"
+     rlRun "modifyPermission \"$permissionName\" $attr $value"
+     rlRun "verifyPermissionAttr \"$value\" all \"Permission name\" \"ABCPermission\"" 0 "Verify Permissions"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1063 - modify permission  --type - for which chosen attr are invalid"
@@ -1050,8 +1060,8 @@ ipapermission_mod_negative()
      permissionName="Change a user password"
      attr="attrs"
      value="xyz"
-     command="modifyPermission \"$permissionName\" $attr \"$value\""
-#     command="ipa permission-mod --attrs=\"$value\" \"$permissionName\""
+     #command="modifyPermission \"$permissionName\" $attr \"$value\""
+     command="ipa permission-mod --attrs=\"$value\" \"$permissionName\""
      expMsg="ipa: ERROR: attribute(s) \"$value\" not allowed"
      rlRun "$command > $TmpDir/ipapermission_invalidattr.log 2>&1" 1 "Verify error message for invalid attr"
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidattr.log"
@@ -1076,9 +1086,8 @@ ipapermission_mod_negative()
      restOfRequiredCommand="--attrs="
      command="modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
      expMsg="ipa: ERROR: - not allowed"
+     rlRun "ipa permission-add \"$permissionName\" --permissions=write --type=user --attr=description"
      rlRun "$command > $TmpDir/ipapermission_invalidaddattr.log 2>&1" 1 "Verify error message for invalid addattr"
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidaddattr.log"
    rlPhaseEnd
 }
-
-

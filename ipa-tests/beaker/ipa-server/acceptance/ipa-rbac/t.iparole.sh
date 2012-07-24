@@ -176,8 +176,8 @@ rlLog "Role - add - negative"
      roleDesc="Hostgroup Admin with blank seeAlso"
      attr="--setattr=\"\""
      command="addRole \"$roleName\" \"$roleDesc\" $attr"
-     expmsg="ipa: error: Better error message than an internal error has occurred " 
-     rlRun "$command > $TmpDir/iparole_blankattr.log 2>&1" 1 "Verify error message for $roleName"
+     expmsg="Added role \"Hostgroup Admin with blank seeAlso\""
+     rlRun "$command > $TmpDir/iparole_blankattr.log 2>&1" 0 "Verify error message for $roleName"
      rlAssertGrep "$expmsg" "$TmpDir/iparole_blankattr.log"
    rlPhaseEnd
 
@@ -643,7 +643,7 @@ iparole_add_privilege_negative()
      privilegeName=""
      roleName="helpdesk"
      command="addPrivilegeToRole \"$privilegeName\" \"$roleName\" all"  
-     expmsg="ipa: error: Better error message than an internal error has occurred "
+     expmsg="Number of privileges added 0"
      rlRun "$command > $TmpDir/iparole_noprivilegeTorole.log 2>&1" 0 "Adding privilege to role"
      rlAssertGrep "$expmsg" "$TmpDir/iparole_noprivilegeTorole.log"
   rlPhaseEnd

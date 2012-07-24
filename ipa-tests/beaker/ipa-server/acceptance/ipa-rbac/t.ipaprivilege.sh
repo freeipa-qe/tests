@@ -168,8 +168,8 @@ rlLog "Negative privilege tests"
      privilegeDesc="Add User with blank attr"
      attr="--setattr=\"\""
      command="addPrivilege \"$privilegeName\" \"$privilegeDesc\" $attr"
-     expmsg="ipa: error: Better error message than an internal error has occurred " 
-     rlRun "$command > $TmpDir/ipaprivilege_blankattr.log 2>&1" 1 "Verify error message for $privilegeName"
+     expmsg="Added privilege \"Add User with blank attr\""
+     rlRun "$command > $TmpDir/ipaprivilege_blankattr.log 2>&1" 0 "Verify $privilegeName privilege is added successfully"
      rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_blankattr.log"
    rlPhaseEnd
 
@@ -266,9 +266,10 @@ ipaprivilege_add_permission_negative()
     privilegeName="Add User"
     permissionList=""
     command="addPermissionToPrivilege \"$permissionList\" \"$privilegeName\""
-    expmsg="ipa: error: Better error message than an internal error has occurred " 
-    rlRun "$command > $TmpDir/ipaprivilege_nonexistentperm.log 2>&1" 0 "Verify error message for $privilegeName"
+    expmsg="Number of permissions added 0"
+    rlRun "$command > $TmpDir/ipaprivilege_nonexistentperm.log 2>&1" 0 "Verify message for $privilegeName"
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
+    rlRun "cat $TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
 }
@@ -337,7 +338,7 @@ ipaprivilege_remove_permission_negative()
     privilegeName="Add User"
     permissionList=""
     command="removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\""
-    expmsg="ipa: error: Better error message than an internal error has occurred " 
+    expmsg="Number of permissions removed 0"
     rlRun "$command > $TmpDir/ipaprivilege_nonexistentperm.log 2>&1" 0 "Verify error message for $privilegeName"
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
