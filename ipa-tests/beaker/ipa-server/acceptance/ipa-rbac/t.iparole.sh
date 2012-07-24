@@ -177,7 +177,7 @@ rlLog "Role - add - negative"
      attr="--setattr=\"\""
      command="addRole \"$roleName\" \"$roleDesc\" $attr"
      expmsg="Added role \"Hostgroup Admin with blank seeAlso\""
-     rlRun "$command > $TmpDir/iparole_blankattr.log 2>&1" 0 "Verify error message for $roleName"
+     rlRun "$command > $TmpDir/iparole_blankattr.log 2>&1" 0 
      rlAssertGrep "$expmsg" "$TmpDir/iparole_blankattr.log"
    rlPhaseEnd
 
@@ -623,7 +623,7 @@ iparole_add_privilege_negative()
      command="addPrivilegeToRole \"$privilegeName\" \"$roleName\" all"  
      expPriv1="privilege: $privilegeName: This entry is already a member"
      expPriv2="Number of privileges added 0"
-     rlRun "$command > $TmpDir/iparole_duplicateprivilegeTorole.log 2>&1" 0 "Adding privilege to role"
+     rlRun "$command > $TmpDir/iparole_duplicateprivilegeTorole.log 2>&1" 0 
      rlAssertGrep "$expPriv1" "$TmpDir/iparole_duplicateprivilegeTorole.log"
      rlAssertGrep "$expPriv2" "$TmpDir/iparole_duplicateprivilegeTorole.log"
   rlPhaseEnd
@@ -634,7 +634,7 @@ iparole_add_privilege_negative()
      command="addPrivilegeToRole \"$privilegeName\" \"$roleName\" all"  
      expPriv1="privilege: $privilegeName: privilege not found"
      exppriv2="Number of privileges added 0"
-     rlRun "$command > $TmpDir/iparole_missingprivilegeTorole.log 2>&1" 0 "Adding privilege to role"
+     rlRun "$command > $TmpDir/iparole_missingprivilegeTorole.log 2>&1" 0 
      rlAssertGrep "$expPriv1" "$TmpDir/iparole_missingprivilegeTorole.log"
      rlAssertGrep "$expPriv2" "$TmpDir/iparole_missingprivilegeTorole.log"
   rlPhaseEnd
@@ -644,7 +644,7 @@ iparole_add_privilege_negative()
      roleName="helpdesk"
      command="addPrivilegeToRole \"$privilegeName\" \"$roleName\" all"  
      expmsg="Number of privileges added 0"
-     rlRun "$command > $TmpDir/iparole_noprivilegeTorole.log 2>&1" 0 "Adding privilege to role"
+     rlRun "$command > $TmpDir/iparole_noprivilegeTorole.log 2>&1" 0 
      rlAssertGrep "$expmsg" "$TmpDir/iparole_noprivilegeTorole.log"
   rlPhaseEnd
 }
