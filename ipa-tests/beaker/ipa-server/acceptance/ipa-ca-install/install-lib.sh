@@ -11,7 +11,8 @@ fixHostFile()
     currenteth=$(route | grep ^default | awk '{print $8}')
 
     # get the ip address of that interface
-    ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+    #ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
+    ipaddr=$(hostname -I | awk '{print $1}') #Added to get ip on Fedora and RHEL using same command
     rlLog "Ip address is $ipaddr"
 
     # Now, fix the hosts file to work with IPA.

@@ -35,7 +35,7 @@ installMaster()
 {
    rlPhaseStartTest "Install IPA MASTER Server"
 
-        rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+        rlRun "service ntpd stop" 0 "Stopping the ntp server"
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
@@ -91,9 +91,23 @@ installSlave()
    rlPhaseStartTest "Install IPA REPLICA Server"
 	
 	yum install -y openssh-clients
-	yum install -y ipa-server bind-dyndb-ldap bind
+	yum install -y bind-dyndb-ldap bind
+ 
+        #Install ipa-server on RHEL and freeipa-server on Fedora
+        rpm -qa | grep ipa-server
+        if [ $? -eq 0 ] ; then
+                rlPass "ipa-server package is installed"
+        else
+             cat /etc/redhat-release | grep "Fedora"
+              if [ $? -eq 0 ] ; then
+               yum install -y freeipa-server
+              else
+               yum install -y ipa-server
+              fi
+        fi
+
         
-	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+	rlRun "service ntpd stop" 0 "Stopping the ntp server"
         # stop the firewall
         service iptables stop
         service ip6tables stop
@@ -114,7 +128,7 @@ installSlave()
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
-                rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
+                rlRun "service ntpd stop" 0 "Stopping the ntp server"
                 rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
                 rlLog "SKIPINSTALL: $SKIPINSTALL"       
                 echo "nameserver $MASTERIP" > /etc/resolv.conf
