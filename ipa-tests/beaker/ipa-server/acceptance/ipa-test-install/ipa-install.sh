@@ -497,13 +497,6 @@ ipa_install_prep()
 	fi
 }
 
-ipa_install_master_tester()
-{
-	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
-		rlLog "$FUNCNAME"
-	rlPhaseEnd
-}
-
 ipa_install_master()
 {
 	tmpout=/tmp/error_msg.out
@@ -546,13 +539,6 @@ ipa_install_master()
 	rlPhaseEnd
 }
 
-ipa_install_replica_tester()
-{
-	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
-		rlLog "$FUNCNAME $MYMASTER"
-	rlPhaseEnd
-}
-
 ipa_install_replica()
 {
 	local MYMASTER=$1
@@ -578,13 +564,6 @@ ipa_install_replica()
 	rlPhaseEnd
 }
 
-ipa_install_client_tester()
-{
-	rlPhaseStartTest "ipa_install_client - Install IPA Client"
-		rlLog "$FUNCNAME $MYMASTER"
-	rlPhaseEnd
-}
-
 ipa_install_client()
 {
 	local MYMASTER=$1
@@ -605,13 +584,13 @@ ipa_install_client()
 
 ipa_connect_replica()
 {
-	local REP1=$1
-	local REP2=$2
+	local REP1=$(echo $1|cut -f1 -d.).$DOMAIN
+	local REP2=$(echo $2|cut -f1 -d.).$DOMAIN
 	
 	rlPhaseStartTest "ipa_connect_replica - Create Replication Agreement between two servers"
 		rlLog "$FUNCNAME $REP1 $REP2"
 	
 		rlLog "RUN ipa-replica-manage connect $REP1 $REP2"
+		rlRun "ipa-replica-manage -p $ADMINPW connect $REP1 $REP2"
 	rlPhaseEnd
-	
 }	
