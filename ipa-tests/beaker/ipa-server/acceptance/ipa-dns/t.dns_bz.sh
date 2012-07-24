@@ -35,6 +35,7 @@ dnsbugs()
    bz772301
    bz818933
    bz767489
+   bz802375
    dnsbugcleanup
 }
 
@@ -546,6 +547,26 @@ bz767489()
     rlPhaseEnd
 }
 
+bz802375()
+{
+
+    # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=802375
+    rlPhaseStartTest "802375 BIND cannot be shutdown correctly, if psearch is enabled and LDAP connect fails"
+
+	rlAssertGrep "psearch yes" "/etc/named.conf"
+	rlRun "service named status"
+        rlRun "cp /etc/named.conf /root/"
+        rlRun "sed -i 's/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ldapi:\/\/127.0.0.1/g' /etc/named.conf"
+	rlRun "service named restart"
+	rlRun "rndc stop"
+
+	rlRun "service named status" 3 "Verifying that named is not running"
+
+        rlRun "mv -f /root/named.conf /etc/"
+        rlRun "service named restart"
+
+    rlPhaseEnd
+}
 
 
 dnsbugcleanup()
