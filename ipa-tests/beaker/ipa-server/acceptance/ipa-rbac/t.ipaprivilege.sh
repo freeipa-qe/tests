@@ -339,7 +339,7 @@ ipaprivilege_remove_permission_negative()
     permissionList=""
     command="removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\""
     expmsg="Number of permissions removed 0"
-    rlRun "$command > $TmpDir/ipaprivilege_nonexistentperm.log 2>&1" 0 "Verify error message for $privilegeName"
+    rlRun "$command > $TmpDir/ipaprivilege_nonexistentperm.log 2>&1" 0 "Verify number of permissions removed is 0"
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_nonexistentperm.log"
   rlPhaseEnd
 
