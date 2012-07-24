@@ -34,6 +34,7 @@ dnsbugs()
    bz804572
    bz772301
    bz818933
+   bz767489
    dnsbugcleanup
 }
 
@@ -517,8 +518,35 @@ bz818933()
         service named restart
         sleep 5
     rlPhaseEnd
-
 }
+
+bz767489()
+{
+
+    # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=767489
+    rlPhaseStartTest "767489 Periodically reconnect to LDAP when the first connection fails"
+
+	named_ldapi_domain=`hostname -d | sed s/[.]/-/g | tr '[:lower:]' '[:upper:]'`
+
+	rlRun "service named status"
+	rlRun "cp /etc/named.conf /root/"
+	rlRun "sed -i 's/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ldapi:\/\/127.0.0.1/g' /etc/named.conf"
+	rlRun "iptables -A INPUT -j REJECT -p TCP --destination-port ldap --reject-with icmp-port-unreachable"
+	rlRun "iptables -A INPUT -j REJECT -p TCP --destination-port ldaps --reject-with icmp-port-unreachable"
+	rlRun "iptables -L"
+
+	rlRun "service named restart"
+	rlRun "service named status"
+
+	rlRun "iptables -F"
+	rlRun "service iptables stop"
+	rlRun "mv -f /root/named.conf /etc/"
+	rlRun "service named restart"
+
+    rlPhaseEnd
+}
+
+
 
 dnsbugcleanup()
 {
