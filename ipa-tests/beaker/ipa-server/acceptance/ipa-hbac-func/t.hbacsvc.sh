@@ -2903,6 +2903,7 @@ hbacsvc_master_bug771706() {
                 create_ipauser user771706 user771706 user771706 $userpw
 		sleep 5
 		export user771706=user771706	
+                export userpw=testpw123@ipa.com
 
         rlPhaseStartTest "ipa-hbacsvc-771706: Bug 771706 - sssd_be crashes during auth when there exists empty service group or hostgroup in an hbacrule."
 
