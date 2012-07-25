@@ -49,6 +49,9 @@ ipakrbt_reset()
 ipakrbt_envsetup()
 {
     rlPhaseStartSetup "ipakrbt_envsetup"
+        rlRun "rlDistroDiff keyctl"
+        KinitAsAdmin	
+        rlRun "ipa krbtpolicy-reset" 0 "reset krbtpolicy to default - just in case!"
 	create_ipauser $username $first $last $password
 	create_ipauser $gusername $first $last $password
     rlPhaseEnd
@@ -57,12 +60,14 @@ ipakrbt_envsetup()
 ipakrbt_envcleanup()
 {
     rlPhaseStartCleanup "ipakrbt_envcleanup"
+	ipactl restart
+        rlRun "rlDistroDiff keyctl"
         KinitAsAdmin	
 	delete_user $username
 	delete_user $gusername
+        rlRun "rlDistroDiff keyctl"
 	KinitAsAdmin
         rlRun "ipa krbtpolicy-reset" 0 "reset krbtpolicy to default - just in case!"
-	ipactl restart
     rlPhaseEnd
 } 
 
@@ -127,9 +132,11 @@ ipakrbt_functional_maxlife()
 {
     rlPhaseStartTest "ipakrbt_functional_maxlife_user"
         local delay=60 # set user maxlife of kerberos ticket life to 1 minute for test account
+        rlRun "rlDistroDiff keyctl"
         KinitAsAdmin
         rlRun "ipa krbtpolicy-mod $username --maxlife=$delay" 0 "set user maxlife to $delay second"
 	Kcleanup
+        rlRun "rlDistroDiff keyctl"
         rlRun "echo $password | kinit $username" 0 "kinit as [$username] and expect ticket expire in $delay seconds"
         rlRun "ipa user-find $username 2>&1 >/dev/null" 0 "after grant kerberos ticket, user-find should success"
         sleep $delay
@@ -140,14 +147,19 @@ ipakrbt_functional_maxlife()
 
 rlPhaseStartTest "ipakrbt_functional_maxlife_global"
         local delay=30 # set maxlife of kerberos ticket life to 30 for test account
+        rlRun "rlDistroDiff keyctl"
         KinitAsAdmin
         rlRun "ipa krbtpolicy-mod --maxlife=$delay" 0 "set global maxlife to $delay second"
 	ipactl restart
         Kcleanup
+        rlRun "rlDistroDiff keyctl"
         rlRun "echo $password | kinit $gusername" 0 "kinit as [$gusername] and expect ticket expire in $delay seconds"
         rlRun "ipa user-find $gusername 2>&1 >/dev/null" 0 "after grant kerberos ticket, user-find should success"
         sleep $delay
         rlRun "ipa user-find $gusername 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$delay] seconds"
+	ipactl restart
+        KinitAsAdmin
+        rlRun "ipa krbtpolicy-reset" 0 "reset krbtpolicy to default - just in case!"
         Kcleanup
     rlPhaseEnd
 } 
@@ -155,13 +167,16 @@ rlPhaseStartTest "ipakrbt_functional_maxlife_global"
 ipakrbt_functional_maxrenew()
 {
     rlPhaseStartTest "ipakrbt_functional_maxrenew_user"
+	ipactl restart
         local maxlife=60
         local renew=90
+        rlRun "rlDistroDiff keyctl"
         KinitAsAdmin
         rlRun "ipa krbtpolicy-mod $username --maxlife=$maxlife --maxrenew=$renew" 0 "set maxlife:[$maxlife], renew=[$renew]"
         Kcleanup
 
         #step 1: normal kinit should success and allow ipa user to do user-find
+        rlRun "rlDistroDiff keyctl"
         rlRun "echo $password | kinit -r 90 $username" 0 "kinit as [$username] and expect ticket expire in $maxlife seconds"
         rlRun "ipa user-find $username 2>&1 >/dev/null" 0 "after grant kerberos ticket, user-find should success"
         sleep 30
@@ -169,7 +184,7 @@ ipakrbt_functional_maxrenew()
         #step 2: run kinit -R should give [maxlife] seonds of new life to user's kerberos ticket
         rlRun "kinit -R $username" 0 "when user kerberos ticket expired but still within renew time, kinit -R should give user new life"
         rlRun "ipa user-find $username 2>&1 >/dev/null" 0 "after kinit -R and 30 seconds, user-find should success"
-	sleep 30
+	sleep 30 
 
         #step 3: run kinit -R should give [maxlife] seonds of new life to user's kerberos ticket
         rlRun "kinit -R $username" 0 "when user kerberos ticket expired but still within renew time, kinit -R should give user new life"
@@ -185,29 +200,34 @@ ipakrbt_functional_maxrenew()
     rlPhaseStartTest "ipakrbt_functional_maxrenew_global"
         local maxlife=30
         local renew=60
+        rlRun "rlDistroDiff keyctl"
         KinitAsAdmin
         rlRun "ipa krbtpolicy-mod --maxlife=$maxlife --maxrenew=$renew" 0 "set maxlife:[$maxlife], renew=[$renew]"
 	ipactl restart
         Kcleanup
         
         #step 1: normal kinit should success and allow ipa user to do user-find
+        rlRun "rlDistroDiff keyctl"
         rlRun "echo $password | kinit -r 60 $gusername" 0 "kinit as [$gusername] and expect ticket expire in $maxlife seconds"
         rlRun "ipa user-find $gusername 2>&1 >/dev/null" 0 "after grant kerberos ticket, user-find should success"
-        sleep 15
+        sleep 13
 
         #step 2: run kinit -R should give [maxlife] seonds of new life to user's kerberos ticket
         rlRun "kinit -R $gusername" 0 "when user kerberos ticket expired but still within renew time, kinit -R should give user new life"
-        rlRun "ipa user-find $gusername 2>&1 >/dev/null" 0 "after kinit -R and 15 seconds, user-find should success"
-	sleep 15
+        rlRun "ipa user-find $gusername 2>&1 >/dev/null" 0 "after kinit -R and 13 seconds, user-find should success"
+	sleep 11
 
         #step 3: run kinit -R should give [maxlife] seonds of new life to user's kerberos ticket
         rlRun "kinit -R $gusername" 0 "when user kerberos ticket expired but still within renew time, kinit -R should give user new life"
-        rlRun "ipa user-find $gusername 2>&1 >/dev/null" 0 "after kinit -R and 15 seconds, user-find should success"
-        sleep 30
+        rlRun "ipa user-find $gusername 2>&1 >/dev/null" 0 "after kinit -R and 11 seconds, user-find should success"
+        sleep 36
 
         #step 4: after renew time limit reaches its limit, kinit -R no longer work
         rlRun "kinit -R $gusername 2>&1 | grep -i 'Ticket expired while renewing credentials' " 0 "when renew time expires, kinit -R should fail"
         rlRun "ipa user-find $gusername 2>&1 | grep -i 'Ticket expired' " 0 "expect 'user-find' to fail for 'Ticket expired' after [$maxlife] seconds"
+	ipactl restart
+        KinitAsAdmin
+        rlRun "ipa krbtpolicy-reset" 0 "reset krbtpolicy to default - just in case!"
         Kcleanup
      rlPhaseEnd
 }
