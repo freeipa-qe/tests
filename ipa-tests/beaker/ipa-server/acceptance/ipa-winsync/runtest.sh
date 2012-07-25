@@ -46,6 +46,8 @@ rpm3="telnet"
 rpm4="coreutils"
 rpm5="glibc-common"
 
+rlJournalStart
+
    rlCheckRpm "$rpm1"
 	if [ $? -ne 0 ]; then
            rlRun "yum install -y $rpm1"
@@ -97,7 +99,6 @@ PACKAGE="ipa-server"
 		"winsync_test_0015"
 	}
 
-rlJournalStart
 
     rlPhaseStartSetup "ipa-winsync-startup: Check for admintools package, setup certificates."
 		rlRun "setup"

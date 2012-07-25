@@ -487,13 +487,11 @@ rlPhaseStartTest "0012 Delete User"
 	rlRun "ipa user-show 456" 2 "User 456 not found in IPA as expected"
 
 	rlLog "Delete user from IPA"
-	rlRun "ipa user-del $aduser2" 0 "Delete $aduser2 from IPA"
-	rlRun "ipa user-del $ADln" 0 "Delete $ADln from IPA"
-#       rlRun "ipa user-del 456" 0 "Delete user 456 from IPA"
+	rlRun "ipa user-del $aduser2 $ADln" 0 "Delete $aduser2 and $ADln from IPA"
 	sleep 10
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $aduser2 deleted in AD"
-#	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User 456 deleted in AD"
-#	ipa user-del 456
+	sleep 5
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$ADfn $ADsn,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $ADln deleted in AD"
 
 rlPhaseEnd
 }
