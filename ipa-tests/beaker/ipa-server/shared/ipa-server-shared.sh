@@ -974,7 +974,7 @@ ipa_quick_uninstall(){
 	if [ ! -d /etc/yum.repos.d/deleted ]; then
 		rlRun "mkdir deleted"
 	fi	
-	for repo in $(ls -1 *.repo|egrep -v "^beaker|^cobbler|^redhat.repo|^rhel-source.repo"); do
+	for repo in $(ls -1 *.repo|egrep -v "^beaker|^cobbler|^redhat.repo|^rhel-source.repo|^fedora"); do
 		rlRun "/bin/mv -f $repo deleted/"
 	done	
 	rlLog "popd"
