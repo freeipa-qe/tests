@@ -491,7 +491,9 @@ ipa_install_prep()
 		for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
 			for server in $(eval echo \$$var); do
 				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
-				AddToKnownHosts $server
+				#AddToKnownHosts $server
+				ssh-keygen -R $server
+				ssh-keyscan $server >> /root/.ssh/known_hosts
 			done
 		done
 	fi
