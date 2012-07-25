@@ -997,7 +997,7 @@ ipa_quick_uninstall(){
 	fi
 	. /etc/sysconfig/network
 	rlRun "hostname $HOSTNAME"
-	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils"
+	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils bind-license bind-libs-lite"
 
 } #ipa_quick_uninstall 
 
