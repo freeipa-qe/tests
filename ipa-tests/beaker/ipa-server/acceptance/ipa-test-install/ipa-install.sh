@@ -404,8 +404,8 @@ ipa_install_prep()
 
 	tmpout=/tmp/error_msg.out
 	currenteth=$(route | grep ^default | awk '{print $8}')
-	ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
-	ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | head -1)
+	ipaddr=$(ip -o -4 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
+	ipv6addr=$(ip -o -6 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
 	hostname=$(hostname)
 	hostname_s=$(hostname -s)
 	if [ "$IPv6SETUP" = "TRUE" ]; then 
