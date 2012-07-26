@@ -338,17 +338,22 @@ SetUpKnownHosts()
 #####################
 configAbrt()
 {
-hostname_s=`hostname -s`
-for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
-        rlCheckRpm "$rpm"
-                if [ $? -ne 0 ]; then
-                        rlRun "yum install -y $rpm"
-                fi
+cat /etc/redhat-release | grep 5
+if [ $? -eq 0 ] ; then
+        rlLog "configAbrt : Machine is a RHEL 5 machine - no abrt"
+else
+
+	hostname_s=`hostname -s`
+	for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
+        	rlCheckRpm "$rpm"
+                	if [ $? -ne 0 ]; then
+                        	rlRun "yum install -y $rpm"
+                	fi
         done
 
-if [ -z "$JOBID" ]; then 
-	eval $(echo $(grep JOBID /etc/motd))
-fi
+	if [ -z "$JOBID" ]; then 
+		eval $(echo $(grep JOBID /etc/motd))
+	fi
 
 cat > /etc/abrt/abrt-action-save-package-data.conf << EOF
 OpenGPGCheck = no
@@ -364,8 +369,8 @@ EmailTo=seceng-idm-qe-list@redhat.com
 SendBinaryData=no
 EOF
 
-rlRun "service abrtd restart"
-
+	rlRun "service abrtd restart"
+fi
 }
 
 #########################################
