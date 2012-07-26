@@ -30,7 +30,12 @@
 #   submit_logs
 #	rlDistroDiff
 ######################################################################
-KINITEXEC=/usr/bin/kinit
+cat /etc/redhat-release | grep 5
+if [ $? -eq 0 ] ; then
+	KINITEXEC=/sur/kerberos/bin/kinit
+else
+	KINITEXEC=/usr/bin/kinit
+fi
 #######################################################################
 # kinitAs Usage:
 #       kinitAs <username> <password>
