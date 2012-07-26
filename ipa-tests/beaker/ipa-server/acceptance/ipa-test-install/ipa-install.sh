@@ -137,7 +137,6 @@ ipa_install_set_vars() {
 ######################################################################
 ipa_install_topo_default()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
 	if [ -z "$MYENV" ]; then
 		export MYENV=1
 	fi
@@ -149,6 +148,7 @@ ipa_install_topo_default()
 		MYBCS=$(eval echo \$BEAKERCLIENT_env${MYENV})
 	rlPhaseEnd	
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_default_master - install Master in Default Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
@@ -159,12 +159,25 @@ ipa_install_topo_default()
 	rlPhaseEnd
 	
 	for MYBR1 in $MYBRS; do
+		TESTORDER=$(( TESTORDER += 1 ))
 		rlPhaseStartTest "ipa_install_topo_default_replica - install Replica1 in Default Topology - $MYBR1"
 			if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 				ipa_install_replica $MYBM1
 				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
 			else
 				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"
+			fi
+		rlPhaseEnd
+	done
+
+	for MYBC1 in $MYBCS; do
+		TESTORDER=$(( TESTORDER += 1 ))
+		rlPhsaeStartTest "ipa_install_topo_default_client - install Client1 in Default Topology - $MYBC1"
+			if [ "$(hostname -s)" = "$(echo $MYBC1|cut -f1 -d.)" ]; then
+				ipa_install_client $MYBM1
+				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBC1.1' -m $MYBC1"
+			else
+				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBC1.1' $MYBC1"
 			fi
 		rlPhaseEnd
 	done
@@ -181,7 +194,6 @@ ipa_install_topo_default()
 ######################################################################
 ipa_install_topo_star()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
 	if [ -z "$MYENV" ]; then
 		export MYENV=1
 	fi
@@ -204,6 +216,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd	
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_master - install Master in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
@@ -213,6 +226,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica1 - install Replica1 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -222,6 +236,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica2 - install Replica2 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -231,6 +246,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica3 - install Replica3 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -240,6 +256,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica4 - install Replica4 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -249,6 +266,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica5 - install Replica5 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -270,7 +288,6 @@ ipa_install_topo_star()
 ######################################################################
 ipa_install_topo_tree1()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
 	if [ -z "$MYENV" ]; then
 		export MYENV=1
 	fi
@@ -293,6 +310,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd	
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_master - install Master in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
@@ -302,6 +320,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica1 - install Replica1 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -311,6 +330,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica2 - install Replica2 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -320,6 +340,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica3 - install Replica3 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR1
@@ -329,6 +350,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica4 - install Replica4 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR2
@@ -338,6 +360,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica5 - install Replica5 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR2
@@ -347,6 +370,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_connect_rep4_and_rep5 - Create replication agreement between Replica4 and Replica5"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_connect_replica $MYBR4 $MYBR5
