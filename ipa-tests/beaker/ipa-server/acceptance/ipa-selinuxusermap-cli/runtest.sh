@@ -55,6 +55,7 @@
 # Include test case file
 . ./ipa-selinuxusermap-config.sh
 . ./ipa-selinuxusermap-add.sh
+. ./ipa-selinuxusermap-add-host.sh
 ########################################################################
 
 PACKAGE="ipa-admintools"
@@ -72,9 +73,11 @@ rlJournalStart
 
 
 # Execute ipa config tests for SELinux user map
-  run_selinuxusermap_config_tests
-# Execute create a new SELinux user map tests
-  run_selinuxusermap_add_tests
+#  run_selinuxusermap_config_tests
+# Execute SELinux user map add tests
+#  run_selinuxusermap_add_tests
+# Execute SELinux user map add-host tests
+  run_selinuxusermap_add_host_tests
 
 # Execute add target hosts and hostgroups to an SELinux user map rule tests
 #  run_selinuxusermap_add_host_tests
