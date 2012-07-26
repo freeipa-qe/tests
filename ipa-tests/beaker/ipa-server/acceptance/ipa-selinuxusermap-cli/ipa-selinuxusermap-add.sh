@@ -271,7 +271,6 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
     rlPhaseEnd
      
     rlPhaseStartTest "ipa-selinuxusermap-cli-023: Add a selinuxuser map with all the options set"
-#	rlRun "addSelinuxusermapAllOptions  $default_selinuxuser allow_all all all \"selinuxuser map with all options set\" $selinuxusermap11"
 	rlRun "ipa selinuxusermap-add --selinuxuser=guest_u:s0 --hbacrule=allow_all --usercat=all --hostcat=all --desc='selinuxuser map with all options set' $selinuxusermap11 > $TmpDir/selinuxusermap11.out"
         rlRun "findSelinuxusermap $selinuxusermap11" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
         rlRun "findSelinuxusermapByOption selinuxuser guest_u:s0 $selinuxusermap11" 0 "Verifying selinuxusermap was added with given selinuxuser"
@@ -279,7 +278,6 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
         rlRun "findSelinuxusermapByOption usercat all $selinuxusermap11" 0 "Verifying selinuxusermap was added with usercat all"
         rlRun "findSelinuxusermapByOption hostcat all $selinuxusermap11" 0 "Verifying selinuxusermap was added with hostcat all"
 	rlAssertGrep "Description: selinuxuser map with all options set" "$TmpDir/selinuxusermap11.out"
-#        rlRun "findSelinuxusermapByOption desc \"selinuxuser map with all options set\" $selinuxusermap11" 0 "Verifying selinuxusermap was added with given description"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-cli-024: Add a selinuxuser map with --all option"
