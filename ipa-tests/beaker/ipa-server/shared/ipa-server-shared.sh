@@ -32,7 +32,7 @@
 ######################################################################
 cat /etc/redhat-release | grep 5
 if [ $? -eq 0 ] ; then
-	KINITEXEC=/sur/kerberos/bin/kinit
+	KINITEXEC=/usr/kerberos/bin/kinit
 else
 	KINITEXEC=/usr/bin/kinit
 fi
