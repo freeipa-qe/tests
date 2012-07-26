@@ -39,7 +39,12 @@
 COMMON_SERVER_PACKAGES="bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
 RHELIPA_SERVER_PACKAGES="ipa-server"
 COMMON_CLIENT_PACKAGES="httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate nmap"
-RHELIPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
+cat /etc/redhat-release | grep 5
+if [ $? -eq 0 ] ; then
+        RHELIPA_CLIENT_PACKAGES="ipa-client"
+else
+        RHELIPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
+fi
 FREEIPA_SERVER_PACKAGES="freeipa-server"
 FREEIPA_CLIENT_PACKAGES="freeipa-admintools freeipa-client"
 
