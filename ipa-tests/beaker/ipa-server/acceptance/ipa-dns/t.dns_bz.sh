@@ -12,6 +12,7 @@ email="ipaqar.redhat.com"
 dnsbugs()
 {
    dnsbugsetup
+   bz841900
    bz750947
    bz789987
    bz789919
@@ -52,6 +53,20 @@ dnsbugsetup()
 	# Determine my IP address
     rlPhaseEnd
 }
+
+bz841900()
+{
+        # Tests for bug https://bugzilla.redhat.com/show_bug.cgi?id=841900
+        rlPhaseStartTest "bz841900 EMBARGOED CVE-2012-3429 bind-dyndb-ldap: named DoS via DNS query with $ in name [rhel-6.3.z]"
+                rlRun "dig @127.0.0.1 -t ANY '$.$DOMAIN' &"
+                rlRun "tail -n40 /var/log/messages | grep -i \"ldap_convert.c:253: REQUIRE(dns_str_len > dns_idx + 3) failed, back trace\"" 1
+                rlRun "tail -n40 /var/log/messages"
+
+                rlRun "ipactl restart"
+                sleep 15
+    rlPhaseEnd
+}
+
 
 bz750947()
 {
