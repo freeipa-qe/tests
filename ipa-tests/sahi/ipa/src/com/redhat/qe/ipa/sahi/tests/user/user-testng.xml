@@ -29,7 +29,13 @@
 			    <include name="userEditMailingAddressTests" />
 				<include name="userEditEmpMiscInfoTests" />
 				<include name="userAddAndAddAnotherTests" />
-			    <include name="userAddAndEditTests" /> 
+			    <include name="userAddAndEditTests" />
+			    <include name="userEditSSHPubKeyTests" />
+			    <include name="userEditUndoSSHPubKeyTests" /> 
+			    <include name="userDeleteSSHPubKeyTests" />
+			    <include name="userEditNegativeSSHPubKeyTests" />
+			    <include name="userEditRefreshResetUpdateSSHPubKeyTests" /> 
+			    <include name="userEditUpdateResetCancelSSHPubKeyTests" />
 				<include name="userDeleteTests" />   
 		        <include name="userMultipleDeleteTests" />
 			</run>

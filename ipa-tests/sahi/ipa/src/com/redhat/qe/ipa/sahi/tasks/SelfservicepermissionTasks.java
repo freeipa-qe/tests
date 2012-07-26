@@ -1,5 +1,7 @@
 package com.redhat.qe.ipa.sahi.tasks;
 
+import org.testng.Assert;
+
 public class SelfservicepermissionTasks {
 
 	public static void addSelfservicePermission(SahiTasks browser, String permissionName, String[] attrs) {
@@ -50,6 +52,27 @@ public class SelfservicepermissionTasks {
 
 	public static void deletePermission(SahiTasks browser, String permissionName) {
 		CommonHelper.deleteEntry(browser, permissionName);
+	}
+
+	public static void resetSSHKeyPermission(SahiTasks browser, String permission,	String attribute1, String attribute2) {
+		if(browser.link(permission).exists()){
+			browser.link(permission).click();
+		}
+		browser.checkbox(attribute1).check();
+		browser.checkbox(attribute2).uncheck();
+		browser.span("Update").click();
+		
+		
+	}
+
+	public static void deleteSSHKey(SahiTasks browser, String errorMsg) {
+		browser.link("Delete").click();
+		browser.span("Update").click();
+		if(browser.div("error_dialog").exists()){
+			Assert.assertTrue(browser.div("error_dialog").getText().contains(errorMsg), "Error Matches Expected error message");
+			browser.button("Cancel").click();
+		}
+		
 	}
 
 }

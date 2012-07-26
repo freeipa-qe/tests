@@ -448,7 +448,7 @@ public class UserTests extends SahiTestScript{
 	 * Delete multiple users - for positive tests
 	 */
 	@Test (groups={"userMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
- "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userEditEmpMiscInfoTests", "userSearchTests" })
+ "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userDeleteSSHPubKeyTests", "userEditSSHPubKeyTests", "userEditUndoSSHPubKeyTests", "userEditEmpMiscInfoTests", "userSearchTests" })
 	public void testMultipleUserDelete(String testName, String uid1, String uid2, String uid3, String uid4) throws Exception {		
 		String uids[] = {uid1, uid2, uid3, uid4};
 		
@@ -505,7 +505,120 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserUpdates(sahiTasks, uid, title, mail);
 	}
 	
+	/*
+	 * sshpubkey Add
+	 */
+	@Test (groups={"userEditSSHPubKeyTests"}, dataProvider="getUserEditSSHPubKeyTestObjects",  dependsOnGroups="userAddAndEditTests")	
+	public void testAddSSHPubKey(String testName, String uid, String keyType, String fileName, String keyName1, String addToKey) throws Exception {
 		
+		sahiTasks.navigateTo(CommonTasks.userPage);
+		
+		String sshKey=CommonTasks.generateSSH(uid,keyType,fileName);
+		
+		UserTasks.addSSHKey(sahiTasks,uid,sshKey,addToKey);
+		if(keyType.equals("dsa")){
+			Assert.assertTrue(sahiTasks.getText(sahiTasks.span(keyName1)).contains("ssh-dss"), "ssh " + keyType + " for " + uid + " added successfully");
+		}
+		else{
+			Assert.assertTrue(sahiTasks.getText(sahiTasks.span(keyName1)).contains("ssh-" + keyType) , "ssh " + keyType + " for " + uid + " added successfully");
+		}
+	}
+	
+	/*
+	 * sshpubkey Add Negative
+	 */
+	@Test (groups={"userEditNegativeSSHPubKeyTests"}, dataProvider="getUserEditNegativeSSHPubKeyTestObjects",  dependsOnGroups="userEditSSHPubKeyTests")	
+	public void testAddNegativeSSHPubKey(String testName, String uid, String key, String keyType, String fileName, String errorMsg, String errorMsg1, String addToKey) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.userPage);
+		
+		
+		if(keyType.equals(""))
+			UserTasks.addSSHKey(sahiTasks, uid, key, addToKey);
+		else{
+			String sshKey=CommonTasks.generateSSH(uid,keyType,fileName);
+			if(testName.equals("add_negative_sshkey_invalid_dsa")){
+				sshKey=sshKey.replaceAll("=", "");
+			}
+			UserTasks.addSSHKey(sahiTasks, uid, sshKey, addToKey);
+		}
+		Assert.assertTrue((sahiTasks.div(errorMsg).exists() || sahiTasks.div(errorMsg1).exists()), "Add Negative tested successfully");
+		if(sahiTasks.button("Cancel").exists()){
+			sahiTasks.button("Cancel").click();
+		}
+	}
+	
+	/*
+	 * sshpubkey Refresh/Reset/Update
+	 */
+	@Test (groups={"userEditRefreshResetUpdateSSHPubKeyTests"}, dataProvider="getUserEditRefreshResetUpdateSSHPubKeyTestObjects",  dependsOnGroups={"userEditSSHPubKeyTests","userEditUndoSSHPubKeyTests","userEditNegativeSSHPubKeyTests"})	
+	public void testAddRefreshResetUpdateSSHPubKey(String testName, String uid, String keyType, String fileName, String keyName, String spanName) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.userPage);
+		
+		String sshKey=CommonTasks.generateSSH(uid,keyType,fileName);
+		UserTasks.SSHKeyRefershResetUpdate(sahiTasks, uid, sshKey, spanName);
+		if(!spanName.equals("Update")){
+			Assert.assertFalse(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + spanName + " Successful");
+		}
+		else{
+			Assert.assertTrue(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + spanName + " Successful");
+		}
+	}
+	
+	/*
+	 * sshpubkey Update/Reset/Cancel
+	 */
+	@Test (groups={"userEditUpdateResetCancelSSHPubKeyTests"}, dataProvider="getUserEditUpdateResetCancelSSHPubKeyTestObjects",  dependsOnGroups={"userEditSSHPubKeyTests","userEditUndoSSHPubKeyTests","userEditNegativeSSHPubKeyTests","userEditRefreshResetUpdateSSHPubKeyTests"})	
+	public void testAddUpdateResetCancelSSHPubKey(String testName, String uid, String keyType, String fileName, String keyName, String buttonName) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.userPage);
+		
+		String sshKey=CommonTasks.generateSSH(uid,keyType,fileName);
+		UserTasks.SSHKeyUpdateResetCancel(sahiTasks, uid, sshKey, buttonName);
+		if(buttonName.equals("Reset")){
+			Assert.assertFalse(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + buttonName + " Successful");
+		}
+		else{
+			Assert.assertTrue(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + buttonName + " Successful");
+		}
+	}
+	
+	/*
+	 * sshpubkey Undo
+	 */
+	@Test (groups={"userEditUndoSSHPubKeyTests"}, dataProvider="getUserEditUndoSSHPubKeyTestObjects",  dependsOnGroups="userEditSSHPubKeyTests")	
+	public void testUndoSSHPubKey(String testName, String uid, String keyType1, String keyType2, String fileName1, String fileName2, String spanName) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.userPage);
+		
+		String sshKey=CommonTasks.generateSSH(uid,keyType1,fileName1);
+		String sshKey1="";
+		if(!keyType2.equals("")){
+			sshKey1=CommonTasks.generateSSH(uid,keyType2,fileName2);
+		}
+		
+		UserTasks.addAndUndoSSHKey(sahiTasks,uid,sshKey,sshKey1, spanName);
+		if(keyType2.equals(""))
+			Assert.assertFalse(sahiTasks.span("New: key set").exists(), "sshKey Add and Undo successful");
+		else
+			Assert.assertFalse(sahiTasks.span("New: key set").exists(), "sshKey Add and UndoAll successful");
+		
+	}
+	
+	/*
+	 * sshpubkey Delete
+	 */
+	@Test (groups={"userDeleteSSHPubKeyTests"}, dataProvider="getUserDeleteSSHPubKeyTestObjects",  dependsOnGroups={"userEditNegativeSSHPubKeyTests","userEditRefreshResetUpdateSSHPubKeyTests"})	
+	public void testDeleteSSHPubKey(String testName, String uid) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.userPage);
+		
+		UserTasks.userSSHDelete(sahiTasks, uid);
+		
+		Assert.assertFalse(sahiTasks.span("sshkey-status strikethrough").exists(), "sshKey Deleted Successfully");
+		
+	}
 	/*
 	 * Search
 	 */
@@ -853,6 +966,113 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	/*
+	 * Data to be used when adding sshpubkeys
+	 */
+	
+	@DataProvider(name="getUserEditSSHPubKeyTestObjects")
+	public Object[][] getUserEditSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(userEditSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> userEditSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 		uid			keyType		fileName		keyName1			addToKey	
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_rsa",		"user9",	"rsa",		"user9_rsa",	"sshkey-status",	""  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_dsa",		"user9",	"dsa",		"user9_dsa",	"sshkey-status[1]",	"" 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_rsa_space",	"user9",	"rsa",		"user9_rsa1",	"sshkey-status[2]",	" " 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_rsa_equal",	"user9",	"rsa",		"user9_rsa2",	"sshkey-status[3]",	"="  	  } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding negative sshpubkeys
+	 */
+	
+	@DataProvider(name="getUserEditNegativeSSHPubKeyTestObjects")
+	public Object[][] getUserEditNegativeSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(userEditNegativeSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> userEditNegativeSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 				uid			key		keyType			fileName			errorMsg									errorMsg1										addToKey		
+		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_empty",		"user9",	"",		"",				"",					"no modifications to be performed",			"",												""  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_invalid",	"user9",	"test",	"",				"",					"invalid 'sshpubkey': must be binary data",	"invalid 'sshpubkey': invalid SSH public key",	"" 	  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_duplicate",	"user9",	"",		"rsa",			"user9_rsa",		"no modifications to be performed",			"",												""  	  } ));        
+		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_invalid_dsa","user9",	"",		"dsa",			"user9_dsa4",		"invalid 'sshpubkey': must be binary data",	"invalid 'sshpubkey': invalid SSH public key",	""  	  } ));
+		return ll;	
+	}
+	/*
+	 * Data to be used when deleting sshpubkeys
+	 */
+	@DataProvider(name="getUserDeleteSSHPubKeyTestObjects")
+	public Object[][] getUserDeleteSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(userDeleteSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> userDeleteSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 	uid	
+		ll.add(Arrays.asList(new Object[]{ "delete_sshkey",		"user9"  	  } ));
+		
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used on undo of sshpubkeys
+	 */
+	
+	@DataProvider(name="getUserEditUndoSSHPubKeyTestObjects")
+	public Object[][] getUserEditUndoSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editUndoSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> editUndoSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 			uid			keyType1	keyType2	fileName1		fileName2		spanName	keyName1			keyName2		
+		ll.add(Arrays.asList(new Object[]{ "add_undo_sshkey_rsa",		"user9",	"rsa",		"",			"user9_rsa1",	"",				"undo"/*,		"sshkey-status[2]",	"" */ 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_undoAll_sshkey",		"user9",	"rsa",		"dsa",		"user9_rsa1",	"user9_dsa1",	"undo all"/*,	"sshkey-status[2]",	"sshkey-status[3]"  */	  } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used on Refresh/Reset/Update of sshpubkeys
+	 */
+	
+	@DataProvider(name="getUserEditRefreshResetUpdateSSHPubKeyTestObjects")
+	public Object[][] getUserEditRefreshResetUpdateSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(userEditRefreshResetUpdateSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> userEditRefreshResetUpdateSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 		uid			keyType		fileName		keyName1			spanName	
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_refresh",	"user9",	"rsa",		"user9_rsa5",	"sshkey-status[4]",	"Refresh"  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_reset",		"user9",	"rsa",		"user9_rsa5",	"sshkey-status[4]",	"Reset" 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_update",		"user9",	"rsa",		"user9_rsa5",	"sshkey-status[4]",	"Update" 	  } ));       
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used on Update/Reset/Cancel of sshpubkeys
+	 */
+	
+	@DataProvider(name="getUserEditUpdateResetCancelSSHPubKeyTestObjects")
+	public Object[][] getUserEditUpdateResetCancelSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(userEditUpdateResetCancelSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> userEditUpdateResetCancelSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 				uid			keyType		fileName		keyName1			spanName	
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_cancel_backlink",	"user9",	"rsa",		"user9_rsa6",	"sshkey-status[5]",	"Cancel"  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_reset_backlink",		"user9",	"rsa",		"user9_rsa6",	"sshkey-status[5]",	"Reset" 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_sshkey_update1_backlink",	"user9",	"rsa",		"user9_rsa6",	"sshkey-status[5]",	"Update" 	  } ));       
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when searching for users

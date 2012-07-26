@@ -655,4 +655,93 @@ public class UserTasks {
 		UserTasks.deleteUser(browser, uid);
 	}
 
+
+
+	public static void addSSHKey(SahiTasks browser, String uid, String sshKey, String addToKey) {
+		if(browser.link(uid).exists()){
+			browser.link(uid).click();
+		}
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(sshKey + addToKey);
+		browser.button("Set").click();
+		browser.span("Update").click();
+		
+	}
+
+
+
+	public static void addAndUndoSSHKey(SahiTasks browser, String uid, String sshKey1, String sshKey2, String spanName) {
+		browser.link(uid).click();
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(sshKey1);
+		browser.button("Set").click();
+		if(!sshKey2.equals("")){
+			browser.link("Add").click();
+			browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+			browser.textarea("certificate").setValue(sshKey2);
+			browser.button("Set").click();
+		}
+		if(spanName.equals("undo")){
+			browser.span("undo").click();
+		}
+		else if(spanName.equals("undo all")){
+			browser.span("undo all").click();
+		}
+		
+	}
+
+
+
+	public static void userSSHDelete(SahiTasks browser, String uid) {
+		browser.link(uid).click();
+		browser.link("Delete").click();
+		if(browser.span("sshkey-status strikethrough").exists()){
+			browser.span("Update").click();
+		}
+		
+	}
+
+
+
+	public static void SSHKeyRefershResetUpdate(SahiTasks browser, String uid, String key, String spanName) {
+		browser.link(uid).click();
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(key);
+		browser.button("Set").click();
+		
+		if(spanName.equals("Refresh"))
+			browser.span("Refresh").click();
+		else if(spanName.equals("Reset"))
+			browser.span("Reset").click();
+		else if(spanName.equals("Update"))
+			browser.span("Update").click();
+	}
+
+
+
+	public static void SSHKeyUpdateResetCancel(SahiTasks browser, String uid,
+			String sshKey, String buttonName) {
+		browser.link(uid).click();
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(sshKey);
+		browser.button("Set").click();
+		browser.link("Users").near(browser.span(uid)).click();
+		if(buttonName.equals("Cancel"))
+			browser.button("Cancel").click();
+		else if(buttonName.equals("Reset")){
+			browser.button("Reset").click();
+			browser.link(uid).click();
+		}
+		else if(buttonName.equals("Update")){
+			browser.button("Update").click();
+			browser.link(uid).click();
+		}
+		
+		
+	}
+
 }

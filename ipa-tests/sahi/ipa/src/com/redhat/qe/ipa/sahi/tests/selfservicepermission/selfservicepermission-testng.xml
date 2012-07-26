@@ -21,6 +21,19 @@
             	    <class name="com.redhat.qe.ipa.sahi.tests.selfservicepermission.SelfservicepermissionTests" />
             	</classes>
     </test>
+    <test name="Self Service Permission Functional Tests">
+		<groups>
+			<run>
+				<include name="init" />  
+			    <include name="addUserSSHKey" />
+			    <include name="resetUserSSHKeyPermission" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.selfservicepermission.SelfServicePermissionFunctionalTests" />
+		</classes>
+	</test> 
+    
 	
     <listeners>        
   	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
