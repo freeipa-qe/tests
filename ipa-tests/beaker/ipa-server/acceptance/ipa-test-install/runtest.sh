@@ -53,6 +53,7 @@ satrtEpoch=`date "+%s"`
 rlJournalStart
     rlPhaseStartSetup "ipa-test-install startup: Check for ipa-server package"
         #rlAssertRpm $PACKAGE
+		rlRun "env"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
