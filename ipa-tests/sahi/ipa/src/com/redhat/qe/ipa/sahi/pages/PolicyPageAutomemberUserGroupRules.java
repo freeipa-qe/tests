@@ -14,12 +14,11 @@ public class PolicyPageAutomemberUserGroupRules extends IPAWebPage {
 	{
 		super(browser, url, testPropertyFile);
 		backLink = "User group rules";
-		duplicateErrorMsgStartsWith = "User Group Rule with name";
+		duplicateErrorMsgStartsWith = "auto_member_rule with name";
 		
 		addPage = "Add Automember User";//when using "Add Automember User" in the properties,it will use all the methods that contain pageName=addPage,and the methods are defined in standardTests
 		duplicatePage = "Add Duplicate Automember User";
 		modifySettingsPage = "Modify Automember User";
-		modifyNegativePage = "Modify Automember User Negative";
 		modifyConditionInclusiveAddPage = "Modify Automember Condition User Inclusive Add";
 		modifyConditionInclusiveDeletePage ="Modify Automember Condition User Inclusive Delete";
 		modifyConditionExclusiveAddPage ="Modify Automember Condition User Exclusive Add";
@@ -35,8 +34,11 @@ public class PolicyPageAutomemberUserGroupRules extends IPAWebPage {
 		registerTestCases("add","addAndAddAnother");
 		registerTestCases("add","addThenEdit");
 		registerTestCases("add","addThenCancel");
+		registerTestCases("add","addNegativeDuplicate");
+		registerTestCases("add","addNegativeRequiredFields");
 		registerTestCases("nonStandardAutomember", AutomemberTestCases);
 		registerTestCases("modify","modify");
+		registerTestCases("modify","modifyUpdateResetCancel");
 		registerTestCases("search","searchPositive");
 		registerTestCases("search","searchNegative");
 		registerTestCases("delete","deleteSingle");
