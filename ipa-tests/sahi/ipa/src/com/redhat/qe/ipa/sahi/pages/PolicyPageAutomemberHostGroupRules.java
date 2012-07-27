@@ -14,12 +14,11 @@ public class PolicyPageAutomemberHostGroupRules extends IPAWebPage {
 	{
 		super(browser, url, testPropertyFile);
 		backLink = "Host group rules";
-		duplicateErrorMsgStartsWith = "Host Group Rule with name";
+		duplicateErrorMsgStartsWith = "auto_member_rule with name";
 		
 		addPage = "Add Automember Host";
 		duplicatePage = "Add Duplicate Automember Host";
 		modifySettingsPage = "Modify Automember Host";
-		modifyNegativePage = "Modify Automember Host Negative";
 		modifyConditionInclusiveAddPage = "Modify Automember Condition Host Inclusive Add";
 		modifyConditionInclusiveDeletePage ="Modify Automember Condition Host Inclusive Delete";
 		modifyConditionExclusiveAddPage ="Modify Automember Condition Host Exclusive Add";
@@ -34,8 +33,11 @@ public class PolicyPageAutomemberHostGroupRules extends IPAWebPage {
 		registerTestCases("add","addAndAddAnother");
 		registerTestCases("add","addThenEdit");
 		registerTestCases("add","addThenCancel");
+		registerTestCases("add","addNegativeDuplicate");
+		registerTestCases("add","addNegativeRequiredFields");
 		registerTestCases("nonStandardAutomember", AutomemberTestCases);
 		registerTestCases("modify","modify");
+		registerTestCases("modify","modifyUpdateResetCancel");
 		registerTestCases("search","searchPositive");
 		registerTestCases("search","searchNegative");
 		registerTestCases("delete","deleteSingle");
