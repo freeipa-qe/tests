@@ -25,21 +25,28 @@ public class AutomemberTests extends IPAWebAutomation {
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
 	
+	
+	private String user1 = "mjohn";
+	private String user2 = "mscott";
+	private String [] users = {user1, user2};
+	
 	private String usergroup1 = "dev";
 	private String usergroup2 = "defgroup";
 	private String usergroup3 = "a";
 	private String usergroup4 = "b";
 	private String usergroup5 = "c";
+	private String usergroup6 = "du001";
 	
-	private String [] usergroups = {usergroup1, usergroup2, usergroup3, usergroup4, usergroup5};
+	private String [] usergroups = {usergroup1, usergroup2, usergroup3, usergroup4, usergroup5, usergroup6};
 	
 	private String hostgroup1 = "qaservers";
 	private String hostgroup2 = "defhostgroup";
 	private String hostgroup3 = "dd";
 	private String hostgroup4 = "ee";
 	private String hostgroup5 = "ff";
+	private String hostgroup6 = "dh001";
 	
-	private String [] hostgroups = {hostgroup1, hostgroup2, hostgroup3, hostgroup4, hostgroup5};
+	private String [] hostgroups = {hostgroup1, hostgroup2, hostgroup3, hostgroup4, hostgroup5 ,hostgroup6};
 		
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
 	public void initialize() throws CloneNotSupportedException {	
@@ -54,15 +61,22 @@ public class AutomemberTests extends IPAWebAutomation {
 		
 		currentPage = browser.fetch("top.location.href");
 		alternateCurrentPage = browser.fetch("top.location.href") + "&netgroup-facet=search" ;
-
-		//add groups for user group members 
+        
+		
+		//add users for automember
+		browser.navigateTo(commonTasks.userPage, true);
+		for (String username : users){
+			UserTasks.createUser(browser, username, username, username, "Add");
+		} 
+		
+		//add groups for automember
 		browser.navigateTo(commonTasks.groupPage, true);
 		for (String groupname : usergroups){
 			String groupDescription = groupname + " description";
 			GroupTasks.addGroup(browser, groupname, groupDescription);
 		} 
 		
-		//add hostgroups for host group members
+		//add hostgroups for automember
 		browser.navigateTo(commonTasks.hostgroupPage, true);
 		for (String hostgroup : hostgroups) {
 			String description = hostgroup + " description";
@@ -73,6 +87,11 @@ public class AutomemberTests extends IPAWebAutomation {
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
 	public void cleanup() throws Exception {	
+		//delete user
+		browser.navigateTo(commonTasks.userPage, true);
+		for (String username : users){
+			UserTasks.deleteUser(browser, username);
+		}
 		//delete user groups
 		browser.navigateTo(commonTasks.groupPage, true);
 		GroupTasks.deleteGroup(browser, usergroups);
