@@ -53,6 +53,7 @@ basedn=`getBaseDN`
 selinuxusermap1="testselinuxusermap1"
 selinuxusermap2="testselinuxusermap2"
 selinuxusermap3="testselinuxusermap3"
+selinuxusermap4="testselinuxusermap4"
 
 default_selinuxuser="guest_u:s0"
 default_selinuxusermap_order_config="\"guest_u:s0$xguest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023\""
@@ -61,14 +62,11 @@ host2="qe-blade-08."$DOMAIN
 host3="switch."$DOMAIN
 host4="qe-blade-05."$DOMAIN
 host5="qe-blade-06."$DOMAIN
-user1="dev"
-usergroup1="dev_ugrp"
 hostgroup1="dev_hosts"
 hostgroup2="ipaqe_hosts"
 hostgroup3="csqe_hosts"
 hostgroup4="dsqe_hosts"
 hostgroup5="desktopqe_hosts"
-pservicegroup="remote_access"
 
 ########################################################################
 
@@ -87,12 +85,6 @@ run_selinuxusermap_add_host_tests(){
         rlRun "addHostGroup $hostgroup1 $hostgroup1" 0 "SETUP: Adding host group $hostgroup1 for testing."
         rlRun "addHostGroup $hostgroup2 $hostgroup2" 0 "SETUP: Adding host group $hostgroup2 for testing."
         rlRun "addHostGroup $hostgroup3 $hostgroup3" 0 "SETUP: Adding host group $hostgroup3 for testing."
-        # add user for testing
-        rlRun "ipa user-add --first=$user1 --last=$user1 $user1" 0 "SETUP: Adding user $user1."
-        # add group for testing
-        rlRun "addGroup $usergroup1 $usergroup1" 0 "SETUP: Adding user $usergroup1."
-	# add service group
-	rlRun "addHBACServiceGroup $servicegroup $servicegroup" 0 "SETUP: Adding service group $servicegroup"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-configtest: ipa help selinuxusermap-add-host"
@@ -233,71 +225,82 @@ run_selinuxusermap_add_host_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-016: Add a host with a empty string"
-	rlRun "ipa selinuxusermap-add-host --hosts=\"\" $selinuxusermap3 > $TmpDir/selinuxusermap-host-add-017.out" 0 "Add host with empty string to selinuxusermap"
-	rlAssertGrep "Number of members added 0" "$TmpDir/selinuxusermap-host-add-017.out"
+	rlRun "ipa selinuxusermap-add-host --hosts=\"\" $selinuxusermap3 > $TmpDir/selinuxusermap-host-add-016.out" 0 "Add host with empty string to selinuxusermap"
+	rlAssertGrep "Number of members added 0" "$TmpDir/selinuxusermap-host-add-016.out"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-017: Add a host groups with a empty string"
-        rlRun "ipa selinuxusermap-add-host --hostgroups=\"\" $selinuxusermap3 > $TmpDir/selinuxusermap-host-add-018.out" 0 "Add host group with empty string to selinuxusermap"
-        rlAssertGrep "Number of members added 0" "$TmpDir/selinuxusermap-host-add-018.out"
+        rlRun "ipa selinuxusermap-add-host --hostgroups=\"\" $selinuxusermap3 > $TmpDir/selinuxusermap-host-add-017.out" 0 "Add host group with empty string to selinuxusermap"
+        rlAssertGrep "Number of members added 0" "$TmpDir/selinuxusermap-host-add-017.out"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-018: Add a host with --all option"
         rlLog "Executing:  ipa selinuxusermap-add-host --hosts=$host1 --all $selinuxusermap3 "
-        rlRun "ipa selinuxusermap-add-host --hosts=$host1 --all $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-019.out" 0 "Add a host with --all option"
-        rlAssertGrep "Rule name: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-019.out"
-        rlAssertGrep "objectclass: ipaassociation, ipaselinuxusermap" "$TmpDir/selinuxusermap-host-add-019.out"
-        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-019.out"
+        rlRun "ipa selinuxusermap-add-host --hosts=$host1 --all $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-018.out" 0 "Add a host with --all option"
+        rlAssertGrep "Rule name: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-018.out"
+        rlAssertGrep "objectclass: ipaassociation, ipaselinuxusermap" "$TmpDir/selinuxusermap-host-add-018.out"
+        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-018.out"
         rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap3" 0 "Clean-up: Delete host from selinuxusermap"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-019: Add a host with --raw option without --all"
         rlLog "Executing:  ipa selinuxusermap-add-host --hosts=$host1 --raw $selinuxusermap3 "
-        rlRun "ipa selinuxusermap-add-host --hosts=$host1 --raw $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-020.out" 0 "Add a host with --raw option"
-        rlAssertGrep "cn: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-020.out"
-        rlAssertGrep "memberhost: fqdn=$host1,cn=computers,cn=accounts,$basedn" "$TmpDir/selinuxusermap-host-add-020.out"
-        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-020.out"
+        rlRun "ipa selinuxusermap-add-host --hosts=$host1 --raw $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-019.out" 0 "Add a host with --raw option"
+        rlAssertGrep "cn: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-019.out"
+        rlAssertGrep "memberhost: fqdn=$host1,cn=computers,cn=accounts,$basedn" "$TmpDir/selinuxusermap-host-add-019.out"
+        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-019.out"
         rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap3" 0 "Clean-up: Delete host from selinuxusermap"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-020: Add a host with --all --raw option"
         rlLog "Executing:  ipa selinuxusermap-add-host --hosts=$host1 --all --raw $selinuxusermap3 "
-        rlRun "ipa selinuxusermap-add-host --hosts=$host1 --all --raw $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-021.out" 0 "Add a host with --all --raw option"
-        rlAssertGrep "cn: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-021.out"
-        rlAssertGrep "memberhost: fqdn=$host1,cn=computers,cn=accounts,$basedn" "$TmpDir/selinuxusermap-host-add-021.out"
-        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/selinuxusermap-host-add-021.out"
-        rlAssertGrep "objectclass: ipaselinuxusermap" "$TmpDir/selinuxusermap-host-add-021.out"
-        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-021.out"
+        rlRun "ipa selinuxusermap-add-host --hosts=$host1 --all --raw $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-020.out" 0 "Add a host with --all --raw option"
+        rlAssertGrep "cn: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-020.out"
+        rlAssertGrep "memberhost: fqdn=$host1,cn=computers,cn=accounts,$basedn" "$TmpDir/selinuxusermap-host-add-020.out"
+        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/selinuxusermap-host-add-020.out"
+        rlAssertGrep "objectclass: ipaselinuxusermap" "$TmpDir/selinuxusermap-host-add-020.out"
+        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-020.out"
         rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap3" 0 "Clean-up: Delete host from selinuxusermap"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-021: Add a host group with --all --raw option"
         rlLog "Executing:  ipa selinuxusermap-add-host --hostgroups=$hostgroup1 --all --raw $selinuxusermap3 "
-        rlRun "ipa selinuxusermap-add-host --hostgroups=$hostgroup1 --all --raw $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-022.out" 0 "Add a host group with --all --raw option"
-	rlRun "cat $TmpDir/selinuxusermap-host-add-022.out"
-        rlAssertGrep "cn: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-022.out"
-        rlAssertGrep "memberhost: cn=$hostgroup1,cn=hostgroups,cn=accounts,$basedn" "$TmpDir/selinuxusermap-host-add-022.out"
-        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/selinuxusermap-host-add-022.out"
-        rlAssertGrep "objectclass: ipaselinuxusermap" "$TmpDir/selinuxusermap-host-add-022.out"
-        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-022.out"
+        rlRun "ipa selinuxusermap-add-host --hostgroups=$hostgroup1 --all --raw $selinuxusermap3  > $TmpDir/selinuxusermap-host-add-021.out" 0 "Add a host group with --all --raw option"
+	rlRun "cat $TmpDir/selinuxusermap-host-add-021.out"
+        rlAssertGrep "cn: $selinuxusermap3" "$TmpDir/selinuxusermap-host-add-021.out"
+        rlAssertGrep "memberhost: cn=$hostgroup1,cn=hostgroups,cn=accounts,$basedn" "$TmpDir/selinuxusermap-host-add-021.out"
+        rlAssertGrep "objectclass: ipaassociation" "$TmpDir/selinuxusermap-host-add-021.out"
+        rlAssertGrep "objectclass: ipaselinuxusermap" "$TmpDir/selinuxusermap-host-add-021.out"
+        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-021.out"
         rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1 $selinuxusermap3" 0 "Clean-up: Delete host group from selinuxusermap"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-022: Add a host when selinuxusermap already has a hbacrule defined"
+	rlRun "ipa hbacrule-add rule1"
+	rlRun "ipa hbacrule-add-host rule1 --hosts=$host1"
+	rlRun "ipa hbacrule-add-sourcehost rule1 --hosts=$host1"
+        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=rule1 $selinuxusermap4"
+        rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=rule1 $selinuxusermap4" 0 "Add a selinuxusermap with hbacrule"
+        rlRun "findSelinuxusermap $selinuxusermap4" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
+        rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap4" 0 "Verifying selinuxusermap was added with given selinuxuser"
+        rlRun "findSelinuxusermapByOption hbacrule rule1 $selinuxusermap4" 0 "Verifying selinuxusermap was added with given HbacRule"
+	command="ipa selinuxusermap-add-host --hosts=$host1 $selinuxusermap4"
+        expmsg="ipa: ERROR: HBAC rule and local members cannot both be set"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify add host to a unknown selinuxusermap fails"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-selinuxusermap-host-add-cli-cleanup: Destroying admin credentials."
 	# delete selinux user 
-	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 ; do
+	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4; do
 		rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
 	done
-	rlRun "deleteGroup $usergroup1" 0 "Deleting User Group associated with rule."
 	for item in $host1 $host2 $host3; do
 		rlRun "deleteHost $item" 0 "Deleting Host associated with rule."
 	done
 	for item in $hostgroup1 $hostgroup2 $hostgroup3; do
 		rlRun "deleteHostGroup $item" 0 "Deleting Host Group associated with rule."
 	done
-	rlRun "ipa user-del $user1" 0 "Delete user $user1."
-	# delete service group
-	rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
+	rlRun "deleteHBACRule rule1" 0 "Deleting hbac rule1"
 	rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing temp directory"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
