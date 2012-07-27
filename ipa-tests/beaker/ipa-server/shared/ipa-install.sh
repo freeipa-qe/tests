@@ -1,22 +1,23 @@
 #!/bin/bash
-### WORK IN PROGRESS...NOT READY FOR USE YET
+### WORK IN PROGRESS...NOT READY FOR USE YET...
+### almost ready for basic testing...07/17/2012
 
 #  
 # ROLE=MASTER, SLAVE, CLIENT, CLIENT2
 # ROLE=MASTER_env2, REPLICA_env2, CLIENT_env2
 # 
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="MASTER">
-#   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
-#   <params> <param name="TOPO" value="star"/> <param name="DOM" value="chicago.testrelm.com"/> </params>
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="MASTER">
+#   <params> <param name="TOPO1" value="star"/> </params>
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
+#   <params> <param name="TOPO1" value="star"/> </params>
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
+#   <params> <param name="TOPO1" value="star"/> </params>
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
+#   <params> <param name="TOPO1" value="star"/> </params>
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
+#   <params> <param name="TOPO1" value="star"/> </params>
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
+#   <params> <param name="TOPO1" value="star"/> </params>
 #
 
 ipa_install_envcleanup() {
@@ -136,7 +137,6 @@ ipa_install_set_vars() {
 ######################################################################
 ipa_install_topo_default()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
 	if [ -z "$MYENV" ]; then
 		export MYENV=1
 	fi
@@ -148,6 +148,7 @@ ipa_install_topo_default()
 		MYBCS=$(eval echo \$BEAKERCLIENT_env${MYENV})
 	rlPhaseEnd	
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_default_master - install Master in Default Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
@@ -158,12 +159,25 @@ ipa_install_topo_default()
 	rlPhaseEnd
 	
 	for MYBR1 in $MYBRS; do
+		TESTORDER=$(( TESTORDER += 1 ))
 		rlPhaseStartTest "ipa_install_topo_default_replica - install Replica1 in Default Topology - $MYBR1"
 			if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 				ipa_install_replica $MYBM1
 				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
 			else
 				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"
+			fi
+		rlPhaseEnd
+	done
+
+	for MYBC1 in $MYBCS; do
+		TESTORDER=$(( TESTORDER += 1 ))
+		rlPhsaeStartTest "ipa_install_topo_default_client - install Client1 in Default Topology - $MYBC1"
+			if [ "$(hostname -s)" = "$(echo $MYBC1|cut -f1 -d.)" ]; then
+				ipa_install_client $MYBM1
+				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBC1.1' -m $MYBC1"
+			else
+				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBC1.1' $MYBC1"
 			fi
 		rlPhaseEnd
 	done
@@ -180,7 +194,6 @@ ipa_install_topo_default()
 ######################################################################
 ipa_install_topo_star()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
 	if [ -z "$MYENV" ]; then
 		export MYENV=1
 	fi
@@ -203,6 +216,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd	
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_master - install Master in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
@@ -212,6 +226,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica1 - install Replica1 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -221,6 +236,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica2 - install Replica2 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -230,6 +246,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica3 - install Replica3 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -239,6 +256,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica4 - install Replica4 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -248,6 +266,7 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica5 - install Replica5 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -269,7 +288,6 @@ ipa_install_topo_star()
 ######################################################################
 ipa_install_topo_tree1()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
 	if [ -z "$MYENV" ]; then
 		export MYENV=1
 	fi
@@ -292,6 +310,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd	
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_master - install Master in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
@@ -301,6 +320,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica1 - install Replica1 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -310,6 +330,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica2 - install Replica2 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
@@ -319,6 +340,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica3 - install Replica3 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR1
@@ -328,6 +350,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica4 - install Replica4 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR2
@@ -337,6 +360,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 	
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica5 - install Replica5 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR2
@@ -346,6 +370,7 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd
 
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_connect_rep4_and_rep5 - Create replication agreement between Replica4 and Replica5"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_connect_replica $MYBR4 $MYBR5
@@ -403,8 +428,8 @@ ipa_install_prep()
 
 	tmpout=/tmp/error_msg.out
 	currenteth=$(route | grep ^default | awk '{print $8}')
-	ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
-	ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | head -1)
+	ipaddr=$(ip -o -4 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
+	ipv6addr=$(ip -o -6 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
 	hostname=$(hostname)
 	hostname_s=$(hostname -s)
 	if [ "$IPv6SETUP" = "TRUE" ]; then 
@@ -490,20 +515,15 @@ ipa_install_prep()
 		for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
 			for server in $(eval echo \$$var); do
 				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
-				AddToKnownHosts $server
+				#AddToKnownHosts $server
+				ssh-keygen -R $server
+				ssh-keyscan $server >> /root/.ssh/known_hosts
 			done
 		done
 	fi
 }
 
 ipa_install_master()
-{
-	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
-		rlLog "$FUNCNAME"
-	rlPhaseEnd
-}
-
-ipa_install_master_new()
 {
 	tmpout=/tmp/error_msg.out
 	rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
@@ -515,7 +535,7 @@ ipa_install_master_new()
 			rlAssertRpm $PKG
 		done
 		
-		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+		rlRun "ipa-server-install $IPAOPTIONS --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
 		if [ $IPADEBUG ]; then
 			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
@@ -547,14 +567,8 @@ ipa_install_master_new()
 
 ipa_install_replica()
 {
-	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
-		rlLog "$FUNCNAME $MYMASTER"
-	rlPhaseEnd
-}
-
-ipa_install_replica_new()
-{
 	local MYMASTER=$1
+	local MYREVNET=$(hostname -i|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 	rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
 		rlLog "$FUNCNAME $MYMASTER"
 
@@ -564,26 +578,19 @@ ipa_install_replica_new()
 			rlAssertRpm $PKG
 		done
 	
-		rlLog "RUN ipa-replica-prepare on MASTER"
-		ssh root@$MYMASTER "echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN"
+		rlLog "RUN ipa-replica-prepare on $MYMASTER"
+		rlRun "ssh root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\" ; service named restart"
 
 		rlLog "RUN sftp to get gpg file"
-		sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/
+		rlRun "sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/"
 
 		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
-		ipa-replica-install -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		rlRun "ipa-replica-install $IPAOPTIONS -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 	rlPhaseEnd
 }
 
 ipa_install_client()
-{
-	rlPhaseStartTest "ipa_install_client - Install IPA Client"
-		rlLog "$FUNCNAME $MYMASTER"
-	rlPhaseEnd
-}
-
-ipa_install_client_new()
 {
 	local MYMASTER=$1
 	rlPhaseStartTest "ipa_install_client - Install IPA Client"
@@ -595,20 +602,21 @@ ipa_install_client_new()
 			rlAssertRpm $PKG
 		done
 
-		rlRun "RUN ipa dns-add for client?"
-		rlRun "RUN ipa-client-install"
+		rlLog "RUN ipa dns-add for client?"
+		rlLog "RUN ipa-client-install"
+		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
 	rlPhaseEnd
 }
 
 ipa_connect_replica()
 {
-	local REP1=$1
-	local REP2=$2
+	local REP1=$(echo $1|cut -f1 -d.).$DOMAIN
+	local REP2=$(echo $2|cut -f1 -d.).$DOMAIN
 	
 	rlPhaseStartTest "ipa_connect_replica - Create Replication Agreement between two servers"
 		rlLog "$FUNCNAME $REP1 $REP2"
 	
 		rlLog "RUN ipa-replica-manage connect $REP1 $REP2"
+		rlRun "ipa-replica-manage -p $ADMINPW connect $REP1 $REP2"
 	rlPhaseEnd
-	
 }	
