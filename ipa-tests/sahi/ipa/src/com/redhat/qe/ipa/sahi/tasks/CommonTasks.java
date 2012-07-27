@@ -119,6 +119,45 @@ public class CommonTasks {
     // form based auth
 	//kdestroy
 	//recorded actions 
+	public static void formauthNewUser(SahiTasks sahiTasks, String userName, String password){
+		try{
+			sahiTasks.open();
+			String osname=System.getProperty("os.name");
+			if (!System.getProperty("os.name").startsWith("Windows"))
+  			    Runtime.getRuntime().exec("kdestroy");
+			sahiTasks.navigateTo(serverUrl, true);
+			
+			if(!sahiTasks.link("form-based authentication").exists()){
+				
+				if(sahiTasks.link("Logout").exists()){
+					
+					sahiTasks.link("Logout").click();
+					if (!System.getProperty("os.name").startsWith("Windows"))
+					   Runtime.getRuntime().exec("kdestroy");
+					if(sahiTasks.link("Return to main page.").exists()){
+						sahiTasks.link("Return to main page.").click();
+					}
+				}
+			}
+			if(sahiTasks.link("form-based authentication").exists()){
+				sahiTasks.link("form-based authentication").click();
+			}
+			sahiTasks.textbox("username").setValue(userName);
+			sahiTasks.password("password").setValue(password);
+			
+			sahiTasks.button("Login").click();
+			if(sahiTasks.password("new_password").exists()){
+				sahiTasks.password("new_password").setValue(password);
+				sahiTasks.password("verify_password").setValue(password);
+				sahiTasks.button("Reset Password and Login").click();
+			}
+			Assert.assertTrue(CommonTasks.kinitAsUser(userName, password), "Logged in successfully as " + userName);			
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void formauth(SahiTasks sahiTasks, String userName, String password){
 		try{
 			sahiTasks.open();
@@ -152,6 +191,7 @@ public class CommonTasks {
 			e.printStackTrace();
 		}
 	}
+	
     public static boolean kinitAsUser(String user, String password) {
     	if (System.getProperty("os.name").startsWith("Windows")) {
     		log.finer("Attempting to kinit on Windows");
