@@ -461,7 +461,9 @@ ipa_install_prep()
 	rlRun "sed -i s/$hostname_s//g  /etc/hosts"
 	rlRun "sed -i /$ipaddr/d    /etc/hosts"
 	if [ -n "$ipv6addr" ]; then 
-		rlRun "sed -i '/$ipv6addr/d'  /etc/hosts"
+		for i6 in $(echo $ipv6addr); do
+			rlRun "sed -i '/$i6/d'  /etc/hosts"
+		done
 	fi
 	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
 	
