@@ -97,7 +97,7 @@ dnsacceptance()
    dnscertrecord
    dnslocrecord
    dnskxrecord
-   dnszonepermission
+# 6.4 test   dnszonepermission
    dnscleanup
 }
 #########################################
