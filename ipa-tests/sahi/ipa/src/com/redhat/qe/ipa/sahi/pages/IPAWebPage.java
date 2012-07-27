@@ -53,7 +53,7 @@ public class IPAWebPage implements StandardTest{
 	protected String modifyConditionExclusiveAddPage;//xdong
 	protected String modifyConditionExclusiveDeletePage;//xdong
 	protected String setDefaultGroupPage;//xdong
-	protected String addOnePage;//xdong
+	
 	
 	protected TestDataFactory factory;
 	private static Logger log = Logger.getLogger(IPAWebPage.class.getName());
@@ -1328,7 +1328,7 @@ public class IPAWebPage implements StandardTest{
 //xdong
 	
 	@Override 
-	public IPAWebTestMonitor modifyConditionInclusiveAdd(IPAWebTestMonitor monitor) {
+	public IPAWebTestMonitor modifyConditionInclusiveAddSingle(IPAWebTestMonitor monitor) {
 		String pageName = modifyConditionInclusiveAddPage ;
 		testAccounts.clear();
 		if (pageName == null){
@@ -1340,7 +1340,7 @@ public class IPAWebPage implements StandardTest{
 		if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
 		{
 			browser.link(testAccount).click();
-			return executeModifyConditionInclusiveAdd(monitor, pageName);
+			return executeModifyConditionInclusiveAddSingle(monitor, pageName);
 		}else{
 			monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
 			return monitor;
@@ -1348,10 +1348,10 @@ public class IPAWebPage implements StandardTest{
 	}
 	
 	
-protected IPAWebTestMonitor executeModifyConditionInclusiveAdd(IPAWebTestMonitor monitor, String pageName) { 
+protected IPAWebTestMonitor executeModifyConditionInclusiveAddSingle(IPAWebTestMonitor monitor, String pageName) { 
 		
 		try {
-			inclusiveAdd(monitor, pageName);
+			inclusiveAddSingle(monitor, pageName);
 			if(browser.div(testAccounts.get(0)).exists()){
 				monitor.pass("Added and Verified Successfully");
 			}
@@ -1368,7 +1368,7 @@ protected IPAWebTestMonitor executeModifyConditionInclusiveAdd(IPAWebTestMonitor
 	}
 
 
-protected void inclusiveAdd(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+protected void inclusiveAddSingle(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
 	{  
 	
 		browser.span("Add").near(browser.heading2("Inclusive")).click();
@@ -1376,9 +1376,115 @@ protected void inclusiveAdd(IPAWebTestMonitor monitor, String pageName) throws I
 		browser.button("Add").click();
 	}	
 
+@Override 
+public IPAWebTestMonitor modifyConditionInclusiveAddAndAddAnother(IPAWebTestMonitor monitor) {
+	String pageName = modifyConditionInclusiveAddPage ;
+	
+	testAccounts.clear();
+	if (pageName == null){
+		monitor.fail("modify test page not defined:");
+		return monitor;
+	}
+
+	String testAccount = factory.getModifyTestAccount(pageName);
+	if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
+	{
+		browser.link(testAccount).click();
+		return executeModifyConditionInclusiveAddAndAddAnother(monitor, pageName);
+	}else{
+		monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+		return monitor;
+	}  
+}
+
+
+protected IPAWebTestMonitor executeModifyConditionInclusiveAddAndAddAnother(IPAWebTestMonitor monitor, String pageName) { 
+	
+	int numOfEntries = 2;
+	try {
+		inclusiveAddAndAddAnother(monitor, pageName, numOfEntries);
+		for(int i=0;i<numOfEntries;i++){
+			if(browser.div(testAccounts.get(i)).exists()){
+				monitor.pass("Added and Verified Successfully");
+			}
+			else{
+				monitor.fail("Add Failed");
+			}
+		}	
+
+	} catch (IPAWebAutomationException e) { 
+		e.printStackTrace();
+		monitor.fail(e);
+	} catch (Exception e){
+		e.printStackTrace();
+		monitor.fail(e);
+	}
+	return monitor;
+}
+
+
+protected void inclusiveAddAndAddAnother(IPAWebTestMonitor monitor, String pageName, int numOfEntries) throws IPAWebAutomationException
+{  
+	browser.span("Add").near(browser.heading2("Inclusive")).click();
+	for (int i=0; i< numOfEntries ; i++)
+	{ 
+		fillDataIntoPage(monitor,pageName);
+		browser.button("Add and Add Another").click();
+	}
+	browser.button("Cancel").click();
+}	
+
 
 @Override 
-public IPAWebTestMonitor modifyConditionInclusiveDelete(IPAWebTestMonitor monitor) {
+public IPAWebTestMonitor modifyConditionInclusiveAddThenCancel(IPAWebTestMonitor monitor) {
+	String pageName = modifyConditionInclusiveAddPage ;
+	testAccounts.clear();
+	if (pageName == null){
+		monitor.fail("modify test page not defined:");
+		return monitor;
+	}
+
+	String testAccount = factory.getModifyTestAccount(pageName);
+	if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
+	{
+		browser.link(testAccount).click();
+		return executeModifyConditionInclusiveAddThenCancel(monitor, pageName);
+	}else{
+		monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+		return monitor;
+	}  
+}
+
+
+protected IPAWebTestMonitor executeModifyConditionInclusiveAddThenCancel(IPAWebTestMonitor monitor, String pageName) { 
+	
+	
+	try {
+		inclusiveAddThenCancel(monitor, pageName);
+		if(browser.div(testAccounts.get(0)).exists()){
+			monitor.fail("Add Failed");
+		}
+		else{
+			monitor.pass("Added and Verified Successfully");
+		}
+	} catch (IPAWebAutomationException e) {
+		e.printStackTrace();
+		monitor.fail(e);
+	}
+	return monitor;
+}
+
+
+protected void inclusiveAddThenCancel(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+{  
+	browser.span("Add").near(browser.heading2("Inclusive")).click();
+	fillDataIntoPage(monitor,pageName);
+	browser.button("Cancel").click();
+}	
+
+
+@Override 
+public IPAWebTestMonitor modifyConditionInclusiveDeleteSingle(IPAWebTestMonitor monitor) {
 	String pageName = modifyConditionInclusiveDeletePage ;
 	testAccounts.clear();
 	if (pageName == null){
@@ -1390,7 +1496,7 @@ public IPAWebTestMonitor modifyConditionInclusiveDelete(IPAWebTestMonitor monito
 	if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
 	{
 		browser.link(testAccount).click();
-		return executeModifyConditionInclusiveDelete(monitor, pageName);
+		return executeModifyConditionInclusiveDeleteSingle(monitor, pageName);
 	}else{
 		monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
 		return monitor;
@@ -1398,10 +1504,10 @@ public IPAWebTestMonitor modifyConditionInclusiveDelete(IPAWebTestMonitor monito
 }
 
 
-protected IPAWebTestMonitor executeModifyConditionInclusiveDelete(IPAWebTestMonitor monitor, String pageName) { 
+protected IPAWebTestMonitor executeModifyConditionInclusiveDeleteSingle(IPAWebTestMonitor monitor, String pageName) { 
 	
 	try {
-		inclusiveDelete(monitor, pageName);
+		inclusiveDeleteSingle(monitor, pageName);
 		if(browser.div(testAccounts.get(0)).exists()){
 			monitor.fail("Delete Failed");
 		}
@@ -1418,7 +1524,7 @@ protected IPAWebTestMonitor executeModifyConditionInclusiveDelete(IPAWebTestMoni
 }
 
 
-protected void inclusiveDelete(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+protected void inclusiveDeleteSingle(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
 {  
 	fillDataIntoPage(monitor,pageName);
 	browser.span("Delete").near(browser.heading2("Inclusive")).click(); 
@@ -1426,8 +1532,67 @@ protected void inclusiveDelete(IPAWebTestMonitor monitor, String pageName) throw
 	
 }	
 
+
 @Override 
-public IPAWebTestMonitor modifyConditionExclusiveAdd(IPAWebTestMonitor monitor) {
+public IPAWebTestMonitor modifyConditionInclusiveDeleteMultiple(IPAWebTestMonitor monitor) {
+	String pageName = modifyConditionInclusiveDeletePage ;
+	testAccounts.clear();
+	if (pageName == null){
+		monitor.fail("modify test page not defined:");
+		return monitor;
+	}
+
+	String testAccount = factory.getModifyTestAccount(pageName);
+	if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
+	{
+		browser.link(testAccount).click();
+		return executeModifyConditionInclusiveDeleteMultiple(monitor, pageName);
+	}else{
+		monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+		return monitor;
+	}  
+}
+
+
+protected IPAWebTestMonitor executeModifyConditionInclusiveDeleteMultiple(IPAWebTestMonitor monitor, String pageName) { 
+	
+	int numOfEntries = 3;
+	try {
+		inclusiveDeleteMultiple(monitor, pageName, numOfEntries);
+		for(int i=0;i<numOfEntries;i++){
+			if(browser.div(testAccounts.get(i)).exists()){
+				monitor.fail("Delete Failed");
+			}
+			else{
+				monitor.pass("Delete Passed");
+			}
+		}
+
+	} catch (IPAWebAutomationException e) { 
+		e.printStackTrace();
+		monitor.fail(e);
+	} catch (Exception e){
+		monitor.fail(e);
+	}
+	return monitor;
+}
+
+
+protected void inclusiveDeleteMultiple(IPAWebTestMonitor monitor, String pageName, int numOfEntries) throws IPAWebAutomationException
+{  
+	for (int i=0;i< numOfEntries;i++)
+		fillDataIntoPage(monitor,pageName);
+	browser.span("Delete").near(browser.heading2("Inclusive")).click(); 
+	browser.button("Delete").click();
+	
+}	
+
+
+
+
+
+@Override 
+public IPAWebTestMonitor modifyConditionExclusiveAddSingle(IPAWebTestMonitor monitor) {
 	String pageName = modifyConditionExclusiveAddPage ;
 	testAccounts.clear();
 	if (pageName == null){
@@ -1439,7 +1604,7 @@ public IPAWebTestMonitor modifyConditionExclusiveAdd(IPAWebTestMonitor monitor) 
 	if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
 	{
 		browser.link(testAccount).click();
-		return executeModifyConditionExclusiveAdd(monitor, pageName);
+		return executeModifyConditionExclusiveAddSingle(monitor, pageName);
 	}else{
 		monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
 		return monitor;
@@ -1447,10 +1612,10 @@ public IPAWebTestMonitor modifyConditionExclusiveAdd(IPAWebTestMonitor monitor) 
 }
 
 
-protected IPAWebTestMonitor executeModifyConditionExclusiveAdd(IPAWebTestMonitor monitor, String pageName) { 
+protected IPAWebTestMonitor executeModifyConditionExclusiveAddSingle(IPAWebTestMonitor monitor, String pageName) { 
 	
 	try {
-		exclusiveAdd(monitor, pageName);
+		exclusiveAddSingle(monitor, pageName);
 		if(browser.div(testAccounts.get(0)).exists()){
 			monitor.pass("Added and Verified Successfully");
 		}
@@ -1467,7 +1632,7 @@ protected IPAWebTestMonitor executeModifyConditionExclusiveAdd(IPAWebTestMonitor
 }
 
 
-protected void exclusiveAdd(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+protected void exclusiveAddSingle(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
 {  
 
 	browser.span("Add").near(browser.heading2("Exclusive")).click();
@@ -1476,54 +1641,216 @@ protected void exclusiveAdd(IPAWebTestMonitor monitor, String pageName) throws I
 }	
 
 @Override 
-public IPAWebTestMonitor modifyConditionExclusiveDelete(IPAWebTestMonitor monitor) {
-	String pageName = modifyConditionExclusiveDeletePage ;
-	testAccounts.clear();
-	if (pageName == null){
-		monitor.fail("modify test page not defined:");
-		return monitor;
-	}
+public IPAWebTestMonitor modifyConditionExclusiveAddAndAddAnother(IPAWebTestMonitor monitor) {
+String pageName = modifyConditionExclusiveAddPage ;
 
-	String testAccount = factory.getModifyTestAccount(pageName);
-	if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
-	{
-		browser.link(testAccount).click();
-		return executeModifyConditionExclusiveDelete(monitor, pageName);
-	}else{
-		monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
-		return monitor;
-	}  
+testAccounts.clear();
+if (pageName == null){
+	monitor.fail("modify test page not defined:");
+	return monitor;
+}
+
+String testAccount = factory.getModifyTestAccount(pageName);
+if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
+{
+	browser.link(testAccount).click();
+	return executeModifyConditionExclusiveAddAndAddAnother(monitor, pageName);
+}else{
+	monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+	return monitor;
+}  
 }
 
 
-protected IPAWebTestMonitor executeModifyConditionExclusiveDelete(IPAWebTestMonitor monitor, String pageName) { 
+protected IPAWebTestMonitor executeModifyConditionExclusiveAddAndAddAnother(IPAWebTestMonitor monitor, String pageName) { 
+
+int numOfEntries = 2;
+try {
+	exclusiveAddAndAddAnother(monitor, pageName, numOfEntries);
+	for(int i=0;i<numOfEntries;i++){
+		if(browser.div(testAccounts.get(i)).exists()){
+			monitor.pass("Added and Verified Successfully");
+		}
+		else{
+			monitor.fail("Add Failed");
+		}
+	}	
+
+} catch (IPAWebAutomationException e) { 
+	e.printStackTrace();
+	monitor.fail(e);
+} catch (Exception e){
+	e.printStackTrace();
+	monitor.fail(e);
+}
+return monitor;
+}
+
+
+protected void exclusiveAddAndAddAnother(IPAWebTestMonitor monitor, String pageName, int numOfEntries) throws IPAWebAutomationException
+{  
+browser.span("Add").near(browser.heading2("Exclusive")).click();
+for (int i=0; i< numOfEntries ; i++)
+{ 
+	fillDataIntoPage(monitor,pageName);
+	browser.button("Add and Add Another").click();
+}
+browser.button("Cancel").click();
+}	
+
+
+@Override 
+public IPAWebTestMonitor modifyConditionExclusiveAddThenCancel(IPAWebTestMonitor monitor) {
+String pageName = modifyConditionExclusiveAddPage ;
+testAccounts.clear();
+if (pageName == null){
+	monitor.fail("modify test page not defined:");
+	return monitor;
+}
+
+String testAccount = factory.getModifyTestAccount(pageName);
+if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
+{
+	browser.link(testAccount).click();
+	return executeModifyConditionExclusiveAddThenCancel(monitor, pageName);
+}else{
+	monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+	return monitor;
+}  
+}
+
+
+protected IPAWebTestMonitor executeModifyConditionExclusiveAddThenCancel(IPAWebTestMonitor monitor, String pageName) { 
+
+
+try {
+	exclusiveAddThenCancel(monitor, pageName);
+	if(browser.div(testAccounts.get(0)).exists()){
+		monitor.fail("Add Failed");
+	}
+	else{
+		monitor.pass("Added and Verified Successfully");
+	}
+} catch (IPAWebAutomationException e) {
+	e.printStackTrace();
+	monitor.fail(e);
+}
+return monitor;
+}
+
+
+protected void exclusiveAddThenCancel(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+{  
+browser.span("Add").near(browser.heading2("Exclusive")).click();
+fillDataIntoPage(monitor,pageName);
+browser.button("Cancel").click();
+}	
+
+
+@Override 
+public IPAWebTestMonitor modifyConditionExclusiveDeleteSingle(IPAWebTestMonitor monitor) {
+String pageName = modifyConditionExclusiveDeletePage ;
+testAccounts.clear();
+if (pageName == null){
+	monitor.fail("modify test page not defined:");
+	return monitor;
+}
+
+String testAccount = factory.getModifyTestAccount(pageName);
+if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
+{
+	browser.link(testAccount).click();
+	return executeModifyConditionExclusiveDeleteSingle(monitor, pageName);
+}else{
+	monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+	return monitor;
+}  
+}
+
+
+protected IPAWebTestMonitor executeModifyConditionExclusiveDeleteSingle(IPAWebTestMonitor monitor, String pageName) { 
+
+try {
+	exclusiveDeleteSingle(monitor, pageName);
+	if(browser.div(testAccounts.get(0)).exists()){
+		monitor.fail("Delete Failed");
+	}
 	
-	try {
-		exclusiveDelete(monitor, pageName);
-		if(browser.div(testAccounts.get(0)).exists()){
+	else{
+		monitor.pass("Deleted and Verified Successfully");
+	}
+	
+} catch (IPAWebAutomationException e) { 
+	e.printStackTrace();
+	monitor.fail(e);
+}
+return monitor;	
+
+}
+
+
+protected void exclusiveDeleteSingle(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+{  
+fillDataIntoPage(monitor,pageName);
+browser.span("Delete").near(browser.heading2("Exclusive")).click(); 
+browser.button("Delete").click();
+
+}	
+
+
+@Override 
+public IPAWebTestMonitor modifyConditionExclusiveDeleteMultiple(IPAWebTestMonitor monitor) {
+String pageName = modifyConditionExclusiveDeletePage ;
+testAccounts.clear();
+if (pageName == null){
+	monitor.fail("modify test page not defined:");
+	return monitor;
+}
+
+String testAccount = factory.getModifyTestAccount(pageName);
+if (testAccount != null && browser.link(testAccount).exists())//testAccount example: user001
+{
+	browser.link(testAccount).click();
+	return executeModifyConditionExclusiveDeleteMultiple(monitor, pageName);
+}else{
+	monitor.fail("test account for page ["+ pageName + "] not defined or link does not exist");
+	return monitor;
+}  
+}
+
+
+protected IPAWebTestMonitor executeModifyConditionExclusiveDeleteMultiple(IPAWebTestMonitor monitor, String pageName) { 
+
+int numOfEntries = 3;
+try {
+	exclusiveDeleteMultiple(monitor, pageName, numOfEntries);
+	for(int i=0;i<numOfEntries;i++){
+		if(browser.div(testAccounts.get(i)).exists()){
 			monitor.fail("Delete Failed");
 		}
 		else{
-			monitor.pass("Deleted and Verified Successfully");
+			monitor.pass("Delete Passed");
 		}
-		
-	} catch (IPAWebAutomationException e) { 
-		e.printStackTrace();
-		monitor.fail(e);
 	}
-	return monitor;	
 
+} catch (IPAWebAutomationException e) { 
+	e.printStackTrace();
+	monitor.fail(e);
+} catch (Exception e){
+	monitor.fail(e);
+}
+return monitor;
 }
 
 
-protected void exclusiveDelete(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
+protected void exclusiveDeleteMultiple(IPAWebTestMonitor monitor, String pageName, int numOfEntries) throws IPAWebAutomationException
 {  
+for (int i=0;i< numOfEntries;i++)
 	fillDataIntoPage(monitor,pageName);
-	browser.span("Delete").near(browser.heading2("Exclusive")).click(); 
-	browser.button("Delete").click();
-	
-}	
+browser.span("Delete").near(browser.heading2("Exclusive")).click(); 
+browser.button("Delete").click();
 
+}	
 
 @Override 
 public IPAWebTestMonitor setDefaultGroup(IPAWebTestMonitor monitor) {
@@ -1533,14 +1860,14 @@ public IPAWebTestMonitor setDefaultGroup(IPAWebTestMonitor monitor) {
 		return monitor;
 	try {
 		setDefault(monitor, pageName);
-		if(browser.textbox(testAccounts.get(0)).exists()){
-			monitor.pass("Set and Verified Successfully");
-			
+		if((browser.textbox("automemberdefaultgroup").value()).equals(testAccounts.get(0))){
+			monitor.pass("Setdefault Passed");
 		}
 		else{
 			monitor.fail("Set Failed");
 		}
 		
+			
 	} catch (IPAWebAutomationException e) { 
 		e.printStackTrace();
 		monitor.fail(e);
@@ -1557,39 +1884,4 @@ protected void setDefault(IPAWebTestMonitor monitor, String pageName) throws IPA
 	
 }	
 
-@Override 
-public IPAWebTestMonitor addOne(IPAWebTestMonitor monitor) {//xdong use for adding one automember group/hostgroup
-	String pageName = addOnePage ;
-	testAccounts.clear();
-	if (pageName == null)
-		return monitor;
-	try {
-		executeAddOne(monitor, pageName);
-		if(browser.link(testAccounts.get(0)).exists()){
-			monitor.pass("Added and Verified Successfully");
-			
-		}
-		else{
-			monitor.fail("Add Failed");
-		}
-	} catch (IPAWebAutomationException e) { 
-		e.printStackTrace();
-		monitor.fail(e);
-	}
-	return monitor;
 }
-
-
-
-protected void executeAddOne(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
-{  
-	browser.span("Add").click();
-	fillDataIntoPage(monitor,pageName);
-	browser.button("Add").click();
-	
-}	
-
-}
-
-
-
