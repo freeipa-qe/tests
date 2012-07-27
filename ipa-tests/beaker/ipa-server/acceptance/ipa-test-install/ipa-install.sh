@@ -582,6 +582,8 @@ ipa_install_replica()
 	
 		rlLog "RUN ipa-replica-prepare on $MYMASTER"
 		rlRun "ssh root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\" ; service named restart"
+		# named can take a little time to update sometimes?
+		rlRun "sleep 60"
 
 		rlLog "RUN sftp to get gpg file"
 		rlRun "sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/"
