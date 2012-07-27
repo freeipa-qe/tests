@@ -8,7 +8,7 @@ public interface StandardTest {
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
 	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard"};
-	public static final String[] AutomemberTestCases = {"modifyConditionInclusiveAdd","modifyConditionInclusiveDelete","modifyConditionExclusiveAdd","modifyConditionExclusiveDelete","modifyUpdateResetCancel","setDefaultGroup"};//xdong
+	public static final String[] AutomemberTestCases = {"modifyConditionInclusiveAddSingle","modifyConditionInclusiveAddAndAddAnother","modifyConditionInclusiveAddThenCancel","modifyConditionInclusiveDeleteSingle","modifyConditionInclusiveDeleteMultiple","modifyConditionExclusiveAddSingle","modifyConditionExclusiveAddAndAddAnother","modifyConditionExclusiveAddThenCancel","modifyConditionExclusiveDeleteSingle","modifyConditionExclusiveDeleteMultiple","setDefaultGroup"};//xdong
 	
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addSpecial(IPAWebTestMonitor monitor);
@@ -16,7 +16,7 @@ public interface StandardTest {
 	public IPAWebTestMonitor addAndAddAnother(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addThenEdit(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addThenCancel(IPAWebTestMonitor monitor);
-	public IPAWebTestMonitor addOne(IPAWebTestMonitor monitor);//xdong
+	
 	
 	public IPAWebTestMonitor addNegative(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addNegativeDuplicate(IPAWebTestMonitor monitor);
@@ -26,11 +26,18 @@ public interface StandardTest {
 	public IPAWebTestMonitor modifyUpdateResetCancel(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor modifyNegative(IPAWebTestMonitor monitor);
 	
-	public IPAWebTestMonitor modifyConditionInclusiveAdd(IPAWebTestMonitor monitor);//xdong
-	public IPAWebTestMonitor modifyConditionInclusiveDelete(IPAWebTestMonitor monitor);//xdong
-	public IPAWebTestMonitor modifyConditionExclusiveAdd(IPAWebTestMonitor monitor);//xdong
-	public IPAWebTestMonitor modifyConditionExclusiveDelete(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionInclusiveAddSingle(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionInclusiveAddAndAddAnother(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionInclusiveAddThenCancel(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionInclusiveDeleteSingle(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionInclusiveDeleteMultiple(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionExclusiveAddSingle(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionExclusiveAddAndAddAnother(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionExclusiveAddThenCancel(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionExclusiveDeleteSingle(IPAWebTestMonitor monitor);//xdong
+	public IPAWebTestMonitor modifyConditionExclusiveDeleteMultiple(IPAWebTestMonitor monitor);//xdong
 	public IPAWebTestMonitor setDefaultGroup(IPAWebTestMonitor monitor);//xdong
+	
 	
 	
 	public IPAWebTestMonitor searchPositive(IPAWebTestMonitor monitor);
