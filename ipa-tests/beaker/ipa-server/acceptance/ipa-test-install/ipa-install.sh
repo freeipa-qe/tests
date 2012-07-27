@@ -6,17 +6,17 @@
 # ROLE=MASTER, SLAVE, CLIENT, CLIENT2
 # ROLE=MASTER_env2, REPLICA_env2, CLIENT_env2
 # 
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="MASTER">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="MASTER">
 #   <params> <param name="TOPO1" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
 #   <params> <param name="TOPO1" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
 #   <params> <param name="TOPO1" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
 #   <params> <param name="TOPO1" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
 #   <params> <param name="TOPO1" value="star"/> </params>
-# <task name="/CoreOS/ipa-server/acceptance/ipa-nis-integration" role="REPLICA">
+# <task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="REPLICA">
 #   <params> <param name="TOPO1" value="star"/> </params>
 #
 
