@@ -12,6 +12,7 @@ email="ipaqar.redhat.com"
 dnsbugs()
 {
    dnsbugsetup
+   bz814495
    bz841900
    bz750947
    bz789987
@@ -52,6 +53,29 @@ dnsbugsetup()
 	rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$email $zone" 0 "Add test zone: $zone"
 	# Determine my IP address
     rlPhaseEnd
+}
+
+bz814495()
+{
+
+        # Tests for bug https://bugzilla.redhat.com/show_bug.cgi?id=814495
+        rlPhaseStartTest "bz814495 IPA DNS locks up and burns horribly after trying to resolve an incorrect query"
+
+	        rlRun "ipactl restart"
+	        sleep 15
+	        rlRun "dig abc,xyz.$DOMAIN &"
+	        sleep 10
+
+        	rlRun "tail -n40 /var/log/messages | grep -i \"connection to the LDAP server was lost\"" 1
+	        rlRun "tail -n40 /var/log/messages | grep -i \"LDAP error: Invalid DN syntax\"" 1
+
+	        rlRun "tail -n40 /var/log/messages"
+
+        	rlRun "ipactl restart"
+	        sleep 15
+
+	rlPhaseEnd
+
 }
 
 bz841900()
