@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
+import javax.annotation.processing.FilerException;
+
 import org.testng.annotations.BeforeMethod;
 
 import com.redhat.qe.auto.testng.Assert;
@@ -120,6 +122,7 @@ public class CommonTasks {
 	public static void formauth(SahiTasks sahiTasks, String userName, String password){
 		try{
 			sahiTasks.open();
+			String osname=System.getProperty("os.name");
 			if (!System.getProperty("os.name").startsWith("Windows"))
   			    Runtime.getRuntime().exec("kdestroy");
 			sahiTasks.navigateTo(serverUrl, true);
@@ -280,6 +283,59 @@ public class CommonTasks {
 		}
 		
 		return csr;
+    }
+    
+    //Generate ssh keys
+    public static String generateSSH(String userId, String keyType, String keyFileName) {
+    	String sshpubkey="";
+    	Process process;
+    	
+		try {
+			boolean exists=(new File("/tmp/" + keyFileName + ".pub")).exists();
+			if(!exists){
+				process = Runtime.getRuntime().exec("ssh-keygen -t " + keyType + " -f /tmp/" + keyFileName);
+				try
+				{
+				Thread.sleep(15000); // do nothing for 15000 miliseconds (15 second)
+				}
+				catch(InterruptedException e)
+				{
+				e.printStackTrace();
+				}
+			}
+			
+			FileInputStream fstream = new FileInputStream("/tmp/" + keyFileName + ".pub");
+			if (!System.getProperty("os.name").startsWith("Windows")) 
+				fstream = new FileInputStream("/tmp/" + keyFileName + ".pub");
+		
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine;
+			boolean createssh = false;
+			int countspace=0;
+			while ((strLine=br.readLine()) != null)   {
+				for(int i=0;i<strLine.length();i++){
+					if(strLine.charAt(i)==' '){
+						if(countspace==0){
+							createssh=true;
+							countspace++;
+						}
+						else{
+							createssh = false;
+						}
+					}
+					if (createssh) {
+						if(strLine.charAt(i)!=' ')
+							sshpubkey = sshpubkey + strLine.charAt(i);
+					}
+				}
+			}
+			in.close();			    
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return sshpubkey;
     }
     
     /**
