@@ -275,6 +275,29 @@ ipa_install_topo_star()
 			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR5.0'  $MYBR5"	
 		fi
 	rlPhaseEnd
+
+	# Balance clients across all nodes
+	MYSERVERS="$MYBM1 $MYBR1 $MYBR2 $MYBR3 $MYBR4 $MYBR5"
+	MYCLIENTS=$(eval echo \$BEAKERCLIENT_env${MYENV})
+	CNUM=0
+	SNUM=0
+	SMAX=$(echo $MYSERVERS|wc -w)
+	CMAX=$(echo $MYCLIENTS|wc -w)
+	for C in $MYCLIENTS; do
+		TESTORDER=$(( TESTORDER += 1 ))
+		CNUM=$(( CNUM += 1 ))
+		if [ $SNUM -eq $SMAX ]; then	
+			SNUM=0
+		fi
+		SNUM=$(( SNUM += 1 ))
+		CS=$(echo "$MYSERVERS"|awk "{print \$$SNUM}")
+		if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
+			ipa_install_client $CS
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$C.0' -m $C"
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$C.0' $C"
+		fi
+	done
 }
 
 ######################################################################
@@ -379,6 +402,29 @@ ipa_install_topo_tree1()
 			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR4.6'  $MYBR4"	
 		fi
 	rlPhaseEnd
+
+	# Balance clients across all nodes
+	MYSERVERS="$MYBM1 $MYBR1 $MYBR2 $MYBR3 $MYBR4 $MYBR5"
+	MYCLIENTS=$(eval echo \$BEAKERCLIENT_env${MYENV})
+	CNUM=0
+	SNUM=0
+	SMAX=$(echo $MYSERVERS|wc -w)
+	CMAX=$(echo $MYCLIENTS|wc -w)
+	for C in $MYCLIENTS; do
+		TESTORDER=$(( TESTORDER += 1 ))
+		CNUM=$(( CNUM += 1 ))
+		if [ $SNUM -eq $SMAX ]; then	
+			SNUM=0
+		fi
+		SNUM=$(( SNUM += 1 ))
+		CS=$(echo "$MYSERVERS"|awk "{print \$$SNUM}")
+		if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
+			ipa_install_client $CS
+			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$C.0' -m $C"
+		else
+			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$C.0' $C"
+		fi
+	done
 }
 
 ipa_install_envs()
