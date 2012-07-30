@@ -54,6 +54,7 @@ selinuxusermap1="testselinuxusermap1"
 selinuxusermap2="testselinuxusermap2"
 selinuxusermap3="testselinuxusermap3"
 selinuxusermap4="testselinuxusermap4"
+selinuxusermap5="testselinuxusermap5"
 
 user1="dev"
 user2="testuser2"
@@ -289,9 +290,21 @@ run_selinuxusermap_add_user_tests(){
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify add user to a unknown selinuxusermap fails"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-selinuxusermap-user-add-cli-023: Create a selinux context for a user with unconfined_u:s0-s0:c0.c1023 on any machine"
+        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hostcat=all $selinuxusermap5"
+        rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hostcat=all $selinuxusermap5" 0 "Add a selinuxusermap with --hostcat=all"
+        rlRun "findSelinuxusermap $selinuxusermap5" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
+        rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap5" 0 "Verifying selinuxusermap was added with given selinuxuser"
+        rlRun "findSelinuxusermapByOption hostcat all $selinuxusermap5" 0 "Verifying selinuxusermap was added with --hostcat=all"
+        rlLog "Executing: ipa selinuxusermap-add-user --users=$user1 $selinuxusermap5"
+        rlRun "ipa selinuxusermap-add-user --users=$user1 $selinuxusermap5 > $TmpDir/selinuxusermap-user-add-023.out" 0 "Add a user to access any machine"
+        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-user-add-023.out"
+        rlRun "ipa selinuxusermap-remove-user --users=$user1 $selinuxusermap5" 0 "Clean-up: Delete user from selinuxusermap"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-selinuxusermap-user-add-cli-cleanup: Destroying admin credentials."
 	# delete selinux user 
-	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4; do
+	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 ; do
 		rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
 	done
 	for item in $user1 $user2 $user3; do

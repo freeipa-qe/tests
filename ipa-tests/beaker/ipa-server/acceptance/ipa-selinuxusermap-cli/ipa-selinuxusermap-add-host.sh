@@ -54,6 +54,7 @@ selinuxusermap1="testselinuxusermap1"
 selinuxusermap2="testselinuxusermap2"
 selinuxusermap3="testselinuxusermap3"
 selinuxusermap4="testselinuxusermap4"
+selinuxusermap5="testselinuxusermap5"
 
 default_selinuxuser="guest_u:s0"
 default_selinuxusermap_order_config="\"guest_u:s0$xguest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023\""
@@ -290,9 +291,23 @@ run_selinuxusermap_add_host_tests(){
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify add host to a unknown selinuxusermap fails"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-023:  Selinux user map rule sets all users to xguest_u:s0 on the new host"
+        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\xguest_u:s0\" --usercat=all $selinuxusermap5"
+        rlRun "ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0\" --usercat=all $selinuxusermap5" 0 "Add a selinuxusermap with --usercat all"
+        rlRun "findSelinuxusermap $selinuxusermap5" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
+        rlRun "findSelinuxusermapByOption selinuxuser \"xguest_u:s0\" $selinuxusermap5" 0 "Verifying selinuxusermap was added with given selinuxuser"
+        rlRun "findSelinuxusermapByOption usercat all $selinuxusermap5" 0 "Verifying selinuxusermap was added with usercat"
+        rlLog "Executing:ipa selinuxusermap-add-host --hosts=$host1 $selinuxusermap5"
+        rlRun "ipa selinuxusermap-add-host --hosts=$host1 $selinuxusermap5 > $TmpDir/selinuxusermap-host-add-023.out" 0 "Add a host to selinuxusermap"
+	rlLog "cat $TmpDir/selinuxusermap-host-add-023.out"
+        rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-023.out"
+#        rlAssertGrep "" "$TmpDir/selinuxusermap-host-add-023.out"
+        rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap5" 0 "Clean-up: Delete host from selinuxusermap"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-selinuxusermap-host-add-cli-cleanup: Destroying admin credentials."
 	# delete selinux user 
-	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4; do
+	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 ; do
 		rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
 	done
 	for item in $host1 $host2 $host3; do

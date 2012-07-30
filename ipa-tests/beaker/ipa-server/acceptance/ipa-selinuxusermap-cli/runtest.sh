@@ -78,9 +78,9 @@ rlJournalStart
 # Execute SELinux user map add tests
 #  run_selinuxusermap_add_tests
 # Execute SELinux user map add-host tests
-#  run_selinuxusermap_add_host_tests
+  run_selinuxusermap_add_host_tests
 # Execute SELinux user map add-user tests
-  run_selinuxusermap_add_user_tests
+#  run_selinuxusermap_add_user_tests
 
 # Execute add target hosts and hostgroups to an SELinux user map rule tests
 #  run_selinuxusermap_add_host_tests
