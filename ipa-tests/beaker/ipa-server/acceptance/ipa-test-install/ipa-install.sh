@@ -83,7 +83,7 @@ ipa_install_set_vars() {
 	while test -n "$(eval echo \$CLIENT_env${I})"; do
 		J=1
 		echo "Parsing CLIENT Variables for Environment ${I}"
-		export BEAKERCLIENT_env${I}=$(eval echo \$CLIENT_env${I})
+		export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
 		for C in $(eval echo \$CLIENT_env${I}); do
 			export CLIENT${J}_env${I}=$C
 			export BEAKERCLIENT${J}_env${I}=$C
