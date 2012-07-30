@@ -413,10 +413,11 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify user's status
-		if (status)
-			Assert.assertTrue(sahiTasks.link("Click to Disable").exists(), "Verified Active status for user " + uid);
+		if (status){
+			Assert.assertTrue("true".equals(sahiTasks.option("Enable").fetch("disabled")), "Verified Active status for user " + uid);
+		}
 		else
-			Assert.assertTrue(sahiTasks.link("Click to Enable").exists(), "Verified Inactive status for user " + uid);
+			Assert.assertTrue("true".equals(sahiTasks.option("Disable").fetch("disabled")), "Verified Inactive status for user " + uid);
 	
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -431,10 +432,10 @@ public class UserTasks {
 		
 		//edit user's job title
 		if (newStatus)
-			sahiTasks.link("Click to Enable").click();
+			sahiTasks.select("action").choose("Enable");
 		else
-			sahiTasks.link("Click to Disable").click();
-		sahiTasks.button(buttonToClick).click();
+			sahiTasks.select("action").choose("Disable");
+		sahiTasks.span(buttonToClick).click();
 		//go back to user list
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
@@ -741,6 +742,14 @@ public class UserTasks {
 			browser.link(uid).click();
 		}
 		
+		
+	}
+
+
+
+	public static void deleteEditUser(SahiTasks sahiTasks, String uid) {
+		sahiTasks.select("action").choose("Delete");
+		sahiTasks.span("Apply").click();
 		
 	}
 

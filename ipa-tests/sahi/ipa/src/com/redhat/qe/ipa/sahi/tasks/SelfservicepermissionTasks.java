@@ -68,11 +68,16 @@ public class SelfservicepermissionTasks {
 	public static void deleteSSHKey(SahiTasks browser, String errorMsg) {
 		browser.link("Delete").click();
 		browser.span("Update").click();
-		if(browser.div("error_dialog").exists()){
-			Assert.assertTrue(browser.div("error_dialog").getText().contains(errorMsg), "Error Matches Expected error message");
-			browser.button("Cancel").click();
-		}
+	}
+
+	public static void revertSSHKeyPermission(SahiTasks browser, String permission, String attribute1, String attribute2) {
 		
+		if(browser.link(permission).exists()){
+			browser.link(permission).click();
+		}
+		browser.checkbox(attribute1).uncheck();
+		browser.checkbox(attribute2).check();
+		browser.span("Update").click();
 	}
 
 }

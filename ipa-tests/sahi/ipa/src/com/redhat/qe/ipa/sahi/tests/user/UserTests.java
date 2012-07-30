@@ -328,36 +328,11 @@ public class UserTests extends SahiTestScript{
 	}
 	
 	
-	/*
-	 * Cancel when deactivating users - for positive tests
-	 */
-	@Test (groups={"userCancelDeactivateTests"}, dataProvider="getUserCancelDeactivateStatusTestObjects", dependsOnGroups={"userAddTests",
-			"userSetPasswordTests"})	
-	public void testUserCancelDeactivate(String testName, String uid, String password) throws Exception {		
-		//verify user to be edited exists
-		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
-		
-		//verify expected status	
-		UserTasks.verifyUserStatus(sahiTasks, uid, true);
-		
-		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, false, "Cancel");
-		
-		//verify status	
-		UserTasks.verifyUserStatus(sahiTasks, uid, true);
-		// verify user can still kinit
-		Assert.assertTrue(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " can still kinit");
-		
-		// kinit back as admin to continue tests
-		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
-	}
-	
 
 	/*
 	 * Deactivate users - for positive tests
 	 */
-	@Test (groups={"userDeactivateTests"}, dataProvider="getUserDeactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userCancelDeactivateTests", 
-			"userSetPasswordTests"})	
+	@Test (groups={"userDeactivateTests"}, dataProvider="getUserDeactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userSetPasswordTests"})		
 	public void testUserDeactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
 		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
@@ -366,7 +341,7 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
 		
 		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, false, "Disable");
+		UserTasks.modifyUserStatus(sahiTasks, uid, false, "Apply");
 		
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
@@ -376,32 +351,11 @@ public class UserTests extends SahiTestScript{
 		
 	}
 	
-	/*
-	 * Cancel when reactivating users - for positive tests
-	 */
-	@Test (groups={"userCancelReactivateTests"}, dataProvider="getUserCancelReactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
-	public void testUserCancelReactivate(String testName, String uid, String password) throws Exception {		
-		//verify user to be edited exists
-		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
 		
-		//verify expected status	
-		UserTasks.verifyUserStatus(sahiTasks, uid, false);
-		
-		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, true, "Cancel");
-		
-		//verify changes to status	
-		UserTasks.verifyUserStatus(sahiTasks, uid, false);
-		// verify user cannot kinit
-		Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
-		
-	}
-	
-	
 	/*
 	 * Reactivate users - for positive tests
 	 */
-	@Test (groups={"userReactivateTests"}, dataProvider="getUserReactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests", "userCancelReactivateTests"})	
+	@Test (groups={"userReactivateTests"}, dataProvider="getUserReactivateStatusTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests"})	
 	public void testUserReactivate(String testName, String uid, String password) throws Exception {		
 		//verify user to be edited exists
 		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
@@ -410,7 +364,7 @@ public class UserTests extends SahiTestScript{
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
 		
 		//modify this user
-		UserTasks.modifyUserStatus(sahiTasks, uid, true, "Enable");
+		UserTasks.modifyUserStatus(sahiTasks, uid, true, "Apply");
 		
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, true);
@@ -421,6 +375,26 @@ public class UserTests extends SahiTestScript{
 		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
 	}
 	
+	
+	/*
+	 * Delete users - one at a time - for positive tests
+	 * note: make sure tests that use testuser are run before testuser gets deleted here
+	 */
+	@Test (groups={"userEditDeleteTests"}, dataProvider="getUserEditDeleteTestObjects", 
+			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
+ "userReactivateTests",
+			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
+			"userAddDeleteUndoResetTests"})	
+	public void testUserEditDelete(String testName, String uid) throws Exception {
+		sahiTasks.link(uid).click();
+		
+		//modify this user
+		UserTasks.deleteEditUser(sahiTasks, uid);
+		
+		//verify user is deleted
+		Assert.assertFalse(sahiTasks.link(uid).exists(), "User " + uid + "  deleted successfully");
+	}
+	
 	/*
 	 * Delete users - one at a time - for positive tests
 	 * note: make sure tests that use testuser are run before testuser gets deleted here
@@ -429,7 +403,7 @@ public class UserTests extends SahiTestScript{
 			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
  "userReactivateTests",
 			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
-			"userAddDeleteUndoResetTests"})	
+			"userAddDeleteUndoResetTests", "userEditDeleteTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
 		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
@@ -834,22 +808,6 @@ public class UserTests extends SahiTestScript{
 	}
 	
 	/*
-	 * Data to be used when cancelling deactivating user
-	 */
-	@DataProvider(name="getUserCancelDeactivateStatusTestObjects")
-	public Object[][] getUserCancelDeactivateStatusTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createUserCancelDeactivateStatusTestObjects());
-	}
-	protected List<List<Object>> createUserCancelDeactivateStatusTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //										testname				  uid			password              		
-		ll.add(Arrays.asList(new Object[]{ "cancel_deactivate",			"testuser",		"Secret123"     } ));
-		        
-		return ll;	
-	}
-	
-	/*
 	 * Data to be used when deactivating user
 	 */
 	@DataProvider(name="getUserDeactivateStatusTestObjects")
@@ -865,21 +823,6 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 
-	/*
-	 * Data to be used when cancelling reactivating user
-	 */
-	@DataProvider(name="getUserCancelReactivateStatusTestObjects")
-	public Object[][] getUserCancelReactivateStatusTestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createUserCancelReactivateStatusTestObjects());
-	}
-	protected List<List<Object>> createUserCancelReactivateStatusTestObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //										testname				  uid			password              		
-		ll.add(Arrays.asList(new Object[]{ "cancel_reactivate",			"testuser",		"Secret123"     } ));
-		        
-		return ll;	
-	}
 	
 	/*
 	 * Data to be used when reactivating user
@@ -910,9 +853,24 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		
-		ll.add(Arrays.asList(new Object[]{ "delete_single_user1",			"testuser"     } ));
 		ll.add(Arrays.asList(new Object[]{ "delete_single_user2",			"user2"     } ));
 		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when deleting users
+	 */
+	@DataProvider(name="getUserEditDeleteTestObjects")
+	public Object[][] getUserEditDeleteTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editDeleteUserTestObjects());
+	}
+	protected List<List<Object>> editDeleteUserTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					uid              		
+		ll.add(Arrays.asList(new Object[]{ "delete_single_user1",			"testuser"     } ));
+			        
 		return ll;	
 	}
 	

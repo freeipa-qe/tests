@@ -62,8 +62,8 @@ public class SelfServicePermissionFunctionalTests extends SahiTestScript{
 		if (!browser.link(uid).exists())
 			UserTasks.createUser(sahiTasks, uid, givenName, sn, password, password, "Add");
 		
-		commonTasks.kinitAsNewUserFirstTime(uid, password, password);
-		commonTasks.formauth(sahiTasks, uid, password);
+		
+		commonTasks.formauthNewUser(sahiTasks, uid, password);
 		
 		String sshKey=CommonTasks.generateSSH(uid,keyType,fileName);
 		
@@ -74,7 +74,7 @@ public class SelfServicePermissionFunctionalTests extends SahiTestScript{
 	}
 	@Test (groups={"resetUserSSHKeyPermission"}, dataProvider="getResetUserSSHKeyPermission",
 			description = "Reset the user sshkey selfservice permission")
-	public void testUserResetSSHKeyPermission(String testName, String uid, String password, String permission, String attribute1, String attribute2, String errorMsg) throws Exception { 
+	public void testUserResetSSHKeyPermission(String testName, String uid, String permission, String attribute1, String attribute2, String password, String errorMsg) throws Exception { 
 		commonTasks.formauth(browser, "admin", System.getProperty("ipa.server.password"));
 		
 		browser.navigateTo(commonTasks.selfservicepermissionPage, true);
@@ -84,6 +84,21 @@ public class SelfServicePermissionFunctionalTests extends SahiTestScript{
 		commonTasks.formauth(sahiTasks, uid, password);
 		
 		SelfservicepermissionTasks.deleteSSHKey(browser, errorMsg);
+		
+		if(browser.div("error_dialog").exists()){
+			Assert.assertTrue(browser.div("error_dialog").getText().contains(errorMsg), "Error Matches Expected error message");
+			browser.button("Cancel").click();
+		}
+		commonTasks.formauth(browser, "admin", System.getProperty("ipa.server.password"));
+		
+		browser.navigateTo(commonTasks.userPage, true);
+		
+		UserTasks.deleteUser(browser, uid);
+		
+		browser.navigateTo(commonTasks.selfservicepermissionPage, true);
+		
+		SelfservicepermissionTasks.revertSSHKeyPermission(browser, permission, attribute1, attribute2);
+		
 		
 	}
 	

@@ -8,15 +8,13 @@
 			<run>
 			    <include name="setup" />
 			    <include name="userAddTests" /> 
-			   	<include name="userMismatchingPasswordNegativeTests" />
-	            <include name="userCancelAddTests" /> 
+			   	<!--<include name="userMismatchingPasswordNegativeTests" />
+	            <include name="userCancelAddTests" /> -->
 				<include name="invalidUserAddTests" />
-			    <include name="invalidCharUserAddTests" />	
+			    <!--<include name="invalidCharUserAddTests" />-->
 				<include name="userEditTests" /> 
 		        <include name="userSetPasswordTests" /> 		
-			    <include name="userCancelDeactivateTests" />	
-				<include name="userDeactivateTests" />
-		        <include name="userCancelReactivateTests" />        
+				<include name="userDeactivateTests" />        
 				<include name="userReactivateTests" /> 
 				<include name="userSearchTests" />		
 				<include name="userMultipleDataTests" />
@@ -36,6 +34,7 @@
 			    <include name="userEditNegativeSSHPubKeyTests" />
 			    <include name="userEditRefreshResetUpdateSSHPubKeyTests" /> 
 			    <include name="userEditUpdateResetCancelSSHPubKeyTests" />
+			    <include name="userEditDeleteTests" />
 				<include name="userDeleteTests" />   
 		        <include name="userMultipleDeleteTests" />
 			</run>
