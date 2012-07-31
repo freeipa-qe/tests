@@ -45,31 +45,16 @@ installMaster()
 {
    rlPhaseStartTest "Install IPA MASTER Server"
 
-        rlRun "service ntpd stop" 0 "Stopping the ntp server"
+        rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
 
         # Determine the IP of the slave to be used when creating the replica file.
-        #ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
-	#rlLog "IP address of SLAVE: $SLAVE is $ipofs"
-	rlLog "IP address of SLAVE: $SLAVE is $SLAVEIP"
+        ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
+	rlLog "IP address of SLAVE: $SLAVE is $ipofs"
 
-	rlRun "yum install -y bind-dyndb-ldap bind"
-
-        #Install ipa-server on RHEL and freeipa-server on Fedora
-        rpm -qa | grep ipa-server
-        if [ $? -eq 0 ] ; then
-                rlPass "ipa-server package is installed"
-        else
-             cat /etc/redhat-release | grep "Fedora"
-              if [ $? -eq 0 ] ; then
-               yum install -y freeipa-server
-              else
-               yum install -y ipa-server
-              fi
-        fi
-
+	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 
 	# Including --idstart=3000 --idmax=50000 to verify bug 782979.
 	echo "ipa-server-install --idstart=3000 --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash

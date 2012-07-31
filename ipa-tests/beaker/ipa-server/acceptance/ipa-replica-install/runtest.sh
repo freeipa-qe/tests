@@ -103,11 +103,8 @@ rlJournalStart
 	ipofm=`dig +short $BEAKERMASTER`
 	ipofs=`dig +short $BEAKERSLAVE`
 
-	#eval "echo \"export MASTERIP=$ipofm\" >> /dev/shm/env.sh"
-	#eval "echo \"export SLAVEIP=$ipofs\" >> /dev/shm/env.sh"
-	
-        eval "echo \"export MASTERIP=$MASTERIP\" >> /dev/shm/env.sh"
-	eval "echo \"export SLAVEIP=$SLAVEIP\" >> /dev/shm/env.sh"
+	eval "echo \"export MASTERIP=$ipofm\" >> /dev/shm/env.sh"
+	eval "echo \"export SLAVEIP=$ipofs\" >> /dev/shm/env.sh"
 
 	. /dev/shm/env.sh
 	cat /dev/shm/env.sh
