@@ -67,8 +67,8 @@ rlJournalStart
         	rlRun "ipa-nis-manage -y $pwdfile enable" 0 "Enable the NIS plugin"
 	#	NIS server setup moved to Client
 		setup-nis-server
-        	service rpcbind restart
-                rlRun "rlDistroDiff dirsrv_svc_restart"	
+        	/etc/init.d/rpcbind restart
+        	/etc/init.d/dirsrv restart
 		setup
         	runtests
         	cleanup
@@ -101,8 +101,8 @@ rlJournalStart
         rc=$?
         if [ $rc -eq 0 ] ; then
 		setup-nis-server
-        	service rpcbind restart
-                rlRun "rlDistroDiff dirsrv_svc_restart"	
+        	/etc/init.d/rpcbind restart
+		/etc/init.d/ypbind restart
         fi
 
    rlJournalPrintText
