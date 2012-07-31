@@ -173,7 +173,7 @@ ipa_install_topo_default()
 
 	for MYBC1 in $MYBCS; do
 		TESTORDER=$(( TESTORDER += 1 ))
-		rlPhsaeStartTest "ipa_install_topo_default_client - install Client1 in Default Topology - $MYBC1"
+		rlPhaseStartTest "ipa_install_topo_default_client - install Client1 in Default Topology - $MYBC1"
 			if [ "$(hostname -s)" = "$(echo $MYBC1|cut -f1 -d.)" ]; then
 				ipa_install_client $MYBM1
 				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBC1.1' -m $MYBC1"
