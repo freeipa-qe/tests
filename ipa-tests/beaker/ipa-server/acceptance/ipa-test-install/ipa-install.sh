@@ -104,7 +104,7 @@ ipa_install_set_vars() {
 	echo "export MASTER=$MASTER_env1" >> /dev/shm/env.sh
 	echo "export SLAVE=\"$REPLICA_env1\"" >> /dev/shm/env.sh
 	echo "export REPLICA=\"$REPLICA_env1\"" >> /dev/shm/env.sh
-	echo "export CLIENT=$CLIENT_env1" >> /dev/shm/env.sh
+	echo "export CLIENT=$CLIENT1_env1" >> /dev/shm/env.sh
 	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
 
 	### Set OS/YUM/RPM related variables here
