@@ -50,7 +50,7 @@ ipa_install_set_vars() {
 	while test -n "$(eval echo \$MASTER_env${I})"; do
 		echo "Parsing MASTER Variables for Environment ${I}"
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
-		export MASTER_env${I}=$M
+		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$DOMAIN
 		export BEAKERMASTER_env${I}=$M
 		export BEAKERMASTER_IP_env${I}=$(dig +short $M)
 		if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
@@ -67,7 +67,7 @@ ipa_install_set_vars() {
 		echo "Parsing REPLICA Variables for Environment ${I}"
 		export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
 		for R in $(eval echo \$REPLICA_env${I}); do
-			export REPLICA${J}_env${I}=$R
+			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$DOMAIN
 			export BEAKERREPLICA${J}_env${I}=$R
 			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R)
 			if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
@@ -86,7 +86,7 @@ ipa_install_set_vars() {
 		echo "Parsing CLIENT Variables for Environment ${I}"
 		export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
 		for C in $(eval echo \$CLIENT_env${I}); do
-			export CLIENT${J}_env${I}=$C
+			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$DOMAIN
 			export BEAKERCLIENT${J}_env${I}=$C
 			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C)
 			if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
