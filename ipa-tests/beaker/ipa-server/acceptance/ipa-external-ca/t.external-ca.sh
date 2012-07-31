@@ -37,7 +37,6 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
 . ./install-lib.sh
 
 
@@ -45,8 +44,7 @@ installMasterExtCA()
 {
    rlPhaseStartTest "Install IPA MASTER Server with external CA"
 
-        #rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
-        rlRun "service ntpd stop" 0 "Stopping the ntp server"
+        rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
@@ -70,14 +68,9 @@ installMasterExtCA()
         fi
 
 	rlAssertExists "/root/ipa.csr"
-        if [ -d /root/ipa-ca ] ; then
-          rlRun "rm -rf /root/ipa-ca"
-        fi
 	rlRun "mkdir /root/ipa-ca"
-	#rlRun "cp /mnt/tests/CoreOS/ipa-server/acceptance/ipa-external-ca/makesub.sh /root/ipa-ca/"
-	rlRun "cp /root/beaker/ipa-server/acceptance/ipa-external-ca/makesub.sh /root/ipa-ca/"
-	#rlRun "cp /mnt/tests/CoreOS/ipa-server/acceptance/ipa-external-ca/signca.py /root/ipa-ca/"
-	rlRun "cp /root/beaker/ipa-server/acceptance/ipa-external-ca/signca.py /root/ipa-ca/"
+	rlRun "cp /mnt/tests/CoreOS/ipa-server/acceptance/ipa-external-ca/makesub.sh /root/ipa-ca/"
+	rlRun "cp /mnt/tests/CoreOS/ipa-server/acceptance/ipa-external-ca/signca.py /root/ipa-ca/"
 	pushd .
 	rlRun "cd /root/ipa-ca"
 
@@ -153,9 +146,9 @@ set send_slow {1 .1}' > $expfile
 #        rlRun "ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p $ADMINPW -a $ADMINPW -r $RELM -P $ADMINPW -U --subject \"O=$RELM\""
 
 
-	sleep 60
+	sleep 30
 	rlRun "ipactl restart"
-	sleep 60
+	sleep 30
 	rlRun "ipactl status"
 
 	# As part of verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=750828"

@@ -46,8 +46,8 @@
 # Test Suite Globals
 ########################################################################
 
-#REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
-#DOMAIN=`os_getdomainname`
+REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
+DOMAIN=`os_getdomainname`
 
 
 ########################################################################
