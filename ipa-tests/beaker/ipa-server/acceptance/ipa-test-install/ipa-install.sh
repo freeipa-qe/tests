@@ -116,7 +116,11 @@ ipa_install_set_vars() {
 	else
 		export DISTRO="RedHat"
 		export IPA_SERVER_PACKAGES="ipa-server"
-		export IPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
+		if [ $(grep "Red Hat.*5\.[0-9]"|wc -l) -gt 0 ]; then
+			export IPA_CLIENT_PACKAGES="ipa-client"
+		else
+			export IPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
+		fi
 		export YUM_OPTIONS=""
 	fi
 
