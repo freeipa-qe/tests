@@ -57,6 +57,10 @@
 . ./ipa-selinuxusermap-add.sh
 . ./ipa-selinuxusermap-add-host.sh
 . ./ipa-selinuxusermap-add-user.sh
+. ./ipa-selinuxusermap-del.sh
+. ./ipa-selinuxusermap-disable.sh
+. ./ipa-selinuxusermap-enable.sh
+. ./ipa-selinuxusermap-find.sh
 ########################################################################
 
 PACKAGE="ipa-admintools"
@@ -78,9 +82,18 @@ rlJournalStart
 # Execute SELinux user map add tests
 #  run_selinuxusermap_add_tests
 # Execute SELinux user map add-host tests
-  run_selinuxusermap_add_host_tests
+#  run_selinuxusermap_add_host_tests
 # Execute SELinux user map add-user tests
 #  run_selinuxusermap_add_user_tests
+# Execute SELinux user map delete tests
+#  run_selinuxusermap_del_tests
+# Execute SELinux user map disable tests
+#  run_selinuxusermap_disable_tests
+# Execute SELinux user map enable tests
+#  run_selinuxusermap_enable_tests
+# Execute SELinux user map enable tests
+  run_selinuxusermap_find_tests
+
 
 # Execute add target hosts and hostgroups to an SELinux user map rule tests
 #  run_selinuxusermap_add_host_tests

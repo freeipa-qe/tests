@@ -65,7 +65,6 @@ selinuxusermap_raw="testselinuxusermap_raw"
 selinuxusermap_raw_noall="testselinuxusermap_raw_noall"
 
 default_selinuxuser="guest_u:s0"
-default_selinuxusermap_order_config="\"guest_u:s0$xguest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023\""
 host1="devhost."$DOMAIN
 user1="dev"
 usergroup1="dev_ugrp"
@@ -186,7 +185,7 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
         rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hostcat=all $selinuxusermap4 > $TmpDir/selinuxusermap_hostcat_all.out" 0 "Add a selinuxusermap with Host Category all"
         rlRun "findSelinuxusermap $selinuxusermap4" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
         rlAssertGrep "Host category: all" "$TmpDir/selinuxusermap_hostcat_all.out"
-        rlRun "findSelinuxusermapByOption usercat all $selinuxusermap2" 0 "Verifying selinuxusermap was added with host category all"
+        rlRun "findSelinuxusermapByOption hostcat all $selinuxusermap4" 0 "Verifying selinuxusermap was added with host category all"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-cli-012: Hosts cannot be added when host category='all' "
@@ -202,28 +201,28 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
 rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding groups to selinuxusermap when user category='all'"
     rlPhaseEnd
   
-    rlPhaseStartTest "ipa-hbacrule-cli-014: setattr on description"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-014: setattr on description"
         rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --setattr=description=newdescription $selinuxusermap5" 0 "Add selinuxuser rule's description with setattr"
     rlPhaseEnd
  
-    rlPhaseStartTest "ipa-hbacrule-cli-015: addattr on description"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-015: addattr on description"
         rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\"  --addattr=description=newdescription $selinuxusermap6" 0 "Add selinuxuser rule's description with addattr"
     rlPhaseEnd
  
-    rlPhaseStartTest "ipa-hbacrule-cli-016: setattr and addattr on description"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-016: setattr and addattr on description"
         rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --setattr=description=newdescription $selinuxusermap7" 0 "Add selinuxuser rule's description with setattr"
         expmsg="ipa: ERROR: description: Only one value allowed."
         command="ipa selinuxusermap-mod --addattr=description=newdescription2 $selinuxusermap7"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd 
 
-    rlPhaseStartTest "ipa-hbacrule-cli-017: Negative: setattr on attribute outside schema"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-017: Negative: setattr on attribute outside schema"
         expmsg="ipa: ERROR: attribute notinschema not allowed"
         command="ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --setattr=notinschema=abcdef  $selinuxusermap8"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-018: Negative: addattr on attribute outside schema"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-018: Negative: addattr on attribute outside schema"
         expmsg="ipa: ERROR: attribute notinschema not allowed"
         command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser --addattr=notinschema=abcdef  $selinuxusermap8"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
@@ -295,18 +294,47 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
         rlRun "ipa selinuxusermap-add --selinuxuser=$default_selinuxuser --all $selinuxusermap_raw_noall" 0 "Add a selinuxusermap with --raw option without --all"
     rlPhaseEnd
 
+rlPhaseStartTest "ipa-selinuxusermap-cli-027: Add a selinuxuser map with invalid character - #"
+        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd#"
+        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd#"
+        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-028: Add a selinuxuser map with invalid character - @"
+        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd@"
+        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-029: Add a selinuxuser map with invalid character - *"
+        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd*"
+        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-030: Add a selinuxuser map with invalid character - ?"
+        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd?"
+        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-selinuxusermap-cli-cleanup: Destroying admin credentials."
 	# delete selinux user 
 	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 $selinuxusermap6 $selinuxusermap7 $selinuxusermap8 $selinuxusermap9 $selinuxusermap10 $selinuxusermap11 $selinuxusermap_all $selinuxusermap_raw $selinuxusermap_raw_noall ; do
 		rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
 	done
+
+	#This clean-up is required since selinuxusermap takes garbage input
+	for item in  abcd?  abcd* abcd@ abcd#; do
+                rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
+        done
 	rlRun "deleteGroup $usergroup1" 0 "Deleting User Group associated with rule."
 	rlRun "deleteHost $host1" 0 "Deleting Host associated with rule."
 	rlRun "deleteHostGroup $hostgroup1" 0 "Deleting Host Group associated with rule."
 	rlRun "ipa user-del $user1" 0 "Delete user $user1."
 	rlRun "deleteHBACRule testHbacRule" 0 "Deleting testHbacRule rule"
-	rlRun "deleteHBACRule newHbacRule" 0 "Deleting testHbacRule rule"
+	rlRun "deleteHBACRule newHbacRule" 0 "Deleting newHbacRule rule"
 	# delete service group
 	rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
 	rlRun "popd"
@@ -314,4 +342,4 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rhts-submit-log -l /var/log/httpd/error_log
     rlPhaseEnd
-}
+ }

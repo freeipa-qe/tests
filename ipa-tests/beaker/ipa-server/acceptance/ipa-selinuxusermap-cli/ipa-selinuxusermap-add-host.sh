@@ -57,7 +57,6 @@ selinuxusermap4="testselinuxusermap4"
 selinuxusermap5="testselinuxusermap5"
 
 default_selinuxuser="guest_u:s0"
-default_selinuxusermap_order_config="\"guest_u:s0$xguest_u:s0$user_u:s0-s0:c0.c1023$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023\""
 host1="devhost."$DOMAIN
 host2="qe-blade-08."$DOMAIN
 host3="switch."$DOMAIN
