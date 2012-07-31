@@ -765,4 +765,12 @@ public class UserTasks {
 		
 	}
 
+
+
+	public static void modifyUserStatusNegative(SahiTasks sahiTasks, String uid) {
+		sahiTasks.checkbox(uid).check();
+		sahiTasks.span("Disable").click();
+		sahiTasks.span("Disable").click();
+	}
+
 }

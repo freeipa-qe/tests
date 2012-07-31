@@ -18,6 +18,7 @@
 				<include name="userReactivateTests" /> 
 				<include name="userDeactivateUserPageTests" />
 				<include name="userReactivateTestsUserPage" />
+				<include name="userDeactivateNegativeTests" />
 				<include name="userSearchTests" />		
 				<include name="userMultipleDataTests" />
 				<include name="userAddDeleteUndoResetTests" />  

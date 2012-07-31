@@ -398,6 +398,24 @@ public class UserTests extends SahiTestScript{
 	}
 	
 	/*
+	 * Deactivate users from User Page - for positive tests
+	 */
+	@Test (groups={"userDeactivateNegativeTests"}, dataProvider="getUserDeactivateNegativeTestObjects", dependsOnGroups={"userAddTests", "userSetPasswordTests", "userDeactivateTests", "userReactivateTests", "userReactivateTestsUserPage", "userDeactivateUserPageTests"})		
+	public void testUserDeactivateNegative(String testName, String uid, String errorMsg) throws Exception {		
+		//verify user to be edited exists
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " exists");
+		
+		//modify this user
+		UserTasks.modifyUserStatusNegative(sahiTasks, uid);
+		
+		Assert.assertTrue(errorMsg.equals(sahiTasks.span("Operations Error").getText()), "Error Matches the expected error");
+		
+		sahiTasks.button("OK").click();
+		
+		
+	}
+	
+	/*
 	 * Reactivate users from User Page - for positive tests
 	 */
 	@Test (groups={"userReactivateTestsUserPage"}, dataProvider="getUserReactivateStatusUserPageTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests", "userDeactivateUserPageTests", "userReactivateTests"})	
@@ -428,7 +446,7 @@ public class UserTests extends SahiTestScript{
 			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
  "userReactivateTests",
 			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
-			"userAddDeleteUndoResetTests", "userDeactivateUserPageTests", "userReactivateTestsUserPage"})	
+			"userAddDeleteUndoResetTests", "userDeactivateUserPageTests", "userReactivateTestsUserPage", "userDeactivateNegativeTests"})	
 	public void testUserEditDelete(String testName, String uid) throws Exception {
 		sahiTasks.link(uid).click();
 		
@@ -896,6 +914,23 @@ public class UserTests extends SahiTestScript{
 		
         //										testname			  uid			password              		
 		ll.add(Arrays.asList(new Object[]{ "deactivate_userpage",	  "testuser",	"Secret123"     } ));
+		        
+		return ll;	
+	}
+	
+	
+	/*
+	 * Data to be used when deactivating user negative
+	 */
+	@DataProvider(name="getUserDeactivateNegativeTestObjects")
+	public Object[][] getUserDeactivateNegativeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserDeactivateNegativeTestObjects());
+	}
+	protected List<List<Object>> createUserDeactivateNegativeTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			  uid			errorMsg		             		
+		ll.add(Arrays.asList(new Object[]{ "deactivate_negative",	  "testuser",	"Operations Error"     } ));
 		        
 		return ll;	
 	}
