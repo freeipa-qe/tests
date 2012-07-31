@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE ipa-selinuxusermap-add.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE ipa-selinuxusermap-config.sh ipa-selinuxusermap-add.sh ipa-selinuxusermap-add-host.sh ipa-selinuxusermap-add-user.sh ipa-selinuxusermap-del.sh ipa-selinuxusermap-disable.sh ipa-selinuxusermap-enable.sh ipa-selinuxusermap-find.sh
 
 .PHONY: all install download clean
 
