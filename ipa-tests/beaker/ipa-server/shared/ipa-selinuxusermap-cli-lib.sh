@@ -54,11 +54,11 @@ addSelinuxusermapAllOptions()
    hbacrule=$2
    usercat=$3
    hostcat=$4
-   desc=$5
+   desc=\"$5\"
    selinuxusermapname=$6
    rc=0
 
-	rlLog "Executing: ipa selinuxusermap-add --selinuxuser=$selinuxuser --hbacrule=$hbacrule --usercat=$usercat --hostcat=$hostcat --desc=$desc $selinuxusermapname"
+	rlLog "Executing: ipa selinuxusermap-add --selinuxuser=$selinuxuser --hbacrule=$hbacrule --usercat=$usercat --hostcat=$hostcat --desc=\"$desc\" $selinuxusermapname"
 	ipa selinuxusermap-add --selinuxuser=$selinuxuser --hbacrule=$hbacrule --usercat=$usercat --hostcat=$hostcat --desc=$desc $selinuxusermapname
 	rc=$?
    	if [ $rc -ne 0 ] ; then
@@ -84,10 +84,11 @@ addHostSelinuxusermap()
    rc=0
 
         rlLog "Executing: ipa selinuxusermap-add-host --hosts=$hosts --hostgroups=$hostgroups  $selinuxusermapname"
-	ipa selinuxusermap-add-host --hosts=$hosts --hostgroups=$hostgroups  $selinuxusermapname
+	ipa selinuxusermap-add-host --hosts=$hosts --hostgroups=$hostgroups  $selinuxusermapname > /tmp/selinuxusermap_slloptions.out
         rc=$?
         if [ $rc -ne 0 ] ; then
                 rlLog "WARNING: Adding new $hosts and $hostgroups to $selinuxusermapname failed."
+		rlRun "cat /tmp/selinuxusermap_slloptions.out"
         else
                 rlLog "Adding new $hosts and $hostgroups to $selinuxusermapname successful."
         fi
@@ -178,6 +179,7 @@ findSelinuxusermapByOption()
    rlLog "Executing: ipa selinuxusermap-find $flag=$value"
    ipa selinuxusermap-find $flag=$value > $tmpfile
    rc=$?
+   rlRun "cat $tmpfile"
    if [ $rc -eq 0 ] ; then
 	rlLog "Searching for rules: $selinuxusermapname"
 	for item in $selinuxusermapname ; do
@@ -229,6 +231,67 @@ verifySelinuxusermapAttr()
         rlLog "WARNING: ipa selinuxusermap-show command failed."
    fi
 
+   return $rc
+}
+
+#######################################################################
+# deleteSelinuxusermap Usage:
+#       deleteSelinuxusermap <rulename>
+######################################################################
+
+deleteSelinuxusermap()
+{
+   selinuxusermapname=$1
+   rc=0
+
+   ipa selinuxusermap-del $selinuxusermapname
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Deleting selinuxusermap rule $selinuxusermapname failed."
+   else
+        rlLog "Selinuxusermap rule $selinuxusermapname deleted successfully."
+   fi
+
+   return $rc
+}
+
+#######################################################################
+# disableSelinuxusermap Usage:
+#       disableSelinuxusermap <rulename>
+######################################################################
+
+disableSelinuxusermap()
+{
+   selinuxusermapname=$1
+   rc=0
+
+   ipa selinuxusermap-disable $selinuxusermapname
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Disabling selinuxusermap rule $selinuxusermapname failed."
+   else
+        rlLog "Selinuxusermap rule $selinuxusermapname disabled successfully."
+   fi
+   return $rc
+}
+
+#######################################################################
+# enableSelinuxusermap Usage:
+#       enableSelinuxusermap <rulename>
+######################################################################
+
+enableSelinuxusermap()
+{
+   selinuxusermapname=$1
+   rc=0
+
+   ipa selinuxusermap-enable $selinuxusermapname
+   rc=$?
+   if [ $rc -ne 0 ] ; then
+        rlLog "WARNING: Enabling selinuxusermap rule $selinuxusermapname failed."
+   else
+        rlLog "Selinuxusermap rule $selinuxusermapname enabled successfully."
+   fi
    return $rc
 }
 
