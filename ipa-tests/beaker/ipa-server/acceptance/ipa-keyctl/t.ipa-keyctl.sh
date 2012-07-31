@@ -2,26 +2,26 @@
 ######################
 # test suite         #
 ######################
-ipasample()
+ipakeyctl()
 {
-    ipasample_envsetup
-    ipasample_lifetime
-    pwhistory
-    ipasample_envcleanup
-} # ipasample
+    ipakeyctl_envsetup
+    #ipakeyctl_lifetime
+    #pwhistory
+    ipakeyctl_envcleanup
+} # ipakeyctl
 
 ######################
 # test set           #
 ######################
-ipasample_lifetime()
+ipakeyctl_lifetime()
 {
-    ipasample_lifetime_envsetup
+    ipakeyctl_lifetime_envsetup
     minlife_nolimit
-    ipasample_lifetime_minlife_somelimit
-    ipasample_lifetime_minlife_negative
-    ipasample_lifetime_minlife_verify
-    ipasample_lifetime_envcleanup
-} #ipasample_lifetime
+    ipakeyctl_lifetime_minlife_somelimit
+    ipakeyctl_lifetime_minlife_negative
+    ipakeyctl_lifetime_minlife_verify
+    ipakeyctl_lifetime_envcleanup
+} #ipakeyctl_lifetime
 
 pwhistory()
 {
@@ -35,41 +35,41 @@ pwhistory()
 ######################
 # test cases         #
 ######################
-ipasample_envsetup()
+ipakeyctl_envsetup()
 {
-    rlPhaseStartSetup "ipasample_envsetup"
+    rlPhaseStartSetup "ipakeyctl_envsetup"
         #environment setup starts here
 
         #environment setup ends   here
     rlPhaseEnd
-} #ipasample_envsetup
+} #ipakeyctl_envsetup
 
-ipasample_envcleanup()
+ipakeyctl_envcleanup()
 {
-    rlPhaseStartCleanup "ipasample_envcleanup"
+    rlPhaseStartCleanup "ipakeyctl_envcleanup"
         #environment cleanup starts here
 
         #environment cleanup ends   here
     rlPhaseEnd
-} #ipasample_envcleanup
+} #ipakeyctl_envcleanup
 
-ipasample_lifetime_envsetup()
+ipakeyctl_lifetime_envsetup()
 {
-    rlPhaseStartSetup "ipasample_lifetime_envsetup"
+    rlPhaseStartSetup "ipakeyctl_lifetime_envsetup"
         #environment setup starts here
 
         #environment setup ends   here
     rlPhaseEnd
-} #ipasample_lifetime_envsetup
+} #ipakeyctl_lifetime_envsetup
 
-ipasample_lifetime_envcleanup()
+ipakeyctl_lifetime_envcleanup()
 {
-    rlPhaseStartCleanup "ipasample_lifetime_envcleanup"
+    rlPhaseStartCleanup "ipakeyctl_lifetime_envcleanup"
         #environment cleanup starts here
 
         #environment cleanup ends   here
     rlPhaseEnd
-} #ipasample_lifetime_envcleanup
+} #ipakeyctl_lifetime_envcleanup
 
 minlife_nolimit()
 {
@@ -95,17 +95,17 @@ minlife_nolimit_logic()
     # test logic ends
 } #minlife_nolimit_logic 
 
-ipasample_lifetime_minlife_somelimit()
+ipakeyctl_lifetime_minlife_somelimit()
 {
 # looped data   : 
 # non-loop data : pwusername pwinitial_password
-    rlPhaseStartTest "ipasample_lifetime_minlife_somelimit"
+    rlPhaseStartTest "ipakeyctl_lifetime_minlife_somelimit"
         rlLog "set password life time to 0"
-        ipasample_lifetime_minlife_somelimit_logic $pwusername $pwinitial_password
+        ipakeyctl_lifetime_minlife_somelimit_logic $pwusername $pwinitial_password
     rlPhaseEnd
-} #ipasample_lifetime_minlife_somelimit
+} #ipakeyctl_lifetime_minlife_somelimit
 
-ipasample_lifetime_minlife_somelimit_logic()
+ipakeyctl_lifetime_minlife_somelimit_logic()
 {
     # accept parameters: $pwusername $pwinitial_password
     local pwusername=$1
@@ -113,22 +113,22 @@ ipasample_lifetime_minlife_somelimit_logic()
     # test logic starts
 
     # test logic ends
-} #ipasample_lifetime_minlife_somelimit_logic 
+} #ipakeyctl_lifetime_minlife_somelimit_logic 
 
-ipasample_lifetime_minlife_negative()
+ipakeyctl_lifetime_minlife_negative()
 {
 # looped data   : minage
 # non-loop data : pwusername pwinitial_password
-    rlPhaseStartTest "ipasample_lifetime_minlife_negative"
+    rlPhaseStartTest "ipakeyctl_lifetime_minlife_negative"
         rlLog "negative test case for minimum password life"
         for $minage_value in $minage
         do
-            ipasample_lifetime_minlife_negative_logic $pwusername $pwinitial_password $minage_value
+            ipakeyctl_lifetime_minlife_negative_logic $pwusername $pwinitial_password $minage_value
         done
     rlPhaseEnd
-} #ipasample_lifetime_minlife_negative
+} #ipakeyctl_lifetime_minlife_negative
 
-ipasample_lifetime_minlife_negative_logic()
+ipakeyctl_lifetime_minlife_negative_logic()
 {
     # accept parameters: $pwusername $pwinitial_password $minage_value
     local pwusername=$1
@@ -137,22 +137,22 @@ ipasample_lifetime_minlife_negative_logic()
     # test logic starts
 
     # test logic ends
-} #ipasample_lifetime_minlife_negative_logic 
+} #ipakeyctl_lifetime_minlife_negative_logic 
 
-ipasample_lifetime_minlife_verify()
+ipakeyctl_lifetime_minlife_verify()
 {
 # looped data   : minage
 # non-loop data : pwusername pwinitial_password
-    rlPhaseStartTest "ipasample_lifetime_minlife_verify"
+    rlPhaseStartTest "ipakeyctl_lifetime_minlife_verify"
         rlLog "verify the changes"
         for $minage_value in $minage
         do
-            ipasample_lifetime_minlife_verify_logic $pwusername $pwinitial_password $minage_value
+            ipakeyctl_lifetime_minlife_verify_logic $pwusername $pwinitial_password $minage_value
         done
     rlPhaseEnd
-} #ipasample_lifetime_minlife_verify
+} #ipakeyctl_lifetime_minlife_verify
 
-ipasample_lifetime_minlife_verify_logic()
+ipakeyctl_lifetime_minlife_verify_logic()
 {
     # accept parameters: $pwusername $pwinitial_password $minage_value
     local pwusername=$1
@@ -161,7 +161,7 @@ ipasample_lifetime_minlife_verify_logic()
     # test logic starts
 
     # test logic ends
-} #ipasample_lifetime_minlife_verify_logic 
+} #ipakeyctl_lifetime_minlife_verify_logic 
 
 pwhistory_envsetup()
 {
