@@ -23,8 +23,10 @@ testReplicationOnMasterAndSlave()
 		rlLog "BEAKERMASTER: $BEAKERMASTER"
 		rlLog "SLAVE: $SLAVE; SLAVEIP: $SLAVEIP"
 		rlLog "BEAKERSLAVE: $BEAKERSLAVE"
-		masterDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.master"
-		slaveDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.slave"
+		#masterDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.master"
+		#slaveDatafile="/mnt/tests/CoreOS/ipa-server/acceptance/replication/data.replication.slave"
+		masterDatafile="/root/beaker/ipa-server/acceptance/replication/data.replication.master"
+		slaveDatafile="/root/beaker/ipa-server/acceptance/replication/data.replication.slave"
 
 		# Determine if this is a master
 		hostname=`hostname -s`
