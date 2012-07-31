@@ -375,6 +375,50 @@ public class UserTests extends SahiTestScript{
 		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
 	}
 	
+	/*
+	 * Deactivate users from User Page - for positive tests
+	 */
+	@Test (groups={"userDeactivateUserPageTests"}, dataProvider="getUserDeactivateStatusUserPageTestObjects", dependsOnGroups={"userAddTests", "userSetPasswordTests", "userDeactivateTests", "userReactivateTests"})		
+	public void testUserDeactivateUserPage(String testName, String uid, String password) throws Exception {		
+		//verify user to be edited exists
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be deactivated exists");
+		
+		//verify expected status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, true);
+		
+		//modify this user
+		UserTasks.modifyUserStatusUserPage(sahiTasks, uid, false);
+		
+		//verify changes to status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, false);
+		// verify user cannot kinit
+		Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
+		
+		
+	}
+	
+	/*
+	 * Reactivate users from User Page - for positive tests
+	 */
+	@Test (groups={"userReactivateTestsUserPage"}, dataProvider="getUserReactivateStatusUserPageTestObjects", dependsOnGroups={"userAddTests", "userDeactivateTests", "userSetPasswordTests", "userDeactivateUserPageTests", "userReactivateTests"})	
+	public void testUserReactivateUserPage(String testName, String uid, String password) throws Exception {		
+		//verify user to be edited exists
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + " to be reactivated exists");
+		
+		//verify expected status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, false);
+		
+		//modify this user
+		UserTasks.modifyUserStatusUserPage(sahiTasks, uid, true);
+		
+		//verify changes to status	
+		UserTasks.verifyUserStatus(sahiTasks, uid, true);
+		// verify user can kinit
+		Assert.assertTrue(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " can kinit");
+		
+		// kinit back as admin to continue tests
+		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged back in as admin to continue tests");
+	}
 	
 	/*
 	 * Delete users - one at a time - for positive tests
@@ -384,7 +428,7 @@ public class UserTests extends SahiTestScript{
 			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
  "userReactivateTests",
 			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
-			"userAddDeleteUndoResetTests"})	
+			"userAddDeleteUndoResetTests", "userDeactivateUserPageTests", "userReactivateTestsUserPage"})	
 	public void testUserEditDelete(String testName, String uid) throws Exception {
 		sahiTasks.link(uid).click();
 		
@@ -403,7 +447,7 @@ public class UserTests extends SahiTestScript{
 			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
  "userReactivateTests",
 			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
-			"userAddDeleteUndoResetTests", "userEditDeleteTests"})	
+			"userAddDeleteUndoResetTests", "userEditDeleteTests", "userDeactivateUserPageTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
 		Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
@@ -422,7 +466,7 @@ public class UserTests extends SahiTestScript{
 	 * Delete multiple users - for positive tests
 	 */
 	@Test (groups={"userMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
- "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userDeleteSSHPubKeyTests", "userEditSSHPubKeyTests", "userEditUndoSSHPubKeyTests", "userEditEmpMiscInfoTests", "userSearchTests" })
+ "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userDeleteSSHPubKeyTests", "userEditSSHPubKeyTests", "userEditUndoSSHPubKeyTests", "userEditEmpMiscInfoTests", "userSearchTests", "userEditDeleteTests" })
 	public void testMultipleUserDelete(String testName, String uid1, String uid2, String uid3, String uid4) throws Exception {		
 		String uids[] = {uid1, uid2, uid3, uid4};
 		
@@ -840,7 +884,37 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	/*
+	 * Data to be used when deactivating user
+	 */
+	@DataProvider(name="getUserDeactivateStatusUserPageTestObjects")
+	public Object[][] getUserDeactivateStatusUserPageTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserDeactivateStatusUserPageTestObjects());
+	}
+	protected List<List<Object>> createUserDeactivateStatusUserPageTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			  uid			password              		
+		ll.add(Arrays.asList(new Object[]{ "deactivate_userpage",	  "testuser",	"Secret123"     } ));
+		        
+		return ll;	
+	}
 	
+	/*
+	 * Data to be used when reactivating user
+	 */
+	@DataProvider(name="getUserReactivateStatusUserPageTestObjects")
+	public Object[][] getUserReactivateStatusUserPageTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserReactivateStatusUserPageTestObjects());
+	}
+	protected List<List<Object>> createUserReactivateStatusUserPageTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname			  uid			password              		
+		ll.add(Arrays.asList(new Object[]{ "reactivate_userpage",	  "testuser",	"Secret123"     } ));
+		        
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when deleting users
@@ -869,7 +943,7 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		
-		ll.add(Arrays.asList(new Object[]{ "delete_single_user1",			"testuser"     } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_delete_user",				"testuser"     } ));
 			        
 		return ll;	
 	}

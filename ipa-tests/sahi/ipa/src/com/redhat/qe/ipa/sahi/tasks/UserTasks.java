@@ -413,9 +413,9 @@ public class UserTasks {
 		sahiTasks.link(uid).click();
 		
 		//verify user's status
-		if (status){
+		sahiTasks.span("Refresh").click();
+		if (status)
 			Assert.assertTrue("true".equals(sahiTasks.option("Enable").fetch("disabled")), "Verified Active status for user " + uid);
-		}
 		else
 			Assert.assertTrue("true".equals(sahiTasks.option("Disable").fetch("disabled")), "Verified Inactive status for user " + uid);
 	
@@ -750,6 +750,18 @@ public class UserTasks {
 	public static void deleteEditUser(SahiTasks sahiTasks, String uid) {
 		sahiTasks.select("action").choose("Delete");
 		sahiTasks.span("Apply").click();
+		
+	}
+
+
+
+	public static void modifyUserStatusUserPage(SahiTasks sahiTasks, String uid, boolean newStatus) {
+		sahiTasks.checkbox(uid).check();
+		
+		if(newStatus)
+			sahiTasks.span("Enable").click();
+		else
+			sahiTasks.span("Disable").click();
 		
 	}
 

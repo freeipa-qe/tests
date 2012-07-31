@@ -16,6 +16,8 @@
 		        <include name="userSetPasswordTests" /> 		
 				<include name="userDeactivateTests" />        
 				<include name="userReactivateTests" /> 
+				<include name="userDeactivateUserPageTests" />
+				<include name="userReactivateTestsUserPage" />
 				<include name="userSearchTests" />		
 				<include name="userMultipleDataTests" />
 				<include name="userAddDeleteUndoResetTests" />  
