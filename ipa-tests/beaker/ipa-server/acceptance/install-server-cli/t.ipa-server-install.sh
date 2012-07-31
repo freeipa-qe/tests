@@ -33,6 +33,72 @@ ipaserverinstall()
 #  -r REALM_NAME, --realm=REALM_NAME    realm name
     ipaserverinstall_realm
 
+#  --setup-dns           configure bind with our zone
+    ipaserverinstall_setupdns
+
+#  --ip-address=IP_ADDRESS     Master Server IP Address
+     ipaserverinstall_ipaddress
+#     Add test to verify: bug 696268: IPA server install with DNS setup, and with --ip-address cannot resolve hostnames
+     ipaserverinstall_invalidipaddress
+
+
+#  --no-forwarders       Do not add any DNS forwarders, use root servers
+    ipaserverinstall_noforwarders
+
+#  --no-reverse          Do not create reverse DNS zone
+     ipaserverinstall_noreverse
+
+#  -N, --no-ntp          do not configure ntp
+     ipaserverinstall_nontp
+
+#  --zonemgr=ZONEMGR     DNS zone manager e-mail address. Defaults to root
+     ipaserverinstall_withzonemgr
+#     Add test to verify: bug 693771 : Preinstall check needed if zonemgr has special char
+     ipaserverinstall_withinvalidzonemgr
+
+#  --subject=SUBJECT     The certificate subject base (default O=<realm-name>)
+     ipaserverinstall_subject
+#     Add test to verify: bug 696282 : Preinstall check needed if subject is not specified in required format
+     ipaserverinstall_invalidsubject
+
+#  --idstart=IDSTART     The starting value for the IDs range (default random)
+#  --idmax=IDMAX         The max value value for the IDs range (default: idstart+199999)
+    ipaserverinstall_id
+
+#  --no_hbac_allow       Don't install allow_all HBAC rule
+     ipaserverinstall_nohbacallow
+
+#  --no-host-dns         Do not use DNS for hostname lookup during installation
+#    Add test to verify:  bug 707229 : ipa-server-install with --no-host-dns still checks DNS : Also look at bug 729377
+     ipaserverinstall_nohostdns
+     ipaserverinstall_nohostsentry
+     ipaserverinstall_nohostdns_nohostsentry
+
+#  --no-ui-redirect      Do not automatically redirect to the Web UI.
+     ipaserverinstall_nouiredirect
+
+#  --reverse-zone=REVERSE_ZONE  The reverse DNS zone to use
+#     Add test to verify: bug 729166 : ipa-server-install creates wrong reverse zone record in LDAP
+      ipaserverinstall_reversezone
+
+#   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+      ipaserverinstall_zonerefresh
+
+#     Add test to verify: bug 681978 : Uninstalling client if the server is installed should be prevented
+       ipaclient_uninstall
+
+
+#     Add test to verify: bug 740403 : invalid Directory Manager password causes ipaserver-install to fail with "Exception in CertSubjectPanel(): java.lang.IndexOutOfBoundsException"
+#     Install using DM password with backslash
+
+#     Add test to verify: bug 742875 : named fails to start after installing ipa server when short hostname preceeds fqdn in /etc/hosts. 
+      ipaserverinstall_shorthostname
+	
+
+ 
+  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
+    ipaserverinstall_selfsign
+# This should be last test - then run IPA Functional tests against this server
 
 }
 
@@ -58,10 +124,6 @@ setup()
 ###############################################################
 ipaserver_version()
 {
-        cat /etc/redhat-release | grep "Fedora"
-        if [ $? -eq 0 ] ; then
-                VERSION=3.0.0.pre1
-        fi
     rlPhaseStartTest "ipa-server-install - 01 - [Positive] Verify version "
         command="ipa-server-install --version"
         local tmpout=$TmpDir/ipaserverinstall_version.out
