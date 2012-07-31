@@ -369,8 +369,7 @@ rlJournalStart
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-23: stop services as non-root user"
-		#rlRun "su testuserqa -c 'ipactl stop' > /tmp/stopnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
-		rlRun "su testuserqa -c 'ipactl stop' > /tmp/stopnonroot.out 2>&1" 4 "Insufficient rights, starting service as nonprivileged user"
+		rlRun "su testuserqa -c 'ipactl stop' > /tmp/stopnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/stopnonroot.out"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that httpd is still running"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that named is still running"
@@ -385,8 +384,7 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-24: start services as non-root user"
 		rlRun "ipactl stop" 0 "Stop services as root first"
-                #rlRun "su testuserqa -c 'ipactl start' > /tmp/startnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
-                rlRun "su testuserqa -c 'ipactl start' > /tmp/startnonroot.out 2>&1" 4 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl start' > /tmp/startnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/startnonroot.out"
                 rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that httpd is NOT running"
                 rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that named is NOT running"
@@ -402,8 +400,7 @@ rlJournalStart
 rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 rlRun "ipactl start" 0 "Start services as root first"
 		getServicePIDs
-                #rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
-                rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 4 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/restartnonroot.out"
 
                 #verify krb5kdc was not restarted
