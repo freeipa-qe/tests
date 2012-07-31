@@ -479,20 +479,22 @@ rlPhaseStartTest "0012 Delete User"
 	rlLog "Delete user from AD"
 	rlRun "deleteuser_ldif $aduser ads"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete $aduser from AD"
-	rlRun "deleteuser_ldif 456 ads"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete user 456 from AD"
-	rlRun "sleep $sec" 0 "Waiting for sync"
+	rlRun "sleep 15" 0 "Waiting for sync"
 	sleep 30
 	rlRun "ipa user-show $aduser" 2 "User $aduser not found in IPA as expected"
-	rlRun "ipa user-show 456" 2 "User 456 not found in IPA as expected"
 
-	rlLog "Delete user from IPA"
-	rlRun "ipa user-del $aduser2 $ADln" 0 "Delete $aduser2 and $ADln from IPA"
+	rlLog "Delete users from IPA"
+	rlRun "ipa user-del $aduser2 $ADln 456" 0 "Delete $aduser2, $ADln and 456 from IPA"
 	sleep 10
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser2 ads,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $aduser2 deleted in AD"
 	sleep 5
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$ADfn $ADsn,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $ADln deleted in AD"
-
+	sleep 5
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 0 "User 456 existed before winsync, hence is not deleted from AD as expected"
+	sleep 5
+	# Making sure 456 is deleted from AD
+	rlRun "deleteuser_ldif 456 ads"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Cleaningg user 456 from AD as well"
 rlPhaseEnd
 }
 
