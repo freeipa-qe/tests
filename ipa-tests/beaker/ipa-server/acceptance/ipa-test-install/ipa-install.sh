@@ -563,8 +563,8 @@ ipa_install_prep()
 	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
 	diff -q /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa > /dev/null 2>&1
 	if [ $? -eq 1 ]; then	
-		cp /dev/shm/id_rsa_global /root/.ssh/id_rsa
-		cp /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa.pub
+		cp -f /dev/shm/id_rsa_global /root/.ssh/id_rsa
+		cp -f /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa.pub
 		for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
 			for server in $(eval echo \$$var); do
 				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
