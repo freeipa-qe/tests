@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-cert-cli
+Description: IPA cert cli tests
+Author: Michael Gregg <mgregg@redhat.com>
