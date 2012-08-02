@@ -112,6 +112,13 @@ ipa_install_set_vars() {
 	echo "export REPLICA=\"$REPLICA_env1\"" >> /dev/shm/env.sh
 	echo "export CLIENT=$CLIENT1_env1" >> /dev/shm/env.sh
 	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
+	echo "export BEAKERMASTER=$BEAKERMASTER_env1" >> /dev/shm/env.sh
+	echo "export BEAKERSLAVE=$BEAKERREPLICA_env1" >> /dev/shm/env.sh
+	echo "export BEAKERCLIENT=$BEAKERCLIENT1_env1" >> /dev/shm/env.sh
+	echo "export BEAKERCLIENT2=$BEAKERCLIENT2_env1" >> /dev/shm/env.sh
+	# CONSIDER: changing env1 to env${MYENV} let each environment set
+	# things specific to itself.  otherwise, current tests as of 2012-08-01
+    # won't work in env's other than 1.
 
 	. /dev/shm/env.sh
 
