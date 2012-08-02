@@ -573,9 +573,6 @@ public class UserTests extends SahiTestScript{
 			UserTasks.addSSHKey(sahiTasks, uid, key, addToKey);
 		else{
 			String sshKey=CommonTasks.generateSSH(uid,keyType,fileName);
-			if(testName.equals("add_negative_sshkey_invalid_dsa")){
-				sshKey=sshKey.replaceAll("=", "");
-			}
 			UserTasks.addSSHKey(sahiTasks, uid, sshKey, addToKey);
 		}
 		Assert.assertTrue((sahiTasks.div(errorMsg).exists() || sahiTasks.div(errorMsg1).exists()), "Add Negative tested successfully");
@@ -1068,7 +1065,7 @@ public class UserTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_empty",		"user9",	"",		"",				"",					"no modifications to be performed",			"",												""  	  } ));
 		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_invalid",	"user9",	"test",	"",				"",					"invalid 'sshpubkey': must be binary data",	"invalid 'sshpubkey': invalid SSH public key",	"" 	  	  } ));
 		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_duplicate",	"user9",	"",		"rsa",			"user9_rsa",		"no modifications to be performed",			"",												""  	  } ));        
-		ll.add(Arrays.asList(new Object[]{ "add_negative_sshkey_invalid_dsa","user9",	"",		"dsa",			"user9_dsa4",		"invalid 'sshpubkey': must be binary data",	"invalid 'sshpubkey': invalid SSH public key",	""  	  } ));
+		
 		return ll;	
 	}
 	/*

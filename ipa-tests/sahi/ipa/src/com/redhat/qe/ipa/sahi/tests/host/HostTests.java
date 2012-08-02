@@ -19,6 +19,7 @@ import com.redhat.qe.ipa.sahi.tasks.DNSTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.ServiceTasks;
+import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 import com.redhat.qe.ipa.sahi.tests.user.UserTests;
 
 
@@ -165,7 +166,7 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * delete multiple hosts
 	 */
-	@Test (groups={"deleteMultipleHostTests"}, dataProvider="deleteMultipleHostsTests",  dependsOnGroups="addAndAddAnotherHostTests")	
+	@Test (groups={"deleteMultipleHostTests"}, dataProvider="deleteMultipleHostsTests",  dependsOnGroups={"addAndAddAnotherHostTests", "hostEditNegativeSSHPubKeyTests", "hostEditSSHPubKeyTests", "hostEditRefreshResetUpdateSSHPubKeyTests", "hostEditUpdateResetCancelSSHPubKeyTests", "hostEditUndoSSHPubKeyTests", "hostDeleteSSHPubKeyTests"})	
 	public void testDeleteMultipleHosts(String testName, String hostname1, String hostname2, String hostname3) throws Exception {
 		String [] hostnames = {hostname1, hostname2, hostname3};
 		for (String hostname : hostnames) {
@@ -420,6 +421,118 @@ public class HostTests extends SahiTestScript{
     		// verify service has a keytab
     		HostTasks.verifyHostKeytab(sahiTasks, fqdn, true);
     	}
+		
+	}
+	
+	/*
+	 * sshpubkey Add
+	 */
+	@Test (groups={"hostEditSSHPubKeyTests"}, dataProvider="getHostEditSSHPubKeyTestObjects",  dependsOnGroups={"addAndEditHostTests","addAndAddAnotherHostTests", "addHostTests"})	
+	public void testAddSSHPubKey(String testName, String hostName, String keyType, String fileName, String keyName1, String addToKey) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.hostPage);
+		
+		String sshKey=CommonTasks.generateSSH(hostName,keyType,fileName);
+		
+		HostTasks.addSSHKey(sahiTasks,hostName,sshKey,addToKey);
+		if(keyType.equals("dsa")){
+			Assert.assertTrue(sahiTasks.getText(sahiTasks.span(keyName1)).contains("ssh-dss"), "ssh " + keyType + " for " + hostName + " added successfully");
+		}
+		else{
+			Assert.assertTrue(sahiTasks.getText(sahiTasks.span(keyName1)).contains("ssh-" + keyType) , "ssh " + keyType + " for " + hostName + " added successfully");
+		}
+	}
+	
+	/*
+	 * sshpubkey Add Negative
+	 */
+	@Test (groups={"hostEditNegativeSSHPubKeyTests"}, dataProvider="getHostEditNegativeSSHPubKeyTestObjects",  dependsOnGroups="hostEditSSHPubKeyTests")	
+	public void testAddNegativeSSHPubKey(String testName, String hostName, String key, String keyType, String fileName, String errorMsg, String errorMsg1, String addToKey) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.hostPage);
+		
+		
+		if(keyType.equals(""))
+			HostTasks.addSSHKey(sahiTasks, hostName, key, addToKey);
+		else{
+			String sshKey=CommonTasks.generateSSH(hostName,keyType,fileName);
+			HostTasks.addSSHKey(sahiTasks, hostName, sshKey, addToKey);
+		}
+		Assert.assertTrue((sahiTasks.div(errorMsg).exists() || sahiTasks.div(errorMsg1).exists()), "Add Negative tested successfully");
+		if(sahiTasks.button("Cancel").exists()){
+			sahiTasks.button("Cancel").click();
+		}
+	}
+	
+	/*
+	 * sshpubkey Refresh/Reset/Update
+	 */
+	@Test (groups={"hostEditRefreshResetUpdateSSHPubKeyTests"}, dataProvider="getHostEditRefreshResetUpdateSSHPubKeyTestObjects",  dependsOnGroups={"hostEditSSHPubKeyTests","hostEditUndoSSHPubKeyTests","hostEditNegativeSSHPubKeyTests"})	
+	public void testAddRefreshResetUpdateSSHPubKey(String testName, String hostName, String keyType, String fileName, String keyName, String spanName) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.hostPage);
+		
+		String sshKey=CommonTasks.generateSSH(hostName,keyType,fileName);
+		HostTasks.SSHKeyRefershResetUpdate(sahiTasks, hostName, sshKey, spanName);
+		if(!spanName.equals("Update")){
+			Assert.assertFalse(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + spanName + " Successful");
+		}
+		else{
+			Assert.assertTrue(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + spanName + " Successful");
+		}
+	}
+	
+	/*
+	 * sshpubkey Update/Reset/Cancel
+	 */
+	@Test (groups={"hostEditUpdateResetCancelSSHPubKeyTests"}, dataProvider="getHostEditUpdateResetCancelSSHPubKeyTestObjects",  dependsOnGroups={"hostEditSSHPubKeyTests","hostEditUndoSSHPubKeyTests","hostEditNegativeSSHPubKeyTests","hostEditRefreshResetUpdateSSHPubKeyTests"})	
+	public void testAddUpdateResetCancelSSHPubKey(String testName, String hostName, String keyType, String fileName, String keyName, String buttonName) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.hostPage);
+		
+		String sshKey=CommonTasks.generateSSH(hostName,keyType,fileName);
+		HostTasks.SSHKeyUpdateResetCancel(sahiTasks, hostName, sshKey, buttonName);
+		if(buttonName.equals("Reset")){
+			Assert.assertFalse(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + buttonName + " Successful");
+		}
+		else{
+			Assert.assertTrue(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + buttonName + " Successful");
+		}
+	}
+	
+	/*
+	 * sshpubkey Undo
+	 */
+	@Test (groups={"hostEditUndoSSHPubKeyTests"}, dataProvider="getHostEditUndoSSHPubKeyTestObjects",  dependsOnGroups="hostEditSSHPubKeyTests")	
+	public void testUndoSSHPubKey(String testName, String hostName, String keyType1, String keyType2, String fileName1, String fileName2, String spanName) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.hostPage);
+		
+		String sshKey=CommonTasks.generateSSH(hostName,keyType1,fileName1);
+		String sshKey1="";
+		if(!keyType2.equals("")){
+			sshKey1=CommonTasks.generateSSH(hostName,keyType2,fileName2);
+		}
+		
+		HostTasks.addAndUndoSSHKey(sahiTasks,hostName,sshKey,sshKey1, spanName);
+		if(keyType2.equals(""))
+			Assert.assertFalse(sahiTasks.span("New: key set").exists(), "sshKey Add and Undo successful");
+		else
+			Assert.assertFalse(sahiTasks.span("New: key set").exists(), "sshKey Add and UndoAll successful");
+		
+	}
+	
+	/*
+	 * sshpubkey Delete
+	 */
+	@Test (groups={"hostDeleteSSHPubKeyTests"}, dataProvider="getHostDeleteSSHPubKeyTestObjects",  dependsOnGroups={"hostEditNegativeSSHPubKeyTests","hostEditRefreshResetUpdateSSHPubKeyTests"})	
+	public void testDeleteSSHPubKey(String testName, String hostName) throws Exception {
+		
+		sahiTasks.navigateTo(CommonTasks.hostPage);
+		
+		HostTasks.hostSSHDelete(sahiTasks, hostName);
+		
+		Assert.assertFalse(sahiTasks.span("sshkey-status strikethrough").exists(), "sshKey Deleted Successfully");
 		
 	}
 	
@@ -734,6 +847,114 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ 	"provision_host_keytab" } ));
 		
 		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding sshpubkeys
+	 */
+	
+	@DataProvider(name="getHostEditSSHPubKeyTestObjects")
+	public Object[][] getHostEditSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(hostEditSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> hostEditSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 			hostName				keyType		fileName		keyName1			addToKey	
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_rsa",		"myhost1.testrelm.com",	"rsa",		"myhost1_rsa",	"sshkey-status",	""  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_dsa",		"myhost1.testrelm.com",	"dsa",		"myhost1_dsa",	"sshkey-status[1]",	"" 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_rsa_space",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa1",	"sshkey-status[2]",	" " 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_rsa_equal",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa2",	"sshkey-status[3]",	"="  	  } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when adding negative sshpubkeys
+	 */
+	
+	@DataProvider(name="getHostEditNegativeSSHPubKeyTestObjects")
+	public Object[][] getHostEditNegativeSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(hostEditNegativeSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> hostEditNegativeSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 						uid						key		keyType			fileName			errorMsg									errorMsg1										addToKey		
+		ll.add(Arrays.asList(new Object[]{ "add_host_negative_sshkey_empty",		"myhost1.testrelm.com",	"",		"",				"",					"no modifications to be performed",			"",												""  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_negative_sshkey_invalid",		"myhost1.testrelm.com",	"test",	"",				"",					"invalid 'sshpubkey': must be binary data",	"invalid 'sshpubkey': invalid SSH public key",	"" 	  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_negative_sshkey_duplicate",	"myhost1.testrelm.com",	"",		"rsa",			"myhost1_rsa",		"no modifications to be performed",			"",												""  	  } ));        
+		
+		return ll;	
+	}
+	/*
+	 * Data to be used when deleting sshpubkeys
+	 */
+	@DataProvider(name="getHostDeleteSSHPubKeyTestObjects")
+	public Object[][] getHostDeleteSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(hostDeleteSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> hostDeleteSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 	hostName	
+		ll.add(Arrays.asList(new Object[]{ "delete_host_sshkey","myhost1.testrelm.com"  	  } ));
+		
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used on undo of sshpubkeys
+	 */
+	
+	@DataProvider(name="getHostEditUndoSSHPubKeyTestObjects")
+	public Object[][] getHostEditUndoSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(editUndoSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> editUndoSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 			uid						keyType1	keyType2	fileName1		fileName2		spanName		
+		ll.add(Arrays.asList(new Object[]{ "add_host_undo_sshkey_rsa",	"myhost1.testrelm.com",	"rsa",		"",			"myhost1_rsa1",	"",				"undo" 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_undoAll_sshkey",	"myhost1.testrelm.com",	"rsa",		"dsa",		"myhost1_rsa1",	"myhost1_dsa1",	"undo all"	  } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used on Refresh/Reset/Update of sshpubkeys
+	 */
+	
+	@DataProvider(name="getHostEditRefreshResetUpdateSSHPubKeyTestObjects")
+	public Object[][] getHostEditRefreshResetUpdateSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(hostEditRefreshResetUpdateSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> hostEditRefreshResetUpdateSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 			uid						keyType		fileName		keyName1			spanName	
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_refresh",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa5",	"sshkey-status[4]",	"Refresh"  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_reset",		"myhost1.testrelm.com",	"rsa",		"myhost1_rsa5",	"sshkey-status[4]",	"Reset" 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_update",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa5",	"sshkey-status[4]",	"Update" 	  } ));       
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used on Update/Reset/Cancel of sshpubkeys
+	 */
+	
+	@DataProvider(name="getHostEditUpdateResetCancelSSHPubKeyTestObjects")
+	public Object[][] getHostEditUpdateResetCancelSSHPubKeyTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(hostEditUpdateResetCancelSSHPubKeyTestObjects());
+	}
+	protected List<List<Object>> hostEditUpdateResetCancelSSHPubKeyTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		 					uid						keyType		fileName		keyName1			spanName	
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_cancel_backlink",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa6",	"sshkey-status[5]",	"Cancel"  	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_reset_backlink",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa6",	"sshkey-status[5]",	"Reset" 	  } ));
+		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_update1_backlink",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa6",	"sshkey-status[5]",	"Update" 	  } ));       
+		return ll;		
 	}
 	
 	/*

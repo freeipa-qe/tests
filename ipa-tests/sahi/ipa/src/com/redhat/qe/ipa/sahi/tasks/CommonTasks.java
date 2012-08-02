@@ -281,7 +281,7 @@ public class CommonTasks {
     public static String generateCSR(String hostname) {
     	String csr="";
     	Process process;
-    	
+    	String tmp=System.getProperty("user.dir");
 		try {
 			if (System.getProperty("os.name").startsWith("Windows"))
 				process=Runtime.getRuntime().exec(System.getProperty("user.dir") + "/scripts/generateCSR.bat " + hostname);
@@ -296,7 +296,7 @@ public class CommonTasks {
 			e.printStackTrace();
 			}
 			
-			FileInputStream fstream = new FileInputStream(hostname+".csr");
+			FileInputStream fstream = new FileInputStream("/tmp/" + hostname+".csr");
 			if (!System.getProperty("os.name").startsWith("Windows")) 
 				fstream = new FileInputStream("/tmp/"+hostname+".csr");
 		

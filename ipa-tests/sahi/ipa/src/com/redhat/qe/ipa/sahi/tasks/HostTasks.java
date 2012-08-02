@@ -224,9 +224,9 @@ public class HostTasks {
 	public static void modifyHostOTP(SahiTasks sahiTasks, String hostname, String otp, boolean set, String button) {
 		sahiTasks.link(hostname).click();
 		if (set == true)
-			sahiTasks.span("Reset OTP").click();
+			sahiTasks.link("Reset One-Time-Password").click();
 		else 
-			sahiTasks.span("Set OTP").click();
+			sahiTasks.link("Set One-Time-Password").click();
 		
 		sahiTasks.password(0).setValue(otp);
 		sahiTasks.password(1).setValue(otp);
@@ -245,11 +245,11 @@ public class HostTasks {
 		sahiTasks.link(hostname).click();
 		if (otpset == true) {
 			Assert.assertTrue(sahiTasks.span("One-Time-Password Present").exists(), "Host " + hostname + " one time password exists");
-			Assert.assertTrue(sahiTasks.span("Reset OTP").exists(), "Host " + hostname + " can reset OTP");
+			Assert.assertTrue(sahiTasks.link("Reset One-Time-Password").exists(), "Host " + hostname + " can reset OTP");
 		}
 		else {
 			Assert.assertTrue(sahiTasks.span("One-Time-Password Not Present").exists(), "Host " + hostname + " one time password does not exist");
-			Assert.assertTrue(sahiTasks.span("Set OTP").exists(), "Host " + hostname + " can set OTP");
+			Assert.assertTrue(sahiTasks.link("Set One-Time-Password").exists(), "Host " + hostname + " can set OTP");
 		}
 			
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -411,7 +411,7 @@ public class HostTasks {
 	 */
 	public static void addHostCertificate(SahiTasks sahiTasks, String hostname, String csr) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("New Certificate").click();
+		sahiTasks.link("New Certificate").click();
 		sahiTasks.textarea(1).setValue(csr);
 		sahiTasks.button("Issue").click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -424,17 +424,17 @@ public class HostTasks {
 	 */
 	public static void verifyHostCertificate(SahiTasks sahiTasks, String hostname) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("Get").isVisible();
-		Assert.assertTrue(sahiTasks.span("Get").exists(), "Host certificate verify Get button");
-		Assert.assertTrue(sahiTasks.span("View").exists(), "Host certificate verify View button");
-		Assert.assertTrue(sahiTasks.span("Revoke").exists(), "Host certificate verify Revoke button");
+		sahiTasks.link("Get").isVisible();
+		Assert.assertTrue(sahiTasks.link("Get").exists(), "Host certificate verify Get button");
+		Assert.assertTrue(sahiTasks.link("View").exists(), "Host certificate verify View button");
+		Assert.assertTrue(sahiTasks.link("Revoke").exists(), "Host certificate verify Revoke button");
 		
 		//view certificate
-		sahiTasks.span("View").click();
+		sahiTasks.link("View").click();
 		sahiTasks.button("Close").click();
 		
 		//get certificate
-		sahiTasks.span("Get").click();
+		sahiTasks.link("Get").click();
 		sahiTasks.button("Close").click();
 		
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -450,7 +450,7 @@ public class HostTasks {
 	 */
 	public static void revokeHostCertificate(SahiTasks sahiTasks, String hostname, String reason, String button) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("Revoke").click();
+		sahiTasks.link("Revoke").click();
 		sahiTasks.select(0).choose(reason);
 		sahiTasks.button(button).click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -466,11 +466,11 @@ public class HostTasks {
 	public static void verifyHostCertificate(SahiTasks sahiTasks, String hostname, String status, String reason) {
 		sahiTasks.link(hostname).click();
 		if (status == "Hold"){
-			Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
+			Assert.assertTrue(sahiTasks.link("Restore").exists(), "Host certificate on hold, verify Restore button");
 			Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
 		}
 		if (status == "Revoked"){
-			Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
+			Assert.assertTrue(sahiTasks.link("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
 			Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
 		}
 		
@@ -485,7 +485,7 @@ public class HostTasks {
 	 */
 	public static void restoreHostCertificate(SahiTasks sahiTasks, String hostname, String button) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("Restore").click();
+		sahiTasks.link("Restore").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
@@ -497,7 +497,7 @@ public class HostTasks {
 	 */
 	public static void newHostCertificate(SahiTasks sahiTasks, String hostname, String csr, String button) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("New Certificate").click();
+		sahiTasks.link("New Certificate").click();
 		sahiTasks.textarea(1).setValue(csr);
 		sahiTasks.button(button).click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
@@ -510,7 +510,7 @@ public class HostTasks {
 	 */
 	public static void invalidHostCSR(SahiTasks sahiTasks, String hostname, String csr, String expectedError) {
 		sahiTasks.link(hostname).click();
-		sahiTasks.span("New Certificate").click();
+		sahiTasks.link("New Certificate").click();
 		sahiTasks.textarea("certificate").setValue(csr);
 		sahiTasks.button("Issue").click();
 		
@@ -615,7 +615,7 @@ public class HostTasks {
 			Assert.assertTrue(sahiTasks.span("Kerberos Key Not Present").exists(), "Host " + hostname + " does not have a keytab provisioned");
 		}
 		if (provisioned == true){
-			Assert.assertTrue(sahiTasks.span("Kerberos Key Present, Host Provisioned: Delete Key, Unprovision").exists(), "Host " + hostname + " has a keytab provisioned");
+			Assert.assertTrue(sahiTasks.span("Kerberos Key Present, Host Provisioned").exists(), "Host " + hostname + " has a keytab provisioned");
 		}	
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
@@ -629,9 +629,88 @@ public class HostTasks {
 	public static void deleteHostKeytab(SahiTasks sahiTasks, String hostname, String button ) {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("Refresh").click();
-		sahiTasks.span("Delete Key, Unprovision").click();
+		sahiTasks.link("Unprovision").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+	}
+	
+	public static void addSSHKey(SahiTasks browser, String hostName, String sshKey, String addToKey) {
+		if(browser.link(hostName).exists()){
+			browser.link(hostName).click();
+		}
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(sshKey + addToKey);
+		browser.button("Set").click();
+		browser.span("Update").click();
+		
+	}
+	
+	public static void SSHKeyRefershResetUpdate(SahiTasks browser, String hostName, String key, String spanName) {
+		browser.link(hostName).click();
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(key);
+		browser.button("Set").click();
+		
+		if(spanName.equals("Refresh"))
+			browser.span("Refresh").click();
+		else if(spanName.equals("Reset"))
+			browser.span("Reset").click();
+		else if(spanName.equals("Update"))
+			browser.span("Update").click();
+	}
+	
+	public static void SSHKeyUpdateResetCancel(SahiTasks browser, String hostName,
+			String sshKey, String buttonName) {
+		browser.link(hostName).click();
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(sshKey);
+		browser.button("Set").click();
+		browser.link("Hosts").near(browser.span(hostName)).click();
+		if(buttonName.equals("Cancel"))
+			browser.button("Cancel").click();
+		else if(buttonName.equals("Reset")){
+			browser.button("Reset").click();
+			browser.link(hostName).click();
+		}
+		else if(buttonName.equals("Update")){
+			browser.button("Update").click();
+			browser.link(hostName).click();
+		}
+		
+		
+	}
+	
+	public static void addAndUndoSSHKey(SahiTasks browser, String hostName, String sshKey1, String sshKey2, String spanName) {
+		browser.link(hostName).click();
+		browser.link("Add").click();
+		browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+		browser.textarea("certificate").setValue(sshKey1);
+		browser.button("Set").click();
+		if(!sshKey2.equals("")){
+			browser.link("Add").click();
+			browser.link("Show/Set key").near(browser.span("New: key not set")).click();
+			browser.textarea("certificate").setValue(sshKey2);
+			browser.button("Set").click();
+		}
+		if(spanName.equals("undo")){
+			browser.span("undo").click();
+		}
+		else if(spanName.equals("undo all")){
+			browser.span("undo all").click();
+		}
+		
+	}
+	
+	public static void hostSSHDelete(SahiTasks browser, String hostName) {
+		browser.link(hostName).click();
+		browser.link("Delete").click();
+		if(browser.span("sshkey-status strikethrough").exists()){
+			browser.span("Update").click();
+		}
+		
 	}
 }
 
