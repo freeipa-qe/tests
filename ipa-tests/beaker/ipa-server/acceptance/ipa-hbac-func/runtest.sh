@@ -88,8 +88,17 @@ rlJournalStart
         if [ $? -eq 0 ] ; then
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Checking client"
-                rlLog "Machine in recipe is CLIENT"
-                rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlLog "Machine in recipe is CLIENT"
+		if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
+			service iptables stop
+			if [ $? -eq 1 ]; then
+				rlFail "BZ 845301 found -- service iptables stop returns 1 when already stopped"
+			else
+				rlPass "BZ 845301 not found -- service iptables stop succeeeded"
+			fi
+		else	
+			rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		fi
 		rlRun "yum install -y ftp"
 		rlRun "cat /etc/krb5.conf"
 		rlRun "authconfig --enablemkhomedir --updateall"
