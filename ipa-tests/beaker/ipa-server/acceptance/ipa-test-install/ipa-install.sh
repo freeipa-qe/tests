@@ -59,6 +59,7 @@ ipa_install_set_vars() {
 		fi
 		I=$(( I += 1 ))
 	done
+	
 
 	# Process REPLICA variables
 	I=1
@@ -74,8 +75,11 @@ ipa_install_set_vars() {
 				export MYROLE=REPLICA${J}_env${I}
 				export MYENV=${I}
 			fi
+			export NEWREPLICAS="$NEWREPLICAS $(echo $R|cut -f1 -d.).$DOMAIN"
+			export NEWREPLICAS=$(echo $NEWREPLICAS)
 			J=$(( J += 1 ))
 		done
+		export REPLICA_env${I}="$NEWREPLICAS"
 		I=$(( I += 1 ))
 	done
 
@@ -93,6 +97,8 @@ ipa_install_set_vars() {
 				export MYROLE=CLIENT${J}_env${I}
 				export MYENV=${I}
 			fi
+			export NEWCLIENTS="$NEWCLIENTS $(echo $C|cut -f1 -d.).$DOMAIN"
+			export NEWCLIENTS=$(echo $NEWCLIENTS)
 			J=$(( J += 1 ))
 		done
 		I=$(( I += 1 ))
@@ -106,6 +112,8 @@ ipa_install_set_vars() {
 	echo "export REPLICA=\"$REPLICA_env1\"" >> /dev/shm/env.sh
 	echo "export CLIENT=$CLIENT1_env1" >> /dev/shm/env.sh
 	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
+
+	. /dev/shm/env.sh
 
 	### Set OS/YUM/RPM related variables here
 	if [ $(grep Fedora /etc/redhat-release|wc -l) -gt 0 ]; then
