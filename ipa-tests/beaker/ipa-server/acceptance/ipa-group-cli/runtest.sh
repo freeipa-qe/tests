@@ -84,7 +84,7 @@ rlJournalStart
 	addmodify
 	setadddelattr
 	findgroups
-	renamegroups
+	renamegroup
 	groupbugs
     rlPhaseEnd
 
