@@ -8,10 +8,10 @@
 			<run>
 			    <include name="setup" />
 			    <include name="userAddTests" /> 
-			   	<!--<include name="userMismatchingPasswordNegativeTests" />
-	            <include name="userCancelAddTests" /> -->
+			   	<include name="userMismatchingPasswordNegativeTests" />
+	            <include name="userCancelAddTests" />
 				<include name="invalidUserAddTests" />
-			    <!--<include name="invalidCharUserAddTests" />-->
+			    <include name="invalidCharUserAddTests" />
 				<include name="userEditTests" /> 
 		        <include name="userSetPasswordTests" /> 		
 				<include name="userDeactivateTests" />        
@@ -20,6 +20,7 @@
 				<include name="userReactivateTestsUserPage" />
 				<include name="userDeactivateNegativeTests" />
 				<include name="userSearchTests" />		
+				<include name="searchUsersNegativeTests" />
 				<include name="userMultipleDataTests" />
 				<include name="userAddDeleteUndoResetTests" />  
 				<include name="userExpandCollapseTests" /> 

@@ -145,6 +145,41 @@ public class HostTests extends SahiTestScript{
 	}
 	
 	/*
+	 * search hosts
+	 */
+	@Test (groups={"searchHostTests"}, dataProvider="getHostSearchTestObjects",  dependsOnGroups={"addHostTests", "addHostBz751529Tests", "addAndAddAnotherHostTests", "hostEditNegativeSSHPubKeyTests", "hostEditSSHPubKeyTests", "hostEditRefreshResetUpdateSSHPubKeyTests", "hostEditUpdateResetCancelSSHPubKeyTests", "hostEditUndoSSHPubKeyTests", "hostDeleteSSHPubKeyTests"})	
+	public void testHostSearch(String testName, String hostName1, String hostName2) throws Exception {
+		String [] hostnames = {hostName1, hostName2};
+		for (String hostname : hostnames) {
+			
+		//search host
+		HostTasks.searchHost(sahiTasks, hostname);
+		
+		//verify host was deleted
+		if(hostname.contains(domain))
+			Assert.assertTrue(sahiTasks.link(hostname).exists(), "Found  " + hostname + "  successfully");
+		else
+			Assert.assertTrue(sahiTasks.link(hostname+ "." + domain).exists(), "Found  " + hostname+ "." + domain + "  successfully");
+		
+		HostTasks.clearSearch(sahiTasks);
+		}
+	}
+	
+	/*
+	 * search hosts negative
+	 */
+	@Test (groups={"searchHostNegativeTests"}, dataProvider="getHostSearchNegativeTestObjects",  dependsOnGroups={"addHostTests", "addHostBz751529Tests", "addAndAddAnotherHostTests", "hostEditNegativeSSHPubKeyTests", "hostEditSSHPubKeyTests", "hostEditRefreshResetUpdateSSHPubKeyTests", "hostEditUpdateResetCancelSSHPubKeyTests", "hostEditUndoSSHPubKeyTests", "hostDeleteSSHPubKeyTests"})	
+	public void testHostSearchNegative(String testName, String hostname) throws Exception {
+		
+		//search host
+		HostTasks.searchHost(sahiTasks, hostname);
+		
+		//verify host was deleted
+		Assert.assertFalse(sahiTasks.link(hostname).exists(), hostname + " does not exist - search successfully");
+		HostTasks.clearSearch(sahiTasks);
+	}
+	
+	/*
 	 * Add and add another host - for positive tests
 	 */
 	@Test (groups={"addAndAddAnotherHostTests"}, dataProvider="getAddAndAddAnotherHostTests", dependsOnGroups="deleteHostTests")	
@@ -166,7 +201,7 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * delete multiple hosts
 	 */
-	@Test (groups={"deleteMultipleHostTests"}, dataProvider="deleteMultipleHostsTests",  dependsOnGroups={"addAndAddAnotherHostTests", "hostEditNegativeSSHPubKeyTests", "hostEditSSHPubKeyTests", "hostEditRefreshResetUpdateSSHPubKeyTests", "hostEditUpdateResetCancelSSHPubKeyTests", "hostEditUndoSSHPubKeyTests", "hostDeleteSSHPubKeyTests"})	
+	@Test (groups={"deleteMultipleHostTests"}, dataProvider="deleteMultipleHostsTests",  dependsOnGroups={"addAndAddAnotherHostTests", "hostEditNegativeSSHPubKeyTests", "hostEditSSHPubKeyTests", "hostEditRefreshResetUpdateSSHPubKeyTests", "hostEditUpdateResetCancelSSHPubKeyTests", "hostEditUndoSSHPubKeyTests", "hostDeleteSSHPubKeyTests", "searchHostTests", "searchHostNegativeTests"})	
 	public void testDeleteMultipleHosts(String testName, String hostname1, String hostname2, String hostname3) throws Exception {
 		String [] hostnames = {hostname1, hostname2, hostname3};
 		for (String hostname : hostnames) {
@@ -647,6 +682,38 @@ public class HostTests extends SahiTestScript{
 		
         //										testname				hostname1		hostname2		hostname3
 		ll.add(Arrays.asList(new Object[]{ "add_and_add_another_host",	"myhost1",	 	"myhost2", 		"myhost3" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching hosts
+	 */
+	@DataProvider(name="getHostSearchTestObjects")
+	public Object[][] getHostSearchTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostSearchTestObjects());
+	}
+	protected List<List<Object>> createHostSearchTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				hostname1	hostname2
+		ll.add(Arrays.asList(new Object[]{ "search_hosts",		"myhost1."+domain,	"myhost1" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching hosts that are not added
+	 */
+	@DataProvider(name="getHostSearchNegativeTestObjects")
+	public Object[][] getHostSearchNegativeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostSearchNegativeTestObjects());
+	}
+	protected List<List<Object>> createHostSearchNegativeTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				hostname1
+		ll.add(Arrays.asList(new Object[]{ "search_hosts_negative",		"myhost5."+domain } ));
 		        
 		return ll;	
 	}

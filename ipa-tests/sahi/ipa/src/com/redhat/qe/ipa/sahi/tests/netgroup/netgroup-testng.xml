@@ -16,6 +16,8 @@
 			    <include name="netGroupUnsavedChangesTests" /> 
 			    <include name="netgroupExpandCollapseTests" /> 
 			    <include name="netgroupUserMemberTests" />
+			    <include name="searchNetgroupTests" />
+			    <include name="searchNetgroupNegativeTests" />
 			</run>
 		</groups>
 	</test>

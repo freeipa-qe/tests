@@ -23,6 +23,8 @@
 			    <include name="invalidHostGroupAddTests" />
 			    <include name="invalidHostGroupModifyTests" />
 			    <include name="invalidHostGroupModifyUndoTests" />
+			    <include name="searchHostGroupTests" />
+			    <include name="searchHostGroupNegativeTests" />
 			</run>
 		</groups>
 		<classes>

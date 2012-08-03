@@ -482,4 +482,16 @@ public class HostgroupTasks {
 			sahiTasks.button("Reset").click();
 		}
 	}
+
+	public static void searchHostgroup(SahiTasks sahiTasks, String groupname) {
+		sahiTasks.textbox("filter").setValue(groupname);
+		sahiTasks.span("icon search-icon").click();
+		
+	}
+
+	public static void clearSearchHostgroup(SahiTasks sahiTasks) {
+		sahiTasks.textbox("filter").setValue("");
+		sahiTasks.span("icon search-icon").click();
+		
+	}
 }

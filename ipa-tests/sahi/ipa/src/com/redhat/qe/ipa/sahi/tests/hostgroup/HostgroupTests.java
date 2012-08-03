@@ -163,7 +163,7 @@ public class HostgroupTests extends SahiTestScript{
 	/*
 	 * Delete multiple host groups positive tests
 	 */
-	@Test (groups={"deleteMultipleHostGroupTests"}, dataProvider="getAddAndAddAnotherHostGroupTestObjects",  dependsOnGroups="addAndAddAnotherHostGroupTests")	
+	@Test (groups={"deleteMultipleHostGroupTests"}, dataProvider="getAddAndAddAnotherHostGroupTestObjects",  dependsOnGroups={"addAndAddAnotherHostGroupTests", "searchHostGroupTests", "searchHostGroupNegativeTests"})	
 	public void testHostGroupDeleteMultiple(String testName, String groupName1, String groupName2, String groupName3) throws Exception {
 		//verify host group exists
 		Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " exists");
@@ -178,6 +178,42 @@ public class HostgroupTests extends SahiTestScript{
 		Assert.assertFalse(sahiTasks.link(groupName1).exists(), "Verify host group " + groupName1 + " was deleted successfully");
 		Assert.assertFalse(sahiTasks.link(groupName2).exists(), "Verify host group " + groupName2 + " was deleted successfully");
 		Assert.assertFalse(sahiTasks.link(groupName3).exists(), "Verify host group " + groupName3 + " was deleted successfully");
+		
+	}
+	
+	/*
+	 * Delete multiple host groups positive tests
+	 */
+	@Test (groups={"searchHostGroupTests"}, dataProvider="getSearchHostGroupTestObjects",  dependsOnGroups="addAndAddAnotherHostGroupTests")	
+	public void testSearchHostGroup(String testName, String groupName1, String groupName2) throws Exception {
+		
+		
+		String [] groupnames = {groupName1, groupName2};
+		for(String groupname : groupnames){
+		//delete host group
+		HostgroupTasks.searchHostgroup(sahiTasks, groupname);
+
+		//verify host group doesn't exist
+		Assert.assertTrue(sahiTasks.link(groupname).exists(), "Found host group " + groupname + " successfully");
+		HostgroupTasks.clearSearchHostgroup(sahiTasks);
+		}
+	}
+	
+	
+	/*
+	 * Delete multiple host groups positive tests
+	 */
+	@Test (groups={"searchHostGroupNegativeTests"}, dataProvider="getSearchHostGroupNegativeTestObjects",  dependsOnGroups="addAndAddAnotherHostGroupTests")	
+	public void testSearchHostGroupNegative(String testName, String groupName) throws Exception {
+		
+		
+		
+		//search negative host group
+		HostgroupTasks.searchHostgroup(sahiTasks, groupName);
+
+		//verify host group doesn't exist
+		Assert.assertFalse(sahiTasks.link(groupName).exists(), groupName + " Host Group does not exist : search successfully");
+		HostgroupTasks.clearSearchHostgroup(sahiTasks);
 		
 	}
 	
@@ -586,6 +622,38 @@ public class HostgroupTests extends SahiTestScript{
 	
 		//										testname										groupanme			description			expectedError
 		ll.add(Arrays.asList(new Object[]{ 		"modify_invalid_description_empty",				myhostgroup,		"",	 				 "Input form contains invalid or missing values." } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching host groups
+	 */
+	@DataProvider(name="getSearchHostGroupTestObjects")
+	public Object[][] getSearchHostGroupTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostGroupSearchTestObjects());
+	}
+	protected List<List<Object>> createHostGroupSearchTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				groupName1				hostname2
+		ll.add(Arrays.asList(new Object[]{ "search_host_groups",		"engineering",			"sales" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching host groups
+	 */
+	@DataProvider(name="getSearchHostGroupNegativeTestObjects")
+	public Object[][] getSearchHostGroupNegativeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostGroupNegativeSearchTestObjects());
+	}
+	protected List<List<Object>> createHostGroupNegativeSearchTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				groupName
+		ll.add(Arrays.asList(new Object[]{ "search_host_groups_negative","marketing" } ));
+		        
 		return ll;	
 	}
 }

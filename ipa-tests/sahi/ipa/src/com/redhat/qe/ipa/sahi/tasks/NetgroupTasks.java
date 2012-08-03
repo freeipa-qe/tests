@@ -367,4 +367,16 @@ public class NetgroupTasks {
 		log.fine("cancel(near retry)");
 		sahiTasks.button("Cancel").click();
 	}
+
+	public static void searchNetgroup(SahiTasks sahiTasks, String netgroup) {
+		sahiTasks.textbox("filter").setValue(netgroup);
+		sahiTasks.span("icon search-icon").click();
+		
+	}
+	
+	public static void clearSearch(SahiTasks sahiTasks) {
+		sahiTasks.textbox("filter").setValue("");
+		sahiTasks.span("icon search-icon").click();
+		
+	}
 }

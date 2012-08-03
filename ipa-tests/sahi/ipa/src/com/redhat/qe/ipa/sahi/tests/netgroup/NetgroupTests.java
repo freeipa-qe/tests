@@ -220,7 +220,7 @@ public class NetgroupTests extends SahiTestScript{
 	/*
 	 * Delete multiple net groups positive tests
 	 */
-	@Test (groups={"deleteMultipleNetGroupTests"}, dataProvider="getAddAndAddAnotherNetGroupTestObjects",  dependsOnGroups="addAndAddAnotherNetGroupTests")	
+	@Test (groups={"deleteMultipleNetGroupTests"}, dataProvider="getAddAndAddAnotherNetGroupTestObjects",  dependsOnGroups={"addAndAddAnotherNetGroupTests", "searchNetgroupTests", "searchNetgroupNegativeTests"})	
 	public void testNetGroupDeleteMultiple(String testName, String groupName1, String groupName2, String groupName3) throws Exception {
 		//verify host group exists
 		Assert.assertTrue(sahiTasks.link(groupName1).exists(), "Verify net group " + groupName1 + " exists");
@@ -317,6 +317,41 @@ public class NetgroupTests extends SahiTestScript{
 		if (button.equals("Add") && action.equals("Add")) 
 			NetgroupTasks.deleteUserMembers(sahiTasks, cn, section, type, names, "Delete");
 	}
+	
+	/*
+	 * search hosts
+	 */
+	@Test (groups={"searchNetgroupTests"}, dataProvider="getNetgroupSearchTestObjects",  dependsOnGroups={"addAndAddAnotherNetGroupTests"})	
+	public void testNetgroupSearch(String testName, String netgroup1, String netgroup2) throws Exception {
+		String [] netgroups = {netgroup1, netgroup2};
+		for (String netgroup : netgroups) {
+			
+		//search host
+		NetgroupTasks.searchNetgroup(sahiTasks, netgroup);
+		
+		//verify host was deleted
+		
+		Assert.assertTrue(sahiTasks.link(netgroup).exists(), "Found  " + netgroup + "  successfully");
+		
+		
+		NetgroupTasks.clearSearch(sahiTasks);
+		}
+	}
+	
+	/*
+	 * search hosts negative
+	 */
+	@Test (groups={"searchNetgroupNegativeTests"}, dataProvider="getNetgroupSearchNegativeTestObjects",  dependsOnGroups={"addAndAddAnotherNetGroupTests"})	
+	public void testNetgroupSearchNegative(String testName, String netgroup) throws Exception {
+		
+		//search host
+		NetgroupTasks.searchNetgroup(sahiTasks, netgroup);
+		
+		//verify host was deleted
+		Assert.assertFalse(sahiTasks.link(netgroup).exists(), netgroup + " does not exist - search successfully");
+		NetgroupTasks.clearSearch(sahiTasks);
+	}
+	
 		
 	
 
@@ -473,6 +508,38 @@ public class NetgroupTests extends SahiTestScript{
 	
 		//										testname					netgroup		
 		ll.add(Arrays.asList(new Object[]{ 		"netgroup_expand_collapse",	"engineering" } ));
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching netgroups
+	 */
+	@DataProvider(name="getNetgroupSearchTestObjects")
+	public Object[][] getNetgroupSearchTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetgroupSearchTestObjects());
+	}
+	protected List<List<Object>> createNetgroupSearchTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				netgroup1		netgroup2
+		ll.add(Arrays.asList(new Object[]{ "search_netgroup",			"marketing",	"sales" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used when searching netgroups that are not added
+	 */
+	@DataProvider(name="getNetgroupSearchNegativeTestObjects")
+	public Object[][] getNetgroupSearchNegativeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetgroupSearchNegativeTestObjects());
+	}
+	protected List<List<Object>> createNetgroupSearchNegativeTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				netgroup
+		ll.add(Arrays.asList(new Object[]{ "search_netgroup_negative",	"finance" } ));
+		        
 		return ll;	
 	}
 	

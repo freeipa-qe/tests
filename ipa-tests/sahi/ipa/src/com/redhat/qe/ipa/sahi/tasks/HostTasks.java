@@ -712,5 +712,18 @@ public class HostTasks {
 		}
 		
 	}
+
+	public static void searchHost(SahiTasks browser, String hostName) {
+		browser.textbox("filter").setValue(hostName);
+		browser.span("icon search-icon").click();
+		
+	}
+
+	public static void clearSearch(SahiTasks browser) {
+		
+		browser.textbox("filter").setValue("");
+		browser.span("icon search-icon").click();
+		
+	}
 }
 

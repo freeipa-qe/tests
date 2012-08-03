@@ -23,6 +23,8 @@
 				<include name="hostInvalidCSRTests" />
 				<include name="hostAddDNSTests" />
 			    <include name="hostGetKeytabTests" />
+			    <include name="searchHostTests" />
+			    <include name="searchHostNegativeTests" />
 			    <include name="hostEditSSHPubKeyTests" />
 			    <include name="hostEditNegativeSSHPubKeyTests" />
 			    <include name="hostEditRefreshResetUpdateSSHPubKeyTests" />

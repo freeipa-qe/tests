@@ -16,6 +16,7 @@ import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
+import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.SudoTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
@@ -445,7 +446,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userEditDeleteTests"}, dataProvider="getUserEditDeleteTestObjects", 
 			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
  "userReactivateTests",
-			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
+			"invalidUserAddTests", "userSearchTests", "searchUsersNegativeTests", "userMultipleDataTests",
 			"userAddDeleteUndoResetTests", "userDeactivateUserPageTests", "userReactivateTestsUserPage", "userDeactivateNegativeTests"})	
 	public void testUserEditDelete(String testName, String uid) throws Exception {
 		sahiTasks.link(uid).click();
@@ -464,7 +465,7 @@ public class UserTests extends SahiTestScript{
 	@Test (groups={"userDeleteTests"}, dataProvider="getUserDeleteTestObjects", 
 			dependsOnGroups={"userAddTests", "userEditTests", "userSetPasswordTests", "userDeactivateTests", 
  "userReactivateTests",
-			"invalidUserAddTests", "userSearchTests", "userMultipleDataTests",
+			"invalidUserAddTests", "userSearchTests", "searchUsersNegativeTests", "userMultipleDataTests",
 			"userAddDeleteUndoResetTests", "userEditDeleteTests", "userDeactivateUserPageTests"})	
 	public void testUserDelete(String testName, String uid) throws Exception {
 		//verify user to be deleted exists
@@ -484,7 +485,7 @@ public class UserTests extends SahiTestScript{
 	 * Delete multiple users - for positive tests
 	 */
 	@Test (groups={"userMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
- "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userDeleteSSHPubKeyTests", "userEditSSHPubKeyTests", "userEditUndoSSHPubKeyTests", "userEditEmpMiscInfoTests", "userSearchTests", "userEditDeleteTests" })
+ "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userDeleteSSHPubKeyTests", "userEditSSHPubKeyTests", "userEditUndoSSHPubKeyTests", "userEditEmpMiscInfoTests", "userSearchTests", "searchUsersNegativeTests", "userEditDeleteTests" })
 	public void testMultipleUserDelete(String testName, String uid1, String uid2, String uid3, String uid4) throws Exception {		
 		String uids[] = {uid1, uid2, uid3, uid4};
 		
@@ -668,6 +669,19 @@ public class UserTests extends SahiTestScript{
 		UserTasks.clearSearch(sahiTasks);
 	}
 	
+	/*
+	 * search users negative
+	 */
+	@Test (groups={"searchUsersNegativeTests"}, dataProvider="getUsersSearchNegativeTestObjects",  dependsOnGroups={"userAddTests"})	
+	public void testUserSearchNegative(String testName, String uid) throws Exception {
+		
+		//search host
+		UserTasks.searchUser(sahiTasks, uid);
+		
+		//verify host was deleted
+		Assert.assertFalse(sahiTasks.link(uid).exists(), uid + " does not exist - search successfully");
+		UserTasks.clearSearch(sahiTasks);
+	}
 	
 	/*
 	 * Expand/Collapse
@@ -1257,6 +1271,21 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	/*
+	 * Data to be used when searching users that are not added
+	 */
+	@DataProvider(name="getUsersSearchNegativeTestObjects")
+	public Object[][] getUsersSearchNegativeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserSearchNegativeTestObjects());
+	}
+	protected List<List<Object>> createUserSearchNegativeTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				hostname1
+		ll.add(Arrays.asList(new Object[]{ "search_users_negative",		"user005" } ));
+		        
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when updating Mailing Address for users
