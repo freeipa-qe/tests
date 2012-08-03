@@ -45,6 +45,12 @@ ipa_install_set_vars() {
 	[ -n "$CLIENT2" -a -z "$CLIENT2_env1" ] && \
 		export CLIENT_env1=$(echo $CLIENT_env1 $CLIENT2)
 	
+	if [ "$IPv6SETUP" = "TRUE" ]; then 
+		rrtype="AAAA"
+	else	
+		rrtype=""
+	fi
+
 	# Process MASTER variables
 	I=1
 	while test -n "$(eval echo \$MASTER_env${I})"; do
@@ -52,7 +58,7 @@ ipa_install_set_vars() {
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
 		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$DOMAIN
 		export BEAKERMASTER_env${I}=$M
-		export BEAKERMASTER_IP_env${I}=$(dig +short $M)
+		export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype)
 		if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
 			export MYROLE=MASTER_env${I}
 			export MYENV=${I}
@@ -70,7 +76,7 @@ ipa_install_set_vars() {
 		for R in $(eval echo \$REPLICA_env${I}); do
 			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$DOMAIN
 			export BEAKERREPLICA${J}_env${I}=$R
-			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R)
+			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype)
 			if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
 				export MYROLE=REPLICA${J}_env${I}
 				export MYENV=${I}
@@ -92,7 +98,7 @@ ipa_install_set_vars() {
 		for C in $(eval echo \$CLIENT_env${I}); do
 			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$DOMAIN
 			export BEAKERCLIENT${J}_env${I}=$C
-			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C)
+			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype)
 			if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
 				export MYROLE=CLIENT${J}_env${I}
 				export MYENV=${I}
@@ -105,10 +111,12 @@ ipa_install_set_vars() {
 	done
 
 	# Make sure Simple Vars are set in env.sh for simplicity and
-    # backwards compatibility with older tests.  This means no
-    # _env<NUM> suffix.
+	# backwards compatibility with older tests.  This means no
+	# _env<NUM> suffix.
 	echo "export MASTER=$MASTER_env1" >> /dev/shm/env.sh
+	echo "export MASTERIP=$BEAKERMASTER_IP_env1" >> /dev/shm/env.sh
 	echo "export SLAVE=\"$REPLICA_env1\"" >> /dev/shm/env.sh
+	echo "export SLAVEIP=$BEAKERREPLICA1_IP_env1" >> /dev/shm/env.sh
 	echo "export REPLICA=\"$REPLICA_env1\"" >> /dev/shm/env.sh
 	echo "export CLIENT=$CLIENT1_env1" >> /dev/shm/env.sh
 	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
@@ -118,7 +126,7 @@ ipa_install_set_vars() {
 	echo "export BEAKERCLIENT2=$BEAKERCLIENT2_env1" >> /dev/shm/env.sh
 	# CONSIDER: changing env1 to env${MYENV} let each environment set
 	# things specific to itself.  otherwise, current tests as of 2012-08-01
-    # won't work in env's other than 1.
+	# won't work in env's other than 1.
 
 	. /dev/shm/env.sh
 
