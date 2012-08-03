@@ -112,6 +112,8 @@ public abstract class IPAWebAutomation extends TestScript {
 				log.info("enter method:[" + methodName + "]");
 				IPAWebTestMonitor monitor = new IPAWebTestMonitor(testPage, methodName);  
 				reporter.addTestCaseInExecutionQueue(monitor); 
+				if(browser.span("Login").exists())
+					CommonTasks.formauth(browser, "admin", System.getProperty("ipa.server.password"));
 				// start test case execution
 				m.invoke(page, monitor);
 				reporter.addIPAWebTestResult(monitor);

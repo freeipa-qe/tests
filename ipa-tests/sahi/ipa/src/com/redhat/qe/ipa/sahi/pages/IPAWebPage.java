@@ -26,8 +26,8 @@ public class IPAWebPage implements StandardTest{
 	protected String modifySettingsPage;
 	protected String modifyUpdateResetCancelPage;
 	protected String modifyNegativePage;
-	protected String delPage;
-	protected String searchPage;
+	protected String delPage; 
+	protected String searchPage; 
 	protected String addUserPage;
 	protected String addGroupPage;
 	protected String addUserDelegationPage;
@@ -64,6 +64,7 @@ public class IPAWebPage implements StandardTest{
 		this.url = url;
 		testQueues = new Hashtable<String,ArrayList<String>>();
 		factory = TestDataFactory.instance(testPropertyFile);
+		
 	}
  
 	public void ensureUrl(){ 
@@ -730,8 +731,9 @@ public class IPAWebPage implements StandardTest{
 				fillEmail(monitor, pageName);
 				browser.span("Update").click();
 				pageName=editDelegatedUserNegative;
-				browser.link("Reset Password").click();
-				resetPasswordNegative(monitor, pageName);
+				if(browser.link("action enabled").exists()){
+					monitor.fail("User without Delegation - reset password: Test Failed");
+				}
 				browser.link("Users").under(browser.div("Users")).click();
 				pageName=editDelegatedUserDisplayName;
 				testAccount=factory.getModifyTestAccount(pageName);
@@ -875,8 +877,9 @@ public class IPAWebPage implements StandardTest{
 		testAccount=factory.getModifyTestAccount(pageName);
 		if(browser.link(testAccount).exists()){
 			browser.link(testAccount).click();
-			browser.link("Reset Password").click();
-			resetPasswordNegative(monitor, pageName);
+			if(browser.link("action enabled").exists()){
+				monitor.fail("User without Delegation - reset password: Test Failed");
+			}
 			if(browser.textbox(0).exists()){
 				monitor.fail("User without Delegation is not editable: Test Failed");
 			}
@@ -1059,36 +1062,6 @@ public class IPAWebPage implements StandardTest{
 		closeDialog(); 
 	}
 	
-	protected void resetPasswordNegative(IPAWebTestMonitor monitor, String pageName){ 
-		StringBuffer testData = new StringBuffer();
-		ArrayList<String> expectedErrorMsgs = new ArrayList<String>();
-		ArrayList<String> uiElements = factory.getUIELements(pageName);
-		for (String uiElement:uiElements)
-		{
-			String[] elementID = uiElement.split(":"); 
-			String tag = elementID[0];
-			String id = elementID[1]; 
-			String valueAndExpectedErrorMsg = factory.getValue(pageName, tag, id);
-			String[] combined = factory.extractValues(valueAndExpectedErrorMsg); 
-			String value = combined[0];
-			String expectedErrorMsg = combined[1];
-			String errortype=combined[2];
-			setElementValue(monitor, pageName,tag,id,value); 
-			testData.append(value + " & ");
-			if (expectedErrorMsg != null)
-				expectedErrorMsgs.add(expectedErrorMsg);
-		}
-		monitor.setCurrentTestData(pageName,  "{" + testData.substring(0,testData.length()-3)+ "}");
-		browser.button("Reset Password").click();
-		boolean matches = verifyExpectedErrorMsg(expectedErrorMsgs);
-		if (matches){
-			monitor.pass("error message matches with expected");
-		}else{
-			monitor.fail("error message does NOT match with expected");
-		}
-		closeDialog(); 
-	}
-	
 	protected void addMultipleNewEntries(IPAWebTestMonitor monitor, String pageName, int numOfEntries) throws IPAWebAutomationException
 	{ 
 		browser.span("Add").click(); 
@@ -1141,7 +1114,7 @@ public class IPAWebPage implements StandardTest{
 					testAccounts.add(value);
 				}
 			}
-			if(pageName.equals("addNegativePage") || pageName.equals("searchPage")){
+			if(pageName.equals(addNegativePage) || pageName.equals(searchPage)){
 				if(value.charAt(value.length()-1)=='l'){
 					value=value.substring(0,value.length()-1);
 					value=" " + value;
