@@ -343,6 +343,7 @@ public class AutomountTests extends SahiTestScript{
 	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapSingle", dependsOnGroups={"deleteAutomountKey", "modifyIndirectAutomountMap","addAutomountKey_negative"},
 			description="delete single automount map")
 	public void deleteAutomountMapSingle(String automountLocation,String automountMap) throws Exception { 
+		browser.navigateTo(commonTasks.automountPage, true);
 		browser.link(automountLocation).click();
 		Assert.assertTrue(browser.link(automountMap).exists(), "before delete, autoumount location (" + automountMap + ")should exist in list");
 		CommonHelper.deleteEntry(browser, automountMap);  
@@ -352,6 +353,7 @@ public class AutomountTests extends SahiTestScript{
 	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapMultiple", dependsOnGroups={"deleteAutomountKey", "modifyIndirectAutomountMap"},
 			description="delete multiple automount map")
 	public void deleteAutomountMapMultiple(String automountLocation,String automountMaps) throws Exception { 
+		browser.navigateTo(commonTasks.automountPage, true);
 		browser.link(automountLocation).click();
 		String[] maps = CommonHelper.stringToArray(automountMaps);
 		for (String map:maps)
@@ -837,6 +839,7 @@ public class AutomountTests extends SahiTestScript{
 	@Test (groups={"deleteAutomountKey"}, dataProvider="deleteAutomountKeySingle", dependsOnGroups="modifyAutomountKey",
 			description = "delete single automount key")
 	public void deleteAutomountKeySingle(String automountLocation, String automountMap, String automountKey) throws Exception { 
+		browser.navigateTo(commonTasks.automountPage, true);//xdong
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();
 		Assert.assertTrue(browser.link(automountKey).exists(), "before delete, autoumount location (" + automountKey + ")should exist in list");
