@@ -252,10 +252,15 @@ public class GroupTasks {
 			sahiTasks.link("memberof_group").click();
 		}
 		sahiTasks.radio("direct").click();
-		//sahiTasks.link("Add").click();
-		//sahiTasks.link("Add[1]").click();
-		sahiTasks.link("Add").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
-		sahiTasks.checkbox(name).click();
+		if(sahiTasks.link("sudousr").exists()){//xdong
+			sahiTasks.link("Add").click();
+			sahiTasks.checkbox("runassudousr").click();
+		}
+		
+		else {
+			sahiTasks.link("Add").click();
+			sahiTasks.checkbox(name).click();
+		}
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
@@ -278,8 +283,8 @@ public class GroupTasks {
 		}
 		sahiTasks.radio("direct").click();
 		sahiTasks.checkbox(name).click();
-		//sahiTasks.span("Delete").click();
-		sahiTasks.link("Delete").near(sahiTasks.div("RefreshDeleteAddShow Results Direct Membership Indirect Membership")).click();
+		sahiTasks.span("Delete").click();
+		//sahiTasks.link("Delete").near(sahiTasks.div("RefreshDeleteAdd")).click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 	}
