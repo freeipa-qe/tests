@@ -642,7 +642,7 @@ rlJournalStart
 		# echo "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
 		# echo "ipa dnsrecord-add $REVERSE_ZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
 		# rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
-		CLIENT_REVZONE=$(echo $BEAKERCLIENT2_IP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+		CLIENT2_REVZONE=$(echo $BEAKERCLIENT2_IP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		rlLog "Running: ipa dnsrecord-add $CLIENT2_REVZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
 		rlRun "ipa dnsrecord-add $CLIENT2_REVZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
 
