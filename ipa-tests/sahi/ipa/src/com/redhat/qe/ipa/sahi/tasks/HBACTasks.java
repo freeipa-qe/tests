@@ -718,6 +718,7 @@ public class HBACTasks {
 	public static void verifyHBACServiceMembership(SahiTasks sahiTasks, String service, String serviceGroup, boolean isMember) {
 		sahiTasks.link(service).click();
 		sahiTasks.link("memberof_hbacsvcgroup").click();
+		sahiTasks.span("Refresh").click();//xdong
 		if (isMember)
 			Assert.assertTrue(sahiTasks.link(serviceGroup).exists(), "Verified " + serviceGroup + " is listed in memberof for service " + service);
 		else
@@ -765,14 +766,16 @@ public class HBACTasks {
 	}
 
 	public static void verifyHBACServiceGroupNavigation(SahiTasks sahiTasks, String cn) {
-		sahiTasks.link(cn).click();
+		sahiTasks.link(cn ).click();
 		sahiTasks.link("su").click();
 		Assert.assertEquals(sahiTasks.textarea("description").value(), "su", "Verified description for service su");
 		sahiTasks.link("memberof_hbacsvcgroup").click();
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verified service group for service su");
-		sahiTasks.link(cn ).click();
+		//sahiTasks.link(cn ).click();
 
-		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
+		
+		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
 	}
 
 	public static void enrollServiceinServiceGroup(SahiTasks sahiTasks,	String svcgrp, String service) {
@@ -788,7 +791,7 @@ public class HBACTasks {
 
 	public static void verifyServicesInServiceGroup(SahiTasks sahiTasks, String service, String svcgrp, boolean expectedResult) {
 		sahiTasks.link(svcgrp).click();
-		
+		sahiTasks.span("Refresh").click();//xdong
 		if (expectedResult)
 			Assert.assertTrue(sahiTasks.checkbox(service).exists(), "Verified service " + service + " is added in " + svcgrp);
 		else
@@ -885,7 +888,8 @@ public class HBACTasks {
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Add").click();
 		//Click to add Host from "Accessing" section
-	    sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).click();
+	    //sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.div("Hosts")).click();
 		sahiTasks.checkbox(hostName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Add").click();
@@ -990,7 +994,6 @@ public class HBACTasks {
 		}
 		
 		sahiTasks.span("Next").click();
-		
 		if(checkIfNotEmptyString(hostname1))
 		{
 			sahiTasks.radio(hostname1).click();
@@ -1016,6 +1019,7 @@ public class HBACTasks {
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();		
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error when running test");
 		sahiTasks.button("OK").click();
+		sahiTasks.span("New Test").click();//xdong
 	}
 	
 	/*@param sahitasks
@@ -1145,12 +1149,16 @@ public class HBACTasks {
 			 String unmrule1, String unmrule2,String unmrule3, String expectedResult)
 	{	
 		sahiTasks.textbox("hbactest-user-external").near(sahiTasks.label("Specify external User:")).setValue(user);
+		sahiTasks.radio("hbactest-user-external").click();//xdong
 		sahiTasks.span("Next").click();
 		sahiTasks.textbox("hbactest-targethost-external").near(sahiTasks.label("Specify external Host:")).setValue(targethost);
+		sahiTasks.radio("hbactest-targethost-external").click();//xdong
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Accessing")))).click();
 		sahiTasks.textbox("hbactest-service-external").near(sahiTasks.label("Specify external HBAC Service:")).setValue(service);
+		sahiTasks.radio("hbactest-service-external").click();//xdong
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
 		sahiTasks.textbox("hbactest-sourcehost-external").setValue(sourcehost);
+		sahiTasks.radio("hbactest-sourcehost-external").click();//xdong
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
 		sahiTasks.checkbox(rule).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
