@@ -599,7 +599,7 @@ hbacsvc_client2_006() {
 hbacsvc_master_007() {
         rlPhaseStartTest "ipa-hbacsvc-007: $user7 part of rule7 is allowed to access hostgroup from hostgroup2 with hbacsvcgrp"
 
-        for i in 7; do
+        for i in 2 7; do
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "create_ipauser user$i user$i user$i $userpw"
                 sleep 5
@@ -646,8 +646,8 @@ hbacsvc_client_007() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user7"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT2"
+                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
