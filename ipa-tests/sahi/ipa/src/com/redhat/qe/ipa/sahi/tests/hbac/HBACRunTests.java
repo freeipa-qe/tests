@@ -129,6 +129,7 @@ public class HBACRunTests extends SahiTestScript {
 		
 		// delete HBACRule
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();//xdong		
 		for (String rule : rulename){
 			HBACTasks.deleteHBAC(sahiTasks, rule, "Delete");
 		}
@@ -262,11 +263,11 @@ public class HBACRunTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
 		//                                  testName			    user          	       hostName1  						service           hostName2  				  rules	            				   expectedError
-		ll.add(Arrays.asList(new Object[]{"deselect_who",  	         "",         		"banana."+domain,   				 "smtp",     "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values.Missing values: User name"}));
-    	ll.add(Arrays.asList(new Object[]{"deselect_accessing",  "hbacrunuser945",              "",     				    "smtp",      "apple."+domain, 				 "smtp",     "Input form contains invalid or missing values.Missing values: Target host"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_viaservices","hbacrunuser945",      "banana."+domain,    				 "",         "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values.Missing values: Service"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_from",       "hbacrunuser945",      "banana."+domain,   				 "smtp",        "",               			 "smtp",     "Input form contains invalid or missing values.Missing values: Source host"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_all",           "",  		 		        "",   						 "",           "",        				      "smtp",     "Input form contains invalid or missing values.Missing values: User nameTarget hostServiceSource host"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_who",  	         "",         		"banana."+domain,   				 "smtp",     "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values. Missing values: User name"}));//xdong
+    	ll.add(Arrays.asList(new Object[]{"deselect_accessing",  "hbacrunuser945",              "",     				    "smtp",      "apple."+domain, 				 "smtp",     "Input form contains invalid or missing values. Missing values: Target host"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_viaservices","hbacrunuser945",      "banana."+domain,    				 "",         "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values. Missing values: Service"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_from",       "hbacrunuser945",      "banana."+domain,   				 "smtp",        "",               			 "smtp",     "Input form contains invalid or missing values. Missing values: Source host"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_all",           "",  		 		        "",   						 "",           "",        				      "smtp",     "Input form contains invalid or missing values. Missing values: User name Target host Service Source host"}));//xdong
 		return ll;
 	}
 	
