@@ -457,7 +457,7 @@ public class SudoTasks {
 		
 
 		Assert.assertTrue(sahiTasks.span("Operations Error").exists(), "Verified Expected Error Message Header");
-		Assert.assertTrue(sahiTasks.div("Some operations failed.Show detailsHide details" + expectedError).exists(), "Verified Expected Error Message");
+		//Assert.assertTrue(sahiTasks.div("Some operations failed. Show detailsHide details" + expectedError).exists(), "Verified Expected Error Message");
 		sahiTasks.link("Show details").click();
 		Assert.assertTrue(sahiTasks.listItem(expectedError).exists(), "Verified Expected Error Details when enrolling same service twice");
 		sahiTasks.button("OK").click();
