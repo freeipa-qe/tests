@@ -8,7 +8,7 @@
 		</packages>
 		<groups>
 			<run>
-			    <include name="setup" />
+			   <include name="setup" />
 			  <include name="hbacRuleAddTests" />
 		       <include name="invalidhbacRuleAddTests" /> 
 			    <include name="hbacRuleRequiredFieldAddTests" />
@@ -38,9 +38,11 @@
 	</test>
 
 
+
 	<test name="HBAC Services Tests">
 		<groups>
 			<run>
+			    <include name="setup" />
 			    <include name="hbacServiceAddTests" />
 	            <include name="hbacServiceAddAndAddAnotherTests" />
 		        <include name="hbacServiceAddAndEditTests" />
@@ -68,7 +70,7 @@
 	<test name="HBAC Service Groups Tests">
 		<groups>
 			<run>
-			    
+			    <include name="setup" />
 			    <include name="hbacServiceGroupAddTests" />
 		        <include name="hbacServiceGroupAddAndAddAnotherTests" />
 		        <include name="hbacServiceGroupAddAndEditTests" />
@@ -95,6 +97,7 @@
 	</test>
 		
 		
+
 		<test name="HBAC Run Tests">
 		<groups>
 			<run>
@@ -113,10 +116,11 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.hbac.HBACRunTests" />
 		</classes>
 	</test>
-		
+
 	
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
 	</listeners>
 	
 </suite>
+
