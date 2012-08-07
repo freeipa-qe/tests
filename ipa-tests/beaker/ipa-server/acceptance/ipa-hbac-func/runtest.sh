@@ -57,6 +57,8 @@ user1="user1"
 user2="user2"
 user3="user3"
 
+RHEL5=$(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l)
+
 ########################################################################
 
 #Checking hostnames of all hosts
