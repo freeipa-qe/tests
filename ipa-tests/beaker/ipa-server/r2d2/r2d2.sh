@@ -21,11 +21,6 @@ else
     exit 0
 fi
 
-# checking to ensure that manifest file exists
-if [ ! -f $manifest ]
-then
-    echo "WARNING - manifest file $manifest not found"
-fi
 
 # check the starting point: where we have acceptance test stored
 while [ ! -d $RHTS/r2d2 ]
@@ -88,7 +83,6 @@ then
     echo "template for PURPOSE :        [$purpose_template]"
     echo "template for testinfo.desc:   [$testinfo_template]"
     echo "template for runtest.sh:      [$runtest_template]"
-    echo "manifest for test case:       [$manifest]"
 
     echo "output file goes to:"
     echo "Makefile:        [$makefile_out]"
@@ -141,16 +135,18 @@ sed -e "s/r2d2_authoremail/$authoremail/g" \
     -e "s/r2d2_testsuitename/$testsuitename/g"\
     $runtest_template > $runtest_out
 echo " " >> $runtest_out
-echo "# manifest:" >> $runtest_out
-cat $manifest >> $runtest_out
 echo "runtest.sh is done:    [$runtest_out]"
 
 ########################################
 #    produce: t.$testsuitename.sh      #
 ########################################
-r2d2pl=$RHTS/r2d2/r2d2.pl
-echo $r2d2pl "$manifest" "$t_out" > /dev/null
-$r2d2pl "$manifest" "$t_out" > /dev/null
+echo "#!/bin/bash" > $t_out
+echo "######################################################" >> $t_out
+echo "# test suite  : $testsuitename" >> $t_out
+echo "# description : $description" >> $t_out
+echo "# created by  : $author ($authoremail)" >> $t_out
+echo "# created date: `date`" >> $t_out
+echo "######################################################" >> $t_out
 echo "testcase file is done: [$t_out]"
 
 echo "------------- end of r2d2 -----------"
