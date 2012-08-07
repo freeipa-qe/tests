@@ -641,15 +641,15 @@ hbacsvc_master_007() {
 
 hbacsvc_client_007() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+	rlPhaseStartTest "ipa-hbacsvc-client1-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user7"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user7"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT2"
-                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+		rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 hbacsvc_client2_007() {
@@ -1405,8 +1405,8 @@ hbacsvc_client_015() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user15"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_failure user15 testpw123@ipa.com $CLIENT"
-                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user15 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -1524,8 +1524,8 @@ hbacsvc_client_016() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user16"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_failure user16 testpw123@ipa.com $CLIENT"
-                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user16 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2220,8 +2220,8 @@ hbacsvc_client_027() {
 		sleep 5
                 rlRun "getent -s sss passwd user27"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_failure user27 testpw123@ipa.com $CLIENT"
-                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user27 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2286,8 +2286,8 @@ hbacsvc_client_028() {
 		sleep 5
                 rlRun "getent -s sss passwd user28"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_failure user28 testpw123@ipa.com $CLIENT"
-                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2359,8 +2359,8 @@ hbacsvc_client_029() {
 		sleep 5
                 rlRun "getent -s sss passwd user29"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_failure user29 testpw123@ipa.com $CLIENT"
-                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user29 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
@@ -2437,8 +2437,8 @@ hbacsvc_client_030() {
 		sleep 5
                 rlRun "getent -s sss passwd user30"
 		# Source host validation has been depricated which caused the following test to fail, hence updating
-                rlRun "ssh_auth_failure user30 testpw123@ipa.com $CLIENT"
-                #rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user30 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
 }
