@@ -1015,20 +1015,25 @@ ipa_quick_uninstall(){
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 check_coredump(){
 
-        /usr/bin/abrt-cli list | grep Directory |  awk '{print $2}'
-                crashes=`/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}' | wc -l`
-                if [ $crashes -ne 0 ]; then
-                        echo "Crash detected."
-                        for dir in `/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}'`; do
-                                cd $dir
-                                /usr/bin/abrt-action-install-debuginfo -v;
-                                /usr/bin/abrt-action-generate-backtrace -v;
-                                /usr/bin/rhts-submit-log -l backtrace
-                                /usr/bin/reporter-mailx -v
-                        done
-                else
-                        echo "No crash detected."
-                fi
+	if [ ! -f /usr/bin/abrt-cli ]; then
+		echo "abrt-cli not found...exiting $FUNCNAME"
+		return 1
+	fi
+
+	/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}'
+	crashes=`/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}' | wc -l`
+	if [ $crashes -ne 0 ]; then
+		echo "Crash detected."
+		for dir in `/usr/bin/abrt-cli list | grep Directory |  awk '{print $2}'`; do
+			cd $dir
+			/usr/bin/abrt-action-install-debuginfo -v;
+			/usr/bin/abrt-action-generate-backtrace -v;
+			/usr/bin/rhts-submit-log -l backtrace
+			/usr/bin/reporter-mailx -v
+		done
+	else
+		echo "No crash detected."
+	fi
 
 
 } #check_coredump
