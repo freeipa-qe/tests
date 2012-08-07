@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-autorenewcert
+Description: IPA auto-renew certificate test suite
+Author: Yi Zhang <yzhang@redhat.com>
