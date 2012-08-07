@@ -94,9 +94,10 @@ rlJournalStart
 		if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
 			service iptables stop
 			if [ $? -eq 1 ]; then
-				rlFail "BZ 845301 found -- service iptables stop returns 1 when already stopped"
+				rlLog "[ FAIL ] BZ 845301 found -- service iptables stop returns 1 when already stopped"
+				rlLog "This affects RHEL5 version of iptables service"
 			else
-				rlPass "BZ 845301 not found -- service iptables stop succeeeded"
+				rlLog "[ PASS ] BZ 845301 not found -- service iptables stop succeeeded"
 			fi
 		else	
 			rlRun "service iptables stop" 0 "Stop the firewall on the client"
