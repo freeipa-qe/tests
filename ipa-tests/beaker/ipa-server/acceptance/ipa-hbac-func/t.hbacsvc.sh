@@ -646,7 +646,13 @@ hbacsvc_client_007() {
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd user7"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-		rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
+		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
+		# RHEL5 though still appears to have source host validation and needs the failure check here.
+		if [ $RHEL5 -eq 1 ]; then
+			rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
+		else
+			rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
+		fi
 		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
 	rlPhaseEnd
@@ -1400,15 +1406,21 @@ hbacsvc_master_015() {
 
 hbacsvc_client_015() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-015: user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
+	rlPhaseStartTest "ipa-hbacsvc-client1-015: user15 from grp15 part of rule15 is allowed to access hostgrp from hostgrp2"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user15"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user15"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user15 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
+		# RHEL5 though still appears to have source host validation and needs the failure check here.
+		if [ $RHEL5 -eq 1 ]; then
+			rlRun "ssh_auth_failure user15 testpw123@ipa.com $CLIENT"
+		else
+			rlRun "ssh_auth_success user15 testpw123@ipa.com $CLIENT"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 hbacsvc_client2_015() {
@@ -1519,15 +1531,21 @@ hbacsvc_master_016() {
 
 hbacsvc_client_016() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-016: user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
+	rlPhaseStartTest "ipa-hbacsvc-client1-016: user16 from grp16 part of rule16 is allowed to access hostgrp from hostgrp2 - hbacsvcgrp"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user16"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user16"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user16 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
+		# RHEL5 though still appears to have source host validation and needs the failure check here.
+		if [ $RHEL5 -eq 1 ]; then
+			rlRun "ssh_auth_failure user16 testpw123@ipa.com $CLIENT"
+		else
+			rlRun "ssh_auth_success user16 testpw123@ipa.com $CLIENT"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 hbacsvc_client2_016() {
@@ -2214,16 +2232,22 @@ hbacsvc_master_027() {
 
 hbacsvc_client_027() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-027: user27 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+	rlPhaseStartTest "ipa-hbacsvc-client1-027: user27 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
-                rlRun "getent -s sss passwd user27"
+		rlRun "getent -s sss passwd user27"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user27 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
+		# RHEL5 though still appears to have source host validation and needs the failure check here.
+		if [ $RHEL5 -eq 1 ]; then
+			rlRun "ssh_auth_failure user27 testpw123@ipa.com $CLIENT"
+		else
+			rlRun "ssh_auth_success user27 testpw123@ipa.com $CLIENT"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 hbacsvc_client2_027() {
@@ -2280,16 +2304,22 @@ hbacsvc_master_028() {
 
 hbacsvc_client_028() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-028: user28 part of rule28 is allowed to access $CLIENT from $CLIENT2 with incorrect hbacsvc"
+	rlPhaseStartTest "ipa-hbacsvc-client1-028: user28 part of rule28 is allowed to access $CLIENT from $CLIENT2 with incorrect hbacsvc"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
-                rlRun "getent -s sss passwd user28"
+		rlRun "getent -s sss passwd user28"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
+		# RHEL5 though still appears to have source host validation and needs the failure check here.
+		if [ $RHEL5 -eq 1 ]; then
+			rlRun "ssh_auth_failure user28 testpw123@ipa.com $CLIENT"
+		else
+			rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 hbacsvc_client2_028() {
@@ -2353,16 +2383,22 @@ hbacsvc_master_029() {
 
 hbacsvc_client_029() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-029: user29 part of rule29 is allowed to access $CLIENT from $CLIENT2 with empty group"
+	rlPhaseStartTest "ipa-hbacsvc-client1-029: user29 part of rule29 is allowed to access $CLIENT from $CLIENT2 with empty group"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
-                rlRun "getent -s sss passwd user29"
+		rlRun "getent -s sss passwd user29"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user29 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
+		# RHEL5 though still appears to have source host validation and needs the failure check here.
+		if [ $RHEL5 -eq 1 ]; then
+			rlRun "ssh_auth_failure user29 testpw123@ipa.com $CLIENT"
+		else
+			rlRun "ssh_auth_success user29 testpw123@ipa.com $CLIENT"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 hbacsvc_client2_029() {
@@ -2431,16 +2467,22 @@ hbacsvc_master_030() {
 
 hbacsvc_client_030() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-030: user30 part of rule30 is allowed to access $CLIENT from $CLIENT2 with empty netgroup"
+	rlPhaseStartTest "ipa-hbacsvc-client1-030: user30 part of rule30 is allowed to access $CLIENT from $CLIENT2 with empty netgroup"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
-                rlRun "getent -s sss passwd user30"
+		rlRun "getent -s sss passwd user30"
 		# Source host validation has been depricated which caused the following test to fail, hence updating
-                rlRun "ssh_auth_success user30 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
+		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
+		# RHEL5 though still appears to have source host validation and needs the failure check here.
+		if [ $RHEL5 -eq 1 ]; then
+			rlRun "ssh_auth_failure user30 testpw123@ipa.com $CLIENT"
+		else
+			rlRun "ssh_auth_success user30 testpw123@ipa.com $CLIENT"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
 
-        rlPhaseEnd
+	rlPhaseEnd
 }
 
 hbacsvc_client2_030() {
