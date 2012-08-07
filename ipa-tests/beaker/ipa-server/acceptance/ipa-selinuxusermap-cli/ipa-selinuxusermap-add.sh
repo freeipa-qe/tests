@@ -127,7 +127,7 @@ run_selinuxusermap_add_tests(){
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for duplicate selinuxusermap"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-cli-003: Add a new selinux user type to existing selinuxusermap"
+    rlPhaseStartTest "ipa-selinuxusermap-cli-003: Add a new selinuxuser rule to existing selinuxusermap"
         command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser $selinuxusermap1"
         expmsg="ipa: ERROR: SELinux User Map rule with name $selinuxusermap1 already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for new selinux user type with existing selinuxusermap"

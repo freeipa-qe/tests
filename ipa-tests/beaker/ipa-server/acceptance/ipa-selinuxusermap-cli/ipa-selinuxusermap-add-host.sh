@@ -55,6 +55,7 @@ selinuxusermap2="testselinuxusermap2"
 selinuxusermap3="testselinuxusermap3"
 selinuxusermap4="testselinuxusermap4"
 selinuxusermap5="testselinuxusermap5"
+selinuxusermap6="testselinuxusermap6"
 
 default_selinuxuser="guest_u:s0"
 host1="devhost."$DOMAIN
@@ -72,7 +73,7 @@ hostgroup5="desktopqe_hosts"
 
 run_selinuxusermap_add_host_tests(){
 
-    rlPhaseStartSetup "ipa-selinuxusermap-addhost-cli-startup: Create temp directory and Kinit"
+    rlPhaseStartSetup "ipa-selinuxusermap-host-add-cli-startup: Create temp directory and Kinit"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -116,8 +117,8 @@ run_selinuxusermap_add_host_tests(){
 	rlAssertGrep "member host: $host1: This entry is already a member" "$TmpDir/selinuxusermap-host-add-002.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-003:  Remove host attr from the se-linux usermap"
-        rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap1" 0 "Delete host attr from selinuxusermap"
+    rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-003:  Remove hosts from the se-linux usermap"
+        rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap1" 0 "Delete host from selinuxusermap"
 	rlRun "ipa selinuxusermap-show $selinuxusermap1 > $TmpDir/selinuxusermap-add-host-003.out" 0 "Show selinuxusermap"
 	rlAssertNotGrep "Hosts: $host1" "$TmpDir/selinuxusermap-add-host-003.out"
     rlPhaseEnd
@@ -127,7 +128,7 @@ run_selinuxusermap_add_host_tests(){
         rlRun "ipa selinuxusermap-show $selinuxusermap1 > $TmpDir/selinuxusermap-add-host-004.out" 0 "Show selinuxusermap"
 	rlRun "cat $TmpDir/selinuxusermap-add-host-004.out"
         rlAssertGrep "Hosts: $host1, $host2, $host3" "$TmpDir/selinuxusermap-add-host-004.out"
-        rlRun "ipa selinuxusermap-remove-host --hosts=$host1,$host2,$host3 $selinuxusermap1" 0 "Delete host attr from selinuxusermap"
+        rlRun "ipa selinuxusermap-remove-host --hosts=$host1,$host2,$host3 $selinuxusermap1" 0 "Delete host from selinuxusermap"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-005: Add multiple hosts to the se-linux usermap - not all hosts added successfully"
@@ -139,7 +140,7 @@ run_selinuxusermap_add_host_tests(){
         rlRun "ipa selinuxusermap-show $selinuxusermap1 > $TmpDir/selinuxusermap-add-host-show-005.out" 0 "Show selinuxusermap"
 	rlRun "cat $TmpDir/selinuxusermap-add-host-show-005.out"
         rlAssertGrep "Hosts: $host1, $host2, $host3" "$TmpDir/selinuxusermap-add-host-show-005.out"
-        rlRun "ipa selinuxusermap-remove-host --hosts=$host1,$host2,$host3 $selinuxusermap1" 0 "Delete host attr from selinuxusermap"
+        rlRun "ipa selinuxusermap-remove-host --hosts=$host1,$host2,$host3 $selinuxusermap1" 0 "Delete hosts from selinuxusermap"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-006: Add host Category - unknown"
@@ -169,8 +170,8 @@ run_selinuxusermap_add_host_tests(){
         rlAssertGrep "member host group: $hostgroup1: This entry is already a member" "$TmpDir/selinuxusermap-host-add-009.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-010:  Remove host group attr from the se-linux usermap"
-        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1 $selinuxusermap2" 0 "Delete host group attr from selinuxusermap"
+    rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-010:  Remove host group from the se-linux usermap"
+        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1 $selinuxusermap2" 0 "Delete host group from selinuxusermap"
         rlRun "ipa selinuxusermap-show $selinuxusermap2 > $TmpDir/selinuxusermap-add-host-010.out" 0 "Show selinuxusermap"
         rlAssertNotGrep "Host Groups: $hostgroup1" "$TmpDir/selinuxusermap-add-host-010.out"
     rlPhaseEnd
@@ -180,7 +181,7 @@ run_selinuxusermap_add_host_tests(){
         rlRun "ipa selinuxusermap-show $selinuxusermap2 > $TmpDir/selinuxusermap-add-host-011.out" 0 "Show $selinuxusermap2"
         rlRun "cat $TmpDir/selinuxusermap-add-host-011.out"
         rlAssertGrep "Host Groups: $hostgroup1, $hostgroup2, $hostgroup3" "$TmpDir/selinuxusermap-add-host-011.out"
-        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1,$hostgroup2,$hostgroup3 $selinuxusermap2" 0 "Delete host group attr from selinuxusermap"
+        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1,$hostgroup2,$hostgroup3 $selinuxusermap2" 0 "Delete host group from selinuxusermap"
     rlPhaseEnd
 
    rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-012: Add multiple host groups to the se-linux usermap - not all host groups added successfully"
@@ -192,7 +193,7 @@ run_selinuxusermap_add_host_tests(){
         rlRun "ipa selinuxusermap-show $selinuxusermap2 > $TmpDir/selinuxusermap-add-host-show-012.out" 0 "Show selinuxusermap"
         rlRun "cat $TmpDir/selinuxusermap-add-host-show-012.out"
         rlAssertGrep "Host Groups: $hostgroup1, $hostgroup2, $hostgroup3" "$TmpDir/selinuxusermap-add-host-show-012.out"
-        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1,$hostgroup2,$hostgroup3 $selinuxusermap2" 0 "Delete host group attr from selinuxusermap"
+        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1,$hostgroup2,$hostgroup3 $selinuxusermap2" 0 "Delete host group from selinuxusermap"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-013: Add host group Category - unknown"
@@ -221,8 +222,8 @@ run_selinuxusermap_add_host_tests(){
         rlRun "cat $TmpDir/selinuxusermap-add-host-show-015.out"
         rlAssertGrep "Hosts: $host1" "$TmpDir/selinuxusermap-add-host-show-015.out"
         rlAssertGrep "Host Groups: $hostgroup1, $hostgroup2" "$TmpDir/selinuxusermap-add-host-show-015.out"
-        rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap3" 0 "Delete host attr from selinuxusermap"
-        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1,$hostgroup2 $selinuxusermap3" 0 "Delete host groups attr from selinuxusermap"
+        rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap3" 0 "Delete host from selinuxusermap"
+        rlRun "ipa selinuxusermap-remove-host --hostgroups=$hostgroup1,$hostgroup2 $selinuxusermap3" 0 "Delete host groups from selinuxusermap"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-016: Add a host with a empty string"
@@ -304,9 +305,22 @@ run_selinuxusermap_add_host_tests(){
         rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap5" 0 "Clean-up: Delete host from selinuxusermap"
     rlPhaseEnd
 
+     rlPhaseStartTest "ipa-selinuxusermap-host-add-cli-024: Add host group and a host that's is part of the hostgroup to the se-linux usermap"
+	rlRun "ipa hostgroup-add-member --hosts=$host1 $hostgroup1" 0 "Add $host1 to $hostgroup1"
+        rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap6" 0 "Add a selinuxusermap"
+        rlRun "ipa selinuxusermap-add-host --hosts=$host1 $selinuxusermap6" 0 "Add host $host1 to selinuxusermap"
+        rlRun "ipa selinuxusermap-add-host --hostgroups=$hostgroup1 $selinuxusermap6" 0 "Add host group $hostgroup1 to selinuxusermap"
+        rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap6" 0 "Verifying selinuxusermap was added with given selinuxuser"
+        rlRun "ipa selinuxusermap-show $selinuxusermap6 > $TmpDir/selinuxusermap-add-host-024.out" 0 "Show selinuxusermap"
+        rlRun "cat $TmpDir/selinuxusermap-add-host-024.out"
+	rlAssertGrep "Hosts: $host1" "$TmpDir/selinuxusermap-add-host-024.out"
+        rlAssertGrep "Host Groups: $hostgroup1" "$TmpDir/selinuxusermap-add-host-024.out"
+	rlRun "ipa hostgroup-remove-member --hosts=$host1 $hostgroup1" 0 "Clean-up: Remove $host1 from $hostgroup1"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-selinuxusermap-host-add-cli-cleanup: Destroying admin credentials."
 	# delete selinux user 
-	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 ; do
+	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 $selinuxusermap6; do
 		rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
 	done
 	for item in $host1 $host2 $host3; do

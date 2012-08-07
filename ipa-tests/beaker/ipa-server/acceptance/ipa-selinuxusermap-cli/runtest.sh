@@ -61,6 +61,10 @@
 . ./ipa-selinuxusermap-disable.sh
 . ./ipa-selinuxusermap-enable.sh
 . ./ipa-selinuxusermap-find.sh
+. ./ipa-selinuxusermap-mod.sh
+. ./ipa-selinuxusermap-remove-host.sh
+. ./ipa-selinuxusermap-remove-user.sh
+. ./ipa-selinuxusermap-show.sh
 ########################################################################
 
 PACKAGE="ipa-admintools"
@@ -80,23 +84,27 @@ rlJournalStart
 # Execute ipa config tests for SELinux user map
 #  run_selinuxusermap_config_tests
 # Execute SELinux user map add tests
-#  run_selinuxusermap_add_tests
+  run_selinuxusermap_add_tests
 # Execute SELinux user map add-host tests
-#  run_selinuxusermap_add_host_tests
+  run_selinuxusermap_add_host_tests
 # Execute SELinux user map add-user tests
-#  run_selinuxusermap_add_user_tests
+  run_selinuxusermap_add_user_tests
 # Execute SELinux user map delete tests
-#  run_selinuxusermap_del_tests
+  run_selinuxusermap_del_tests
 # Execute SELinux user map disable tests
-#  run_selinuxusermap_disable_tests
+  run_selinuxusermap_disable_tests
 # Execute SELinux user map enable tests
-#  run_selinuxusermap_enable_tests
-# Execute SELinux user map enable tests
+  run_selinuxusermap_enable_tests
+# Execute SELinux user map find  tests
   run_selinuxusermap_find_tests
-
-
-# Execute add target hosts and hostgroups to an SELinux user map rule tests
-#  run_selinuxusermap_add_host_tests
+# Execute SELinux user map mod tests
+  run_selinuxusermap_mod_tests
+# Execute SELinux user map remove-host tests
+  run_selinuxusermap_remove_host_tests
+# Execute SELinux user map remove-user tests
+  run_selinuxusermap_remove_user_tests
+# Execute SELinux user map show tests
+  run_selinuxusermap_show_tests
 
     rlPhaseStartCleanup "ipa-selinuxusermap-cli-cleanup: Clean-up."
         rhts-submit-log -l /var/log/httpd/error_log

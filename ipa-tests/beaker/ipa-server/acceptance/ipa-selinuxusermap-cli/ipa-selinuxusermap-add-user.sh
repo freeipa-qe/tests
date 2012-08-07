@@ -116,8 +116,8 @@ run_selinuxusermap_add_user_tests(){
 	rlAssertGrep "member user: $user1: This entry is already a member" "$TmpDir/selinuxusermap-user-add-002.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-user-add-cli-003:  Remove user attr from the se-linux usermap"
-        rlRun "ipa selinuxusermap-remove-user --users=$user1 $selinuxusermap1" 0 "Delete user attr from selinuxusermap"
+    rlPhaseStartTest "ipa-selinuxusermap-user-add-cli-003:  Remove user from the se-linux usermap"
+        rlRun "ipa selinuxusermap-remove-user --users=$user1 $selinuxusermap1" 0 "Delete user from selinuxusermap"
 	rlRun "ipa selinuxusermap-show $selinuxusermap1 > $TmpDir/selinuxusermap-add-user-003.out" 0 "Show selinuxusermap"
 	rlAssertNotGrep "Users: $user1" "$TmpDir/selinuxusermap-add-user-003.out"
     rlPhaseEnd
@@ -169,7 +169,7 @@ run_selinuxusermap_add_user_tests(){
         rlAssertGrep "member group: $usergroup1: This entry is already a member" "$TmpDir/selinuxusermap-user-add-009.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-user-add-cli-010:  Remove user group attr from the se-linux usermap"
+    rlPhaseStartTest "ipa-selinuxusermap-user-add-cli-010:  Remove user group from the se-linux usermap"
         rlRun "ipa selinuxusermap-remove-user --groups=$usergroup1 $selinuxusermap2" 0 "Delete user group from selinuxusermap"
         rlRun "ipa selinuxusermap-show $selinuxusermap2 > $TmpDir/selinuxusermap-add-user-010.out" 0 "Show selinuxusermap"
         rlAssertNotGrep "User Groups: $usergroup1" "$TmpDir/selinuxusermap-add-user-010.out"
@@ -180,7 +180,7 @@ run_selinuxusermap_add_user_tests(){
         rlRun "ipa selinuxusermap-show $selinuxusermap2 > $TmpDir/selinuxusermap-add-user-011.out" 0 "Show $selinuxusermap2"
         rlRun "cat $TmpDir/selinuxusermap-add-user-011.out"
         rlAssertGrep "User Groups: $usergroup1, $usergroup2, $usergroup3" "$TmpDir/selinuxusermap-add-user-011.out"
-        rlRun "ipa selinuxusermap-remove-user --groups=$usergroup1,$usergroup2,$usergroup3 $selinuxusermap2" 0 "Delete user group attr from selinuxusermap"
+        rlRun "ipa selinuxusermap-remove-user --groups=$usergroup1,$usergroup2,$usergroup3 $selinuxusermap2" 0 "Delete user group from selinuxusermap"
     rlPhaseEnd
 
    rlPhaseStartTest "ipa-selinuxusermap-user-add-cli-012: Add multiple user groups to the se-linux usermap - not all user groups added successfully"

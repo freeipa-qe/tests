@@ -170,7 +170,7 @@ run_selinuxusermap_find_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-find-008: Find selinuxuser map with --sizelimit option"
-        rlRun "addSelinuxusermap \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap6 --desc=\"some description\"" 0 "Add a selinuxusermap"
+        rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --desc=\"some description\" $selinuxusermap6" 0 "Add a selinuxusermap"
         rlRun "findSelinuxusermap $selinuxusermap6" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
         rlRun "ipa selinuxusermap-find > $TmpDir/selinuxusermap-find_test8_all.out" 0 "Find selinuxusermap"
         rlRun "cat $TmpDir/selinuxusermap-find_test8_all.out"
