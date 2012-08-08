@@ -138,14 +138,15 @@ popd
 	rlRun "host $ADhost"
 
 	# Removing IPA cert from AD
+	# Passing $ADip instead of $ADhost as I faced issue in F17
 	rlLog "Cleanup AD before PassSync Install"
-	./IPAcert_install.exp delete $ADadmin $ADpswd $ADhost $msifile > /dev/null 2>&1
+	./IPAcert_install.exp delete $ADadmin $ADpswd $ADip $msifile > /dev/null 2>&1
 	sleep 10
 
 	# Uploading the IPA certificate in AD and importing it for passync
 	rm -f $ipacrt
 	rlRun "cp $crt_file $ipacrt"
-	rlRun "./IPAcert_install.exp add $ADadmin $ADpswd $ADhost $msifile $IPAhost $ipacrt $IPAhostIP > /dev/null 2>&1" 0 "Installing PassSync, forwarder and IPA cert in AD"
+	rlRun "./IPAcert_install.exp add $ADadmin $ADpswd $ADip $msifile $IPAhost $ipacrt $IPAhostIP > /dev/null 2>&1" 0 "Installing PassSync, forwarder and IPA cert in AD"
 	rlLog "AD server is being rebooted. Waiting 5 mins"
 	sleep 300
 	while true; do

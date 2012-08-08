@@ -45,6 +45,7 @@ rpm2="expect"
 rpm3="telnet"
 rpm4="coreutils"
 rpm5="glibc-common"
+rpm6="openssh-clients"
 
 rlJournalStart
 
@@ -71,6 +72,11 @@ rlJournalStart
    rlCheckRpm "$rpm5"
 	if [ $? -ne 0 ]; then
            rlRun "yum install -y $rpm5"
+        fi
+
+   rlCheckRpm "$rpm6"
+        if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm6"
         fi
 
 # Include test case file

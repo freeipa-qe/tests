@@ -29,7 +29,7 @@
 set action [lrange $argv 0 0]
 set username [lrange $argv 1 1]
 set password  [lrange $argv 2 2]
-set adhost [lrange $argv 3 3]
+set adhostip [lrange $argv 3 3]
 set msifile [lrange $argv 4 4]
 set ipahost [lrange $argv 5 5]
 set ipacrt [lrange $argv 6 6]
@@ -43,7 +43,7 @@ set timeout 20
 
 if { [string compare $action add ] == 0 } {
 # Add forwarder for testrelm.com
-spawn telnet $adhost;
+spawn telnet $adhostip;
 expect "login: ";
 send -- "$username\r";
 expect "*?assword:*";
@@ -52,9 +52,10 @@ expect "*>";
 send -- "dnscmd /zoneadd $ipadomain /forwarder $ipahostip\r";
 sleep 5;
 send -- "exit\r";
+sleep 5;
 
 # Upload PassSync Installer and IPA certificate
-spawn sftp -o StrictHostKeychecking=no $username@$adhost;
+spawn sftp -o StrictHostKeychecking=no $username@$adhostip;
 expect "*?assword:*";
 send -- "$password\r";
 expect ">";
@@ -66,16 +67,15 @@ sleep 5;
 send -- "put $msifile\r";
 sleep 5;
 send -- "bye\r";
+sleep 5;
 
 # Install and configure PassSync
-spawn ssh $username@$adhost;
+spawn ssh $username@$adhostip;
 expect "*?assword:*";
 send -- "$password\r";
 expect "*>";
 send -- "cd $ipapath\r";
 expect "*IPA>";
-send -- "dnscmd /zoneadd $ipadomain /forwarder $ipahostip\r";
-sleep 5
 send -- "msiexec /i $msifile /qn /l logfile.txt hostname=\"$ipahost\" portnum=\"636\" user=\"uid=passsync,cn=sysaccounts,cn=etc,dc=testrelm,dc=com\" password=\"password\" certtoken=\"Secret123\" srchbase=\"cn=users,cn=accounts,dc=testrelm,dc=com\"\r";
 sleep 5;
 # Import the certificate in the certdb for Passsync
@@ -96,7 +96,7 @@ expect eof;
 
 } elseif { [string compare $action delete ] == 0 } {
 # Uninstall PassSync
-spawn ssh -o StrictHostKeychecking=no $username@$adhost;
+spawn ssh -o StrictHostKeychecking=no $username@$adhostip;
 expect "*?assword:*";
 send -- "$password\r";
 expect "*>";
@@ -110,8 +110,9 @@ send -- "cd c:\\\r";
 expect "*>";
 send -- "rmdir /S /Q IPA\r";
 send -- "exit\r";
+sleep 5
 # Delete Forwarder for testrelm.com
-spawn telnet $adhost;
+spawn telnet $adhostip;
 expect "login: ";
 send -- "$username\r";
 expect "*?assword:*";
