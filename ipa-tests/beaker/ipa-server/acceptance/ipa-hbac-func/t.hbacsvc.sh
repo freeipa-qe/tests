@@ -648,7 +648,9 @@ hbacsvc_client_007() {
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
-		if [ $RHEL5 -eq 1 ]; then
+		# RHEL5.9 is getting source host validation disabled also so changing the test
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
 		else
 			rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
@@ -1413,7 +1415,9 @@ hbacsvc_client_015() {
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
-		if [ $RHEL5 -eq 1 ]; then
+		# RHEL5.9 is getting source host validation disabled also so changing the test
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user15 testpw123@ipa.com $CLIENT"
 		else
 			rlRun "ssh_auth_success user15 testpw123@ipa.com $CLIENT"
@@ -1538,7 +1542,9 @@ hbacsvc_client_016() {
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
-		if [ $RHEL5 -eq 1 ]; then
+		# RHEL5.9 is getting source host validation disabled also so changing the test
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user16 testpw123@ipa.com $CLIENT"
 		else
 			rlRun "ssh_auth_success user16 testpw123@ipa.com $CLIENT"
@@ -2240,7 +2246,9 @@ hbacsvc_client_027() {
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
-		if [ $RHEL5 -eq 1 ]; then
+		# RHEL5.9 is getting source host validation disabled also so changing the test
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user27 testpw123@ipa.com $CLIENT"
 		else
 			rlRun "ssh_auth_success user27 testpw123@ipa.com $CLIENT"
@@ -2312,7 +2320,9 @@ hbacsvc_client_028() {
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
-		if [ $RHEL5 -eq 1 ]; then
+		# RHEL5.9 is getting source host validation disabled also so changing the test
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user28 testpw123@ipa.com $CLIENT"
 		else
 			rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
@@ -2391,7 +2401,9 @@ hbacsvc_client_029() {
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
-		if [ $RHEL5 -eq 1 ]; then
+		# RHEL5.9 is getting source host validation disabled also so changing the test
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user29 testpw123@ipa.com $CLIENT"
 		else
 			rlRun "ssh_auth_success user29 testpw123@ipa.com $CLIENT"
@@ -2475,7 +2487,9 @@ hbacsvc_client_030() {
 		# Source host validation has been depricated which caused the following test to fail, hence updating
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
-		if [ $RHEL5 -eq 1 ]; then
+		# RHEL5.9 is getting source host validation disabled also so changing the test
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user30 testpw123@ipa.com $CLIENT"
 		else
 			rlRun "ssh_auth_success user30 testpw123@ipa.com $CLIENT"
