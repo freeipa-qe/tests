@@ -59,7 +59,7 @@ selinuxusermap6="testselinuxusermap6"
 
 default_selinuxuser="guest_u:s0"
 host1="devhost."$DOMAIN
-host2="qe-blade-08."$DOMAIN
+host2="qe-blade-00008."$DOMAIN
 host3="switch."$DOMAIN
 host4="qe-blade-05."$DOMAIN
 host5="qe-blade-06."$DOMAIN

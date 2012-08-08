@@ -110,7 +110,7 @@ run_selinuxusermap_config_tests(){
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-005: Modify ipa config default selinuxuser with non existing selinux user"
         new_selinuxuser="unknowntype_u:s0"
 	command="ipa config-mod --ipaselinuxusermapdefault=$new_selinuxuser"
-        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Default SELinux user map default user not in order list"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermapdefault': SELinux user map default user not in order list"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
     rlPhaseEnd
 

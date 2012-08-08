@@ -299,24 +299,28 @@ rlPhaseStartTest "ipa-selinuxusermap-cli-027: Add a selinuxuser map with invalid
         command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd#"
         expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-cli-028: Add a selinuxuser map with invalid character - @"
         command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd@"
         expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-cli-029: Add a selinuxuser map with invalid character - *"
         command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd*"
         expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-cli-030: Add a selinuxuser map with invalid character - ?"
         command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd?"
         expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-selinuxusermap-cli-cleanup: Destroying admin credentials."
