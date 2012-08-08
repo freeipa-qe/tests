@@ -252,15 +252,15 @@ public class GroupTasks {
 			sahiTasks.link("memberof_group").click();
 		}
 		sahiTasks.radio("direct").click();
-		if(sahiTasks.link("sudousr").exists()){//xdong
-			sahiTasks.link("Add").click();
-			sahiTasks.checkbox("runassudousr").click();
-		}
+		//if(sahiTasks.link("sudousr").exists()){//xdong
+		//	sahiTasks.link("Add").click();
+		//	sahiTasks.checkbox("runassudousr").click();
+		//}
 		
-		else {
+		//else {
 			sahiTasks.link("Add").click();
 			sahiTasks.checkbox(name).click();
-		}
+		//}
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
@@ -441,12 +441,14 @@ public class GroupTasks {
 	public static void addRole_Single(SahiTasks browser, String role) {
 		browser.link("memberof_role").click();
 		CommonHelper.addEntry(browser, role);
+		browser.span("Refresh").click();//xdong
 	}
 
 
 	public static void addRole_Multiple(SahiTasks browser,String[] roles) {
 		browser.link("memberof_role").click();
 		CommonHelper.addEntry(browser, roles);
+		browser.span("Refresh").click();//xdong
 	}
 
 	public static void addRole_ViaSearch(SahiTasks browser,	String filter, String role) {
