@@ -1,12 +1,26 @@
 # Role Based Access Control has 3 sets of clis: privilege, privilege and role
 #  this will cover the functional tests 
 
+#############################################
+##          Variables                      ##
+#############################################
+
+##### For DNS Zone Permission tests
+login1="dnsuser1"
+password="Secret123"
+ipaddr="$MASTER"
+zone1="one.testrelm.com"
+zone2="two.testrelm.com"
+dnsPrivilege="DNSTestPrivilege"
+dnsRole="DNSTestRole"
+
 ipaRBACFunctionalTests() {
     setupRBACTests
     test01
     test04
 #    test05
     test06
+    testDNSPermissions
     cleanupRBACTests
 }
 
@@ -67,6 +81,7 @@ cleanupRBACTests()
   rlRun "deletePrivilege \"$privilegeName\"" 0 "Deleting $privilegeName"
   roleName="Test Group Desc And User Admin"
   rlRun "deleteRole \"$roleName\"" 0 "Deleting $roleName"
+
 }
 
 # Scenario:
@@ -208,16 +223,6 @@ test04()
    
 }
 
-#test05()
-#{
-# verify bug xxx
-# for the roles in 
-# ipa role-find | grep "Role name" | cut -d ":" -f2
-# go through each to verify it has privileges added
-# do same for privileges to verify it has permissions added.
-
-#}
-
 
 
 #test05()
@@ -281,3 +286,197 @@ test06()
      rlAssertGrep "$expmsg" "$TmpDir/ipaRBAC_test06_2.log"
    rlPhaseEnd
 }
+
+testDNSPermissions()
+{
+   dnsSetup
+   testPerDomainDNS
+   dnsCleanup
+}
+
+# Setup:
+# Add 1 users, 2 zones
+# add privilege, role
+dnsSetup() 
+{
+
+       rlRun "kinitAs $ADMINID $ADMINPW"
+
+       # add a test user
+       firstname="dnsuser1"
+       lastname="dnsuser1"
+       create_ipauser $login1 $firstname $lastname $password
+
+       # add two DNS Zones
+       rlRun "kinitAs $ADMINID $ADMINPW"
+       email="ipaqar.resdhat.com"
+       ipa dnszone-add --name-server=$ipaddr $zone1 --admin-email=$email
+       ipa dnszone-add --name-server=$ipaddr $zone2 --admin-email=$email
+
+       # Add a new privilege to test
+       ipa privilege-add $dnsPrivilege --desc=$dnsPrivilege
+
+       # Add a new role to test
+       ipa role-add $dnsRole --desc=$dnsRole
+
+      # Add privilege to role
+      addPrivilegeToRole "$dnsPrivilege" "$dnsRole"
+       
+}
+
+dnsCleanup()
+{
+     rlRun "kinitAs $ADMINID $ADMINPW"
+     ipa user-del $login1 
+     ipa dnszone-del $zone1 $zone2
+     ipa privilege-del $dnsPrivilege
+     ipa role-del $dnsRole
+}
+
+
+
+# bug 801931/Per-domain DNS record permissions
+testPerDomainDNS()
+{ 
+      rlLog "Executing: ipa dnszone-add-permission $zone1"
+      rlRun "ipa dnszone-add-permission $zone1" 0 "Add permission to manage $zone1"
+      dnsPermission="Manage DNS zone $zone1"
+      rlRun "addPermissionToPrivilege \"$dnsPermission\" \"$dnsPrivilege\"" 0 "Add permission to privilege"
+ 
+      type="users"
+      rlRun "addMemberToRole \"$dnsRole\" $type $login1 all" 0 "Adding member to role $dnsRole"
+
+      # kinit as dnsUser1
+      rlRun "kinitAs $login1 $password" 0 "kinit as $login1"
+      
+      # user can list only one.testrelm.com
+      
+      rlPhaseStartTest "ipa-rbac-1010 - Can list zone managed by user" 
+         rlRun "ipa dnszone-show $zone1 --all" 0 "$login1 can list $zone1"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1011 - Cannot list zone not managed by user" 
+          command="ipa dnszone-show $zone2"
+          expmsg="ipa: ERROR: $zone2: DNS zone not found"
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_show.log 2>&1" 2 "Verify error message when listing unauthorized zone"
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_show.log"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1012 - Cannot add permission for zone not managed by user" 
+          command="ipa dnszone-add-permission $zone2"
+          expmsg="ipa: ERROR: $zone2: DNS zone not found"
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_addperm.log 2>&1" 2 "Verify error message when adding permission for unauthorized zone"
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_addperm.log"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1013 - Cannot add a new zone"
+          testZone="testzone.testrelm.com"
+          command="ipa dnszone-add --name-server=$ipaddr $testZone --admin-email=$email"
+          expmsg="ipa: ERROR: Insufficient access: Insufficient 'add' privilege to add the entry 'idnsname=$testZone,cn=dns,dc=testrelm,dc=com'."
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_add.log 2>&1" 1 "Verify error message when adding new zone" 
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_add.log"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1014 - Cannot delete zone managed by user"
+          command="ipa dnszone-del $zone1"
+          expmsg="ipa: ERROR: Insufficient access: Insufficient 'delete' privilege to delete the entry 'idnsname=$zone1,cn=dns,dc=testrelm,dc=com'."
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_del.log 2>&1" 1 "Verify error message when deleting zone managed by user" 
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_del.log"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1015 - Cannot edit managedBy attr for zone managed by user"
+          command="ipa dnszone-mod $zone1 --setattr=managedBy=\"uid=dnsuser2,cn=users,cn=accounts,dc=testrelm,dc=com\""
+          expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'managedBy' attribute of entry 'idnsname=$zone1,cn=dns,dc=testrelm,dc=com'."
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_managebyattr.log 2>&1" 1 "Verify error message when modifying managedby attr for zone managed by user" 
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_managebyattr.log"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1016 - Can enable/disable zone managed by user"
+         rlRun "ipa dnszone-disable $zone1" 0 "$login1 can disable $zone1"
+         rlRun "ipa dnszone-enable $zone1" 0 "$login1 can enable $zone1"
+      rlPhaseEnd
+
+
+      rlPhaseStartTest "ipa-rbac-1017 - Cannot enable/disable zone not managed by user"
+          command="ipa dnszone-disable $zone2"
+          expmsg="ipa: ERROR: no such entry"
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_disable.log 2>&1" 2 "Verify error message when disabling zone not managed by user" 
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_disable.log"
+          command="ipa dnszone-enable $zone2"
+          expmsg="ipa: ERROR: no such entry"
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_enable.log 2>&1" 2 "Verify error message when enabling zone not managed by user" 
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_enable.log"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1018 - Can read Global configuration, but cannot modify it"
+          rlRun "ipa dnsconfig-show" 0 "$login1 can read Global Configuration"
+          command="ipa dnsconfig-mod --allow-sync-ptr=TRUE"
+          expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'idnsAllowSyncPTR' attribute of entry 'cn=dns,dc=testrelm,dc=com'."
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_config1.log 2>&1" 1 "Verify error message when updating global configuration for Allow PTR sync"
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_config1.log"
+          command="ipa dnsconfig-mod --forwarder=1.1.1.1"
+          expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'idnsForwarders' attribute of entry 'cn=dns,dc=testrelm,dc=com'."
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_config2.log 2>&1" 1 "Verify error message when  updating global configuration for Global forwarders" 
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_config2.log"
+      rlPhaseEnd
+
+
+      rlPhaseStartTest "ipa-rbac-1019 - Can add/delete/modify/find DNS records" 
+          arecordName="ARecord"
+          arecord="1.1.1.1,2.2.2.2"
+          arecordIP2="2.2.2.2"
+          txtrecord="ABC"
+          rlRun "ipa dnsrecord-add $zone1 $arecordName --a-rec $arecord" 0 "Add a A Record with ip - $arecord"
+          rlRun "ipa dnsrecord-show $zone1 $arecordName | grep $arecordIP2 " 0 "Show the record, and verify A record with $arecord"
+          rlRun "ipa dnsrecord-mod $zone1 $arecordName --txt-rec $txtrecord" 0 "Modify the record to add a TXT record"
+          rlRun "ipa dnsrecord-find $zone1 $arecordName | grep $txtrecord" 0 "Find the record, verify TXT record"
+          rlRun "ipa dnsrecord-del $zone1 $arecordName --a-rec $arecordIP2" 0 "Delete the A record - for one IP"
+          rlRun "ipa dnsrecord-del $zone1 $arecordName --txt-rec $txtrecord" 0 "Delete the TXT rec"
+          rlRun "ipa dnsrecord-show $zone1 $arecordName | grep $arecordIP2 " 1 "Show the record, and verify A record with $arecord is deleted"
+          rlRun "ipa dnsrecord-show $zone1 $arecordName | grep $txtrecord " 1 "Show the record, and verify A record with $txtrecord is deleted"
+      rlPhaseEnd
+
+      rlPhaseStartTest "ipa-rbac-1020 - Cannot remove permission to manage this zone"
+          command="ipa dnszone-remove-permission $zone1" 
+          expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'managedBy' attribute of entry 'idnsname=$zone1,cn=dns,dc=testrelm,dc=com'."
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_removeperm.log 2>&1" 1 "Verify error message whenremoving zone permission"
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_removeperm.log"
+      rlPhaseEnd
+
+
+
+      rlRun "kinitAs $ADMINID $ADMINPW"
+      rlLog "Executing: ipa dnszone-remove-permission $zone1"
+      ipa dnszone-remove-permission $zone1
+
+
+}
+
+
+#test05()
+#{
+# Check available DNS permissions:
+# Read DNS Entries
+#     User can list all zones
+#     User cannot add/enable/disable/delete any zone
+#     User cannot add/delete a record to a zone
+# Write DNS configuration 
+#   Need Read DNS Entries to see the list
+#   Can modify Global config
+# Add DNS Entries
+#   Need Read DNS Entries to see the list
+#   Can add zone
+#   Cannot delete/enable/disable zone
+#   Can add record
+#   cannot modify dns record
+# Remove DNS Entries
+#   cannot disable/enable/add dns zone
+#   can delete zone/record
+#   cannot modify dns record
+# Update DNS Entries
+#   cannot add/delete zone
+#   can disable/enable zone
+#   cannot add record
+#   can update a record - add/edit/delete
+#}
+
