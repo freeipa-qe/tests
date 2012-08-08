@@ -551,7 +551,7 @@ public class SudoTests extends SahiTestScript{
 		// and related to above Bug 735185 
 		//add user to usergroup
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
-		GroupTasks.addMembers(sahiTasks, groupName, "user", uid, "Add");
+		GroupTasks.addMembers(sahiTasks, groupName, "user", runAsUID, "Add");//xdong
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
 		//now verify it is indirect member of this Sudo rule
