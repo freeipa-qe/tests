@@ -252,15 +252,8 @@ public class GroupTasks {
 			sahiTasks.link("memberof_group").click();
 		}
 		sahiTasks.radio("direct").click();
-		//if(sahiTasks.link("sudousr").exists()){//xdong
-		//	sahiTasks.link("Add").click();
-		//	sahiTasks.checkbox("runassudousr").click();
-		//}
-		
-		//else {
-			sahiTasks.link("Add").click();
-			sahiTasks.checkbox(name).click();
-		//}
+		sahiTasks.link("Add").click();
+		sahiTasks.checkbox(name).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
