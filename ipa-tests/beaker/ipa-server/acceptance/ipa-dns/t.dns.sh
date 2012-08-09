@@ -812,7 +812,7 @@ dnskxrecord()
 dnszonepermission()
 {
    # Positive add permission
-       rlPhaseStartTest "add zone, then a permission to manage it, and verify if managedby attribute is set, and that permission is added"
+       rlPhaseStartTest "ipa-dnszone-permission-01 add zone, then a permission to manage it, and verify if managedby attribute is set, and that permission is added"
           ipa dnszone-add --name-server=$ipaddr --admin-email=$email $managedZone
           rlRun "ipa dnszone-add-permission $managedZone" 0 "Add permission to manage zone"
           rlRun "ipa dnszone-show $managedZone --all | grep -i managedby" 0 "Verify managedby attribute is set"
@@ -820,13 +820,13 @@ dnszonepermission()
        rlPhaseEnd
        
    # Positive remove permission
-       rlPhaseStartTest " Remove permission to manage zone, verify managedby attribute is not set, and permission is deleted"
+       rlPhaseStartTest "ipa-dnszone-permission-02 Remove permission to manage zone, verify managedby attribute is not set, and permission is deleted"
           rlRun "ipa dnszone-remove-permission $managedZone" 0 "Remove permission for zone to be managed"
           rlRun "ipa dnszone-show $managedZone --all | grep -i managedby" 1 "Verify managedby attribute is not available" 
           rlRun "ipa permission-find \"manage dns zone $managedZone\"" 1 "Verify permission to manage the zone is removed" 
        rlPhaseEnd
 
-       rlPhaseStartTest "add zone, then a permission to manage it, then delete the zone and verify that permission is deleted"
+       rlPhaseStartTest "ipa-dnszone-permission-03 add zone, then a permission to manage it, then delete the zone and verify that permission is deleted"
           rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email $managedZone1" 0 "Add zone to be managed"
           rlRun "ipa dnszone-add-permission $managedZone1" 0 "Add permission to manage zone"
           rlRun "ipa dnszone-del $managedZone1" 0 "Delete the zone"
@@ -834,7 +834,7 @@ dnszonepermission()
        rlPhaseEnd
 
    # Negative add permission
-       rlPhaseStartTest "add duplicate permission to manage zone" 
+       rlPhaseStartTest "ipa-dnszone-permission-04 add duplicate permission to manage zone" 
           ipa dnszone-add-permission $managedZone
           command="ipa dnszone-add-permission $managedZone" 
           expMsg="ipa: ERROR: permission with name \"Manage DNS zone $managedZone\" already exists"
@@ -842,7 +842,7 @@ dnszonepermission()
           rlAssertGrep "$expMsg" "$TmpDir/dnszonepermission_duplicate.log"
        rlPhaseEnd
 
-       rlPhaseStartTest "add permission to manage non-existent zone" 
+       rlPhaseStartTest "ipa-dnszone-permission-05 add permission to manage non-existent zone" 
           command="ipa dnszone-add-permission $nonexistentZone" 
           expMsg="ipa: ERROR: $nonexistentZone: DNS zone not found"
           rlRun "$command > $TmpDir/dnszonepermission_addfornonexistentzone.log 2>&1" 2 "Verify error message when adding permission for non existent zone"
@@ -850,7 +850,7 @@ dnszonepermission()
        rlPhaseEnd
 
    # Negative remove permission
-       rlPhaseStartTest " Remove permission to manage zone again"
+       rlPhaseStartTest "ipa-dnszone-permission-06 Remove permission to manage zone again"
           ipa dnszone-remove-permission $managedZone
           command="ipa dnszone-remove-permission $managedZone"
           expMsg="ipa: ERROR: Manage DNS zone $managedZone: permission not found"
@@ -858,7 +858,7 @@ dnszonepermission()
           rlAssertGrep "$expMsg" "$TmpDir/dnszonepermission_redelete.log"
        rlPhaseEnd
 
-       rlPhaseStartTest " Remove permission for non-existent zone" 
+       rlPhaseStartTest "ipa-dnszone-permission-07 Remove permission for non-existent zone" 
           command="ipa dnszone-remove-permission $nonexistentZone"
           expMsg="ipa: ERROR: $nonexistentZone: DNS zone not found"
           rlRun "$command > $TmpDir/dnszonepermission_deletefornonexistentzone.log 2>&1" 2 "Verify error message for when deleting permission for non existent zone"
