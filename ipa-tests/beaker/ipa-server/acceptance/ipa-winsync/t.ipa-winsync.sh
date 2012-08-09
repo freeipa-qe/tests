@@ -593,14 +593,14 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 
 	rlLog "Winsync OU with existing users"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd --win-subtree=\"OU=$OU1,$ADdc\"" 0 "Creating winsync agreement with OU $OU1 win-subtree"
-	sleep 10
+	sleep 15
 
 	 # Restart PassSync after winsync agreement is established
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
 	sleep 5
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
         rlRun "net rpc service start PassSync -I $ADhost -U administrator%$ADpswd" 0 "Restarting PassSync Service"
-	sleep 10
+	sleep 15
 
 	rlRun "ipa user-show $l1user | grep \"Account disabled: False\"" 0 "$l1user from OU $OU1 synced and enabled in IPA"
 	sleep 5
@@ -623,14 +623,14 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 
 	rlLog "Winsync OU without existing users"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd --win-subtree=\"OU=$OU2,$ADdc\"" 0 "Creating winsync agreement with OU $OU2 win-subtree"
-	sleep 10
+	sleep 15
 
 	 # Restart PassSync after winsync agreement is established
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
 	sleep 5
         net rpc service stop PassSync -I $ADhost -U administrator%$ADpswd
         rlRun "net rpc service start PassSync -I $ADhost -U administrator%$ADpswd" 0 "Restarting PassSync Service"
-	sleep 5
+	sleep 10
 
 	rlRun "syncinterval_ldif $sec add"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to $sec sec"
@@ -650,7 +650,7 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub2user in OU $OU2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $sub2user passwd"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $sub2user"
-	rlRun "sleep 15" 0 "Waiting for sync"
+	rlRun "sleep 25" 0 "Waiting for sync"
 	sleep $sec
 	
 	rlRun "ipa user-show $l2user | grep \"Account disabled: False\"" 0 "$l2user from OU $OU2 synced and enabled in IPA"
