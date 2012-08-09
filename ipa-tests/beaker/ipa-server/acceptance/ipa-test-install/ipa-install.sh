@@ -91,6 +91,7 @@ ipa_install_set_vars() {
 		done
 		export REPLICA_env${I}="$NEWREPLICAS"
 		I=$(( I += 1 ))
+		unset NEWREPLICAS
 	done
 
 	# Process CLIENT variables
