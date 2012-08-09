@@ -30,7 +30,7 @@
 #   submit_logs
 #	rlDistroDiff
 ######################################################################
-cat /etc/redhat-release | grep 5
+cat /etc/redhat-release | grep "5\.[0-9]"
 if [ $? -eq 0 ] ; then
 	KINITEXEC=/usr/kerberos/bin/kinit
 else
