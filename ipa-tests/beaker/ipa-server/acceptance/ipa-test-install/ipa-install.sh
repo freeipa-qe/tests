@@ -22,8 +22,10 @@
 
 ipa_install_envcleanup() {
 	for i in $(seq 1 10); do
+		unset ${!BEAKERCLIENT*}
 		unset ${!BEAKERSLAVE*}
 		unset ${!BEAKERREPLICA*}
+		unset ${!CLIENT*}
 		unset ${!SLAVE*}
 		unset ${!REPLICA*}
 		unset ${!MASTER*}
