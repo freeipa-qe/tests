@@ -113,6 +113,7 @@ ipa_install_set_vars() {
 			J=$(( J += 1 ))
 		done
 		I=$(( I += 1 ))
+		unset NEWCLIENTS
 	done
 
 	# Make sure Simple Vars are set in env.sh for simplicity and
