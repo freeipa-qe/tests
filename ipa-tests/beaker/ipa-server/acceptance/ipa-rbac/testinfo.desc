@@ -4,7 +4,7 @@ TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-rbac
 Description:     IPA RBAC test, including 3 CLI sets: role, permission and privilege
 Type:            Regression
-TestTime:        30m
+TestTime:        80m
 RunFor:          ipa-server
 Requires:        ipa-admintools
 Requires:        expect
