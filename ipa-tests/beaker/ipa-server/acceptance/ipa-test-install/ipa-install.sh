@@ -33,6 +33,8 @@ ipa_install_envcleanup() {
 		unset ${!MYROLE*}
 		unset ${!MYENV*}
 		unset ${!TOPO*}
+		unset ${!NEWREPLICA*}
+		unset ${!NEWCLIENT*}
 	done
 }
 
