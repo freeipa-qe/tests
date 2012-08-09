@@ -414,14 +414,14 @@ rlPhaseStartTest "0008 Modify user attributes after replication setup"
 	rlLog "Modify user attributes for user existing before winsync"
 	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_3"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
-	rlRun "sleep 10" 0 "Waiting for sync"
+	rlRun "sleep 25" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "ipa user-show $ADln | grep \"Telephone Number: $phn_3\"" 0 "Attribute modify for user existing before winsync"
 
 	rlLog "Modify user attributes for user created after winsync"
 	rlRun "telephoneNumber_ldif $aduser ads $phn_4"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $aduser"
-	rlRun "sleep 10" 0 "Waiting for sync"
+	rlRun "sleep 25" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "ipa user-show $aduser | grep \"Telephone Number: $phn_4\"" 0 "Attribute modify for user created after winsync"
 rlPhaseEnd
@@ -432,16 +432,14 @@ winsync_test_0009() {
 rlPhaseStartTest "0009 Update Password"
 	rlLog "Update password in AD"
 	rlRun "ADuser_passwd_ldif $ADfn $ADsn $userpw2"
-#	rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Reset $ADfn passwd from AD"
-#	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
 	sleep 40
 	rm -f /tmp/krb5cc_*_*
-	rlRun "ssh_auth_success $ADln $userpw2 $IPAhost" 0 "$ADln login in IPA server with new password"
+	rlRun "ssh_auth_success $ADln $userpw2 $IPAhost"
 
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
-	sleep 20
+	sleep 30
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep -i \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
 
 rlPhaseEnd
@@ -492,8 +490,8 @@ rlPhaseStartTest "0012 Delete User"
 	rlLog "Delete user from AD"
 	rlRun "deleteuser_ldif $aduser ads"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete $aduser from AD"
-	rlRun "sleep 15" 0 "Waiting for sync"
-	sleep 30
+	rlRun "sleep 25" 0 "Waiting for sync"
+	sleep $sec
 	rlRun "ipa user-show $aduser" 2 "User $aduser not found in IPA as expected"
 
 	rlLog "Delete users from IPA"
@@ -503,11 +501,11 @@ rlPhaseStartTest "0012 Delete User"
 	sleep 5
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$ADfn $ADsn,CN=Users,$ADdc\"" 32 "Sync with AD is immediate. User $ADln deleted in AD"
 	sleep 5
-	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 0 "User 456 existed before winsync, hence is not deleted from AD as expected"
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 0 "456 was in IPA and then added in AD after winsync, hence is not deleted from AD as expected"
 	sleep 5
 	# Making sure 456 is deleted from AD
 	rlRun "deleteuser_ldif 456 ads"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Cleaningg user 456 from AD as well"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Manual deletion of user 456 from AD"
 rlPhaseEnd
 }
 
