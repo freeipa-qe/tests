@@ -128,6 +128,18 @@ ipa_install_set_vars() {
 	# things specific to itself.  otherwise, current tests as of 2012-08-01
 	# won't work in env's other than 1.
 
+	# FIX Env specific vars like RELM, DOMAIN, BASEDN
+	if [ $MYENV -gt 1 ]; then 
+		RELM=$(echo $RELM|sed "s/^\([^\.]*\)/\1$MYENV/g")
+		sed -i "s/RELM=.*$/RELM=$RELM/" /dev/shm/env.sh
+
+		DOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$MYENV/g")
+		sed -i "s/DOMAIN=.*$/DOMAIN=$DOMAIN/" /dev/shm/env.sh
+
+		BASEDN=$(echo $BASEDN|sed "s/^\([^\,]*\)/\1$MYENV/g")
+		sed -i "s/BASEDN=.*$/BASEDN=\"$BASEDN\"/" /dev/shm/env.sh
+	fi
+
 	. /dev/shm/env.sh
 
 	### Set OS/YUM/RPM related variables here
