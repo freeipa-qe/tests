@@ -55,10 +55,18 @@ ipa_install_set_vars() {
 		rrtype=""
 	fi
 
+	# Try to set our ENV first.  Will confirm/fix this later as well for full confirmation
+	MYENV=$(env|grep $(hostname -s)|grep -v HOSTNAME|egrep "MASTER|REPLICA|SLAVE|CLIENT"|grep "_env"|sed 's/^.*_env\([0-9]*\)=.*$/\1/'|head)
+	
+	
+
 	# Process MASTER variables
 	I=1
 	while test -n "$(eval echo \$MASTER_env${I})"; do
 		echo "Parsing MASTER Variables for Environment ${I}"
+		if [ $I -gt 1 ]; then
+			DOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+		fi
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
 		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$DOMAIN
 		export BEAKERMASTER_env${I}=$M
@@ -76,6 +84,9 @@ ipa_install_set_vars() {
 	while test -n "$(eval echo \$REPLICA_env${I})"; do
 		J=1
 		echo "Parsing REPLICA Variables for Environment ${I}"
+		if [ $I -gt 1 ]; then
+			DOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+		fi
 		export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
 		for R in $(eval echo \$REPLICA_env${I}); do
 			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$DOMAIN
@@ -99,6 +110,9 @@ ipa_install_set_vars() {
 	while test -n "$(eval echo \$CLIENT_env${I})"; do
 		J=1
 		echo "Parsing CLIENT Variables for Environment ${I}"
+		if [ $I -gt 1 ]; then
+			DOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+		fi
 		export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
 		for C in $(eval echo \$CLIENT_env${I}); do
 			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$DOMAIN
@@ -137,13 +151,13 @@ ipa_install_set_vars() {
 	# FIX Env specific vars like RELM, DOMAIN, BASEDN
 	if [ $MYENV -gt 1 ]; then 
 		NEWRELM=$(echo $RELM|sed "s/^\([^\.]*\)/\1$MYENV/g")
-		sed -i "s/$RELM/$NEWRELM/" /dev/shm/env.sh
+		sed -i "s/RELM=.*$/RELM=$RELM/" /dev/shm/env.sh
 
 		NEWDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$MYENV/g")
-		sed -i "s/$DOMAIN/$NEWDOMAIN/" /dev/shm/env.sh
+		sed -i "s/DOMAIN=.*$/DOMAIN=$DOMAIN/" /dev/shm/env.sh
 
 		NEWBASEDN=$(echo $BASEDN|sed "s/^\([^\,]*\)/\1$MYENV/g")
-		sed -i "s/$BASEDN/$NEWBASEDN/" /dev/shm/env.sh
+		sed -i "s/BASEDN=.*$/BASEDN=\"$BASEDN\"/" /dev/shm/env.sh
 	fi
 
 	. /dev/shm/env.sh
