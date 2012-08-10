@@ -132,6 +132,7 @@ ipa_install_set_vars() {
 			export NEWCLIENTS=$(echo $NEWCLIENTS)
 			J=$(( J += 1 ))
 		done
+		export CLIENT_env${I}="$NEWCLIENTS"
 		I=$(( I += 1 ))
 		unset NEWCLIENTS
 	done
