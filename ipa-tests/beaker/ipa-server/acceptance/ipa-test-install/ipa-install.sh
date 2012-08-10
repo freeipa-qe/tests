@@ -158,13 +158,13 @@ ipa_install_set_vars() {
 	# FIX Env specific vars like RELM, DOMAIN, BASEDN
 	if [ $MYENV -gt 1 ]; then 
 		NEWRELM=$(echo $RELM|sed "s/^\([^\.]*\)/\1$MYENV/g")
-		sed -i "s/RELM=.*$/RELM=$RELM/" /dev/shm/env.sh
+		sed -i "s/RELM=.*$/RELM=$NEWRELM/" /dev/shm/env.sh
 
 		NEWDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$MYENV/g")
-		sed -i "s/DOMAIN=.*$/DOMAIN=$DOMAIN/" /dev/shm/env.sh
+		sed -i "s/DOMAIN=.*$/DOMAIN=$NEWDOMAIN/" /dev/shm/env.sh
 
 		NEWBASEDN=$(echo $BASEDN|sed "s/^\([^\,]*\)/\1$MYENV/g")
-		sed -i "s/BASEDN=.*$/BASEDN=\"$BASEDN\"/" /dev/shm/env.sh
+		sed -i "s/BASEDN=.*$/BASEDN=\"$NEWBASEDN\"/" /dev/shm/env.sh
 	fi
 
 	. /dev/shm/env.sh
