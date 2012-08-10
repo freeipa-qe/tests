@@ -502,7 +502,7 @@ ipa_install_envs()
 		while test -n "$(eval echo \$BEAKERMASTER_env${I})"; do
 			RUNMASTER=$(eval echo \$BEAKERMASTER_env${I})
 			if [ "$MYENV" != "$I" ]; then
-				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYENV.0' $RUNMASTER"
+				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$I.0' $RUNMASTER"
 			else
 				ipa_install_topo
 			fi
