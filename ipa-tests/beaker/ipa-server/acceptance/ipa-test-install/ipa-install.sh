@@ -66,6 +66,8 @@ ipa_install_set_vars() {
 		echo "Parsing MASTER Variables for Environment ${I}"
 		if [ $I -gt 1 ]; then
 			THISDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+		else
+			THISDOMAIN=$DOMAIN
 		fi
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
 		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
@@ -86,6 +88,8 @@ ipa_install_set_vars() {
 		echo "Parsing REPLICA Variables for Environment ${I}"
 		if [ $I -gt 1 ]; then
 			THISDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+		else
+			THISDOMAIN=$DOMAIN
 		fi
 		export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
 		for R in $(eval echo \$REPLICA_env${I}); do
@@ -112,6 +116,8 @@ ipa_install_set_vars() {
 		echo "Parsing CLIENT Variables for Environment ${I}"
 		if [ $I -gt 1 ]; then
 			THISDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+		else
+			THISDOMAIN=$DOMAIN
 		fi
 		export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
 		for C in $(eval echo \$CLIENT_env${I}); do
