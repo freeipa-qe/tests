@@ -65,10 +65,10 @@ ipa_install_set_vars() {
 	while test -n "$(eval echo \$MASTER_env${I})"; do
 		echo "Parsing MASTER Variables for Environment ${I}"
 		if [ $I -gt 1 ]; then
-			DOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+			THISDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
 		fi
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
-		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$DOMAIN
+		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
 		export BEAKERMASTER_env${I}=$M
 		export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype)
 		if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
@@ -85,18 +85,18 @@ ipa_install_set_vars() {
 		J=1
 		echo "Parsing REPLICA Variables for Environment ${I}"
 		if [ $I -gt 1 ]; then
-			DOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+			THISDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
 		fi
 		export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
 		for R in $(eval echo \$REPLICA_env${I}); do
-			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$DOMAIN
+			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
 			export BEAKERREPLICA${J}_env${I}=$R
 			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype)
 			if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
 				export MYROLE=REPLICA${J}_env${I}
 				export MYENV=${I}
 			fi
-			export NEWREPLICAS="$NEWREPLICAS $(echo $R|cut -f1 -d.).$DOMAIN"
+			export NEWREPLICAS="$NEWREPLICAS $(echo $R|cut -f1 -d.).$THISDOMAIN"
 			export NEWREPLICAS=$(echo $NEWREPLICAS)
 			J=$(( J += 1 ))
 		done
@@ -111,18 +111,18 @@ ipa_install_set_vars() {
 		J=1
 		echo "Parsing CLIENT Variables for Environment ${I}"
 		if [ $I -gt 1 ]; then
-			DOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
+			THISDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$I/g")
 		fi
 		export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
 		for C in $(eval echo \$CLIENT_env${I}); do
-			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$DOMAIN
+			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN
 			export BEAKERCLIENT${J}_env${I}=$C
 			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype)
 			if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
 				export MYROLE=CLIENT${J}_env${I}
 				export MYENV=${I}
 			fi
-			export NEWCLIENTS="$NEWCLIENTS $(echo $C|cut -f1 -d.).$DOMAIN"
+			export NEWCLIENTS="$NEWCLIENTS $(echo $C|cut -f1 -d.).$THISDOMAIN"
 			export NEWCLIENTS=$(echo $NEWCLIENTS)
 			J=$(( J += 1 ))
 		done
