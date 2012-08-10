@@ -645,8 +645,8 @@ ipa_install_prep()
 	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
 	diff -q /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa > /dev/null 2>&1
 	if [ $? -eq 1 ]; then	
-		cp -f /dev/shm/id_rsa_global /root/.ssh/id_rsa
-		cp -f /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa.pub
+		/bin/cp -f /dev/shm/id_rsa_global /root/.ssh/id_rsa
+		/bin/cp -f /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa.pub
 		for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
 			for server in $(eval echo \$$var); do
 				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
@@ -655,6 +655,39 @@ ipa_install_prep()
 				ssh-keyscan $server >> /root/.ssh/known_hosts
 			done
 		done
+	fi
+
+	# configure abrt
+	if [ $(cat /etc/redhat-release|grep "5\.[0-9]" |wc -l) -gt 0 ]; then
+		rlLog "configAbrt : Machine is a RHEL 5 machine - no abrt"
+	else
+		hostname_s=`hostname -s`
+		for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
+			rlCheckRpm "$rpm"
+			if [ $? -ne 0 ]; then
+				rlRun "yum install -y $rpm"
+			fi
+		done
+
+		if [ -z "$JOBID" ]; then 
+			eval $(echo $(grep JOBID /etc/motd))
+		fi
+
+		cat > /etc/abrt/abrt-action-save-package-data.conf <<-EOF
+		OpenGPGCheck = no
+		BlackList = nspluginwrapper, valgrind, strace, mono-core
+		ProcessUnpackaged = yes
+		BlackListedPaths = /usr/share/doc/*, */example*, /usr/bin/nspluginviewer, /usr/lib/xulrunner-*/plugin-container
+		EOF
+
+		cat > /etc/libreport/plugins/mailx.conf <<-EOF
+		Subject=CRASH ALERT: Crash detected in ipa automation [Beaker Job: $JOBID].
+		EmailFrom=root@$hostname_s
+		EmailTo=seceng-idm-qe-list@redhat.com
+		SendBinaryData=no
+		EOF
+
+		rlRun "service abrtd restart"
 	fi
 }
 
