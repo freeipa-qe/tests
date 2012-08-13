@@ -49,9 +49,10 @@ public class HBACRunTests extends SahiTestScript {
 	private String ad = "admins";
 	
 	
-	private String servicename = "smtp";
-	private String servicename2 = "smtp1";
-	private String [] servicenames = {servicename, servicename2};
+	private String servicename = "smtp1";
+	private String servicename2 = "smtp2";
+	private String servicename3 = "smtp";
+	private String [] servicenames = {servicename, servicename2,servicename3};
 	private String newservicename = "ftp";
 	private String dec = "adding http service for HBAC";
 		
@@ -93,7 +94,7 @@ public class HBACRunTests extends SahiTestScript {
 			if (rule.equals(rulename1))
 			{			
 			  
-				HBACTasks.addAndEditHBACRuleHost(sahiTasks, rule, user1, fqdn1, rule, fqdn0);
+				HBACTasks.addAndEditHBACRuleHost(sahiTasks, rule, user1, fqdn1, servicename, fqdn0);
 								
 			}
 			else
@@ -129,7 +130,7 @@ public class HBACRunTests extends SahiTestScript {
 		
 		// delete HBACRule
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
-		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();//xdong		
+		//sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();//xdong		
 		for (String rule : rulename){
 			HBACTasks.deleteHBAC(sahiTasks, rule, "Delete");
 		}
@@ -161,9 +162,9 @@ public class HBACRunTests extends SahiTestScript {
 	 * Add Run Test - check required fields - for negative tests
 	 */	
 	@Test (groups={"hbacRequiredFieldRunTests"}, description="HBAC Run Test - missing required field", dataProvider="getHBACRunRequiredFieldTestObjects")
-	public void testHBACRunRequiredFieldTest(String testName, String user,String hostname1, String servicename, String hostname2, String rules, String expectedError) throws Exception 
+	public void testHBACRunRequiredFieldTest(String testName, String user,String hostname1, String servicename, String hostname2, String rules, String expectedError1,String expectedError2) throws Exception 
 		{
-			HBACTasks.createRunTestWithRequiredField (sahiTasks,user,hostname1,servicename,hostname2,rules,expectedError);
+			HBACTasks.createRunTestWithRequiredField (sahiTasks,user,hostname1,servicename,hostname2,rules,expectedError1,expectedError2);
 			
 			sahiTasks.navigateTo(commonTasks.hbacTest, true);
 		}
@@ -207,11 +208,82 @@ public class HBACRunTests extends SahiTestScript {
 	 * HBAC Rule include Enable and Disable Test
 	 */
 	@Test (groups={"hbacRuleIncludeTests"}, description="Rune based on Positive and Negative Tests for rule enable and disable", dataProvider="getHBACRuleIncludeTestObjects")
-	public void testHBACRuleTest(String testName, String user,String servicename, String include,String rule,String rule1,String mrule1, String mrule2,String mrule3,
-			 String unmrule1, String unmrule2,String unmrule3, String expectedResult) throws Exception 
+	public void testHBACRuleTest(String testName, String user,String servicename ,String rule, String expectedResult1, String expectedResult2, String expectedResult3,
+			String mrule1a, String mrule2a,String mrule3a, String unmrule1a, String unmrule2a,String unmrule3a,
+			String mrule1b, String mrule2b,String mrule3b, String unmrule1b, String unmrule2b,String unmrule3b,
+			String mrule1c, String mrule2c,String mrule3c, String unmrule1c, String unmrule2c,String unmrule3c) throws Exception 
 	{
+		if (testName.equals("Rule_enabled_service_smtp1_Test"))
+		{
+			System.out.println("In this test rule 'smtp'is enabled. In this rule(smtp) via-service used is 'smtp1'");
+			HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
+					mrule1a,mrule2a,mrule3a,unmrule1a,unmrule2a,unmrule3a,
+					mrule1b,mrule2b,mrule3b,unmrule1b,unmrule2b,unmrule3b,
+					mrule1c,mrule2c,mrule3c,unmrule1c,unmrule2c,unmrule3c);	
+		}
+		if(testName.equals("Rule_disabled_service_smtp1_Test"))
+		{
+			//changing smtp rule enable to rule disable
+			System.out.println("In this test rule 'smtp'is disable. In this rule(smtp) via-service used is 'smtp1'");
+		    sahiTasks.link("HBAC Rules").click();
+		    sahiTasks.link("smtp").click();
+		    sahiTasks.radio("ipaenabledflag-1-1").click();
+		    sahiTasks.span("Update").click();
+		    sahiTasks.link("HBAC Test").click();
+		    HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
+					mrule1a,mrule2a,mrule3a,unmrule1a,unmrule2a,unmrule3a,
+					mrule1b,mrule2b,mrule3b,unmrule1b,unmrule2b,unmrule3b,
+					mrule1c,mrule2c,mrule3c,unmrule1c,unmrule2c,unmrule3c);	
+		}
+		if(testName.equals("Rule_disabled_service_smtp2_Test"))
+		{
+			System.out.println("In this test rule 'smtp'is disable. In this rule(smtp) via-service used is 'smtp2'");
+			//changing via-service smtp1 to smtp2.
+			//deleting smtp1
+			sahiTasks.link("HBAC Rules").click();
+			sahiTasks.link(rule).click();
+			sahiTasks.checkbox("smtp1").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+			sahiTasks.span("Delete").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+			sahiTasks.button("Delete").click();
+			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+			//adding smtp2
+			String searchString = "smtp2";
+			String searchResult[] = {"smtp2" };
+			HBACTasks.modifyHBACRuleViaServiceSection_forHBACTest(sahiTasks, rule, searchString, searchResult);
+			sahiTasks.link("HBAC Test").click();
+		    HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
+					mrule1a,mrule2a,mrule3a,unmrule1a,unmrule2a,unmrule3a,
+					mrule1b,mrule2b,mrule3b,unmrule1b,unmrule2b,unmrule3b,
+					mrule1c,mrule2c,mrule3c,unmrule1c,unmrule2c,unmrule3c);	
+		}
+		if(testName.equals("Rule_enabled_service_smtp2_Test"))
+		{
+			System.out.println("In this test rule 'smtp'is enabled. In this rule(smtp) via-service used is 'smtp2'");
+			//changing smtp rule disable to rule enable
+			sahiTasks.link("HBAC Rules").click();
+		    sahiTasks.link("smtp").click();
+		    sahiTasks.radio("ipaenabledflag-1-0").click();
+		    sahiTasks.span("Update").click();
+		    sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		    sahiTasks.link("HBAC Test").click();		    
+		    HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
+					mrule1a,mrule2a,mrule3a,unmrule1a,unmrule2a,unmrule3a,
+					mrule1b,mrule2b,mrule3b,unmrule1b,unmrule2b,unmrule3b,
+					mrule1c,mrule2c,mrule3c,unmrule1c,unmrule2c,unmrule3c);	
+		    //restore default settings 
+		    System.out.println("restoring default setting");
+		    sahiTasks.link("HBAC Rules").click();
+			sahiTasks.link(rule).click();
+			sahiTasks.checkbox("smtp2").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+			sahiTasks.span("Delete").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+			sahiTasks.button("Delete").click();
+			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+			String searchString = "smtp1";
+			String searchResult[] = {"smtp1"};
+			HBACTasks.modifyHBACRuleViaServiceSection_forHBACTest(sahiTasks, rule, searchString, searchResult);
+		}
 		
-			HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,include,rule,rule1,mrule1,mrule2,mrule3,unmrule1,unmrule2,unmrule3, expectedResult);
+		
 			sahiTasks.navigateTo(commonTasks.hbacTest, true);
 	}
 		
@@ -243,11 +315,11 @@ public class HBACRunTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
 		//                                  testName			  user		  	service   rules	    mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3      expectedResult
-		ll.add(Arrays.asList(new Object[]{"positive_test",   "hbacrunuser945",   "smtp",  "smtp",   "smtp",			   "",			"",			"",				"",				"",		 "Access Granted"}));
-		ll.add(Arrays.asList(new Object[]{"wrong_who",       "hbacrunuser6348",  "smtp",  "smtp", 	  "",			 	"",			"",			"",				"",				"smtp",  "Access Denied"}));
-		ll.add(Arrays.asList(new Object[]{"wrong_accessing", "hbacrunuser945",   "smtp",  "smtp", 	  "",				"",			"",			"",				"",				"smtp",  "Access Denied"}));
+		ll.add(Arrays.asList(new Object[]{"positive_test",   "hbacrunuser945",   "smtp1",  "smtp",   "smtp",			   "",			"",			"",				"",				"",		 "Access Granted"}));
+		ll.add(Arrays.asList(new Object[]{"wrong_who",       "hbacrunuser6348",  "smtp1",  "smtp", 	  "",			 	"",			"",			"",				"",				"smtp",  "Access Denied"}));
+		ll.add(Arrays.asList(new Object[]{"wrong_accessing", "hbacrunuser945",   "smtp1",  "smtp", 	  "",				"",			"",			"",				"",				"smtp",  "Access Denied"}));
 		ll.add(Arrays.asList(new Object[]{"wrong_viaservice","hbacrunuser945",   "ftp",   "smtp", 	  "",				"",			"",			"",				"",				"smtp",  "Access Denied"}));
-		ll.add(Arrays.asList(new Object[]{"wrong_rule",      "hbacrunuser945",   "smtp",  "denial",	  "",				"",			"",			"",				"",				"denial", "Access Denied"}));
+		ll.add(Arrays.asList(new Object[]{"wrong_rule",      "hbacrunuser945",   "smtp1",  "denial",	  "",				"",			"",			"",				"",				"denial", "Access Denied"}));
 		return ll;
 	}
 	
@@ -262,12 +334,12 @@ public class HBACRunTests extends SahiTestScript {
 	protected List<List<Object>> createRequiredFieldTestObjects(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-		//                                  testName			    user          	       hostName1  						service           hostName2  				  rules	            				   expectedError
-		ll.add(Arrays.asList(new Object[]{"deselect_who",  	         "",         		"banana."+domain,   				 "smtp",     "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values. Missing values: User name"}));//xdong
-    	ll.add(Arrays.asList(new Object[]{"deselect_accessing",  "hbacrunuser945",              "",     				    "smtp",      "apple."+domain, 				 "smtp",     "Input form contains invalid or missing values. Missing values: Target host"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_viaservices","hbacrunuser945",      "banana."+domain,    				 "",         "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values. Missing values: Service"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_from",       "hbacrunuser945",      "banana."+domain,   				 "smtp",        "",               			 "smtp",     "Input form contains invalid or missing values. Missing values: Source host"}));
-		ll.add(Arrays.asList(new Object[]{"deselect_all",           "",  		 		        "",   						 "",           "",        				      "smtp",     "Input form contains invalid or missing values. Missing values: User name Target host Service Source host"}));//xdong
+		//                                  testName			    user          	       hostName1  						service           hostName2  				  rules	            				   expectedError1(for firefox)																			expectedError2(for IE)
+		ll.add(Arrays.asList(new Object[]{"deselect_who",  	         "",         		"banana."+domain,   				"smtp1",     "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values.Missing values: User name",     								"Input form contains invalid or missing values. Missing values: User name"}));//xdong
+    	ll.add(Arrays.asList(new Object[]{"deselect_accessing",  "hbacrunuser945",              "",     				    "smtp1",      "apple."+domain, 				 "smtp",     "Input form contains invalid or missing values.Missing values: Target host", 									"Input form contains invalid or missing values. Missing values: Target host"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_viaservices","hbacrunuser945",      "banana."+domain,    				 "",         "apple."+domain,  				 "smtp",     "Input form contains invalid or missing values.Missing values: Service",      								    "Input form contains invalid or missing values. Missing values: Service"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_from",       "hbacrunuser945",      "banana."+domain,   				 "smtp1",        "",               			 "smtp",     "Input form contains invalid or missing values.Missing values: Source host"   ,								"Input form contains invalid or missing values. Missing values: Source host"}));
+		ll.add(Arrays.asList(new Object[]{"deselect_all",           "",  		 		        "",   						 "",           "",        				      "smtp",     "Input form contains invalid or missing values.Missing values: User name Target host Service Source host",   "Input form contains invalid or missing values. Missing values: User name Target host Service Source host"}));//xdong
 		return ll;
 	}
 	
@@ -283,13 +355,13 @@ public class HBACRunTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
 		//                                  testName			  			user		  	service    rules	  rules    service      user        mrule1   		 mrule2 	 mrule3		expectedResult
-		ll.add(Arrays.asList(new Object[]{"prev_button_positive_test",   "hbacrunuser6348",   "ftp",  "denial",  "smtp",   "smtp", "hbacrunuser945","smtp",			   "",			"",    "Access Granted"}));
+		ll.add(Arrays.asList(new Object[]{"prev_button_positive_test",   "hbacrunuser6348",   "ftp",  "denial",  "smtp",   "smtp1", "hbacrunuser945","smtp",			   "",			"",    "Access Granted"}));
 		
 		return ll;
 	}
 	
 	/*
-	 * Data to be used when searching : Positive Test
+	 * Data to be used when searching : Positive and Negative Test
 	 */
 	@DataProvider(name="getHBACSearchTestObjects")
 	public Object[][] getHBACSearchTestObjects() {
@@ -298,11 +370,15 @@ public class HBACRunTests extends SahiTestScript {
 	protected List<List<Object>> createHBACSearchTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname				user       			 target_host 					service			 source_host				multiple_result1	       		
-		ll.add(Arrays.asList(new Object[]{ "search_who",			  "hbacrunuser945",			"" , 						   "",				"",							""		} ));
-		ll.add(Arrays.asList(new Object[]{ "search_accessing",		      "",				"banana."+domain,   "",				"",    						""		} ));
-		ll.add(Arrays.asList(new Object[]{ "search_viaservice",	          "",					"",							  "smtp",			"",			      		    "smtp1" } ));
-		ll.add(Arrays.asList(new Object[]{ "search_from",				  "",				    "",								"",	         "apple."+domain, ""     } ));     
+        //										testname				   user       			 target_host 					service			 source_host				multiple_result1	       		
+	    ll.add(Arrays.asList(new Object[]{ "search_who",			       "hbacrunuser945",			"" , 						   "",				"",							""		} ));
+		ll.add(Arrays.asList(new Object[]{ "Negative_search_who",			  "varun",			        "" , 						   "",				"",							""		} ));
+		ll.add(Arrays.asList(new Object[]{ "search_accessing",		          "",				"banana."+domain,                      "",				"",    						""		} ));
+		ll.add(Arrays.asList(new Object[]{ "Negative_search_accessing",		   "",				"zeta."+domain,                        "",				"",    						""		} ));
+		ll.add(Arrays.asList(new Object[]{ "search_viaservice",	               "",					"",							     "smtp",			"",			      		    "smtp2" } ));
+		ll.add(Arrays.asList(new Object[]{ "Negative_search_viaservice",	    "",					"",							     "ffd",			"",			      		        "" } ));
+		ll.add(Arrays.asList(new Object[]{ "search_from",				        "",				      "",								"",	         "apple."+domain,                 ""     } ));     
+		ll.add(Arrays.asList(new Object[]{ "Negative_search_from",				  "",				    "",								"",	         "tera."+domain,                ""     } ));
 		return ll;	
 	}
 	
@@ -317,8 +393,8 @@ public class HBACRunTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //									    testname											user       					 target_host 					service			    source_host				  rule 	    mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3 			expected_result	       		
-		ll.add(Arrays.asList(new Object[]{ "positive_specify_external_user_hosts,service",	    "redhatuser",			       "zeta."+domain , 				 "ftpd",	    "tera."+domain,	          "allow_all", "allow_all",		   "",			"",			"",				"",				"",		    	    "Access Granted"	} ));
-		ll.add(Arrays.asList(new Object[]{ "negative_specify_external_user_hosts,service",	    "fedorauser",			       "yotta."+domain , 				 "ftpd",	    "peta."+domain,	          "denial",        "",			   "",			"",	     "denial",    		"",				"",		   	        "Access Denied"	} ));
+		//ll.add(Arrays.asList(new Object[]{ "positive_specify_external_user_hosts,service",	    "redhatuser",			       "zeta."+domain , 				 "ftpd",	    "tera."+domain,	          "allow_all", "allow_all",		   "",			"",			"",				"",				"",		    	    "Access Granted"	} ));
+		ll.add(Arrays.asList(new Object[]{ "specify_external_user_hosts,service_test",      	    "fedorauser",			       "yotta."+domain , 				 "ftpd",	    "peta."+domain,	           "",        "allow_all",		   "",			"",	     "denial",    		"smtp",				"",		   	        "Access Granted"	} ));
 		return ll;	
 	}
 	
@@ -334,11 +410,13 @@ public class HBACRunTests extends SahiTestScript {
 	}
 	protected List<List<Object>> createHBACRuleIncludeTestObjects(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
-			
-		//                                  testName						  user		  		service   	include    	rule   		rule1	      	    mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3     	 expectedResult
-        ll.add(Arrays.asList(new Object[]{"positive_Include_enable_test",   "hbacrunuser945",  	 "smtp",  	"enabled",   "", 	      "",	    "allow_all",		 "smtp",     	"",		 "denial",			"",				"",	      "Access Granted"}));
-		ll.add(Arrays.asList(new Object[]{"positive_Include_disabled_test", "hbacrunuser945",  	 "smtp",    "disabled",  "smtp",	"smtp",		       "smtp",		       "",		  	"",			"",				"",				"",	      "Access Granted"}));
-		ll.add(Arrays.asList(new Object[]{"negative_Include_disable_test",  "hbacrunuser945", 	 "smtp",    "disabled",	  "",	 "No entries.",    	      "",		       "",			"",			"",				"",				"",	      "Access Denied"}));
+																																												 //(mrule= Matched rule  and   unmrule= Unmatched Rule)											
+		//                                  testName						    user		 service   	rule    expectedResult1rule1    expectedResult2		expectedResult3      mrule1a  mrule2a	mrule3a     unmrule1a 	unmrule2a   unmrule3a   mrule1b    mrule2b	mrule3b     unmrule1b 	unmrule2b   unmrule3b   mrule1c       mrule2c   	mrule3c     unmrule1c 	unmrule2c   unmrule3c
+       	ll.add(Arrays.asList(new Object[]{"Rule_enabled_service_smtp1_Test", "hbacrunuser945","smtp1",  "smtp",    "Access Granted"      ,"Access Denied",    "Access Granted",   "smtp",    "",      ""           ,""          ,""       ,""         ,""        ,""      ,""         ,""           ,""         ,""     ,"smtp"       ,"allow_all"    ,""        ,"denial"      ,""       ,""}));
+		ll.add(Arrays.asList(new Object[]{"Rule_disabled_service_smtp1_Test","hbacrunuser945","smtp1",  "smtp"    ,"Access Granted"      ,"Access Granted"    ,"Access Granted"   ,"smtp"   ,""      ,""          , ""          ,""       ,""         ,"smtp"    ,""      ,""         ,""           ,""         ,""     ,"allow_all"  ,""             ,""        ,"denial"      ,""       ,""}));
+		ll.add(Arrays.asList(new Object[]{"Rule_disabled_service_smtp2_Test","hbacrunuser945","smtp1"  ,"smtp"    ,"Access Denied"       ,"Access Denied"     ,"Access Granted"   ,""       ,""      ,""          , "smtp"      ,""       ,""         , ""       ,""      ,""         ,"smtp"       ,""         ,""     ,"allow_all"  ,""             ,""        ,"denial"      ,""       ,""}));
+		ll.add(Arrays.asList(new Object[]{"Rule_enabled_service_smtp2_Test", "hbacrunuser945","smtp1"  ,"smtp"    ,"Access Denied"       ,"Access Denied"     ,"Access Granted"   ,""       ,""      ,""          , "smtp"      ,""       ,""         , ""       ,""      ,""         ,""           ,""         ,""     ,"allow_all"  ,""             ,""        ,"denial"      ,"smtp"   ,""}));
+		
 		return ll;
 	}
 	
@@ -354,7 +432,7 @@ public class HBACRunTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 			
 		//                                  testName				 		   user		    service     match    	un_match      mrule1   		 mrule2 	 mrule3		 unmrule1		 unmrule2		unmrule3    expectedResult
-		ll.add(Arrays.asList(new Object[]{"Rule_Matched_and_Unmatched_test",  "admin",  	 "smtp",  "matched",   "unmatched",   "allow_all",	"denial",     "",		  "smtp",	        "",		    	"",     "Access Granted"}));
+		ll.add(Arrays.asList(new Object[]{"Rule_Matched_and_Unmatched_test",  "admin",  	 "smtp1",  "matched",   "unmatched",   "allow_all",	"denial",     "",		  "smtp",	        "",		    	"",     "Access Granted"}));
 
 		return ll;
 	}
