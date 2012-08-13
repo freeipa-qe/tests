@@ -498,17 +498,18 @@ ipa_install_envs()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
 	I=1
+	local ENVTESTORDER=$TESTORDER
 	rlPhaseStartTest "ipa_install_envs - Install IPA in all defined Environments sequentially"
 		while test -n "$(eval echo \$BEAKERMASTER_env${I})"; do
 			RUNMASTER=$(eval echo \$BEAKERMASTER_env${I})
 			if [ "$MYENV" != "$I" ]; then
-				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$I.0' $RUNMASTER"
+				rlRun "rhts-sync-block -s '$ENVTESTORDER.$FUNCNAME.$I.0' $RUNMASTER"
 			else
 				ipa_install_topo
 			fi
 			# Now, if we're the MASTER for ENV $I, rhts-sync-set to unblock others...
 			if [ "$(hostname -s)" = "$(echo $RUNMASTER|cut -f1 -d.)" ]; then
-				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYENV.0' -m $RUNMASTER"
+				rlRun "rhts-sync-set -s '$ENVTESTORDER.$FUNCNAME.$MYENV.0' -m $RUNMASTER"
 			fi
 			I=$(( I += 1 ))
 		done
