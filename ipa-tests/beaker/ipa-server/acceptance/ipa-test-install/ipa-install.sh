@@ -39,6 +39,8 @@ ipa_install_envcleanup() {
 }
 
 ipa_install_set_vars() {
+	# Initialize Global TESTORDER variable
+	TESTORDER=1
 
 	# First let's normalize the data to use <ROLE>_env<NUM> variables:
 	[ -n "$MASTER"  -a -z "$MASTER_env1"  ] && export MASTER_env1="$MASTER"
