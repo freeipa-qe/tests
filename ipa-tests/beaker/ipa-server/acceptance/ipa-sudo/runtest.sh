@@ -247,31 +247,22 @@ functional() {
 	"cleanup-func"
 }
 
-
 rlJournalStart
+	echo $(hostname)
 	if [ $(hostname) = "$CLIENT" ]; then
-		rlPhaseStartSetup "ipa-sudo-startup-client: No client side work for sanity tests"
-			rlRun "setup"
-		rlPhaseEnd
-
-		rlPhaseStartCleanup "ipa-sudo-cleanup-client: Wait for Master to finish tests"
+		rlPhaseStartTest "ipa-sudo-client-wait: Wait for Master to finish tests"
 			rlLog "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
 			rlRun "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
 		rlPhaseEnd
 	else
-		rlPhaseStartSetup "ipa-sudo-startup-master: Check for admintools package, kinit and enabling nis"
-			rlRun "setup"
-			rlRun "echo setup"
-		rlPhaseEnd
-
+		setup
 		# tests start...
 		sudo_001
 		sanity
 		# tests end.
-
-		rlPhaseStartCleanup "ipa-sudo-cleanup: Destroying admin credentials & and disabling nis."
-			rlRun "cleanup"
-			rlRun "echo cleanup"
+		cleanup
+		
+		rlPhaseStartTest "ipa-sudo-client-go: Wait for Master to finish tests"
 			rlLog "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
 			rlRun "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
 		rlPhaseEnd
