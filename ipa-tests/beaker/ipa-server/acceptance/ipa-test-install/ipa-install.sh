@@ -646,6 +646,8 @@ ipa_install_prep()
 	# setup SSH keys
 	## Adding code from SetUpAuthKeys
 	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
+	chmod 700 /root/.ssh
+	restorecon -R /root/.ssh
 	diff -q /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa > /dev/null 2>&1
 	if [ $? -eq 1 ]; then	
 		/bin/cp -f /dev/shm/id_rsa_global /root/.ssh/id_rsa
@@ -654,7 +656,9 @@ ipa_install_prep()
 			for server in $(eval echo \$$var); do
 				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
 				#AddToKnownHosts $server
-				ssh-keygen -R $server
+				if [ -f /root/.ssh/known_hosts ]; then
+					ssh-keygen -R $server
+				fi
 				ssh-keyscan $server >> /root/.ssh/known_hosts
 			done
 		done
