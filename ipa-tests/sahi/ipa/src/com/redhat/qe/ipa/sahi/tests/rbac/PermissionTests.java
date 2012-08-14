@@ -540,7 +540,7 @@ public class PermissionTests extends SahiTestScript {
 					"Manage Group1",
 					"Manage NetGroup1",
 					"Manage Host1",	
-					//"Manage DNSRecord1",
+					"Manage DNSRecord1",
 					"Manage Group2",
 					"Bug 807755_User1",
 					"Bug 807755_Host",
@@ -568,10 +568,30 @@ public class PermissionTests extends SahiTestScript {
 			//Reset permissions to what was installed
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.search(sahiTasks, "Modify netgroup membership");
-			PermissionTasks.modifyPermission(sahiTasks, "Modify netgroup membership", "", "", "description");
+			sahiTasks.link("Modify netgroup membership").click();
+			sahiTasks.checkbox("add").click();
+			sahiTasks.span("icon combobox-icon").click();
+			sahiTasks.select("list").choose("");
+			sahiTasks.checkbox("description").click();
+			sahiTasks.span("Update").click();	
+			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			
+			sahiTasks.navigateTo(commonTasks.permissionPage, true);
+			CommonTasks.search(sahiTasks, "Remove Automount keys");
+			sahiTasks.link("Remove Automount keys").click();
+			sahiTasks.checkbox("add").click();
+			sahiTasks.span("icon combobox-icon").click();
+			sahiTasks.select("list").choose("");
+			sahiTasks.span("Update").click();	
+			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.search(sahiTasks, "Enroll a host");
-			PermissionTasks.modifyPermission(sahiTasks, "Enroll a host", "write", "", "objectclass");
+			sahiTasks.link("Enroll a host").click();
+			sahiTasks.checkbox("objectclass").click();
+			sahiTasks.span("Update").click();	
+			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.clearSearch(sahiTasks);
 		}
