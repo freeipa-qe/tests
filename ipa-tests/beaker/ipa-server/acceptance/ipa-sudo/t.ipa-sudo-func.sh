@@ -106,7 +106,13 @@ func_setup() {
 rlPhaseStartTest "Setup for sudo functional tests"
 
         # check for packages
-        for item in $PACKAGE1 $PACKAGE2 ; do
+	if [ $(grep "5\.[0-9]" /etc/redhat-release|wc -l) -gt 0 ]; then
+		TESTPKGS="$PACKAGE2"
+	else
+		TESTPKGS="$PACKAGE1 $PACKAGE2"
+	fi
+
+        for item in $TESTPKGS ; do
                 rpm -qa | grep $item
                 if [ $? -eq 0 ] ; then
                         rlPass "$item package is installed"
@@ -127,8 +133,14 @@ rlPhaseStartTest "Setup for sudo functional tests"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 
+	if [ -n "$CLIENT" ]; then
+		SUDOCLIENT=$CLIENT
+	else 
+		SUDOCLIENT=$MASTER
+	fi
+
 	# Add the machine with the hostname in $1 to the sshknown hosts file.
-	AddToKnownHosts $MASTER	
+	AddToKnownHosts $SUDOCLIENT	
         # stopping firewall
         rlRun "service iptables stop"
 
@@ -143,7 +155,7 @@ rlPhaseStartTest "Setup for sudo functional tests"
 	# searches for /etc/nslcd.conf for sudo maps. 
 	# https://bugzilla.redhat.com/show_bug.cgi?id=709235
 
-	if [ $distro_variant = Fedora ] ; then
+	if [ "$distro_variant" = "Fedora" ] ; then
 		rlLog "Distro variant detected is $distro_variant"
 		rlRun "yum install nss_ldap -y"
 	else
@@ -212,6 +224,82 @@ EOF
 rlPhaseEnd
 }
 
+func_setup_sudoclient() {
+rlPhaseStartTest "Setup for sudo functional tests on separate client"
+
+        # check for packages
+	if [ $(grep "5\.[0-9]" /etc/redhat-release|wc -l) -gt 0 ]; then
+		TESTPKGS="$PACKAGE2"
+	else
+		TESTPKGS="$PACKAGE1 $PACKAGE2"
+	fi
+
+        for item in $TESTPKGS ; do
+                rpm -qa | grep $item
+                if [ $? -eq 0 ] ; then
+                        rlPass "$item package is installed"
+                else
+                        rlFail "$item package NOT found!"
+                fi
+        done
+
+        # kinit as admin and creating users
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        rlRun "pushd $TmpDir"
+
+	# Add the machine with the hostname in $1 to the sshknown hosts file.
+	AddToKnownHosts $MASTER
+	AddToKnownHosts $CLIENT	
+
+        # stopping firewall
+        rlRun "service iptables stop"
+
+        # enabling NIS
+	rlRun "nisdomainname `hostname -d`"
+
+	if [ "$distro_variant" = "Fedora" ] ; then
+		rlLog "Distro variant detected is $distro_variant"
+		rlRun "yum install nss_ldap -y"
+	else
+		rlLog "Distro variant detected is $distro_variant"
+		rlRun "yum install nss-pam-ldapd -y"
+	fi
+
+	SUDO_LDAP_CONF_PATH=`/usr/bin/sudo -V | grep 'ldap.conf path' | cut -d " " -f 3`
+
+	cat > $SUDO_LDAP_CONF_PATH <<-EOF
+	bind_policy soft
+	sudoers_base ou=SUDOers,$basedn
+	binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
+	bindpw $bindpw
+	ssl no
+
+	tls_cacertfile /etc/ipa/ca.crt
+	tls_checkpeer yes
+	bind_timelimit 5
+	timelimit 15
+	sudoers_debug 5
+	BASE cn=ng,cn=alt,$basedn
+	TLS_CACERTDIR /etc/ipa
+	uri ldap://$MASTER
+	EOF
+
+	rlRun "cat $SUDO_LDAP_CONF_PATH"
+	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
+	rlRun "export LDAPTLS_CACERT"
+
+	rlAssertNotGrep "sudoers" "/etc/nsswitch.conf"
+	if [ $? = 0 ]; then
+		rlFileBackup /etc/nsswitch.conf
+		rlRun "echo \"sudoers:    ldap\" >> /etc/nsswitch.conf"
+	fi
+
+	rlRun "grep ^[^#] /etc/nsswitch.conf"
+
+rlPhaseEnd
+}
+
 
 #######################################################################################################################
 ############
@@ -239,10 +327,6 @@ rlPhaseStartTest "Bug 711786: sudorunasgroup automatically picks up incorrect va
 rlPhaseEnd
 }
 
-sudorule-add-allow-command_func001() {
-
-rlPhaseStartTest "sudorule-add-allow-command_func001: Allowed commands available from sudo client"
-
 #set up for fcuntional tests
 sudorun_withusr() {
 cat > $TmpDir/sudo_list.exp << EOF
@@ -251,7 +335,7 @@ cat > $TmpDir/sudo_list.exp << EOF
 set timeout 30
 set send_slow {1 .1}
 match_max 100000
-spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
+spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -268,6 +352,7 @@ EOF
 chmod 755 $TmpDir/sudo_list.exp
 cat $TmpDir/sudo_list.exp
 $TmpDir/sudo_list.exp
+sftp $SUDOCLIENT:$sudoout $sudoout
 cat $sudoout
 }
 
@@ -282,7 +367,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
+spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -295,6 +380,7 @@ EOF
 chmod 755 $TmpDir/sudo_list.exp
 cat $TmpDir/sudo_list.exp
 $TmpDir/sudo_list.exp
+sftp $SUDOCLIENT:$sudoout $sudoout
 cat $sudoout
 }
 
@@ -310,7 +396,7 @@ set timeout 30
 set send_slow {1 .1}
 match_max 100000
 
-spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
+spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
@@ -321,9 +407,14 @@ EOF
 chmod 755 $TmpDir/sudo_list.exp
 cat $TmpDir/sudo_list.exp
 $TmpDir/sudo_list.exp
+sftp $SUDOCLIENT:$sudoout $sudoout
 cat $sudoout
 }
 
+
+sudorule-add-allow-command_func001() {
+
+rlPhaseStartTest "sudorule-add-allow-command_func001: Allowed commands available from sudo client"
 
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -340,14 +431,14 @@ cat $sudoout
 	rlRun "ipa sudocmdgroup-add sudogrp1 --desc=sudogrp1"
 	rlRun "ipa sudocmdgroup-add-member sudogrp1 --sudocmds=/bin/date,/bin/touch,/bin/uname"
 	rlRun "ipa sudorule-add sudorule1"
-	rlRun "ipa sudorule-add-host  sudorule1 --hosts=$MASTER"
+	rlRun "ipa sudorule-add-host  sudorule1 --hosts=$SUDOCLIENT"
 	rlRun "ipa sudorule-add-user sudorule1 --users=user1"
 
 	rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/mkdir sudorule1"
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
@@ -365,7 +456,7 @@ rlPhaseStartTest "sudorule-add-allow-commandgrp_func001: Add command groups avai
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
@@ -384,7 +475,7 @@ rlPhaseStartTest "sudorule-remove-allow-command_func001: Remove commands availab
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertNotGrep "/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -402,7 +493,7 @@ rlPhaseStartTest "sudorule-remove-allow-commandgrp_func001: Remove command group
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertNotGrep "/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -422,7 +513,7 @@ rlPhaseStartTest "sudorule-add-deny-command_func001: Deny commands available for
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
@@ -442,7 +533,7 @@ rlPhaseStartTest "sudorule-remove-deny-command_func001: Deny commands removed fr
         rlRun "sudo_list user1"
         rlAssertGrep "sudo: user_matches=1" "$sudoout"
         rlAssertGrep "sudo: host_matches=1" "$sudoout"
-        rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+        rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
         rlAssertNotGrep "(root) !/bin/mkdir" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -461,7 +552,7 @@ rlPhaseStartTest "sudorule-add-deny-commandgrp_func001: Deny command groups avai
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/date, !/bin/touch, !/bin/uname" "$sudoout"
 	rlRun "cat $sudoout"
@@ -481,7 +572,7 @@ rlPhaseStartTest "sudorule-remove-deny-commandgrp_func001: Remove denied command
         rlRun "sudo_list user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$MASTER' ... MATCH" "$sudoout"
+	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertNotGrep "(root) !/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -536,8 +627,8 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 	sleep 5
 
 	rlRun "ipa hostgroup-add hostgrp1 --desc=test_hostgrp"
-	rlRun "ipa sudorule-remove-host sudorule1 --hosts=$MASTER"
-	rlRun "ipa hostgroup-add-member hostgrp1 --hosts=$MASTER"
+	rlRun "ipa sudorule-remove-host sudorule1 --hosts=$SUDOCLIENT"
+	rlRun "ipa hostgroup-add-member hostgrp1 --hosts=$SUDOCLIENT"
 
 	rlRun "ipa sudorule-add-host sudorule1 --hostgroup=hostgrp1"
 	sleep 5
@@ -569,7 +660,7 @@ rlPhaseStartTest "sudorule-remove-hostgrp_func001: Removing hostgroup and verify
         rlRun "sudo_list user1"
         rlAssertNotGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
         
-	rlRun "ipa sudorule-add-host sudorule1 --hosts=$MASTER"
+	rlRun "ipa sudorule-add-host sudorule1 --hosts=$SUDOCLIENT"
         rlRun "rm -fr $sudoout"
 
 rlPhaseEnd
@@ -860,7 +951,7 @@ rlPhaseStartTest "sudorule-add-runasgroup_func001: Adding RunAs group and verify
 #set send_slow {1 .1}
 #match_max 100000
 #
-#spawn ssh -o StrictHostKeyChecking=no -l $1 $MASTER
+#spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
 #expect "*: "
 #send -s "$userpw\r"
 #expect "*$ "

@@ -52,149 +52,149 @@ PACKAGE="ipa-server"
 #   Sanity Tests
 #########################################
 
-	sudocmd() {
-		"sudocmd_001"
-		"sudocmd_002"
-		"sudocmd_003"
-		"sudocmd_004"
-		"sudocmd_005"
-		"sudocmd_006"
-		"sudocmd_007"
-		"sudocmd_008"
-		"sudocmd_009"
-		"sudocmd_010"
-	}
+sudocmd() {
+	"sudocmd_001"
+	"sudocmd_002"
+	"sudocmd_003"
+	"sudocmd_004"
+	"sudocmd_005"
+	"sudocmd_006"
+	"sudocmd_007"
+	"sudocmd_008"
+	"sudocmd_009"
+	"sudocmd_010"
+}
 
-	sudocmdgroup() {
-		"sudocmdgroup_001"
-		"sudocmdgroup_002"
-		"sudocmdgroup_003"
-		"sudocmdgroup_004"
-		"sudocmdgroup_005"
-		"sudocmdgroup_006"
-		"sudocmdgroup_007"
-		"sudocmdgroup_008"
-		"sudocmdgroup_009"
-		"sudocmdgroup_010"
-		"sudocmdgroup_011"
-		"sudocmdgroup_012"
-		"sudocmdgroup_013"
-		"sudocmdgroup_014"
-		"sudocmdgroup_015"
-	}
+sudocmdgroup() {
+	"sudocmdgroup_001"
+	"sudocmdgroup_002"
+	"sudocmdgroup_003"
+	"sudocmdgroup_004"
+	"sudocmdgroup_005"
+	"sudocmdgroup_006"
+	"sudocmdgroup_007"
+	"sudocmdgroup_008"
+	"sudocmdgroup_009"
+	"sudocmdgroup_010"
+	"sudocmdgroup_011"
+	"sudocmdgroup_012"
+	"sudocmdgroup_013"
+	"sudocmdgroup_014"
+	"sudocmdgroup_015"
+}
 
-	sudorule() {
-		"sudorule_001"
-	
-		"sudorule_add_000"
-		"sudorule_add_001"
-		"sudorule_add_002"
-		"sudorule_add_003"
-		"sudorule_add_004"
-		"sudorule_add_005"
-		"sudorule_add_006"
-		"sudorule_add_007"
-		"sudorule_add_008"
-		"sudorule_add_009"
-	
-		"sudorule-add-allow-command_001"
-		"sudorule-remove-allow-command_001"
-		"sudorule-add-allow-command_002"
-		"sudorule-remove-allow-command_002"
-		"sudorule-add-allow-command_003"
-		"sudorule-remove-allow-command_003"
-		
-		"sudorule-add-host_001"
-		"sudorule-add-host_002"
-		"sudorule-add-host_003"
-		"sudorule-add-host_004"
-		"sudorule-add-host_005"
-		"sudorule-add-host_006"
-	
-		"sudorule-remove-host_001"
-		"sudorule-remove-host_002"
-		"sudorule-remove-host_003"
-		"sudorule-remove-host_004"
-		"sudorule-remove-host_005"
-		"sudorule-remove-host_006"
+sudorule() {
+	"sudorule_001"
 
-		"sudorule_enable_flag_001"
-		"sudorule_enable_flag_002"
-	
-		"sudorule-add-user_001"
-		"sudorule-add-user_002"
-		"sudorule-add-user_003"
+	"sudorule_add_000"
+	"sudorule_add_001"
+	"sudorule_add_002"
+	"sudorule_add_003"
+	"sudorule_add_004"
+	"sudorule_add_005"
+	"sudorule_add_006"
+	"sudorule_add_007"
+	"sudorule_add_008"
+	"sudorule_add_009"
 
-		"sudorule-remove-user_001"
-		"sudorule-remove-user_002"
-		"sudorule-remove-user_003"
-	
-		"sudorule-show_001"
-		"sudorule-show_002"
-		"sudorule-show_003"
-		"sudorule-show_004"
-		"sudorule-show_005"
-	
-		"sudorule-add-option_001"
-		"sudorule-add-option_002"
-		"sudorule-add-option_003"
-		"sudorule-add-option_004"
-	
-		"sudorule-remove-option_001"
-		"sudorule-remove-option_002"
-		"sudorule-remove-option_003"
-		"sudorule-remove-option_004"
+	"sudorule-add-allow-command_001"
+	"sudorule-remove-allow-command_001"
+	"sudorule-add-allow-command_002"
+	"sudorule-remove-allow-command_002"
+	"sudorule-add-allow-command_003"
+	"sudorule-remove-allow-command_003"
 
-		"sudorule-add-runasuser_001"
-		"sudorule-add-runasuser_002"
-		"sudorule-add-runasuser_003"
-		
-		"sudorule-remove-runasuser_001"
-		"sudorule-remove-runasuser_002"
-		"sudorule-remove-runasuser_003"
-		"sudorule-remove-runasuser_004"
-		"sudorule-remove-runasuser_005"
+	"sudorule-add-host_001"
+	"sudorule-add-host_002"
+	"sudorule-add-host_003"
+	"sudorule-add-host_004"
+	"sudorule-add-host_005"
+	"sudorule-add-host_006"
 
-		"sudorule-add-runasgroup_001"
-		"sudorule-add-runasgroup_002"
+	"sudorule-remove-host_001"
+	"sudorule-remove-host_002"
+	"sudorule-remove-host_003"
+	"sudorule-remove-host_004"
+	"sudorule-remove-host_005"
+	"sudorule-remove-host_006"
 
-		"sudorule-remove-runasgroup_001"
-		"sudorule-remove-runasgroup_002"
+	"sudorule_enable_flag_001"
+	"sudorule_enable_flag_002"
 
-		"sudorule-mod_001"
-		"sudorule-mod_002"
-		"sudorule-mod_003"
-		"sudorule-mod_004"
-		"sudorule-mod_005"
-		"sudorule-mod_006"
-		"sudorule-mod_007"
-		"sudorule-mod_008"
-		"sudorule-mod_009"
-		"sudorule-mod_010"
-		"sudorule-mod_011"
-		"sudorule-mod_012"
-		"sudorule-mod_013"
+	"sudorule-add-user_001"
+	"sudorule-add-user_002"
+	"sudorule-add-user_003"
 
-		"sudorule-find_001"
-		"sudorule-find_002"
-		"sudorule-find_003"
-		"sudorule-find_004"
-		"sudorule-find_005"
-		"sudorule-find_006"
-		"sudorule-find_007"
-		"sudorule-find_008"
-		"sudorule-find_009"
-		"sudorule-find_010"
-		"sudorule-find_011"
-		#"sudorule-find_012"
-		"sudorule-find_013"
-		"sudorule-find_014"
-		
-		"sudorule_del_001"
-		"sudorule_del_002"
-		"sudorule_del_003"
-		
-		}
+	"sudorule-remove-user_001"
+	"sudorule-remove-user_002"
+	"sudorule-remove-user_003"
+
+	"sudorule-show_001"
+	"sudorule-show_002"
+	"sudorule-show_003"
+	"sudorule-show_004"
+	"sudorule-show_005"
+
+	"sudorule-add-option_001"
+	"sudorule-add-option_002"
+	"sudorule-add-option_003"
+	"sudorule-add-option_004"
+
+	"sudorule-remove-option_001"
+	"sudorule-remove-option_002"
+	"sudorule-remove-option_003"
+	"sudorule-remove-option_004"
+
+	"sudorule-add-runasuser_001"
+	"sudorule-add-runasuser_002"
+	"sudorule-add-runasuser_003"
+
+	"sudorule-remove-runasuser_001"
+	"sudorule-remove-runasuser_002"
+	"sudorule-remove-runasuser_003"
+	"sudorule-remove-runasuser_004"
+	"sudorule-remove-runasuser_005"
+
+	"sudorule-add-runasgroup_001"
+	"sudorule-add-runasgroup_002"
+
+	"sudorule-remove-runasgroup_001"
+	"sudorule-remove-runasgroup_002"
+
+	"sudorule-mod_001"
+	"sudorule-mod_002"
+	"sudorule-mod_003"
+	"sudorule-mod_004"
+	"sudorule-mod_005"
+	"sudorule-mod_006"
+	"sudorule-mod_007"
+	"sudorule-mod_008"
+	"sudorule-mod_009"
+	"sudorule-mod_010"
+	"sudorule-mod_011"
+	"sudorule-mod_012"
+	"sudorule-mod_013"
+
+	"sudorule-find_001"
+	"sudorule-find_002"
+	"sudorule-find_003"
+	"sudorule-find_004"
+	"sudorule-find_005"
+	"sudorule-find_006"
+	"sudorule-find_007"
+	"sudorule-find_008"
+	"sudorule-find_009"
+	"sudorule-find_010"
+	"sudorule-find_011"
+	#"sudorule-find_012"
+	"sudorule-find_013"
+	"sudorule-find_014"
+
+	"sudorule_del_001"
+	"sudorule_del_002"
+	"sudorule_del_003"
+
+}
 
 sanity() {
 	"sudocmd"
@@ -249,45 +249,65 @@ functional() {
 
 
 rlJournalStart
+	if [ $(hostname) = "$CLIENT" ]; then
+		rlPhaseStartSetup "ipa-sudo-startup-client: No client side work for sanity tests"
+			rlLog "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
+			rlRun "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
+		rlPhaseEnd
+	else
+		rlPhaseStartSetup "ipa-sudo-startup-master: Check for admintools package, kinit and enabling nis"
+			rlRun "setup"
+			rlRun "echo setup"
+		rlPhaseEnd
 
-    rlPhaseStartSetup "ipa-sudo-startup: Check for admintools package, kinit and enabling nis"
-		rlRun "setup"
-		rlRun "echo setup"
-    rlPhaseEnd
+		# tests start...
+		sudo_001
+		sanity
+		# tests end.
 
-	# tests start...
-sudo_001
-sanity
-	# tests end.
+		rlPhaseStartCleanup "ipa-sudo-cleanup: Destroying admin credentials & and disabling nis."
+			rlRun "cleanup"
+			rlRun "echo cleanup"
+			rlLog "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
+			rlRun "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
+		rlPhaseEnd
+	fi
 
-    rlPhaseStartCleanup "ipa-sudo-cleanup: Destroying admin credentials & and disabling nis."
-		rlRun "cleanup"
-		rlRun "echo cleanup"
-    rlPhaseEnd
+	if [ $(hostname) = "$CLIENT" ]; then
+		rlPhaseStartSetup "ipa-sudo-startup-client: No client side work for sanity tests"
+			rlRun "func_setup_sudoclient"
+			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0' -m $BEAKERCLIENT"
+			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0' -m $BEAKERCLIENT"
+			rlLog "rhts-sync-block -s 'ipa-sudo-func-startup-master.block.1' $BEAKERMASTER"
+			rlRun "rhts-sync-block -s 'ipa-sudo-func-startup-master.block.1' $BEAKERMASTER"
+		rlPhaseEnd
+	else
+		rlPhaseStartSetup "ipa-sudo-func-startup: Check for admintools package, kinit, enabling nis, setting up binddn pwd and configuring nss_ldap.conf"
+			rlLog "rhts-sync-block -s 'ipa-sudo-func-startup-client.block.0' $BEAKERCLIENT"
+			rlRun "rhts-sync-block -s 'ipa-sudo-func-startup-client.block.0' $BEAKERCLIENT"
+			rlRun "func_setup"
+			rlRun "echo func_setup"
+		rlPhaseEnd
 
+		# tests start...
+		functional
+		bugs
 
-    rlPhaseStartSetup "ipa-sudo-func-startup: Check for admintools package, kinit, enabling nis, setting up binddn pwd and configuring nss_ldap.conf"
-		rlRun "func_setup"
-                rlRun "echo func_setup"
-    rlPhaseEnd
+		bug769491
+		bug741604
+		bug782976
+		bug783286
+		bug800537
+		bug800544
+		# tests end.
 
-        # tests start...
-functional
-bugs
-
-bug769491
-bug741604
-bug782976
-bug783286
-bug800537
-bug800544
-        # tests end.
-
-    rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
-                rlRun "func_cleanup"
-                rlRun "echo func_cleanup"
-    rlPhaseEnd
-
+		rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
+			rlRun "func_cleanup"
+			rlRun "echo func_cleanup"
+			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1' -m $BEAKERMASTER"
+			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1' -m $BEAKERMASTER"
+		rlPhaseEnd
+	fi
 
 rlJournalPrintText
 report=/tmp/rhts.report.$RANDOM.txt
