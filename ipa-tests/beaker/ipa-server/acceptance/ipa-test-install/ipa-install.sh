@@ -663,6 +663,8 @@ ipa_install_prep()
 	# configure abrt
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]" |wc -l) -gt 0 ]; then
 		rlLog "configAbrt : Machine is a RHEL 5 machine - no abrt"
+	elif [ $(cat /etc/redhat-release|grep "6\.[0-2] "|wc -l) -gt 0 ]; then
+		rlLog "configAbrt : Machine is RHEL 6.2 or earlier.  no abrt"
 	else
 		hostname_s=`hostname -s`
 		for rpm in abrt-tui abrt-addon-ccpp libreport-plugin-mailx; do
