@@ -251,6 +251,10 @@ functional() {
 rlJournalStart
 	if [ $(hostname) = "$CLIENT" ]; then
 		rlPhaseStartSetup "ipa-sudo-startup-client: No client side work for sanity tests"
+			rlRun "setup"
+		rlPhaseEnd
+
+		rlPhaseStartCleanup "ipa-sudo-cleanup-client: Wait for Master to finish tests"
 			rlLog "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
 			rlRun "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
 		rlPhaseEnd
