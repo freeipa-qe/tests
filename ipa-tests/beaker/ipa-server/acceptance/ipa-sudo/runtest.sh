@@ -253,10 +253,10 @@ rlJournalStart
 		rlLog
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-sudo-cli-sanity-tests"
+	rlPhaseStartTest "ipa-sudo-cli-sanity-tests - cli regression and sanity tests for ipa sudo functionality"
 		if [ $(hostname) = "$CLIENT" ]; then
-			rlLog "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
-			rlRun "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
+			rlLog "rhts-sync-block -s 'ipa-sudo.0' $BEAKERMASTER"
+			rlRun "rhts-sync-block -s 'ipa-sudo.0' $BEAKERMASTER"
 		else
 			setup
 			# tests start...
@@ -265,8 +265,8 @@ rlJournalStart
 			# tests end.
 			cleanup
 			
-			rlLog "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
-			rlRun "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
+			rlLog "rhts-sync-set -s 'ipa-sudo.0'"
+			rlRun "rhts-sync-set -s 'ipa-sudo.0'"
 		fi
 	rlPhaseEnd
 
@@ -275,44 +275,52 @@ rlJournalStart
 	rlPhaseEnd
 
 	############## sudo cli functional tests #############
-	if [ $(hostname) = "$CLIENT" ]; then
-		rlPhaseStartSetup "ipa-sudo-startup-client: No client side work for sanity tests"
-			rlRun "func_setup_sudoclient"
-			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0'"
-			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0'"
-			rlLog "rhts-sync-block -s 'ipa-sudo-func-startup-master.block.1' $BEAKERMASTER"
-			rlRun "rhts-sync-block -s 'ipa-sudo-func-startup-master.block.1' $BEAKERMASTER"
-		rlPhaseEnd
-	else
-		rlPhaseStartSetup "ipa-sudo-func-startup: Check for admintools package, kinit, enabling nis, setting up binddn pwd and configuring nss_ldap.conf"
-			rlLog "rhts-sync-block -s 'ipa-sudo-func-startup-client.block.0' $BEAKERCLIENT"
-			rlRun "rhts-sync-block -s 'ipa-sudo-func-startup-client.block.0' $BEAKERCLIENT"
-			rlRun "func_setup"
-			rlRun "echo func_setup"
-		rlPhaseEnd
+	rlPhaseStartTest "ipa-sudo-func-tests - functional tests for ipa sudo"
+		rlLog
+	rlPhaseEnd
 
-		# tests start...
-		functional
-		bugs
+	rlPhaseStartTest "ipa-sudo-func-tests - functional and bugzilla tests for ipa sudo"
+		if [ $(hostname) = "$CLIENT" ]; then
+			func_setup_sudoclient
 
-		bug769491
-		bug741604
-		bug782976
-		bug783286
-		bug800537
-		bug800544
-		# tests end.
+			rlLog "rhts-sync-set -s 'ipa-sudo-func.0'"
+			rlRun "rhts-sync-set -s 'ipa-sudo-func.0'"
 
-		rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
-			rlRun "func_cleanup"
-			rlRun "echo func_cleanup"
-			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1'"
-			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1'"
-		rlPhaseEnd
-	fi
+			rlLog "rhts-sync-block -s 'ipa-sudo-func.1' $BEAKERMASTER"
+			rlRun "rhts-sync-block -s 'ipa-sudo-func.1' $BEAKERMASTER"
+		else
+			# On MASTER wait for func_setup_sudoclient to complete on client first
+			rlLog "rhts-sync-block -s 'ipa-sudo-func.0' $BEAKERCLIENT"
+			rlRun "rhts-sync-block -s 'ipa-sudo-func.0' $BEAKERCLIENT"
 
-rlJournalPrintText
-report=/tmp/rhts.report.$RANDOM.txt
-makereport $report
-rhts-submit-log -l $report
+			func_setup
+
+			# tests start...
+			functional
+			bugs
+
+			bug769491
+			bug741604
+			bug782976
+			bug783286
+			bug800537
+			bug800544
+			# tests end.
+
+			func_cleanup
+
+			rlLog "rhts-sync-set -s 'ipa-sudo-func.1'" 
+			rlRun "rhts-sync-set -s 'ipa-sudo-func.1'"
+		fi
+	rlPhaseEnd
+
+	rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
+		rlLog
+	rlPhaseEnd
+
+	rlJournalPrintText
+	report=/tmp/rhts.report.$RANDOM.txt
+	makereport $report
+	rhts-submit-log -l $report
+
 rlJournalEnd
