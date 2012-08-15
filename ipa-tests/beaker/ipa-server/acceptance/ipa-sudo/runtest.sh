@@ -263,16 +263,16 @@ rlJournalStart
 		cleanup
 		
 		rlPhaseStartTest "ipa-sudo-client-go: Wait for Master to finish tests"
-			rlLog "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
-			rlRun "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
+			rlLog "rhts-sync-set -s 'ipa-sudo-startup-master.block'"
+			rlRun "rhts-sync-set -s 'ipa-sudo-startup-master.block'"
 		rlPhaseEnd
 	fi
 
 	if [ $(hostname) = "$CLIENT" ]; then
 		rlPhaseStartSetup "ipa-sudo-startup-client: No client side work for sanity tests"
 			rlRun "func_setup_sudoclient"
-			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0' -m $BEAKERCLIENT"
-			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0' -m $BEAKERCLIENT"
+			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0'"
+			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-client.block.0'"
 			rlLog "rhts-sync-block -s 'ipa-sudo-func-startup-master.block.1' $BEAKERMASTER"
 			rlRun "rhts-sync-block -s 'ipa-sudo-func-startup-master.block.1' $BEAKERMASTER"
 		rlPhaseEnd
@@ -299,8 +299,8 @@ rlJournalStart
 		rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
 			rlRun "func_cleanup"
 			rlRun "echo func_cleanup"
-			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1' -m $BEAKERMASTER"
-			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1' -m $BEAKERMASTER"
+			rlLog "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1'"
+			rlRun "rhts-sync-set -s 'ipa-sudo-func-startup-master.block.1'"
 		rlPhaseEnd
 	fi
 
