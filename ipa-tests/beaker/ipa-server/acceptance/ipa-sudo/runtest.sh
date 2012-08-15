@@ -250,7 +250,10 @@ functional() {
 rlJournalStart
 	############## sudo cli sanity tests #############
 	rlPhaseStartSetup "ipa-sudo-cli-sanity-tests-setup"
-		rlLog
+		env|sort
+		rlLog "============================================"
+		cat /dev/shm/env.sh
+		rlLog "******* HOSTNAME = $HOSTNAME"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-sudo-cli-sanity-tests - cli regression and sanity tests for ipa sudo functionality"
@@ -265,8 +268,8 @@ rlJournalStart
 			# tests end.
 			cleanup
 			
-			rlLog "rhts-sync-set -s 'ipa-sudo.0'"
-			rlRun "rhts-sync-set -s 'ipa-sudo.0'"
+			rlLog "rhts-sync-set -s 'ipa-sudo.0' -m $BEAKERMASTER"
+			rlRun "rhts-sync-set -s 'ipa-sudo.0' -m $BEAKERMASTER"
 		fi
 	rlPhaseEnd
 
