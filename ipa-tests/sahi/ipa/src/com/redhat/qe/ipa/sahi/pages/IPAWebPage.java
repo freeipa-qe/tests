@@ -530,6 +530,12 @@ public class IPAWebPage implements StandardTest{
 					monitor.fail("error dialog appears as expected, error message does NOT match. expect[" + expectedErrorMsg + "] actual ["+ errorMessage + "]");
 				browser.button("Cancel").click();
 				browser.span("undo").click();
+			}
+			else if(browser.div("Input form contains invalid or missing values.").exists())
+			{	
+				monitor.pass("error dialog appears as expected");
+				browser.button("OK").click();
+				browser.span("undo").click();
 			}else{ 
 				monitor.fail("error dialog does not appear, expect[" + expectedErrorMsg + "]");
 				if(browser.button("OK").exists()){
