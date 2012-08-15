@@ -268,8 +268,8 @@ rlJournalStart
 			# tests end.
 			cleanup
 			
-			rlLog "rhts-sync-set -s 'ipa_sudo.0' -m $BEAKERMASTER"
-			rlRun "rhts-sync-set -s 'ipa_sudo.0' -m $BEAKERMASTER"
+			rlLog "rhts-sync-set -s 'ipa_sudo.0'"
+			rlRun "rhts-sync-set -s 'ipa_sudo.0'"
 		fi
 	rlPhaseEnd
 
