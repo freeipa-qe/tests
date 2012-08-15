@@ -247,6 +247,8 @@ functional() {
 	"cleanup-func"
 }
 
+TESTORDER=0
+
 rlJournalStart
 	############## sudo cli sanity tests #############
 	rlPhaseStartSetup "ipa-sudo-cli-sanity-tests-setup"
@@ -256,10 +258,11 @@ rlJournalStart
 		rlLog "******* HOSTNAME = $HOSTNAME"
 	rlPhaseEnd
 
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa-sudo-cli-sanity-tests - cli regression and sanity tests for ipa sudo functionality"
 		if [ $(hostname) = "$CLIENT" ]; then
-			rlLog "rhts-sync-block -s 'ipa_sudo.0' $BEAKERMASTER"
-			rlRun "rhts-sync-block -s 'ipa_sudo.0' $BEAKERMASTER"
+			rlLog "rhts-sync-block -s '$TESTORDER.ipa_sudo.0' $BEAKERMASTER"
+			rlRun "rhts-sync-block -s '$TESTORDER.ipa_sudo.0' $BEAKERMASTER"
 		else
 			setup
 			# tests start...
@@ -268,8 +271,8 @@ rlJournalStart
 			# tests end.
 			cleanup
 			
-			rlLog "rhts-sync-set -s 'ipa_sudo.0'"
-			rlRun "rhts-sync-set -s 'ipa_sudo.0'"
+			rlLog "rhts-sync-set -s '$TESTORDER.ipa_sudo.0' -m $BEAKERMASTER"
+			rlRun "rhts-sync-set -s '$TESTORDER.ipa_sudo.0' -m $BEAKERMASTER"
 		fi
 	rlPhaseEnd
 
@@ -282,19 +285,20 @@ rlJournalStart
 		rlLog
 	rlPhaseEnd
 
+	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa-sudo-func-tests - functional and bugzilla tests for ipa sudo"
 		if [ $(hostname) = "$CLIENT" ]; then
 			func_setup_sudoclient
 
-			rlLog "rhts-sync-set -s 'ipa_sudo_func.0'"
-			rlRun "rhts-sync-set -s 'ipa_sudo_func.0'"
+			rlLog "rhts-sync-set -s '$TESTORDER.ipa_sudo_func.0' -m $BEAKERCLIENT"
+			rlRun "rhts-sync-set -s '$TESTORDER.ipa_sudo_func.0' -m $BEAKERCLIENT"
 
-			rlLog "rhts-sync-block -s 'ipa_sudo_func.1' $BEAKERMASTER"
-			rlRun "rhts-sync-block -s 'ipa_sudo_func.1' $BEAKERMASTER"
+			rlLog "rhts-sync-block -s '$TESTORDER.ipa_sudo_func.1' $BEAKERMASTER"
+			rlRun "rhts-sync-block -s '$TESTORDER.ipa_sudo_func.1' $BEAKERMASTER"
 		else
 			# On MASTER wait for func_setup_sudoclient to complete on client first
-			rlLog "rhts-sync-block -s 'ipa_sudo_func.0' $BEAKERCLIENT"
-			rlRun "rhts-sync-block -s 'ipa_sudo_func.0' $BEAKERCLIENT"
+			rlLog "rhts-sync-block -s '$TESTORDER.ipa_sudo_func.0' $BEAKERCLIENT"
+			rlRun "rhts-sync-block -s '$TESTORDER.ipa_sudo_func.0' $BEAKERCLIENT"
 
 			func_setup
 
@@ -312,8 +316,8 @@ rlJournalStart
 
 			func_cleanup
 
-			rlLog "rhts-sync-set -s 'ipa_sudo_func.1'" 
-			rlRun "rhts-sync-set -s 'ipa_sudo_func.1'"
+			rlLog "rhts-sync-set -s '$TESTORDER.ipa_sudo_func.1' -m $BEAKERMASTER" 
+			rlRun "rhts-sync-set -s '$TESTORDER.ipa_sudo_func.1' -m $BEAKERMASTER"
 		fi
 	rlPhaseEnd
 
