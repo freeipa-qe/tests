@@ -53,12 +53,14 @@ public abstract class IPAWebAutomation extends TestScript {
  
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
 	public void initialize() throws CloneNotSupportedException {
-		log.info("kinit as admin");
-		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
-		log.info("Opening browser");
-		browser.open();
-		log.info("Accessing: IPA Server URL");
-		browser.setStrictVisibilityCheck(true); 
+		//log.info("kinit as admin");
+		//Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
+		//log.info("Opening browser");
+		//browser.open();
+		//log.info("Accessing: IPA Server URL");
+		//browser.setStrictVisibilityCheck(true); 
+		String password= System.getProperty("ipa.server.password");
+		CommonTasks.formauth(browser,"admin",password);	
 	}//initialize
 	
 	@Test (groups="report", dependsOnGroups = "delete",
