@@ -248,26 +248,33 @@ functional() {
 }
 
 rlJournalStart
-	echo $(hostname)
-	if [ $(hostname) = "$CLIENT" ]; then
-		rlPhaseStartTest "ipa-sudo-client-wait: Wait for Master to finish tests"
+	############## sudo cli sanity tests #############
+	rlPhaseStartSetup "ipa-sudo-cli-sanity-tests-setup"
+		rlLog
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-sudo-cli-sanity-tests"
+		if [ $(hostname) = "$CLIENT" ]; then
 			rlLog "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
 			rlRun "rhts-sync-block -s 'ipa-sudo-startup-master.block' $BEAKERMASTER"
-		rlPhaseEnd
-	else
-		setup
-		# tests start...
-		#sudo_001
-		#sanity
-		# tests end.
-		cleanup
-		
-		rlPhaseStartTest "ipa-sudo-client-go: Wait for Master to finish tests"
-			rlLog "rhts-sync-set -s 'ipa-sudo-startup-master.block'"
-			rlRun "rhts-sync-set -s 'ipa-sudo-startup-master.block'"
-		rlPhaseEnd
-	fi
+		else
+			setup
+			# tests start...
+			#sudo_001
+			#sanity
+			# tests end.
+			cleanup
+			
+			rlLog "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
+			rlRun "rhts-sync-set -s 'ipa-sudo-startup-master.block' -m $BEAKERMASTER"
+		fi
+	rlPhaseEnd
 
+	rlPhaseStartCleanup "ipa-sudo-cli-sanity-tests-cleanup"
+		rlLog
+	rlPhaseEnd
+
+	############## sudo cli functional tests #############
 	if [ $(hostname) = "$CLIENT" ]; then
 		rlPhaseStartSetup "ipa-sudo-startup-client: No client side work for sanity tests"
 			rlRun "func_setup_sudoclient"
