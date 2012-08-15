@@ -301,7 +301,6 @@ run_selinuxusermap_add_host_tests(){
         rlRun "ipa selinuxusermap-add-host --hosts=$host1 $selinuxusermap5 > $TmpDir/selinuxusermap-host-add-023.out" 0 "Add a host to selinuxusermap"
 	rlLog "cat $TmpDir/selinuxusermap-host-add-023.out"
         rlAssertGrep "Number of members added 1" "$TmpDir/selinuxusermap-host-add-023.out"
-#        rlAssertGrep "" "$TmpDir/selinuxusermap-host-add-023.out"
         rlRun "ipa selinuxusermap-remove-host --hosts=$host1 $selinuxusermap5" 0 "Clean-up: Delete host from selinuxusermap"
     rlPhaseEnd
 

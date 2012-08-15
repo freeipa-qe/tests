@@ -166,13 +166,220 @@ run_selinuxusermap_config_tests(){
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-011: setattr ipa config default selinuxuser with non existing selinux user"
         new_selinuxuser="unknowntype_u:s0"
         command="ipa config-mod --setattr=ipaselinuxusermapdefault=$new_selinuxuser"
-        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Default SELinux user map default user not in order list"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermapdefault': SELinux user map default user not in order list"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
 	rlLog "Cleanup: back on default ipa config default selinuxuser: ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser"
         ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser
 	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2940"
     rlPhaseEnd
+	
+    rlPhaseStartTest "ipa-selinuxusermap-config-cli-012: Remove selinux user from the order list when its default"
+        new_selinuxusermap_order_config="xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+
+        expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_default.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_default.out"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': SELinux user map default user not in order list"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+	ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023 
+	if [ $? -eq 0 ] ; then
+		rlFail "ERROR: Command expected to fail."	
+	else
+		ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023 2> $TmpDir/selinuxusermap_no_defaultuser.out
+		actual=`cat $TmpDir/selinuxusermap_no_defaultuser.out`
+		if [[ "$actual" = "$expmsg" ]] ; then
+			rlPass "Error message $expmsg is as expected"
+		else
+			rlFail "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
+		fi	
+	fi
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_chkconfig.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_chkconfig.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_chkconfig.out"
+    rlPhaseEnd
  
+     rlPhaseStartTest "ipa-selinuxusermap-config-cli-013: selinuxuser syntax check - user:MLS:MCS"
+	rlLog "Executing: Syntax check - user:MLS:MCS - user does not end in traditional _u"
+        new_selinuxusermap_order_config="newuser:s0\$guest_u:s0"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: newuser:s0\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_default.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_default.out"
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$guest_u:s0
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_1.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_1.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_1.out"
+
+        rlLog "Executing: Syntax check - user:MLS:MCS - user has characters other than \^\[a-z\]\[A-Z\]\[a-zA-Z\]"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+	rlLog "Executing:ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$test123:s0"	
+	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$test123:s0 > $TmpDir/selinuxusermap_non_alphabet.out		
+	rlRun "cat $TmpDir/selinuxusermap_non_alphabet.out"
+        new_selinuxusermap_order_config="guest_u:s0\$test123:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$test123:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_2.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_2.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_2.out" 
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_2.out" 
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - user has beginning non alphabet characters "
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$4test:s0"
+	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$4test:s0 > $TmpDir/selinuxusermap_non_alphabetbegin.out		
+	rlRun "cat $TmpDir/selinuxusermap_non_alphabetbegin.out"
+        new_selinuxusermap_order_config="guest_u:s0\$4test:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$4test:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_3.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_3.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_3.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_3.out"
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - user part is missing"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$:s0"
+	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$:s0 > $TmpDir/selinuxusermap_missing_user.out		
+	rlRun "cat $TmpDir/selinuxusermap_missing_user.out"
+        new_selinuxusermap_order_config="guest_u:s0\$:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_4.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_4.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_4.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_4.out"
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MLS part is missing"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=test_u\$guest_u:s0"
+	ipa config-mod --setattr=ipaselinuxusermaporder=test_u\$guest_u:s0 > $TmpDir/selinuxusermap_missing_mls.out		
+	rlRun "cat $TmpDir/selinuxusermap_missing_mls.out"
+        new_selinuxusermap_order_config="test_u\$guest_u:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: test_u\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_5.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_5.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_5.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_5.out"
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MLS characters other than s\[0-15\]\(-s\[0-15\]\)"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+	rlLog "Executing: ipa config-mod --ipaselinuxusermaporder=test_u:a0-a1\$guest_u:s0"
+	ipa config-mod --ipaselinuxusermaporder=test_u:a0-a1\$guest_u:s0 > $TmpDir/selinuxusermap_mls_invalid_syntax.out		
+	rlRun "cat $TmpDir/selinuxusermap_mls_invalid_syntax.out"
+        new_selinuxusermap_order_config="test_u:a0-a1\$guest_u:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: test_u:a0-a1\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_6.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_6.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_6.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_6.out"
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MLS characters - s16"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s16\$guest_u:s0"
+	ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s16\$guest_u:s0 > $TmpDir/selinuxusermap_mls_syntax_s16.out		
+	rlRun "cat $TmpDir/selinuxusermap_mls_syntax_s16.out"
+        new_selinuxusermap_order_config="test_u:s16\$guest_u:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: test_u:s16\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_7.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_7.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_7.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_7.out"
+
+        rlLog "Executing: Syntax check - user:MLS:MCS - MLS characters missing '-' s1s15"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s1s15\$guest_u:s0"
+	ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s1s15\$guest_u:s0 > $TmpDir/selinuxusermap_mls_incorrect_syntax.out		
+	rlRun "cat $TmpDir/selinuxusermap_mls_incorrect_syntax.out"
+        new_selinuxusermap_order_config="test_u:s1s15\$guest_u:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: test_u:s1s15\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_8.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_8.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_8.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_8.out"
+
+	rlLog "Executing: Positive: Syntax check - user:MLS:MCS - testuser_u:s0"
+        new_selinuxusermap_order_config="testuser_u:s0\$guest_u:s0"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: testuser_u:s0\$guest_u:s0"
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0\$guest_u:s0
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_9.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_9.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_9.out"
+
+	rlLog "Executing: Positive: Syntax check - user:MLS:MCS - testuser_u:s0-s1"
+        new_selinuxusermap_order_config="testuser_u:s0-s1\$guest_u:s0"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: testuser_u:s0-s1\$guest_u:s0"
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s1\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s1\$guest_u:s0
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_10.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_10.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_10.out"
+
+	rlLog "Executing: Positive: Syntax check - user:MLS:MCS - testuser_u:s0-s15:c0.c1023"
+        new_selinuxusermap_order_config="testuser_u:s0-s15:c0.c1023\$guest_u:s0"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: testuser_u:s0-s15:c0.c1023\$guest_u:s0"
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s15:c0.c1023\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s15:c0.c1023\$guest_u:s0
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_11.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_11.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_11.out"
+
+	rlLog "Executing: Positive: Syntax check - user:MLS:MCS - testuser_u:s0-s1:c0,c2,c15.c26"
+        new_selinuxusermap_order_config="testuser_u:s0-s1:c0,c2,c15.c26\$guest_u:s0"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: testuser_u:s0-s1:c0,c2,c15.c26\$guest_u:s0"
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s1:c0,c2,c15.c26\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s1:c0,c2,c15.c26\$guest_u:s0
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_12.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_12.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_12.out"
+
+	rlLog "Executing: Positive: Syntax check - user:MLS:MCS - testuser_u:s0-s0:c0.c1023"
+        new_selinuxusermap_order_config="testuser_u:s0-s0:c0.c1023\$guest_u:s0"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: testuser_u:s0-s0:c0.c1023\$guest_u:s0"
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s0:c0.c1023\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=testuser_u:s0-s0:c0.c1023\$guest_u:s0
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_13.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_13.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_13.out"
+	
+	rlLog "Executing: Syntax check - user:MLS:MCS - MCS characters not c0.c1023"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+        rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s0-s0:c0.c2048\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s0-s0:c0.c2048\$guest_u:s0 > $TmpDir/selinuxusermap_mls_incorrect_syntax.out
+        rlRun "cat $TmpDir/selinuxusermap_mls_incorrect_syntax.out"
+        new_selinuxusermap_order_config="test_u:s0-s0:c0.c2048\$guest_u:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: test_u:s0-s0:c0.c2048\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_14.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_14.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_14.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_14.out"
+
+        rlLog "Executing: Syntax check - user:MLS:MCS - MCS characters missing . and , (c0c1023)"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+        rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s0-s0:c0c1023\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s0-s0:c0c1023\$guest_u:s0 > $TmpDir/selinuxusermap_mls_incorrect_syntax.out
+        rlRun "cat $TmpDir/selinuxusermap_mls_incorrect_syntax.out"
+        new_selinuxusermap_order_config="test_u:s0-s0:c0c1023\$guest_u:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: test_u:s0-s0:c0c1023\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_15.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_15.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_15.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_15.out"
+
+        rlLog "Executing: Syntax check - user:MLS:MCS - MCS characters othen than c0.c1023"
+        expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': Invalid SELinux user name, only a-Z and _ are allowed"
+        rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s0-s0:a0.a1023\$guest_u:s0"
+        ipa config-mod --setattr=ipaselinuxusermaporder=test_u:s0-s0:a0.a1023\$guest_u:s0 > $TmpDir/selinuxusermap_mls_incorrect_syntax.out
+        rlRun "cat $TmpDir/selinuxusermap_mls_incorrect_syntax.out"
+        new_selinuxusermap_order_config="test_u:s0-s0:a0.a1023\$guest_u:s0"
+        not_expected_selinuxusermap_order_config_entry="SELinux user map order: test_u:s0-s0:a0.a1024\$guest_u:s0"
+        rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder_13_16.out" 0 "Show ipa config"
+        rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder_13_16.out"
+        rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_16.out"
+        rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_16.out"
+
+
+	rlLog "Clean up: back on original configuration: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2993"
+    rlPhaseEnd
  
     rlPhaseStartCleanup "ipa-selinuxusermap-config-cli-cleanup: Destroying admin credentials."
 	rlRun "popd"

@@ -63,6 +63,10 @@ selinuxusermap11="testselinuxusermap11"
 selinuxusermap_all="testselinuxusermap_all"
 selinuxusermap_raw="testselinuxusermap_raw"
 selinuxusermap_raw_noall="testselinuxusermap_raw_noall"
+selinuxusermap_multiplehbac="testselinuxusermap_multiplehbac"
+selinuxusermap_multipleselinuxuser="testselinuxusermap_multipleselinuxuser"
+selinuxusermap_sytaxcheck1="testselinuxusermap_syntaxcheck1"
+selinuxusermap_sytaxcheck2="testselinuxusermap_syntaxcheck2"
 
 default_selinuxuser="guest_u:s0"
 host1="devhost."$DOMAIN
@@ -323,9 +327,112 @@ rlPhaseStartTest "ipa-selinuxusermap-cli-027: Add a selinuxuser map with invalid
 	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
     rlPhaseEnd
 
+    rlPhaseStartTest "ipa-selinuxusermap-cli-031: Add a selinuxuser map with multiple hbacrule"
+        rlRun "addHBACRule all all all all testHbacRuleM1" 0 "Adding HBAC rule."
+        rlRun "findHBACRuleByOption name testHbacRuleM1 testHbacRuleM1" 0 "Finding rule testHbacRuleM1 by name"
+        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=testHbacRuleM1,allow_all $selinuxusermap_multiplehbac"
+        command="ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=testHbacRuleM1,allow_all $selinuxusermap_multiplehbac"
+        expmsg="ipa: ERROR: HBAC rule testHbacRuleM1,allow_all not found"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-032: Remove hbacrule rule when selinux mapping rule pointing to it exist"
+        command="ipa hbacrule-del testHbacRule"
+        expmsg="ipa: ERROR: testHbacRule cannot be deleted because SELinux User Map $selinuxusermap8 requires it"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlRun "findSelinuxusermap $selinuxusermap8" 0 "Verifying selinuxusermap exists using ipa selinuxusermap-find"
+        rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap8" 0 "Verifying selinuxusermap selinuxuser"
+        rlRun "findSelinuxusermapByOption hbacrule "testHbacRule" $selinuxusermap8" 0 "Verifying selinuxusermap has pointer to HbacRule"
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-033: Add a selinuxuser map with multiple selinuxusers"
+        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0-s0:c0.c1023\"  $selinuxusermap_multipleselinuxuser"
+        command="ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0-s0:c0.c1023\" $selinuxusermap_multipleselinuxuser"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	
+	rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0\$user_u:s0-s0:c0.c1023\"  $selinuxusermap_multipleselinuxuser"
+        command="ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0-s0:c0.c1023\" $selinuxusermap_multipleselinuxuser"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa-selinuxusermap-cli-034: Add a selinuxuser map - syntax check - user MLS MCS"
+	rlLog "Executing: Syntax check - user:MLS:MCS - selinuxuser does not end in traditional _u"
+	rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$guest_u:s0"
+	ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$guest_u:s0
+        rlLog "ipa selinuxusermap-add --selinuxuser=\"newuser:s0\"  $selinuxusermap_sytaxcheck1"
+	rlRun "ipa selinuxusermap-add --selinuxuser=\"newuser:s0\" $selinuxusermap_sytaxcheck1" 0 "Add a selinuxusermap with selinuxuser syntax does not end in traditional _u "
+	rlRun "findSelinuxusermapByOption selinuxuser \"newuser:s0\" $selinuxusermap_sytaxcheck1" 0 "Verifying selinuxusermap was added with given selinuxuser"
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - selinuxuser has characters other than \^\[a-z\]\[A-Z\]\[a-zA-Z\]"	
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test123:s0\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test123:s0\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid SELinux user name, only a-Z and _ are allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - user has beginning non alphabet characters"
+        rlLog "ipa selinuxusermap-add --selinuxuser=\"4test:s0\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"4test:s0\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid SELinux user name, only a-Z and _ are allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - user part is missing"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\":s0\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\":s0\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid SELinux user name, only a-Z and _ are allowed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MLS part is missing"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test_u\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test_u\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MLS characters other than s\[0-15\]\(-s\[0-15\]\)"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test_u:a0-a1\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test_u:a0-a1\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."	
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MLS characters - s16"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test_u:a0-a1\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test_u:a0-a1\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."      
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MLS characters missing '-' s1s15"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test_u:s1s15\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test_u:s1s15\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	
+	rlLog "Executing: Syntax check - user:MLS:MCS - MCS characters not c0.c1023"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test_u:s0-s0:c0.c2048\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test_u:s0-s0:c0.c2048\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MCS value, must match c[0-1023].c[0-1023] and/or c[0-1023]-c[0-c0123]"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MCS characters missing . and , (c0c1023)"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test_u:s0-s0:c0c1023\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test_u:s0-s0:c0c1023\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MCS value, must match c[0-1023].c[0-1023] and/or c[0-1023]-c[0-c0123]"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+
+	rlLog "Executing: Syntax check - user:MLS:MCS - MCS characters othen than c0.c1023"
+	rlLog "ipa selinuxusermap-add --selinuxuser=\"test_u:s0-s0:a0.a1023\" $selinuxusermap_sytaxcheck2 "
+        command="ipa selinuxusermap-add --selinuxuser=\"test_u:s0-s0:a0.a1023\" $selinuxusermap_sytaxcheck2"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MCS value, must match c[0-1023].c[0-1023] and/or c[0-1023]-c[0-c0123]"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+	
+	rlLog "Clean up: back on original configuration: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/3001"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-selinuxusermap-cli-cleanup: Destroying admin credentials."
 	# delete selinux user 
-	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 $selinuxusermap6 $selinuxusermap7 $selinuxusermap8 $selinuxusermap9 $selinuxusermap10 $selinuxusermap11 $selinuxusermap_all $selinuxusermap_raw $selinuxusermap_raw_noall ; do
+	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 $selinuxusermap6 $selinuxusermap7 $selinuxusermap8 $selinuxusermap9 $selinuxusermap10 $selinuxusermap11 $selinuxusermap_all $selinuxusermap_raw $selinuxusermap_raw_noall $selinuxusermap_multiplehbac $selinuxusermap_multipleselinuxuser $selinuxusermap_sytaxcheck1; do
 		rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
 	done
 
@@ -339,6 +446,7 @@ rlPhaseStartTest "ipa-selinuxusermap-cli-027: Add a selinuxuser map with invalid
 	rlRun "ipa user-del $user1" 0 "Delete user $user1."
 	rlRun "deleteHBACRule testHbacRule" 0 "Deleting testHbacRule rule"
 	rlRun "deleteHBACRule newHbacRule" 0 "Deleting newHbacRule rule"
+	rlRun "deleteHBACRule testHbacRuleM1" 0 "Deleting testHbacRuleM1 rule"
 	# delete service group
 	rlRun "ipa hbacsvcgroup-del $servicegroup" 0 "CLEANUP: Deleting service group $servicegroup"
 	rlRun "popd"
