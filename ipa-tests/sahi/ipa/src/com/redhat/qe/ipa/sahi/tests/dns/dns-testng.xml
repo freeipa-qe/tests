@@ -1,6 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPADNSTestSuite">	
-    <test name="DNS Tests" preserve-order="true">
+   
+    <test name="DNS Tests">
             	<packages>
             	    <package name="com.redhat.qe.ipa.sahi.*" />
             	</packages>
@@ -9,18 +10,25 @@
             	        <include name="setup" />
             	        <include name="init" />   
             	       
-            	        <include name="addDNSZoneTest" /> 
+            	        <include name="addDNSZoneTest" />
+            	        <include name="addandanotherDNSZoneTest" />
+            	        <include name="add_then_cancel_DNSZoneTest" />
+            	        <include name="addDNSZoneNegativeTest" />
+            	        <include name="dnsZone_addandedit" />
+            	        <include name="recordType_NegativeTest" />
                         <include name="dnsZoneRecordsTest_add" />
-                        <include name="dnsZoneRecordsTest_addandaddanother" />
+                   	    <include name="dnsZoneRecordsTest_addandaddanother" />
                         <include name="dnsZoneRecordsTest_addandaddedit" />
                         <include name="dnsZoneRecordsTest_add_then_cancel" />
                         <include name="dnsZoneSettingsTest" />
-                        <include name="delDNSZoneTest" />
+                       <include name="delDNSZoneTest" />
                        
                         <include name="addReverseDNSZone" />
+                        <include name="addandanother_ReverseDNSZone" />
+                        <include name="addReverseDNSZoneNegativeTest" />
                         <include name="reverseDNSZoneRecordsTest_add" /> 
                         <include name="reverseDNSZoneRecordsTest_addandaddanother" /> 
-                        <include name="reverseDNSZoneRecordsTest_addandedit" /> 
+            			<include name="reverseDNSZoneRecordsTest_addandedit" /> 
                         <include name="reverseDNSZoneRecordsTest_add_then_cancel" />
                         <include name="dnsReverseZoneSettingsTest" />
                         <include name="deleteReverseDNSZone" />
@@ -39,6 +47,30 @@
             	    <class name="com.redhat.qe.ipa.sahi.tests.dns.DNSTests" />
             	</classes>
     </test>
+    
+    <!--
+    <test name="DNS Global configuration">
+		<groups>
+			<run>
+			
+			<include name="setup" />
+	        <include name="addGlobalForwarders" />
+	        <include name="delGlobalForwarders" />
+	        <include name="addInvalidForwarders" />
+	        <include name="allowPTRSync" />
+	        <include name="forwardPolicy" />
+	        <include name="zoneRefreshInterval_NegativeTest" />
+	        <include name="zoneRefreshInterval_PositiveTest" />
+	        <include name="ExpandCollapseDNSConfigTests" />
+			</run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.dns.DNSGlobalconfigTests" />
+		</classes>
+	</test>
+    
+    -->
+    
 	
     <listeners>        
   	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
