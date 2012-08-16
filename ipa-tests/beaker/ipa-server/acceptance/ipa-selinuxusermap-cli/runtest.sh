@@ -82,9 +82,9 @@ rlJournalStart
 
 
 # Execute ipa config tests for SELinux user map
-  run_selinuxusermap_config_tests
+#  run_selinuxusermap_config_tests
 # Execute SELinux user map add tests
-  run_selinuxusermap_add_tests
+#  run_selinuxusermap_add_tests
 # Execute SELinux user map add-host tests
 #  run_selinuxusermap_add_host_tests
 # Execute SELinux user map add-user tests
@@ -92,7 +92,7 @@ rlJournalStart
 # Execute SELinux user map delete tests
 #  run_selinuxusermap_del_tests
 # Execute SELinux user map disable tests
-#  run_selinuxusermap_disable_tests
+  run_selinuxusermap_disable_tests
 # Execute SELinux user map enable tests
 #  run_selinuxusermap_enable_tests
 # Execute SELinux user map find  tests
