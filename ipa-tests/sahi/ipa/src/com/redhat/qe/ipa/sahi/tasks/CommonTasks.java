@@ -30,6 +30,7 @@ public class CommonTasks {
 	public static String hostgroupPage =  serverUrl + "/ipa/ui/#identity=hostgroup&navigation=identity";
 	public static String netgroupPage =  serverUrl + "/ipa/ui/#identity=netgroup&navigation=identity";
 	public static String dnsPage =  serverUrl + "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
+	public static String dnsConfigPage =  serverUrl +"/ipa/ui/#dns=dnsconfig&identity=dns&navigation=identity"; 
 	public static String alternateDNSpage = dnsPage + "&dnszone-facet=search";
 	public static String passwordPolicyPage =  serverUrl + "/ipa/ui/#policy=pwpolicy&navigation=policy";
 	public static String kerberosTicketPolicyPage =  serverUrl + "/ipa/ui/#policy=krbtpolicy&navigation=policy";
