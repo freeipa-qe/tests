@@ -289,6 +289,7 @@ rlPhaseStartTest "Setup for sudo functional tests on separate client"
 	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
 	rlRun "export LDAPTLS_CACERT"
 
+	rlRun "sed -i '/sudoers/d' /etc/nsswitch.conf"
 	rlAssertNotGrep "sudoers" "/etc/nsswitch.conf"
 	if [ $? = 0 ]; then
 		rlFileBackup /etc/nsswitch.conf
