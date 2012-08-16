@@ -38,7 +38,7 @@ public class ServiceTasks {
 	public static void addCustomService(SahiTasks sahiTasks, String customservice, String hostname, Boolean force) {
 		sahiTasks.link("Add").click();
 		sahiTasks.textbox("service").setValue(customservice);
-		sahiTasks.span("icon combobox-icon").near(sahiTasks.textbox("host")).click();
+		sahiTasks.span("icon combobox-icon").near(sahiTasks.label("Host Name:")).click();
 		sahiTasks.select("list").choose(hostname);
 		if (force == true){
 				sahiTasks.checkbox("force").check();
@@ -100,7 +100,8 @@ public class ServiceTasks {
 	 */
 	public static void revokeServiceCertificate(SahiTasks sahiTasks, String serviceprinc, String reason, String button) {
 		sahiTasks.link(serviceprinc).click();
-		sahiTasks.span("Revoke").click();
+		sahiTasks.span("Revoke").near(sahiTasks.span("Get")).click();
+		//sahiTasks.span("Revoke").click();
 		sahiTasks.select(0).choose(reason);
 		sahiTasks.button(button).click();
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
@@ -242,8 +243,8 @@ public class ServiceTasks {
 			Assert.assertTrue(sahiTasks.bold("Kerberos Key Not Present").exists(), "Service " + serviceprinc + " does not have a keytab provisioned");
 		}
 		if (provisioned == true){
-			Assert.assertTrue(sahiTasks.bold("Kerberos Key Present, Service Provisioned:").exists(), "Service " + serviceprinc + " has a keytab provisioned");
-		}	
+			Assert.assertTrue(sahiTasks.bold("Kerberos Key Present, Service Provisioned").exists(), "Service " + serviceprinc + " has a keytab provisioned");
+		}	                                  
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
 	
@@ -256,7 +257,7 @@ public class ServiceTasks {
 	public static void deleteServiceKeytab(SahiTasks sahiTasks, String serviceprinc, String button ) {
 		sahiTasks.link(serviceprinc).click();
 		sahiTasks.span("Refresh").click();
-		sahiTasks.span("Delete Key, Unprovision").click();
+		sahiTasks.link("Delete Key, Unprovision").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
