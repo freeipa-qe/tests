@@ -137,7 +137,7 @@ run_selinuxusermap_disable_tests(){
         rlAssertGrep "Enabled: FALSE" "$TmpDir/selinuxusermap_disable_test4.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-disable-006: Disable selinuxuser map when a  hbacrule associated" 
+    rlPhaseStartTest "ipa-selinuxusermap-disable-006: Disable selinuxuser map when a hbacrule associated - hbacrule is not disabled" 
   	rlRun "addHBACRule all all all all testHbacRule" 0 "Adding HBAC rule."
 	rlRun "findHBACRuleByOption name testHbacRule testHbacRule" 0 "Finding rule testHbacRule by name"
         rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=testHbacRule $selinuxusermap4" 
@@ -149,7 +149,25 @@ run_selinuxusermap_disable_tests(){
         rlRun "ipa selinuxusermap-show $selinuxusermap4 >  $TmpDir/selinuxusermap_disable_test5.out" 0 "Selinuxusermap show"
         rlRun "cat $TmpDir/selinuxusermap_disable_test5.out"
         rlAssertGrep "Enabled: FALSE" "$TmpDir/selinuxusermap_disable_test5.out"
+	rlRun "findHBACRuleByOption name testHbacRule testHbacRule" 0 "Finding rule testHbacRule by name"
+	# verify hbac rule is not disabled
+        rlRun "verifyHBACStatus testHbacRule TRUE" 0 "Verify rule is not disabled"
+	rlLog "Clean-up: ipa selinuxusermap-enable $selinuxusermap4"
+        rlRun "ipa selinuxusermap-enable $selinuxusermap4"
     rlPhaseEnd
+
+
+    rlPhaseStartTest "ipa-selinuxusermap-disable-007: Disable hbacrule rule when selinux mapping rule pointing to hbacrule - both hbacrule and selinuxmap is disabled "
+	rlRun "ipa hbacrule-disable testHbacRule"
+        rlRun "findHBACRuleByOption name testHbacRule testHbacRule" 0 "Finding rule testHbacRule by name"
+        # verify hbac rule is disabled
+        rlRun "verifyHBACStatus testHbacRule FALSE" 0 "Verify rule is disabled"
+        rlRun "findSelinuxusermap $selinuxusermap4" 0 "Verifying selinuxusermap exists using ipa selinuxusermap-find"
+        rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap4" 0 "Verifying selinuxusermap selinuxuser"
+        rlRun "findSelinuxusermapByOption hbacrule "testHbacRule" $selinuxusermap4" 0 "Verifying selinuxusermap has pointer to HbacRule"
+        rlRun "findSelinuxusermapByOption enabled FALSE  $selinuxusermap4" 0 "Verifying $selinuxusermap4 enabled FALSE"
+        rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2731"
+ rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-selinuxusermap-disable-cleanup: Destroying admin credentials."
 	# delete selinux user 
