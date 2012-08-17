@@ -47,6 +47,10 @@
 
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
+default_selinuxuser="guest_u:s0"
+default_selinuxusermap_order_config="guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+
+
 
 ########################################################################
 
@@ -74,14 +78,13 @@ run_selinuxusermap_config_tests(){
         expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_default.out" 0 "Show ipa default config"
 	rlRun "cat  $TmpDir/selinuxusermap_default.out"
-        #rlRun "ipa config-mod --ipaselinuxusermaporder=\"$new_selinuxusermap_order_config\"" 0 "Modify ipa config selinuxuser map order: ipa config-mod --ipaselinuxusermaporder=\"$new_selinuxusermap_order_config\""
         rlLog " Executing: ipa config-mod --ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
         ipa config-mod --ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
         rlRun "ipa config-show > $TmpDir/selinuxusermap_neworder.out" 0 "Show ipa config"
 	rlRun "cat  $TmpDir/selinuxusermap_neworder.out"
         rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_neworder.out"
-        rlRun "ipa config-mod --ipaselinuxusermaporder=$default_selinuxusermap_order_config" 0 "Cleanup: back on default ipa config selinuxuser map order"
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2938"
+        rlLog "Cleanup: back on default ipa config selinuxuser map order"
+        ipa config-mod --ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-003: Modify ipa config default selinuxuser"
@@ -90,13 +93,12 @@ run_selinuxusermap_config_tests(){
         rlRun "ipa config-mod --ipaselinuxusermapdefault=$new_selinuxuser" 0 "Modify ipa config default selinuxuser"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_new_default.out" 0 "Show ipa config"
         rlAssertGrep "$expected_default_selinuxuser" "$TmpDir/selinuxusermap_new_default.out"
-        #rlRun "ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser" 0 "Cleanup: back on default ipa config default selinuxuser: ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser"
         rlLog "Cleanup: back on default ipa config default selinuxuser: ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser"
         ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-004: Modify ipa config selinuxuser map order with non existing selinux user - selinux user order should get updated since there is no way to detect that contexts are available"
-        expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0"
 	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_order_unknown.out"
 	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_order_unknown.out
         rlRun "ipa config-show > $TmpDir/selinuxusermap_order_unkown.out" 0 "Show ipa config"
@@ -104,7 +106,6 @@ run_selinuxusermap_config_tests(){
         rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_order_unkown.out"
 	rlLog "Cleanup: back on default ipa config selinuxuser map order: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
 	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2938"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-005: Modify ipa config default selinuxuser with non existing selinux user"
@@ -115,10 +116,9 @@ run_selinuxusermap_config_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-006: Modify ipa config selinuxuser map order with existing order"
-        command="ipa config-mod --ipaselinuxusermaporder=$default_selinuxusermap_order_config"
+        command="ipa config-mod --ipaselinuxusermaporder=guest_u:s0\\\$xguest_u:s0\\\$user_u:s0-s0:c0.c1023\\\$staff_u:s0-s0:c0.c1023\\\$unconfined_u:s0-s0:c0.c1023"
         expmsg="ipa: ERROR: no modifications to be performed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2938"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-007: Modify ipa config default selinuxuser with existing selinux user"
@@ -170,7 +170,6 @@ run_selinuxusermap_config_tests(){
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
 	rlLog "Cleanup: back on default ipa config default selinuxuser: ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser"
         ipa config-mod --ipaselinuxusermapdefault=$default_selinuxuser
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2940"
     rlPhaseEnd
 	
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-012: Remove selinux user from the order list when its default"
