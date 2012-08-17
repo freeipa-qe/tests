@@ -39,8 +39,8 @@ ipa_install_envcleanup() {
 }
 
 ipa_install_set_vars() {
-	# Initialize Global TESTORDER variable
-	TESTORDER=1
+	# Initialize Global TESTCOUNT variable
+	TESTCOUNT=1
 
 	# First let's normalize the data to use <ROLE>_env<NUM> variables:
 	[ -n "$MASTER"  -a -z "$MASTER_env1"  ] && export MASTER_env1="$MASTER"
@@ -223,36 +223,36 @@ ipa_install_topo_default()
 		MYBCS=$(eval echo \$BEAKERCLIENT_env${MYENV})
 	rlPhaseEnd	
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_default_master - install Master in Default Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBM1.0'  $MYBM1"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0'  $MYBM1"	
 		fi
 	rlPhaseEnd
 	
 	for MYBR1 in $MYBRS; do
-		TESTORDER=$(( TESTORDER += 1 ))
+		TESTCOUNT=$(( TESTCOUNT += 1 ))
 		rlPhaseStartTest "ipa_install_topo_default_replica - install Replica1 in Default Topology - $MYBR1"
 			if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 				ipa_install_replica $MYBM1
-				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
+				rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
 			else
-				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"
+				rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1'  $MYBR1"
 			fi
 		rlPhaseEnd
 	done
 
 	for MYBC1 in $MYBCS; do
-		TESTORDER=$(( TESTORDER += 1 ))
+		TESTCOUNT=$(( TESTCOUNT += 1 ))
 		rlPhaseStartTest "ipa_install_topo_default_client - install Client1 in Default Topology - $MYBC1"
 			if [ "$(hostname -s)" = "$(echo $MYBC1|cut -f1 -d.)" ]; then
 				ipa_install_client $MYBM1
-				rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBC1.1' -m $MYBC1"
+				rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBC1.1' -m $MYBC1"
 			else
-				rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBC1.1' $MYBC1"
+				rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBC1.1' $MYBC1"
 			fi
 		rlPhaseEnd
 	done
@@ -291,63 +291,63 @@ ipa_install_topo_star()
 		fi
 	rlPhaseEnd	
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_master - install Master in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBM1.0'  $MYBM1"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0'  $MYBM1"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica1 - install Replica1 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1'  $MYBR1"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica2 - install Replica2 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR2.2' -m $MYBR2"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR2.2' -m $MYBR2"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR2.2'  $MYBR2"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR2.2'  $MYBR2"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica3 - install Replica3 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR3.3' -m $MYBR3"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR3.3' -m $MYBR3"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR3.3'  $MYBR3"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR3.3'  $MYBR3"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica4 - install Replica4 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR4.0' -m $MYBR4"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR4.0' -m $MYBR4"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR4.0'  $MYBR4"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR4.0'  $MYBR4"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_star_replica5 - install Replica5 in Star Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR5.0' -m $MYBR5"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR5.0' -m $MYBR5"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR5.0'  $MYBR5"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR5.0'  $MYBR5"	
 		fi
 	rlPhaseEnd
 
@@ -359,7 +359,7 @@ ipa_install_topo_star()
 	SMAX=$(echo $MYSERVERS|wc -w)
 	CMAX=$(echo $MYCLIENTS|wc -w)
 	for C in $MYCLIENTS; do
-		TESTORDER=$(( TESTORDER += 1 ))
+		TESTCOUNT=$(( TESTCOUNT += 1 ))
 		CNUM=$(( CNUM += 1 ))
 		if [ $SNUM -eq $SMAX ]; then	
 			SNUM=0
@@ -368,9 +368,9 @@ ipa_install_topo_star()
 		CS=$(echo "$MYSERVERS"|awk "{print \$$SNUM}")
 		if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
 			ipa_install_client $CS
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$C.0' -m $C"
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$C.0' -m $C"
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$C.0' $C"
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$C.0' $C"
 		fi
 	done
 }
@@ -408,73 +408,73 @@ ipa_install_topo_tree1()
 		fi
 	rlPhaseEnd	
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_master - install Master in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
 			ipa_install_master
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBM1.0'  $MYBM1"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0'  $MYBM1"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica1 - install Replica1 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR1.1'  $MYBR1"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1'  $MYBR1"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica2 - install Replica2 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBM1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR2.2' -m $MYBR2"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR2.2' -m $MYBR2"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR2.2'  $MYBR2"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR2.2'  $MYBR2"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica3 - install Replica3 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR1
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR3.3' -m $MYBR3"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR3.3' -m $MYBR3"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR3.3'  $MYBR3"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR3.3'  $MYBR3"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica4 - install Replica4 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR2
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR4.4' -m $MYBR4"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR4.4' -m $MYBR4"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR4.4'  $MYBR4"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR4.4'  $MYBR4"	
 		fi
 	rlPhaseEnd
 	
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_replica5 - install Replica5 in Tree1 Topology"
 		if [ "$(hostname -s)" = "$(echo $MYBR5|cut -f1 -d.)" ]; then
 			ipa_install_replica $MYBR2
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR5.5' -m $MYBR5"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR5.5' -m $MYBR5"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR5.5'  $MYBR5"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR5.5'  $MYBR5"	
 		fi
 	rlPhaseEnd
 
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_install_topo_tree1_connect_rep4_and_rep5 - Create replication agreement between Replica4 and Replica5"
 		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
 			ipa_connect_replica $MYBR4 $MYBR5
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$MYBR4.6' -m $MYBR4"	
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR4.6' -m $MYBR4"	
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$MYBR4.6'  $MYBR4"	
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR4.6'  $MYBR4"	
 		fi
 	rlPhaseEnd
 
@@ -486,7 +486,7 @@ ipa_install_topo_tree1()
 	SMAX=$(echo $MYSERVERS|wc -w)
 	CMAX=$(echo $MYCLIENTS|wc -w)
 	for C in $MYCLIENTS; do
-		TESTORDER=$(( TESTORDER += 1 ))
+		TESTCOUNT=$(( TESTCOUNT += 1 ))
 		CNUM=$(( CNUM += 1 ))
 		if [ $SNUM -eq $SMAX ]; then	
 			SNUM=0
@@ -495,31 +495,30 @@ ipa_install_topo_tree1()
 		CS=$(echo "$MYSERVERS"|awk "{print \$$SNUM}")
 		if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
 			ipa_install_client $CS
-			rlRun "rhts-sync-set -s '$TESTORDER.$FUNCNAME.$C.0' -m $C"
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$C.0' -m $C"
 		else
-			rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME.$C.0' $C"
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$C.0' $C"
 		fi
 	done
 }
 
 ipa_install_envs()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	I=1
-	local ENVTESTORDER=$TESTORDER
+	local ENVTESTCOUNT=$TESTCOUNT
 	rlPhaseStartTest "ipa_install_envs - Install IPA in all defined Environments sequentially"
 		while test -n "$(eval echo \$BEAKERMASTER_env${I})"; do
 			RUNMASTER=$(eval echo \$BEAKERMASTER_env${I})
 			if [ "$MYENV" != "$I" ]; then
-				rlLog "rhts-sync-block -s '$ENVTESTORDER.$FUNCNAME.$I.0' $RUNMASTER"
-				rlRun "rhts-sync-block -s '$ENVTESTORDER.$FUNCNAME.$I.0' $RUNMASTER"
+				rlLog "rhts-sync-block -s '$ENVTESTCOUNT.$FUNCNAME.$I.0' $RUNMASTER"
+				rlRun "rhts-sync-block -s '$ENVTESTCOUNT.$FUNCNAME.$I.0' $RUNMASTER"
 			else
 				ipa_install_topo
 			fi
 			# Now, if we're the MASTER for ENV $I, rhts-sync-set to unblock others...
 			if [ "$(hostname -s)" = "$(echo $RUNMASTER|cut -f1 -d.)" ]; then
-				TESTORDER=$ENVTESTORDER
-				rlRun "rhts-sync-set -s '$ENVTESTORDER.$FUNCNAME.$MYENV.0' -m $RUNMASTER"
+				rlRun "rhts-sync-set -s '$ENVTESTCOUNT.$FUNCNAME.$MYENV.0' -m $RUNMASTER"
 			fi
 			I=$(( I += 1 ))
 		done
