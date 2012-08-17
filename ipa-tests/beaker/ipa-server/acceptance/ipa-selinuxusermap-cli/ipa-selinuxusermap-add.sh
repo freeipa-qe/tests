@@ -366,10 +366,10 @@ rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with inv
 	rlRun "ipa hbacrule-disable testHbacRule" 0 "Disable hbac rule."
         # verify disabled
 	rlRun "verifyHBACStatus testHbacRule FALSE" 0 "Verify rule is now disabled"
-	rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"user_u:s0-s0:c0.c1023\"  --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule"
-        command="ipa selinuxusermap-add --selinuxuser=\"user_u:s0-s0:c0.c1023\" --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule"
-        expmsg="ipa: "
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+        rlLog "ipa selinuxusermap-add --selinuxuser=\"user_u:s0-s0:c0.c1023\" --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule"
+	rlRun "ipa selinuxusermap-add --selinuxuser=\"user_u:s0-s0:c0.c1023\" --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule" 0 "Add a selinuxusermap with disabled hbacrule "
+	rlRun "findSelinuxusermapByOption selinuxuser \"user_u:s0-s0:c0.c1023\" $selinuxusermap_disabledhbacrule" 0 "Verifying selinuxusermap was added with given selinuxuser"
+	rlRun "findSelinuxusermapByOption hbacrule testHbacRule $selinuxusermap_disabledhbacrule" 0 "Verifying selinuxusermap was added with disabled hbacrule"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-add-cli-035: Add a selinuxuser map - syntax check - selinuxuser name MLS MCS"
