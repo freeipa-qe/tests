@@ -518,6 +518,7 @@ ipa_install_envs()
 			fi
 			# Now, if we're the MASTER for ENV $I, rhts-sync-set to unblock others...
 			if [ "$(hostname -s)" = "$(echo $RUNMASTER|cut -f1 -d.)" ]; then
+				TESTORDER=$ENVTESTORDER
 				rlRun "rhts-sync-set -s '$ENVTESTORDER.$FUNCNAME.$MYENV.0' -m $RUNMASTER"
 			fi
 			I=$(( I += 1 ))
