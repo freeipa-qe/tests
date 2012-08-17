@@ -266,8 +266,8 @@ rlJournalStart
 		else
 			setup
 			# tests start...
-			#sudo_001
-			#sanity
+			sudo_001
+			sanity
 			# tests end.
 			cleanup
 			
