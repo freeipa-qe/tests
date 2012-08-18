@@ -42,7 +42,14 @@
 # Include test case file
 . ./t.ipa-cert-cli.sh
 
-PACKAGE="ipa-server"
+grep Fedora /etc/redhat-release
+if [ $? -eq 0 ]; then
+	# OS is Fedora
+	PACKAGE="freeipa-server"
+else
+	# OS is probably RHEL
+	PACKAGE="ipa-server"
+fi
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
@@ -58,7 +65,7 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    ipa-cert-cli
+    ipa_cert_cli
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipa-cert-cli cleanup"
