@@ -50,6 +50,7 @@ selinuxusermapsvc_master_001() {
                 	rlRun "export user$i=user$i"
 	        done
 
+		rlRun "setenforce 0"
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ssh_auth_success $user2 testpw123@ipa.com $MASTER"
@@ -96,6 +97,7 @@ selinuxusermapsvc_client_001() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-001: $user1 accessing $CLIENT from $CLIENT using SSHD service."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "setenforce 0"
                 rlRun "getent -s sss passwd $user1"
 		sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser $user1 testpw123@ipa.com $CLIENT $ipa_selinuxuser_verif"
@@ -109,6 +111,7 @@ selinuxusermapsvc_client2_001() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-001: $user1 accessing $CLIENT from $CLIENT2 using SSHD service."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "setenforce 0"
                 rlRun "getent -s sss passwd $user1"
                 rlRun "verify_ssh_auth_failure_selinuxuser $user1 testpw123@ipa.com $CLIENT2 $ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser $user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
