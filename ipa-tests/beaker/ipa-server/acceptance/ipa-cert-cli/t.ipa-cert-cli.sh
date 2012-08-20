@@ -37,7 +37,7 @@ certcli_envsetup()
 		mv /etc/ipa/default.conf-original-$dc
 		echo '[global]' >> /etc/ipa/server.conf
 		echo 'debug=True' >> /etc/ipa/server.conf
-		echo 'debug=True' >> /etc/ipa/default.conf
+		#echo 'debug=True' >> /etc/ipa/default.conf
 		#rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to enable debug mode"
 	rlPhaseEnd
 		
@@ -47,6 +47,7 @@ certcli_basic()
 {
 	rlPhaseStartTest "kinit as u1 and verify that the keyring gets created"
 		kdestroy
+		keyctl purge user # Purging keys to be certain that the user-find populates the keyring properly.
 		KinitAsUser $u1 $u1pass
 		rlRun "ipa user-find $u1" 0 "show this user to populate the keyring"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
@@ -166,6 +167,8 @@ certcli_basic()
 		rlRun "keyctl show @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
 	rlPhaseEnd
 	
+	# This Section verifies that multiple principals are supported at the same time 
+
 	rlPhaseStartTest "Populate keyring for u1. restart ipa_memcache. Ensure that the ipa session id changes"
 		kdestroy
 		KinitAsUser $u1 $u1pass
@@ -276,8 +279,8 @@ certcli_envcleanup()
 		delete_ipauser $u2
 		rm -f /etc/ipa/server.conf-backup
 		rlRun "mv /etc/ipa/server.conf /etc/ipa/server.conf-backup" 0 "copying server.conf to a backup"
-		cat /etc/ipa/default.conf | grep -v debug > /dev/shm/default.conf
-		rm -f /etc/ipa/default.conf
+		#cat /etc/ipa/default.conf | grep -v debug > /dev/shm/default.conf
+		#rm -f /etc/ipa/default.conf
 		rlRun "cp -a /dev/shm/default.conf /etc/ipa/default.conf" 0 "Restoring default.conf"
 		#rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to disable debug mode"
 		#environment cleanup ends   here
