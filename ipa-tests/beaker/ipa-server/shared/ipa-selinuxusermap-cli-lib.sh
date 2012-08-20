@@ -12,6 +12,10 @@
 #	findSelinuxusermap
 #	findSelinuxusermapByOption
 #	verifySelinuxusermapAttr
+#	verify_ssh_auth_success_selinuxuser_krbcred
+#	verify_ssh_auth_failure_selinuxuser_krbcred
+#	verify_ssh_auth_success_selinuxuser
+#	verify_ssh_auth_failure_selinuxuser
 #
 ######################################################################
 # Assumes:
@@ -293,5 +297,99 @@ enableSelinuxusermap()
         rlLog "Selinuxusermap rule $selinuxusermapname enabled successfully."
    fi
    return $rc
+}
+
+#######################################################################
+# verify_ssh_auth_success_selinuxuser_krbcred Usage:
+#       verify_ssh_auth_success_selinuxuser_krbcred <username> <hostname> <selinuxuser>
+######################################################################
+verify_ssh_auth_success_selinuxuser_krbcred()
+{
+user=$1
+host=$2
+selinuxuser=$3
+	rc=0
+        ssh -l "$user" $host id -Z | grep $selinuxuser
+	if [ $? = 0 ]; then
+		rlPass "Authentication successful for $user, with selinuxuser $selinuxuser as expected"
+	else   
+        	rlFail "ERROR: Authentication failed for $user, with selinuxuser $selinuxuser expected success."
+fi
+}
+
+#######################################################################
+# verify_ssh_auth_failure_selinuxuser_krbcred  Usage:
+#       verify_ssh_auth_failure_selinuxuser_krbcred <username> <hostname> <selinuxuser>
+######################################################################
+verify_ssh_auth_failure_selinuxuser_krbcred()
+{
+user=$1
+host=$2
+selinuxuser=$3
+        rc=0
+        ssh -l "$user" $host id -Z | grep $selinuxuser
+        if [ $? = 0 ]; then
+                rlFail "ERROR: Authentication success for $user, with selinuxuser $selinuxuser expected failure."
+        else
+                rlPass "Authentication failed for $user, with selinuxuser $selinuxuser as expected"
+fi
+}
+
+#######################################################################
+# verify_ssh_auth_success_selinuxuser_nokrbcred Usage:
+#       verify_ssh_auth_success_selinuxuser <username> <passwd> <hostname> <selinuxuser>
+######################################################################
+verify_ssh_auth_success_selinuxuser()
+{
+user=$1
+passwd=$2
+host=$3
+selinuxuser=$4
+        rc=0
+	expect -f - <<-EOF | grep -C 77 '^login successful'
+        	spawn ssh -l "$user" $host id -Z | grep $selinuxuser
+       # 	spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+                expect {
+                	"*assword: " {
+                        send -- "$passwd\r"
+                        	}
+                       }
+                expect eof
+	EOF
+	if [ $? = 0 ]; then
+                rlPass "Authentication successful for $user, with selinuxuser $selinuxuser as expected"
+        else
+                rlFail "ERROR: Authentication failed for $user, with selinuxuser $selinuxuser expected success."
+	fi
+
+}
+
+#######################################################################
+# verify_ssh_auth_failure_selinuxuser Usage:
+#       verify_ssh_auth_failure_selinuxuser <username> <passwd> <hostname> <selinuxuser>
+######################################################################
+verify_ssh_auth_failure_selinuxuser()
+{
+user=$1
+passwd=$2
+host=$3
+selinuxuser=$4
+        rc=0
+        expect -f - <<-EOF | grep -C 77 '^login successful'
+                spawn ssh -l "$user" $host id -Z | grep $selinuxuser
+       #        spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+                expect {
+                        "*assword: " {
+                        send -- "$passwd\r"
+                                }
+                       }
+                expect eof
+	EOF
+	if [ $? = 0 ]; then
+                rlFail "ERROR: Authentication success for $user, with selinuxuser $selinuxuser expected failure."
+        else
+                rlPass "Authentication failed for $user, with selinuxuser $selinuxuser as expected"
+        fi
+
 }
 
