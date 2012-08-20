@@ -88,6 +88,8 @@ rlJournalStart
 	   	yum -y install $COMMON_SERVER_PACKAGES
 
 	   	if [ "$FLAVOR" == "Fedora" ] ; then
+			# Installing fastest mirrors yum plugin to speed up installs
+			yum -y install yum-plugin-fastestmirror
 			yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
                 	yum -y update
 
@@ -142,6 +144,8 @@ rlJournalStart
            	yum -y install $COMMON_SERVER_PACKAGES
 
            	if [ "$FLAVOR" == "Fedora" ] ; then
+			# Installing fastest mirrors yum plugin to speed up installs
+			yum -y install yum-plugin-fastestmirror
                 	yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
                 	yum -y update
 
@@ -198,6 +202,8 @@ rlJournalStart
            	yum -y install $COMMON_CLIENT_PACKAGES
 
            	if [ "$FLAVOR" == "Fedora" ] ; then
+			# Installing fastest mirrors yum plugin to speed up installs
+			yum -y install yum-plugin-fastestmirror
                 	yum -y install --disablerepo=updates-testing $FREEIPA_CLIENT_PACKAGES
                 	yum -y update
 
