@@ -284,6 +284,12 @@ rlJournalStart
                 rlLog "Machine in recipe in not a CLIENT2"
         fi
 
+	# Back up /dev/shm for use after rebooting on the host machine
+	rlLog "Backing up /dev/shm to /root/dev-shm-backup"
+	mkdir -p  /root/dev-shm-backup
+	rsync -av /dev/shm/* /root/dev-shm-backup/.	
+	rlLog "/dev/shm backup complete"
+
    rlJournalPrintText
    report=/tmp/rhts.report.$RANDOM.txt
    makereport $report
