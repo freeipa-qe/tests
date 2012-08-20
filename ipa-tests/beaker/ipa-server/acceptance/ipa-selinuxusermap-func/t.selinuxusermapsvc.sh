@@ -2,16 +2,15 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-hbacfunc
-#   Description: Functional test cases for ipa hbca
+#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-selinuxusermap-func
+#   Description: Functional test cases for ipa selinuxusermap
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa will be tested:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Authors: 
-#	     Gowrishankar Rajaiyan <gsr@redhat.com>
-#   Date   : August 11, 2011
+#	   Asha Akkianagdy <aakkiang@redhat.com>
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
