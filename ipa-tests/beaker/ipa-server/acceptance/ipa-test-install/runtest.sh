@@ -46,6 +46,9 @@ PACKAGE="ipa-admin"
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 
+# Make sure TESTORDER is initialized or multihost may have issues
+TESTORDER=1
+
 ##########################################
 #   test main 
 #########################################
