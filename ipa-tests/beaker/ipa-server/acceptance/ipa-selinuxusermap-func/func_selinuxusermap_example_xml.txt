@@ -1,6 +1,6 @@
 <job product="cpe:/o:redhat:enterprise_linux:6:update2" retention_tag="audit">
 	<whiteboard>
-		IPA :: HBAC Func :: x86_64
+		IPA :: Selinuxusermap Func :: x86_64
 	</whiteboard>
 	<recipeSet priority="Normal">
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="RECIPE_MEMBERS" whiteboard="IPA MASTER SERVER">
