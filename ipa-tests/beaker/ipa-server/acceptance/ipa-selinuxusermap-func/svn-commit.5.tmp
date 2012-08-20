@@ -1,5 +1,0 @@
-
---This line, and those below, will be ignored--
-
-A    func_selinuxusermap_example_xml.txt
-AM   t.selinuxusermapsvc.sh
