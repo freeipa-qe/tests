@@ -41,6 +41,9 @@
 
 . /dev/shm/nis.sh
 
+# Force initialization of TESTORDER for rhts-sync for RHEL5
+export TESTORDER=1
+
 # Include test case files
 for file in $(ls tests.d/t.*.sh); do
 	. ./$file
