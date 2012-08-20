@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-selinuxusermap-func
+Description: Selinuxusermap Functional acceptance tests 
+Author: Asha Akkiangady  <aakkiang@redhat.com>
