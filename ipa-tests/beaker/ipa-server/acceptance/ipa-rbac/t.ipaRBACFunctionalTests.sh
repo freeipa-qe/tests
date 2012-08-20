@@ -21,7 +21,7 @@ ipaRBACFunctionalTests() {
 #    test05
     test06
     testDNSPermissions
-    cleanupRBACTests
+   cleanupRBACTests
 }
 
 setupRBACTests()
@@ -443,13 +443,44 @@ testPerDomainDNS()
           rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_removeperm.log"
       rlPhaseEnd
 
+      rlPhaseStartTest "ipa-rbac-1021 - Verify can use dig to do DNS queries" 
+            # add a host with an ip
+            kinitAs $ADMINID $ADMINPW
+            host1="hostfordnstest".$zone2
+            rzone=`getReverseZone`
+            rlLog "Reverse Zone: $rzone"
+            if [ $rzone ] ; then
+             oct=`echo $rzone | cut -d "i" -f 1`
+             oct1=`echo $oct | cut -d "." -f 3`
+             oct2=`echo $oct | cut -d "." -f 2`
+             oct3=`echo $oct | cut -d "." -f 1`
+             hostipaddr=$oct1.$oct2.$oct3.99
+             ipa host-add --ip-address=$hostipaddr $host1
+            else
+             rlFail "Reverse DNS zone not found."
+            fi
+            kinitAs $login1 $password
+
+           # use dig to lookup host added 
+           rlRun "dig $host1 | grep $hostipaddr" 0 "Checking with dig to verify that actual DNS queries are still functional, when a permission is added to a zone"
 
 
-      rlRun "kinitAs $ADMINID $ADMINPW"
-      rlLog "Executing: ipa dnszone-remove-permission $zone1"
-      ipa dnszone-remove-permission $zone1
+           kinitAs $ADMINID $ADMINPW
+           ipa host-del $host1 --updatedns 
+           kinitAs $login1 $password
+      rlPhaseEnd
 
 
+      rlPhaseStartTest "ipa-rbac-1022 - User with permission removed can no longer access the zone" 
+          rlRun "kinitAs $ADMINID $ADMINPW"
+          rlLog "Executing: ipa dnszone-remove-permission $zone1"
+          ipa dnszone-remove-permission $zone1
+          kinitAs $login1 $password
+          command="ipa dnszone-show $zone1"
+          expmsg="ipa: ERROR: $zone1: DNS zone not found"
+          rlRun "$command > $TmpDir/ipaDNSPermissionTest_showzonewithnoperm.log 2>&1" 2 "Verify error message when listing zone with no permission"
+          rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_showzonewithnoperm.log"
+      rlPhaseEnd
 }
 
 
