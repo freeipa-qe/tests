@@ -252,8 +252,17 @@ rlPhaseStartTest "Setup for sudo functional tests on separate client"
 	AddToKnownHosts $MASTER
 	AddToKnownHosts $CLIENT	
 
-        # stopping firewall
-        rlRun "service iptables stop"
+	# stopping firewall
+	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
+		service iptables stop
+		if [ $? -eq 1 ]; then
+			rlFail "BZ 845301 found -- service iptables stop returns 1 when already stopped"
+		else
+			rlPass "BZ 845301 not found -- service iptables stop succeeeded"
+		fi
+	else    
+		rlRun "service iptables stop" 0 "Stop the firewall on the client"
+	fi
 
         # enabling NIS
 	rlRun "nisdomainname `hostname -d`"
