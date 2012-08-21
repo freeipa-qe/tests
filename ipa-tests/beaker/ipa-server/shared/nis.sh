@@ -20,7 +20,11 @@ NISSERVICE1="my-ftp"
 NISSERVICE2="my-web"
 NISSERVICE3="my-ssh"
 NIS_SERVER_PACKAGES="ypbind ypserv yp-tools rpcbind"
-NIS_CLIENT_PACKAGES="ypbind yp-tools rpcbind nscd"
+if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+	NIS_CLIENT_PACKAGES="ypbind yp-tools portmap nscd"
+else
+	NIS_CLIENT_PACKAGES="ypbind yp-tools rpcbind nscd"
+fi
 
 export NISUSER1 NISUSER2 NISUSER3 NISUSER4 NISUSER1PASSWD NISUSER2PASSWD NISUSER3PASSWD NISUSER4PASSWD
 export NISUSER1PASSWD2 NISUSER2PASSWD2 NISUSER3PASSWD2 NISUSER4PASSWD2
@@ -207,7 +211,11 @@ setup-nis-client()
 	nisdomainname $NISDOMAIN
 
 	# Start/restart services
-	service rpcbind restart
+	if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+		service portmap restart
+	else
+		service rpcbind restart
+	fi
 	service ypbind start
 	service nscd start
 }
