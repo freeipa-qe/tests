@@ -282,4 +282,39 @@ sub convert_time {
     return $time; 
 }
 
+sub setCertLifeLeft{
+    my $cert=shift;
+    my $now = localtime;
+    my $time_epoch_now = str2time($now);
+    my $notafter=$cert->{"NotAfter_sec"}+0;
+    my $time_left = $notafter - $time_epoch_now;
+    my $time_left_str = convert_time($time_left);
+    $cert->{"LifeLeft_sec"} = $time_left;
+    $cert->{"LifeLeft"} = $time_left_str;
+}
 
+sub setCertStatus{
+    my $cert=shift;
+    my $now = localtime;
+    my $time_epoch_now = str2time($now);
+    my $notbefore=$cert->{"NotBefore_sec"}+0;
+    my $notafter=$cert->{"NotAfter_sec"}+0;
+    if ($time_epoch_now < $notbefore){
+        $cert->{"status"} = "preValid";
+    }elsif ($notbefore <= $time_epoch_now && $time_epoch_now <= $notafter){
+        $cert->{"status"} = "valid";
+    }else{ 
+        $cert->{"status"} = "exipred";
+    }  
+    #print "debug: set cert [".$cert->{"nickname"}." status to :".$cert->{"status"}."\n";
+}
+
+sub isValid{
+    my $cert=shift;
+    setCertStatus($cert);
+    if ($cert->{"status"} eq "valid" ){
+        return 1;
+    }else{
+        return 0;
+    }
+}

@@ -1,91 +1,5 @@
 #!/usr/bin/perl
-#
-#
-
-use strict;
-use warnings;
-use Getopt::Std;
-use Date::Parse;
-
-our %options=();
-getopts("d:n:p:f:", \%options);
-
-our $certutil="/bin/certutil";
-our $cert_dbdir;
-our $cert_nickname;
-our @cert_nicknamelist;
-our %certs;
-our $theCert;
-our $property_name;
-our $property_value;
-our $property_separator;
-our $cert_outputfile;
-
-# check -d user input
-if (defined $options{"d"} ){
-    $cert_dbdir = $options{"d"};
-    if (! -d $cert_dbdir){
-        print "Cert directory [$cert_dbdir] not exist\n";
-        exit 1;
-    }elsif (! -r $cert_dbdir){
-        print "Cert directory [$cert_dbdir] not readable\n";
-        exit 1;
-    }
-}else{
-    print "Cert directory required, use -d <dir>\n";
-    exit 1;
-}
-
-# check -n user input
-findAllNickname();
-
-if (defined $options{"n"} ){
-    $cert_nickname= $options{"n"};
-    if (! grep /$cert_nickname/, @cert_nicknamelist){
-        print "Nickname [$cert_nickname] not found\n";
-        printAllCertNickname();
-        exit 1;
-    }else{
-        parseCertDetails();
-        $theCert = findValidCert($cert_nickname);
-    }
-}else{
-    print "Cert nickname is required, use -n <nick name>\n";
-    printAllCertNickname();
-    exit 1;
-}
-
-if (defined $options{"p"} ){
-    $property_name = $options{"p"};
-    $property_value = "";
-    if (%certs){
-        foreach (sort keys %certs){
-            my $cert = $certs{$_};
-            setCertStatus($cert);
-            setCertLifeLeft($cert);
-            next if (! isValid($cert));
-            if (exists $cert->{$property_name}){
-                $property_value .= $cert->{$property_name}. ",";
-                last;
-            }
-        }
-    }
-    # print property value if -p is given, regardless of -f
-    chop $property_value;
-    print "$property_value\n"; 
-}else{
-    if (defined $options{"f"} ){
-        $cert_outputfile= $options{"f"};
-        printCertToFile($theCert, $cert_outputfile);
-    }else{
-        printCert($theCert);
-    }
-}
-
-#########################################
-##           subroutine                  #
-##########################################
-
+# functions called by other cert related perl program
 sub trim{
     my $input = shift;
     $input =~ s/^([\t|\s])*//g;
@@ -115,6 +29,91 @@ sub printAllCertNickname{
 }
 
 sub parseCertDetails{
+    my ($nickname, $certfile)= @_;
+    open CERT,"<$certfile";
+    my @lines = <CERT>;
+    close CERT;
+    my $flag=0;
+    my $key=""; 
+    my $value="";
+    my %currentCert;
+    foreach my $line (@lines){
+        if ($line =~ /^Certificate:$/){
+            if (%currentCert){
+                $currentCert{"nickname"} = $nickname;
+                my $serial = $currentCert{"serial"};
+                my %copy = %currentCert;
+                $certs{$serial} = \%copy;
+            }
+            next;
+        }
+        if ($line =~ /Serial Number:\s*(\d+)\s*/){
+           $currentCert{"serial"} = trim($1); 
+           next;
+        }
+        if ($line =~ /Issuer: "(.*)"/){
+            $currentCert{"issuer"} = trim($1); 
+            next;
+        }
+        if ($line =~ /Subject: "(.*)"/){
+            $currentCert{"subject"} = trim($1); 
+            next;
+        }
+        if ($line =~ /Not Before:(.*)$/){
+            my $date = trim($1);
+            my $epoch = str2time($date);
+            #my $d = localtime($time); # this is to convert it back to local time so I know this is epoch time
+            $currentCert{"NotBefore"}="$date";
+            $currentCert{"NotBefore_sec"}="$epoch";
+            $currentCert{"Life"} = $epoch;
+            next;
+        }
+        if ($line =~ /Not After :(.*)$/){
+            my $date = trim($1);
+            my $epoch = str2time($date) + 0;
+            $currentCert{"NotAfter"}="$date";
+            $currentCert{"NotAfter_sec"}="$epoch";
+
+            my $cert_life_insecond = $epoch - $currentCert{"Life"};
+            my $cert_life_str = convert_time ($cert_life_insecond);
+            $currentCert{"Life"} = $cert_life_str;
+            $currentCert{"Life_sec"} = $cert_life_insecond;
+
+            my $now = localtime;
+            my $time_epoch_now = str2time($now);
+            if ($time_epoch_now > $epoch){
+                $currentCert{"status"} = "exipred";
+            }else{
+                $currentCert{"status"} = "valid";
+            }
+
+            my $time_left_str = convert_time($epoch - $time_epoch_now);
+            $currentCert{"LifeLeft"} = $time_left_str;
+            next;
+        }
+        if ($line =~ /Fingerprint \(SHA1\)/){
+            $flag=1;
+            $key = "Fingerprint SHA1";
+            next;
+        }
+        if ($flag && $key ne "" ){
+            $value = trim ($line);
+            $currentCert{$key} = $value;
+            $key="";
+            $value="";
+            $flag = 0;
+            next;
+        }
+    }
+    if (%currentCert){
+        my $serial = $currentCert{"serial"};
+        $currentCert{"nickname"} = $nickname;
+        $certs{$serial} = \%currentCert;
+    }
+}
+
+
+sub parseCertutil{
     my $cmdoutput = `$certutil -L -d $cert_dbdir -n "$cert_nickname"`;
     my @lines = split(/\n/,$cmdoutput);
     my $flag=0;
@@ -191,7 +190,7 @@ sub parseCertDetails{
 sub printCert{
     my ($cert) = shift;
     if (ref($cert) eq "HASH"){
-        foreach (keys %$cert){
+        foreach (sort keys %$cert){
             my $key = $_;
             $key = sprintf ("%-18s",$key);
             print "$key: ".$cert->{$_}."\n";
@@ -239,6 +238,7 @@ sub convert_time {
 
 sub findCert{
     my ($nickname,$status)=@_;
+    #print "debug: find [$nickname],[$status]\n";
     if (%certs){
         foreach (sort keys %certs){
             my $cert = $certs{$_};
@@ -247,6 +247,8 @@ sub findCert{
                && $cert->{"status"} eq $status ){
                 setCertLifeLeft($cert);
                 return $cert;
+            }else{
+                #print "debug: read cert [".$cert->{"nickname"}."], [".$cert->{"status"}."]\n";
             }
         }
     }
@@ -276,11 +278,10 @@ sub printCertToFile{
         if (! open OUT, ">$output"){
             return;
         }
-        setCertStatus($cert);
-        setCertLifeLeft($cert);
         foreach (sort keys $cert){
             my $key = $_;
-            print OUT $key."=".$cert->{$_}."\n";
+            my $formatted_key = sprintf("%-16s",$key);
+            print OUT $formatted_key."| ".$cert->{$_}."\n";
         }
         close OUT;
     }
@@ -308,17 +309,77 @@ sub setCertStatus{
     }elsif ($notbefore <= $time_epoch_now && $time_epoch_now <= $notafter){
         $cert->{"status"} = "valid";
     }else{ 
-        $cert->{"status"} = "exipred";
+        $cert->{"status"} = "expired";
     }  
-    #print "debug: set cert [".$cert->{"nickname"}." status to :".$cert->{"status"}."\n";
+    #print "debug: set cert [".$cert->{"nickname"}."] status to:(".$cert->{"status"}.")\n";
 }
 
 sub isValid{
     my $cert=shift;
-    setCertStatus($cert);
+    if (! exists $cert->{"status"}){
+        setCertStatus($cert);
+    }
     if ($cert->{"status"} eq "valid" ){
         return 1;
     }else{
         return 0;
     }
 }
+
+sub LDAPsearch{
+    my ($ldap,$searchString,$attrs,$base) = @_;
+    if (!$attrs ) { 
+        $attrs = [ 'cn','userCertificate' ]; 
+    }
+
+    my $result = $ldap->search ( 
+                    base    => "$base",
+                    scope   => "sub",
+                    filter  => "$searchString",
+                    attrs   =>  $attrs
+                    );
+    my $href = $result->as_struct;
+    my @arrayOfDNs  = keys %$href;        # use DN hashes
+    foreach ( @arrayOfDNs ) {
+        next if ( $_ =~ /^cn=ca_renewal/ );
+        print "found renewal cert DN [$_] \n";
+        my $valref = $$href{$_};
+        my @arrayOfAttrs = sort keys %$valref; #use Attr hashes
+        my $attrName;        
+        my $nickname;
+        foreach $attrName (@arrayOfAttrs) {
+            next if ( $attrName =~ /;binary$/ );
+            my $attrVal =  @$valref{$attrName};
+            if ($attrName =~ /cn/i){
+                $nickname = @$attrVal[0];
+            }
+            if ($attrName =~ /userCertificate/i){
+                my $derfile="/tmp/cert.".rand().".der";
+                my $certfile="$derfile".".cert";
+                if (saveAsFile($certfile,$derfile, @$attrVal)){
+                    #print "\t $attrName: der file: [$derfile], cert file [$certfile]\n";
+                    parseCertDetails($nickname, $certfile);
+                }
+            }else{
+                #print "\t $attrName: @$attrVal \n";
+            }
+        }
+        #print "#-------------------------------\n";
+    }
+}
+
+sub saveAsFile{
+    my ($certfile,$derfile,@content) = @_;
+    if (open PKCS12,">$derfile"){
+        foreach (@content){
+            print PKCS12 $_;
+        }
+        close PKCS12; 
+        my $certDetail=`openssl x509 -inform der -in $derfile -text > $certfile`;
+        return 1;
+    }else{
+        print "can not open file [$derfile] to write\n";
+        return 0;
+    } 
+}
+1;
