@@ -97,6 +97,10 @@ setup-nis-server()
 	service ypserv restart
 	service ypbind restart
 
+	# disable iptables if not done already
+	service iptables stop
+	service ip6tables stop
+
 	# configuring netgroups
 	cat <<-EOF >>/etc/netgroup
 	convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)
