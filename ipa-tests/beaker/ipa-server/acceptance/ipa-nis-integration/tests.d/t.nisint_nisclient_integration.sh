@@ -134,7 +134,11 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 
 		rlRun "service nscd stop"
 		rlRun "service ypbind stop"
-		rlRun "service rpcbind stop"
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			rlRun "service portmap stop"
+		else
+			rlRun "service rpcbind stop"
+		fi
 
 		rlRun "cp /etc/yp.conf /etc/yp.conf.orig.$NISDOMAIN"
 		rlRun "sed -i 's/$NISDOMAIN/$DOMAIN/g' /etc/yp.conf"
@@ -167,7 +171,11 @@ nisint_nisclient_integration_change_to_ipa_nismaster()
 		rlRun "nisdomainname $DOMAIN"
 		rlRun "nisdomainname"
 		rlRun "host $MASTER"
-		rlRun "service rpcbind start"
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			rlRun "service portmap start"
+		else
+			rlRun "service rpcbind start"
+		fi
 		rlRun "service ypbind start"
 		rlRun "service nscd start"
 		
