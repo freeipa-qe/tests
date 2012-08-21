@@ -75,7 +75,7 @@ selinuxusermapsvc_master_001() {
                 rlRun "rlDistroDiff keyctl"
 		rlRun "kinitAs $user1 $userpw" 0 "Kinit as $user1"
                 rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $ipa_selinuxuser"
-		rlRun "verify_ssh_auth_success_selinuxuser_krbcred $user2 $CLIENT2 $ipa_default_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT has selinux policy $ipa_default_selinuxuser"
+		rlRun "verify_ssh_auth_success_selinuxuser_krbcred $user1 $CLIENT2 $ipa_default_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT has selinux policy $ipa_default_selinuxuser_verif"
                 rlRun "rlDistroDiff keyctl"
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlPhaseEnd
@@ -94,6 +94,8 @@ selinuxusermapsvc_master_001_cleanup() {
 selinuxusermapsvc_client_001() {
 
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-001: $user1 accessing $CLIENT from $CLIENT using SSHD service."
+		ipa_selinuxuser_verif="staff_u:.*s0-s0:c0.c1023"
+		ipa_default_selinuxuser_verif="guest_u:.*s0"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
@@ -107,6 +109,8 @@ selinuxusermapsvc_client_001() {
 selinuxusermapsvc_client2_001() {
 
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-001: $user1 accessing $CLIENT from $CLIENT2 using SSHD service."
+		ipa_selinuxuser_verif="staff_u:.*s0-s0:c0.c1023"
+		ipa_default_selinuxuser_verif="guest_u:.*s0"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
