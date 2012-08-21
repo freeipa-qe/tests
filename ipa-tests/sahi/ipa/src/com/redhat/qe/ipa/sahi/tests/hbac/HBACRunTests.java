@@ -229,6 +229,7 @@ public class HBACRunTests extends SahiTestScript {
 		    sahiTasks.link("smtp").click();
 		    sahiTasks.radio("ipaenabledflag-1-1").click();
 		    sahiTasks.span("Update").click();
+		    sahiTasks.navigateTo(commonTasks.hbacPage, true);//mvarun
 		    sahiTasks.link("HBAC Test").click();
 		    HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
 					mrule1a,mrule2a,mrule3a,unmrule1a,unmrule2a,unmrule3a,
@@ -242,8 +243,16 @@ public class HBACRunTests extends SahiTestScript {
 			//deleting smtp1
 			sahiTasks.link("HBAC Rules").click();
 			sahiTasks.link(rule).click();
-			sahiTasks.checkbox("smtp1").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
-			sahiTasks.span("Delete").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+			sahiTasks.checkbox("memberservice_hbacsvc").near(sahiTasks.row("smtp1")).click();//mvarun
+			if(sahiTasks.tableHeader("Services DeleteAdd").exists())
+			{
+				sahiTasks.span("Delete").near(sahiTasks.tableHeader("Services DeleteAdd")).click();//for IE
+			}
+			else
+			{
+				sahiTasks.span("Delete").near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();//for fireFox
+			}
+			
 			sahiTasks.button("Delete").click();
 			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 			//adding smtp2
@@ -264,7 +273,7 @@ public class HBACRunTests extends SahiTestScript {
 		    sahiTasks.link("smtp").click();
 		    sahiTasks.radio("ipaenabledflag-1-0").click();
 		    sahiTasks.span("Update").click();
-		    sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		    sahiTasks.navigateTo(commonTasks.hbacPage, true);//mvarun
 		    sahiTasks.link("HBAC Test").click();		    
 		    HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
 					mrule1a,mrule2a,mrule3a,unmrule1a,unmrule2a,unmrule3a,
@@ -274,8 +283,15 @@ public class HBACRunTests extends SahiTestScript {
 		    System.out.println("restoring default setting");
 		    sahiTasks.link("HBAC Rules").click();
 			sahiTasks.link(rule).click();
-			sahiTasks.checkbox("smtp2").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
-			sahiTasks.span("Delete").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+			sahiTasks.checkbox("memberservice_hbacsvc").near(sahiTasks.row("smtp2")).click();
+			if(sahiTasks.tableHeader("Services DeleteAdd").exists())
+			{
+				sahiTasks.span("Delete").near(sahiTasks.tableHeader("Services DeleteAdd")).click();//for IE
+			}
+			else
+			{
+				sahiTasks.span("Delete").near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();//for fireFox
+			}
 			sahiTasks.button("Delete").click();
 			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 			String searchString = "smtp1";
