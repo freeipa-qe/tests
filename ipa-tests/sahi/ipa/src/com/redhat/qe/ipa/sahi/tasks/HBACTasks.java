@@ -449,8 +449,14 @@ public class HBACTasks {
 		}		
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Add").click();
-		//sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("Service GroupsDeleteAdd")).click();
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.div("Service Groups")).click();
+		if(sahiTasks.tableHeader("Services DeleteAdd").exists())
+		{
+			sahiTasks.span("Add").near(sahiTasks.tableHeader("Services DeleteAdd")).click();//for IE
+		}
+		else
+		{
+			sahiTasks.span("Add").near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();//for fireFox
+		}
 		sahiTasks.checkbox("Sudo").click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Add").click();
