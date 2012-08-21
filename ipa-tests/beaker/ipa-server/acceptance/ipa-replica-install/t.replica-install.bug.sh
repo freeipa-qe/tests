@@ -142,3 +142,14 @@ replicaBugCheck_bz830314()
 		#rlRun "grep named /var/log/ipareplica-install.log"
 	rlPhaseEnd
 }
+
+replicaBugCheck_bz845405()
+{
+    rlPhaseStartTest "bz845405 - ipa-replica-install httpd restart failed"
+        if [ $(grep "Command '/sbin/service httpd restart ' returned non-zero exit status 1" /var/log/ipareplica-install.log |wc -l) -gt 0 ]; then
+            rlFail "BZ 845405 found...ipa-replica-install httpd restart failed"
+        else
+            rlPass "BZ 845405 not found"
+        fi
+    rlPhaseEnd
+}

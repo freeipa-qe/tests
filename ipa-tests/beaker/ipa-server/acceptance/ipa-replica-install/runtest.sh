@@ -190,6 +190,7 @@ rlJournalStart
 			installSlave
 			installCA
 			replicaBugCheck_bz784696
+			replicaBugCheck_bz845405
 			uninstall
 
 			installSlave_nr1
