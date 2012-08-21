@@ -242,7 +242,8 @@ rlPhaseStartTest "0002 bz820258 - Modify Winsync Interval (default 300 seconds)"
 	if [ $z -ge 5 ]; then
 	 rlRun "echo \"SyncInterval is unchanged: $z mins\"" 0 "bz820258: Winsync interval change to $sec sec failed as expected"
 	 rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=820258"
-	 rlRun "service dirsrv restart" 0 "Restarting dirsrv for winsync interval change to take effect"
+	 #rlRun "service dirsrv restart" 0 "Restarting dirsrv for winsync interval change to take effect"
+	 rlRun "rlDistroDiff dirsrv_svc_restart" 0 "Restarting dirsrv for winsync interval change to take effect"
 	 rlRun "sleep 120" 0 "Waiting for new interval logs"
 	 sleep $sec
 	fi
@@ -523,7 +524,8 @@ rlPhaseStartTest "0014 Using options force-sync, re-initialize, disconnect and d
 	
 	rlRun "syncinterval_ldif delete"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to 5 mins"
-	rlRun "service dirsrv restart" 0 "Restarting to make winsync interval change effective"
+	#rlRun "service dirsrv restart" 0 "Restarting to make winsync interval change effective"
+	rlRun "rlDistroDiff dirsrv_svc_restart" 0 "Restarting to make winsync interval change effective"
 	sleep 10
 
 	rlRun "ADuser_ldif $aduser ads $aduser add" 0 "Generate ldif file to add user $aduser"
@@ -634,7 +636,8 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 
 	rlRun "syncinterval_ldif $sec add"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to $sec sec"
-        rlRun "service dirsrv restart" 0 "Restarting to make winsync interval change effective"
+        #rlRun "service dirsrv restart" 0 "Restarting to make winsync interval change effective"
+        rlRun "rlDistroDiff dirsrv_svc_restart" 0 "Restarting to make winsync interval change effective"
 	sleep 10
 
 	rlRun "ADuser_ldif $l2user ads $l2user add $OU2" 0 "Generate ldif file to add user $l2user"
@@ -682,7 +685,8 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 	rlRun "certutil -D -n \"AD cert\" -d /etc/dirsrv/slapd-TESTRELM-COM"
 
 	rlRun "rm -f /etc/named.conf && cp -p /etc/named.conf.winsync /etc/named.conf" 0 "Replacing named.conf file from backup"
-	rlRun "service named restart"
+	rlServiceStop "named"
+        rlServiceStart "named"
 
 #	rlRun "kill -15 `pidof rdesktop`"
 	rlRun "rm -f *.ldif"
