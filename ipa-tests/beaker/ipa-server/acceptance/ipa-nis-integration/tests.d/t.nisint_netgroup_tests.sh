@@ -267,7 +267,7 @@ nisint_netgroup_test_1005()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlRun "getent netgroup testnetgroup1" 0 "getent search for existing netgroup"
+		rlRun "getent -s nis netgroup testnetgroup1" 0 "getent search for existing netgroup"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
@@ -295,7 +295,7 @@ nisint_netgroup_test_1006()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlRun "getent netgroup|grep notanetgroup" 1 "attempt to getent search for non-existent netgroup"
+		rlRun "getent -s nis netgroup notanetgroup|grep notanetgroup" 1 "attempt to getent search for non-existent netgroup"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
@@ -432,7 +432,11 @@ nisint_netgroup_test_1009()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlRun "service rpcbind restart"
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			rlRun "service portmap restart"
+		else
+			rlRun "service rpcbind restart"
+		fi
 		rlRun "service nfs restart"
 		rlRun "service nfslock restart"
 		rlRun "exportfs @testnetgroup1:/tmp"
@@ -471,7 +475,11 @@ nisint_netgroup_test_1010()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlRun "service rpcbind restart"
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			rlRun "service portmap restart"
+		else
+			rlRun "service rpcbind restart"
+		fi
 		rlRun "service nfs restart"
 		rlRun "service nfslock restart"
 		rlRun "exportfs @testnetgroup1:/tmp"

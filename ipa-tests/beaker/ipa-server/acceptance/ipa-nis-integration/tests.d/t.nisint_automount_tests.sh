@@ -82,6 +82,9 @@ nisint_automount_test_envsetup()
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "yum -y install autofs" 0 "Install autofs for testing"
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			rlRun "sed -i 's/automount:.*$/automount:   nis/' /etc/nsswitch.conf"
+		fi
 		rlRun "service autofs restart"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $NISCLIENT_IP"
 		rlLog "rhts-sync-block -s '$FUNCNAME.1' $NISMASTER_IP"
