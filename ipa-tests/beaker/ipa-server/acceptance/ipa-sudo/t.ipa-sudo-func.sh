@@ -256,7 +256,7 @@ rlPhaseStartTest "Setup for sudo functional tests on separate client"
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
 		service iptables stop
 		if [ $? -eq 1 ]; then
-			rlFail "BZ 845301 found -- service iptables stop returns 1 when already stopped"
+			rlLog "BZ 845301 found -- service iptables stop returns 1 when already stopped"
 		else
 			rlPass "BZ 845301 not found -- service iptables stop succeeeded"
 		fi
