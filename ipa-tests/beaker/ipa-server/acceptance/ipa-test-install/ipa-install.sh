@@ -627,7 +627,7 @@ ipa_install_prep()
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
 		service iptables stop
 		if [ $? -eq 1 ]; then
-			rlFail "BZ 845301 found -- service iptables stop returns 1 when already stopped"
+			rlLog "BZ 845301 found -- service iptables stop returns 1 when already stopped"
 		else
 			rlPass "BZ 845301 not found -- service iptables stop succeeeded"
 		fi
@@ -638,7 +638,7 @@ ipa_install_prep()
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
 		service ip6tables stop
 		if [ $? -eq 1 ]; then
-			rlFail "BZ 845301 found -- service ip6tables stop returns 1 when already stopped"
+			rlLog "BZ 845301 found -- service ip6tables stop returns 1 when already stopped"
 		else
 			rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
 		fi
