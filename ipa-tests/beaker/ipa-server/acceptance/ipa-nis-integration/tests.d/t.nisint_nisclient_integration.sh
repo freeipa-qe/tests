@@ -201,7 +201,11 @@ nisint_nisclient_integration_setup_kerberos_for_auth()
 	rlPhaseStartTest "nisint_nisclient_integration_setup_kerberos_for_auth: Setup Kerberos for NIS Client"
 		rlRun "yum -y install krb5-workstation pam_krb5" 0 "Install krb5-workstation pam_krb5"
 		rlRun "service ntpd stop"
-		rlRun "service ntpdate start"
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			rlRun "ntpdate $NTPSERVER"
+		else
+			rlRun "service ntpdate start"
+		fi
 		rlRun "service ntpd start"
 		rlRun "chkconfig ntpd on"
 		rlRun "touch /etc/krb5.keytab"

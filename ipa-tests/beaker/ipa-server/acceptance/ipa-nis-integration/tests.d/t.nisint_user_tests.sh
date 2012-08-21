@@ -411,7 +411,7 @@ nisint_user_test_1010()
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "su - testuser2 -c 'touch /tmp/mytestfile.user1'" 1 "attempt to touch existing file fail without permissions"
-		rlRun "su - notauser -c 'touch /tmp/mytestfile.user1'" 125 "su fail as non-existent user"
+		rlRun "su - notauser -c 'touch /tmp/mytestfile.user1'" 1,125 "su fail as non-existent user"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)
