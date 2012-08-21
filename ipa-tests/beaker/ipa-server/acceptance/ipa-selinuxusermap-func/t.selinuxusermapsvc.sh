@@ -57,7 +57,7 @@ selinuxusermapsvc_master_001() {
 		ipa_selinuxuser="staff_u:s0-s0:c0.c1023"
 		ipa_selinuxuser_verif="staff_u:.*s0-s0:c0.c1023"
 		ipa_default_selinuxuser_verif="guest_u:.*s0"
-		
+		userpw="testpw123@ipa.com"
 
 		rlRun "ipa selinuxusermap-add selinuxusermaprule1 --selinuxuser=$ipa_selinuxuser"
 		rlRun "ipa selinuxusermap-add-user selinuxusermaprule1 --users=$user1"
