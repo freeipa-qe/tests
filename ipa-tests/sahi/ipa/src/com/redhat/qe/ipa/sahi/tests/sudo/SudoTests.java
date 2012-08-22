@@ -333,21 +333,20 @@ public class SudoTests extends SahiTestScript{
 	 * Edit the General Section for the Sudo Rule
 	 */
 	@Test (groups={"sudoRuleGeneralSettingsTests"}, description="Edit General Section for Sudo Rule",
-			dataProvider="getSudoRuleGeneralSettingsTestObjects", 
-			dependsOnGroups={"sudoRuleAddAndEditTests","sudoRuleExternalUserHostSettingsTests"})
+			dataProvider="getSudoRuleGeneralSettingsTestObjects")
 	public void testSudoRuleGeneralSettings(String testName, String cn, String description) throws Exception {		
 		//verify rule to be edited exists
-		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
-		
+	   /*Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");*/
+		SudoTasks.createSudoRule(sahiTasks, cn, "Add");
 		//modify this rule
 		SudoTasks.modifySudoRuleGeneralSection(sahiTasks, cn, description);
 		
-		//verify changes	
+		/*//verify changes	
 		SudoTasks.verifySudoRuleGeneralSection(sahiTasks, cn, description);
 		
 		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag-1", "undo");
 		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag-1", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag-1", "Update");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag-1", "Update");*/
 	}
 	
 	
@@ -410,9 +409,9 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, uid, "Users", "indirect", true);
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-2", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-2", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-2", "Update");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "Update");
 	}
 	
 	/*
@@ -473,9 +472,9 @@ public class SudoTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 				
 		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-3", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-3", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-3", "Update");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "Update");
 	}
 	
 	
@@ -507,9 +506,9 @@ public class SudoTests extends SahiTestScript{
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
 		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-4", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-4", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-4", "Update");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "Update");
 	}
 	
 	/*
@@ -564,9 +563,9 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.verifySudoRuleForRunAsUserCategorySection(sahiTasks, commonTasks, cn, runAsUID, runAsUserGroupName, false);
 		
 		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-5", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-5", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-5", "Update");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "Update");
 	}
 	
 	/*
@@ -590,9 +589,9 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.verifySudoRuleForRunAsGroupCategorySection(sahiTasks, commonTasks, cn, runAsGroupName, false);
 		
 		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-6", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-6", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-6", "Update");		
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "undo");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "Reset");
+		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "Update");		
 	}
 	
 	/*
@@ -976,7 +975,7 @@ public class SudoTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					cn   				description
-		ll.add(Arrays.asList(new Object[]{ "edit_general_rule",			"SudoRule4",		"This rule is for eng"      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_general_rule",			"SudoRule6",		"This rule is for eng"      } ));
 		
 		return ll;	
 	}
