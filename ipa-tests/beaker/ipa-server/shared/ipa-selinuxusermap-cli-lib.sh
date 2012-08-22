@@ -347,7 +347,7 @@ host=$3
 selinuxuser=$4
         rc=0
 	expect -f - <<-EOF | grep -C 77 '^login successful'
-        	spawn ssh -l "$user" $host id -Z | grep $selinuxuser
+        	spawn ssh -l "$user" $host"
        # 	spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
                 expect {
                 	"*assword: " {
@@ -357,9 +357,17 @@ selinuxuser=$4
                 expect eof
 	EOF
 	if [ $? = 0 ]; then
-                rlPass "Authentication successful for $user, with selinuxuser $selinuxuser as expected"
+                rlPass "Authentication successful for $user"
+		SELINUX_POLICY=`id -Z`
+		echo $SELINUX_POLICY
+		echo $SELINUX_POLICY | grep $selinuxuser
+		if [ $? = 0 ]; then
+	                rlPass "Selinuxuser $selinuxuser as expected"
+		else
+			rlFail "ERROR:Selinuxuser $selinuxuser policy does not exist."
+		fi
         else
-                rlFail "ERROR: Authentication failed for $user, with selinuxuser $selinuxuser expected success."
+                rlFail "ERROR: Authentication failed for $user."
 	fi
 
 }
