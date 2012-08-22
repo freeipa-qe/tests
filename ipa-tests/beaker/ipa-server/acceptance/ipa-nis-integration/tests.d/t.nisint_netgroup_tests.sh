@@ -205,7 +205,11 @@ nisint_netgroup_test_1003()
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
 		else
-			rlRun "ipa netgroup-show testnetgroup1" 0 "ipa search for existing netgroup"
+			if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) ]; then
+				rlPass "ipa command not provided with RHEL 5...skipping"
+			else
+				rlRun "ipa netgroup-show testnetgroup1" 0 "ipa search for existing netgroup"
+			fi
 			rlRun "ldapsearch -x -h $MASTER_IP -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -b cn=testnetgroup1,cn=ng,cn=compat,$BASEDN \"nisNetgroupTriple=*\($MASTER,testuser1,$DOMAIN\)*\""
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
@@ -237,6 +241,8 @@ nisint_netgroup_test_1004()
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
+		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) ]; then
+			rlPass "ipa command not provided with RHEL 5...skipping"
 		else
 			rlRun "ipa netgroup-show notanetgroup" 2 "fail to ipa search for non-existent netgroup"
 		fi
@@ -267,7 +273,11 @@ nisint_netgroup_test_1005()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
-		rlRun "getent -s nis netgroup testnetgroup1" 0 "getent search for existing netgroup"
+		if [ $(ypwhich 2>/dev/null |wc -l) -gt 0 ]; then
+			rlRun "getent -s nis netgroup testnetgroup1" 0 "getent search for existing netgroup"
+		else
+			rlRun "getent netgroup testnetgroup1" 0 "getent search for existing netgroup"
+		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
 	*)

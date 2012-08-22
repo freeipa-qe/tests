@@ -82,7 +82,7 @@ nisint_automount_test_envsetup()
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlRun "yum -y install autofs" 0 "Install autofs for testing"
-		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 -a $(ypwhich 2>/dev/null|wc -l) -gt 0 ]; then
 			rlRun "sed -i 's/automount:.*$/automount:   nis/' /etc/nsswitch.conf"
 		fi
 		rlRun "service autofs restart"
@@ -182,6 +182,8 @@ nisint_automount_test_1003()
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
+		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) ]; then
+			rlPass "ipa command not provided with RHEL 5...skipping"
 		else
 			KinitAsAdmin
 			rlRun "ipa automountkey-find nis auto.master|grep nisint" 0 "ipa search for existing auto.master entry"
@@ -217,6 +219,8 @@ nisint_automount_test_1004()
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
+		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) ]; then
+			rlPass "ipa command not provided with RHEL 5...skipping"
 		else
 			KinitAsAdmin
 			rlRun "ipa automountkey-find nis auto.master|grep notamap" 1 "fail to ipa search for non-existent auto.master entry"
