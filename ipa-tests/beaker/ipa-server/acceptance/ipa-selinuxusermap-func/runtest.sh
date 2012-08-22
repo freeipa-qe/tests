@@ -119,15 +119,18 @@ rlJournalStart
 
                 rlRun "cat /etc/hosts"
 
-
 	rlPhaseEnd
 
         rlPhaseStartTest "CLIENT1 tests start"
-
 	# selinuxusermapsvc_client_001
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_001 $BEAKERMASTER"
                 selinuxusermapsvc_client_001
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_001 -m $BEAKERCLIENT"
+
+	# selinuxusermapsvc_client_002
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_002 $BEAKERMASTER"
+                selinuxusermapsvc_client_002
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_002 -m $BEAKERCLIENT"
 
 	rlPhaseEnd
 
@@ -139,7 +142,6 @@ rlJournalStart
         else
 
                 rlLog "Machine in recipe in not a CLIENT"
-
         fi
 
         #####################################################################
@@ -176,11 +178,15 @@ rlJournalStart
 	rlPhaseEnd
 
         rlPhaseStartTest "CLIENT2 tests start"
-
 	# selinuxusermapsvc_client2_001
 		rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_001 $BEAKERMASTER"
 		selinuxusermapsvc_client2_001
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_001 -m $BEAKERCLIENT2"
+
+	# selinuxusermapsvc_client2_002
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_002 $BEAKERMASTER"
+                selinuxusermapsvc_client2_002
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_002 -m $BEAKERCLIENT2"
 
 	rlPhaseEnd
 
@@ -261,6 +267,12 @@ rlJournalStart
 		rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_master_001 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_001 -s DONE_selinuxusermapsvc_client2_001 $BEAKERCLIENT $BEAKERCLIENT2"
 		selinuxusermapsvc_master_001_cleanup
+
+	# selinuxusermapsvc_master_002
+                selinuxusermapsvc_master_002
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_master_002 -m $BEAKERMASTER"
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_002 -s DONE_selinuxusermapsvc_client2_002 $BEAKERCLIENT $BEAKERCLIENT2"
+                selinuxusermapsvc_master_002_cleanup
 
 	rlPhaseEnd
 
