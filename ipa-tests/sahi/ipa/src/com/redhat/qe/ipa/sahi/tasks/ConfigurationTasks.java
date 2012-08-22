@@ -35,7 +35,8 @@ public class ConfigurationTasks {
 		else
 			if (sahiTasks.button("Cancel").exists())
 				sahiTasks.button("Cancel").click();
-		sahiTasks.span("undo").near(sahiTasks.textbox("ipausersearchfields")).click();
+		
+		sahiTasks.span("undo").near(sahiTasks.textbox(field)).click();
 	}
 	
 	public static void setGroupConfigValue(SahiTasks sahiTasks, CommonTasks commonTasks, String group) {
@@ -200,9 +201,13 @@ public class ConfigurationTasks {
 		sahiTasks.navigateTo(commonTasks.userPage);
 		UserTasks.createUser(sahiTasks, user, user, user, "Add");
 		//add an email for this user
-		sahiTasks.link(user).click();	
+		sahiTasks.link(user).click();
+		sahiTasks.span("Refresh").click();//IE problem.
 		Assert.assertEquals(sahiTasks.textbox("homedirectory").value(), homedir + "/" + user, "Verified  Home directory for user " + user + ": " + homedir);
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		if (sahiTasks.div("This page has unsaved changes. Please save or revert.").exists()){
+			sahiTasks.button("Reset").click();//IE problem.
+		}
 		UserTasks.deleteUser(sahiTasks, user);
 		
 		sahiTasks.navigateTo(commonTasks.configurationPage);
@@ -215,6 +220,10 @@ public class ConfigurationTasks {
 	
 	public static void verifyUserNameLengthFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String nameLength, String userGood, String userBad) {
 		sahiTasks.navigateTo(commonTasks.userPage);
+		if (sahiTasks.div("This page has unsaved changes. Please save or revert.").exists()){
+			sahiTasks.button("Reset").click();//IE problem.
+		}
+		
 		UserTasks.createUser(sahiTasks, userGood, userGood, userGood, "Add");
 		//add an email for this user
 		Assert.assertTrue(sahiTasks.link(userGood).exists(), "Verified " + userGood + " was added successfully");
@@ -245,10 +254,10 @@ public class ConfigurationTasks {
 				 
 			
 		{
-			sahiTasks.span("undo").near(sahiTasks.textbox("ipadefaultemaildomain")).click();
+			sahiTasks.span("undo").near(sahiTasks.textbox(field)).click();
 		}
 		
-		sahiTasks.span(buttonToClick).click();
+		else sahiTasks.span(buttonToClick).click();
 		//buttonToClick is either Undo or Reset...so verify value is reverted
 		Assert.assertEquals(sahiTasks.textbox(field).value(), originalValue, "Verified config value for " + field + "  is " + originalValue);
 	}
