@@ -347,8 +347,7 @@ host=$3
 selinuxuser=$4
         rc=0
 	expect -f - <<-EOF | grep -C 77 '^login successful'
-        	spawn ssh -l "$user" $host"
-       # 	spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+        	spawn ssh -o StrictHostKeyChecking=no -l "$user" $host 
                 expect {
                 	"*assword: " {
                         send -- "$passwd\r"
@@ -384,7 +383,7 @@ host=$3
 selinuxuser=$4
         rc=0
         expect -f - <<-EOF | grep -C 77 '^login successful'
-                spawn ssh -l "$user" $host id -Z | grep $selinuxuser
+                spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host id -Z | grep $selinuxuser
        #        spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
                 expect {
                         "*assword: " {
