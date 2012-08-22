@@ -341,12 +341,7 @@ public class SudoTests extends SahiTestScript{
 		//modify this rule
 		SudoTasks.modifySudoRuleGeneralSection(sahiTasks, cn, description);
 		
-		/*//verify changes	
-		SudoTasks.verifySudoRuleGeneralSection(sahiTasks, cn, description);
 		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag-1", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag-1", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipaenabledflag-1", "Update");*/
 	}
 	
 	
