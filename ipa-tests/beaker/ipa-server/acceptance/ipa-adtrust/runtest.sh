@@ -40,13 +40,19 @@
 . /dev/shm/env.sh
 
 # Install samba-common package if not already installed
-rpm1="samba4-common"
+cat /etc/redhat-release | grep "Red Hat"
+if [ $? -eq 0 ]; then
+  rpm1="ipa-server-trust-ad"
+else
+  rpm1="freeipa-server-trust-ad"
+fi
+
 rpm2="expect"
 rpm3="telnet"
 rpm4="coreutils"
 rpm5="glibc-common"
 rpm6="openssh-clients"
-rpm7="ipa-server-trust-ad"
+rpm7="samba4-common"
 
 rlJournalStart
 
@@ -88,13 +94,21 @@ rlJournalStart
 # Include test case file
 . ./t.ipa-adtrust.sh
 
-PACKAGE="ipa-server"
+#PACKAGE="ipa-server"
 ##########################################
 #   Sanity Tests
 #########################################
 
 	adtrust_connect() {
-		"winsync_test_0015"
+		"adtrust_test_0001"
+		"adtrust_test_0002"
+		"adtrust_test_0003"
+		"adtrust_test_0004"
+		"adtrust_test_0005"
+		"adtrust_test_0006"
+		"adtrust_test_0007"
+		"adtrust_test_0008"
+#		"adtrust_test_0009"
 	}
 
 
