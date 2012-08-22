@@ -111,7 +111,8 @@ public class SudoTasks {
 		
 		//Update and go back to Sudo Rules list
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();		
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 	}
 
 
@@ -170,11 +171,32 @@ public class SudoTasks {
 	public static void modifySudoRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.textarea("description").setValue(description);
+		/*sahiTasks.textarea("description").setValue(description);
 		sahiTasks.radio("ipaenabledflag-1-1").click();
 		
-		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
+		sahiTasks.span("Update").click();*/
+		
+		sahiTasks.select("action").choose("Disable");
+		sahiTasks.span("Apply").click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("Sudo Rules[1]").click();
+		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Varify Sudo rule is disabled sucessfully");
+		sahiTasks.link("SudoRule6").click();
+		sahiTasks.select("action").choose("Enable");
+		sahiTasks.span("Apply").click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("Sudo Rules[1]").click();
+		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Varify Sudo rule is enabled sucessfully");
+		sahiTasks.link("SudoRule6").click();
+		sahiTasks.select("action").choose("Delete");
+		sahiTasks.span("Apply").click();
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " deleted successfully");
+		
+		
+		
+		
+		
+			
 		
 	}
 	
@@ -490,7 +512,7 @@ public class SudoTasks {
 		sahiTasks.radio(category).click();
 		sahiTasks.span(action).click();
 		if ( (action.equals("undo")) || (action.equals("Reset")) )
-			Assert.assertTrue(sahiTasks.radio(category+"[1]").checked(), "Verified " + category + " set after choosing to " + action);		
+			Assert.assertFalse(sahiTasks.radio(category).checked(), "Verified " + category + " set after choosing to " + action);		
 		else
 			Assert.assertTrue(sahiTasks.radio(category).checked(), "Verified " + category + " set after choosing to " + action);
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
@@ -748,11 +770,12 @@ public class SudoTasks {
 		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.span("Add").click();
-		sahiTasks.checkbox(command).under(sahiTasks.div("Available")).click();
+		sahiTasks.checkbox(command).in(sahiTasks.table("search-table scrollable")).click();
 		sahiTasks.span(">>").click();		
 		sahiTasks.span("Add").near(sahiTasks.button("Cancel")).click();
 		
 		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 	}
 	
 	
