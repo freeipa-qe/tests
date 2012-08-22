@@ -116,10 +116,21 @@ setup()
         ## which reference the MASTER. 
         ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
         ipa_server_master="_srv_, $MASTER" # sssd.conf updates
-        domain_realm_force_master="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
+			domain_realm_force_master="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+		else
+			RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
+			domain_realm_force_master="$MASTER:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
+		fi
         slavetoverify=`echo $SLAVE | sed 's/\"//g' | sed 's/^ //g'`
         ipa_server_slave="_srv_, $slavetoverify" # sssd.conf updates
-        domain_realm_force_slave="$SLAVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
+			domain_realm_force_slave="$SLAVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+		else
+			RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
+			domain_realm_force_slave="$SLAVE:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
+		fi
+
     rlPhaseEnd
 }
 
