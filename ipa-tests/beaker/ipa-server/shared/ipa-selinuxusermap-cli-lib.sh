@@ -347,7 +347,7 @@ host=$3
 selinuxuser=$4
         rc=0
 	expect -f - <<-EOF | grep -C 77 '^login successful'
-        	spawn ssh -o StrictHostKeyChecking=no -l "$user" $host 
+        	spawn ssh -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
                 expect {
                 	"*assword: " {
                         send -- "$passwd\r"
@@ -382,21 +382,27 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-        expect -f - <<-EOF | grep -C 77 '^login successful'
-                spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host id -Z | grep $selinuxuser
-       #        spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+	expect -f - <<-EOF | grep -C 77 '^login successful'
+                spawn ssh -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
                 expect {
                         "*assword: " {
                         send -- "$passwd\r"
                                 }
                        }
                 expect eof
-	EOF
-	if [ $? = 0 ]; then
-                rlFail "ERROR: Authentication success for $user, with selinuxuser $selinuxuser expected failure."
+        EOF
+        if [ $? = 0 ]; then
+                rlPass "Authentication successful for $user"
+		SELINUX_POLICY=`id -Z`
+                echo $SELINUX_POLICY
+                echo $SELINUX_POLICY | grep $selinuxuser
+                if [ $? = 0 ]; then
+                	rlFail "ERROR: Selinuxuser policy is $selinuxuser, this is not expected."
+                else
+                	rlPass "Selinuxuser $selinuxuser as expected"
+                fi
         else
-                rlPass "Authentication failed for $user, with selinuxuser $selinuxuser as expected"
+                rlFail "ERROR: Authentication failed for $user."
         fi
-
 }
 
