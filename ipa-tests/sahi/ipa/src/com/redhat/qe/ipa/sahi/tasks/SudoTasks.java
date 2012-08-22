@@ -171,11 +171,6 @@ public class SudoTasks {
 	public static void modifySudoRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
 		sahiTasks.link(cn).click();
 		
-		/*sahiTasks.textarea("description").setValue(description);
-		sahiTasks.radio("ipaenabledflag-1-1").click();
-		
-		sahiTasks.span("Update").click();*/
-		
 		sahiTasks.select("action").choose("Disable");
 		sahiTasks.span("Apply").click();
 		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
