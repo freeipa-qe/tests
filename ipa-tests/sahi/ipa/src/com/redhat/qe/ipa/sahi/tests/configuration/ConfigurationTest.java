@@ -18,6 +18,66 @@ import com.redhat.qe.ipa.sahi.tasks.ConfigurationTasks;
 import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.logging.Logger;
+
+import javax.annotation.processing.FilerException;
+
+import org.testng.annotations.BeforeMethod;
+
+import com.redhat.qe.auto.testng.Assert;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.logging.Logger;
+
+import javax.annotation.processing.FilerException;
+
+import org.testng.annotations.BeforeMethod;
+
+import com.redhat.qe.auto.testng.Assert;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.logging.Logger;
+
+import javax.annotation.processing.FilerException;
+
+import org.testng.annotations.BeforeMethod;
+
+import com.redhat.qe.auto.testng.Assert;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.logging.Logger;
+
+import javax.annotation.processing.FilerException;
+
+import org.testng.annotations.BeforeMethod;
+
+import com.redhat.qe.auto.testng.Assert;
 
 
 /*
@@ -44,7 +104,7 @@ public class ConfigurationTest extends SahiTestScript{
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", 
 			alwaysRun=true, dependsOnGroups="setup")
 	public void initialize() throws CloneNotSupportedException {
-		//sahiTasks.setStrictVisibilityCheck(true);
+		sahiTasks.setStrictVisibilityCheck(true);
 		
 		//to set up search tests, adding objects in one category on identity and policy tabs 
 		//add users
@@ -57,7 +117,7 @@ public class ConfigurationTest extends SahiTestScript{
 		UserTasks.modifyUserMailingAddress(sahiTasks, "user0", "Westford Street", "Westford", "MA", "01234");
 		//add hbacrules
 		sahiTasks.navigateTo(commonTasks.hbacPage, true);
-	    String testHBACRule="rule";
+		String testHBACRule="rule";
 	    for (int i=0; i<15; i++) {
 			if (!sahiTasks.link(testHBACRule+i).exists())
 				HBACTasks.addHBACRule(sahiTasks, testHBACRule+i, "Add");
@@ -578,7 +638,7 @@ public class ConfigurationTest extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					homedir						uid			
-		ll.add(Arrays.asList(new Object[]{ "userhomedir_new",				"/home/users"					} ));
+		ll.add(Arrays.asList(new Object[]{ "userhomedir_new",				"/home"					} ));
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_specialchar",		"^&/*)(h*o@m%e/!u^s:e~r`s"		} ));		
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_numbers",			"1/home2/3users4"					} ));
 		ll.add(Arrays.asList(new Object[]{ "userhomedir_space_inbetween",	"12 34"						} ));
