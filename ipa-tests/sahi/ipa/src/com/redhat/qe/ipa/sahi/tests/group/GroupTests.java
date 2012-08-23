@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import org.testng.annotations.*; 
 
+import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.*;
@@ -150,6 +151,32 @@ public class GroupTests extends SahiTestScript{
 		if (browser.link("User Groups").in(browser.span("back-link")).exists())
 			browser.link("User Groups").in(browser.span("back-link")).click();
 	}
+	
+	///////////////////////// searchGroup test cases //////////////////////	
+	
+	@Test (groups={"searchGroup"}, dataProvider="searchGroupPositiveData",  dependsOnGroups="addGroup_negative")
+	public void testGroupSearch(String testScrenario,String searchgroupName) {
+		
+		GroupTasks.searchGroup(browser, searchgroupName);
+		
+		
+		Assert.assertTrue(browser.link(searchgroupName).exists(), "Searched and found group " + searchgroupName + "  successfully");
+		
+		GroupTasks.clearSearch(browser);
+	}
+	
+	@Test (groups={"searchGroupNegative"}, dataProvider="searchGroupNegativeData",  dependsOnGroups={"searchGroup"})	
+	public void testGroupSearchNegative(String testScrenario,String searchgroupName)  {
+		
+		GroupTasks.searchGroup(browser, searchgroupName);
+		
+		Assert.assertFalse(browser.link(searchgroupName).exists(), "group" + searchgroupName + "  not found as expected");	
+		
+		GroupTasks.clearSearch(browser);
+	}
+	
+	
+	
 
 	///////////////////////// modifyGroup test cases (enroll user and groups ) //////////////////////
 	@Test(groups={"modifyGroup"},  dependsOnGroups="addGroup",
@@ -1166,5 +1193,16 @@ public class GroupTests extends SahiTestScript{
 	{
 		return getsudoPrepare();
 	}
-	
+	@DataProvider(name="searchGroupPositiveData")
+	 public Object[][] getsearchGroupPositive()
+	{
+		String [][] searchgroupName ={ {GroupTests.testUserGroups[1],GroupTests.testUserGroups[2]} ,{GroupTests.testUserGroups[3] ,GroupTests.testUserGroups[4]}};
+		return searchgroupName;
+	}
+	@DataProvider(name="searchGroupNegativeData")
+	 public Object[][] getsearchGroupNegative()
+	{
+		String [][] searchgroupName ={ {GroupTests.testUserGroups[5]+" " , " "+GroupTests.testUserGroups[6] },{"%$#%@*&%@!@#" ,"invalidgroup"}};
+		return searchgroupName;
+	}
 }//class GroupTest
