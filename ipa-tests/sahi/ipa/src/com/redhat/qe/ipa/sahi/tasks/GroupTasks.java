@@ -401,6 +401,17 @@ public class GroupTasks {
 		browser.textarea("description").setValue(desc);
 	}
 
+	public static void searchGroup(SahiTasks browser, String groupName) {
+		browser.textbox("filter").setValue(groupName);
+		browser.span("icon search-icon").click();
+	}
+	
+	
+	public static void clearSearch(SahiTasks browser) {
+		browser.textbox("filter").setValue("");
+		browser.span("icon search-icon").click();
+	}
+	
 	///////////////////// neggroup tasks //////////////////////////////
 	public static void addNetGroup_Single(SahiTasks browser, String netGroupName) {
 		browser.link("memberof_netgroup").click();
