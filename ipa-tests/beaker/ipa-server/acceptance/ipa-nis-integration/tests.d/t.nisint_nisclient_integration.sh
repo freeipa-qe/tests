@@ -113,6 +113,11 @@ nisint_nisclient_integration_check_ipa_nis_data_remotely()
 {
 	rlPhaseStartTest "nisint_nisclient_integration_check_ipa_nis_data_remotely: Check that expected NIS maps are viewable"
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			rlRun "service portmap start"
+		else
+			rlRun "service rpcbind start"
+		fi
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER passwd"
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER group"    
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER netgroup"
