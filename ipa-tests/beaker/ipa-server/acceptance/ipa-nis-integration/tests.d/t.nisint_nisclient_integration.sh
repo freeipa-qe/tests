@@ -214,6 +214,7 @@ nisint_nisclient_integration_setup_kerberos_for_auth()
 		rlRun "sed -i \"s/EXAMPLE.COM/$RELM/g\" /etc/krb5.conf"
 		rlRun "sed -i \"s/example.com/$DOMAIN/g\" /etc/krb5.conf"
 		rlRun "authconfig --enablekrb5 --update"
+		rlRun "restorecon -v /etc/krb5.conf"
 		if [ $(service ypbind status|grep -i running|wc -l) -lt 1 ]; then
 			rlLog "ypbind was stopped by krb5 authconfig...restarting"
 			rlRun "service ypbind start"
@@ -228,6 +229,7 @@ nisint_nisclient_integration_undo_kerberos_setup()
 		yum -y remove krb5-workstation
 		mv /etc/krb5.conf.orig.nisint /etc/krb5.conf
 		rlRun "authconfig --disablekrb5 --update"
+		rlRun "restorecon -v /etc/krb5.conf"
 		rm /etc/krb5.keytab
 	rlPhaseEnd
 }

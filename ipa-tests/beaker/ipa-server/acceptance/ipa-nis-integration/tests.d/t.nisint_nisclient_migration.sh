@@ -97,6 +97,8 @@ nisint_nisclient_migration_envsetup()
 		rlRun "authconfig --disablekrb5 --update"
 		rlRun "authconfig --disablenis --update"
 		rlRun "mv -f /etc/krb5.conf /etc/krb5.conf.nismig"
+		rlRun "touch /etc/krb5.conf"
+		rlRun "restorecon -v /etc/krb5.conf"
 		rlRun "mv -f /etc/krb5.keytab /etc/krb5.keytab.nismig"
 		rlRun "mv -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.nismig"
 		rlRun "service ntpd stop"
