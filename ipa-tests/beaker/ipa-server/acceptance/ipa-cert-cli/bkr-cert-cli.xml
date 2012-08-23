@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server dns tests workstation x86_64
+		freeipa CLI session support
 	</whiteboard>
 	<recipeSet>
 		<recipe whiteboard="ipa dns tests - x86_64" ks_meta="selinux=disabled partitions=yes">
