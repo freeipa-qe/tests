@@ -3,11 +3,11 @@
 dir=$( cd "$( dirname "$0" )" && pwd )
 
 # prepare for storage directories for autorenew cert test
-TmpDir="$dir/tmp"
-testid=$RANDOM
-testdir="$TmpDir/autorenewcert/$testid"
-currentCertDir="$testdir/current"
-renewalCertDir="$testdir/renewal"
+#TmpDir="$dir/tmp"
+#testid=$RANDOM
+#testdir="$TmpDir/autorenewcert/$testid"
+#currentCertDir="$testdir/current"
+#renewalCertDir="$testdir/renewal"
 
 # helping tools used for this test
 certconf="$dir/certs.conf"
@@ -27,15 +27,17 @@ DN="cn=directory manager"
 # constance used for cert autorenew test
 oneday=86400 
 halfday=43200
+sixhour=21600
 onehour=3600
 halfhour=1800
-wait4renew=30
-maxwait=`echo "$wait4renew * 3" | bc`
-numofround=1
+wait4renew=10
+maxwait=`echo "$wait4renew * 12" | bc`
 continueTest="no"
 # cert names
 allcerts="oscpSubsystemCert caSSLServiceCert caSubsystemCert caAuditLogCert ipaRAagentCert ipaServiceCert_ds ipaServiceCert_pki ipaServiceCert_httpd caJarSigningCert"
+notRenewedCerts="$allcerts"
 soonTobeRenewedCerts=""
 justRenewedCerts=""
 renewedCerts=""
-sortedValidCerts=""
+checkTestConditionRequired="true"
+loglevel=debug #loglevel: info/debug

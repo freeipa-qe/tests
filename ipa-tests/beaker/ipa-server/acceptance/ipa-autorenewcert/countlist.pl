@@ -7,14 +7,12 @@ use Date::Parse;
 
 
 our %options=();
-getopts("s:l:c:", \%options);
+getopts("s:c:", \%options);
 
 our $sourceStr;
-our $recordStr;
 our $item;
 
 our @source;
-our @records;
 our %counter;
 
 if (defined $options{"s"} ){
@@ -22,14 +20,6 @@ if (defined $options{"s"} ){
     @source=split(/ /,$sourceStr);
 }else{
     print "no source string defined -s <spaces separated string>\n";
-    exit 1;
-}
-
-if (defined $options{"l"} ){
-    $recordStr=$options{"l"};
-    @records=split(/ /,$recordStr);
-}else{
-    print "no record string defined -l <spaces separated string>\n";
     exit 1;
 }
 
@@ -41,20 +31,18 @@ if (defined $options{"c"} ){
 }
 
 foreach (@source){
-    $counter{$_} = 0;
-}
-
-foreach (@records){
     if (exists $counter{$_} ){
         my $index = $counter{$_};
         $counter{$_} = $index + 1;
-    } 
+    }else{
+        $counter{$_} = 1;
+    }
 }
 
 if (exists $counter{"$item"}){
     print $counter{"$item"};
 }else{
-    print -1
+    print 0;
 }
 
 #print "source : [$sourceStr]\n";

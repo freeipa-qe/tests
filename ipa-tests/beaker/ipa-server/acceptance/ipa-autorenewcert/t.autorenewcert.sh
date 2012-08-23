@@ -20,25 +20,39 @@ autorenewcert()
 {
 #    certSanityCheck     # FIXME: not sure what it should be
     local certsShouldBeRenewed=$@
-    calculating_critical_period $certsShouldBeRenewed
+    calculate_autorenew_date $certsShouldBeRenewed
     adjust_system_time $autorenew autorenew    
-    go_to_sleep_so_certmonger_has_chance_to_trigger_renewal_action
+    go_to_sleep
     adjust_system_time $postExpire postExpire
-    check_which_cert_is_actually_renewed $certsShouldBeRenewed
-    report_cert_renewal_result
+    check_actually_renewed_certs $certsShouldBeRenewed
+    report_test_result
 #    certSanityCheck 
 }
 
-#list_all_ipa_certs
+############## main test #################
 
-check_test_condition
-while [ $continueTest = "yes" ]
+round=1
+fix_prevalid_cert_problem #weird problem
+# conditions for test to continue (continue_test returns "yes")
+# 1. all ipa certs are valid
+# 2. if there are some certs haven't get chance to be renewed, test should be continue
+while [ "`continue_test`" = "yes" ]
 do
-    #pause
+    print_test_header $round
+    list_all_ipa_certs
     find_soon_to_be_renewed_certs
+    #pause
     autorenewcert $soonTobeRenewedCerts
-    save_certs_that_just_being_renewed
-    check_test_condition
+    #pause
+    record_just_renewed_certs
+    report_renew_status
+    round=$((round + 1))
+    fix_prevalid_cert_problem #weird problem
 done
 
-# after test, all certs still have to have 'valid' certs
+if [ "$checkTestConditionRequired" = "true" ];then
+    echo "check test condition"
+    check_test_condition 
+fi
+
+################ end of main ###########

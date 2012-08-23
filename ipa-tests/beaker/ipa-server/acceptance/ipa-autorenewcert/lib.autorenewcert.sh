@@ -1,15 +1,6 @@
 #!/bin/bash
 . ./d.autorenewcert.sh
 
-prepareStorage(){
-    if [ ! -d $testdir ];then
-        mkdir -p $testdir
-        mkdir $currentCertDir
-        mkdir $renewalCertDir
-        echo "cert storage: current [$currentCertDir] renewal: [$renewalCertDir]"
-    fi
-}
-
 generateCertConf(){
     echo "# auto generated file, do not edit by hand" > $certconf
     echo "# `date`" >> $certconf
@@ -167,57 +158,62 @@ caJarSigningCert(){
 
 list_all_ipa_certs(){
     generateCertConf
-    #sortAndFindToBeRenewedCerts
-    echo "--------------------- all IPA certs ------------------------------------"
-    echo "[valid certs]:"
-    if [ "$sortedValidCerts" != "" ];then
-        listCerts "valid" $sortedValidCerts
-    else
-        listCerts "valid" $allcerts
-    fi
+    sort_certs
     echo ""
+    echo "+-------------------- all IPA certs [`date`]----------------------------------+"
     echo "[preValid certs]:"
-    listCerts "preValid" $allcerts
+    list_certs "preValid" $allcerts
     echo ""
+
+    echo "[valid certs]:"
+    list_certs "valid" $allcerts
+    echo ""
+
     echo "[expired certs]:"
-    listCerts "expired" $allcerts
-    echo "-----------------------------------------------------------------------"
+    list_certs "expired" $allcerts
+    echo "+--------------------------------------------------------------------------------------------------+"
+    echo ""
 }
 
-listCerts(){
+list_certs(){
     local state=$1
     shift
     for cert in $@
     do
-        listCert $cert $state
+        print_cert_brief $cert $state
     done
 }
 
-listCert(){
+print_cert_brief(){
     local cert=$1
     local passinState=$2
     local readState=`$cert status $passinState`
-    if [ "$readState" = "$passinState" ];then
-        local nickname=`$cert nickname $passinState`
-        local serial=`$cert serial $passinState`
-        local notbefore_sec=`$cert NotBefore_sec $passinState`
-        local notbefore_date=`$cert NotBefore $passinState`
-        local notafter_sec=`$cert NotAfter_sec $passinState`
-        local notafter_date=`$cert NotAfter $passinState`
-        local timeleft=`$cert LifeLeft $passinState`
-        local life=`$cert Life $passinState`
+    if [[ "$passinState" =~ ^(preValid|valid|expired)$ ]] ;then
+        if [ "$readState" = "$passinState" ];then
+            local nickname=`$cert nickname $passinState`
+            local serial=`$cert serial $passinState`
+            local notbefore_sec=`$cert NotBefore_sec $passinState`
+            local notbefore_date=`$cert NotBefore $passinState`
+            local notafter_sec=`$cert NotAfter_sec $passinState`
+            local notafter_date=`$cert NotAfter $passinState`
+            local timeleft=`$cert LifeLeft $passinState`
+            local life=`$cert Life $passinState`
+            local subject=`$cert subject $passinState`
 
-        local name="$cert($nickname)"
-        local fp_name=`perl -le "print sprintf (\"%-47s\",\"$name\")"`
-        local fp_serial=`perl -le "print sprintf (\"%-2d\",$serial)"`
-        local fp_state=`perl -le "print sprintf (\"%-8s\",$passinState)"`
-        local fp_timeleft=`perl -le "print sprintf(\"%-20s\",\"$timeleft\")"`
-        echo -n "$fp_name #$fp_serial: ($fp_state) "
-        echo "expires in:[$fp_timeleft] [$notbefore_date]-[$notafter_date] length[$life] "
+            local fp_certname=`perl -le "print sprintf (\"%-21s\",\"$cert\")"`
+            local name="$fp_certname($nickname)"
+            local fp_name=`perl -le "print sprintf (\"%-51s\",\"$name\")"`
+            local fp_serial=`perl -le "print sprintf (\"%-2d\",$serial)"`
+            local fp_state=`perl -le "print sprintf (\"%-8s\",$passinState)"`
+            local fp_timeleft=`perl -le "print sprintf(\"%-20s\",\"$timeleft\")"`
+            echo "$fp_name #$fp_serial: [$notbefore_date]~~[$notafter_date] expires@($fp_timeleft) life [$life] "
+        fi
+    else
+        echo "not supported status :[$passinState]"
     fi
 }
 
-print_single_cert_details(){
+print_cert_details(){
     local indent=$1
     local cert=$2
     local state=$3
@@ -236,6 +232,7 @@ print_single_cert_details(){
 
 max(){
     local max=$1
+    shift
     for n in $@
     do
         if [ $max -lt $n ];then
@@ -247,6 +244,7 @@ max(){
 
 min(){
     local min=$1
+    shift
     for n in $@
     do
         if [ $min -gt $n ];then
@@ -257,21 +255,29 @@ min(){
 } 
 
 getNotBefore(){
+    local state=$1
+    shift
     local notBefore=""
     for cert in $@
     do
-        local notBefore_epoch=`$cert "NotBefore_sec" valid`
-        notBefore="$notBefore $notBefore_epoch"
+        local notBefore_epoch=`$cert "NotBefore_sec" $state`
+        if [ "$notBefore_epoch" != "no cert found" ];then
+            notBefore="$notBefore $notBefore_epoch"
+        fi
     done
     echo $notBefore
 }
 
 getNotAfter(){
+    local state=$1
+    shift
     local notAfter=""
     for cert in $@
     do
-        local notAfter_epoch=`$cert "NotAfter_sec" valid`
-        notAfter="$notAfter $notAfter_epoch"
+        local notAfter_epoch=`$cert "NotAfter_sec" $state`
+        if [ "$notAfter_epoch" != "no cert found" ];then
+            notAfter="$notAfter $notAfter_epoch"
+        fi
     done
     echo $notAfter
 }
@@ -285,30 +291,43 @@ epochToDate(){
     perl -e "print scalar localtime($1)"
 }
 
-calculating_critical_period(){
+fix_prevalid_cert_problem(){
+    local before=`getNotBefore "preValid" $allcerts `
+    echo "+----------------- check prevalid problem -----------------+"
+    echo -n "[fix_prevalid_cert_problem]"
+    if [ "$before" = "" ];then
+        echo " no preValid problem found"
+    else
+        echo " found previlid problem, fixing..."
+        list_certs "preValid" $allcerts
+        local before_max=`max $before`
+        local now=`date`
+        local now_epoch=`dateToEpoch "$now"`
+        echo "      current time   : $now"
+        echo "      cert not-before: `epochToDate $before_max`"
+        if [ $now_epoch -lt $before_max ];then
+            adjust_system_time $before_max preValid
+        fi 
+    fi
+    echo "+---------------------------------------------------------+"
+}
+
+calculate_autorenew_date(){
     local group=$@
-    #listCerts $group
-    
-    local after=`getNotAfter $group`
+    local after=`getNotAfter valid $group`
     local after_min=`min $after`
     local after_max=`max $after`
-    #local adjust=`echo $after - $halfday | bc`
-    #echo "before: $before = " `epochToDate $before`
-    #echo "after : $after  = $after"
-    #echo "after min : $after_min  = " `epochToDate $after_min`
-    #echo "after max : $after_max  = " `epochToDate $after_max`
     certExpire=`min $after`
     preAutorenew=`echo "$certExpire - $oneday" | bc`
     autorenew=`echo "$certExpire - $halfday" | bc`
     postAutorenew=`echo "$certExpire - $halfhour " | bc`
     postExpire=`echo "$certExpire + $halfday" | bc`
-    echo "[calculating_critical_period]"
-    #echo "  preAutorenew :"`epochToDate $preAutorenew` " ($preAutorenew)"  
-    echo "  autorenew    :" `epochToDate $autorenew` " ($autorenew)"  
-    #echo "  postAutorenew:" `epochToDate $postAutorenew` " ($postAutorenew)" 
-    echo "  certExpire   :" `epochToDate $certExpire` " ($certExpire)" 
-    echo "  postExpire   :" `epochToDate $postExpire` " ($postExpire)" 
-    echo ""
+    INFO "[calculate_autorenew_date]"
+    #INFO "  preAutorenew :"`epochToDate $preAutorenew` " ($preAutorenew)"  
+    INFO "|    autorenew    :" `epochToDate $autorenew` " ($autorenew)"  
+    #INFO "  postAutorenew:" `epochToDate $postAutorenew` " ($postAutorenew)" 
+    DEBUG "|    certExpire   :" `epochToDate $certExpire` " ($certExpire)" 
+    INFO "|    postExpire   :" `epochToDate $postExpire` " ($postExpire)" 
 }
 
 certSanityCheck(){
@@ -318,33 +337,32 @@ certSanityCheck(){
 adjust_system_time(){
     local adjustTo=$1
     local label=$2
-    echo "[adjust_system_time] ($label)"
+    INFO "[adjust_system_time] ($label)"
     stopIPA
-    #echo "  given [$adjustTo]" `epochToDate $adjustTo`
+    DEBUG "|     | given [$adjustTo]" `epochToDate $adjustTo`
     local before=`date`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     local after=`date`
-    echo "  adjust [$before]=>[$after] done"
+    DEBUG "|     | adjust [$before]=>[$after] done"
     startIPA
 }
 
 stopIPA(){
     local out=`ipactl stop | sed -e "s/Stopping/ : Stopping/"`
     local cleanout=`echo $out`
-    echo "  [stop ipa ] $cleanout"
+    DEBUG "[stop ipa ] $cleanout"
 }
 
 startIPA(){
     local out=`ipactl start | sed -e "s/Starting/ : Starting/"`
     local cleanout=`echo $out`
-    echo "  [start ipa] $cleanout"
+    DEBUG  "[start ipa] $cleanout"
 }
 
-go_to_sleep_so_certmonger_has_chance_to_trigger_renewal_action(){
+go_to_sleep(){
     local waittime=0
-    #until ldapsearch -D "cn=directory manager" -w Secret123 -b "cn=ca_renewal,cn=ipa,cn=etc,dc=yzhang,dc=redhat,dc=com" | grep "numEntries: 5" || [ $waittime -gt $maxwait ]
-    echo -n "[go_to_sleep_so_certmonger_has_chance_to_trigger_renewal_action] "
-    until [ $waittime -gt $maxwait ]
+    echo -n "[go_to_sleep] $maxwait(s): "
+    while [ $waittime -lt $maxwait ]
     do    
         waittime=$((waittime + $wait4renew))
         echo -n " ...$waittime(s)"
@@ -353,63 +371,54 @@ go_to_sleep_so_certmonger_has_chance_to_trigger_renewal_action(){
     echo ""
 }
 
-verifyRenewalCertInLDAP(){
-    local group=$@
-    for cert in $group
-    do
-        local nickname=`$cert nickname`
-        local certFile="$renewalCertDir/$cert.cert"
-        echo "verify cert [$cert] nickname: [$nickname]"
-        $readRenewalCert -n "$nickname" -f "$certFile"
-        if [ -f $certFile ];then
-            echo "----------- found renewal cert [$cert] ------------"
-            cat $certFile
-            echo "---------------------------------------------------"
-        else
-            echo "ERROR: for [$cert], no renewal cert found, error"
-        fi
-    done        
-}
-
-save_certs_that_just_being_renewed(){
+record_just_renewed_certs(){
     renewedCerts="$renewedCerts $justRenewedCerts"
     justRenewedCerts="" #reset so we can continue test
 }
 
-check_which_cert_is_actually_renewed(){
+report_renew_status(){
+    echo "--------------- Cert Renew report ----------------"
+    for cert in $allcerts
+    do
+        local counter=`$countlist -s "$renewedCerts" -c "$cert"`
+        local fp_certname=`perl -le "print sprintf (\"%+21s\",\"$cert\")"`
+        echo "$fp_certname : renewed [ $counter ] times"
+    done
+    echo "--------------------------------------------------"
+}
+
+check_actually_renewed_certs(){
     local certsShouldBeRenewed=$@
-    echo "[check_which_cert_is_actually_renewed]:"
+    INFO "[check_actually_renewed_certs]:"
     for cert in $certsShouldBeRenewed
     do
-        echo -n "   [$cert]"
         local state=`$cert status valid`
         if [ "$state" = "valid" ];then
-            echo " valid cert found"
+            DEBUG "|     valid cert found for  [$cert]"
             justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
         else
-            echo " NO valid cert found"
+            DEBUG "|     NO valid cert found for [$cert]"
         fi
     done
 }
 
-report_cert_renewal_result(){
-    echo "################ cert auto renew test result report #########################"
-    echo "#       [soon to be renewed certs]: [$soonTobeRenewedCerts]"
-    echo "#       [acutally being renewed  ]: [$justRenewedCerts]"
+report_test_result(){
+    echo ""
+    DEBUG "##################### renew test result report ##############################"
+    DEBUG "#       [soon to be renewed certs]: [$soonTobeRenewedCerts]"
+    DEBUG "#       [acutally being renewed  ]: [$justRenewedCerts]"
     if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
-        echo "# PASS: soon to be renewed certs matches with actually renewed certs #"
-        testresult="pass"
+        INFO "# Test PASS: [$soonTobeRenewedCerts] does renewed"
     else
-        echo "# FAIL: soon to be renewed certs DOES NOT matches with actually renewed certs"
-        local difflist=`$difflist $soonTobeRenewedCerts $justRenewedCerts`
+        local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
+        INFO "# Test FAIL: certs not renewed [ $difflist ]"
         for cert in $difflist
         do
-            print_single_cert_details "     " $cert expired
-            print_single_cert_details "     " $cert preValid
+            print_cert_details "     " $cert expired
+            print_cert_details "     " $cert preValid
         done
-        testresult="fail"
     fi
-    echo "#############################################################################"
+    DEBUG "#############################################################################"
 }
 
 pause(){
@@ -421,9 +430,33 @@ pause(){
     fi
 }
 
+sort_certs(){
+    local tempdatafile="$dir/cert.timeleft.$RANDOM.txt"
+    DEBUG "[sort_certs]"
+    for cert in $allcerts
+    do
+        local timeleft_sec=`$cert LifeLeft_sec valid`
+        if [ "$timeleft_sec" != "no cert found" ];then
+            echo "$cert=$timeleft_sec" >> $tempdatafile
+        else
+            timeleft_sec=`$cert LifeLeft_sec preValid`
+            if [ "$timeleft_sec" != "no cert found" ];then
+                echo "$cert=$timeleft_sec" >> $tempdatafile 
+            else
+                timeleft_sec=`$cert LifeLeft_sec expired`
+                echo "$cert=$timeleft_sec" >> $tempdatafile
+            fi
+        fi
+    done
+    if [ -f $tempdatafile ];then
+        allcerts=`$sortlist $tempdatafile`
+        DEBUG "|      after sorted: [$allcerts]"
+        rm $tempdatafile
+    fi   
+}
+
 find_soon_to_be_renewed_certs(){
     local tempdatafile="$dir/cert.timeleft.$RANDOM.txt"
-    echo -n "[find_soon_to_be_renewed_certs]"
     for cert in $allcerts
     do
         local timeleft_sec=`$cert LifeLeft_sec valid`
@@ -432,16 +465,48 @@ find_soon_to_be_renewed_certs(){
         fi
     done
     if [ -f $tempdatafile ];then
-        sortedValidCerts=`$sortlist $tempdatafile`
-        soonTobeRenewedCerts=`$grouplist $tempdatafile $halfhour`
-        #echo "  all IPA certs: [$allcerts]"
-        #echo "  sorted  certs: [$sortedValidCerts]"
-        #echo "  to be renewed: [$soonTobeRenewedCerts]"
-        echo "[$soonTobeRenewedCerts]"
+        soonTobeRenewedCerts=`$grouplist "$tempdatafile" "$halfhour"`
+        DEBUG "[find_soon_to_be_renewed_certs] test: [$soonTobeRenewedCerts]"
         rm $tempdatafile
     else
-        echo "  no valid certs found, test can not continue"
+        DEBUG "[find_soon_to_be_renewed_certs] ERROR: no cert found to test: [$soonTobeRenewedCerts]"
     fi
+}
+
+continue_test(){
+    # test will continue in two condition
+    # 1. there are some certs haven't get chance to renew once
+    # 2. all certs have valid version
+
+    local continueTest="no"
+    notRenewedCerts=`$difflist "$renewedCerts" "$allcerts"`
+    local validCerts=`get_all_valid_certs`
+    local notValid=`$difflist "$validCerts" "$allcerts"`
+    
+    if [ "$notRenewedCerts" = "" ];then
+        # if all certs have been renewed once, not need to continue test
+        continueTest="no" 
+    else
+        if [ "$notValid" = "" ];then
+            continueTest="yes" # if all certs are continue test
+        else
+            continueTest="no"  # other wise, stop test
+            checkTestConditionRequired="true"
+        fi
+    fi
+    echo $continueTest
+}
+
+get_all_valid_certs(){
+    local validCerts=""
+    for cert in $allcerts
+    do
+        state=`$cert status valid`
+        if [ "$state" = "valid" ];then
+            validCerts="$validCerts $cert"
+        fi
+    done
+    echo "$validCerts"
 }
 
 check_test_condition(){
@@ -450,73 +515,88 @@ check_test_condition(){
     # 2. there are some certs haven't get chance to be renewed
    
     # check condition 1:
-    local noValidCertFound=""
-    local state=""
-    for cert in $allcerts
+    notRenewedCerts=`$difflist "$renewedCerts" "$allcerts"`
+    local validCerts=`get_all_valid_certs`
+    local notValid=`$difflist "$validCerts" "$allcerts"`
+
+    list_all_ipa_certs
+    echo "[all certs  ] [$allcerts]"
+    echo "[valid certs] [$validCerts]"
+    echo "[not valid  ] [$notValid]"
+    echo "[not renewed] [$notRenewedCerts]"
+    for cert in $noValid
     do
-        state=`$cert status valid`
-        if [ "$state" = "valid" ];then
-            listCert $cert valid
-        else
-            noValidCertFound="$noValidCertFound $cert"
-        fi
+        DEBUG "   No valid certs found for [$cert]"
+        local db=`$cert db`
+        local nickname=`$cert nickname`
+        DEBUG "      debug [certutil -L -d $db -n \"$nickname\"] "
+        DEBUG "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]"
+        print_cert_details "     " $cert preValid
+        print_cert_details "     " $cert expired
     done
-    if [ "$noValidCertFound" != "" ];then
-        # if this queue is not empty, that means we found some certs expired and not being renewed, test can not continue
-        continueTest="no" # test can not continue since there are some certs are not valid
-        echo "[check_test_condition] Test Can not continue, invalid certs found [$noValidCertFound]"
-        for cert in $noValidCertFound
-        do
-            echo "   No valid certs found for [$cert]"
-            local db=`$cert db`
-            local nickname=`$cert nickname`
-            echo "      debug [certutil -L -d $db -n \"$nickname\"] "
-            echo "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]"
-            print_single_cert_details "     " $cert preValid
-            print_single_cert_details "     " $cert expired
-        done
-    else
-        # check contition 2:  each cert has to be renewed at least required [$numofround] times
-        local notRenewedCerts=""
-        for cert in $allcerts
-        do
-            local counter=`$countlist -s "$allcerts" -l "$renewedCerts" -c "$cert" `
-            if [ $counter -lt $numofround ];then
-                notRenewedCerts="$notRenewedCerts $cert"
-            else
-                echo "  cert: [$cert] has bee renewed [$counter] times, required [$numofround]"
-            fi
-        done
-        if [ "$notRenewedCerts" = "" ];then
-            continueTest="no" # all certs have been renewed required [$numofround] times, no need to continue test
-            echo "[check_test_condition] no need to continue"
-        else
-            continueTest="yes" # 
-            echo "[check_test_condition] the following certs has not being renewed for min [$numofround] times, test should continue =="
-            for cert in $notRenewedCerts
-            do
-                listCert $cert valid
-            done
-        fi
-    fi
+}
+
+INFO(){
+    log info $@
+}
+
+DEBUG(){
+    log debug $@
 }
 
 log(){
-    local loglevel
-    local logmsg 
-    if [ $# -ge 2 ];then
-        loglevel=$1  
+    local level=""
+    local logmsg=""
+    if [[ $# -ge 2 ]];then
+        level=$1  
         shift
         logmsg=$@
     else           
         logmsg=$@ 
-    fi 
-    if [ "$loglevel" != "" ] && [ $loglevel -ge $mode ];then
-        echo "[$mode] $logmsg"
     fi
-#info=3
-#debug=4
-#mode=2
-#log $info detail info
+    # default to INFO, if level is not defined
+    if [ "$level" = "" ];then
+        level="info"
+    fi
+    local setting=`get_int_level $loglevel`
+    local request=`get_int_level $level`
+    if [ $setting -ge $request ];then
+        echo "$logmsg"
+    fi
 }      
 
+get_int_level(){
+    # debug=3 ; info=2 ;
+    local level=$1
+    case $level in
+    debug)
+        echo 3
+        ;;
+    info)
+        echo 2
+        ;;
+    esac
+}
+
+get_log_level(){
+    # debug=3 ; info=2 ;
+    local intlevel=$1
+    case $intlevel in
+    3)
+        echo "debug"
+        ;;
+    2)
+        echo "info"
+        ;;
+    esac
+}
+
+print_test_header(){
+    local round=$1
+    echo ""
+    echo ""
+    echo "###########################################################"
+    echo "#                    test round [$round]                       #"
+    echo "###########################################################"
+    echo ""
+}
