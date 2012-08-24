@@ -227,8 +227,10 @@ public class HBACRunTests extends SahiTestScript {
 			System.out.println("In this test rule 'smtp'is disable. In this rule(smtp) via-service used is 'smtp1'");
 		    sahiTasks.link("HBAC Rules").click();
 		    sahiTasks.link("smtp").click();
-		    sahiTasks.radio("ipaenabledflag-1-1").click();
-		    sahiTasks.span("Update").click();
+		    //sahiTasks.radio("ipaenabledflag-1-1").click();
+		    sahiTasks.select("action").choose("Disable");
+		    sahiTasks.span("Apply").click();
+		    //sahiTasks.span("Update").click();
 		    sahiTasks.navigateTo(commonTasks.hbacPage, true);//mvarun
 		    sahiTasks.link("HBAC Test").click();
 		    HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
@@ -271,8 +273,10 @@ public class HBACRunTests extends SahiTestScript {
 			//changing smtp rule disable to rule enable
 			sahiTasks.link("HBAC Rules").click();
 		    sahiTasks.link("smtp").click();
-		    sahiTasks.radio("ipaenabledflag-1-0").click();
-		    sahiTasks.span("Update").click();
+		    //sahiTasks.radio("ipaenabledflag-1-0").click();
+		    //sahiTasks.span("Update").click();
+		    sahiTasks.select("action").choose("Enable");
+		    sahiTasks.span("Apply").click();
 		    sahiTasks.navigateTo(commonTasks.hbacPage, true);//mvarun
 		    sahiTasks.link("HBAC Test").click();		    
 		    HBACTasks.testRuleIncludeTest(sahiTasks,user,fqdn1,servicename,fqdn0,rule,expectedResult1,expectedResult2,expectedResult3,
