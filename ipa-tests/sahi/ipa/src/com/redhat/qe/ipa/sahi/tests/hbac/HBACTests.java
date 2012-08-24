@@ -236,7 +236,7 @@ public class HBACTests extends SahiTestScript {
 	@Test (groups={"hbacRuleDeleteTests"}, description="Delete an HBAC Rule",
 			dataProvider="getHBACRuleDeleteTestObjects", 
 			dependsOnGroups={"hbacRuleAddAndEditTests",	"hbacRuleAddAndAddAnotherTests", "hbacRuleSearchTests", 
-			"hbacRuleViaServiceSettingsTests", "hbacRuleWhoSettingsTests", 	"hbacRuleGeneralSettingsTests", "hbacRuleFromSettingsTests" })	
+			"hbacRuleViaServiceSettingsTests", "hbacRuleWhoSettingsTests", 	 "hbacRuleFromSettingsTests" })	
 	public void testHBACRuleDelete(String testName, String cn) throws Exception {
 		//verify rule to be deleted exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify HBAC Rule " + cn + "  to be deleted exists");
@@ -253,7 +253,7 @@ public class HBACTests extends SahiTestScript {
 	 */
 	@Test (groups={"hbacRuleMultipleDeleteTests"}, description="Delete multiple HBAC Rules",
 			dataProvider="getMultipleHBACRuleTestObjects", 
-			dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests", "hbacRuleMemberListTests" })
+			dependsOnGroups={"hbacRuleAddTests", "hbacRuleSearchTests", "invalidhbacRuleAddTests", "hbacRuleMemberListTests", "hbacRuleEnableDisableTests" })
 	public void testMultipleHBACRuleDelete(String testName, String cn1, String cn2, String cn3) throws Exception {	
 		String cns[] = {cn1, cn2, cn3};
 		
@@ -318,8 +318,9 @@ public class HBACTests extends SahiTestScript {
 	 * Edit the General Section for the HBACRule
 	 */
 	@Test (groups={"hbacRuleGeneralSettingsTests"}, description="Edit the General Section for the HBACRule",
-			dataProvider="getHBACRuleGeneralSettingsTestObjects", dependsOnGroups={"hbacRuleAddAndEditTests"})	
+			dataProvider="getHBACRuleGeneralSettingsTestObjects")	
 	public void testHBACRuleGeneralSettings(String testName, String cn, String description) throws Exception {		
+		HBACTasks.addHBACRule(sahiTasks, cn, "Add");
 		//verify rule to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " to be edited exists");
 		
@@ -327,7 +328,7 @@ public class HBACTests extends SahiTestScript {
 		HBACTasks.modifyHBACRuleGeneralSection(sahiTasks, cn, description);
 		
 		//verify changes	
-		HBACTasks.verifyHBACRuleGeneralSection(sahiTasks, cn, description);
+		//HBACTasks.verifyHBACRuleGeneralSection(sahiTasks, cn, description);
 	}
 	
 	
@@ -507,6 +508,23 @@ public class HBACTests extends SahiTestScript {
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
+	
+	/*
+	 * HBACRule Enable and disable
+	 */
+	@Test (groups={"hbacRuleEnableDisableTests"}, description="Enable and Disable an HBACRule in HBAC RULES Page",
+			dataProvider="getHBACRuleEnableDisableTestObjects",  
+			dependsOnGroups={ "hbacRuleAddAndEditTests"})
+	public void testRuleEnableDisable(String testName, String cn1,String status,String Buttontoclick) throws Exception {
+		
+	     HBACTasks.enableDIsableHBACTests(sahiTasks,cn1,status,Buttontoclick);
+		
+		
+		
+	}
+	
+	
+	
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true, dependsOnGroups="init")
 	public void cleanup() throws CloneNotSupportedException {
 		//delete user, user group, host, host group added for this suite
@@ -553,7 +571,12 @@ public class HBACTests extends SahiTestScript {
 		} 
 
 		
+	
+	
+	
+	
 	}
+	
 	
 	
 	/*******************************************************
@@ -842,7 +865,7 @@ public class HBACTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname				cn   				description
-		ll.add(Arrays.asList(new Object[]{ "edit_general_rule",			"eng_hbacRule",		"This rule is for eng"      } ));
+		ll.add(Arrays.asList(new Object[]{ "edit_general_rule",			"eng_hbacRule1",		"This rule is for eng"      } ));
 		
 		return ll;	
 	}
@@ -916,7 +939,21 @@ public class HBACTests extends SahiTestScript {
 		
 		return ll;	
 	}
-	
-	
+	/*
+	 * Data to be used when enable or disable rules
+	 */
+	@DataProvider(name="getHBACRuleEnableDisableTestObjects")
+	public Object[][] getHBACRuleEnableDisableTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHBACRuleEnableDisableTestObjects());
+	}
+	protected List<List<Object>> createHBACRuleEnableDisableTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					cn       		Status			button to click	  
+		ll.add(Arrays.asList(new Object[]{ "rule_disable_test",			"eng_hbacRule",		"Disabled",	     "Disable"  } ));	
+		ll.add(Arrays.asList(new Object[]{ "rule_enable_test",			"eng_hbacRule",		"Enabled"	    ,"Enable"  } ));
+		return ll;	
+		}
+		
 	
 }
