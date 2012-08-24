@@ -78,7 +78,18 @@ nisint_nisclient_envsetup()
 	rlPhaseStartTest "nisint_nisclient_envsetup: "
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "setup-nis-client" 0 "Running NIS Client setup"
-		rlRun "service iptables stop" 0,1 "Disabling iptables"
+		#rlRun "service iptables stop" 0,1 "Disabling iptables"
+		if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
+			service iptables stop
+			if [ $? -eq 1 ]; then
+				rlLog "[ FAIL ] BZ 845301 found -- service iptables stop returns 1 when already stopped"
+				rlLog "This affects RHEL5 version of iptables service"
+			else
+				rlLog "[ PASS ] BZ 845301 not found -- service iptables stop succeeeded"
+			fi
+		else	
+			rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		fi
 		rlRun "ps -ef|grep [y]pbind" 0 "Check that NIS Client (ypbind) is running"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
