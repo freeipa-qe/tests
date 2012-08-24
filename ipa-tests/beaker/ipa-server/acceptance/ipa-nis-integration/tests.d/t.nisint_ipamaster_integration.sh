@@ -742,7 +742,7 @@ nisint_ipamaster_integration_setup_nis_listener()
 		rlRun "echo $ADMINPW|ipa-compat-manage enable" 0,2
 		rlRun "echo $ADMINPW|ipa-nis-manage enable" 0,2
 		rlRun "service rpcbind restart"
-		rlRun "service dirsrv restart"
+		rlRun "rlDistroDiff dirsrv_svc_restart"
 		rlRun "ipactl status"
 		#rlRun "ipactl restart"
 		[ -f $tmpout ] && rm -f $tmpout	
