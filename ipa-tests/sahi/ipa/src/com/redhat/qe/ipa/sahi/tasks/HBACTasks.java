@@ -106,7 +106,8 @@ public class HBACTasks {
 		
 		//Update and go back to HBAC Rules list
 		sahiTasks.link("Update").click();
-		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();		
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 	}
 
 
@@ -168,13 +169,37 @@ public class HBACTasks {
 	 * @param cn - the rule to modify for
 	 */
 	public static void modifyHBACRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
-		sahiTasks.link(cn).click();
+		/*sahiTasks.link(cn).click();
 		
 		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.radio("ipaenabledflag-1-0").click();
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();*/
+		
+		
+sahiTasks.link(cn).click();
+		
+		//Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
+		//Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-0").checked(), "Verified rule is disabled");
+		
+		sahiTasks.select("action").choose("Disable");
+		sahiTasks.span("Apply").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("Sudo Rules[1]").click();
+		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Varify rule is disabled sucessfully");
+		sahiTasks.link(cn).click();
+		sahiTasks.select("action").choose("Enable");
+		sahiTasks.span("Apply").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("Sudo Rules[1]").click();
+		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Varify rule is enabled sucessfully");
+		sahiTasks.link(cn).click();
+		sahiTasks.select("action").choose("Delete");
+		sahiTasks.span("Apply").click();
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " deleted successfully");
+		
+		
 		
 	}
 	
@@ -197,6 +222,9 @@ public class HBACTasks {
 		
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();	
 		
+		
+		
+		
 	}
 	
 	/**
@@ -208,9 +236,26 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
-		Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-0").checked(), "Verified rule is disabled");		
+		//Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-0").checked(), "Verified rule is disabled");
 		
-		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.select("action").choose("Disable");
+		sahiTasks.span("Apply").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("Sudo Rules[1]").click();
+		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Varify rule is disabled sucessfully");
+		sahiTasks.link(cn).click();
+		sahiTasks.select("action").choose("Enable");
+		sahiTasks.span("Apply").click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("Sudo Rules[1]").click();
+		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Varify rule is enabled sucessfully");
+		sahiTasks.link(cn).click();
+		sahiTasks.select("action").choose("Delete");
+		sahiTasks.span("Apply").click();
+		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " deleted successfully");
+		
+		
+		//sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();			
 	}
 
 	/**
@@ -257,7 +302,7 @@ public class HBACTasks {
 		sahiTasks.link(cn).click();
 		
 		
-		sahiTasks.radio("hostcategory-3-0").click();
+		sahiTasks.radio("hostcategory-2-0").click();
 		sahiTasks.span("undo").near(sahiTasks.label("Specified Hosts and Groups")).click();
 
 		//sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).click();
@@ -355,7 +400,7 @@ public class HBACTasks {
 	public static void updateCategory(SahiTasks sahiTasks, String cn, String hostgroupName, boolean memberExists) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.radio("sourcehostcategory-5-0").click();
+		sahiTasks.radio("sourcehostcategory-4-0").click();
 		sahiTasks.span("Update").click();
 		
 		//Assert.assertFalse(sahiTasks.checkbox(hostgroupName).under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source Host GroupsDeleteAdd")).exists(), "Verified when categorry was switch, entries got deleted");
@@ -457,7 +502,7 @@ public class HBACTasks {
 		{
 			sahiTasks.span("Add").near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();//for fireFox
 		}
-		sahiTasks.checkbox("Sudo").click();
+		sahiTasks.checkbox("sudo").click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Add").click();
 		
@@ -494,24 +539,24 @@ public class HBACTasks {
 		String originalDescription = sahiTasks.textarea("description").getValue();
 		String newDescription = "This description will be reset";		
 		sahiTasks.textarea("description").setValue(newDescription);		
-		sahiTasks.radio("usercategory-2-0").click();
+		sahiTasks.radio("usercategory-1-0").click();
 		
 		// TODO: nkrishnan - how to check Add/Delete are disabled when "all" is selected
 		
 		sahiTasks.span("Reset").click();
 	
 		Assert.assertEquals(sahiTasks.textarea("description").getText(), originalDescription, "Changes to Description are Reset");
-		Assert.assertTrue(sahiTasks.radio("usercategory-2-1").checked(), "Changes to UserCategory are Reset");
+		Assert.assertTrue(sahiTasks.radio("usercategory-1-1").checked(), "Changes to UserCategory are Reset");
 		
 		sahiTasks.textarea("description").setValue("will undo this desc from here");
 		sahiTasks.span("undo").near(sahiTasks.textarea("description")).click();
 		Assert.assertEquals(sahiTasks.textarea("description").getText(), originalDescription, "Changes to Description are Undone");
 		
-		sahiTasks.radio("hostcategory-3-0").click();
+		sahiTasks.radio("hostcategory-2-0").click();
 		sahiTasks.span("undo").near(sahiTasks.label("Specified Hosts and Groups")).click();
-		Assert.assertTrue(sahiTasks.radio("hostcategory-3-1").checked(), "Changes to HostCategory are Undone");
+		Assert.assertTrue(sahiTasks.radio("hostcategory-2-1").checked(), "Changes to HostCategory are Undone");
 		
-		sahiTasks.radio("servicecategory-4-0").click();
+		sahiTasks.radio("servicecategory-3-0").click();
 
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		sahiTasks.button("Reset").click();
@@ -542,6 +587,15 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 	}
 	
+	public static void enableDIsableHBACTests(SahiTasks sahiTasks, String cn, String status, String buttonToClick)
+	{
+		sahiTasks.checkbox(cn).click();
+		sahiTasks.span(buttonToClick).click();
+		Assert.assertTrue(sahiTasks.div(status).exists(),"verified rule "+cn+" "+ status+" successfully");
+		sahiTasks.checkbox(cn).click();
+				
+	}
+		
 	
 	
 	
@@ -578,6 +632,7 @@ public class HBACTasks {
 		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 	}
 
 	public static void verifyHBACServiceUpdates(SahiTasks sahiTasks, String cn,	String newdescription) {
@@ -915,7 +970,8 @@ public class HBACTasks {
 		
 		//Update and go back to HBAC Rules list
 		sahiTasks.link("Update").click();
-		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();		
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 	}
 	
 	/*
@@ -925,9 +981,9 @@ public class HBACTasks {
 	public static void modifyHBACMemberList(SahiTasks sahiTasks, String rule)
 	{
 		sahiTasks.link(rule).click();
-		sahiTasks.radio("hostcategory-3-0").click();
-		sahiTasks.radio("servicecategory-4-0").click();
-		sahiTasks.radio("sourcehostcategory-5-0").click();
+		sahiTasks.radio("hostcategory-2-0").click();
+		sahiTasks.radio("servicecategory-3-0").click();
+		sahiTasks.radio("sourcehostcategory-4-0").click();
 		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		
