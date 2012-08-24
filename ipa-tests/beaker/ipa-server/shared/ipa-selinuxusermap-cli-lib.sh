@@ -347,7 +347,7 @@ host=$3
 selinuxuser=$4
         rc=0
 	SELINUX_POLICY=$(expect -f - <<-EOF 
-        	spawn ssh -l "$user" $host id -Z >> $expfile
+        	spawn ssh -l "$user" $host id -Z 
                 expect {
                 	"*assword: " {
                         send -- "$passwd\r"
@@ -381,7 +381,7 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-	SELINUX_POLICY=$(expect -f - <<-EOF | grep -C 77 '^login successful'
+	SELINUX_POLICY=$(expect -f - <<-EOF 
                 spawn ssh -l "$user" $host id -Z
                 expect {
                         "*assword: " {
