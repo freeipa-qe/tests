@@ -803,6 +803,7 @@ public class IPAWebPage implements StandardTest{
 				else{
 					monitor.fail("Add and Verify Failed");
 				}
+			
 			}
 
 			pageName=addGroupPage;
@@ -838,7 +839,7 @@ public class IPAWebPage implements StandardTest{
 						monitor.fail("Add and Verify Failed");
 					}
 				}
-
+				browser.link("User Groups").in(browser.div("content")).click();//xdong
 			}
 			browser.navigateTo(commonTasks.groupPage, true);
 			pageName=memberuserToMemberGroupPage;
@@ -876,9 +877,13 @@ public class IPAWebPage implements StandardTest{
 		String oldPassword=factory.getModifyTestAccount(pageName);
 		pageName=loginNewPassword;
 		String newPassword=factory.getModifyTestAccount(pageName);
+		
 		CommonTasks.kinitAsNewUserFirstTime(userName, oldPassword, newPassword);
-		CommonTasks.formauth(browser, userName, newPassword);
+		CommonTasks.formauthNewUser(browser, userName, newPassword);
+		//CommonTasks.formauth(browser, userName, newPassword);
+		
 		browser.link("Users").under(browser.div("Users")).click();
+		
 		pageName=editDelegatedUserNegative;
 		testAccount=factory.getModifyTestAccount(pageName);
 		if(browser.link(testAccount).exists()){
@@ -892,7 +897,7 @@ public class IPAWebPage implements StandardTest{
 		}
 		monitor.pass();
 		return monitor;
-	}
+}
 	
 	
 	////////////////////////////////// generic UI operation  /////////////////////////////
