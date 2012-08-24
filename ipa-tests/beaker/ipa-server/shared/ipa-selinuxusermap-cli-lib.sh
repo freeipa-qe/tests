@@ -346,18 +346,17 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-	expect -f - <<-EOF | grep -C 77 '^login successful'
-        	spawn ssh -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+	SELINUX_POLICY=$(expect -f - <<-EOF 
+        	spawn ssh -l "$user" $host id -Z >> $expfile
                 expect {
                 	"*assword: " {
                         send -- "$passwd\r"
                         	}
                        }
                 expect eof
-	EOF
+	EOF)
 	if [ $? = 0 ]; then
                 rlPass "Authentication successful for $user"
-		SELINUX_POLICY=`id -Z`
 		echo $SELINUX_POLICY
 		echo $SELINUX_POLICY | grep $selinuxuser
 		if [ $? = 0 ]; then
@@ -382,18 +381,17 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-	expect -f - <<-EOF | grep -C 77 '^login successful'
-                spawn ssh -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+	SELINUX_POLICY=$(expect -f - <<-EOF | grep -C 77 '^login successful'
+                spawn ssh -l "$user" $host id -Z
                 expect {
                         "*assword: " {
                         send -- "$passwd\r"
                                 }
                        }
                 expect eof
-        EOF
+        EOF)
         if [ $? = 0 ]; then
                 rlPass "Authentication successful for $user"
-		SELINUX_POLICY=`id -Z`
                 echo $SELINUX_POLICY
                 echo $SELINUX_POLICY | grep $selinuxuser
                 if [ $? = 0 ]; then
