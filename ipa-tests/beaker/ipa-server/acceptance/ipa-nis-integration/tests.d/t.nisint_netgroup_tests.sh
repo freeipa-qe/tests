@@ -81,6 +81,7 @@ nisint_netgroup_test_envsetup()
 		rlLog "Machine in recipe is NISCLIENT"
 		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "sed -i 's/netgroup:   nisplus/netgroup:   nis/' /etc/nsswitch.conf"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
