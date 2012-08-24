@@ -78,6 +78,7 @@ nisint_nisclient_envsetup()
 	rlPhaseStartTest "nisint_nisclient_envsetup: "
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "setup-nis-client" 0 "Running NIS Client setup"
+		rlRun "service iptables stop" 0 "Disabling iptables"
 		rlRun "ps -ef|grep [y]pbind" 0 "Check that NIS Client (ypbind) is running"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
