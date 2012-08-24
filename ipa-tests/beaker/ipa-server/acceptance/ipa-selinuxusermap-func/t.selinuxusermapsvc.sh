@@ -41,8 +41,8 @@
 # Test Suite Globals
 t1_ipa_selinuxuser="staff_u:s0-s0:c0.c1023"
 t1_ipa_selinuxuser_verif="staff_u:.*s0-s0:c0.c1023"
-t1_ipa_default_selinuxuser="guest_u:s0"
-t1_ipa_default_selinuxuser_verif="guest_u:.*s0"
+t1_ipa_default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
+t1_ipa_default_selinuxuser_verif="unconfined_u:.*s0-s0:c0.c1023"
 
 selinuxusermapsvc_master_001() {
 
