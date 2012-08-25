@@ -778,15 +778,20 @@ hbacsvc_client_008() {
 
 hbacsvc_client2_008() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
+	rlPhaseStartTest "ipa-hbacsvc-client2-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user8"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user8"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user8 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
+			rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
+		else
+			rlRun "ssh_auth_success user8 testpw123@ipa.com $CLIENT2"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
-        rlPhaseEnd
+	rlPhaseEnd
 
 }
 
@@ -897,15 +902,20 @@ hbacsvc_client_009() {
 
 hbacsvc_client2_009() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-009: user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
+	rlPhaseStartTest "ipa-hbacsvc-client2-009: user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user9"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user9"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
+			rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
+		else
+			rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
-        rlPhaseEnd
+	rlPhaseEnd
 
 }
 
@@ -951,15 +961,20 @@ hbacsvc_client_009_1() {
 
 hbacsvc_client2_009_1() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-009_1: grp9 removed from rule9 which was allowed to access $CLIENT2 from $CLIENT"
+	rlPhaseStartTest "ipa-hbacsvc-client2-009_1: grp9 removed from rule9 which was allowed to access $CLIENT2 from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user9"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user9"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
+			rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
+		else
+			rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
-        rlPhaseEnd
+	rlPhaseEnd
 
 }
 
@@ -1021,15 +1036,20 @@ hbacsvc_client_010() {
 
 hbacsvc_client2_010() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-010: user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
+	rlPhaseStartTest "ipa-hbacsvc-client2-010: user10 from grp10 part of rule10 is allowed to access hostgrp from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user10"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user10"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user10 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
+			rlRun "ssh_auth_failure user10 testpw123@ipa.com $CLIENT2"
+		else
+			rlRun "ssh_auth_success user10 testpw123@ipa.com $CLIENT2"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
-        rlPhaseEnd
+	rlPhaseEnd
 
 }
 
@@ -1089,15 +1109,20 @@ hbacsvc_client_011() {
 
 hbacsvc_client2_011() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-011: user11 from grp11 part of rule11 is allowed to access hostgrp from $CLIENT"
+	rlPhaseStartTest "ipa-hbacsvc-client2-011: user11 from grp11 part of rule11 is allowed to access hostgrp from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user11"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "getent -s sss passwd user11"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
-                rlRun "ssh_auth_success user11 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
+		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+		if [ $SRCHOSTENABLED -eq 0 ]; then
+			rlRun "ssh_auth_failure user11 testpw123@ipa.com $CLIENT2"
+		else
+			rlRun "ssh_auth_success user11 testpw123@ipa.com $CLIENT2"
+		fi
+		rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
-        rlPhaseEnd
+	rlPhaseEnd
 
 }
 
