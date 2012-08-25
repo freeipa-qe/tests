@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/tests/Regression/ipa-selinuxusermap-func
-#   Description: Selinuxusermap Functional acceptance tests
-#   Author: Asha Akkiangady <aakkiang@redhat.com>
+#   Makefile of /CoreOS/tests/Regression/ipa-hbac-func
+#   Description: Host Based Access Control Functional acceptance tests
+#   Author: Gowrishankar Rajaiyan <grajaiya@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -24,12 +24,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-func
+export TEST=/CoreOS/ipa-server/acceptance/ipa-hbac-func
 export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.selinuxusermapsvc.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.hbacsvc.sh
 
 .PHONY: all install download clean
 
@@ -46,11 +46,11 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Asha Akkiangady <aakkiang@redhat.com>" > $(METADATA)
+	@echo "Owner:           Gowrishankar Rajaiyan <grajaiya@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Selinuxusermap acceptance tests" >> $(METADATA)
+	@echo "Description:     Host Based Access Control (HBAC) CLI acceptance tests" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
 	@echo "TestTime:        240m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)

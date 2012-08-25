@@ -1,3 +1,3 @@
-PURPOSE of /CoreOS/tests/Regression/ipa-selinuxusermap-func
-Description: Selinuxusermap Functional acceptance tests 
-Author: Asha Akkiangady  <aakkiang@redhat.com>
+PURPOSE of /CoreOS/tests/Regression/ipa-hbac-func
+Description: Host Based Access Control Functional acceptance tests
+Author: Gowrishankar Rajaiyan <grajaiya@redhat.com>
