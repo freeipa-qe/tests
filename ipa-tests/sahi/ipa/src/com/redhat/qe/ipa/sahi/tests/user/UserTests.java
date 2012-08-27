@@ -347,9 +347,15 @@ public class UserTests extends SahiTestScript{
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
 		// verify user cannot kinit
-		Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
-		
-		
+		//Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
+		// xdong : TODO: login using formauth 
+		// Verify - that user could not login
+		//login back as the admin
+		//Assert.assertFalse(CommonTasks.formauth(sahiTasks, uid, password), "Verify " + uid + " cannot kinit");
+		CommonTasks.formauth(sahiTasks, uid, password);
+		Assert.assertTrue(sahiTasks.div("error-box").exists(), "Verify " + uid + " cannot kinit");
+		CommonTasks.formauth(sahiTasks, "admin", "Secret123");
+
 	}
 	
 		
@@ -393,9 +399,11 @@ public class UserTests extends SahiTestScript{
 		//verify changes to status	
 		UserTasks.verifyUserStatus(sahiTasks, uid, false);
 		// verify user cannot kinit
-		Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
-		
-		
+		//Assert.assertFalse(CommonTasks.kinitAsUser(uid, password), "Verify " + uid + " cannot kinit");
+		CommonTasks.formauth(sahiTasks, uid, password);
+		Assert.assertTrue(sahiTasks.div("error-box").exists(), "Verify " + uid + " cannot kinit");
+		CommonTasks.formauth(sahiTasks, "admin", "Secret123");
+				
 	}
 	
 	/*
