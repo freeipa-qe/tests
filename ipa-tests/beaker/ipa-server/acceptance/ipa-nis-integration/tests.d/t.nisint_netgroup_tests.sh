@@ -449,8 +449,17 @@ nisint_netgroup_test_1009()
 		else
 			rlRun "service rpcbind restart"
 		fi
-		rlRun "service nfs restart"
-		rlRun "service nfslock restart"
+		
+		if [ -f /usr/lib/systemd/system/nfs-server.service ]; then
+			rlRun "systemctl restart nfs-server.service"
+		else
+			rlRun "service nfs restart"
+		fi
+		if [ -f /usr/lib/systemd/system/nfs-lock.service ]; then
+			rlRun "systemctl restart nfs-lock.service"
+		else
+			rlRun "service nfslock restart"
+		fi
 		rlRun "exportfs @testnetgroup1:/tmp"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0.$TESTORDER' -m $NISCLIENT_IP"
 		rlLog "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $MASTER_IP"
@@ -492,8 +501,16 @@ nisint_netgroup_test_1010()
 		else
 			rlRun "service rpcbind restart"
 		fi
-		rlRun "service nfs restart"
-		rlRun "service nfslock restart"
+		if [ -f /usr/lib/systemd/system/nfs-server.service ]; then
+			rlRun "systemctl restart nfs-server.service"
+		else
+			rlRun "service nfs restart"
+		fi
+		if [ -f /usr/lib/systemd/system/nfs-lock.service ]; then
+			rlRun "systemctl restart nfs-lock.service"
+		else
+			rlRun "service nfslock restart"
+		fi
 		rlRun "exportfs @testnetgroup1:/tmp"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0.$TESTORDER' -m $NISCLIENT_IP"
 		rlLog "rhts-sync-block -s '$FUNCNAME.1.$TESTORDER' $NISMASTER_IP"
