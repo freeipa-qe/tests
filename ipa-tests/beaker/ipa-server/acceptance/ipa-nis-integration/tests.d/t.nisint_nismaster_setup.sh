@@ -82,6 +82,7 @@ nisint_nismaster_envsetup()
 {
 	rlPhaseStartTest "nisint_nismaster_envsetup: "
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "yum -y install ntp ntpdate"
 		rlRun "setup-nis-server" 0 "Running NIS Master Server setup"
 		rlRun "ps -ef|grep [y]pserv" 0 "Check that NIS Server (ypserv) is running"
 		#rlRun "service iptables stop" 0,1 "Disabling iptables"
