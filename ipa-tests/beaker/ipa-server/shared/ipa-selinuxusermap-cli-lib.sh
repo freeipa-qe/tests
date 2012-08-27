@@ -300,36 +300,45 @@ enableSelinuxusermap()
 }
 
 #######################################################################
-# verify_ssh_auth_success_selinuxuser_krbcred Usage:
-#       verify_ssh_auth_success_selinuxuser_krbcred <username> <hostname> <selinuxuser>
+# verify_ssh_selinuxuser_success_with_krbcred Usage:
+#       verify_ssh_selinuxuser_success_with_krbcred <username> <hostname> <selinuxuser>
 ######################################################################
-verify_ssh_auth_success_selinuxuser_krbcred()
+verify_ssh_selinuxuser_success_with_krbcred()
 {
 user=$1
 host=$2
 selinuxuser=$3
-	rc=0
-        ssh -l "$user" $host id -Z | grep $selinuxuser
+	tmpfile=/tmp/show_selinuxpolicy.out
+	ssh -l "$user" $host id -Z > $tmpfile
+        cat $tmpfile | grep $selinuxuser 
 	if [ $? = 0 ]; then
 		rlPass "Authentication successful for $user, with selinuxuser $selinuxuser as expected"
 	else   
         	rlFail "ERROR: Authentication failed for $user, with selinuxuser $selinuxuser expected success."
-fi
+		rlLog "Got selinux policy:"
+		cat $tmpfile
+	fi
+	
+	
 }
 
 #######################################################################
-# verify_ssh_auth_failure_selinuxuser_krbcred  Usage:
-#       verify_ssh_auth_failure_selinuxuser_krbcred <username> <hostname> <selinuxuser>
+# verify_ssh_selinuxuser_failure_with_krbcred  Usage:
+#       verify_ssh_selinuxuser_failure_with_krbcred <username> <hostname> <selinuxuser>
 ######################################################################
-verify_ssh_auth_failure_selinuxuser_krbcred()
+verify_ssh_selinuxuser_failure_with_krbcred()
 {
 user=$1
 host=$2
 selinuxuser=$3
         rc=0
-        ssh -l "$user" $host id -Z | grep $selinuxuser
+	tmpfile=/tmp/show_selinuxpolicy.out
+        ssh -l "$user" $host id -Z > $tmpfile
+        cat $tmpfile | grep $selinuxuser 
         if [ $? = 0 ]; then
                 rlFail "ERROR: Authentication success for $user, with selinuxuser $selinuxuser expected failure."
+		rlLog "Got selinux policy:"
+		cat $tmpfile
         else
                 rlPass "Authentication failed for $user, with selinuxuser $selinuxuser as expected"
 fi
