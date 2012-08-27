@@ -84,6 +84,18 @@ nisint_nismaster_envsetup()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "setup-nis-server" 0 "Running NIS Master Server setup"
 		rlRun "ps -ef|grep [y]pserv" 0 "Check that NIS Server (ypserv) is running"
+		#rlRun "service iptables stop" 0,1 "Disabling iptables"
+		if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
+			service iptables stop
+			if [ $? -eq 1 ]; then
+				rlLog "[ FAIL ] BZ 845301 found -- service iptables stop returns 1 when already stopped"
+				rlLog "This affects RHEL5 version of iptables service"
+			else
+				rlLog "[ PASS ] BZ 845301 not found -- service iptables stop succeeeded"
+			fi
+		else	
+			rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		fi
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }

@@ -76,6 +76,7 @@ nisint_netgroup_test_envsetup()
 		rlLog "Machine in recipe is NISMASTER"
 		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "sed -i 's/netgroup:   nisplus/netgroup:   nis/' /etc/nsswitch.conf"
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
