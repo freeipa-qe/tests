@@ -75,7 +75,7 @@ selinuxusermapsvc_master_001() {
 		rlRun "rlDistroDiff keyctl" 
 		rlRun "kinitAs $user1 $userpw" 0 "Kinit as $user1"	
 		rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT has selinux policy $t1_ipa_selinuxuser"
-		rlRun "verify_ssh_auth_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+		rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
                 rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $ipa_default_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $ipa_default_selinuxuser"
 
 		rlRun "rlDistroDiff keyctl" 
