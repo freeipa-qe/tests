@@ -12,7 +12,11 @@ fixHostFile()
 
     # get the ip address of that interface
     #ipaddr=$(ifconfig $currenteth | grep inet\ addr | sed s/:/\ /g | awk '{print $3}')
-    ipaddr=$(hostname -I | awk '{print $1}')
+	if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+		ipaddr=$(hostname -i|awk '{print $1}')
+	else
+		ipaddr=$(hostname -I | awk '{print $1}')
+	fi
     rlLog "Ip address is $ipaddr"
 
     # Now, fix the hosts file to work with IPA.
