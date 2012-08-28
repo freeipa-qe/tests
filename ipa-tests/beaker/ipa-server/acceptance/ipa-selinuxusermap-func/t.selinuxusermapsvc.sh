@@ -136,9 +136,9 @@ selinuxusermapsvc_master_002() {
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 		rlRun "ipa selinuxusermap-add selinuxusermaprule2 --selinuxuser=$t1_ipa_selinuxuser" 0 "Add a selinuxusermap rule."
-		rlRun "ipa selinuxusermaprule-add-user selinuxusermaprule2 --users=$user1"
-		rlRun "ipa selinuxusermaprule-add-host selinuxusermaprule2 --hosts=$MASTER"
-		rlRun "ipa selinuxusermaprule-show selinuxusermaprule2 --all"
+		rlRun "ipa selinuxusermap-add-user selinuxusermaprule2 --users=$user1"
+		rlRun "ipa selinuxusermap-add-host selinuxusermaprule2 --hosts=$MASTER"
+		rlRun "ipa selinuxusermap-show selinuxusermaprule2 --all"
 
 	# ipa selinuxusermaptest:
 
@@ -158,6 +158,7 @@ selinuxusermapsvc_master_002() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlPhaseEnd
 }
+
 selinuxusermapsvc_master_002_cleanup() {
 	# Cleanup
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -168,6 +169,7 @@ selinuxusermapsvc_master_002_cleanup() {
         rlRun "ipa selinuxusermap-del selinuxusermaprule2"
 
 }
+
 selinuxusermapsvc_client_002() {
 	rlPhaseStartTest "ipa-selinuxusermapsvc-client1-002: user1 accessing $MASTER from $CLIENT using SSHD service."
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -179,6 +181,7 @@ selinuxusermapsvc_client_002() {
         rlPhaseEnd
 
 }
+
 selinuxusermapsvc_client2_002() {
 	rlPhaseStartTest "ipa-selinuxusermapsvc-client2-002: user1 accessing $MASTER from $CLIENT2 using SSHD service."
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -220,7 +223,7 @@ selinuxusermapsvc_master_003() {
 	rlRun "ipa hbacrule-show rule1 --all"
 
         rlRun "ipa selinuxusermap-add selinuxusermaprule1 --selinuxuser=$t1_ipa_selinuxuser --hbacrule=rule1"
-        rlRun "ipa selinuxusermaprule-show selinuxusermaprule1 --all"
+        rlRun "ipa selinuxusermap-show selinuxusermaprule1 --all"
 
 	# ipa selinuxusermaptest:
 	rlRun "rlDistroDiff keyctl"
@@ -312,7 +315,7 @@ selinuxusermapsvc_master_004() {
 	
 	# Selinuxusermap2 - with rule2
 	rlRun "ipa selinuxusermap-add selinuxusermaprule2 --selinuxuser=t1_ipa_selinuxuser --hbacrule=rule2"
-        rlRun "ipa selinuxusermaprule-show selinuxusermaprule2 --all"
+        rlRun "ipa selinuxusermap-show selinuxusermaprule2 --all"
 
 	# ipa selinuxusermaptest:
         rlRun "rlDistroDiff keyctl"
@@ -607,7 +610,7 @@ selinuxusermapsvc_master_005() {
 	
 	# Selinuxusermap2 - with rule2
 	rlRun "ipa selinuxusermap-add selinuxusermaprule2 --selinuxuser=t1_ipa_selinuxuser --hbacrule=rule2"
-        rlRun "ipa selinuxusermaprule-show selinuxusermaprule2 --all"
+        rlRun "ipa selinuxusermap-show selinuxusermaprule2 --all"
 
 	# ipa selinuxusermaptest:
         rlRun "rlDistroDiff keyctl"
@@ -867,4 +870,5 @@ selinuxusermapsvc_client2_005_4() {
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
         rlPhaseEnd
 }
+
 
