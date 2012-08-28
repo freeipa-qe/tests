@@ -12,8 +12,8 @@
 #	findSelinuxusermap
 #	findSelinuxusermapByOption
 #	verifySelinuxusermapAttr
-#	verify_ssh_auth_success_selinuxuser_krbcred
-#	verify_ssh_auth_failure_selinuxuser_krbcred
+#	verify_ssh_selinuxuser_success_with_krbcred
+#	verify_ssh_selinuxuser_failure_with_krbcred
 #	verify_ssh_auth_success_selinuxuser
 #	verify_ssh_auth_failure_selinuxuser
 #
