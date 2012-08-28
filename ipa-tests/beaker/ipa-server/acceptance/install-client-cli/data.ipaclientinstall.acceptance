@@ -53,7 +53,11 @@ ticket_lifetime="24h"
 forwardable="yes"
 pkinit_anchors="FILE:/etc/ipa/ca.crt"
 domain_realm="$RELM $RELM"
-domain_realm_nonexistent="$RELM $RELM $RELM $RELM"
+if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+	domain_realm_nonexistent="$RELM $RELM"
+else
+	domain_realm_nonexistent="$RELM $RELM $RELM $RELM"
+fi
 dns_lookup_kdc_force="false"
 dns_lookup_realm_force="false"
 
