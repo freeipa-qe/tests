@@ -155,7 +155,7 @@ public class GroupTests extends SahiTestScript{
 	///////////////////////// searchGroup test cases //////////////////////	
 	
 	@Test (groups={"searchGroup"}, dataProvider="searchGroupPositiveData",  dependsOnGroups="addGroup_negative")
-	public void testGroupSearch(String testScrenario,String searchgroupName) {
+	public void testGroupSearch(String searchgroupName) {
 		
 		GroupTasks.searchGroup(browser, searchgroupName);
 		
@@ -166,7 +166,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	@Test (groups={"searchGroupNegative"}, dataProvider="searchGroupNegativeData",  dependsOnGroups={"searchGroup"})	
-	public void testGroupSearchNegative(String testScrenario,String searchgroupName)  {
+	public void testGroupSearchNegative(String searchgroupName)  {
 		
 		GroupTasks.searchGroup(browser, searchgroupName);
 		
@@ -178,8 +178,12 @@ public class GroupTests extends SahiTestScript{
 	
 	
 
+
+	
+	
+	
 	///////////////////////// modifyGroup test cases (enroll user and groups ) //////////////////////
-	@Test(groups={"modifyGroup"},  dependsOnGroups="addGroup",
+     @Test(groups={"modifyGroup"},  dependsOnGroups="addGroup",
 		description="this is a bridge test group.")
 	public void modifyGroupBridge()
 	{
@@ -1196,13 +1200,13 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider(name="searchGroupPositiveData")
 	 public Object[][] getsearchGroupPositive()
 	{
-		String [][] searchgroupName ={ {GroupTests.testUserGroups[1],GroupTests.testUserGroups[2]} ,{GroupTests.testUserGroups[3] ,GroupTests.testUserGroups[4]}};
+		String [][] searchgroupName ={ {GroupTests.testUserGroups[1]},{GroupTests.testUserGroups[2]} ,{GroupTests.testUserGroups[3]},{GroupTests.testUserGroups[4]}};
 		return searchgroupName;
 	}
 	@DataProvider(name="searchGroupNegativeData")
 	 public Object[][] getsearchGroupNegative()
 	{
-		String [][] searchgroupName ={ {GroupTests.testUserGroups[5]+" " , " "+GroupTests.testUserGroups[6] },{"%$#%@*&%@!@#" ,"invalidgroup"}};
+		String [][] searchgroupName ={ {GroupTests.testUserGroups[5]+" "},{" "+GroupTests.testUserGroups[6] },{"%$#%@*&%@!@#"},{"invalidgroup"}};
 		return searchgroupName;
 	}
 }//class GroupTest
