@@ -174,12 +174,12 @@ ipa_install_set_vars() {
 	### Set OS/YUM/RPM related variables here
 	if [ $(grep Fedora /etc/redhat-release|wc -l) -gt 0 ]; then
 		export DISTRO="Fedora"
-		export IPA_SERVER_PACKAGES="freeipa-server"
+		export IPA_SERVER_PACKAGES="freeipa-server freeipa-server-trust-ad"
 		export IPA_CLIENT_PACKAGES="freeipa-admintools freeipa-client"
 		export YUM_OPTIONS="--disablerepo=updates-testing"
 	else
 		export DISTRO="RedHat"
-		export IPA_SERVER_PACKAGES="ipa-server"
+		export IPA_SERVER_PACKAGES="ipa-server ipa-server-trust-ad"
 		if [ $(grep "Red Hat.*5\.[0-9]" /etc/redhat-release|wc -l) -gt 0 ]; then
 			export IPA_CLIENT_PACKAGES="ipa-client"
 		else
