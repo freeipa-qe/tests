@@ -12,10 +12,12 @@
             	        <include name="addAutomountLocation_negative" />
             	        <include name="deleteAutomountLocation" />
             	        <include name="deleteAutomountLocationMultiple" />
+            	        <include name="automountLocationExpandCollapseTests" />
             	       
             	        <include name="addAutomountMap" />
             	        <include name="modifyAutomountMap" />
-                        <include name="deleteAutomountMap" /> 
+                        <include name="deleteAutomountMap" />
+                        <include name="automountMapExpandCollapseTest" />
             	        
             	        <include name="addIndirectAutomountMap" />
             	        <include name="addIndirectAutomountMap_negative" />
@@ -26,7 +28,8 @@
             	        <include name="addAutomountKey_negative" />
             	        <include name="modifyAutomountKey" />
             	        <include name="modifyAutomountKey_negative" />
-            	        <include name="deleteAutomountKey" />
+            	        <include name="deleteAutomountKey" /> 
+            	        <include name="AutomountKeyExpandCollapse" />
             	    </run>
             	</groups>
             	<classes>
