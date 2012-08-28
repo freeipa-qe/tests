@@ -43,6 +43,7 @@
 
 PACKAGE="ipa-client"
 SERVICE="ipa_kpasswd"
+HOSTNAME=$(hostname)
 
 ##########################################
 #   test main

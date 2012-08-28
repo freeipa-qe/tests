@@ -363,13 +363,15 @@ ipaclientinstall_hostname()
        expmsg1="Warning: Hostname ($CLIENT.nonexistent) not found in DNS"
        expmsg2="Could not update DNS SSHFP records."
 
-        if [ -f /etc/fedora-release ] ; then
-                rlRun "$command > $tmpout 2>&1" 
-                rlAssertGrep "Hostname ($CLIENT.nonexistent) not found in DNS" "$tmpout"
-                rlAssertGrep "Could not update DNS SSHFP records." "$tmpout"
-        else
-		qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
-        fi
+		if [ -f /etc/fedora-release ] ; then
+			rlRun "$command > $tmpout 2>&1" 
+			rlAssertGrep "Hostname ($CLIENT.nonexistent) not found in DNS" "$tmpout"
+			rlAssertGrep "Could not update DNS SSHFP records." "$tmpout"
+		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+			qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1"
+		else
+			qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
+		fi
 
        verify_install true nonexistent
        verify_hostname $CLIENT.nonexistent
@@ -386,7 +388,11 @@ ipaclientinstall_hostname()
        verify_keytab_afteruninstall $CLIENT.nonexistent $tmpout
 
        # clear the host record, there is no DNS record associated for this host
-	rlRun "ipa host-del $CLIENT.nonexistent" 0 "Deleting client record and DNS entry from server"
+       if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+          rlRun "ssh root@$MASTER \"echo $ADMINPW|kinit admin; ipa host-del $CLIENT.nonexistent\"" 0 "Deleting client record and DNS entry from server"
+       else
+	      rlRun "ipa host-del $CLIENT.nonexistent" 0 "Deleting client record and DNS entry from server"
+       fi
     rlPhaseEnd
 
 }
