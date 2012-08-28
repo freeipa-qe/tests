@@ -1,7 +1,7 @@
 #!/bin/bash
 . ./d.autorenewcert.sh
 
-generateCertConf(){
+generate_cert_conf(){
     echo "# auto generated file, do not edit by hand" > $certconf
     echo "# `date`" >> $certconf
     for cert in $allcerts
@@ -157,7 +157,7 @@ caJarSigningCert(){
 }
 
 list_all_ipa_certs(){
-    generateCertConf
+    generate_cert_conf
     sort_certs
     echo ""
     echo "+-------------------- all IPA certs [`date`]----------------------------------+"
@@ -254,7 +254,7 @@ min(){
     echo $min
 } 
 
-getNotBefore(){
+get_not_before_sec(){
     local state=$1
     shift
     local notBefore=""
@@ -268,7 +268,7 @@ getNotBefore(){
     echo $notBefore
 }
 
-getNotAfter(){
+get_not_after_sec(){
     local state=$1
     shift
     local notAfter=""
@@ -282,17 +282,21 @@ getNotAfter(){
     echo $notAfter
 }
 
-dateToEpoch(){
+convert_utc_date_to_epoch(){
+    date -d "$@ UTC" "+%s"
+}
+
+convert_date_to_epoch(){
     date -d "$@" "+%s"
 }
     
 
-epochToDate(){
+convert_epoch_to_date(){
     perl -e "print scalar localtime($1)"
 }
 
 fix_prevalid_cert_problem(){
-    local before=`getNotBefore "preValid" $allcerts `
+    local before=`get_not_before_sec "preValid" $allcerts `
     echo "+----------------- check prevalid problem -----------------+"
     echo -n "[fix_prevalid_cert_problem]"
     if [ "$before" = "" ];then
@@ -302,9 +306,9 @@ fix_prevalid_cert_problem(){
         list_certs "preValid" $allcerts
         local before_max=`max $before`
         local now=`date`
-        local now_epoch=`dateToEpoch "$now"`
+        local now_epoch=`convert_date_to_epoch "$now"`
         echo "      current time   : $now"
-        echo "      cert not-before: `epochToDate $before_max`"
+        echo "      cert not-before: `convert_epoch_to_date $before_max`"
         if [ $now_epoch -lt $before_max ];then
             adjust_system_time $before_max preValid
         fi 
@@ -314,24 +318,20 @@ fix_prevalid_cert_problem(){
 
 calculate_autorenew_date(){
     local group=$@
-    local after=`getNotAfter valid $group`
+    local after=`get_not_after_sec valid $group`
     local after_min=`min $after`
     local after_max=`max $after`
     certExpire=`min $after`
     preAutorenew=`echo "$certExpire - $oneday" | bc`
-    autorenew=`echo "$certExpire - $halfday" | bc`
+    autorenew=`echo "$certExpire - $sixdays" | bc`
     postAutorenew=`echo "$certExpire - $halfhour " | bc`
     postExpire=`echo "$certExpire + $halfday" | bc`
     INFO "[calculate_autorenew_date]"
-    #INFO "  preAutorenew :"`epochToDate $preAutorenew` " ($preAutorenew)"  
-    INFO "|    autorenew    :" `epochToDate $autorenew` " ($autorenew)"  
-    #INFO "  postAutorenew:" `epochToDate $postAutorenew` " ($postAutorenew)" 
-    DEBUG "|    certExpire   :" `epochToDate $certExpire` " ($certExpire)" 
-    INFO "|    postExpire   :" `epochToDate $postExpire` " ($postExpire)" 
-}
-
-certSanityCheck(){
-    echo certSanityCheck need work
+    #INFO "  preAutorenew :"`convert_epoch_to_date $preAutorenew` " ($preAutorenew)"  
+    INFO "|    autorenew    :" `convert_epoch_to_date $autorenew` " ($autorenew)"  
+    #INFO "  postAutorenew:" `convert_epoch_to_date $postAutorenew` " ($postAutorenew)" 
+    DEBUG "|    certExpire   :" `convert_epoch_to_date $certExpire` " ($certExpire)" 
+    INFO "|    postExpire   :" `convert_epoch_to_date $postExpire` " ($postExpire)" 
 }
 
 adjust_system_time(){
@@ -339,7 +339,7 @@ adjust_system_time(){
     local label=$2
     INFO "[adjust_system_time] ($label)"
     stopIPA
-    DEBUG "|     | given [$adjustTo]" `epochToDate $adjustTo`
+    DEBUG "|     | given [$adjustTo]" `convert_epoch_to_date $adjustTo`
     local before=`date`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     local after=`date`
@@ -394,10 +394,10 @@ check_actually_renewed_certs(){
     do
         local state=`$cert status valid`
         if [ "$state" = "valid" ];then
-            DEBUG "|     valid cert found for  [$cert]"
+            rlPass "|     valid cert found for  [$cert]"
             justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
         else
-            DEBUG "|     NO valid cert found for [$cert]"
+            rlFail "|     NO valid cert found for [$cert]"
         fi
     done
 }
@@ -408,10 +408,10 @@ report_test_result(){
     DEBUG "#       [soon to be renewed certs]: [$soonTobeRenewedCerts]"
     DEBUG "#       [acutally being renewed  ]: [$justRenewedCerts]"
     if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
-        INFO "# Test PASS: [$soonTobeRenewedCerts] does renewed"
+        rlPass "# Test PASS: [$soonTobeRenewedCerts] does renewed"
     else
         local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
-        INFO "# Test FAIL: certs not renewed [ $difflist ]"
+        rlFail "# Test FAIL: certs not renewed [ $difflist ]"
         for cert in $difflist
         do
             print_cert_details "     " $cert expired
@@ -594,9 +594,156 @@ get_log_level(){
 print_test_header(){
     local round=$1
     echo ""
-    echo ""
     echo "###########################################################"
+    echo "#                                                         #"
     echo "#                    test round [$round]                       #"
+    echo "#                                                         #"
     echo "###########################################################"
     echo ""
 }
+
+test_ipa_via_kinit_as_admin(){
+    #local pw=$adminpassword
+    local pw=$ADMINPW #use the password in env.sh file
+    local out=$dir/kinitasadmin.$RANDOM.txt
+    local exp
+    local temppw
+    INFO "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
+    echo $pw | kinit admin 2>&1 > $out
+    if [ $? = 0 ];then
+        rlPass "[test_ipa_via_kinit_as_admin] kinit as admin with [$pw] success"
+    elif [ $? = 1 ];then
+        echo "[test_ipa_via_kinit_as_admin] first try of kinit as admin with [$pw] failed"
+        echo "[test_ipa_via_kinit_as_admin] check ipactl status"
+        ipactl status
+        if echo $pw | kinit admin | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
+        then
+            echo "[test_ipa_via_kinit_as_admin] got kinit: Generic error, restart ipa and try same password again"
+            ipactl restart
+            rlRun "$kdestroy"
+            echo $pw | kinit admin 2>&1 > $out
+            if [ $? = 0 ];then
+                rlPass "[test_ipa_via_kinit_as_admin] kinit as admin with [$pw] success at second attemp -- after restart ipa"
+                return
+            fi
+        fi        
+            
+        echo "[test_ipa_via_kinit_as_admin] password [$pw] failed, check whether it is because password expired"
+        echo "============ output of [echo $pw | kinit $ADMIN] ============="
+        cat $out
+        echo "============================================================"
+        if grep "Password expired" $out 2>&1 >/dev/null
+        then
+            echo "admin password exipred, do reset process"
+            exp=$dir/resetadminpassword.$RANDOM.exp
+            temppw="New_$pw"
+            kinit_aftermaxlife "admin" "$ADMINPW" $temppw
+            # set password policy to allow admin change password right away
+            min=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2`
+            min=`echo $min`
+            history=`ipa pwpolicy-show | grep "History size" | cut -d":" -f2`
+            history=`echo $history`
+            classses=`ipa pwpolicy-show | grep "classes" | cut -d":" -f2`
+            classes=`echo $classes`
+            ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=0 --history=0 --minclasses=0
+            # now set admin password back to original password
+            echo "set timeout 10" > $exp
+            echo "set force_conservative 0" >> $exp
+            echo "set send_slow {1 .01}" >> $exp
+            echo "spawn ipa passwd admin" >> $exp
+            echo 'expect "Current Password: "' >> $exp
+            echo "send -s -- $temppw\r" >> $exp
+            echo 'expect "New Password: "' >> $exp
+            echo "send -s -- $pw\r" >> $exp
+            echo 'expect "Enter New Password again to verify: "' >> $exp
+            echo "send -s -- $pw\r" >> $exp
+            echo 'expect eof' >> $exp
+            /usr/bin/expect $exp 
+            cat $exp
+            rm $exp
+            # after reset password, test the new password
+            $kdestroy
+            echo $pw | kinit admin
+            if [ $? = 1 ];then
+                rlPass "[test_ipa_via_kinit_as_admin] reset password back to original [$pw] failed"
+            else
+                rlFail "[test_ipa_via_kinit_as_admin] reset password failed"
+            fi
+            ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes
+            echo "[test_ipa_via_kinit_as_admin] set admin password back to [$pw] success -- after set to temp"
+        elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
+        then
+            rlFail "[test_ipa_via_kinit_as_admin] wrong admin password provided: [$pw]"
+        else
+            rlFail "[test_ipa_via_kinit_as_admin] unhandled error"
+        fi
+    else
+        rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
+    fi
+    rm $out
+}
+
+kinit_aftermaxlife()
+{
+    local username=$1
+    local pw=$2
+    local newpw=$3
+    local exp=$tmpdir/kinitaftermaxlife.$RANDOM.exp
+    echo "set timeout 10" > $exp
+    echo "set force_conservative 0" >> $exp
+    echo "set send_slow {1 .01}" >> $exp
+    echo "spawn kinit -V $username" >> $exp
+    echo 'match_max 100000' >> $exp
+    echo 'expect "*: "' >> $exp
+    echo "send -s -- $pw\r" >> $exp
+    echo 'expect "Password expired. You must change it now."' >> $exp
+    echo 'expect "Enter new password: "' >> $exp
+    echo "send -s -- $newpw\r" >> $exp
+    echo 'expect "Enter it again: "' >> $exp
+    echo "send -s -- $newpw\r" >> $exp
+    echo 'expect eof' >> $exp
+    echo "$kdestroy"
+
+    echo "====== [kinit_aftermaxlife] exp file ========="
+    cat $exp
+    echo "----------- ipactl status -------------------"
+    ipactl status
+    echo "=============================================="
+    /usr/bin/expect $exp
+    echo "$kdestroy"
+
+    echo "====== [kinit_aftermaxlife] ipactl status after run exp file ========="
+    ipactl status
+    echo "=============================================="
+
+    echo $newpw | kinit $username
+    # clean up
+    rm $exp
+} #kinit_aftermaxlife
+
+
+
+test_dirsrv_via_ssl_based_ldapsearch(){
+    # doc: http://directory.fedoraproject.org/wiki/Howto:SSL#Use_ldapsearch_with_SSL
+    echo "test_dirsrv_via_ssl_based_ldapsearch"
+    $ldapsearch -H ldaps://$host -x -D "$DN" -w "$DNPW" -s base -b "" objectclass=* | grep "vendorName:"
+    if [ "$?" = "0" ];then
+        rlPass "[test_dirsrv_via_ssl_based_ldapsearch] Test Pass"
+    else
+        rlFail "[test_dirsrv_via_ssl_based_ldapsearch] Test Failed"
+    fi
+    echo ""
+}
+
+test_dogtag_via_getcert(){
+    echo "test_dogtag_via_getcert"
+    local certid=1
+    ipa cert-show $certid | grep "Certificate:"
+    if [ "$?" = "0" ];then
+        rlPass "[test_dogtag_via_getcert] Test Pass"
+    else
+        rlFail "[test_dogtag_via_getcert] Test Failed"
+    fi
+    echo ""
+}
+

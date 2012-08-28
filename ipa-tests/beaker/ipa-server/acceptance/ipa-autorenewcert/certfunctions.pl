@@ -60,17 +60,21 @@ sub parseCertDetails{
             next;
         }
         if ($line =~ /Not Before:(.*)$/){
-            my $date = trim($1);
+            my $utcdate = trim($1);
+            my $date=`date --date='$utcdate UTC'`;
             my $epoch = str2time($date);
             #my $d = localtime($time); # this is to convert it back to local time so I know this is epoch time
+            $currentCert{"NotBefore_utc"}="$utcdate";
             $currentCert{"NotBefore"}="$date";
             $currentCert{"NotBefore_sec"}="$epoch";
             $currentCert{"Life"} = $epoch;
             next;
         }
         if ($line =~ /Not After :(.*)$/){
-            my $date = trim($1);
-            my $epoch = str2time($date) + 0;
+            my $utcdate = trim($1);
+            my $date=`date --date='$utcdate UTC'`;
+            my $epoch = str2time($date);
+            $currentCert{"NotAfter_utc"}="$utcdate";
             $currentCert{"NotAfter"}="$date";
             $currentCert{"NotAfter_sec"}="$epoch";
 
@@ -144,18 +148,25 @@ sub parseCertutil{
             next;
         }
         if ($line =~ /Not Before:(.*)$/){
-            my $date = trim($1);
+            #my $date = trim($1);
+            my $utcdate = trim($1);
+            my $date=`date --date='$utcdate UTC'`;
+            #my $epoch = str2time($date." UTC");
             my $epoch = str2time($date);
             #my $d = localtime($time); # this is to convert it back to local time so I know this is epoch time
             $currentCert{"NotBefore"}="$date";
+            $currentCert{"NotBefore_utc"}="$utcdate UTC";
             $currentCert{"NotBefore_sec"}="$epoch";
             $currentCert{"Life"} = $epoch;
             next;
         }
         if ($line =~ /Not After :(.*)$/){
-            my $date = trim($1);
+            #my $date = trim($1);
+            my $utcdate = trim($1);
+            my $date=`date --date='$utcdate UTC'`;
             my $epoch = str2time($date) + 0;
             $currentCert{"NotAfter"}="$date";
+            $currentCert{"NotAfter_utc"}="$utcdate UTC";
             $currentCert{"NotAfter_sec"}="$epoch";
 
             my $cert_life_insecond = $epoch - $currentCert{"Life"};
