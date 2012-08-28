@@ -80,6 +80,7 @@ public class PasswordPolicyTests extends SahiTestScript{
 		
 		Assert.assertTrue(browser.link("Password Policies").exists());
 		browser.link("Password Policies").click();
+		
 		Assert.assertTrue(browser.link(policyName).exists(), "new policy [" + policyName +"] has been added");
 	}
 
@@ -102,11 +103,17 @@ public class PasswordPolicyTests extends SahiTestScript{
 		
 		// scenario: lower bound of data range
 		String lowerThanMin = "-1";
-		String lowerThanMin_errorMsg = "Minimum value is 0";
+		String lowerThanMin_errorMsg = "invalid 'priority': must be at least 0";
+		browser.textbox("cn").click();
+		browser.select("list").choose("passwordpolicygrp000");
 		browser.textbox("cospriority").setValue(lowerThanMin);
-		Assert.assertTrue(browser.span(lowerThanMin_errorMsg).exists(),"data range check: lower than min");
+		browser.button("Add").click();
+		Assert.assertTrue(browser.div(lowerThanMin_errorMsg).exists(),"data range check: lower than min");
+		browser.button("Cancel").near(browser.button("Retry")).click();
+		browser.button("Cancel").near(browser.button("Add and Edit")).click();
 		
 		// Scenario: upper bound of data range
+		browser.span("Add").click();
 		String biggerThanMax="2147483648";
 		String biggerThanMax_errorMsg="Maximum value is 2147483647";
 		browser.textbox("cospriority").setValue(biggerThanMax);
@@ -160,6 +167,27 @@ public class PasswordPolicyTests extends SahiTestScript{
 	}//test_modify_PasswordPolicy_Negative
 	
 	
+	@Test (groups={"PolicyExpandCollapseTest"}, dataProvider="Policy_ExpandCollapse", dependsOnGroups="modifyPolicy")	
+	public void PolicyExpand_CollapseTest(String testName, String policyName) throws Exception {
+		// get into password policy detail page
+		browser.link(policyName).click();
+		browser.span("Collapse All").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Group:").isVisible(),"No fields are visible");
+		
+		browser.span("Expand All").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Group:").isVisible(),"All fields are visible");
+		
+		browser.span("icon section-expand expanded-icon").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Group:").isVisible(),"No fields are visible");
+		
+		browser.span("icon section-expand collapsed-icon").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Group:").isVisible(),"All fields are visible");
+	}
+	
 	/***************************************************************************
 	 *                          Data providers                                 *
 	 ***************************************************************************/
@@ -173,7 +201,12 @@ public class PasswordPolicyTests extends SahiTestScript{
 				{"test field: krbminpwdlife", policy,"krbminpwdlife","5"} ,
 				{"test field: krbpwdhistorylength", policy,"krbpwdhistorylength","6"} ,
 				{"test field: krbpwdmindiffchars", policy,"krbpwdmindiffchars","3"} ,
-				{"test field: krbpwdminlength", policy,"krbpwdminlength","12"}
+				{"test field: krbpwdminlength", policy,"krbpwdminlength","12"},				
+				{"test field: krbpwdmaxfailure", policy,"krbpwdmaxfailure","6"},
+				{"test field: krbpwdfailurecountinterval", policy,"krbpwdfailurecountinterval","60"},
+				{"test field: krbpwdlockoutduration", policy,"krbpwdlockoutduration","600"}
+				
+				
 			};
 		return testData;	
 	}//Data provider: getPasswordPolicyDetails 
@@ -187,23 +220,40 @@ public class PasswordPolicyTests extends SahiTestScript{
 			{	
 				{"krbmaxpwdlife: non-integer", 		  policy,"krbmaxpwdlife","abc", "Must be an integer"}, 
 				{"krbmaxpwdlife: upper range integer",policy,"krbmaxpwdlife","2147483648", "Maximum value is 2147483647"},
-				{"krbmaxpwdlife: lower range integer",policy,"krbmaxpwdlife","-1","Minimum value is 0"},		
+				{"krbmaxpwdlife: lower range integer",policy,"krbmaxpwdlife","-1","invalid 'maxlife': must be at least 0"},		
 				
 				{"krbminpwdlife: non-integer",		  policy,"krbminpwdlife","edf", "Must be an integer"},
-				{"krbminpwdlife: upper range integer",policy,"krbminpwdlife","2147483648", "Maximum value is 2147483647"},
-				{"krbminpwdlife: lower range integer",policy,"krbminpwdlife","-1","Minimum value is 0"},
+				{"krbminpwdlif1stPolicye: upper range integer",policy,"krbminpwdlife","2147483648", "Maximum value is 2147483647"},
+				{"krbminpwdlife: lower range integer",policy,"krbminpwdlife","-1","invalid 'minlife': must be at least 0"},
 		
 				{"krbpwdhistorylength: non-integer",	    policy,"krbpwdhistorylength","HIJ", "Must be an integer"}, 
 				{"krbpwdhistorylength: upper range integer",policy,"krbpwdhistorylength","2147483648", "Maximum value is 2147483647"},
-				{"krbpwdhistorylength: lower range integer",policy,"krbpwdhistorylength","-1", "Minimum value is 0"},
+				{"krbpwdhistorylength: lower range integer",policy,"krbpwdhistorylength","-1","invalid 'history': must be at least 0"},
 		
-				{"krbpwdmindiffchars: noon-integer",	   policy,"krbpwdmindiffchars","3lm", "Must be an integer"}, 
+				{"krbpwdmindiffchars: non-integer",	   policy,"krbpwdmindiffchars","3lm", "Must be an integer"}, 
 				{"krbpwdmindiffchars: upper range integer",policy,"krbpwdmindiffchars","2147483648", "Maximum value is 5"},
-				{"krbpwdmindiffchars: lower range integer",policy,"krbpwdmindiffchars","-1","Minimum value is 0"},
+				{"krbpwdmindiffchars: lower range integer",policy,"krbpwdmindiffchars","-1","invalid 'minclasses': must be at least 0"},
 		
 				{"krbpwdminlength: non-integer",		policy,"krbpwdminlength","n0p", "Must be an integer"},  
 				{"krbpwdminlength: upper range integer",policy,"krbpwdminlength","2147483648", "Maximum value is 2147483647"},
-				{"krbpwdminlength: lower range integer",policy,"krbpwdminlength","-1", "Minimum value is 0"}
+				{"krbpwdminlength: lower range integer",policy,"krbpwdminlength","-1","invalid 'minlength': must be at least 0"},
+								
+				{"krbpwdmaxfailure: non-integer",		 policy,"krbpwdmaxfailure","n0p", "Must be an integer"},  
+				{"krbpwdmaxfailure: upper range integer",policy,"krbpwdmaxfailure","2147483648", "Maximum value is 2147483647"},
+				{"krbpwdmaxfailure: lower range integer",policy,"krbpwdmaxfailure","-1","invalid 'maxfail': must be at least 0"},
+				
+				{"krbpwdfailurecountinterval: non-integer",		 policy,"krbpwdfailurecountinterval","n0p", "Must be an integer"},  
+				{"krbpwdfailurecountinterval: upper range integer",policy,"krbpwdfailurecountinterval","2147483648", "Maximum value is 2147483647"},
+				{"krbpwdfailurecountinterval: lower range integer",policy,"krbpwdfailurecountinterval","-1","invalid 'failinterval': must be at least 0"},
+				
+				{"krbpwdlockoutduration: non-integer",		 policy,"krbpwdlockoutduration","n0p", "Must be an integer"},  
+				{"krbpwdlockoutduration: upper range integer",policy,"krbpwdlockoutduration","2147483648", "Maximum value is 2147483647"},
+				{"krbpwdlockoutduration: lower range integer",policy,"krbpwdlockoutduration","-1","invalid 'lockouttime': must be at least 0"}
+				
+				
+				
+				
+				
 			};
 		return testData;	
 	}//Data provider: createPasswordPolicyDetailsNegative 
@@ -246,4 +296,12 @@ public class PasswordPolicyTests extends SahiTestScript{
 								{"passwordpolicygrp003"},{"passwordpolicygrp004"},{"passwordpolicygrp005"}};
 		return policies;
 	}
+	
+
+	@DataProvider(name="Policy_ExpandCollapse")
+	public Object[][] getPolicy_ExpandCollapse() {
+		String[][] policy =  { {"Policy_ExpandCollapse_Test", PasswordPolicyTests.testUserGroups[0]} };
+		return policy; 
+	}
+	
 }//class PasswordPolicyTests
