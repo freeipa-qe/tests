@@ -502,6 +502,121 @@ ipa_install_topo_tree1()
 	done
 }
 
+######################################################################
+# ipa_install_topo_tree2
+#            M
+#           / \
+#          R1  R2
+#               \
+#                R3
+#                 \
+#                  R4
+# This REQUIRES 4 replicas
+######################################################################
+ipa_install_topo_tree2() 
+{
+	if [ -z "$MYENV" ]; then
+		export MYENV=1
+	fi
+
+	MINREPS=4
+	rlPhaseStartTest "ipa_install_topo_tree2_envsetup - Make sure enough Replicas are defined"
+		if [ $(eval echo \$REPLICA_env${MYENV}|wc -w) -lt $MINREPS ]; then
+			rlFail "Not enough Replicas defined for tree2 topology...skipping"
+			rlPhaseEnd
+			return 1
+		else
+			rlPass "Enough Replicas defined for tree2 topology...continuing"
+			MYBM1=$(eval echo \$BEAKERMASTER_env${MYENV})
+			MYBR1=$(eval echo \$BEAKERREPLICA1_env${MYENV})
+			MYBR2=$(eval echo \$BEAKERREPLICA2_env${MYENV})
+			MYBR3=$(eval echo \$BEAKERREPLICA3_env${MYENV})
+			MYBR4=$(eval echo \$BEAKERREPLICA4_env${MYENV})
+			MYBR5=$(eval echo \$BEAKERREPLICA5_env${MYENV})
+			MYBC1=$(eval echo \$BEAKERCLIENT1_env${MYENV})
+			MYBC2=$(eval echo \$BEAKERCLIENT2_env${MYENV})
+		fi
+	rlPhaseEnd	
+
+	# M
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_install_topo_tree2_master - install Master in Tree2 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBM1|cut -f1 -d.)" ]; then
+			ipa_install_master
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0' -m $MYBM1"	
+		else
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBM1.0'  $MYBM1"	
+		fi
+	rlPhaseEnd
+	
+	# R1
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_install_topo_tree1_replica1 - install Replica1 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1' -m $MYBR1"	
+		else
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1'  $MYBR1"	
+		fi
+	rlPhaseEnd
+	
+	# R2
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_install_topo_tree1_replica2 - install Replica2 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBM1
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR2.2' -m $MYBR2"	
+		else
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR2.2'  $MYBR2"	
+		fi
+	rlPhaseEnd
+	
+	# R3
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_install_topo_tree1_replica3 - install Replica3 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBR2
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR3.3' -m $MYBR3"	
+		else
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR3.3'  $MYBR3"	
+		fi
+	rlPhaseEnd
+	
+	# R4
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_install_topo_tree1_replica4 - install Replica4 in Tree1 Topology"
+		if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
+			ipa_install_replica $MYBR3
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR4.4' -m $MYBR4"	
+		else
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$MYBR4.4'  $MYBR4"	
+		fi
+	rlPhaseEnd
+
+	# Balance clients across all nodes
+	MYSERVERS="$MYBM1 $MYBR1 $MYBR2 $MYBR3 $MYBR4 $MYBR5"
+	MYCLIENTS=$(eval echo \$BEAKERCLIENT_env${MYENV})
+	CNUM=0
+	SNUM=0
+	SMAX=$(echo $MYSERVERS|wc -w)
+	CMAX=$(echo $MYCLIENTS|wc -w)
+	for C in $MYCLIENTS; do
+		TESTCOUNT=$(( TESTCOUNT += 1 ))
+		CNUM=$(( CNUM += 1 ))
+		if [ $SNUM -eq $SMAX ]; then	
+			SNUM=0
+		fi
+		SNUM=$(( SNUM += 1 ))
+		CS=$(echo "$MYSERVERS"|awk "{print \$$SNUM}")
+		if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
+			ipa_install_client $CS
+			rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$C.0' -m $C"
+		else
+			rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.$C.0' $C"
+		fi
+	done
+}
+
 ipa_install_envs()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
@@ -533,6 +648,9 @@ ipa_install_topo()
 		;;
 	tree1|TREE1|tree|TREE)
 		ipa_install_topo_tree1
+		;;
+	tree2|TREE2|tree|TREE)
+		ipa_install_topo_tree2
 		;;
 	*)
 		ipa_install_topo_default
