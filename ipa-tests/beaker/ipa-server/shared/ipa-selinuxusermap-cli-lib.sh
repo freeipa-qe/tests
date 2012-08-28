@@ -355,7 +355,7 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-	SELINUX_POLICY=$(expect -f - <<-EOF 
+	SELINUX_POLICY=$( expect -f - <<-EOF 
         	spawn ssh -l "$user" $host id -Z 
                 expect {
                 	"*assword: " {
@@ -363,7 +363,7 @@ selinuxuser=$4
                         	}
                        }
                 expect eof
-	EOF)
+	EOF )
 	if [ $? = 0 ]; then
                 rlPass "Authentication successful for $user"
 		echo $SELINUX_POLICY
@@ -390,7 +390,7 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-	SELINUX_POLICY=$(expect -f - <<-EOF 
+	SELINUX_POLICY=$( expect -f - <<-EOF 
                 spawn ssh -l "$user" $host id -Z
                 expect {
                         "*assword: " {
@@ -398,7 +398,7 @@ selinuxuser=$4
                                 }
                        }
                 expect eof
-        EOF)
+        EOF )
         if [ $? = 0 ]; then
                 rlPass "Authentication successful for $user"
                 echo $SELINUX_POLICY
