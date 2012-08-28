@@ -66,7 +66,7 @@ public class AutomountTests extends SahiTestScript{
 		for (String location:locations)
 			Assert.assertTrue(browser.link(location).exists(), "after add, location ["+location+"] does exist");
 	}
-
+	
 	@Test (groups={"addAutomountLocation"}, dataProvider="addAutomountLocation_addthenedit",
 		description = "add new automount location via 'Add and Edit' button")
 	public void addAutomount_addthenedit(String automountLocation) throws Exception {  
@@ -83,8 +83,11 @@ public class AutomountTests extends SahiTestScript{
 			log.info("not in edit mode, test failed");
 			Assert.assertTrue(false, "after click 'Add and Edit' we are not in edit mode, test failed");
 		}
+		browser.span("Refresh").click();
 		Assert.assertTrue(browser.link(automountLocation).exists(), "after add, automount location (" + automountLocation + ") should exist in list");
 	}
+	
+	
 
 	@Test (groups={"addAutomountLocation"},  dataProvider="addAutomountLocation_addthencancel",
 		description = "add new automount location via 'Add' then click 'Cancel', expect no new automount location being added")
@@ -113,7 +116,6 @@ public class AutomountTests extends SahiTestScript{
 			}
 		}
 	}
-
 	@Test (groups={"addAutomountLocation_negative"},
 		description = "required filed: automation location name is required")
 	public void addAutomount_negative_required_field() throws Exception {  
@@ -128,6 +130,34 @@ public class AutomountTests extends SahiTestScript{
 			browser.button("Cancel").click();
 			Assert.assertTrue(false, "error fields 'Required field' does NOT appear as expected, test failed");
 		}
+	}
+	
+	@Test (groups={"automountLocationExpandCollapseTests"},dataProvider="addAutomountLocation_ExpandCollapse",
+			dependsOnGroups="addAutomountLocation")
+	public void automountLocationExpand_Collapse(String automountLocation) throws Exception{
+		
+		browser.link(automountLocation).click();
+		browser.link("Settings").click();
+		browser.span("Collapse All").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Location:").isVisible(),"No data is visible");
+		
+		browser.span("Expand All").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Location:").isVisible(),"Verified all data is visible");
+		
+		browser.span("icon section-expand expanded-icon").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Location:").isVisible(),"Verified Identity Settings data is visible");
+		
+		browser.span("icon section-expand collapsed-icon").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Location:").isVisible(),"Verified Identity Settings data is visible");
+		
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		
+		
+		
 	}
 
 	/////////// modify automount location settings/////////////////////////
@@ -199,13 +229,16 @@ public class AutomountTests extends SahiTestScript{
 		if (browser.link("details").exists() && browser.link("keys").exists())
 		{
 			log.info("in edit mode, test success, now go back to automount ");
-			browser.link(automountLocation).in(browser.span("path")).click(); 
+			browser.link(automountLocation).in(browser.span("path")).click();
+			
 		}
 		else{
 			log.info("not in edit mode, test failed");
 			browser.link(automountLocation).in(browser.span("path")).click(); 
 			Assert.assertTrue(false, "after click 'Add and Edit' we are not in edit mode, test failed");
+			
 		}
+		browser.span("Refresh").click();
 		Assert.assertTrue(browser.link(automountMap).exists(), "after add, automount map (" + automountMap + ") should exist in list");
 	}
 
@@ -363,6 +396,37 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(map).exists(), "after delete, automount map (" + map + ") should NOT exist in list");
 	}
 
+	
+	@Test (groups={"automountMapExpandCollapseTest"}, dataProvider="automountMap_ExpandCollapse", 
+			dependsOnGroups="addAutomountLocation")
+		public void automountMapExpand_Collapse(String automountLocation, String automountMap) throws Exception { 
+		
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.link("Settings").click();
+		browser.span("Collapse All").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Map:").isVisible(),"No Automount Map data is visible");
+		
+		browser.span("Expand All").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Map:").isVisible(),"Verified all Automount Map data is visible");
+		
+		browser.span("icon section-expand expanded-icon").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Map:").isVisible(),"Verified Automount_Map Identity Settings data is visible");
+		
+		browser.span("icon section-expand collapsed-icon").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Map:").isVisible(),"Verified Automount_Map Identity Settings data is visible");
+		
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		
+		
+	}
+	
+	
+	
 	/////////// add indirect automount map /////////////////////////
 	@Test (groups={"addIndirectAutomountMap"}, dataProvider="addIndirectAutomountMap", dependsOnGroups="addAutomountLocation",
 		description = "add new indirect automount map via 'Add' button")
@@ -403,6 +467,7 @@ public class AutomountTests extends SahiTestScript{
 		{
 			log.info("in edit mode, test success, now go back to automount ");
 			browser.link(automountLocation).in(browser.span("path")).click(); 
+			browser.span("Refresh").click();
 			Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "after add, indirect automount map (" + indirectAutomountMap + ") should exist in list");
 		}
 		else{
@@ -593,6 +658,8 @@ public class AutomountTests extends SahiTestScript{
 	public void modifyIndirectAutomountMap_negative(String automountLocation, String indirectAutomountMapName, String description) throws Exception {
 		// there is no negative test case for indirected automount map
 	}
+	
+	
 
 	/////////// delete indirect automount map /////////////////////////
 	@Test (groups={"deleteIndirectAutomountMap"}, dataProvider="deleteIndirectAutomountMapSingle", dependsOnGroups="modifyIndirectAutomountMap",
@@ -664,17 +731,20 @@ public class AutomountTests extends SahiTestScript{
 				log.info("in edit mode, test success, now go back to automount "); 
 				browser.span("undo").click();
 				browser.link(automountMap).in(browser.span("path")).click(); 
+				
 			}else{
 				log.info("somehow, we are not in edit mode, test failed");
 				browser.span("undo").click();
 				browser.link(automountMap).in(browser.span("path")).click(); 
 				Assert.assertTrue(false, "expect in edit page, but not, test failed");
+				
 			}
 		}
 		else{
 			log.info("not in edit mode, test failed");
 			Assert.assertTrue(false, "after click 'Add and Edit' we are not in edit mode, test failed");
 		}
+		browser.span("Refresh").click();
 		Assert.assertTrue(browser.link(automountKey).exists(), "after add, automount key (" + automountKey + ") should exist in list");
 		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
 	}
@@ -860,6 +930,33 @@ public class AutomountTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(key).exists(), "after delete, automount key (" + key + ") should NOT exist in list");
 	}
 
+	
+	@Test (groups={"AutomountKeyExpandCollapse"}, dataProvider="automountKey_ExpandCollapse",
+			dependsOnGroups="modifyAutomountMap")
+		public void automountKey_ExpandCollapse(String automountLocation, String automountMap, String automountKey) throws Exception {
+		
+		browser.link(automountLocation).click();
+		browser.link(automountMap).click();
+		browser.link(automountKey).click();
+		browser.span("Collapse All").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Key:").isVisible(),"No Automount Key data is visible");
+		
+		browser.span("Expand All").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Key:").isVisible(),"Verified all Automount Key data is visible");
+		
+		browser.span("icon section-expand expanded-icon").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Key:").isVisible(),"Verified Automount_Key Identity Settings data is visible");
+		
+		browser.span("icon section-expand collapsed-icon").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Key:").isVisible(),"Verified Automount_Key Identity Settings data is visible");
+		
+		browser.link("Automount Locations").in(browser.span("back-link")).click(); 
+		
+	}
 
 	/***************************************************************************** 
 	 *             Data providers                                                * 
@@ -923,6 +1020,15 @@ public class AutomountTests extends SahiTestScript{
 		String[][] automountlocations = {{all}}; 
 		return automountlocations;
 	}
+	
+	
+	@DataProvider(name="addAutomountLocation_ExpandCollapse")
+	public Object[][] getaddAutomountLocation_ExpandCollapse()
+	{
+		String[][] automountlocations = {{testAutomountLocation[5]}}; 
+		return automountlocations;
+	}
+	
 
 	/// test data for automount map ///	
 	@DataProvider(name="addAutomountMap")
@@ -979,6 +1085,14 @@ public class AutomountTests extends SahiTestScript{
 		String[][] automountmaps = {{testAutomountLocation[0], all}}; 
 		return automountmaps;
 	}
+	
+	@DataProvider(name="automountMap_ExpandCollapse")
+	public Object[][] getautomountMap_ExpandCollapse()
+	{
+		String[][] automountmaps = {{testAutomountLocation[0], testAutomountMap[5]}}; 
+		return automountmaps;
+	}
+
 
 	/// test data for indirect automount map ///	
 	@DataProvider(name="addIndirectAutomountMap")
@@ -1112,6 +1226,13 @@ public class AutomountTests extends SahiTestScript{
 	public Object[][] getDeleteAutomountKeyMultiple()
 	{
 		return getAddAutomountKey_addandaddanother();
+	}
+	
+	@DataProvider(name="automountKey_ExpandCollapse")
+	public Object[][] getautomountKey_ExpandCollapse()
+	{
+		String[][] automountkeys = {{testAutomountLocation[0],testAutomountMap[1],testAutomountKey[5]}}; 
+		return automountkeys;
 	}
 
 
