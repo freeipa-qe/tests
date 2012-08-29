@@ -588,6 +588,10 @@ public class UserTests extends SahiTestScript{
 		if(sahiTasks.button("Cancel").exists()){
 			sahiTasks.button("Cancel").click();
 		}
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		if(sahiTasks.button("Reset").exists()){
+			sahiTasks.button("Reset").click();
+		}
 	}
 	
 	/*
@@ -623,6 +627,10 @@ public class UserTests extends SahiTestScript{
 		}
 		else{
 			Assert.assertTrue(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + buttonName + " Successful");
+		}
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		if(sahiTasks.button("Reset").exists()){
+			sahiTasks.button("Reset").click();
 		}
 	}
 	

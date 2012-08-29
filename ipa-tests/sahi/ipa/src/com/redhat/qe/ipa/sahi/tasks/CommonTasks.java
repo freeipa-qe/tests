@@ -330,11 +330,16 @@ public class CommonTasks {
     public static String generateSSH(String userId, String keyType, String keyFileName) {
     	String sshpubkey="";
     	Process process;
-    	
+    	String sshkeyfile=keyFileName;
+    	if (!System.getProperty("os.name").startsWith("Windows"))
+    		sshkeyfile="/tmp/" + keyFileName;
+    	String sshkeygencmd="ssh-keygen";
+    	if (System.getProperty("os.name").startsWith("Windows"))
+    		sshkeygencmd="C:\\rhcygwin\\bin\\ssh-keygen";
 		try {
-			boolean exists=(new File("/tmp/" + keyFileName + ".pub")).exists();
+			boolean exists=(new File(sshkeyfile + ".pub")).exists();
 			if(!exists){
-				process = Runtime.getRuntime().exec("ssh-keygen -t " + keyType + " -f /tmp/" + keyFileName);
+				process = Runtime.getRuntime().exec(sshkeygencmd + " -t " + keyType + " -f " + sshkeyfile + " -P 11111111");
 				try
 				{
 				Thread.sleep(15000); // do nothing for 15000 miliseconds (15 second)
@@ -345,10 +350,8 @@ public class CommonTasks {
 				}
 			}
 			
-			FileInputStream fstream = new FileInputStream("/tmp/" + keyFileName + ".pub");
-			if (!System.getProperty("os.name").startsWith("Windows")) 
-				fstream = new FileInputStream("/tmp/" + keyFileName + ".pub");
-		
+			FileInputStream fstream = new FileInputStream(sshkeyfile + ".pub");
+					
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;

@@ -68,6 +68,8 @@ public class UserTasks {
 		log.fine("error check");
 		Assert.assertTrue(sahiTasks.div(expectedError).exists(), " " + uid);
 		log.fine("cancel");
+		if (sahiTasks.button("Retry").exists())
+			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
 		sahiTasks.button("Cancel").near(sahiTasks.button("Add and Edit")).click();
 	}
 	
