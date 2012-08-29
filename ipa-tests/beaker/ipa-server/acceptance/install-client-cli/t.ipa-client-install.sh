@@ -481,14 +481,18 @@ ipaclientinstall_nonadminprincipal()
 
 ipaclientinstall_principalwithinvalidpassword()
 {
-    rlPhaseStartTest "ipa-client-install-17- [Negative] Install with principal with invalid password"
-       uninstall_fornexttest
-       rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $testpwd -U" 
-       command="ipa-client-install  -p $ADMINID -w $testpwd -U" 
-       expmsg="kinit: Password incorrect while getting initial credentials"
-       tmpout=$TmpDir/ipaclientinstall_principalwithinvalidpassword.out
-       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with principal with invalid password" 
-    rlPhaseEnd
+	rlPhaseStartTest "ipa-client-install-17- [Negative] Install with principal with invalid password"
+		uninstall_fornexttest
+		rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $testpwd -U" 
+		command="ipa-client-install  -p $ADMINID -w $testpwd -U" 
+		if [ $(grep 5\.[0-9] /etc/redhat-release | wc -l) -gt 0 ]; then
+			expmsg="kinit(v5): Password incorrect while getting initial credentials"
+		else
+			expmsg="kinit: Password incorrect while getting initial credentials"
+		fi
+		tmpout=$TmpDir/ipaclientinstall_principalwithinvalidpassword.out
+		qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with principal with invalid password" 
+	rlPhaseEnd
 }
 
 
