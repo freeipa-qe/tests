@@ -16,6 +16,13 @@
 
 . ./lib.autorenewcert.sh
 
+# calculate dynamic variables
+host=`hostname`
+CAINSTANCE="pki-ca"
+DSINSTANCE="`find_dirsrv_instance ds`"
+CA_DSINSTANCE="`find_dirsrv_instance ca`"
+
+
 certSanityCheck(){
     test_ipa_via_kinit_as_admin
     test_dirsrv_via_ssl_based_ldapsearch

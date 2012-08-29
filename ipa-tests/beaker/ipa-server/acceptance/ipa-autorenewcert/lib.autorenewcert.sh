@@ -1,17 +1,6 @@
 #!/bin/bash
 . ./d.autorenewcert.sh
 
-generate_cert_conf(){
-    echo "# auto generated file, do not edit by hand" > $certconf
-    echo "# `date`" >> $certconf
-    for cert in $allcerts
-    do
-        local db=`$cert db`
-        local nickname=`$cert nickname`
-        echo "$cert=$db:$nickname" >> $certconf
-    done
-}
-
 oscpSubsystemCert(){
     local db="/var/lib/$CAINSTANCE/alias"
     local nickname="ocspSigningCert cert-$CAINSTANCE"
@@ -93,7 +82,7 @@ ipaRAagentCert(){
 }
 
 ipaServiceCert_ds(){
-    local db="/etc/dirsrv/slapd-$DSINSTANCE"
+    local db="/etc/dirsrv/$DSINSTANCE"
     local nickname="Server-Cert"
     local state=$2
     if [ "$state" = "" ];then
@@ -109,7 +98,7 @@ ipaServiceCert_ds(){
 }
 
 ipaServiceCert_pki(){
-    local db="/etc/dirsrv/slapd-$CA_DSINSTANCE"
+    local db="/etc/dirsrv/$CA_DSINSTANCE"
     local nickname="Server-Cert"
     local state=$2
     if [ "$state" = "" ];then
@@ -157,7 +146,6 @@ caJarSigningCert(){
 }
 
 list_all_ipa_certs(){
-    generate_cert_conf
     sort_certs
     echo ""
     echo "+-------------------- all IPA certs [`date`]----------------------------------+"
@@ -602,43 +590,43 @@ print_test_header(){
     echo ""
 }
 
-test_ipa_via_kinit_as_admin(){
-    #local pw=$adminpassword
-    local pw=$ADMINPW #use the password in env.sh file
-    local out=$dir/kinitasadmin.$RANDOM.txt
+test_ipa_via_kinit_as_$ADMINID(){
+    #local pw=$$ADMINIDpassword
+    local pw=$$ADMINIDPW #use the password in env.sh file
+    local out=$dir/kinitas$ADMINID.$RANDOM.txt
     local exp
     local temppw
-    INFO "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
-    echo $pw | kinit admin 2>&1 > $out
+    INFO "[test_ipa_via_kinit_as_$ADMINID] test with password: [$pw]"
+    echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
-        rlPass "[test_ipa_via_kinit_as_admin] kinit as admin with [$pw] success"
+        rlPass "[test_ipa_via_kinit_as_$ADMINID] kinit as $ADMINID with [$pw] success"
     elif [ $? = 1 ];then
-        echo "[test_ipa_via_kinit_as_admin] first try of kinit as admin with [$pw] failed"
-        echo "[test_ipa_via_kinit_as_admin] check ipactl status"
+        echo "[test_ipa_via_kinit_as_$ADMINID] first try of kinit as $ADMINID with [$pw] failed"
+        echo "[test_ipa_via_kinit_as_$ADMINID] check ipactl status"
         ipactl status
-        if echo $pw | kinit admin | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
+        if echo $pw | kinit $ADMINID | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
         then
-            echo "[test_ipa_via_kinit_as_admin] got kinit: Generic error, restart ipa and try same password again"
+            echo "[test_ipa_via_kinit_as_$ADMINID] got kinit: Generic error, restart ipa and try same password again"
             ipactl restart
             rlRun "$kdestroy"
-            echo $pw | kinit admin 2>&1 > $out
+            echo $pw | kinit $ADMINID 2>&1 > $out
             if [ $? = 0 ];then
-                rlPass "[test_ipa_via_kinit_as_admin] kinit as admin with [$pw] success at second attemp -- after restart ipa"
+                rlPass "[test_ipa_via_kinit_as_$ADMINID] kinit as $ADMINID with [$pw] success at second attemp -- after restart ipa"
                 return
             fi
         fi        
             
-        echo "[test_ipa_via_kinit_as_admin] password [$pw] failed, check whether it is because password expired"
-        echo "============ output of [echo $pw | kinit $ADMIN] ============="
+        echo "[test_ipa_via_kinit_as_$ADMINID] password [$pw] failed, check whether it is because password expired"
+        echo "============ output of [echo $pw | kinit $$ADMINID] ============="
         cat $out
         echo "============================================================"
         if grep "Password expired" $out 2>&1 >/dev/null
         then
-            echo "admin password exipred, do reset process"
-            exp=$dir/resetadminpassword.$RANDOM.exp
+            echo "$ADMINID password exipred, do reset process"
+            exp=$dir/reset$ADMINIDpassword.$RANDOM.exp
             temppw="New_$pw"
-            kinit_aftermaxlife "admin" "$ADMINPW" $temppw
-            # set password policy to allow admin change password right away
+            kinit_aftermaxlife "$ADMINID" "$$ADMINIDPW" $temppw
+            # set password policy to allow $ADMINID change password right away
             min=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2`
             min=`echo $min`
             history=`ipa pwpolicy-show | grep "History size" | cut -d":" -f2`
@@ -646,11 +634,11 @@ test_ipa_via_kinit_as_admin(){
             classses=`ipa pwpolicy-show | grep "classes" | cut -d":" -f2`
             classes=`echo $classes`
             ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=0 --history=0 --minclasses=0
-            # now set admin password back to original password
+            # now set $ADMINID password back to original password
             echo "set timeout 10" > $exp
             echo "set force_conservative 0" >> $exp
             echo "set send_slow {1 .01}" >> $exp
-            echo "spawn ipa passwd admin" >> $exp
+            echo "spawn ipa passwd $ADMINID" >> $exp
             echo 'expect "Current Password: "' >> $exp
             echo "send -s -- $temppw\r" >> $exp
             echo 'expect "New Password: "' >> $exp
@@ -663,22 +651,22 @@ test_ipa_via_kinit_as_admin(){
             rm $exp
             # after reset password, test the new password
             $kdestroy
-            echo $pw | kinit admin
+            echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
-                rlPass "[test_ipa_via_kinit_as_admin] reset password back to original [$pw] failed"
+                rlPass "[test_ipa_via_kinit_as_$ADMINID] reset password back to original [$pw] failed"
             else
-                rlFail "[test_ipa_via_kinit_as_admin] reset password failed"
+                rlFail "[test_ipa_via_kinit_as_$ADMINID] reset password failed"
             fi
             ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes
-            echo "[test_ipa_via_kinit_as_admin] set admin password back to [$pw] success -- after set to temp"
+            echo "[test_ipa_via_kinit_as_$ADMINID] set $ADMINID password back to [$pw] success -- after set to temp"
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
-            rlFail "[test_ipa_via_kinit_as_admin] wrong admin password provided: [$pw]"
+            rlFail "[test_ipa_via_kinit_as_$ADMINID] wrong $ADMINID password provided: [$pw]"
         else
-            rlFail "[test_ipa_via_kinit_as_admin] unhandled error"
+            rlFail "[test_ipa_via_kinit_as_$ADMINID] unhandled error"
         fi
     else
-        rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
+        rlFail "[test_ipa_via_kinit_as_$ADMINID] unknow error, return code [$?] not recoginzed"
     fi
     rm $out
 }
@@ -726,7 +714,7 @@ kinit_aftermaxlife()
 test_dirsrv_via_ssl_based_ldapsearch(){
     # doc: http://directory.fedoraproject.org/wiki/Howto:SSL#Use_ldapsearch_with_SSL
     echo "test_dirsrv_via_ssl_based_ldapsearch"
-    $ldapsearch -H ldaps://$host -x -D "$DN" -w "$DNPW" -s base -b "" objectclass=* | grep "vendorName:"
+    $ldapsearch -H ldaps://$host -x -D "$ROOTDN" -w "$ROOTDNPWD" -s base -b "" objectclass=* | grep "vendorName:"
     if [ "$?" = "0" ];then
         rlPass "[test_dirsrv_via_ssl_based_ldapsearch] Test Pass"
     else
@@ -747,3 +735,24 @@ test_dogtag_via_getcert(){
     echo ""
 }
 
+find_dirsrv_instance(){
+    local asking=$1
+    local all=`ls -d /etc/dirsrv/slapd-*`
+    local ca_ds_instance=""
+    local ds_instance=""
+    # determine dirsrv instance name
+    for name in $all
+    do
+        basename=`basename $name`
+        if [[ $name =~ "PKI-IPA" ]];then
+            ca_ds_instance=$basename
+        else
+            ds_instance=$basename
+        fi
+    done
+    if [ "$asking" = "ca" ];then
+        echo $ca_ds_instance
+    elif [ "$asking" = "ds" ];then
+        echo "$ds_instance"
+    fi
+}
