@@ -90,7 +90,6 @@ rlJournalStart
 	   	if [ "$FLAVOR" == "Fedora" ] ; then
 			# Installing fastest mirrors yum plugin to speed up installs
 			yum -y install yum-plugin-fastestmirror
-			sleep 500
 			yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
 	   		yum clean all
                 	yum -y update
