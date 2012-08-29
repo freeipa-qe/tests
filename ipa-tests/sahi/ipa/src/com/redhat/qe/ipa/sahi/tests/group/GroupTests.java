@@ -86,23 +86,23 @@ public class GroupTests extends SahiTestScript{
 	
 	@Test (groups={"addGroup"}, dataProvider="addGroupMultiple",
 		description="add group test, add multiple user groups") 
-	public void addGroup_add(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
+	public void addGroup_add(String testScenario, String groupName, String groupDescription, String gid, String groupType){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
-		GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, isPosix);
+		GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, groupType);
 		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
 	}
 	
 	@Test (groups={"addGroup"}, dataProvider="addGroupAddAndAddAnother",
 		description="add group test: use 'add and add another' button to create multiple groups at one shot")
 	public void addGroup_add_and_add_another(String testScenario, 
-											String firstGroupName, String firstGroupDescription, String firstGid, String first_isPosix,
-											String secondGroupName, String secondGroupDescription, String secondGid, String second_isPosix){
+											String firstGroupName, String firstGroupDescription, String firstGid, String first_groupType,
+											String secondGroupName, String secondGroupDescription, String secondGid, String second_groupType){
 		Assert.assertFalse(browser.link(firstGroupName).exists(),"before 'Add', first group does NOT exists");
 		Assert.assertFalse(browser.link(secondGroupName).exists(),"before 'Add', second group does NOT exists");
 		
 		GroupTasks.add_and_add_another_UserGroup(browser, 
-												firstGroupName, firstGroupDescription, firstGid, first_isPosix, 
-												secondGroupName, secondGroupDescription, secondGid, second_isPosix);
+												firstGroupName, firstGroupDescription, firstGid, first_groupType, 
+												secondGroupName, secondGroupDescription, secondGid, second_groupType);
 		
 		Assert.assertTrue(browser.link(firstGroupName).exists(),"after 'Add', first group exists");
 		Assert.assertTrue(browser.link(secondGroupName).exists(),"after 'Add', second group exists");
@@ -110,26 +110,26 @@ public class GroupTests extends SahiTestScript{
 	
 	@Test (groups={"addGroup"}, dataProvider="addGroupAddAndEdit",
 		description="add group test: add and switch to edit mode")
-	public void addGroup_add_and_edit(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
+	public void addGroup_add_and_edit(String testScenario, String groupName, String groupDescription, String gid, String groupType){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
-		GroupTasks.add_and_edit_UserGroup(browser, groupName, groupDescription, gid, isPosix);
+		GroupTasks.add_and_edit_UserGroup(browser, groupName, groupDescription, gid, groupType);
 		browser.link("User Groups").in(browser.div("content")).click();
 		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
 	}
 	
 	@Test (groups={"addGroup"}, dataProvider="addGroupAddThenCancel",
 		description="add group test")
-	public void addGroup_add_then_cancel(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
+	public void addGroup_add_then_cancel(String testScenario, String groupName, String groupDescription, String gid, String groupType){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
-		GroupTasks.add_then_cancel_UserGroup(browser, groupName, groupDescription, gid, isPosix);
+		GroupTasks.add_then_cancel_UserGroup(browser, groupName, groupDescription, gid, groupType);
 		Assert.assertFalse(browser.link(groupName).exists(),"after 'Add', group should not exists as well");
 	}
 	
 	@Test (groups={"addGroup"}, dataProvider="addGroupPrepareData",
 		description="add group test")
-	public void addGroup_prepareData(String testScenario, String groupName, String groupDescription, String gid, String isPosix){
+	public void addGroup_prepareData(String testScenario, String groupName, String groupDescription, String gid, String groupType){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
-		GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, isPosix);
+		GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, groupType);
 		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
 	}
 	
@@ -175,12 +175,7 @@ public class GroupTests extends SahiTestScript{
 		GroupTasks.clearSearch(browser);
 	}
 	
-	
-	
-
-
-	
-	
+		
 	
 	///////////////////////// modifyGroup test cases (enroll user and groups ) //////////////////////
      @Test(groups={"modifyGroup"},  dependsOnGroups="addGroup",
@@ -386,6 +381,58 @@ public class GroupTests extends SahiTestScript{
 			Assert.fail("Expected error-dialog does not show");
 		} 
 	}
+	//xdong
+	@Test (groups={"modifyGroupType_settings"}, dataProvider="groupTypeSettings",dependsOnGroups="modifySettings",description = "modify group type detail settings")
+		public void modifyGroupType_settings(String testScenario, String groupName,String groupDescription,String gid,String groupType){
+			Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
+			GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, groupType);
+			Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
+		    browser.link(groupName).click();
+		   			
+			if (testScenario == "normalToPosix"){
+				browser.link("External").click();
+				Assert.assertFalse(browser.span("Add").exists(),"Verified normal grouptype can't add external members");
+				browser.link("Settings").click();
+				browser.select("action").choose("Change to POSIX group");
+				browser.span("Apply").click();
+				Assert.assertTrue(browser.span("POSIX").exists(),"Group Type modified to POSIX as expected");
+				browser.select("action").choose("Delete");
+				browser.span("Apply").click();
+				Assert.assertFalse(browser.link(groupName).exists(),"Group Type modified to POSIX deleted as expected");
+			}
+			else if (testScenario == "normalToExternal") {
+				browser.link("External").click();
+				Assert.assertFalse(browser.span("Add").exists(),"Verified normal grouptype can't add external members");
+				browser.link("Settings").click();
+				browser.select("action").choose("Change to external group");
+				browser.span("Apply").click();
+				Assert.assertTrue(browser.span("External").exists(),"Group Type modified to external as expected");
+				browser.select("action").choose("Delete");
+				browser.span("Apply").click();
+				Assert.assertFalse(browser.link(groupName).exists(),"Group Type modified to external deleted as expected");
+			}
+			else if (testScenario == "Posix") {
+				browser.link("External").click();
+				Assert.assertFalse(browser.span("Add").exists(),"Verified Posix grouptype can't add external members");
+				browser.link("Settings").click();
+				browser.select("action").choose("Change to external group");
+				Assert.assertFalse(browser.span("External").exists(),"Verified Posix grouptype can't be changed to external group type");
+				browser.select("action").choose("Delete");
+				browser.span("Apply").click();
+				Assert.assertFalse(browser.link(groupName).exists(),"Group Type Posix deleted as expected");
+			}
+			else if (testScenario == "External") {
+				browser.link("External").click();
+				Assert.assertTrue(browser.span("Add").exists(),"Verified external grouptype can add external members");
+				//TODO :add/add another/canel tests for adding external members
+				browser.link("Settings").click();
+				browser.select("action").choose("Change to POSIX group");
+				Assert.assertFalse(browser.span("POSIX").exists(),"Verified external grouptype can't be changed to Posix group type");
+				browser.select("action").choose("Delete");
+				browser.span("Apply").click();
+				Assert.assertFalse(browser.link(groupName).exists(),"Group Type External deleted as expected");
+			}
+		}
 	
 	/////////////////////////////////// netgroup test //////////////////////////////////	
 	@Test(groups={"netgroup"}, dependsOnGroups="modifyGroup_settings_negative",
@@ -787,9 +834,9 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider (name="addGroupMultiple")
 	public Object[][] get_addGroupMultiple(){
 		String[][] groups={//scenario, user group name, description, posix or not info
-						{"posix group",GroupTests.testUserGroups[0],"posix group, with given gid","1500000001","isPosix"},
-						{"non posix group",GroupTests.testUserGroups[1],"non posix group","","nonPosix"},
-						{"default group: non-posix, assigned gid",GroupTests.testUserGroups[2],	"default group","","default"}	};
+						{"posix group",GroupTests.testUserGroups[0],"posix group, with given gid","1500000001","posix"},
+						{"non posix group",GroupTests.testUserGroups[1],"non posix group","","normal"},
+						{"default group: non-posix, assigned gid",GroupTests.testUserGroups[2],	"default group","","default"}};
 		return groups;
 	}
 	
@@ -797,14 +844,14 @@ public class GroupTests extends SahiTestScript{
 	public Object[][] get_addGroupAddAndAddAnother(){
 		String[][] groups={//scenario, user group name, description, posix or not info
 						{"2 posix groups",	
-								GroupTests.testUserGroups[3], "posix, given gid","1500000003","isPosix",
-								GroupTests.testUserGroups[4], "posix, given gid","1500000004","isPosix"},
+								GroupTests.testUserGroups[3], "posix, given gid","1500000003","posix",
+								GroupTests.testUserGroups[4], "posix, given gid","1500000004","posix"},
 						{"2 non posix group",	
-								GroupTests.testUserGroups[5], "non posix","","nonPosix",
-								GroupTests.testUserGroups[6], "non posix","","nonPosix"},
+								GroupTests.testUserGroups[5], "non posix","","normal",
+								GroupTests.testUserGroups[6], "non posix","","normal"},
 						{"mixed groups: posix and non posix",
 								GroupTests.testUserGroups[7], "non posix","","default",
-								GroupTests.testUserGroups[8], "posix, assigned gid", "","isPosix"}	};
+								GroupTests.testUserGroups[8], "posix, assigned gid", "","posix"}	};
 		return groups;
 	}
 	
@@ -812,9 +859,9 @@ public class GroupTests extends SahiTestScript{
 	public Object[][] get_addGroupAddAndEdit(){
 		String[][] groups={//scenario, user group name, description, posix or not info
 						{"posix group",	
-								GroupTests.testUserGroups[9],"posix group, with given gid","1500000009","isPosix"},
+								GroupTests.testUserGroups[9],"posix group, with given gid","1500000009","posix"},
 						{"non posix group",	
-								GroupTests.testUserGroups[10],"non posix group","","nonPosix"},
+								GroupTests.testUserGroups[10],"non posix group","","normal"},
 						{"default group: non-posix, assigned gid",
 								GroupTests.testUserGroups[11],	"default group","","default"}};
 		return groups;
@@ -823,17 +870,17 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider (name="addGroupAddThenCancel")
 	public Object[][] get_addGroupAddThenCancel(){
 		String[][] groups={//scenario, user group name, description, posix or not info
-						{"posix group","usergrp013","posix group, with given gid",GroupTests.testUserGroups[11],"isPosix"}};
+						{"posix group","usergrp013","posix group, with given gid",GroupTests.testUserGroups[11],"posix"}};
 		return groups;
 	}
 	
 	@DataProvider (name="addGroupPrepareData")
 	public Object[][] get_addGroupPrepareData(){
 		String[][] groups={//scenario, user group name, description, posix or not info 
-				{"non posix group",GroupTests.testUserGroups[12],"non posix group","","nonPosix"},
+				{"non posix group",GroupTests.testUserGroups[12],"non posix group","","normal"},
 				{"default group: non-posix, assigned gid",GroupTests.testUserGroups[13],	"default group","","default"},
-				{"posix group",	GroupTests.testUserGroups[14],"posix group, with given gid","1500000014","isPosix"},
-				{"non posix group",GroupTests.testUserGroups[15],"non posix group","","nonPosix"}	}; 
+				{"posix group",	GroupTests.testUserGroups[14],"posix group, with given gid","1500000014","posix"},
+				{"non posix group",GroupTests.testUserGroups[15],"non posix group","","normal"}	}; 
 		return groups;
 	}
 	
@@ -1209,4 +1256,17 @@ public class GroupTests extends SahiTestScript{
 		String [][] searchgroupName ={ {GroupTests.testUserGroups[5]+" "},{" "+GroupTests.testUserGroups[6] },{"%$#%@*&%@!@#"},{"invalidgroup"}};
 		return searchgroupName;
 	}
+	
+	@DataProvider(name="groupTypeSettings")
+	 public Object[][] getgroupTypeSettings()
+		{
+			String [][] groupTypeSettingsData ={ 
+			
+			{"normalToPosix","usergrp016","non posix normal group","","normal"},//add all three grouptypes to verify only external group could add external members.
+			{"normalToExternal","usergrp017","non posix normal group","","normal"},
+			{"Posix","usergrp018","posix group, with given gid","1500000001","posix"},
+			{"External","usergrp019","non posix external group","","external"}};
+			return groupTypeSettingsData;
+		}
+	 
 }//class GroupTest

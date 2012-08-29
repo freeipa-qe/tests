@@ -6,7 +6,7 @@
         </packages>
         <groups>
             <run> 
-                <include name="setup" />
+               <include name="setup" />
                 <include name="init" />
                 <include name="addGroup" />  
                 <include name="addGroup_negative" /> 
@@ -18,7 +18,8 @@
                 <include name="modifySettings" />
                 <include name="modifyGroup_settings" />
                 <include name="modifyGroup_settings_negative" /> 
-                <include name="netgroup" />
+                <include name="modifyGroupType_settings" /> 
+               <include name="netgroup" />
 	           <include name="modifyGroup_netgroup_prepare" />
 	           <include name="modifyGroup_netgroup_add" />
 	           <include name="modifyGroup_netgroup_delete" />
@@ -37,7 +38,7 @@
 	           <include name="modifyGroup_sudo_delete" />
 	           <include name="modifyGroup_sudo_cleanup" />  
 	           <include name="bugverification" />  
-                <include name="deleteGroup" />
+                <include name="deleteGroup" /> 
             </run>
         </groups>
         <classes>
