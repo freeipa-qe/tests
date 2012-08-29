@@ -433,8 +433,8 @@ ipaclientinstall_nonexistentprincipal()
 {
     rlPhaseStartTest "ipa-client-install-15- [Negative] Install with non-existent principal"
         uninstall_fornexttest
-        command="ipa-client-install  -p $testuser -w $testpwd -U" 
-        expmsg="kinit: Client '$testuser@$RELM' not found in Kerberos database while getting initial credentials"
+        command="ipa-client-install  -p $testuserbad -w $testpwd -U" 
+        expmsg="kinit: Client '$testuserbad@$RELM' not found in Kerberos database while getting initial credentials"
         local tmpout=$TmpDir/ipaclientinstall_password
         qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with non-existent principal"
        # rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with non-existent principal"

@@ -80,3 +80,5 @@ USEMKHOMEDIR="yes"
 #testuser="TestUser"
 testuser="testuser"
 testpwd="TestPassword"
+testuserbad="badtestuser"
+
