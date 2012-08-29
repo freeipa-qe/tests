@@ -38,6 +38,7 @@ dnsbugs()
    bz818933
    bz767489
    bz802375
+   bz805430
    dnsbugcleanup
 }
 
@@ -425,7 +426,7 @@ EOF
 
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		else
-	                cat > /tmp/nsupdate.txt << EOF
+			cat > /tmp/nsupdate.txt << EOF
 zone $DOMAIN.
 update delete $MASTER. IN SSHFP
 send
@@ -617,6 +618,22 @@ bz802375()
     rlPhaseEnd
 }
 
+bz805430()
+{
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=805430
+	rlPhaseStartTest "805430  IPA dnszone-add does not accept the utmost valid serial number."
+
+		kdestroy
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		outfile="/dev/shm/utmosr-zone-addtest.txt"
+		ipa dnszone-add --name-server=$MASTER --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone &> $outfile
+		ipa dnszone-del maxtzone
+		rlRun "ipa dnszone-add --name-server=$MASTER --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone" 0 "test to make sure the maxtzone dnszone-add returns 0"
+		rlRun "grep 'can be at most' $outfile" 1 "check output of dnszone-add for error message"
+		ipa dnszone-del maxtzone
+
+	rlPhaseEnd
+}	
 
 dnsbugcleanup()
 {
