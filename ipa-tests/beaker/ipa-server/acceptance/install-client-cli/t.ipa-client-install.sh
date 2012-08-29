@@ -3,6 +3,21 @@
 #                      test suite                                #
 #   perform the various combinations of install and uninstall    #
 #################################################################
+ipamastersetup()
+{
+	rlPhaseStartTest "ipamastersetup - setup stuff on master that strictly requires ipa command"
+       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before uninstalling"
+       create_ipauser $testuser $testuser $testuser $testpwd
+	rlPhaseEnd
+}
+
+ipamastercleanup()
+{
+	rlPhaseStartTest "ipamastercleanup - clean up master server"
+		# delete the user added for this test
+		delete_ipauser	$testuser
+	rlPhaseEnd
+}
 
 ipaclientinstall()
 {
@@ -447,8 +462,6 @@ ipaclientinstall_nonadminprincipal()
 {
     rlPhaseStartTest "ipa-client-install-16- [Negative] Install with principal with no admin priviliges"
        install_fornexttest
-       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before uninstalling"
-       create_ipauser $testuser $testuser $testuser $testpwd
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install  --principal $testuser -w $testpwd -U"
        command="ipa-client-install  --principal $testuser -w $testpwd -U" 
@@ -462,9 +475,7 @@ ipaclientinstall_nonadminprincipal()
        		qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with non-admin principal" "$expmsg"
         fi
 
-       # delete the user added for this test
        install_fornexttest
-       delete_ipauser $testuser
     rlPhaseEnd
 }
 

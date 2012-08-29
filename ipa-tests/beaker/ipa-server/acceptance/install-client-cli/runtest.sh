@@ -75,7 +75,9 @@ rlJournalStart
         rc=0
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
+				ipamastersetup
                 rhts-sync-block -s DONE $BEAKERCLIENT
+				ipamastercleanup
                 rlPass
         else
                 rlLog "Machine in recipe in not a MASTER"
