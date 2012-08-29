@@ -41,8 +41,10 @@
 
 # Include test case file
 . ./t.autorenewcert.sh
+. ./lib.autorenewcert.sh
+. ./d.autorenewcert.sh
 
-PACKAGE="ipa-server"
+PACKAGE="ipa-server perl-TimeDate perl-LDAP"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
