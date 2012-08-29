@@ -166,30 +166,33 @@ public class GroupTasks {
 			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
 	}
 
-	public static void add_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
+	public static void add_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String groupType){
 		browser.span("Add").click();
 		browser.textbox("cn").setValue(groupName);
 		browser.textarea("description").setValue(groupDescription); 
 		if (! gid.equals(""))
 			browser.textbox("gidnumber").setValue(gid);
-		if (isPosix.equals("nonPosix"))
-			browser.checkbox("nonposix").click();
+		if (groupType.equals("external"))
+			browser.radio("external").click();
+		if (groupType.equals("posix"))
+			browser.radio("posix").click();
 		browser.button("Add").click();
 	}
 	
 	public static void add_and_add_another_UserGroup(
 							SahiTasks browser, 
-							String firstGroupName, String firstGroupDescription, String firstGid, String first_isPosix,
-							String secondGroupName, String secondGroupDescription, String secondGid, String second_isPosix){
+							String firstGroupName, String firstGroupDescription, String firstGid, String first_groupType,
+							String secondGroupName, String secondGroupDescription, String secondGid, String second_groupType){
 		
 		browser.span("Add").click();
 		browser.textbox("cn").setValue(firstGroupName);
 		browser.textarea("description").setValue(firstGroupDescription);
 		if (! firstGid.equals(""))
 			browser.textbox("gidnumber").setValue(firstGid);
-		if (first_isPosix.equals("nonPosix")){
-			browser.checkbox("nonposix").click();
-		}
+		if (first_groupType.equals("external"))
+			browser.radio("external").click();
+		if (first_groupType.equals("posix"))
+			browser.radio("posix").click();
 		
 		// click Add and Add Another to create a new group without leave the current dialog, 
 		// this the main purpose of this test case
@@ -198,23 +201,25 @@ public class GroupTasks {
 		browser.textarea("description").setValue(secondGroupDescription);
 		if (! secondGid.equals(""))
 			browser.textbox("gidnumber").setValue(secondGid);
-		if (second_isPosix.equals("nonPosix")){
-			browser.checkbox("nonposix").click();
-		}
+		if (second_groupType.equals("external"))
+			browser.radio("external").click();
+		if (second_groupType.equals("posix"))
+			browser.radio("posix").click();
 		// finally cancel to go back to main user group page
 		browser.button("Add and Add Another").click();
 		browser.button("Cancel").click();
 	}
 	
-	public static void add_and_edit_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
+	public static void add_and_edit_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String groupType){
 		browser.link("Add").click();
 
 		browser.textbox("cn").setValue(groupName);
 		browser.textarea("description").setValue(groupDescription);
 		browser.textbox("gidnumber").setValue(gid);
-		if (isPosix.equals("nonPosix")){
-			browser.checkbox("nonposix").click();
-		} 
+		if (groupType.equals("external"))
+			browser.radio("external").click();
+		if (groupType.equals("posix"))
+			browser.radio("posix").click();
 		browser.button("Add and Edit").click();
 		
 		// do some minimum editing to ensure page navigation is what we are intend to do
@@ -223,15 +228,16 @@ public class GroupTasks {
 		browser.link("Update").click();
 	}
 	
-	public static void add_then_cancel_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String isPosix){
+	public static void add_then_cancel_UserGroup(SahiTasks browser, String groupName, String groupDescription, String gid, String groupType){
 		browser.link("Add").click();
 
 		browser.textbox("cn").setValue(groupName);
 		browser.textarea("description").setValue(groupDescription);
 		browser.textbox("gidnumber").setValue(gid);
-		if (isPosix.equals("isPosix")){
-			browser.checkbox("nonposix").click();
-		} 
+		if (groupType.equals("external"))
+			browser.radio("external").click();
+		if (groupType.equals("posix"))
+			browser.radio("posix").click();
 		browser.button("Cancel").click();
 	}
 
