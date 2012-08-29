@@ -590,42 +590,41 @@ print_test_header(){
     echo ""
 }
 
-test_ipa_via_kinit_as_$ADMINID(){
-    #local pw=$$ADMINIDpassword
-    local pw=$$ADMINIDPW #use the password in env.sh file
-    local out=$dir/kinitas$ADMINID.$RANDOM.txt
+test_ipa_via_kinit_as_admin(){
+    local pw=$ADMINIDPW #use the password in env.sh file
+    local out=$dir/kinit.as.admin.$RANDOM.txt
     local exp
     local temppw
-    INFO "[test_ipa_via_kinit_as_$ADMINID] test with password: [$pw]"
+    INFO "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
     echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
-        rlPass "[test_ipa_via_kinit_as_$ADMINID] kinit as $ADMINID with [$pw] success"
+        rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success"
     elif [ $? = 1 ];then
-        echo "[test_ipa_via_kinit_as_$ADMINID] first try of kinit as $ADMINID with [$pw] failed"
-        echo "[test_ipa_via_kinit_as_$ADMINID] check ipactl status"
+        echo "[test_ipa_via_kinit_as_admin] first try of kinit as $ADMINID with [$pw] failed"
+        echo "[test_ipa_via_kinit_as_admin] check ipactl status"
         ipactl status
         if echo $pw | kinit $ADMINID | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
         then
-            echo "[test_ipa_via_kinit_as_$ADMINID] got kinit: Generic error, restart ipa and try same password again"
+            echo "[test_ipa_via_kinit_as_admin] got kinit: Generic error, restart ipa and try same password again"
             ipactl restart
             rlRun "$kdestroy"
             echo $pw | kinit $ADMINID 2>&1 > $out
             if [ $? = 0 ];then
-                rlPass "[test_ipa_via_kinit_as_$ADMINID] kinit as $ADMINID with [$pw] success at second attemp -- after restart ipa"
+                rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success at second attemp -- after restart ipa"
                 return
             fi
         fi        
             
-        echo "[test_ipa_via_kinit_as_$ADMINID] password [$pw] failed, check whether it is because password expired"
-        echo "============ output of [echo $pw | kinit $$ADMINID] ============="
+        echo "[test_ipa_via_kinit_as_admin] password [$pw] failed, check whether it is because password expired"
+        echo "============ output of [echo $pw | kinit $ADMINID] ============="
         cat $out
         echo "============================================================"
         if grep "Password expired" $out 2>&1 >/dev/null
         then
             echo "$ADMINID password exipred, do reset process"
-            exp=$dir/reset$ADMINIDpassword.$RANDOM.exp
+            exp=$dir/reset.admin.password.$RANDOM.exp
             temppw="New_$pw"
-            kinit_aftermaxlife "$ADMINID" "$$ADMINIDPW" $temppw
+            kinit_aftermaxlife "$ADMINID" "$ADMINIDPW" $temppw
             # set password policy to allow $ADMINID change password right away
             min=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2`
             min=`echo $min`
@@ -653,20 +652,20 @@ test_ipa_via_kinit_as_$ADMINID(){
             $kdestroy
             echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
-                rlPass "[test_ipa_via_kinit_as_$ADMINID] reset password back to original [$pw] failed"
+                rlPass "[test_ipa_via_kinit_as_admin] reset password back to original [$pw] failed"
             else
-                rlFail "[test_ipa_via_kinit_as_$ADMINID] reset password failed"
+                rlFail "[test_ipa_via_kinit_as_admin] reset password failed"
             fi
             ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes
-            echo "[test_ipa_via_kinit_as_$ADMINID] set $ADMINID password back to [$pw] success -- after set to temp"
+            echo "[test_ipa_via_kinit_as_admin] set $ADMINID password back to [$pw] success -- after set to temp"
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
-            rlFail "[test_ipa_via_kinit_as_$ADMINID] wrong $ADMINID password provided: [$pw]"
+            rlFail "[test_ipa_via_kinit_as_admin] wrong $ADMINID password provided: [$pw]"
         else
-            rlFail "[test_ipa_via_kinit_as_$ADMINID] unhandled error"
+            rlFail "[test_ipa_via_kinit_as_admin] unhandled error"
         fi
     else
-        rlFail "[test_ipa_via_kinit_as_$ADMINID] unknow error, return code [$?] not recoginzed"
+        rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
     fi
     rm $out
 }
