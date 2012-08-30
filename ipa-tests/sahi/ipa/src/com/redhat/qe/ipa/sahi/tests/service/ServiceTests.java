@@ -62,7 +62,7 @@ public class ServiceTests extends SahiTestScript {
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		HostTasks.addHost(sahiTasks, "servicehost1", domain, ipaddr1);
 		HostTasks.addHost(sahiTasks, "servicehost2", domain, ipaddr2);
-		HostTasks.addHost(sahiTasks, "nodns", domain, "");
+		HostTasks.addHost(sahiTasks, "nodns", domain, ""); 
 		
 		sahiTasks.navigateTo(commonTasks.servicePage, true);
 		ServiceTasks.addCustomService(sahiTasks, "SRVC", mytesthost, false);
@@ -188,7 +188,7 @@ public class ServiceTests extends SahiTestScript {
 	/*
 	 * Add Service Certificate Tests
 	 */
-	@Test (groups={"serviceAddCertificateTests"}, dataProvider="getServiceAddCertificateTestObjects", dependsOnGroups="serviceAddTests")	
+	@Test (groups={"serviceAddCertificateTests"}, dataProvider="getServiceAddCertificateTestObjects", dependsOnGroups={"serviceAddTests","serviceRemoveKeytabTests"})	
 	public void testserviceAddCertificate(String testName, String button, boolean certexists) throws Exception {
 		
 		// add request certificate
@@ -287,7 +287,7 @@ public class ServiceTests extends SahiTestScript {
 		/*
 		 * Service get keytab tests
 		 */
-		@Test (groups={"serviceGetKeytabTests"}, dataProvider="getServiceGetKeytabTestObjects")	
+		@Test (groups={"serviceGetKeytabTests"}, dataProvider="getServiceGetKeytabTestObjects",dependsOnGroups="serviceAddTests")	
 		public void testgetServiceKeytab(String testName ) throws Exception {
 			String keytabfile = "/tmp/" + mytesthost + ".keytab";
 			// verify service does not have a keytab
