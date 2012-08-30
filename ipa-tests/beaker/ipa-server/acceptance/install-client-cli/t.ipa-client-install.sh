@@ -81,6 +81,7 @@ ipaclientinstall()
 #   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
      ipaclientinstall_enablednsupdates
 
+# Bug 852746 RHEL5 ipa-client-install --no-sssd fails because of authconfig --enableforcelegacy option
 #   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
    ipaclientinstall_nosssd
 
@@ -576,6 +577,11 @@ ipaclientinstall_nosssd()
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd" 0 "Installing ipa client and configuring - with no SSSD configured"
         verify_install true nosssd
+		if [ $(grep "authconfig: error: no such option: --enableforcelegacy" /var/log/ipaclient-install.log|wc -l) -gt 0 ]; then
+			rlFail "BZ 852746 found...RHEL5 ipa-client-install --no-sssd fails because of authconfig --enableforcelegacy option"
+		else
+			rlPass "BZ 852746 not found...no error related to authconfig enableforcelegacy"
+		fi
     rlPhaseEnd
     rlPhaseStartTest "ipa-client-install-25- [Positive] Uninstall after install with -no-sssd "
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
