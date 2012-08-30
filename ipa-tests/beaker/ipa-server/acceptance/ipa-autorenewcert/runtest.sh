@@ -60,7 +60,9 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    main_autorenewcert_test
+    rlPhaseStartTest "autorenewcert"
+        main_autorenewcert_test
+    rlPhaseEnd
     # r2d2_test_ends
 
     rlPhaseStartCleanup "autorenewcert cleanup"
