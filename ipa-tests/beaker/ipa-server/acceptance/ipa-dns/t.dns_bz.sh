@@ -39,6 +39,7 @@ dnsbugs()
    bz767489
    bz802375
    bz805430
+   bz819635
    dnsbugcleanup
 }
 
@@ -621,7 +622,7 @@ bz802375()
 bz805430()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=805430
-	rlPhaseStartTest "805430  IPA dnszone-add does not accept the utmost valid serial number."
+	rlPhaseStartTest "805430 IPA dnszone-add does not accept the utmost valid serial number."
 
 		kdestroy
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -634,6 +635,21 @@ bz805430()
 
 	rlPhaseEnd
 }	
+
+bz819635()
+{
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=819635
+	# There may be a better way to do this. 
+	rlPhaseStartTest "819635 Verify a help page change"
+		kdestroy
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep global\ forwarders" 1 "Ensure old string does not exist in help section"
+		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep per-zone\ forwarders" 0 "Ensure new string does not exist in help section"
+		rlRun "ipa dnsconfig-mod --help | grep 'forwarder=STR' | grep global\ forwarders" 1 "Ensure old string does not exist in help section"
+		rlRun "ipa dnsconfig-mod --help | grep 'forwarder=STR' | grep per-zone\ forwarders" 0 "Ensure new string does not exist in help section"
+
+	rlPhaseEnd
+}
 
 dnsbugcleanup()
 {
