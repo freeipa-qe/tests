@@ -54,8 +54,8 @@ nisint_ethers_test_envsetup()
 	"MASTER")
 		rlLog "Machine in recipe is IPAMASTER"
 		KinitAsAdmin
-		rlRun "ipa host-del testethershost1.$DOMAIN --macaddress=99:88:77:66:55:44 --force"
-		rlRun "ipa host-del testethershost2.$DOMAIN --macaddress=11:22:33:44:55:66 --force"
+		rlRun "ipa host-add testethershost1.$DOMAIN --macaddress=99:88:77:66:55:44 --force"
+		rlRun "ipa host-add testethershost2.$DOMAIN --macaddress=11:22:33:44:55:66 --force"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"NISMASTER")
@@ -128,7 +128,7 @@ nisint_ethers_test_1001()
 		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 			rlPass "ypbind not running...skipping test"
 		else
-			rlRun "ypcat ethers|grep testethers1" 0 "ypcat search for existing ethers"
+			rlRun "ypcat ethers|grep testethershost1" 0 "ypcat search for existing ethers"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
 		;;
