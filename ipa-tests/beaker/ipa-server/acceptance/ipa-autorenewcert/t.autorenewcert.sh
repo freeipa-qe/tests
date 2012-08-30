@@ -27,46 +27,46 @@ certSanityCheck(){
     test_ipa_via_kinit_as_admin
     test_dirsrv_via_ssl_based_ldapsearch
     test_dogtag_via_getcert
+    exercise_ipa_via_create_brand_new_customer_cert
 }
 
 autorenewcert()
 {
-    certSanityCheck     # FIXME: not sure what it should be
-    local certsShouldBeRenewed=$@
-    calculate_autorenew_date $certsShouldBeRenewed
-    adjust_system_time $autorenew autorenew    
-    go_to_sleep
-    adjust_system_time $postExpire postExpire
-    check_actually_renewed_certs $certsShouldBeRenewed
-    report_test_result
-    certSanityCheck 
+        certSanityCheck
+        print_test_header $testid
+        calculate_autorenew_date $soonTobeRenewedCerts
+        adjust_system_time $autorenew autorenew    
+        go_to_sleep
+        adjust_system_time $postExpire postExpire
+        check_actually_renewed_certs $soonTobeRenewedCerts
+        report_test_result
+        certSanityCheck 
 }
 
 ############## main test #################
-
-round=1
-fix_prevalid_cert_problem #weird problem
-# conditions for test to continue (continue_test returns "yes")
-# 1. all ipa certs are valid
-# 2. if there are some certs haven't get chance to be renewed, test should be continue
-
-while [ "`continue_test`" = "yes" ]
-do
-    print_test_header $round
-    list_all_ipa_certs
-    find_soon_to_be_renewed_certs
-    #pause
-    autorenewcert $soonTobeRenewedCerts
-    #pause
-    record_just_renewed_certs
-    report_renew_status
-    round=$((round + 1))
+main_autorenewcert_test(){
+    testid=1
     fix_prevalid_cert_problem #weird problem
-done
+    # conditions for test to continue (continue_test returns "yes")
+    # 1. all ipa certs are valid
+    # 2. if there are some certs haven't get chance to be renewed, test should be continue
 
-if [ "$checkTestConditionRequired" = "true" ];then
-    echo "check test condition"
-    check_test_condition 
-fi
+    while [ "`continue_test`" = "yes" ]
+    do
+        list_all_ipa_certs
+        find_soon_to_be_renewed_certs
+        #pause
+        autorenewcert $round
+        #pause
+        record_just_renewed_certs
+        report_renew_status
+        testid=$((testid + 1))
+        fix_prevalid_cert_problem #weird problem
+    done
 
+    if [ "$checkTestConditionRequired" = "true" ];then
+        echo "check test condition"
+        check_test_condition 
+    fi
+}
 ################ end of main ###########

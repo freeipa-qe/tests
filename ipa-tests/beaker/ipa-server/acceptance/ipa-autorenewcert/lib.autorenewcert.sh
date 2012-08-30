@@ -316,10 +316,10 @@ calculate_autorenew_date(){
     postExpire=`echo "$certExpire + $halfday" | bc`
     echo "[calculate_autorenew_date]"
     #echo "  preAutorenew :"`convert_epoch_to_date $preAutorenew` " ($preAutorenew)"  
-    echo "|    autorenew    :" `convert_epoch_to_date $autorenew` " ($autorenew)"  
+    echo "     autorenew    :" `convert_epoch_to_date $autorenew` " ($autorenew)"  
     #echo "  postAutorenew:" `convert_epoch_to_date $postAutorenew` " ($postAutorenew)" 
-    echo "|    certExpire   :" `convert_epoch_to_date $certExpire` " ($certExpire)" 
-    echo "|    postExpire   :" `convert_epoch_to_date $postExpire` " ($postExpire)" 
+    echo "     certExpire   :" `convert_epoch_to_date $certExpire` " ($certExpire)" 
+    echo "     postExpire   :" `convert_epoch_to_date $postExpire` " ($postExpire)" 
 }
 
 adjust_system_time(){
@@ -327,11 +327,11 @@ adjust_system_time(){
     local label=$2
     echo "[adjust_system_time] ($label)"
     stopIPA
-    echo "|     | given [$adjustTo]" `convert_epoch_to_date $adjustTo`
+    echo "        given [$adjustTo]" `convert_epoch_to_date $adjustTo`
     local before=`date`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     local after=`date`
-    echo "|     | adjust [$before]=>[$after] done"
+    echo "        adjust [$before]=>[$after] done"
     startIPA
 }
 
@@ -376,37 +376,42 @@ report_renew_status(){
 }
 
 check_actually_renewed_certs(){
+    rlPhaseStartTest "autorenewcert round [$testid] - check_actually_renewed_certs"
     local certsShouldBeRenewed=$@
     echo "[check_actually_renewed_certs]:"
     for cert in $certsShouldBeRenewed
     do
         local state=`$cert status valid`
         if [ "$state" = "valid" ];then
-            rlPass "|     valid cert found for  [$cert]"
+            rlPass "      valid cert found for  [$cert]"
             justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
         else
-            rlFail "|     NO valid cert found for [$cert]"
+            rlFail "      NO valid cert found for [$cert]"
         fi
     done
+    rlPhaseEnd
 }
 
 report_test_result(){
+    rlPhaseStartTest "autorenewcert round [$testid] final result"
     echo ""
     echo "##################### renew test result report ##############################"
     echo "#       [soon to be renewed certs]: [$soonTobeRenewedCerts]"
     echo "#       [acutally being renewed  ]: [$justRenewedCerts]"
+    echo "#############################################################################"
     if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
-        rlPass "# Test PASS: [$soonTobeRenewedCerts] does renewed"
+        rlPass "round [$testid] renewed certs: [$soonTobeRenewedCerts]"
     else
         local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
-        rlFail "# Test FAIL: certs not renewed [ $difflist ]"
+        rlFail "round [$testid] certs not renewed [ $difflist ]"
+        rlLog "current system time :[`date`]"
         for cert in $difflist
         do
             print_cert_details "     " $cert expired
             print_cert_details "     " $cert preValid
         done
     fi
-    echo "#############################################################################"
+    rlPhaseEnd
 }
 
 pause(){
@@ -438,7 +443,7 @@ sort_certs(){
     done
     if [ -f $tempdatafile ];then
         allcerts=`$sortlist $tempdatafile`
-        echo "|      after sorted: [$allcerts]"
+        echo "       after sorted: [$allcerts]"
         rm $tempdatafile
     fi   
 }
@@ -536,6 +541,8 @@ print_test_header(){
 }
 
 test_ipa_via_kinit_as_admin(){
+    
+    rlPhaseStartTest "autorenewcert round [$testid] - test_ipa_via_kinit_as_admin"
     local pw=$ADMINPW #use the password in env.sh file
     local out=$dir/kinit.as.admin.$RANDOM.txt
     local exp
@@ -597,12 +604,12 @@ test_ipa_via_kinit_as_admin(){
             $kdestroy
             echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
-                rlPass "[test_ipa_via_kinit_as_admin] reset password back to original [$pw] failed"
+                rlFail "[test_ipa_via_kinit_as_admin] reset password back to original [$pw] failed"
             else
-                rlFail "[test_ipa_via_kinit_as_admin] reset password failed"
+                rlPass "[test_ipa_via_kinit_as_admin] reset password success"
+                ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes
+                echo "[test_ipa_via_kinit_as_admin] set $ADMINID password back to [$pw] success -- after set to temp"
             fi
-            ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes
-            echo "[test_ipa_via_kinit_as_admin] set $ADMINID password back to [$pw] success -- after set to temp"
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
             rlFail "[test_ipa_via_kinit_as_admin] wrong $ADMINID password provided: [$pw]"
@@ -613,6 +620,7 @@ test_ipa_via_kinit_as_admin(){
         rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
     fi
     rm $out
+    rlPhaseEnd
 }
 
 kinit_aftermaxlife()
@@ -656,6 +664,7 @@ kinit_aftermaxlife()
 
 
 test_dirsrv_via_ssl_based_ldapsearch(){
+    rlPhaseStartTest "autorenewcert round [$testid] - test_dirsrv_via_ssl_based_ldapsearch"
     # doc: http://directory.fedoraproject.org/wiki/Howto:SSL#Use_ldapsearch_with_SSL
     echo "test_dirsrv_via_ssl_based_ldapsearch"
     $ldapsearch -H ldaps://$host -x -D "$ROOTDN" -w "$ROOTDNPWD" -s base -b "" objectclass=* | grep "vendorName:"
@@ -665,9 +674,11 @@ test_dirsrv_via_ssl_based_ldapsearch(){
         rlFail "[test_dirsrv_via_ssl_based_ldapsearch] Test Failed"
     fi
     echo ""
+    rlPhaseEnd
 }
 
 test_dogtag_via_getcert(){
+    rlPhaseStartTest "autorenewcert round [$testid] - test_dogtag_via_getcert"
     echo "test_dogtag_via_getcert"
     local certid=1
     ipa cert-show $certid | grep "Certificate:"
@@ -677,6 +688,7 @@ test_dogtag_via_getcert(){
         rlFail "[test_dogtag_via_getcert] Test Failed"
     fi
     echo ""
+    rlPhaseEnd
 }
 
 find_dirsrv_instance(){
@@ -700,3 +712,89 @@ find_dirsrv_instance(){
         echo "$ds_instance"
     fi
 }
+
+exercise_ipa_via_create_brand_new_customer_cert(){
+    rlPhaseStartTest "autorenewcert round [$testid] - exercise_ipa_via_create_brand_new_customer_cert"
+    local serviceName=testservice_$RANDOM
+    local certRequestFile=$dir/certreq.$RANDOM.csr
+    local certPrivateKeyFile=$dir/certprikey.$RANDOM.key
+    local principal=$serviceName/$host
+    echo "certreq    [$certRequestFile]"
+    echo "privatekey [$certPrivateKeyFile]"
+    echo "principal  [$principal]"
+
+    #requires : kinit as admin to success 
+    echo step 1: create/add a host this should already done : use existing host $host
+
+    echo step 2: add a test service add service: [$principal]
+    ipa service-add $principal
+
+    echo step 3: create a cert request
+    create_cert_request_file $certRequestFile $certPrivateKeyFile
+    local ret=$?
+    if [ "$ret" = "0" ];then
+        echo "cert file creation success, continue"
+    else
+        echo "cert file creation failed, return fail"
+        return 1
+    fi
+
+    echo step 4: process cert request
+    ipa cert-request --principal=$principal $certRequestFile 
+    if [ $? = 0 ];then
+        rlPass "customer cert create success, test pass"
+    else
+        rlFail "customer cert create failed, test failed"
+    fi
+    rlPhaseEnd
+}
+
+create_cert_request_file()
+{
+    local requestFile=$1
+    local keyFile=$2
+    # command to use:
+    local certCmd="openssl req -out $requestFile -new -newkey rsa:2048 -nodes -keyout $keyFile"
+    local exp=$dir/createCertRequestFile.$RANDOM.exp  # local test
+
+    echo "set timeout 5" > $exp
+    echo "set force_conservative 0" >> $exp
+    echo "set send_slow {1 .1}" >> $exp
+    echo "spawn $certCmd" >> $exp
+    echo 'match_max 100000' >> $exp
+
+    echo 'expect "Country Name *"' >> $exp
+    echo "send -s -- \"US\r\"" >> $exp
+
+    echo 'expect "State or Province Name *"' >> $exp
+    echo "send -s -- \"CA\r\"" >> $exp
+
+    echo 'expect "Locality Name *"' >> $exp
+    echo "send -s -- \"Mountain View\r\"" >> $exp
+
+    echo 'expect "Organization Name *"' >> $exp
+    echo "send -s -- \"IPA\r\"" >> $exp
+
+    echo 'expect "Organizational Unit Name *"' >> $exp
+    echo "send -s -- \"QA\r\"" >> $exp
+
+    echo 'expect "Common Name *"' >> $exp
+    echo "send -s -- \"$host\r\"" >> $exp
+
+    echo 'expect "Email Address *"' >> $exp
+    echo "send -s -- \"ipaqa@redhat.com\r\"" >> $exp
+
+    echo 'expect "A challenge password *"' >> $exp
+    echo "send -s -- \"\r\"" >> $exp
+
+    echo 'expect "An optional company name *"' >> $exp
+    echo "send -s -- \"\r\"" >> $exp
+
+    echo 'expect eof ' >> $exp
+    
+    echo "create cert request file [$requestFile]"
+    /usr/bin/expect $exp
+    local ret=$?
+   
+} #create_cert_request_file
+ 

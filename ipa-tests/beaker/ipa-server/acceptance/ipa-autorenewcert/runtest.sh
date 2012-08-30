@@ -44,7 +44,7 @@
 . ./lib.autorenewcert.sh
 . ./d.autorenewcert.sh
 
-PACKAGE="ipa-server perl-TimeDate perl-LDAP"
+PACKAGELIST="ipa-server perl-TimeDate perl-LDAP"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
@@ -60,9 +60,7 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    rlPhaseStartTest "autorenewcert"
-        autorenewcert
-    rlPhaseEnd
+    main_autorenewcert_test
     # r2d2_test_ends
 
     rlPhaseStartCleanup "autorenewcert cleanup"
