@@ -85,7 +85,7 @@ public class ServiceTasks {
 	 */
 	public static void addServiceCertificate(SahiTasks sahiTasks, String servicename, String csr, String button) {
 		sahiTasks.link(servicename).click();
-		sahiTasks.span("New Certificate").click();
+		sahiTasks.link("New Certificate").click();
 		sahiTasks.textarea(0).setValue(csr);
 		sahiTasks.button(button).click();
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
@@ -100,7 +100,7 @@ public class ServiceTasks {
 	 */
 	public static void revokeServiceCertificate(SahiTasks sahiTasks, String serviceprinc, String reason, String button) {
 		sahiTasks.link(serviceprinc).click();
-		sahiTasks.span("Revoke").near(sahiTasks.span("Get")).click();
+		sahiTasks.link("Revoke").near(sahiTasks.link("Get")).click();
 		//sahiTasks.span("Revoke").click();
 		sahiTasks.select(0).choose(reason);
 		sahiTasks.button(button).click();
@@ -115,7 +115,7 @@ public class ServiceTasks {
 	 */
 	public static void restoreServiceCertificate(SahiTasks sahiTasks, String serviceprinc, String button) {
 		sahiTasks.link(serviceprinc).click();
-		sahiTasks.span("Restore").click();
+		sahiTasks.link("Restore").click();
 		sahiTasks.button(button).click();
 		sahiTasks.link("Services").in(sahiTasks.div("content")).click();
 	}
@@ -129,23 +129,23 @@ public class ServiceTasks {
 	public static void verifyServiceCertificate(SahiTasks sahiTasks, String servicename, boolean certexists) {
 		sahiTasks.link(servicename).click();
 		if (certexists == false){
-			Assert.assertFalse(sahiTasks.span("Get").exists(), "Service certificate verify Get button doesn't exist");
-			Assert.assertFalse(sahiTasks.span("View").exists(), "Service certificate verify View button  doesn't exist");
-			Assert.assertFalse(sahiTasks.span("Revoke").exists(), "Service certificate verify Revoke button  doesn't exist");
-			Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Service certificate verify New Certificate button exists");
+			//Assert.assertFalse(sahiTasks.link("Get").exists(), "Service certificate verify Get button doesn't exist");
+			//Assert.assertFalse(sahiTasks.link("View").exists(), "Service certificate verify View button  doesn't exist");
+			//Assert.assertFalse(sahiTasks.link("Revoke").exists(), "Service certificate verify Revoke button  doesn't exist");
+			Assert.assertTrue(sahiTasks.link("New Certificate").exists(), "Service certificate verify New Certificate button exists");
 		}
 		else {
-			sahiTasks.span("Get").isVisible();
-			Assert.assertTrue(sahiTasks.span("Get").exists(), "Service certificate verify Get button");
-			Assert.assertTrue(sahiTasks.span("View").exists(), "Service certificate verify View button");
-			Assert.assertTrue(sahiTasks.span("Revoke").exists(), "Service certificate verify Revoke button");
+			sahiTasks.link("Get").isVisible();
+			Assert.assertTrue(sahiTasks.link("Get").exists(), "Service certificate verify Get button");
+			Assert.assertTrue(sahiTasks.link("View").exists(), "Service certificate verify View button");
+			Assert.assertTrue(sahiTasks.link("Revoke").exists(), "Service certificate verify Revoke button");
 		
 			//view certificate
-			sahiTasks.span("View").click();
+			sahiTasks.link("View").click();
 			sahiTasks.button("Close").click();
 		
 			//get certificate
-			sahiTasks.span("Get").click();
+			sahiTasks.link("Get").click();
 			sahiTasks.button("Close").click();
 		}
 		
@@ -162,11 +162,11 @@ public class ServiceTasks {
 	public static void verifyServiceCertificateStatus(SahiTasks sahiTasks, String serviceprinc, String status, String reason) {
 		sahiTasks.link(serviceprinc).click();
 		if (status == "Hold"){
-			Assert.assertTrue(sahiTasks.span("Restore").exists(), "Host certificate on hold, verify Restore button");
+			Assert.assertTrue(sahiTasks.link("Restore").exists(), "Host certificate on hold, verify Restore button");
 			Assert.assertTrue(sahiTasks.span("Certificate Hold").exists(), "Verifying Certificate Hold status.");
 		}
 		if (status == "Revoked"){
-			Assert.assertTrue(sahiTasks.span("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
+			Assert.assertTrue(sahiTasks.link("New Certificate").exists(), "Host certificate revoked, verify New Certificate button");
 			Assert.assertTrue(sahiTasks.span(reason).exists(), "Verifying Certificate Revoked status: " + reason);
 		}
 		
