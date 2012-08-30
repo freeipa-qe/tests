@@ -468,8 +468,10 @@ public class GroupTasks {
 
 	public static void deleteRole_Single(SahiTasks browser,String role) {
 		browser.link("memberof_role").click();
-		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "role should in the list before deleted");
-		CommonHelper.deleteEntry(browser, role.toLowerCase());
+		//Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "role should in the list before deleted");
+		Assert.assertTrue(browser.link(role).exists(), "role should in the list before deleted");
+		//CommonHelper.deleteEntry(browser, role.toLowerCase());
+		CommonHelper.deleteEntry(browser, role);
 	}
 	
 	public static void deleteRole_Multiple(SahiTasks browser,String[] roles) {
@@ -478,7 +480,8 @@ public class GroupTasks {
 		int i=0;
 		for (String name:roles)
 		{
-			String lowerCaseRoleName = name.toLowerCase();
+			//String lowerCaseRoleName = name.toLowerCase();
+			String lowerCaseRoleName = name;
 			lowerCaseRoles[i] = lowerCaseRoleName;
 			i++;
 			Assert.assertTrue(browser.link(lowerCaseRoleName).exists(), "roles exist before delete");
