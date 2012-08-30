@@ -26,4 +26,3 @@ soonTobeRenewedCerts=""
 justRenewedCerts=""
 renewedCerts=""
 checkTestConditionRequired="true"
-loglevel=debug #loglevel: info/debug

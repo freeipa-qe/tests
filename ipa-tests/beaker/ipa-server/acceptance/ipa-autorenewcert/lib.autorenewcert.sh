@@ -314,37 +314,37 @@ calculate_autorenew_date(){
     autorenew=`echo "$certExpire - $sixdays" | bc`
     postAutorenew=`echo "$certExpire - $halfhour " | bc`
     postExpire=`echo "$certExpire + $halfday" | bc`
-    INFO "[calculate_autorenew_date]"
-    #INFO "  preAutorenew :"`convert_epoch_to_date $preAutorenew` " ($preAutorenew)"  
-    INFO "|    autorenew    :" `convert_epoch_to_date $autorenew` " ($autorenew)"  
-    #INFO "  postAutorenew:" `convert_epoch_to_date $postAutorenew` " ($postAutorenew)" 
-    DEBUG "|    certExpire   :" `convert_epoch_to_date $certExpire` " ($certExpire)" 
-    INFO "|    postExpire   :" `convert_epoch_to_date $postExpire` " ($postExpire)" 
+    echo "[calculate_autorenew_date]"
+    #echo "  preAutorenew :"`convert_epoch_to_date $preAutorenew` " ($preAutorenew)"  
+    echo "|    autorenew    :" `convert_epoch_to_date $autorenew` " ($autorenew)"  
+    #echo "  postAutorenew:" `convert_epoch_to_date $postAutorenew` " ($postAutorenew)" 
+    echo "|    certExpire   :" `convert_epoch_to_date $certExpire` " ($certExpire)" 
+    echo "|    postExpire   :" `convert_epoch_to_date $postExpire` " ($postExpire)" 
 }
 
 adjust_system_time(){
     local adjustTo=$1
     local label=$2
-    INFO "[adjust_system_time] ($label)"
+    echo "[adjust_system_time] ($label)"
     stopIPA
-    DEBUG "|     | given [$adjustTo]" `convert_epoch_to_date $adjustTo`
+    echo "|     | given [$adjustTo]" `convert_epoch_to_date $adjustTo`
     local before=`date`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     local after=`date`
-    DEBUG "|     | adjust [$before]=>[$after] done"
+    echo "|     | adjust [$before]=>[$after] done"
     startIPA
 }
 
 stopIPA(){
     local out=`ipactl stop | sed -e "s/Stopping/ : Stopping/"`
     local cleanout=`echo $out`
-    DEBUG "[stop ipa ] $cleanout"
+    echo "[stop ipa ] $cleanout"
 }
 
 startIPA(){
     local out=`ipactl start | sed -e "s/Starting/ : Starting/"`
     local cleanout=`echo $out`
-    DEBUG  "[start ipa] $cleanout"
+    echo  "[start ipa] $cleanout"
 }
 
 go_to_sleep(){
@@ -377,7 +377,7 @@ report_renew_status(){
 
 check_actually_renewed_certs(){
     local certsShouldBeRenewed=$@
-    INFO "[check_actually_renewed_certs]:"
+    echo "[check_actually_renewed_certs]:"
     for cert in $certsShouldBeRenewed
     do
         local state=`$cert status valid`
@@ -392,9 +392,9 @@ check_actually_renewed_certs(){
 
 report_test_result(){
     echo ""
-    DEBUG "##################### renew test result report ##############################"
-    DEBUG "#       [soon to be renewed certs]: [$soonTobeRenewedCerts]"
-    DEBUG "#       [acutally being renewed  ]: [$justRenewedCerts]"
+    echo "##################### renew test result report ##############################"
+    echo "#       [soon to be renewed certs]: [$soonTobeRenewedCerts]"
+    echo "#       [acutally being renewed  ]: [$justRenewedCerts]"
     if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
         rlPass "# Test PASS: [$soonTobeRenewedCerts] does renewed"
     else
@@ -406,7 +406,7 @@ report_test_result(){
             print_cert_details "     " $cert preValid
         done
     fi
-    DEBUG "#############################################################################"
+    echo "#############################################################################"
 }
 
 pause(){
@@ -420,7 +420,7 @@ pause(){
 
 sort_certs(){
     local tempdatafile="$dir/cert.timeleft.$RANDOM.txt"
-    DEBUG "[sort_certs]"
+    echo "[sort_certs]"
     for cert in $allcerts
     do
         local timeleft_sec=`$cert LifeLeft_sec valid`
@@ -438,7 +438,7 @@ sort_certs(){
     done
     if [ -f $tempdatafile ];then
         allcerts=`$sortlist $tempdatafile`
-        DEBUG "|      after sorted: [$allcerts]"
+        echo "|      after sorted: [$allcerts]"
         rm $tempdatafile
     fi   
 }
@@ -454,10 +454,10 @@ find_soon_to_be_renewed_certs(){
     done
     if [ -f $tempdatafile ];then
         soonTobeRenewedCerts=`$grouplist "$tempdatafile" "$halfhour"`
-        DEBUG "[find_soon_to_be_renewed_certs] test: [$soonTobeRenewedCerts]"
+        echo "[find_soon_to_be_renewed_certs] test: [$soonTobeRenewedCerts]"
         rm $tempdatafile
     else
-        DEBUG "[find_soon_to_be_renewed_certs] ERROR: no cert found to test: [$soonTobeRenewedCerts]"
+        echo "[find_soon_to_be_renewed_certs] ERROR: no cert found to test: [$soonTobeRenewedCerts]"
     fi
 }
 
@@ -514,69 +514,14 @@ check_test_condition(){
     echo "[not renewed] [$notRenewedCerts]"
     for cert in $noValid
     do
-        DEBUG "   No valid certs found for [$cert]"
+        echo "   No valid certs found for [$cert]"
         local db=`$cert db`
         local nickname=`$cert nickname`
-        DEBUG "      debug [certutil -L -d $db -n \"$nickname\"] "
-        DEBUG "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]"
+        echo "      debug [certutil -L -d $db -n \"$nickname\"] "
+        echo "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]"
         print_cert_details "     " $cert preValid
         print_cert_details "     " $cert expired
     done
-}
-
-INFO(){
-    log info $@
-}
-
-DEBUG(){
-    log debug $@
-}
-
-log(){
-    local level=""
-    local logmsg=""
-    if [[ $# -ge 2 ]];then
-        level=$1  
-        shift
-        logmsg=$@
-    else           
-        logmsg=$@ 
-    fi
-    # default to INFO, if level is not defined
-    if [ "$level" = "" ];then
-        level="info"
-    fi
-    local setting=`get_int_level $loglevel`
-    local request=`get_int_level $level`
-    if [ $setting -ge $request ];then
-        echo "$logmsg"
-    fi
-}      
-
-get_int_level(){
-    # debug=3 ; info=2 ;
-    local level=$1
-    case $level in
-    debug)
-        echo 3
-        ;;
-    info)
-        echo 2
-        ;;
-    esac
-}
-
-get_log_level(){
-    # debug=3 ; info=2 ;
-    local intlevel=$1
-    case $intlevel in
-    3)
-        echo "debug"
-        ;;
-    2)
-        echo "info"
-        ;;
-    esac
 }
 
 print_test_header(){
@@ -595,7 +540,7 @@ test_ipa_via_kinit_as_admin(){
     local out=$dir/kinit.as.admin.$RANDOM.txt
     local exp
     local temppw
-    INFO "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
+    echo "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
     echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
         rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success"
@@ -662,7 +607,7 @@ test_ipa_via_kinit_as_admin(){
         then
             rlFail "[test_ipa_via_kinit_as_admin] wrong $ADMINID password provided: [$pw]"
         else
-            rlFail "[test_ipa_via_kinit_as_admin] unhandled error"
+            rlFail "[test_ipa_via_kinit_as_admin] unhandled error: Not because password expired; not because wrong password provided"
         fi
     else
         rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
