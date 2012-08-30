@@ -124,7 +124,9 @@ nisint_nisclient_integration_check_ipa_nis_data_remotely()
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.master"
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.home"
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.nisint"
-		rlRun "ypcat -k -d $DOMAIN -h $MASTER ethers"
+		if [ $ENABLE_ETHERS -gt 0 ]; then
+			rlRun "ypcat -k -d $DOMAIN -h $MASTER ethers"
+		fi
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd 
 }
@@ -254,8 +256,10 @@ nisint_nisclient_integration_check_ipa_nis_data_locally()
 		rlRun "ypcat -k netgroup"
 		rlRun "ypcat -k auto.master"
 		rlRun "ypcat -k auto.home"
-		rlRun "ypcat -k auto.nisint"
-		rlRun "ypcat -k ethers"
+	 	rlRun "ypcat -k auto.nisint"
+		if [ $ENABLE_ETHERS -gt 0 ]; then
+			rlRun "ypcat -k ethers"
+		fi
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd 
 }

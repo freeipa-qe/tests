@@ -303,13 +303,13 @@ nisint_ipamaster_integration_add_nis_data_ethers()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 	
 		ORIGIFS="$IFS"
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
 		IFS=$'\n'
 		for line in $(cat /dev/shm/nis-map.ethers); do
 			IFS="$ORIGIFS"
 			echo "$line"
 			mac=$(echo "$line" | awk '{print $1}')
-			host=$(echo "$line" | sed -e "s#^$key[ \t]*##")
+			host=$(echo "$line" | sed -e "s#^$mac[ \t]*##")
 			rlRun "ipa host-add $host --macaddress=$mac --force --no-reverse"
 		done	
 		[ -f $tmpout ] && rm -f $tmpout
@@ -405,14 +405,14 @@ nisint_ipamaster_integration_del_nis_data_ethers()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 	
 		ORIGIFS="$IFS"
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
 		IFS=$'\n'
 		for line in $(cat /dev/shm/nis-map.ethers); do
 			IFS="$ORIGIFS"
 			echo "$line"
 			mac=$(echo "$line" | awk '{print $1}')
-			host=$(echo "$line" | sed -e "s#^$key[ \t]*##")
-			rlRun "ipa host-mod $host --macaddress=''"
+			host=$(echo "$line" | sed -e "s#^$mac[ \t]*##")
+			rlRun "ipa host-del $host"
 		done
 	rlPhaseEnd
 }

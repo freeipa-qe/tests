@@ -170,3 +170,73 @@ nisint_ethers_test_1002()
 	esac
 	rlPhaseEnd
 }
+
+# ypmatch positive
+nisint_ethers_test_1003()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "nisint_ethers_test_1003: ypmatch positive test"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			for i in 1 2 3 4; do
+				rlRun "ypmatch 00:00:00:00:00:0$i ethers.byaddr" 0 "Successfully run ypmatch to find ethers.byaddr entry"
+			done
+			for i in 1 2 3 4; do
+				rlRun "ypmatch etherhost$i.$DOMAIN ethers.byname" 0 "Successfully run ypmatch to find ethers.byname entry"
+			done
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# ypmatch negative
+nisint_ethers_test_1004()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "nisint_ethers_test_1004: ypmatch negative test"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypmatch FF:FF:FF:00:00:0F ethers.byaddr" 1 "Successfully run ypmatch to find ethers.byaddr entry"
+			rlRun "ypmatch nonexistent.server.com ethers.byname" 1 "Successfully run ypmatch to find ethers.byname entry"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
