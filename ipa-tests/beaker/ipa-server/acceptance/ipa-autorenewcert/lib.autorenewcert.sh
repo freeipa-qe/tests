@@ -207,7 +207,7 @@ print_cert_details(){
     local state=$3
     local db=`$cert db`
     local nickname=`$cert nickname`
-    local tempcertfile="$dir/cert.detail.$RANDOM.txt"
+    local tempcertfile="$TmpDir/cert.detail.$RANDOM.txt"
     $readCert -d $db -n "$nickname" -s $state -f $tempcertfile 2>&1 >/dev/null
     if [ -f $tempcertfile ];then
         echo "$indent+------------------------------------------------------------------------+"
@@ -424,7 +424,7 @@ pause(){
 }
 
 sort_certs(){
-    local tempdatafile="$dir/cert.timeleft.$RANDOM.txt"
+    local tempdatafile="$TmpDir/cert.timeleft.$RANDOM.txt"
     echo "[sort_certs]"
     for cert in $allcerts
     do
@@ -449,7 +449,7 @@ sort_certs(){
 }
 
 find_soon_to_be_renewed_certs(){
-    local tempdatafile="$dir/cert.timeleft.$RANDOM.txt"
+    local tempdatafile="$TmpDir/cert.timeleft.$RANDOM.txt"
     for cert in $allcerts
     do
         local timeleft_sec=`$cert LifeLeft_sec valid`
@@ -544,7 +544,7 @@ test_ipa_via_kinit_as_admin(){
     
     rlPhaseStartTest "autorenewcert round [$testid] - test_ipa_via_kinit_as_admin"
     local pw=$ADMINPW #use the password in env.sh file
-    local out=$dir/kinit.as.admin.$RANDOM.txt
+    local out=$TmpDir/kinit.as.admin.$RANDOM.txt
     local exp
     local temppw
     echo "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
@@ -574,7 +574,7 @@ test_ipa_via_kinit_as_admin(){
         if grep "Password expired" $out 2>&1 >/dev/null
         then
             echo "$ADMINID password exipred, do reset process"
-            exp=$dir/reset.admin.password.$RANDOM.exp
+            exp=$TmpDir/reset.admin.password.$RANDOM.exp
             temppw="New_$pw"
             kinit_aftermaxlife "$ADMINID" "$ADMINPW" $temppw
             # set password policy to allow $ADMINID change password right away
@@ -628,7 +628,7 @@ kinit_aftermaxlife()
     local username=$1
     local pw=$2
     local newpw=$3
-    local exp=$tmpdir/kinitaftermaxlife.$RANDOM.exp
+    local exp=$TmpDir/kinitaftermaxlife.$RANDOM.exp
     echo "set timeout 10" > $exp
     echo "set force_conservative 0" >> $exp
     echo "set send_slow {1 .01}" >> $exp
@@ -716,8 +716,8 @@ find_dirsrv_instance(){
 exercise_ipa_via_create_brand_new_customer_cert(){
     rlPhaseStartTest "autorenewcert round [$testid] - exercise_ipa_via_create_brand_new_customer_cert"
     local serviceName=testservice_$RANDOM
-    local certRequestFile=$dir/certreq.$RANDOM.csr
-    local certPrivateKeyFile=$dir/certprikey.$RANDOM.key
+    local certRequestFile=$TmpDir/certreq.$RANDOM.csr
+    local certPrivateKeyFile=$TmpDir/certprikey.$RANDOM.key
     local principal=$serviceName/$host
     echo "certreq    [$certRequestFile]"
     echo "privatekey [$certPrivateKeyFile]"
@@ -755,7 +755,7 @@ create_cert_request_file()
     local keyFile=$2
     # command to use:
     local certCmd="openssl req -out $requestFile -new -newkey rsa:2048 -nodes -keyout $keyFile"
-    local exp=$dir/createCertRequestFile.$RANDOM.exp  # local test
+    local exp=$TmpDir/createCertRequestFile.$RANDOM.exp  # local test
 
     echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp
