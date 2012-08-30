@@ -591,7 +591,7 @@ print_test_header(){
 }
 
 test_ipa_via_kinit_as_admin(){
-    local pw=$ADMINIDPW #use the password in env.sh file
+    local pw=$ADMINPW #use the password in env.sh file
     local out=$dir/kinit.as.admin.$RANDOM.txt
     local exp
     local temppw
@@ -624,7 +624,7 @@ test_ipa_via_kinit_as_admin(){
             echo "$ADMINID password exipred, do reset process"
             exp=$dir/reset.admin.password.$RANDOM.exp
             temppw="New_$pw"
-            kinit_aftermaxlife "$ADMINID" "$ADMINIDPW" $temppw
+            kinit_aftermaxlife "$ADMINID" "$ADMINPW" $temppw
             # set password policy to allow $ADMINID change password right away
             min=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2`
             min=`echo $min`
