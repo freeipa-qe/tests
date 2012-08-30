@@ -271,6 +271,7 @@ nisint_nismaster_setup_ethers()
 		00:00:00:00:00:03 etherhost3.$DOMAIN
 		00:00:00:00:00:04 etherhost4.$DOMAIN
 		EOF
+		sed -i 's!^\(all: .*\) mail \\$!\1 ethers mail \\!' /var/yp/Makefile
 		rlRun "make -C /var/yp" 0 "Update NIS ethers map"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers|grep etherhost" 0 "Check that new ethers are in the map"
 		[ -f $tmpout ] && rm -f $tmpout

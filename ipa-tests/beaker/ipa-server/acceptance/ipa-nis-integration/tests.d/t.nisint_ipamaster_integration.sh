@@ -91,7 +91,9 @@ nisint_ipamaster_integration_add_nis_data()
 	nisint_ipamaster_integration_add_nis_data_hosts
 	nisint_ipamaster_integration_add_nis_data_netgroup
 	nisint_ipamaster_integration_add_nis_data_automount
-	nisint_ipamaster_integration_add_nis_data_ethers
+	if [ $ENABLE_ETHERS -gt 0 ]; then
+		nisint_ipamaster_integration_add_nis_data_ethers
+	fi
 }
 
 nisint_ipamaster_integration_add_nis_data_passwd()
@@ -322,6 +324,9 @@ nisint_ipamaster_integration_del_nis_data()
 	nisint_ipamaster_integration_del_nis_data_hosts
 	nisint_ipamaster_integration_del_nis_data_netgroup
 	nisint_ipamaster_integration_del_nis_data_automount
+	if [ $ENABLE_ETHERS -gt 0 ]; then
+		nisint_ipamaster_integration_del_nis_data_ethers
+	fi
 }
 
 nisint_ipamaster_integration_del_nis_data_passwd()
@@ -409,6 +414,7 @@ nisint_ipamaster_integration_del_nis_data_ethers()
 			host=$(echo "$line" | sed -e "s#^$key[ \t]*##")
 			rlRun "ipa host-mod $host --macaddress=''"
 		done
+	rlPhaseEnd
 }
 
 nisint_ipamaster_integration_add_nis_data_ldif()
@@ -419,7 +425,9 @@ nisint_ipamaster_integration_add_nis_data_ldif()
 	nisint_ipamaster_integration_add_nis_data_ldif_hosts
 	nisint_ipamaster_integration_add_nis_data_ldif_netgroup
 	nisint_ipamaster_integration_add_nis_data_ldif_automount
-	nisint_ipamaster_integration_add_nis_data_ldif_ethers
+	if [ $ENABLE_ETHERS -gt 0 ]; then
+		nisint_ipamaster_integration_add_nis_data_ldif_ethers
+	fi
 }
 
 nisint_ipamaster_integration_add_nis_data_ldif_passwd()
@@ -843,7 +851,9 @@ nisint_ipamaster_integration_check_ipa_nis_data()
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.master"
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.home"
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.nisint"
-		rlRun "ypcat -k -d $DOMAIN -h $MASTER ethers"
+		if [ $ENABLE_ETHERS -gt 0 ]; then
+			rlRun "ypcat -k -d $DOMAIN -h $MASTER ethers"
+		fi
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd 
 }

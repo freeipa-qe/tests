@@ -80,6 +80,7 @@ MASTER_REAL=$MASTER
 NISMASTER_REAL=$NISMASTER
 NISCLIENT_REAL=$NISCLIENT
 
+
 rlLog_hostnames()
 {
 	HOSTNAME=$(hostname)
@@ -116,6 +117,8 @@ rlJournalStart
 		#rlAssertRpm $PACKAGE
 		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
 		rlRun "pushd $TmpDir"
+		rlRun "yum -y install openldap-clients"
+		ENABLE_ETHERS=$(ldapsearch -h $MASTER_IP -xLLL -D "$ROOTDN" -w "$ROOTDNPWD" -b "cn=NIS Server,cn=plugins,cn=config" "nis-map=ethers.byaddr"|grep "dn: nis-domain=$DOMAIN+nis-map=ethers.byaddr"|wc -l)
 		rlLog_hostnames
 	rlPhaseEnd
 	
@@ -135,6 +138,9 @@ rlJournalStart
 	nisint_group_tests
 	nisint_netgroup_tests
 	nisint_automount_tests
+	if [ $ENABLE_ETHERS -gt 0 ]; then
+		nisint_ethers_tests
+	fi
 	nisint_client_is_nis_bz_tests
 
 	##############################################################
@@ -145,6 +151,9 @@ rlJournalStart
 	nisint_group_tests
 	nisint_netgroup_tests
 	nisint_automount_tests
+	if [ $ENABLE_ETHERS -gt 0 ]; then
+		nisint_ethers_tests
+	fi
 	nisint_client_is_ipa_bz_tests
 
 	nisint_end
