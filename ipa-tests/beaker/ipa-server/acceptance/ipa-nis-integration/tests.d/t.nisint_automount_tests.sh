@@ -73,8 +73,16 @@ nisint_automount_test_envsetup()
 		rlRun "service rpcbind restart"
 		rlRun "service ypserv restart"
 		rlRun "service ypbind restart"
-		rlRun "service nfs restart"
-		rlRun "service nfslock restart"
+		if [ -f /usr/lib/systemd/system/nfs-server.service ]; then
+			rlRun "systemctl restart nfs-server.service"
+		else
+			rlRun "service nfs restart"
+		fi
+		if [ -f /usr/lib/systemd/system/nfs-lock.service ]; then
+			rlRun "systemctl restart nfs-lock.service"
+		else
+			rlRun "service nfslock restart"
+		fi
 		rlRun "exportfs -a"
 		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISMASTER_IP"
 		

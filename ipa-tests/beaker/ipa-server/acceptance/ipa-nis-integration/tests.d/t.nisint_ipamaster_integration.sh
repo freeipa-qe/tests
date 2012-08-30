@@ -91,6 +91,7 @@ nisint_ipamaster_integration_add_nis_data()
 	nisint_ipamaster_integration_add_nis_data_hosts
 	nisint_ipamaster_integration_add_nis_data_netgroup
 	nisint_ipamaster_integration_add_nis_data_automount
+	nisint_ipamaster_integration_add_nis_data_ethers
 }
 
 nisint_ipamaster_integration_add_nis_data_passwd()
@@ -293,6 +294,26 @@ nisint_ipamaster_integration_add_nis_data_automount()
 	rlPhaseEnd
 }
 
+nisint_ipamaster_integration_add_nis_data_ethers()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ethers: Import NIS ethers map"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+	
+		ORIGIFS="$IFS"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		IFS=$'\n'
+		for line in $(cat /dev/shm/nis-map.ethers); do
+			IFS="$ORIGIFS"
+			echo "$line"
+			mac=$(echo "$line" | awk '{print $1}')
+			host=$(echo "$line" | sed -e "s#^$key[ \t]*##")
+			rlRun "ipa host-add $host --macaddress=$mac --force --no-reverse"
+		done	
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
+
 nisint_ipamaster_integration_del_nis_data()
 {
 	echo $FUNCNAME
@@ -372,6 +393,24 @@ nisint_ipamaster_integration_del_nis_data_automount()
 	rlPhaseEnd	
 }
 
+nisint_ipamaster_integration_del_nis_data_ethers()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_ethers: Delete MAC entries from hosts in map"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+	
+		ORIGIFS="$IFS"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		IFS=$'\n'
+		for line in $(cat /dev/shm/nis-map.ethers); do
+			IFS="$ORIGIFS"
+			echo "$line"
+			mac=$(echo "$line" | awk '{print $1}')
+			host=$(echo "$line" | sed -e "s#^$key[ \t]*##")
+			rlRun "ipa host-mod $host --macaddress=''"
+		done
+}
+
 nisint_ipamaster_integration_add_nis_data_ldif()
 {
 	echo $FUNCNAME
@@ -380,6 +419,7 @@ nisint_ipamaster_integration_add_nis_data_ldif()
 	nisint_ipamaster_integration_add_nis_data_ldif_hosts
 	nisint_ipamaster_integration_add_nis_data_ldif_netgroup
 	nisint_ipamaster_integration_add_nis_data_ldif_automount
+	nisint_ipamaster_integration_add_nis_data_ldif_ethers
 }
 
 nisint_ipamaster_integration_add_nis_data_ldif_passwd()
@@ -734,6 +774,49 @@ nisint_ipamaster_integration_add_nis_data_ldif_automount()
 	rlPhaseEnd
 }
 
+nisint_ipamaster_integration_add_nis_data_ldif_ethers()
+{
+	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_ldif_ethers: Import NIS ethers map from ldif"
+		KinitAsAdmin
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		local tmpldif=/tmp/nis-map.ethers.ldif
+	
+		ORIGIFS="$IFS"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		IFS=$'\n'
+		for line in $(cat /dev/shm/nis-map.ethers); do
+			IFS="$ORIGIFS"
+			echo "$line"
+			mac=$(echo "$line" | awk '{print $1}')
+			host=$(echo "$line" | sed -e "s#^$key[ \t]*##")
+			cat >> $tmpldif <<-EOF
+			dn: fqdn=$host,cn=computers,cn=accounts,$BASEDN
+			macAddress: $mac
+			cn: $host
+			objectClass: ipaobject
+			objectClass: nshost
+			objectClass: ipahost
+			objectClass: pkiuser
+			objectClass: ipaservice
+			objectClass: krbprincipalaux
+			objectClass: krbprincipal
+			objectClass: ieee802device
+			objectClass: ipasshhost
+			objectClass: top
+			objectClass: ipaSshGroupOfPubKeys
+			fqdn: $host
+			managedBy: fqdn=$host,cn=computers,cn=accounts,$BASEDN
+			krbPrincipalName: host/$host@$RELM
+			serverHostName: $(echo $host|cut -f1 -d.)
+
+			EOF
+		done	
+		rlRun "ldapadd -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
+		[ -f $tmpout  ] && rm -f $tmpout
+		[ -f $tmpldif ] && rm -f $tmpldif
+	rlPhaseEnd
+}
+
 nisint_ipamaster_integration_setup_nis_listener()
 {
 	rlPhaseStartTest "nisint_ipamaster_integration_setup_nis_listener: Enable the IPA NIS Listener"
@@ -760,6 +843,7 @@ nisint_ipamaster_integration_check_ipa_nis_data()
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.master"
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.home"
 		rlRun "ypcat -k -d $DOMAIN -h $MASTER auto.nisint"
+		rlRun "ypcat -k -d $DOMAIN -h $MASTER ethers"
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd 
 }

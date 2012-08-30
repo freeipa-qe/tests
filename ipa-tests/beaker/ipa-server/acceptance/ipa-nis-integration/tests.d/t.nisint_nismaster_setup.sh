@@ -61,6 +61,7 @@ nisint_nismaster_setup()
 		nisint_nismaster_setup_users
 		nisint_nismaster_setup_groups
 		nisint_nismaster_setup_hosts
+		nisint_nismaster_setup_ethers
 
 		rlRun "rhts-sync-set   -s 'nisint_nismaster_setup_ended' -m $NISMASTER_IP"
 		rlPass "$FUNCNAME complete for NISMASTER ($HOSTNAME)"
@@ -260,3 +261,18 @@ nisint_nismaster_setup_hosts()
 	rlPhaseEnd
 }
 
+nisint_nismaster_setup_ethers()
+{
+	rlPhaseStartTest "nisint_nismaster_setup_ethers: Setting up NIS ethers map for Integration testing"
+		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		cat >> /etc/ethers <<-EOF
+		00:00:00:00:00:01 etherhost1.$DOMAIN
+		00:00:00:00:00:02 etherhost2.$DOMAIN
+		00:00:00:00:00:03 etherhost3.$DOMAIN
+		00:00:00:00:00:04 etherhost4.$DOMAIN
+		EOF
+		rlRun "make -C /var/yp" 0 "Update NIS ethers map"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers|grep etherhost" 0 "Check that new ethers are in the map"
+		[ -f $tmpout ] && rm -f $tmpout
+	rlPhaseEnd
+}
