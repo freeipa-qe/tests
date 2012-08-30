@@ -388,9 +388,8 @@ public class GroupTests extends SahiTestScript{
 			GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, groupType);
 			Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
 		    browser.link(groupName).click();
-		   			
+		    browser.link("External").click();		
 			if (testScenario == "normalToPosix"){
-				browser.link("External").click();
 				Assert.assertFalse(browser.span("Add").exists(),"Verified normal grouptype can't add external members");
 				browser.link("Settings").click();
 				browser.select("action").choose("Change to POSIX group");
@@ -399,9 +398,7 @@ public class GroupTests extends SahiTestScript{
 				browser.select("action").choose("Delete");
 				browser.span("Apply").click();
 				Assert.assertFalse(browser.link(groupName).exists(),"Group Type modified to POSIX deleted as expected");
-			}
-			else if (testScenario == "normalToExternal") {
-				browser.link("External").click();
+			}else if (testScenario == "normalToExternal") {
 				Assert.assertFalse(browser.span("Add").exists(),"Verified normal grouptype can't add external members");
 				browser.link("Settings").click();
 				browser.select("action").choose("Change to external group");
@@ -410,9 +407,7 @@ public class GroupTests extends SahiTestScript{
 				browser.select("action").choose("Delete");
 				browser.span("Apply").click();
 				Assert.assertFalse(browser.link(groupName).exists(),"Group Type modified to external deleted as expected");
-			}
-			else if (testScenario == "Posix") {
-				browser.link("External").click();
+			}else if (testScenario == "Posix") {
 				Assert.assertFalse(browser.span("Add").exists(),"Verified Posix grouptype can't add external members");
 				browser.link("Settings").click();
 				browser.select("action").choose("Change to external group");
@@ -420,9 +415,7 @@ public class GroupTests extends SahiTestScript{
 				browser.select("action").choose("Delete");
 				browser.span("Apply").click();
 				Assert.assertFalse(browser.link(groupName).exists(),"Group Type Posix deleted as expected");
-			}
-			else if (testScenario == "External") {
-				browser.link("External").click();
+			}else if (testScenario == "External") {
 				Assert.assertTrue(browser.span("Add").exists(),"Verified external grouptype can add external members");
 				//TODO :add/add another/canel tests for adding external members
 				browser.link("Settings").click();
@@ -532,8 +525,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_role_addSingle( String userGroupName, String role){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addRole_Single(browser, role); 
-		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), 
-				"expecte user group:["+userGroupName +"] under role:["+role+"]");
+		//Assert.assertTrue(browser.link(role.toLowerCase()).exists(),"expected user group:["+userGroupName +"] under role:["+role+"]");
+		Assert.assertTrue(browser.link(role).exists(),"expected user group:["+userGroupName +"] under role:["+role+"]");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -544,7 +537,8 @@ public class GroupTests extends SahiTestScript{
 		String[] roles = multiRoles.split(",");
 		GroupTasks.addRole_Multiple(browser, roles);
 		for (String role:roles) 
-			Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "after add, check name exist in the list");
+			//Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "after add, check name exist in the list");
+			Assert.assertTrue(browser.link(role).exists(), "after add, check name exist in the list");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -553,7 +547,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_role_addViaSearch(String userGroupName, String role){ 
 		browser.link(userGroupName).click(); 
 		GroupTasks.addRole_ViaSearch(browser, role, role);
-		Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "after add, check name exist in the list");
+		//Assert.assertTrue(browser.link(role.toLowerCase()).exists(), "after add, check name exist in the list");
+		Assert.assertTrue(browser.link(role).exists(), "after add, check name exist in the list");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -562,7 +557,8 @@ public class GroupTests extends SahiTestScript{
 	public void modifyGroup_role_deleteSingle(String userGroupName, String role){ 
 		browser.link(userGroupName).click();  
 		GroupTasks.deleteRole_Single(browser, role);
-		Assert.assertFalse(browser.link(role.toLowerCase()).exists(), "role name should not in the list after deleted");
+		//Assert.assertFalse(browser.link(role.toLowerCase()).exists(), "role name should not in the list after deleted");
+		Assert.assertFalse(browser.link(role).exists(), "role name should not in the list after deleted");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
@@ -573,7 +569,8 @@ public class GroupTests extends SahiTestScript{
 		String[] names = roles.split(","); 
 		GroupTasks.deleteRole_Multiple(browser, names);
 		for (String role:names)
-			Assert.assertFalse(browser.link(role.toLowerCase()).exists(), "role does NOT exist after delete");
+			//Assert.assertFalse(browser.link(role.toLowerCase()).exists(), "role does NOT exist after delete");
+			Assert.assertFalse(browser.link(role).exists(), "role does NOT exist after delete");
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
