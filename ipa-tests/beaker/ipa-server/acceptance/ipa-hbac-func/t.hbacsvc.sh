@@ -668,6 +668,10 @@ hbacsvc_client2_007() {
                 rlRun "getent -s sss passwd user7"
 		sleep 5
                 rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
+				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
+		sleep 5
+                rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
+				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
 
         rlPhaseEnd
 
