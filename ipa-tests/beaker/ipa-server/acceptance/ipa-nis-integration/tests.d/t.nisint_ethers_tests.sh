@@ -1,0 +1,172 @@
+#!/bin/bash
+# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   t.nisint_ethers_tests.sh of /CoreOS/ipa-tests/acceptance/ipa-nis-integration
+#   Description: IPA NIS Integration and Migration Ethers functionality tests
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The following needs to be tested:
+#   
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Author: Scott Poore <spoore@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2012 Red Hat, Inc. All rights reserved.
+#
+#   This copyrighted material is made available to anyone wishing
+#   to use, modify, copy, or redistribute it subject to the terms
+#   and conditions of the GNU General Public License version 2.
+#
+#   This program is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public
+#   License along with this program; if not, write to the Free
+#   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+#   Boston, MA 02110-1301, USA.
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+######################################################################
+# variables
+######################################################################
+
+######################################################################
+# test suite
+######################################################################
+nisint_ethers_tests()
+{
+	nisint_ethers_test_envsetup
+	nisint_ethers_test_1001
+	nisint_ethers_test_1002
+	nisint_ethers_test_envcleanup
+}
+
+nisint_ethers_test_envsetup()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "nisint_ethers_test_envsetup: Create Hosts and Ethers entries and Prep environment for tests"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		KinitAsAdmin
+		rlRun "ipa host-del testethershost1.$DOMAIN --macaddress=99:88:77:66:55:44 --force"
+		rlRun "ipa host-del testethershost2.$DOMAIN --macaddress=11:22:33:44:55:66 --force"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+
+	rlPhaseEnd
+}
+
+nisint_ethers_test_envcleanup()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "nisint_ethers_test_envcleanup: Delete etherss and cleanup"
+	case "$MYROLE" in
+	"MASTER")
+		KinitAsAdmin
+		rlLog "Machine in recipe is IPAMASTER"
+		rlRun "ipa host-del testethershost1.$DOMAIN"
+		rlRun "ipa host-del testethershost2.$DOMAIN"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+
+	rlPhaseEnd
+
+}
+
+# ypcat positive
+nisint_ethers_test_1001()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "nisint_ethers_test_1001: ypcat positive test"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat ethers|grep testethers1" 0 "ypcat search for existing ethers"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# ypcat negative
+nisint_ethers_test_1002()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "nisint_ethers_test_1002: ypcat negative test"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is IPAMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISMASTER")
+		rlLog "Machine in recipe is NISMASTER"
+		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $NISCLIENT_IP"
+		;;
+	"NISCLIENT")
+		rlLog "Machine in recipe is NISCLIENT"
+		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
+			rlPass "ypbind not running...skipping test"
+		else
+			rlRun "ypcat ethers|grep notaethers" 1 "Fail to ypcat search for non-existent ethers"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE"
+		;;
+	esac
+	rlPhaseEnd
+}
