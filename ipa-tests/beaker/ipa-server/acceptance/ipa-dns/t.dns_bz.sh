@@ -41,6 +41,7 @@ dnsbugs()
    bz805430
    bz819635
    bz809562
+   bz828687
    dnsbugcleanup
 }
 
@@ -669,6 +670,43 @@ bz809562()
 		rlRun "ipa dnsrecord-add $DOMAIN tt --a-rec=1.2.3.4" 1 "Attempt to create a A record to conflict with the CNAME record."
 		rlRun "ipa dnsrecord-find $DOMAIN tt | grep A\ record" 1 "Make sure the A record was not created"
 		ipa dnsrecord-del $DOMAIN tt --cname-rec="tt.$DOMAIN"
+	rlPhaseEnd
+}
+
+bz828687()
+{
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=828687
+	rlPhaseStartTest "828687 Unable to update dns when deleting host"
+		ipaddr=$(hostname -i)
+		rlLog "Ip address is $ipaddr"
+		ipoc1=$(echo $ipaddr | cut -d\. -f1)
+		ipoc2=$(echo $ipaddr | cut -d\. -f2)
+		ipoc3=$(echo $ipaddr | cut -d\. -f3)
+		ipoc4=$(echo $ipaddr | cut -d\. -f4)
+		newoc4=252
+		temail="ipaqar.redhat.com"
+		tserial=2010010701
+		trefresh=303
+		tretry=101
+		texpire=1202
+		tminimum=33
+		tttl=55
+		tzone="llnewzone"
+		thn=$(hostname)
+		tipaddr="$thn." # Add a . to the end of the address to test with
+
+		# Add a zone to test with
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Adding a new zone to test with"
+		# Add a host to test with
+		rlRun "ipa host-add --ip-address='$ipoc1.$ipoc2.$ipoc3.$newoc4' 'tt.$tzone'" 0 "Add a new host to test with"
+		rlRun "ipa host-find tt.$tzone" 0 "verifying that the host was created."
+		rlRun "ipa dnsrecord-find $ipoc3.$ipoc2.$ipoc1.in-addr.arpa. $newoc4 | grep $tzone" 0 "Make sure PTR record was added for the new host."
+		rlRun "ipa host-del tt.$tzone --updatedns" 0 "Try to delete the new host. This should pass"
+	
+		# Cleanup
+		ipa dnsrecord-del $ipoc3.$ipoc2.$ipoc1.in-addr.arpa. $newoc4 --ptr-rec="tt.$tzone."
+		ipa host-del tt.$tzone
+		ipa dnszone-del $tzone
 	rlPhaseEnd
 }
 
