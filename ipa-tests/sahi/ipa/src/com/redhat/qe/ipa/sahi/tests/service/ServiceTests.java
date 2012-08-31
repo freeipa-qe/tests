@@ -297,7 +297,9 @@ public class ServiceTests extends SahiTestScript {
 			CommonTasks.getPrincipalKeytab(testprincipal, keytabfile);
 			
 			// verify service has a keytab
-			ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, true);
+			 if (!System.getProperty("os.name").startsWith("Windows")) {
+	            	ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, true);
+			}
 		}
 		
 		/*
@@ -305,11 +307,12 @@ public class ServiceTests extends SahiTestScript {
 		 */
 		@Test (groups={"serviceRemoveKeytabTests"}, dataProvider="getServiceRemoveKeytabTestObjects", dependsOnGroups={"serviceGetKeytabTests", "serviceAddTests"} )	
 		public void testremoveServiceKeytab(String testName ) throws Exception {
-			
-			//  unprovision keytab
-			ServiceTasks.deleteServiceKeytab(sahiTasks, testprincipal, "Unprovision");
-			// verify service has a keytab
-			ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, false);
+			if (!System.getProperty("os.name").startsWith("Windows")) {
+				//  unprovision keytab
+				ServiceTasks.deleteServiceKeytab(sahiTasks, testprincipal, "Unprovision");
+				// verify service has a keytab
+				ServiceTasks.verifyServiceKeytab(sahiTasks, testprincipal, false);
+			}
 		}
 		
 		/*

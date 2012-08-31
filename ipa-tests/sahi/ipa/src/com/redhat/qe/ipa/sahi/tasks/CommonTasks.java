@@ -297,7 +297,7 @@ public class CommonTasks {
 			e.printStackTrace();
 			}
 			
-			FileInputStream fstream = new FileInputStream("/tmp/" + hostname+".csr");
+			FileInputStream fstream = new FileInputStream(hostname+".csr");
 			if (!System.getProperty("os.name").startsWith("Windows")) 
 				fstream = new FileInputStream("/tmp/"+hostname+".csr");
 		
