@@ -337,7 +337,7 @@ adjust_system_time(){
     local adjustTo=$1
     local label=$2
     rlPhaseStartTest "autorenewcert round [$testid] - adjust_system_time $label"
-    rlLog "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
+    echo "      [adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
     local before=`date`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     if [ "$?" = "0" ];then
