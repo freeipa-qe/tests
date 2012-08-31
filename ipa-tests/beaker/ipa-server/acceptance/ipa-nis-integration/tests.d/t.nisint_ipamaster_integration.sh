@@ -119,7 +119,7 @@ nisint_ipamaster_integration_add_nis_data_passwd()
 			# Now create this entry
 			rlRun "create_ipauser $username NIS USER passw0rd1"
 			KinitAsAdmin
-			rlRun "ipa user-mod $username --gidnumber=$gid --uid=$uid --gecos=$gecos --homedir=$homedir --shell=$shell"
+			rlRun "ipa user-mod $username --gidnumber=$gid --uid=$uid --gecos='$gecos' --homedir=$homedir --shell=$shell"
 			rlRun "ipa user-show $username"
 		done
 		
