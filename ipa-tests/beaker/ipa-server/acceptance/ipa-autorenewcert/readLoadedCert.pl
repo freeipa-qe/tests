@@ -6,7 +6,6 @@ use strict;
 use warnings;
 use Getopt::Std;
 use Date::Parse;
-BEGIN {my $cur=`pwd`; push @INC, $cur; push @INC, "/export/iparhts/acceptance/ipa-autorenewcert" }
 require "certfunctions.pl";
 
 our %options=();
