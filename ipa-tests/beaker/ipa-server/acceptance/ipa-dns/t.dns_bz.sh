@@ -40,6 +40,7 @@ dnsbugs()
    bz802375
    bz805430
    bz819635
+   bz809562
    dnsbugcleanup
 }
 
@@ -648,6 +649,26 @@ bz819635()
 		rlRun "ipa dnsconfig-mod --help | grep 'forwarder=STR' | grep global\ forwarders" 1 "Ensure old string does not exist in help section"
 		rlRun "ipa dnsconfig-mod --help | grep 'forwarder=STR' | grep per-zone\ forwarders" 0 "Ensure new string does not exist in help section"
 
+	rlPhaseEnd
+}
+	
+bz809562()
+{
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=809562
+	rlPhaseStartTest "809562 Constraints for CNAME records are not enforced "
+		kdestroy
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa dnsrecord-add $DOMAIN tt --a-rec=1.2.3.4" 0 "Add a A record to conflict with the cname record"
+		rlRun "ipa dnsrecord-find $DOMAIN tt | grep A\ record" 0 "Make sure the A record was created"
+		rlRun "ipa dnsrecord-add $DOMAIN tt --cname-rec='tt.$DOMAIN'" 1 "Attempt to add a cname record, this should fail"
+		rlRun "ipa dnsrecord-find $DOMAIN tt | grep CNAME\ record" 1 "Make sure the CNAME record was not created"
+		rlRun "ipa dnsrecord-del $DOMAIN tt --a-rec=1.2.3.4" 0 "Delete the A record that conflict with the cname record"
+		rlRun "ipa dnsrecord-find $DOMAIN tt | grep A\ record" 1 "Make sure the A record was removed"
+		rlRun "ipa dnsrecord-add $DOMAIN tt --cname-rec='tt.$DOMAIN'" 0 "Adding a cname record"
+		rlRun "ipa dnsrecord-find $DOMAIN tt | grep CNAME\ record" 0 "Make sure the CNAME record was created"
+		rlRun "ipa dnsrecord-add $DOMAIN tt --a-rec=1.2.3.4" 1 "Attempt to create a A record to conflict with the CNAME record."
+		rlRun "ipa dnsrecord-find $DOMAIN tt | grep A\ record" 1 "Make sure the A record was not created"
+		ipa dnsrecord-del $DOMAIN tt --cname-rec="tt.$DOMAIN"
 	rlPhaseEnd
 }
 
