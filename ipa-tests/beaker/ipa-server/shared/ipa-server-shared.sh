@@ -332,6 +332,7 @@ makereport()
     fi
     # capture the result and make a simple report
     local total=`rlJournalPrintText | grep "RESULT" | wc -l`
+    local unfinished=`rlJournalPrintText | grep "RESULT" | grep "\[unfinished\]" | wc -l`
     local pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
     local fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
     local abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
@@ -340,22 +341,26 @@ makereport()
         total=$((total-1))
         fail=$((fail-1))
     fi
-    echo "================ Final Pass/Fail Report =================" > $report
-    echo "   Test Date: `date` " >> $report
-    echo "   Total : [$total] "  >> $report
-    echo "   Passed: [$pass] "   >> $report
-    echo "   Failed: [$fail] "   >> $report
-    echo "   Abort : [$abort]"   >> $report
-    echo "   Crash : [$crashes]" >> $report
-    echo "---------------------------------------------------------" >> $report
+    echo "========================== Final Pass/Fail Report ===========================" > $report
+    echo "  Test Date: `date` " >> $report
+    echo "     Total : [$total] "  >> $report
+    echo "     Passed: [$pass] "   >> $report
+    echo "     Failed: [$fail] "   >> $report
+    echo " Unfinished: [$unfinished] "   >> $report
+    echo "     Abort : [$abort]"   >> $report
+    echo "     Crash : [$crashes]" >> $report
+    echo " ---------------------------------------------------------" >> $report
     rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
     echo "" >> $report
     rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| grep -v "^:: \[   FAIL   \] :: RESULT: $" | sed -e 's/:/ /g' -e 's/RESULT//g'  >> $report
     echo "" >> $report
+    rlJournalPrintText | grep "RESULT" | grep "\[unfinished\]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+    echo "" >> $report
     rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-    echo "====[$report]============================================" >> $report
-    echo "report saved as: $report"
+    echo "===========================[$report]===============================" >> $report
     cat $report
+    echo "[`date`] test summary report saved as: $report"
+    echo ""
 } #makereport
 
 ############################################################################
