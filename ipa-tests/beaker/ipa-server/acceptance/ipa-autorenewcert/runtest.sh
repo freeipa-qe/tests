@@ -41,8 +41,8 @@
 
 # Include test case file
 . ./t.autorenewcert.sh
-. ./lib.autorenewcert.sh
-. ./d.autorenewcert.sh
+#. ./lib.autorenewcert.sh
+#. ./d.autorenewcert.sh
 
 PACKAGELIST="ipa-server perl-TimeDate perl-LDAP"
 
@@ -54,19 +54,17 @@ satrtEpoch=`date "+%s"`
 
 rlJournalStart
     rlPhaseStartSetup "autorenewcert startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
+        #rlAssertRpm $PACKAGELIST
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
-        rlRun "pushd $TmpDir"
+        #rlRun "pushd $TmpDir"
     rlPhaseEnd
 
     # r2d2_test_starts
-    rlPhaseStartTest "autorenewcert"
-        main_autorenewcert_test
-    rlPhaseEnd
+    main_autorenewcert_test
     # r2d2_test_ends
 
     rlPhaseStartCleanup "autorenewcert cleanup"
-        rlRun "popd"
+        #rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 

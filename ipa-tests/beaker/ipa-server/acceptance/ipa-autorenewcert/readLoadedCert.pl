@@ -2,11 +2,14 @@
 #
 #
 
+#BEGIN{ our $cur=`pwd`; push @INC,"$cur";}
+
 use strict;
 use warnings;
 use Getopt::Std;
 use Date::Parse;
 require "certfunctions.pl";
+
 
 our %options=();
 getopts("d:n:p:f:s:", \%options);

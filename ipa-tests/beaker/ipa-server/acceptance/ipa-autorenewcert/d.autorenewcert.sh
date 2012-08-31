@@ -9,6 +9,7 @@ sortlist="$dir/sortlist.pl"
 grouplist="$dir/grouplist.pl"
 countlist="$dir/countlist.pl"
 difflist="$dir/difflist.pl"
+testResult="$dir/test.result.$RANDOM.txt"
 
 # constance used for cert autorenew test
 sixdays=518400
