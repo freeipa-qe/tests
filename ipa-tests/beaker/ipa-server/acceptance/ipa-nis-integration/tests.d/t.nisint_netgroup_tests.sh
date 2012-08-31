@@ -430,7 +430,7 @@ nisint_netgroup_test_1009()
 		rlLog "rhts-sync-block -s '$FUNCNAME.0.$TESTORDER' $NISCLIENT_IP"
 		rlRun "rhts-sync-block -s '$FUNCNAME.0.$TESTORDER' $NISCLIENT_IP"
 		rlRun "mkdir /nctmp" 0 "Create temp mount point."
-		rlRun "mount $NISCLIENT:/tmp /nctmp" 0 "NFS Mount with netgroup access"
+		rlRun "mount -o intr,soft,timeo=100 $NISCLIENT:/tmp /nctmp" 0 "NFS Mount with netgroup access"
 		rlRun "umount /nctmp" 0 "Unmount NFS export"
 		rlRun "rmdir /nctmp" 0 "Remove temp mount point."
 		rlRun "rhts-sync-set -s '$FUNCNAME.1.$TESTORDER' -m $MASTER_IP"
