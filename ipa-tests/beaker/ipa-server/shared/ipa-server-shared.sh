@@ -318,43 +318,44 @@ addAttribute()
 
 makereport()
 {
-
-	check_coredump
-	local report=$1
-# some modification here: make report work even the TmpDir removed
-		if [ -n "$report" ];then
-# this overwriting the existing report
-#report=/tmp/rhts.report.$RANDOM.txt
-			touch $report
-		else
-			if [ ! -w "$report" ];then
-				report=/tmp/rhts.report.$RANDOM.txt
-					touch $report
-			else
-				touch $report
-					fi
-					fi
-# capture the result and make a simple report
-					local total=`rlJournalPrintText | grep "RESULT" | wc -l`
-					local pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
-					local fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
-					local abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
-					echo "================ final pass/fail report =================" > $report
-					echo "   Test Date: `date` " >> $report
-					echo "   Total : [$total] "  >> $report
-					echo "   Passed: [$pass] "   >> $report
-					echo "   Failed: [$fail] "   >> $report
-					echo "   Abort : [$abort]"   >> $report
-					echo "   Crash : [$crashes]"   >> $report
-					echo "---------------------------------------------------------" >> $report
-					rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-					echo "" >> $report
-					rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-					echo "" >> $report
-					rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
-					echo "=========================================================" >> $report
-					echo "report saved as: $report"
-					cat $report
+    check_coredump
+    local report=$1
+    if [ -n "$report" ];then
+        touch $report
+    else
+        if [ ! -w "$report" ];then
+            report=/tmp/rhts.report.$RANDOM.txt
+            touch $report
+        else
+            touch $report
+        fi
+    fi
+    # capture the result and make a simple report
+    local total=`rlJournalPrintText | grep "RESULT" | wc -l`
+    local pass=`rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]" | wc -l`
+    local fail=`rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]" | wc -l`
+    local abort=`rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]" | wc -l`
+    if rlJournalPrintText | grep "^:: \[   FAIL   \] :: RESULT: $" 
+    then
+        total=$((total-1))
+        fail=$((fail-1))
+    fi
+    echo "================ Final Pass/Fail Report =================" > $report
+    echo "   Test Date: `date` " >> $report
+    echo "   Total : [$total] "  >> $report
+    echo "   Passed: [$pass] "   >> $report
+    echo "   Failed: [$fail] "   >> $report
+    echo "   Abort : [$abort]"   >> $report
+    echo "   Crash : [$crashes]" >> $report
+    echo "---------------------------------------------------------" >> $report
+    rlJournalPrintText | grep "RESULT" | grep "\[   PASS   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+    echo "" >> $report
+    rlJournalPrintText | grep "RESULT" | grep "\[   FAIL   \]"| grep -v "^:: \[   FAIL   \] :: RESULT: $" | sed -e 's/:/ /g' -e 's/RESULT//g'  >> $report
+    echo "" >> $report
+    rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
+    echo "====[$report]============================================" >> $report
+    echo "report saved as: $report"
+    cat $report
 } #makereport
 
 ############################################################################
