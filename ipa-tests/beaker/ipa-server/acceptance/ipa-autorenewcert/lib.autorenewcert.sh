@@ -210,9 +210,9 @@ print_cert_details(){
     local tempcertfile="$TmpDir/cert.detail.$RANDOM.txt"
     $readCert -d $db -n "$nickname" -s $state -f $tempcertfile 2>&1 >/dev/null
     if [ -f $tempcertfile ];then
-        echo "$indent+------------------------------------------------------------------------+"
-        cat $tempcertfile | sed -e "s/^\w/$indent &/"
-        echo "$indent+------------------------------------------------------------------------+"
+        echo "$indent+-------------------------------------------------------------------------------+"
+        cat $tempcertfile | sed -e "s/^\w/$indent | &/"
+        echo "$indent+-------------------------------------------------------------------------------+"
         rm $tempcertfile
     fi
     echo ""
@@ -337,12 +337,12 @@ adjust_system_time(){
     local adjustTo=$1
     local label=$2
     rlPhaseStartTest "autorenewcert round [$testid] - adjust_system_time $label"
-    echo "      [adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
+    echo "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
     local before=`date`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     if [ "$?" = "0" ];then
         local after=`date`
-        rlPass "PASS, adjust [$before]=>[$after] done"
+        rlPass "PASS, adjust ($label) [$before]=>[$after] done"
     else
         local after=`date`
         rlFail "Fail, change date failed, current data: [`date`]"
@@ -392,18 +392,15 @@ go_to_sleep(){
 prepare_for_next_round(){
     renewedCerts="$renewedCerts $justRenewedCerts"
     justRenewedCerts="" #reset so we can continue test
-
-    local header="      "
-    echo ""
-    echo "$header +-------------- Cert Renew report ($testid)------------+"
+    local header="  "
+    echo "$header +------------------- Cert Renew report ($testid)-----------------+"
     for cert in $allcerts
     do
         local counter=`$countlist -s "$renewedCerts" -c "$cert"`
-        local fp_certname=`perl -le "print sprintf (\"%+21s\",\"$cert\")"`
-        echo "$header | $fp_certname : renewed [ $counter ] times    |"
+        local fp_certname=`perl -le "print sprintf (\"%+26s\",\"$cert\")"`
+        echo "$header | $fp_certname : renewed [ $counter ] times         |"
     done
-    echo "$header +------------------------------------------------+"
-    echo ""
+    echo "$header +----------------------------------------------------------+"
 }
 
 check_actually_renewed_certs(){
@@ -465,7 +462,7 @@ pause(){
 
 sort_certs(){
     local tempdatafile="$TmpDir/cert.timeleft.$RANDOM.txt"
-    echo -n "[sort_certs]"
+    echo "[sort_certs] sorted by cert timeLeft_sec: "
     for cert in $allcerts
     do
         local timeleft_sec=`$cert LifeLeft_sec valid`
@@ -483,7 +480,7 @@ sort_certs(){
     done
     if [ -f $tempdatafile ];then
         allcerts=`$sortlist $tempdatafile`
-        echo "   sorted by cert timeLeft_sec: [$allcerts]"
+        echo " [$allcerts]"
         rm $tempdatafile
     fi   
 }
@@ -580,7 +577,7 @@ test_ipa_via_kinit_as_admin(){
     rlPhaseStartTest "autorenewcert round [$testid] - test_ipa_via_kinit_as_admin ($@)"
     local pw=$ADMINPW #use the password in env.sh file
     local out=$TmpDir/kinit.as.admin.$RANDOM.txt
-    echo "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
+    rlLog "[test_ipa_via_kinit_as_admin] test with password: [$pw]: echo $pw | kinit $ADMINID"
     echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
         rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success"
@@ -705,8 +702,9 @@ kinit_aftermaxlife()
 test_dirsrv_via_ssl_based_ldapsearch(){
     rlPhaseStartTest "autorenewcert round [$testid] - test_dirsrv_via_ssl_based_ldapsearch ($@)"
     # doc: http://directory.fedoraproject.org/wiki/Howto:SSL#Use_ldapsearch_with_SSL
-    echo "$ldapsearch -H ldaps://$host -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -s base -b \"\" objectclass=* | grep vendorName:"
-    $ldapsearch -H ldaps://$host -x -D "$ROOTDN" -w "$ROOTDNPWD" -s base -b "" objectclass=* | grep "vendorName:"
+    local testCMD="$ldapsearch -H ldaps://$host -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -s base -b \"\" objectclass=* | grep \"vendorName:\" "
+    rlLog "test command: $testCMD"
+    $testCMD
     if [ "$?" = "0" ];then
         rlPass "[test_dirsrv_via_ssl_based_ldapsearch] Test Pass"
         echo "    [ PASS ] test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
@@ -720,9 +718,10 @@ test_dirsrv_via_ssl_based_ldapsearch(){
 
 test_dogtag_via_cert_show(){
     rlPhaseStartTest "autorenewcert round [$testid] - test_dogtag_via_cert_show ($@)"
-    echo "test_dogtag_via_cert_show"
     local certid=1
-    ipa cert-show $certid | grep "Certificate:"
+    local testCMD="ipa cert-show $certid | grep 'Certificate:'"
+    rlLog "test command : $testCMD"
+    $testCMD
     if [ "$?" = "0" ];then
         rlPass "[test_dogtag_via_cert_show] Test Pass"
         echo "    [ PASS ] test_dogtag_via_cert_show ($@)" >> $testResult
@@ -767,22 +766,22 @@ test_ipa_via_creating_new_cert(){
     echo "principal  [$principal]"
 
     #requires : kinit as admin to success 
-    echo step 1: create/add a host this should already done : use existing host $host
+    echo "[step 1/4] create/add a host this should already done : use existing host $host"
 
-    echo step 2: add a test service add service: [$principal]
+    echo "[step 2/4] add a test service add service: [$principal]"
     ipa service-add $principal
 
-    echo step 3: create a cert request
+    echo "[step 3/4] create a cert request"
     create_cert_request_file $certRequestFile $certPrivateKeyFile
-    local ret=$?
-    if [ "$ret" = "0" ];then
+    if [ "$?" = "0" ];then
         echo "cert file creation success, continue"
     else
-        echo "cert file creation failed, return fail"
-        return 1
+        rlFail "cert file creation failed, return fail"
+        echo "    [ FAIL ] test_ipa_via_creating_new_cert ($@)" >> $testResult
+        return
     fi
 
-    echo step 4: process cert request
+    echo "[step 4/4] process cert request"
     ipa cert-request --principal=$principal $certRequestFile 
     if [ $? = 0 ];then
         rlPass "customer cert create success, test pass"
