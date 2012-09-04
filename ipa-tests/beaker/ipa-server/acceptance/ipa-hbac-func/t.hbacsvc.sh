@@ -669,9 +669,19 @@ hbacsvc_client2_007() {
 		sleep 5
                 rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
 				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 		sleep 5
                 rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
 				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 
         rlPhaseEnd
 
@@ -1316,9 +1326,19 @@ hbacsvc_client2_013() {
                 rlRun "getent -s sss passwd user13"
                 rlRun "ssh_auth_success user13 testpw123@ipa.com $CLIENT"
 				rlRun "tail -20 /var/log/secure"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 		sleep 5
                 rlRun "ssh_auth_success user13 testpw123@ipa.com $CLIENT"
 				rlRun "tail -20 /var/log/secure"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 
         rlPhaseEnd
 
@@ -1391,9 +1411,19 @@ hbacsvc_client2_014() {
                 rlRun "getent -s sss passwd user14"
                 rlRun "ssh_auth_success user14 testpw123@ipa.com $CLIENT"
 				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 		sleep 5
                 rlRun "ssh_auth_success user14 testpw123@ipa.com $CLIENT"
 				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 
         rlPhaseEnd
 
@@ -1866,6 +1896,11 @@ hbacsvc_client2_019() {
                 rlRun "getent -s sss passwd user19"
                 rlRun "ssh_auth_failure user19 testpw123@ipa.com $CLIENT2"
                 rlRun "ssh_auth_success user19 testpw123@ipa.com $CLIENT"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 
         rlPhaseEnd
 
@@ -1943,6 +1978,11 @@ hbacsvc_client2_020() {
                 rlRun "getent -s sss passwd user20"
                 rlRun "ssh_auth_failure user20 testpw123@ipa.com $CLIENT2"
                 rlRun "ssh_auth_success user20 testpw123@ipa.com $CLIENT"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 
         rlPhaseEnd
 
