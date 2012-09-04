@@ -128,7 +128,10 @@ rlJournalStart
                 echo $BEAKERCLIENT2_IP  $CLIENT2 >> /etc/hosts
 
                 rlRun "cat /etc/hosts"
-
+	
+		rlLog "setting debug_level in sssd.conf"
+		sed -i "s/\(\[domain.$DOMAIN\]\)$/\1\ndebug_level = 9/" /etc/sssd/sssd.conf
+		rlRun "service sssd restart"		
 
 	rlPhaseEnd
 
@@ -385,6 +388,10 @@ rlJournalStart
 		echo $BEAKERCLIENT_IP	$CLIENT >> /etc/hosts
 
 		rlRun "cat /etc/hosts"
+
+		rlLog "setting debug_level in sssd.conf"
+		sed -i "s/\(\[domain.$DOMAIN\]\)$/\1\ndebug_level = 9/" /etc/sssd/sssd.conf
+		rlRun "service sssd restart"		
 
 	rlPhaseEnd
 
