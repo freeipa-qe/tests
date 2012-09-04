@@ -2416,6 +2416,18 @@ hbacsvc_client2_028() {
 		sleep 5
                 rlRun "getent -s sss passwd user28"
                 rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
+		sleep 5
+                rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
+				if [ $? -gt 0 ]; then
+					DATE=$(date +%Y%m%d-%H%M%S)
+					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+				fi
 
         rlPhaseEnd
 
