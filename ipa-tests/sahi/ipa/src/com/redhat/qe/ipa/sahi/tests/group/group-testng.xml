@@ -37,7 +37,7 @@
 	           <include name="modifyGroup_sudo_add" />
 	           <include name="modifyGroup_sudo_delete" />
 	           <include name="modifyGroup_sudo_cleanup" />  
-	           <include name="bugverification" />  
+	          <!-- <include name="bugverification" />  -->
                 <include name="deleteGroup" /> 
             </run>
         </groups>
