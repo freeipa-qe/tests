@@ -32,25 +32,26 @@ cert_sanity_check(){
 
 autorenewcert()
 {
-        print_test_header $testid
+        print_test_header
         cert_sanity_check "Before auto renew triggered"
 
         calculate_autorenew_date $soonTobeRenewedCerts
 
-        stop_ipa_server "Before set system time to autorenew"
+        stop_ipa_server "Before autorenew"
         adjust_system_time $autorenew autorenew    
-        start_ipa_server "After set system time to autorenew"
+        start_ipa_server "After autorenew"
 
         go_to_sleep
 
-        stop_ipa_server "Before set system time to postExpire"
+        stop_ipa_server "Before postExpire"
         adjust_system_time $postExpire postExpire
-        start_ipa_server "After set system time to postExpire"
+        start_ipa_server "After postExpire"
 
         check_actually_renewed_certs $soonTobeRenewedCerts
-        compare_expected_renewal_certs_with_actual_renewed_certs
+        compare_expected_renewal_certs_with_actual_renewed_certs "After postExpire"
 
         cert_sanity_check  "After auto renew triggered"
+        test_status_report 
 }
 
 ############## main test #################
@@ -63,7 +64,7 @@ main_autorenewcert_test(){
 
     while [ "`continue_test`" = "yes" ]
     do
-        echo ""> $testResult  # reset test result from last round
+        echo "" > $testResult  # reset test result from last round
         list_all_ipa_certs
         find_soon_to_be_renewed_certs
         autorenewcert $round

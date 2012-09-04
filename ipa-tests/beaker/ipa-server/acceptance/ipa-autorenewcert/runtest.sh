@@ -55,7 +55,7 @@ satrtEpoch=`date "+%s"`
 rlJournalStart
     rlPhaseStartSetup "autorenewcert startup: Check for ipa-server package"
         #rlAssertRpm $PACKAGELIST
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory: [$TmpDir]"
         #rlRun "pushd $TmpDir"
     rlPhaseEnd
 
@@ -65,7 +65,7 @@ rlJournalStart
 
     rlPhaseStartCleanup "autorenewcert cleanup"
         #rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+        rlRun "rm -r $TmpDir" 0 "Removing tmp directory: [$TmpDir]"
     rlPhaseEnd
 
     makereport

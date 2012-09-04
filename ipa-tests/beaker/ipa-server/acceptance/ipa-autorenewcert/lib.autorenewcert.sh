@@ -353,6 +353,7 @@ adjust_system_time(){
 stop_ipa_server(){
     rlPhaseStartTest "autorenewcert round [$testid] - stop_ipa_server ($@)"
     local out=`ipactl stop 2>&1`
+    sleep 5 # give system some time so ipa server can fully stopped
     if echo $out | grep "Aborting ipactl"
     then
         rlFail "stop ipa server Failed"
@@ -365,6 +366,7 @@ stop_ipa_server(){
 start_ipa_server(){
     rlPhaseStartTest "autorenewcert round [$testid] - start_ipa_server ($@)" 
     local out=`ipactl start 2>&1`
+    sleep 5 # give system some time so ipa server can fully stopped
     if echo $out | grep "Aborting ipactl"
     then
         rlFail "start ipa server Failed"
@@ -427,11 +429,11 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
     echo ""
     if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
         rlPass "PASS round [$testid] renewed certs: [$soonTobeRenewedCerts]"
-        echo "[`date`] PASS: round [$testid] - does matche: compare_expected_renewal_certs_with_actual_renewed_certs" >> $testResult
+        echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
     else
         local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
         rlFail "FAIL round [$testid] certs not renewed [ $difflist ]"
-        echo "[`date`] FAIL: round [$testid] - does not matche: compare_expected_renewal_certs_with_actual_renewed_certs" >> $testResult
+        echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
         rlLog "current system time :[`date`]"
         for cert in $difflist
         do
@@ -439,10 +441,17 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
             print_cert_details "     " $cert preValid
         done
     fi
-    echo "#-------------- ipa function and cert test result round($testid) -------------------------------#"
-    cat $testResult
-    echo "#-------------------------------------------------------------------------------------#"
     rlPhaseEnd
+}
+
+test_status_report(){
+    if [ -f $testReport ];then
+        echo ""
+        echo "#-------------- autorenewcert test status report round($testid) -------------------------------#"
+        cat $testResult
+        echo "#----------------------------------------------------------------------------------------#"
+        echo ""
+    fi
 }
 
 pause(){
@@ -456,7 +465,7 @@ pause(){
 
 sort_certs(){
     local tempdatafile="$TmpDir/cert.timeleft.$RANDOM.txt"
-    rlLog "[sort_certs]"
+    echo -n "[sort_certs]"
     for cert in $allcerts
     do
         local timeleft_sec=`$cert LifeLeft_sec valid`
@@ -474,7 +483,7 @@ sort_certs(){
     done
     if [ -f $tempdatafile ];then
         allcerts=`$sortlist $tempdatafile`
-        echo "       after sorted: [$allcerts]"
+        echo "   sorted by cert timeLeft_sec: [$allcerts]"
         rm $tempdatafile
     fi   
 }
@@ -497,41 +506,19 @@ find_soon_to_be_renewed_certs(){
     else
         rlFail "FAIL : no cert found to test: [$soonTobeRenewedCerts]"
     fi
+    rlPhaseEnd
 }
 
 continue_test(){
     if [ ! -f $testResult ];then
         touch $testResult
-        echo "yes"
-        return
-    fi
-    if grep "FAIL" $testResult 2>&1 >/dev/null
-    then
-        echo "no"
+        echo "yes" # when test gets into first round, there is no testResult file exist, just echo 'yes' to continue test
     else
-        echo "yes"
+        if ! grep "FAIL" $testResult 2>&1 >/dev/null
+        then
+            echo "yes"
+        fi
     fi
-    # test will continue in two condition
-    # 1. there are some certs haven't get chance to renew once
-    # 2. all certs have valid version
-
-    #local continueTest="no"
-    #notRenewedCerts=`$difflist "$renewedCerts" "$allcerts"`
-    #local validCerts=`get_all_valid_certs`
-    #local notValid=`$difflist "$validCerts" "$allcerts"`
-    
-    #if [ "$notRenewedCerts" = "" ];then
-        # if all certs have been renewed once, not need to continue test
-    #    continueTest="no" 
-    #else
-    #    if [ "$notValid" = "" ];then
-    #        continueTest="yes" # if all certs are valid continue test
-    #    else
-    #        continueTest="no"  # other wise, stop test
-    #        checkTestConditionRequired="true"
-    #    fi
-    #fi
-    #echo $continueTest
 }
 
 get_all_valid_certs(){
@@ -555,11 +542,15 @@ final_cert_status_report(){
     notRenewedCerts=`$difflist "$renewedCerts" "$allcerts"`
     local validCerts=`get_all_valid_certs`
     local notValid=`$difflist "$validCerts" "$allcerts"`
-
-    list_all_ipa_certs
+    echo ""
+    echo "######################################################################################################################"
+    echo "#                                                                                                                    #"
+    echo "#                                        Final IPA Cert Status Report                                                #"
+    echo "#--------------------------------------------------------------------------------------------------------------------#"
     echo "[all certs  ] [$allcerts]"
     echo "[valid certs] [$validCerts]"
     echo "[not valid  ] [$notValid]"
+    list_all_ipa_certs
     for cert in $notValid
     do
         echo "   No valid certs found for [$cert]"
@@ -570,31 +561,30 @@ final_cert_status_report(){
         print_cert_details "     " $cert preValid
         print_cert_details "     " $cert expired
     done
+    test_status_report
+    echo "######################################################################################################################"
+    echo ""
 }
 
 print_test_header(){
-    local round=$1
     echo ""
     echo "###########################################################"
     echo "#                                                         #"
-    echo "#                    test round [$round]                       #"
+    echo "#                    test round [$testid]                       #"
     echo "#                                                         #"
     echo "###########################################################"
     echo ""
 }
 
 test_ipa_via_kinit_as_admin(){
-    
     rlPhaseStartTest "autorenewcert round [$testid] - test_ipa_via_kinit_as_admin ($@)"
     local pw=$ADMINPW #use the password in env.sh file
     local out=$TmpDir/kinit.as.admin.$RANDOM.txt
-    local exp
-    local temppw
     echo "[test_ipa_via_kinit_as_admin] test with password: [$pw]"
     echo $pw | kinit $ADMINID 2>&1 > $out
     if [ $? = 0 ];then
         rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success"
-        echo "[`date`] PASS: test_ipa_via_kinit_as_admin ($@)" >> $testResult
+        echo "    [ PASS ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
     elif [ $? = 1 ];then
         echo "[test_ipa_via_kinit_as_admin] first try of kinit as $ADMINID with [$pw] failed"
         echo "[test_ipa_via_kinit_as_admin] check ipactl status"
@@ -603,30 +593,30 @@ test_ipa_via_kinit_as_admin(){
         then
             echo "[test_ipa_via_kinit_as_admin] got kinit: Generic error, restart ipa and try same password again"
             ipactl restart
-            rlRun "$kdestroy"
+            $kdestroy
             echo $pw | kinit $ADMINID 2>&1 > $out
             if [ $? = 0 ];then
-                rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success at second attemp -- after restart ipa"
-                echo "[`date`] PASS: test_ipa_via_kinit_as_admin ($@)" >> $testResult
+                rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success at second attempt -- after restart ipa"
+                echo "    [ PASS ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
                 return
+            else
+                rlLog "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] failed at second attempt -- after restart ipa, continue trying"
             fi
-        fi        
+        fi
             
         echo "[test_ipa_via_kinit_as_admin] password [$pw] failed, check whether it is because password expired"
-        echo "============ output of [echo $pw | kinit $ADMINID] ============="
+        echo "#------------ output of [echo $pw | kinit $ADMINID] ------------#"
         cat $out
-        echo "============================================================"
+        echo "#----------------------------------------------------------------#"
         if grep "Password expired" $out 2>&1 >/dev/null
         then
             echo "$ADMINID password exipred, do reset process"
-            exp=$TmpDir/reset.admin.password.$RANDOM.exp
-            temppw="New_$pw"
-            kinit_aftermaxlife "$ADMINID" "$ADMINPW" $temppw
+            local exp=$TmpDir/reset.admin.password.$RANDOM.exp
+            local temppw="New_$pw"
+            kinit_aftermaxlife "$ADMINID" "$ADMINPW" "$temppw"
             # set password policy to allow $ADMINID change password right away
-            min=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2`
-            min=`echo $min`
-            history=`ipa pwpolicy-show | grep "History size" | cut -d":" -f2`
-            history=`echo $history`
+            local minlife=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2| xargs echo`
+            local history=`ipa pwpolicy-show | grep "History size" | cut -d":" -f2| xargs echo`
             classses=`ipa pwpolicy-show | grep "classes" | cut -d":" -f2`
             classes=`echo $classes`
             ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=0 --history=0 --minclasses=0
@@ -650,24 +640,24 @@ test_ipa_via_kinit_as_admin(){
             echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
                 rlFail "[test_ipa_via_kinit_as_admin] reset password back to original [$pw] failed"
-                echo "[`date`] FAIL: test_ipa_via_kinit_as_admin ($@)" >> $testResult
+                echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
             else
                 rlPass "[test_ipa_via_kinit_as_admin] reset password success"
-                echo "[`date`] PASS: test_ipa_via_kinit_as_admin ($@)" >> $testResult
-                ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes
+                echo "    [ PASS ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
+                ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$minlife --history=$history --minclasses=$classes
                 echo "[test_ipa_via_kinit_as_admin] set $ADMINID password back to [$pw] success -- after set to temp"
             fi
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
             rlFail "[test_ipa_via_kinit_as_admin] wrong $ADMINID password provided: [$pw]"
-            echo "[`date`]  FAIL: test_ipa_via_kinit_as_admin ($@)" >> $testResult
+            echo "  FAIL: test_ipa_via_kinit_as_admin ($@)" >> $testResult
         else
             rlFail "[test_ipa_via_kinit_as_admin] unhandled error: Not because password expired; not because wrong password provided"
-            echo "[`date`] FAIL: test_ipa_via_kinit_as_admin ($@)" >> $testResult
+            echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
         fi
     else
         rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
-        echo "[`date`] FAIL: test_ipa_via_kinit_as_admin ($@)" >> $testResult
+        echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
     fi
     rm $out
     rlPhaseEnd
@@ -693,21 +683,20 @@ kinit_aftermaxlife()
     echo "send -s -- $newpw\r" >> $exp
     echo 'expect eof' >> $exp
     echo "$kdestroy"
-
-    echo "====== [kinit_aftermaxlife] exp file ========="
-    cat $exp
-    echo "----------- ipactl status -------------------"
-    ipactl status
-    echo "=============================================="
     /usr/bin/expect $exp
-    echo "$kdestroy"
 
-    echo "====== [kinit_aftermaxlife] ipactl status after run exp file ========="
-    ipactl status
-    echo "=============================================="
-
+    echo "kinit as [$username] with new password [$newpw]"
     echo $newpw | kinit $username
-    # clean up
+    if [ "$?" = "0" ];then
+        echo "[kinit_aftermaxlife] kinit success"
+    else
+        echo "[kinit_aftermaxlife] kinit failed, please check the exp file"
+        echo "#------ [kinit_aftermaxlife] exp file -------#" 
+        cat $exp
+        echo "#----------- ipactl status -------------------#"
+        ipactl status
+        echo "#---------------------------------------------#"
+    fi
     rm $exp
 } #kinit_aftermaxlife
 
@@ -720,10 +709,10 @@ test_dirsrv_via_ssl_based_ldapsearch(){
     $ldapsearch -H ldaps://$host -x -D "$ROOTDN" -w "$ROOTDNPWD" -s base -b "" objectclass=* | grep "vendorName:"
     if [ "$?" = "0" ];then
         rlPass "[test_dirsrv_via_ssl_based_ldapsearch] Test Pass"
-        echo "[`date`] PASS: test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
+        echo "    [ PASS ] test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
     else
         rlFail "[test_dirsrv_via_ssl_based_ldapsearch] Test Failed"
-        echo "[`date`] FAIL: test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
+        echo "    [ FAIL ] test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
     fi
     echo ""
     rlPhaseEnd
@@ -736,10 +725,10 @@ test_dogtag_via_cert_show(){
     ipa cert-show $certid | grep "Certificate:"
     if [ "$?" = "0" ];then
         rlPass "[test_dogtag_via_cert_show] Test Pass"
-        echo "[`date`] PASS: test_dogtag_via_cert_show ($@)" >> $testResult
+        echo "    [ PASS ] test_dogtag_via_cert_show ($@)" >> $testResult
     else
         rlFail "[test_dogtag_via_cert_show] Test Failed"
-        echo "[`date`] FAIL: test_dogtag_via_cert_show ($@)" >> $testResult
+        echo "    [ FAIL ] test_dogtag_via_cert_show ($@)" >> $testResult
     fi
     echo ""
     rlPhaseEnd
@@ -797,10 +786,10 @@ test_ipa_via_creating_new_cert(){
     ipa cert-request --principal=$principal $certRequestFile 
     if [ $? = 0 ];then
         rlPass "customer cert create success, test pass"
-        echo "[`date`] PASS: test_ipa_via_creating_new_cert ($@)" >> $testResult
+        echo "    [ PASS ] test_ipa_via_creating_new_cert ($@)" >> $testResult
     else
         rlFail "customer cert create failed, test failed"
-        echo "[`date`] FAIL: test_ipa_via_creating_new_cert ($@)" >> $testResult
+        echo "    [ FAIL ] test_ipa_via_creating_new_cert ($@)" >> $testResult
     fi
     rlPhaseEnd
 }
