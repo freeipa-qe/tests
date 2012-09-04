@@ -42,6 +42,7 @@ dnsbugs()
    bz819635
    bz809562
    bz828687
+   bz817413
    dnsbugcleanup
 }
 
@@ -707,6 +708,97 @@ bz828687()
 		ipa dnsrecord-del $ipoc3.$ipoc2.$ipoc1.in-addr.arpa. $newoc4 --ptr-rec="tt.$tzone."
 		ipa host-del tt.$tzone
 		ipa dnszone-del $tzone
+	rlPhaseEnd
+}
+
+bz817413()
+{
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=817413
+	# A domain:
+	# 1. Can't have an empty component: sub..domain.com
+	# 2. top-level domain must be alphabetic: sub.123
+	# 3. Valid characters are a-z0-9. dash is allowed but it can't be first or last.
+	# 4. An component can't be longer than 63 characters.
+	rlPhaseStartTest "817413: test of invalid characters in domain name"
+		temail="ipaqar.redhat.com"
+		tserial=2010010701
+		trefresh=303
+		tretry=101
+		texpire=1202
+		tminimum=33
+		tttl=55
+		tzone="llnewzone"
+
+		# 1.
+		# Attempt adding a zone with a empty component
+		tzone="domain..empty.com"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a empty component"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+		
+		# 2.
+		# Attempt adding a zone with a numeric TLD
+		tzone="domain.numeric.123"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a numeric TLD"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# 3.
+		# Attempt adding a zone with a dash at the start
+		tzone='\-domain.dash.com'
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl '$tzone'" 1 "Attempt adding a domain with dash at the front"
+		rlRun "ipa dnszone-find '$tzone'" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# Attempt adding a zone with a dash at the end
+		tzone="domain.dash.com-"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with dash at the end"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# Attempt adding a zone with a dash a bad character
+		tzone="domain.badchar^.com"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a bad char"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# Attempt adding a zone with a dash a different bad character
+		tzone="domain.badchar#.com"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a bad char"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# Attempt adding a zone with a dash a different bad character
+		tzone="domain.badchar$.com"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a bad char"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# Attempt adding a zone with a dash a different bad character
+		tzone="domain.badchar*.com"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a bad char"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# 4.
+		# Attempt adding a domain with any element longer than 63 char
+		tzone="domain.sixthreemax.12345678901234567890123345678901234567890123456789012345678901234567890.com"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a element longer than 63 char"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# Attempt adding a domain with any element longer than 63 char
+		tzone="firstlkjhjklasghduygasiudfygvq7i6ertf78q6t4871y8347y2r8734y87aylfisduhcvkljasnkljnasdljdnclakj.long.com"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a element longer than 63 char"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+		# Attempt adding a domain with TLD longer than 63 char
+		tzone="long.tld.tldlkjhjklasghduygasiudfygvq7i6ertf78q6t4871y8347y2r8734y87aylfisduhcvkljasnkljnasdljdnclakj"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a element longer than 63 char"
+		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
 	rlPhaseEnd
 }
 
