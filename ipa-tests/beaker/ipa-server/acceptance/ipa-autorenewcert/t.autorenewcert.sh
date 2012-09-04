@@ -57,7 +57,7 @@ autorenewcert()
 ############## main test #################
 main_autorenewcert_test(){
     testid=1
-    #fix_prevalid_cert_problem #weird problem
+    fix_prevalid_cert_problem #weird problem
     # conditions for test to continue (continue_test returns "yes")
     # 1. all ipa certs are valid
     # 2. if there are some certs haven't get chance to be renewed, test should be continue

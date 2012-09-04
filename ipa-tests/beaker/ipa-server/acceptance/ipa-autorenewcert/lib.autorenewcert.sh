@@ -704,7 +704,7 @@ test_dirsrv_via_ssl_based_ldapsearch(){
     # doc: http://directory.fedoraproject.org/wiki/Howto:SSL#Use_ldapsearch_with_SSL
     local testCMD="$ldapsearch -H ldaps://$host -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -s base -b \"\" objectclass=* | grep \"vendorName:\" "
     rlLog "test command: $testCMD"
-    $testCMD
+    $ldapsearch -H ldaps://$host -x -D "$ROOTDN" -w "$ROOTDNPWD" -s base -b "" objectclass=* | grep "vendorName:" 
     if [ "$?" = "0" ];then
         rlPass "[test_dirsrv_via_ssl_based_ldapsearch] Test Pass"
         echo "    [ PASS ] test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
@@ -721,7 +721,7 @@ test_dogtag_via_cert_show(){
     local certid=1
     local testCMD="ipa cert-show $certid | grep 'Certificate:'"
     rlLog "test command : $testCMD"
-    $testCMD
+    ipa cert-show $certid | grep 'Certificate:'
     if [ "$?" = "0" ];then
         rlPass "[test_dogtag_via_cert_show] Test Pass"
         echo "    [ PASS ] test_dogtag_via_cert_show ($@)" >> $testResult
