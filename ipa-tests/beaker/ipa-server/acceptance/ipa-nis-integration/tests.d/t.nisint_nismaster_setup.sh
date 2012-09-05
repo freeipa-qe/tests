@@ -201,8 +201,16 @@ nisint_nismaster_setup_nfs_exports()
 		/nisint/app2 @nisint_evilservers(ro)
 		EOF
 	
-		rlRun "service nfs restart" 0 "restart nfs services"
-		rlRun "service nfslock restart" 0 "restart nfslock service"
+		if [ -f /usr/lib/systemd/system/nfs-server.service ]; then
+			rlRun "systemctl restart nfs-server.service"
+		else
+			rlRun "service nfs restart"
+		fi
+		if [ -f /usr/lib/systemd/system/nfs-lock.service ]; then
+			rlRun "systemctl restart nfs-lock.service"
+		else
+			rlRun "service nfslock restart"
+		fi
 		rlRun "exportfs -av" 0 "Export /nisint dirs for NIS Integration testing"
 		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER services|grep nisint_" 0 "Check that new services are in the map"
 		[ -f $tmpout ] && rm -f $tmpout
