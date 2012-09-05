@@ -38,6 +38,14 @@
 ######################################################################
 # test suite
 ######################################################################
+nisint_ethers_map_enabled_check() 
+{
+	rlPhaseStartTest "nisint_ethers_map_enabled_check: check if ethers map is enabled"
+		export ENABLE_ETHERS=$(ldapsearch -h $MASTER_IP -xLLL -D "$ROOTDN" -w "$ROOTDNPWD" -b "cn=NIS Server,cn=plugins,cn=config" "nis-map=ethers.byaddr"|grep "dn: nis-domain=$DOMAIN+nis-map=ethers.byaddr"|wc -l)
+		rlLog "ENABLE_ETHERS=$ENABLE_ETHER"
+	rlPhaseEnd
+}
+
 nisint_ethers_tests()
 {
 	nisint_ethers_test_envsetup

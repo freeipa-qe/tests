@@ -49,6 +49,7 @@ nisint_ipamaster_integration()
 		
 		nisint_ipamaster_integration_envsetup
 		nisint_ipamaster_integration_setup_nis_listener
+		nisint_ethers_map_enabled_check
 		nisint_ipamaster_integration_add_nis_data
 		nisint_ipamaster_integration_del_nis_data
 		nisint_ipamaster_integration_add_nis_data_ldif
@@ -60,11 +61,15 @@ nisint_ipamaster_integration()
 		rlLog "Machine in recipe is NISMASTER"
 		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
 		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
+
+		nisint_ethers_map_enabled_check
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
 		rlLog "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
 		rlRun "rhts-sync-block -s 'nisint_ipamaster_integration_end' $MASTER_IP"
+
+		nisint_ethers_map_enabled_check
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE"
@@ -835,6 +840,7 @@ nisint_ipamaster_integration_setup_nis_listener()
 		rlRun "service rpcbind restart"
 		rlRun "rlDistroDiff dirsrv_svc_restart"
 		rlRun "ipactl status"
+		export ENABLE_ETHERS=$(ldapsearch -h $MASTER_IP -xLLL -D "$ROOTDN" -w "$ROOTDNPWD" -b "cn=NIS Server,cn=plugins,cn=config" "nis-map=ethers.byaddr"|grep "dn: nis-domain=$DOMAIN+nis-map=ethers.byaddr"|wc -l)
 		#rlRun "ipactl restart"
 		[ -f $tmpout ] && rm -f $tmpout	
 	rlPhaseEnd

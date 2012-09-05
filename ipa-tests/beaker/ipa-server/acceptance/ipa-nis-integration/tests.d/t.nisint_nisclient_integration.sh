@@ -62,6 +62,7 @@ nisint_nisclient_integration()
 		rlLog "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER_IP"
 		rlRun "rhts-sync-block -s 'nisint_nisclient_integration_start' $MASTER_IP"
 
+		nisint_ethers_map_enabled_check
 		nisint_nisclient_integration_check_ipa_nis_data_remotely
 		nisint_nisclient_integration_change_to_ipa_nismaster
 		nisint_nisclient_integration_setup_kerberos_for_auth
