@@ -43,6 +43,7 @@ dnsbugs()
    bz809562
    bz828687
    bz817413
+   bz813380
    dnsbugcleanup
 }
 
@@ -800,6 +801,40 @@ bz817413()
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 
 	rlPhaseEnd
+}
+
+bz813380()
+{
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=813380
+	# Bug 813380 - Improve NS record validation of non-fqdn records
+	rlPhaseStartTest "Bug 813380 - Improve NS record validation of non-fqdn records"
+		ipaddr=$(hostname -i)
+		rlLog "Ip address is $ipaddr"
+		ipoc1=$(echo $ipaddr | cut -d\. -f1)
+		ipoc2=$(echo $ipaddr | cut -d\. -f2)
+		ipoc3=$(echo $ipaddr | cut -d\. -f3)
+		ipoc4=$(echo $ipaddr | cut -d\. -f4)
+		newoc4=251
+		temail="ipaqar.redhat.com"
+		tserial=2010010701
+		trefresh=303
+		tretry=101
+		texpire=1202
+		tminimum=33
+		tttl=55
+		tzone="llnewzone.com"
+
+		# Add a zone to test with
+		rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+		# Create a host to add as a NS to the new zone
+		rlRun "ipa host-add nsnew.$tzone --ip-address=$ipoc1.$ipoc2.$ipoc3.$newoc4" 0 "Add a host to add as a ns server for the zone $tzone"
+		rlRun "ipa host-find nsnew.$tzone" 0 "make sure that the new host was created"
+		rlRun "ipa dnsrecord-add $tzone @ --ns-rec=nsnew" 0 "Add a non-FQDN NS record to the new zone"
+		rlRun "ipa dnsrecord-show $tzone @ | grep nsnew.$tzone" 0 "Make sure that the FQDN ns record appears to be in the new zone"
+		ipa host-del nsnew.$tzone # Cleanup the host
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+
+	rlPhaseEnd	
 }
 
 dnsbugcleanup()
