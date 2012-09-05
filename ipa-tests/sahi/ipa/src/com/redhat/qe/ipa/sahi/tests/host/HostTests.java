@@ -497,6 +497,8 @@ public class HostTests extends SahiTestScript{
 		if(sahiTasks.button("Cancel").exists()){
 			sahiTasks.button("Cancel").click();
 		}
+		sahiTasks.span("Reset").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -533,6 +535,8 @@ public class HostTests extends SahiTestScript{
 		else{
 			Assert.assertTrue(sahiTasks.span(keyName).exists(), "sshpubkey Add and " + buttonName + " Successful");
 		}
+		sahiTasks.span("Reset").click();
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
