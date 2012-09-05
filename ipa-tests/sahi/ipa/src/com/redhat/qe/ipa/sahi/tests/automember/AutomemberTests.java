@@ -144,9 +144,13 @@ public class AutomemberTests extends IPAWebAutomation {
 	/***************************************************************************** 
 	 *             Data providers                                                * 
 	 *****************************************************************************/
-	
+	//RHEL::
 	private String AutomemberTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
-	
+	//F17::
+	//private String AutomemberTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
+	//Win::
+	//private String AutomemberTestDataFile = "C:\\automembertest.properties";
+		
 	private String[] PolicyPageAutomemberUserGroupRules = {"simple add and delete","PolicyPageAutomemberUserGroupRules", AutomemberTestDataFile};
 	private String[] PolicyPageAutomemberHostGroupRules = {"simple add and delete","PolicyPageAutomemberHostGroupRules", AutomemberTestDataFile};
 	private String[] IdentityPageUserGroups = {"simple add and delete","IdentityPageUserGroups", AutomemberTestDataFile};
