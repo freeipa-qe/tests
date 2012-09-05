@@ -43,6 +43,8 @@ nisint_ethers_tests()
 	nisint_ethers_test_envsetup
 	nisint_ethers_test_1001
 	nisint_ethers_test_1002
+	nisint_ethers_test_1003
+	nisint_ethers_test_1004
 	nisint_ethers_test_envcleanup
 }
 

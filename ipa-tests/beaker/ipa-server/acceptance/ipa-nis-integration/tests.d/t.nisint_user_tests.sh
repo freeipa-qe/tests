@@ -208,7 +208,7 @@ nisint_user_test_1003()
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
-		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) ]; then
+		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
 			rlPass "ipa command not provided with RHEL 5...skipping"
 		else
 			rlRun "ipa user-show testuser1" 0 "ipa search for existing user"
@@ -242,7 +242,7 @@ nisint_user_test_1004()
 		rlLog "Machine in recipe is NISCLIENT"
 		if [ $(grep "auth_provider = .*ipa" /etc/sssd/sssd.conf 2>/dev/null|wc -l) -eq 0 ]; then
 			rlPass "ipa not configured...skipping"
-		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) ]; then
+		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
 			rlPass "ipa command not provided with RHEL 5...skipping"
 		else
 			rlRun "ipa user-show testuser1" 0 "ipa search for existing user"
