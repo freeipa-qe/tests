@@ -194,11 +194,18 @@ nisint_ethers_test_1003()
 		if [ $(ps -ef|grep [y]pbind|wc -l) -eq 0 ]; then
 			rlPass "ypbind not running...skipping test"
 		else
+			rlLog "Checking the ipa added entries"
+			rlRun "ypmatch 99:88:77:66:55:44 ethers.byaddr | grep testethershost1.$DOMAIN"
+			rlRun "ypmatch 11:22:33:44:55:66 ethers.byaddr | grep testethershost2.$DOMAIN"
+			rlRun "ypmatch testethershost1.$DOMAIN ethers.byname | grep 99:88:77:66:55:44"
+			rlRun "ypmatch testethershost2.$DOMAIN ethers.byname | grep 11:22:33:44:55:66"
+	
+			rlLog "Checking the ldif added entries"
 			for i in 1 2 3 4; do
-				rlRun "ypmatch 00:00:00:00:00:0$i ethers.byaddr" 0 "Successfully run ypmatch to find ethers.byaddr entry"
+				rlRun "ypmatch 00:00:00:00:00:0$i ethers.byaddr | grep etherhost$i.$DOMAIN" 0 "Successfully run ypmatch to find ethers.byaddr entry"
 			done
 			for i in 1 2 3 4; do
-				rlRun "ypmatch etherhost$i.$DOMAIN ethers.byname" 0 "Successfully run ypmatch to find ethers.byname entry"
+				rlRun "ypmatch etherhost$i.$DOMAIN ethers.byname | grep 00:00:00:00:00:0$i" 0 "Successfully run ypmatch to find ethers.byname entry"
 			done
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $NISCLIENT_IP"
