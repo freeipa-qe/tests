@@ -138,7 +138,7 @@ reset_group_pwpolicy()
     then
         rlPass "group pwpolicy has been set"
     else
-        rlFail "group pwpolicy set failed"
+        rlFail "FAIL - group pwpolicy set failed"
         echo "------------------------------"
         cat $out
         echo "------------------------------"
@@ -178,7 +178,7 @@ reset_nestedgroup_pwpolicy()
     then
         rlPass "group pwpolicy has been set"
     else
-        rlFail "group pwpolicy set failed"
+        rlFail "FAIL - group pwpolicy set failed"
         echo "------------------------------"
         cat $out
         echo "------------------------------"
@@ -366,7 +366,7 @@ add_grp(){
         rlRun "ipa group-add $grpname --desc \"$desc\"" 0 "create group [$grpname]"
         rlRun "$kdestroy"
     else
-        rlFail "no group name is given, fail to create group"
+        rlFail "FAIL - no group name is given, fail to create group"
     fi
 } # add_grp
 
@@ -378,7 +378,7 @@ del_grp(){
         rlRun "ipa group-del $grpname" 0 "delete group: [$grpname]"
         rlRun "$kdestroy"
     else
-        rlFail "no group name is given, fail to delete group"
+        rlFail "FAIL - no group name is given, fail to delete group"
     fi
 } #del_grp
 
@@ -596,18 +596,18 @@ Local_KinitAsAdmin()
             rlRun "rlDistroDiff keyctl"
             echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
-                rlFail "[Local_KinitAsAdmin] reset password back to original [$pw] failed"
+                rlFail "FAIL - [Local_KinitAsAdmin] reset password back to original [$pw] failed"
             fi
             ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes           
             rlPass "[Local_KinitAsAdmin] set admin password back to [$pw] success -- after set to temp"
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
-            rlFail "[Local_KinitAsAdmin] admin password wrong? [$pw]"
+            rlFail "FAIL - [Local_KinitAsAdmin] admin password wrong? [$pw]"
         else
             echo "[Local_KinitAsAdmin] unhandled error"
         fi
     else
-        rlFail "[Local_KinitAsAdmin] unknow error, return code [$?] not recoginzed"
+        rlFail "FAIL - [Local_KinitAsAdmin] unknow error, return code [$?] not recoginzed"
     fi
     rm $out
 } #KinitAsAdmin
@@ -635,7 +635,7 @@ change_password()
         then
             echo "[change_password] [$userlogin] kinit as current pw [$currentpw] success, test continue"
         else
-            rlFail "[change_password] no kerberos found for [$userlogin], test can not continue"
+            rlFail "FAIL - [change_password] no kerberos found for [$userlogin], test can not continue"
             return 1
         fi
     fi
@@ -836,7 +836,7 @@ minlife_default()
         rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work [$testacPW]"
         change_password $testac $testacPW "dummy123"
         if [ $? = 0 ];then
-            rlFail "password change success, this is not expected"
+            rlFail "FAIL - password change success, this is not expected"
             currentPW="dummy123"
         else 
             rlPass "password change failed as expected"
@@ -852,10 +852,10 @@ minlife_default()
         if [ $? = 0 ];then
             rlPass "password change success, this is expected"
         else
-            rlFail "password change failed is not expected"
+            rlFail "FAIL - password change failed is not expected"
         fi
     else
-        rlFail "can not set pre-condition"
+        rlFail "FAIL - can not set pre-condition"
     fi
 } #minlife_default
 
@@ -907,12 +907,12 @@ minlife_lowerbound()
                     oldpw=$newpw
                     newpw=$tmp 
                 else
-                    rlFail "password change failed is not expected"
+                    rlFail "FAIL - password change failed is not expected"
                 fi
             done
             del_test_ac
         else
-            rlFail "can not set pre-condition for minlife lowbound test"
+            rlFail "FAIL - can not set pre-condition for minlife lowbound test"
         fi
         rm $out
     # test logic ends
@@ -969,7 +969,7 @@ util_pwpolicy_removeall()
     if [ $total = $i ];then
         rlPass "all password policy [$i:$list] have been deleted"
     else
-        rlFail "expect [$total] password policy, deleted [$i]"
+        rlFail "FAIL - expect [$total] password policy, deleted [$i]"
     fi
     rlRun "$kdestroy"
     #rm $out

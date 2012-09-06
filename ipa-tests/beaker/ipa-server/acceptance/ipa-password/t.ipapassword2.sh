@@ -248,7 +248,7 @@ ipapassword2_maxfail_positive()
 	    if [ $actual -eq $value ] ; then
 		rlPass "Max failures correct [$actual]"
 	    else
-		rlFail "Max failures not as expected.  Got: [$actual] Expected: [$value]"
+		rlFail "FAIL - Max failures not as expected.  Got: [$actual] Expected: [$value]"
 	    fi
         done
    rlPhaseEnd
@@ -263,7 +263,7 @@ ipapassword2_maxfail_positive()
 		if [ $count -eq $value ] ; then
 			rlPass "User's failed counter is as expected: [$count]"
 		else
-			rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
+			rlFail "FAIL - User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
 		fi
 	done
 
@@ -277,7 +277,7 @@ ipapassword2_maxfail_positive()
         if [ $count -eq 0 ] ; then
         	rlPass "User's failed counter is as expected: [$count]"
         else
-        	rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
+        	rlFail "FAIL - User's failed counter is NOT as expected.  Got: [$count] Expected: [$value]"
         fi
    rlPhaseEnd
 
@@ -312,10 +312,10 @@ ipapassword2_maxfail_positive()
 		if [ $count -eq 0 ] ; then
 			rlPass "User's failed counter is as expected: [$count]"
 		else
-			rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [0]"	
+			rlFail "FAIL - User's failed counter is NOT as expected.  Got: [$count] Expected: [0]"	
 		fi
         else
-        	rlFail "User's failed counter is NOT as expected.  Got: [$count] Expected: [1]"
+        	rlFail "FAIL - User's failed counter is NOT as expected.  Got: [$count] Expected: [1]"
 		rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=718062"
         fi
    rlPhaseEnd
