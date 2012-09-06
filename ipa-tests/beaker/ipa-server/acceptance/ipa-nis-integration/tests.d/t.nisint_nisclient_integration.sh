@@ -211,11 +211,7 @@ nisint_nisclient_integration_setup_kerberos_for_auth()
 		rlRun "yum -y install krb5-workstation pam_krb5" 0 "Install krb5-workstation pam_krb5"
 		rlRun "service ntpd stop"
 		sleep 5
-		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
-			rlRun "ntpdate $NTPSERVER"
-		else
-			rlRun "service ntpdate start"
-		fi
+		rlRun "ntpdate $NTPSERVER"
 		rlRun "service ntpd start"
 		rlRun "chkconfig ntpd on"
 		rlRun "touch /etc/krb5.keytab"
