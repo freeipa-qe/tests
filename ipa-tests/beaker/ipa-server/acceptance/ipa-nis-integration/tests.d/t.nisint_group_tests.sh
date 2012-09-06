@@ -329,6 +329,7 @@ nisint_group_test_1007()
 		;;
 	"NISCLIENT")
 		rlLog "Machine in recipe is NISCLIENT"
+		rlRun "getent group testgroup1"
 		rlRun "touch /tmp/mytestfile.user1" 0 "touch new file as existing user"
 		rlRun "chown testuser1:testuser1 /tmp/mytestfile.user1" 0 "chown file to another group"
 		rlRun "su - testuser1 -c 'chown testuser1:testgroup1 /tmp/mytestfile.user1'" 0 "chown file to another group"
