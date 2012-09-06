@@ -230,9 +230,19 @@ public class NetgroupTasks {
 		sahiTasks.link(groupName).click();
 		String categoryToChoose="";
 		if (category.equals("usercategory"))
-			categoryToChoose = category + "-1";
+			if (!System.getProperty("os.name").startsWith("Windows")){
+				categoryToChoose = category + "-1";
+			}else{
+				categoryToChoose = category + "-4";
+			}
+		
 		else
-			categoryToChoose = category +"-2";
+			if (!System.getProperty("os.name").startsWith("Windows")){
+				categoryToChoose = category + "-2";
+			}else{
+				categoryToChoose = category + "-5";
+			}
+			
 		sahiTasks.radio(categoryToChoose+"-0").click();
 		sahiTasks.span(action).click();
 		if (action.equals("Update"))  
@@ -257,9 +267,18 @@ public class NetgroupTasks {
 		sahiTasks.link(groupName).click();
 		String categoryToChoose="";
 		if (category.equals("usercategory"))
-			categoryToChoose = category + "-1";
+			if (!System.getProperty("os.name").startsWith("Windows")){
+				categoryToChoose = category + "-1";
+			}else{
+				categoryToChoose = category + "-4";
+			}
+		
 		else
-			categoryToChoose = category +"-2";
+			if (!System.getProperty("os.name").startsWith("Windows")){
+				categoryToChoose = category + "-2";
+			}else{
+				categoryToChoose = category + "-5";
+			}
 		sahiTasks.radio(categoryToChoose+"-1").click();
 		sahiTasks.span("Update").click();		
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();	
