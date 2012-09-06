@@ -76,6 +76,7 @@ nisint_nisclient_migration_envsetup()
 		NISCLIENT=$NISCLIENT_S.$DOMAIN
 
 		rlRun "yum -y install *ipa-admintools *ipa-client"
+		rlRun "yum -y update"
 
 		rlRun "sed -i s/^$NISCLIENT_IP.*$HOSTNAME_S.*$// /etc/hosts"
 		rlRun "echo '$NISCLIENT_IP $HOSTNAME_S.$DOMAIN $HOSTNAME_S' >> /etc/hosts"
