@@ -85,11 +85,6 @@ setup-nis-server()
 	sed -i 's/^shadow:.*$/shadow: files nis/' /etc/nsswitch.conf
 	sed -i 's/^group:.*$/group:  files nis/' /etc/nsswitch.conf
 
-	adduser --password $NISUSER1PASSWD $NISUSER1
-	adduser --password $NISUSER2PASSWD $NISUSER2
-	adduser --password $NISUSER3PASSWD $NISUSER3
-	adduser --password $NISUSER4PASSWD $NISUSER4
-	
 	echo "$MYHOSTNAME" | $LIBDIR/yp/ypinit -m	
 	service yppasswdd start
 	service ypxfrd start
@@ -105,6 +100,12 @@ setup-nis-server()
 	service iptables stop
 	service ip6tables stop
 
+	# add nis users
+	adduser --password $NISUSER1PASSWD $NISUSER1
+	adduser --password $NISUSER2PASSWD $NISUSER2
+	adduser --password $NISUSER3PASSWD $NISUSER3
+	adduser --password $NISUSER4PASSWD $NISUSER4
+	
 	# configuring netgroups
 	cat <<-EOF >>/etc/netgroup
 	convertpeople (-,$NISUSER1,$NISDOMAIN) (-,$NISUSER2,$NISDOMAIN) (-,$NISUSER3,$NISDOMAIN) (-,$NISUSER4,$NISDOMAIN)
