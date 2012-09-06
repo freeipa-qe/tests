@@ -44,6 +44,7 @@ dnsbugs()
    bz828687
    bz817413
    bz813380
+   bz829340
    dnsbugcleanup
 }
 
@@ -835,6 +836,30 @@ bz813380()
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 
 	rlPhaseEnd	
+}
+
+bz829340()
+{
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=829340
+	# Bug 829340 - plugin doesn't handle IPv6 elements in idnsForwarders attribute
+	rlPhaseStartTest "Bug 829340 - check support for IPv6 elements in idnsForwarders attribute"
+		temail="ipaqar.redhat.com"
+		tserial=2010010701
+		trefresh=303
+		tretry=101
+		texpire=1202
+		tminimum=33
+		tttl=55
+		tzone="idnszone.com"
+		ipv6address='fe80::210:14ff:fe05:134'
+
+		# Add a zone to test with
+		rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+		rlRun "ipa dnszone-mod $tzone --addattr=idnsForwarders='$ipv6address'" 0 "add a IPv6 address to the idns Forwarders field of a zone."
+		rlRun "ipa dnszone-find $tzone | grep Zone\ forwarders | grep '$ipv6address'" 0 "Make sure that the IPv6 address appears to be part of the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+		
+	rlPhaseEnd
 }
 
 dnsbugcleanup()
