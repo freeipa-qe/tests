@@ -45,6 +45,7 @@ dnsbugs()
    bz817413
    bz813380
    bz829340
+   bz798493
    dnsbugcleanup
 }
 
@@ -859,6 +860,36 @@ bz829340()
 		rlRun "ipa dnszone-find $tzone | grep Zone\ forwarders | grep '$ipv6address'" 0 "Make sure that the IPv6 address appears to be part of the zone."
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 		
+	rlPhaseEnd
+}
+
+bz798493()
+{
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=798493
+	# Bug 798493 - adding reverse zones in gui fails to create correct zone 
+	rlPhaseStartTest "Bug 798493 - adding reverse zones in gui fails to create correct zone"
+		# Add a zone
+		forward='10.11.12.0/24'
+		reverse='12.11.10.in-addr.arpa.'
+		echo '' | ipa dnszone-add --name-server=`hostname` --admin-email="admin@testrelm.com" --name-from-ip=$forward
+		rlRun "ipa dnszone-find '$reverse'" 0 "Make sure dnszone-find seems to find the reverse zone"
+		rlRun "ipa dnszone-find '$reverse' | grep 'Zone name: $reverse'" 0 "Make sure dnszone-find outputs teh correct zone name."
+		ipa dnszone-del $reverse
+		# Add a zone
+		forward='10.11.12.0/20'
+		reverse='11.10.in-addr.arpa.'
+		echo '' | ipa dnszone-add --name-server=`hostname` --admin-email="admin@testrelm.com" --name-from-ip=$forward
+		rlRun "ipa dnszone-find '$reverse'" 0 "Make sure dnszone-find seems to find the reverse zone"
+		rlRun "ipa dnszone-find '$reverse' | grep 'Zone name: $reverse'" 0 "Make sure dnszone-find outputs teh correct zone name."
+		ipa dnszone-del $reverse
+		# Add a zone
+		forward='10.11.12.0/16'
+		reverse='11.10.in-addr.arpa.'
+		echo '' | ipa dnszone-add --name-server=`hostname` --admin-email="admin@testrelm.com" --name-from-ip=$forward
+		rlRun "ipa dnszone-find '$reverse'" 0 "Make sure dnszone-find seems to find the reverse zone"
+		rlRun "ipa dnszone-find '$reverse' | grep 'Zone name: $reverse'" 0 "Make sure dnszone-find outputs teh correct zone name."
+		ipa dnszone-del $reverse
+
 	rlPhaseEnd
 }
 
