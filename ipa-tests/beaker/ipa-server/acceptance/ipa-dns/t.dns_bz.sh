@@ -46,6 +46,7 @@ dnsbugs()
    bz813380
    bz829340
    bz798493
+   bz809565
    dnsbugcleanup
 }
 
@@ -890,6 +891,31 @@ bz798493()
 		rlRun "ipa dnszone-find '$reverse' | grep 'Zone name: $reverse'" 0 "Make sure dnszone-find outputs teh correct zone name."
 		ipa dnszone-del $reverse
 
+	rlPhaseEnd
+}
+
+bz809565()
+{
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=809565
+	rlPhaseStartTest "Bug 809565 - Cannot change DNS name without recreating it"
+		temail="ipaqar.redhat.com"
+		tserial=2010010701
+		trefresh=303
+		tretry=101
+		texpire=1202
+		tminimum=33
+		tttl=55
+		tzone="idnszone.com"
+		ipv6address='fe80::210:14ff:fe05:134'
+
+		# Add a zone to test with
+		rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+		ipa dnszone-mod $tzone --addattr=idnsName='Name1'
+		nameb='Name2'
+		rlRun "ipa dnszone-mod $tzone --addattr=idnsName='$nameb'" 0 "Try to modify the idns name without destroying it first."
+		rlRun "ipa dnszone-find $tzone | grep '$nameb'" 0 "Make sure that the new name exists in the zone."
+		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+		
 	rlPhaseEnd
 }
 
