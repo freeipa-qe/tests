@@ -14,30 +14,32 @@
 			    <include name="permissionInvalidAddTypeTests" /> 
 			    <include name="permissionBug807755Tests" /> 
 			    <include name="permissionBug783500Tests" />
+			    <include name="permissionBug815364Tests" />
+			    <include name="permissionBug811207Tests"/>
 			    <include name="permissionRequiredFieldAddTests" />  
 			    <include name="permissionMemberOfAddTests" />
-			    <!--  TODO <include name="permissionMissingMemberOfAddTests" /> --> 	
+			     <!--TODO <include name="permissionMissingMemberOfAddTests" />--> 
 			    <include name="permissionMultipleDeleteTests" /> 
 			    <include name="permissionAddAndAddAnotherTypeTests" />
 			    <include name="permissionAddAndEditTypeTests" /> 
 			    <include name="permissionAddCancelFilterTests" /> 
 			    <include name="permissionAddFilterUndoAttributeTests" /> 
-			    <include name="permissionExpandCollapseTests" /> -->
+			    <include name="permissionExpandCollapseTests" /> 
 			    <include name="permissionModifyTests" /> 
-			    <include name="permissionInvalidModifyTests" /> 
+			   	<include name="permissionInvalidModifyTests" /> 
 			    <include name="permissionAddAndAddPrivilegesTests" />
 			    <include name="permissionDeleteMemberTests" /> 
 			</run>
-		</groups>
+		</groups> 
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
 		</classes>
-	</test> 
+	</test>
 
 
 
 	
-	<test name="Privilege Tests">
+	<!--<test name="Privilege Tests">
 		<groups>
 			<run>	
 			     <include name="setup" />
@@ -92,18 +94,21 @@
 	<test name="RBAC Functional Tests">
 		<groups>
 			<run>
-				<include name="setup" />
-			    <!-- <include name="hostAddsUser" /> 							
-				 <include name="permissionAddSubtreeTests" /> --> 
-				<include name="dnsUpdateAdmin" /> 
-				<include name="dnsListZone" /> 
+				<include name="setup" />-->
+			    		<!--<include name="hostAddsUser" /> 							
+				 		<include name="permissionAddSubtreeTests" />  -->
+				<!--<include name="dnsUpdateAdmin" /> 
+				<include name="dnsListZone" />
+				<include name="ResetPassword_Bug784621" />
+				<include name="ReaddingPrivilege_Bug811211" />
+				<include name="IndirectRoles_Bug839008"/>
 			</run>
 		</groups>
 		<classes>
 		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
 		    <class name="com.redhat.qe.ipa.sahi.tests.rbac.RBACFunctional" />
 		</classes>
-	</test>
+	</test>-->
 
 		
 </suite>

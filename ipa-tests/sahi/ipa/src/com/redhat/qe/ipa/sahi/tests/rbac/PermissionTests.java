@@ -350,6 +350,41 @@ public class PermissionTests extends SahiTestScript {
 			CommonTasks.clearSearch(sahiTasks);
 		}
 		
+		/*
+		* Find Permission with 'dns' filter - Bug 815364
+		* Search 
+		*/
+		@Test (groups={"permissionBug815364Tests"}, description="Verify Bug 815364 - Search for permission with 'dns' as the filter, cases are not correct for some of the permissions", 
+				dataProvider="permissionBug815364TestObjects")	
+		public void testPermissionBug815364(String testName, String filter) throws Exception {		
+			CommonTasks.search(sahiTasks, filter);		
+			String[] dnsEntries={"Read DNS Entries", "Add DNS Entries", "Remove DNS Entries", "Update DNS Entries", "Write DNS Configuration"};
+			for(String dns:dnsEntries){
+					Assert.assertTrue(sahiTasks.link(dns).exists(), "" + dns + " exists");
+			}
+			CommonTasks.clearSearch(sahiTasks);
+		}
+		
+		/*
+		 * Attribute does not Refresh when Type is changed - Bug 811207 
+		 */
+		@Test (groups={"permissionBug811207Tests"}, description="Verify Bug 811207 - Attributes does not Refresh when Type is changed", 
+				dataProvider="permissionBug811207TestObjects")	
+		public void testPermissionBug811207(String testName, String cn, String right, String type1, String type2, String buttonToClick) throws Exception {		
+			sahiTasks.navigateTo(commonTasks.permissionPage, true);
+			String attributes[] = {"description"};
+			String rights[] = {right};
+			PermissionTasks.createPermissionWithType(sahiTasks, cn, rights, type1, attributes, buttonToClick);
+			CommonTasks.search(sahiTasks, cn);
+			sahiTasks.link(cn).click();
+			if(sahiTasks.select("type").exists())
+				sahiTasks.select("type").choose("Service");
+			Assert.assertFalse(sahiTasks.checkbox("description").exists(), "Attributes have been refreshed when type changed");
+			sahiTasks.span("Reset").click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			
+		}
+		
 		
 		/*
 		 * Add permission - Type - Bug 783500
@@ -419,7 +454,8 @@ public class PermissionTests extends SahiTestScript {
 			if (!attribute.equals("none") && (!attribute.isEmpty()))
 				PermissionTasks.undoResetUpdatePermission(sahiTasks, cn, "Attributes", attribute, "Update");
 			
-			
+			if(cn.equals("Modify netgroup membership"))
+				PermissionTasks.RevertChanges(sahiTasks,cn,right,attribute);
 			
 			CommonTasks.clearSearch(sahiTasks);
 		}
@@ -456,7 +492,7 @@ public class PermissionTests extends SahiTestScript {
 			String privileges[] = {privilege1, privilege2};
 			//new permission can be added now
 			PermissionTasks.addPermissionAddPrivilege(sahiTasks, cn, rights, type,  privileges, buttonToClick);
-			
+			sahiTasks.span("Refresh").click();
 			//verify privilege was added successfully
 			CommonTasks.search(sahiTasks, cn);
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Added permission " + cn + "  successfully");
@@ -557,7 +593,8 @@ public class PermissionTests extends SahiTestScript {
 					"Manage Group4",
 					"Manage SELinux",
 					"Manage Sudo",
-					"Manage Automount"
+					"Manage Automount",
+					"Bug811207_permission"
 			};
 			
 			for (String permissionTestObject : permissionTestObjects) {
@@ -594,6 +631,7 @@ public class PermissionTests extends SahiTestScript {
 			
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.clearSearch(sahiTasks);
+			PermissionTasks.RevertChanges(sahiTasks, "Modify netgroup membership", "add", "description");
 		}
 		
 		
@@ -757,6 +795,34 @@ public class PermissionTests extends SahiTestScript {
 			
 			return permissions;	
 		}
+		
+		/*
+		 * Data to be used when searching permissions with filter 'dns' - Type - Bug 815364
+		 */
+		@DataProvider(name="permissionBug815364TestObjects")
+		public Object[][] getpermissionBug815364TestObjects() {
+			String[][] permissions={
+			//	testname					filter  			 			
+			{ "add_permission_type_bug815364_search",	"dns"        }	};
+			
+			return permissions;	
+		}
+		
+		/*
+		 * Data to be used when adding permissions - Type - Bug 811207
+		 */
+		@DataProvider(name="permissionBug811207TestObjects")
+		public Object[][] getpermissionBug811207TestObjects() {
+			String[][] permissions={
+			//	testname					cn  					right		type1			type2		buttonToClick		 			
+			{ "add_permission_type_bug811207_search",	"Bug811207_permission",	"write",	"User Group",	"Services",	"Add"   }	};
+			
+			return permissions;	
+		}
+		
+		/*
++		 * Data to be used when adding permissions - Type - Bug 783500
++		 */
 	
 		/*
 		 * Check for Required fields when adding permissions
@@ -828,10 +894,10 @@ public class PermissionTests extends SahiTestScript {
 		public Object[][] getpermissionModifyTestObjects() {
 			String[][] permissions={
 			//	testname					cn								right		Member Of Group			Type		Attribute		
-			{ "edit_permission",			"Modify netgroup membership", 	"add",		"permissiontestgroup",	"Netgroup",	"description"	 },
-			{ "edit_permission_subtree",	"Remove Automount keys", 		"add",		"permissiontestgroup",	"",			""	 },
-			{ "edit_permission_clear_attr",	"Enroll a host", 				"",			"",						"Host",			"none"	 } };
-		
+			{ "edit_permission",					"Modify netgroup membership", 	"add",		"ipausers",			"Netgroup",	"description"	 },
+			{ "edit_permission_subtree_ticket3028",	"Remove Automount keys", 		"add",		"ipausers",				"",			""	 },
+			{ "edit_permission_clear_attr",			"Enroll a host", 				"",			"",		"Host",			"none"	 } };
+					 		
 			return permissions;	
 		}
 		

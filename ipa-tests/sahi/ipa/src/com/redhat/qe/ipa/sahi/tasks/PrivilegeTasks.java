@@ -38,13 +38,16 @@ public class PrivilegeTasks {
 	}
 
 	public static void verifyPrivilege(SahiTasks sahiTasks, String name, String newDescription) {
+		CommonTasks.search(sahiTasks, name);
 		sahiTasks.link(name).click();
 		sahiTasks.link("Settings").click();
 		Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
 	}
 
-	public static void deletePrivilege(SahiTasks sahiTasks,	String name, String buttonToClick) {		
+	public static void deletePrivilege(SahiTasks sahiTasks,	String name, String buttonToClick) {
+		CommonTasks.search(sahiTasks, name);
 		if (sahiTasks.link(name).exists()){
 			sahiTasks.checkbox(name).click();
 			sahiTasks.link("Delete").click();
@@ -55,6 +58,7 @@ public class PrivilegeTasks {
 				sahiTasks.checkbox(name).click();
 			}
 		}
+		CommonTasks.clearSearch(sahiTasks);
 	}
 
 	public static void addInvalidPrivilege(SahiTasks sahiTasks, String name, String description, String expectedError) {
@@ -132,13 +136,19 @@ public class PrivilegeTasks {
 		sahiTasks.link(name).click();
 		sahiTasks.link("Settings").click();
 		sahiTasks.textarea("description").setValue(newDescription);
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").near(sahiTasks.span(name)).click();
 		sahiTasks.button(buttonToClick).click();
 		
 		if (!buttonToClick.equals("Cancel")) {
 			CommonTasks.search(sahiTasks, name);
-			if (buttonToClick.equals("Update"))
+			if (buttonToClick.equals("Update")){
 				verifyPrivilege(sahiTasks, name, newDescription);
+				sahiTasks.link(name).click();
+				sahiTasks.link("Settings").click();
+				sahiTasks.textarea("description").setValue(description);
+				sahiTasks.span("Update").click();
+				sahiTasks.link("Privileges").near(sahiTasks.span(name)).click();
+			}
 			else
 				verifyPrivilege(sahiTasks, name, description);
 			CommonTasks.clearSearch(sahiTasks);
@@ -179,6 +189,7 @@ public class PrivilegeTasks {
 			sahiTasks.textarea("description").setValue(description);
 			sahiTasks.button("Add and Edit").click();
 		} else {
+			CommonTasks.search(sahiTasks, name);
 			sahiTasks.link(name).click();
 		}
 		
@@ -199,6 +210,7 @@ public class PrivilegeTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button(buttonToClick).click();
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
 	}
 
 	
@@ -230,6 +242,7 @@ public class PrivilegeTasks {
 	
 
 	public static void verifyPrivilegeMembership(SahiTasks sahiTasks, String name, String membershipToCheckfor, String[] members, boolean exists) {
+		CommonTasks.search(sahiTasks, name);
 		sahiTasks.link(name).click();
 		if (membershipToCheckfor.equals("Permissions"))
 			sahiTasks.link("memberof_permission").click();
@@ -246,6 +259,7 @@ public class PrivilegeTasks {
 			}
 		}	
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
 	}
 	
 	public static void verifyPrivilegeMembershipInPermissionRole(SahiTasks sahiTasks, String name, String memberType, String[] members) {

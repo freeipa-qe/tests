@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 import com.redhat.qe.auto.testng.Assert;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
+import com.redhat.qe.ipa.sahi.tasks.GroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.PermissionTasks;
 import com.redhat.qe.ipa.sahi.tasks.PrivilegeTasks;
@@ -100,7 +101,8 @@ public class RBACFunctional extends SahiTestScript {
 			dataProvider="dnsUpdateAdminTestObjects")
 			//, dependsOnGroups="permissionAddSubtreeTests")	
 	public void testDNSUpdateAdmin(String testName, String permissionName, String privilegeName, String privilegeDescription,
-			String roleName, String roleDescription, String userName) throws Exception {		
+			String roleName, String roleDescription, String userName) throws Exception {
+		
 		//Add privilege with permission
 		sahiTasks.navigateTo(commonTasks.privilegePage, true);
 		log.info("Add Privilege");
@@ -125,13 +127,14 @@ public class RBACFunctional extends SahiTestScript {
 	    RoleTasks.addMemberToRole(sahiTasks, roleName, "User", userName);
 
 	    String newPassword="Secret123";
-	    log.info("Kinit as " + userName );
+	    CommonTasks.formauthNewUser(sahiTasks, userName, newPassword);
+	    /*log.info("Kinit as " + userName );
 	    CommonTasks.kinitAsNewUserFirstTime(userName, password, newPassword);
 	    
 	    sahiTasks.link("Logout").click();
 	    sahiTasks.link("Return to main page.").click();
 	    Assert.assertEquals("Logged In As: " + userName + " " + userName,sahiTasks.link("Logged In As: " + userName +  " " + userName).text(), 
-	    		"User logged in as expected: " + userName);
+	    		"User logged in as expected: " + userName);*/
 	    
 	
 		//Verify bug
@@ -139,10 +142,12 @@ public class RBACFunctional extends SahiTestScript {
 		Assert.assertFalse(sahiTasks.span("Error: IPA Error 3007").exists(), "No error when going to DNS Page");
 		Assert.assertFalse(sahiTasks.link(System.getProperty("ipa.server.domain")).exists(), "No zone listed for " 
 				+ System.getProperty("ipa.server.domain"));
+		
+		CommonTasks.formauth(sahiTasks, "admin", System.getProperty("ipa.server.password"));
 	
-		CommonTasks.kinitAsAdmin();
+		/*CommonTasks.kinitAsAdmin();
 		sahiTasks.link("Logout").click();
-	    sahiTasks.link("Return to main page.").click();
+	    sahiTasks.link("Return to main page.").click();*/
 	}
 	
 	
@@ -181,12 +186,147 @@ public class RBACFunctional extends SahiTestScript {
 	}
 	
 	/*
+	 * Bug 784621
+	 */
+	@Test (groups={"ResetPassword_Bug784621"}, description="Bug 784621 - Reset Password", 
+			dataProvider="ResetPasswordBug784621TestObjects")	
+	
+	public void testResetPassword_Bug784621(String testName, String permissionName, String right, String filter, String attribute, String privilegeName, String privilegedesc,
+			String roleName,  String roleDesc, String uidloginuser, String givennameloginuser, String snloginuser, String userpassword, String userpassword2, String uid, String givenname, String sn) throws Exception {
+	
+	    
+		log.info("Add Permission - " + permissionName);	
+		sahiTasks.navigateTo(commonTasks.permissionPage, true);
+		String rights[]={right};
+		String[] attributes={attribute};
+		PermissionTasks.createPermissionWithFilter(sahiTasks, permissionName, rights, filter, attributes, "Add");
+		PermissionTasks.verifyPermissionFilter(sahiTasks, permissionName, rights, filter, attributes);
+		
+		log.info("Add Privilege - " + privilegeName);	
+		sahiTasks.navigateTo(commonTasks.privilegePage, true);
+		String permissions[] = {permissionName};
+		PrivilegeTasks.addPrivilege(sahiTasks, privilegeName, privilegedesc, "Add");
+		PrivilegeTasks.verifyPrivilege(sahiTasks, privilegeName, privilegedesc);
+		PrivilegeTasks.addMembersToPrivilege(sahiTasks, privilegeName, "Permissions", permissionName, permissions, "Add");
+		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, privilegeName, "Permissions", permissions, true);
+		
+		log.info("Add User to Login - " + uidloginuser);	
+		sahiTasks.navigateTo(commonTasks.userPage);
+		UserTasks.createUser(sahiTasks, uidloginuser, givennameloginuser, snloginuser, userpassword, userpassword2, "Add");
+		Assert.assertTrue(sahiTasks.link(uidloginuser).exists(), "Main User added successfully");
+		UserTasks.createUser(sahiTasks, uid, givenname, sn, "Add");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "User to be checked added successfully");
+		
+		log.info("Add Role - " + roleName);	
+		sahiTasks.navigateTo(commonTasks.rolePage);
+		String privileges[]={privilegeName};
+		RoleTasks.addRoleAddPrivileges(sahiTasks, roleName, roleDesc, privilegeName, privileges, "Add");
+		RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, roleName, "Privileges", privileges, true);
+		RoleTasks.addMemberToRole(sahiTasks, roleName, "Users", uidloginuser);
+		RoleTasks.verifyMembership(sahiTasks, roleName, "Users", uidloginuser);
+		
+		CommonTasks.formauthNewUser(sahiTasks, uidloginuser, userpassword);
+		
+		CommonTasks.search(sahiTasks, uid);
+		sahiTasks.link(uid).click();
+		Assert.assertTrue(sahiTasks.textbox("carlicense").exists(), "Attribute is editable");
+		Assert.assertTrue(sahiTasks.link("action disabled").exists(), "Password cannot be reset for this user");
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
+		
+		CommonTasks.formauth(sahiTasks, "admin", System.getProperty("ipa.server.password"));
+		
+		
+		
+	}
+	
+	/*
+	 * Bug 811211
+	 */
+	@Test (groups={"ReaddingPrivilege_Bug811211"}, description="Bug 811211 - Readding privilege", 
+			dataProvider="ReaddingPrivilegeBug811211TestObjects")	
+	
+	public void testResetPassword_Bug811211(String testName, String permissionName, String right, String filter, String attribute, String privilegeName, String privilegedesc) throws Exception {
+	
+	    
+		log.info("Add Permission - " + permissionName);	
+		sahiTasks.navigateTo(commonTasks.permissionPage, true);
+		String rights[]={right};
+		String[] attributes={attribute};
+		PermissionTasks.createPermissionWithFilter(sahiTasks, permissionName, rights, filter, attributes, "Add");
+		PermissionTasks.verifyPermissionFilter(sahiTasks, permissionName, rights, filter, attributes);
+		
+		log.info("Add Privilege - " + privilegeName);	
+		sahiTasks.navigateTo(commonTasks.privilegePage, true);
+		String permissions[] = {permissionName};
+		PrivilegeTasks.addPrivilege(sahiTasks, privilegeName, privilegedesc, "Add");
+		PrivilegeTasks.verifyPrivilege(sahiTasks, privilegeName, privilegedesc);
+		PrivilegeTasks.addMembersToPrivilege(sahiTasks, privilegeName, "Permissions", permissionName, permissions, "Add");
+		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, privilegeName, "Permissions", permissions, true);
+		
+		PrivilegeTasks.deletePrivilege(sahiTasks, privilegeName, "Delete");
+		
+		log.info("Re-add Privilege - " + privilegeName);	
+		sahiTasks.navigateTo(commonTasks.privilegePage, true);
+		PrivilegeTasks.addPrivilege(sahiTasks, privilegeName, privilegedesc, "Add and Edit");
+		
+		for(String permission: permissions){
+			Assert.assertFalse(sahiTasks.link(permission).exists(), "No permissions added");
+		}
+		
+	}
+	
+	
+	
+	/*
+	 * Bug 839008
+	 */
+	@Test (groups={"IndirectRoles_Bug839008"}, description="Bug 839008 - Indirect Roles", 
+			dataProvider="IndirectRolesBug839008TestObjects")	
+	
+	public void testIndirectRoles_Bug839008(String testName, String permissionName, String privilegeName, String privilegedesc,
+			String roleName, String roleDesc, String uid, String givenName, String sn, String groupName, String groupDesc) throws Exception {
+	
+	    
+		log.info("Add Permission - read dns entries");	
+		sahiTasks.navigateTo(commonTasks.privilegePage, true);
+		String permissions[] = {permissionName};
+		PrivilegeTasks.addPrivilege(sahiTasks, privilegeName, privilegedesc, "Add");
+		PrivilegeTasks.verifyPrivilege(sahiTasks, privilegeName, privilegedesc);
+		PrivilegeTasks.addMembersToPrivilege(sahiTasks, privilegeName, "Permissions", permissionName, permissions, "Add");
+		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, privilegeName, "Permissions", permissions, true);
+		
+		log.info("Add Role - " + roleName);	
+		sahiTasks.navigateTo(commonTasks.rolePage);
+		String privileges[]={privilegeName};
+		RoleTasks.addRoleAddPrivileges(sahiTasks, roleName, roleDesc, privilegeName, privileges, "Add");
+		RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, roleName, "Privileges", privileges, true);
+		
+		log.info("Add User " + uid);	
+		sahiTasks.navigateTo(commonTasks.userPage);
+		UserTasks.createUser(sahiTasks, uid, givenName, sn, "Add");
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "User added successfully");
+		
+		log.info("Add User Group " + groupName);	
+		sahiTasks.navigateTo(commonTasks.groupPage);
+		GroupTasks.add_UserGroup(sahiTasks, groupName, groupDesc, "", "nonPosix");
+		Assert.assertTrue(sahiTasks.link(groupName).exists(), "User Group added successfully");
+		/*GroupTasks.addMembers(sahiTasks, groupName, "user","indirect", uid, "Add");
+		GroupTasks.verifyMembers(sahiTasks, groupName, "user", uid, "YES");
+		GroupTasks.addRole_Single(sahiTasks, roleName);
+		String[] grprulenames={roleName};
+		GroupTasks.verifyMemberOf(sahiTasks, groupName, "roles", grprulenames, "indirect", "YES");*/
+				
+		
+	}
+	
+	/*
 	 * Cleanup after tests are run
 	 */
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
 		sahiTasks.navigateTo(commonTasks.permissionPage, true);
-		String[] permissionTestObjects = {"Manage DNSRecord1"				
+		String[] permissionTestObjects = {"Manage DNSRecord1", "bug784621_permission", "bug811211_permission"				
 		};
 		for (String permissionTestObject : permissionTestObjects) {
 			log.fine("Cleaning Permission: " + permissionTestObject);
@@ -194,7 +334,7 @@ public class RBACFunctional extends SahiTestScript {
 		} 
 		
 		sahiTasks.navigateTo(commonTasks.privilegePage, true);
-		String[] privilegeTestObjects = {"TestPrivilegeDNS"				
+		String[] privilegeTestObjects = {"TestPrivilegeDNS", "bug784621_privilege", "bug811211_privilege", "bug839008_privilege"			
 		};
 		for (String privilegeTestObject : privilegeTestObjects) {
 			log.fine("Cleaning Privilege: " + privilegeTestObject);
@@ -203,7 +343,7 @@ public class RBACFunctional extends SahiTestScript {
 		
 		
 		sahiTasks.navigateTo(commonTasks.rolePage, true);
-		String[] roleTestObjects = {"TestRoleDNS"				
+		String[] roleTestObjects = {"TestRoleDNS", "bug784621_role", "bug839008_role"			
 		};
 		for (String roleTestObject : roleTestObjects) {
 			log.fine("Cleaning Role: " + roleTestObject);
@@ -212,11 +352,19 @@ public class RBACFunctional extends SahiTestScript {
 		
 		
 		sahiTasks.navigateTo(commonTasks.userPage, true);
-		String[] userTestObjects = {"testuserdns"				
+		String[] userTestObjects = {"testuserdns", "bug784621_user", "xyz", "bug839008_user"				
 		};
 		for (String userTestObject : userTestObjects) {
 			log.fine("Cleaning Role: " + userTestObject);
 			UserTasks.deleteUser(sahiTasks, userTestObject);
+		} 
+		
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		String[] groupTestObjects = {"bug839008_group"				
+		};
+		for (String groupTestObject : groupTestObjects) {
+			log.fine("Cleaning Role: " + groupTestObject);
+			GroupTasks.deleteGroup(sahiTasks, groupTestObject);
 		} 
 		
 	}
@@ -258,6 +406,45 @@ public class RBACFunctional extends SahiTestScript {
 		String[][] roles={
 		// testName			permissionName	 		privilegeName	 	 	roleName 			userName
 		{ "dnsUpdateAdmin",	"Read DNS Entries",		"TestPrivilegeDNS",	  	"TestRoleDNS", 		"testuserdns"	}
+		};
+        
+		return roles;	
+	}
+	
+	/*
+	 * Data to be used when testing bug 784621
+	 */		
+	@DataProvider(name="ResetPasswordBug784621TestObjects")
+	public Object[][] getResetPasswordBug784621TestObjects() {
+		String[][] roles={
+		// testName						permissionName			permission	filter 				attribute		privilegeName	 		privilegedesc 					roleName 			roledesc				uidloginuser		givennameloginuser	snloginuser			userpassword	userpassword2	uid		givenname	sn		
+		{ "bug784621_ResetPassword",	"bug784621_permission",	"write",	"(givenname=xyz)",	"carlicense",	"bug784621_privilege",	"bug784621_privilege desc", 	"bug784621_role", 	"bug784621_role desc",	"bug784621_user",	"bug784621_user",	"bug784621_test",	"Secret123",	"Secret123",	"xyz",	"xyz",		"test"	}
+		};
+        
+		return roles;	
+	}
+	
+	/*
+	 * Data to be used when testing bug 811211
+	 */		
+	@DataProvider(name="ReaddingPrivilegeBug811211TestObjects")
+	public Object[][] getReaddingPrivilegeBug811211TestObjects() {
+		String[][] roles={
+		// testName						permissionName			permission	filter 				attribute		privilegeName	 		privilegedesc 						
+		{ "bug811211_ReaddingPrivilege","bug811211_permission",	"write",	"(givenname=abc)",	"carlicense",	"bug811211_privilege",	"bug811211_privilege desc"	}
+		};
+        
+		return roles;	
+	}
+	
+	/*
+	 * Data to be used when testing bug 839008
+	 */		
+	@DataProvider(name="IndirectRolesBug839008TestObjects")
+	public Object[][] getIndirectRolesBug839008TestObjects() {
+		String[][] roles={
+		// testName						permissionName		privilegeName	 		privilegedesc 				roleName			roleDesc				uid					givenname				sn				groupName			groupDesc
+		{ "bug839008_IndirectRoles","Read DNS Entries",	"bug839008_privilege",	"bug839008_privilege desc", "bug839008_role",	"bug839008_roleDesc",	"bug839008_user",	"bug839008_givenname",	"bug839008_sn", "bug839008_group",	"bug839008_group desc"}
 		};
         
 		return roles;	

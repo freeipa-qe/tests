@@ -61,8 +61,15 @@ public class RoleTasks {
 		
 		if (!buttonToClick.equals("Cancel")) {
 			CommonTasks.search(sahiTasks, name);
-			if (buttonToClick.equals("Update"))
+			if (buttonToClick.equals("Update")){
 				verifyRole(sahiTasks, name, newDescription);
+				sahiTasks.link(name).click();
+				sahiTasks.link("Settings").click();
+				sahiTasks.textarea("description").setValue(description);
+				sahiTasks.span("Update").click();
+				sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+				
+			}
 			else
 				verifyRole(sahiTasks, name, description);
 			CommonTasks.clearSearch(sahiTasks);
@@ -111,7 +118,8 @@ public class RoleTasks {
 	}
 	
 	
-	public static void deleteRole(SahiTasks sahiTasks,	String name, String buttonToClick) {		
+	public static void deleteRole(SahiTasks sahiTasks,	String name, String buttonToClick) {
+		CommonTasks.search(sahiTasks, name);
 		if (sahiTasks.link(name).exists()){
 			sahiTasks.checkbox(name).click();
 			sahiTasks.link("Delete").click();
@@ -122,6 +130,7 @@ public class RoleTasks {
 				sahiTasks.checkbox(name).click();
 			}
 		}
+		CommonTasks.clearSearch(sahiTasks);
 	}
 	
 	public static void addRoleWithRequiredField(SahiTasks sahiTasks, String name, String description, String expectedError) {
@@ -195,6 +204,7 @@ public class RoleTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button(buttonToClick).click();
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 	}
 	
 	
@@ -209,6 +219,7 @@ public class RoleTasks {
 			sahiTasks.textarea("description").setValue(description);
 			sahiTasks.button("Add and Edit").click();
 		} else {
+			CommonTasks.search(sahiTasks, name);
 			sahiTasks.link(name).click();
 		}
 		
@@ -225,10 +236,12 @@ public class RoleTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Add").click();
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
 	}
 	
 	
 	public static void verifyRoleMemberOfPrivilege(SahiTasks sahiTasks, String name, String membershipToCheckfor, String[] privileges, boolean exists) {
+		CommonTasks.search(sahiTasks, name);
 		sahiTasks.link(name).click();
 		if (membershipToCheckfor.equals("Privileges"))
 			sahiTasks.link("memberof_privilege").click();
@@ -244,9 +257,11 @@ public class RoleTasks {
 			}
 		}	
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
 	}
 	
 	public static void verifyMembership(SahiTasks sahiTasks, String name, String type, String member) {
+		CommonTasks.search(sahiTasks, name);
 		sahiTasks.link(name).click();
 		
 		if (type.equals("Users")) 
@@ -264,6 +279,7 @@ public class RoleTasks {
 		Assert.assertTrue(sahiTasks.link(name.toLowerCase()).exists(), "Verified " + name + " is listed for " + member );
 		sahiTasks.link(name.toLowerCase()).click();
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
 	}
 	
 	public static void verifyRoleMembershipInPrivilege(SahiTasks sahiTasks, String name, String[] privileges) {

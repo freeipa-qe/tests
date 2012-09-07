@@ -245,25 +245,34 @@ public class PermissionTasks {
 	public static void verifyPermissionType(SahiTasks sahiTasks, String cn, String[] rights, String type, String[] attributes, String memberOfGroup) {
 		if (sahiTasks.link(cn).exists()) {
 			sahiTasks.link(cn).click();
+			// https://fedorahosted.org/freeipa/ticket/2875 
+			sahiTasks.span("Refresh").click();
 			for (String right : rights) {
 				if (!right.isEmpty()) {
 					Assert.assertTrue(sahiTasks.checkbox(right).checked(), "Verified permission " + right + " is checked for " + cn );
+					//sahiTasks.checkbox(right).click();
 				}
+				
 			}	
 			if (!type.isEmpty())
 				Assert.assertEquals(type, sahiTasks.select("type").selectedText(), "Verified type " + type + " for " + cn);
 			for (String attribute : attributes) {
 				if (!attribute.isEmpty() && (!attribute.equals("none"))) {
 					Assert.assertTrue(sahiTasks.checkbox(attribute).checked(), "Verified attribute " + attribute + " is checked for " + cn );
+					//sahiTasks.checkbox(attribute).click();
 				}
 			}
-			if (!memberOfGroup.isEmpty())
+			if (!memberOfGroup.isEmpty()){
 				Assert.assertEquals(memberOfGroup, sahiTasks.textbox("memberof").value());
+				//sahiTasks.textbox("memberof").setValue("");
+			}
+			//sahiTasks.span("Update").click();
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
 		}
 	}
 	
 	public static void verifyPermissionFilter(SahiTasks sahiTasks, String cn, String[] rights, String filter, String[] attributes) {
+		CommonTasks.search(sahiTasks, cn);
 		if (sahiTasks.link(cn).exists()) {
 			sahiTasks.link(cn).click();
 			for (String right : rights) {
@@ -280,6 +289,7 @@ public class PermissionTasks {
 				}
 			}
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			CommonTasks.clearSearch(sahiTasks);
 		}
 	}
 
@@ -486,6 +496,26 @@ public class PermissionTasks {
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(buttonToClick).click();
 		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();		
+	}
+
+	public static void RevertChanges(SahiTasks sahiTasks, String cn, String right, String attribute) {
+		CommonTasks.search(sahiTasks, cn);
+		if (sahiTasks.link(cn).exists()) {
+			sahiTasks.link(cn).click();
+			sahiTasks.span("Refresh").click();
+			if(sahiTasks.checkbox(right).checked())
+				sahiTasks.checkbox(right).click();
+			if(sahiTasks.checkbox(attribute).checked())
+				sahiTasks.checkbox(attribute).click();
+			if(sahiTasks.span("icon combobox-icon").exists()){
+			sahiTasks.span("icon combobox-icon").click();
+			sahiTasks.select("list").choose("");
+			}
+			sahiTasks.span("Update").click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			CommonTasks.clearSearch(sahiTasks);
+		}
+		
 	}
 	
 	
