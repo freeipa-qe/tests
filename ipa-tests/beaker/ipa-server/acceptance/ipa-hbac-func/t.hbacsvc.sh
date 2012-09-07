@@ -86,10 +86,10 @@ hbacsvc_master_001() {
 hbacsvc_master_001_cleanup() {
         # Cleanup
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	for i in {1..3}; do
-		rlRun "ipa user-del user$i"
-        done
-	rlRun "rm -fr /tmp/krb5cc_*_*"
+	#for i in {1..3}; do
+	#	rlRun "ipa user-del user$i"
+    #    done
+	#rlRun "rm -fr /tmp/krb5cc_*_*"
 	rlRun "ipa hbacrule-del rule1"
 	rlRun "ipa hbacrule-del admin_allow_all"
 }
@@ -103,6 +103,8 @@ hbacsvc_client_001() {
 		sleep 5
                 rlRun "ssh_auth_success $user1 testpw123@ipa.com $CLIENT"
                 rlRun "ssh_auth_failure $user2 testpw123@ipa.com $CLIENT"
+                #rlRun "rm -fr /tmp/krb5cc_*_*"
+
         rlPhaseEnd
 }
 
@@ -113,6 +115,7 @@ hbacsvc_client2_001() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
                 rlRun "ssh_auth_failure $user1 testpw123@ipa.com $CLIENT2"
+                #rlRun "rm -fr /tmp/krb5cc_*_*"
 
         rlPhaseEnd
 }
@@ -164,10 +167,10 @@ hbacsvc_master_002() {
 hbacsvc_master_002_cleanup() {
 	# Cleanup
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	for i in {1..3}; do
-		rlRun "ipa user-del user$i"
-        done
-		rlRun "rm -fr /tmp/krb5cc_*_*"
+	#for i in {1..3}; do
+	#	rlRun "ipa user-del user$i"
+    #    done
+	#	rlRun "rm -fr /tmp/krb5cc_*_*"
 		rlRun "ipa hbacrule-del rule2"
 }
 
@@ -180,6 +183,7 @@ hbacsvc_client_002() {
 		# Source host validation has been depricated which caused the following test to fail, hence updating accordingly.
 		rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
+		#rlRun "rm -fr /tmp/krb5cc_*_*"
 
 	rlPhaseEnd
 }
@@ -194,8 +198,9 @@ hbacsvc_client2_002() {
 		sleep 5
                 rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
+		#rlRun "rm -fr /tmp/krb5cc_*_*"
 
-        rlPhaseEnd
+	rlPhaseEnd
 
 }
 
@@ -223,6 +228,7 @@ hbacsvc_master_002_1() {
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule1 --nodetail | grep -i \"Access granted: True\"" 1
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule1 --nodetail | grep -i \"matched: rule2\"" 1
+                #rlRun "rm -fr /tmp/krb5cc_*_*"
 
         rlPhaseEnd
 }
@@ -234,6 +240,7 @@ hbacsvc_client_002_1() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
                 rlRun "ftp_auth_failure $user1 testpw123@ipa.com $MASTER"
+                #rlRun "rm -fr /tmp/krb5cc_*_*"
 
         rlPhaseEnd
 }
@@ -246,6 +253,7 @@ hbacsvc_client2_002_1() {
                 rlRun "getent -s sss passwd $user1"
                 rlRun "ftp_auth_failure $user1 testpw123@ipa.com $MASTER"
                 rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
+                #rlRun "rm -fr /tmp/krb5cc_*_*"
 
         rlPhaseEnd
 
@@ -305,10 +313,10 @@ hbacsvc_master_003() {
 hbacsvc_master_003_cleanup() {
 	# Cleanup
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        for i in {1..3}; do
-                rlRun "ipa user-del user$i"
-        done
-		rlRun "rm -fr /tmp/krb5cc_*_*"
+        #for i in {1..3}; do
+        #        rlRun "ipa user-del user$i"
+        #done
+		#rlRun "rm -fr /tmp/krb5cc_*_*"
 		rlRun "ipa hbacrule-del rule3"
 		rlRun "ipa hbacsvc-del vsftpd"
 }
@@ -321,6 +329,7 @@ hbacsvc_client_003() {
                 rlRun "getent -s sss passwd $user3"
                 rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
                 rlRun "ftp_auth_success $user3 testpw123@ipa.com $MASTER"
+                #rlRun "rm -fr /tmp/krb5cc_*_*"
 
         rlPhaseEnd
 }
@@ -333,6 +342,7 @@ hbacsvc_client2_003() {
                 rlRun "getent -s sss passwd $user3"
 		sleep 5
                 rlRun "ftp_auth_success $user3 testpw123@ipa.com $MASTER"
+                #rlRun "rm -fr /tmp/krb5cc_*_*"
 
         rlPhaseEnd
 
