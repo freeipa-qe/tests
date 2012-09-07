@@ -404,9 +404,15 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.verifySudoRuleForEnrollment(sahiTasks, commonTasks, cn, uid, "Users", "indirect", true);
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "Update");
+		if (!System.getProperty("os.name").startsWith("Windows")){
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-1-0", "Update");
+		}else{
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-4-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-4-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "usercategory-4-0", "Update");
+		}
 	}
 	
 	/*
@@ -466,10 +472,15 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.verifySudoRuleForEnrollment(sahiTasks,commonTasks,cn, fqdn, "Hosts", "direct", true);
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 				
-		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "Update");
+		if (!System.getProperty("os.name").startsWith("Windows")){
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-2-0", "Update");
+		}else{
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-5-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-5-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "hostcategory-5-0", "Update");
+		}
 	}
 	
 	
@@ -500,10 +511,15 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.addMembers(sahiTasks, allowCommandGroupName, lsCommandName, "Add");
 		sahiTasks.navigateTo(commonTasks.sudoRulePage, true);
 		
-		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "Update");
+		if (!System.getProperty("os.name").startsWith("Windows")){
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-3-0", "Update");
+		}else{
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-6-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-6-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "cmdcategory-6-0", "Update");
+		}
 	}
 	
 	/*
@@ -557,10 +573,15 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.modifySudoRuleRunAsUserCategorySection(sahiTasks, cn, runAsUID, runAsUserGroupName, false);
 		SudoTasks.verifySudoRuleForRunAsUserCategorySection(sahiTasks, commonTasks, cn, runAsUID, runAsUserGroupName, false);
 		
-		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "Update");
+		if (!System.getProperty("os.name").startsWith("Windows")){
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-4-0", "Update");
+		}else{
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-7-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-7-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasusercategory-7-0", "Update");
+		}
 	}
 	
 	/*
@@ -583,10 +604,15 @@ public class SudoTests extends SahiTestScript{
 		SudoTasks.modifySudoRuleRunAsGroupCategorySection(sahiTasks, cn, runAsGroupName, false);
 		SudoTasks.verifySudoRuleForRunAsGroupCategorySection(sahiTasks, commonTasks, cn, runAsGroupName, false);
 		
-		
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "undo");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "Reset");
-		SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "Update");		
+		if (!System.getProperty("os.name").startsWith("Windows")){
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-5-0", "Update");
+		}else{
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-8-0", "undo");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-8-0", "Reset");
+			SudoTasks.undoResetUpdateSudoRuleSections(sahiTasks, cn, "ipasudorunasgroupcategory-8-0", "Update");
+		}
 	}
 	
 	/*
