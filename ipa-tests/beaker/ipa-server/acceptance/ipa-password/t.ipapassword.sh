@@ -9,6 +9,7 @@ ipapassword()
     ipapassword_grouppolicy
     ipapassword_nestedgroup
     ipapassword_attr
+    ipapassword_bugzillas
     ipapassword_envcleanup
 } # ipapassword
 
@@ -87,6 +88,11 @@ ipapassword_attr()
     ipapassword_attr_add
     ipapassword_attr_envcleanup
 } #ipapassword_attr
+
+ipapassword_bugzillas()
+{
+    bz_818836
+} # Tests for pwpolicy bugzillas
 
 ######################
 # test cases         #
@@ -3151,4 +3157,28 @@ ipapassword_attr_add_logic()
         fi
         rm $out
 } #ipapassword_attr_add_logic
+
+bz_818836()
+{
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=818836
+	rlPhaseStartTest "Bug 818836 - ipa pwpolicy-find displays incorrect max and min lifetime."
+		# Add a group to test on
+		grp="tgroup1"
+		ipa group-add --desc=desc $grp
+		# Set the password max lifetime to something, then make sure it outputs properly.
+		maxlife=99
+		ipa pwpolicy-add $grp --priority=10 --maxlife=$maxlife
+		rlRun "ipa pwpolicy-find $grp | grep Max\ lifetime | grep $maxlife" 0 "Make sure that the specified max lifetime applies to group $grp"
+		# Set the password max lifetime to something, then make sure it outputs properly.
+		maxlife=12
+		ipa pwpolicy-mod $grp --maxlife=$maxlife
+		rlRun "ipa pwpolicy-find $grp | grep Max\ lifetime | grep $maxlife" 0 "Make sure that the specified max lifetime applies to group $grp"
+		# Set the password max lifetime to something, then make sure it outputs properly.
+		maxlife=40
+		ipa pwpolicy-mod $grp --maxlife=$maxlife
+		rlRun "ipa pwpolicy-find $grp | grep Max\ lifetime | grep $maxlife" 0 "Make sure that the specified max lifetime applies to group $grp"
+		# Cleanup	
+		ipa group-del $grp
+	rlPhaseEnd
+} bz_818836
 
