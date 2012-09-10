@@ -133,7 +133,7 @@ public class AutomountTests extends SahiTestScript{
 	}
 	
 	@Test (groups={"automountLocationExpandCollapseTests"},dataProvider="addAutomountLocation_ExpandCollapse",
-			dependsOnGroups="addAutomountLocation")
+			dependsOnGroups="addIndirectAutomountMap_negative") //xdong
 	public void automountLocationExpand_Collapse(String automountLocation) throws Exception{
 		
 		browser.link(automountLocation).click();
@@ -176,7 +176,7 @@ public class AutomountTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(automountLocation).exists(), "after delete, automount location (" + automountLocation + ") should NOT exist in list");
 	}
 
-	@Test (groups={"deleteAutomountLocationMultiple"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups="deleteAutomountMap",
+	@Test (groups={"deleteAutomountLocationMultiple"}, dataProvider="deleteAutomountLocationMultiple", dependsOnGroups={"deleteAutomountMap","deleteIndirectAutomountMap", "addAutomountKey_negative"},
 		description="delete multiple automount location")
 	public void deleteAutomountLocationMultiple(String automountLocations) throws Exception { 
 		String[] locations = automountLocations.split(",");
@@ -383,7 +383,7 @@ public class AutomountTests extends SahiTestScript{
 		Assert.assertFalse(browser.link(automountMap).exists(), "after delete, automount map (" + automountMap + ") should NOT exist in list");
 	}
 
-	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapMultiple", dependsOnGroups={"deleteAutomountKey", "modifyIndirectAutomountMap"},
+	@Test (groups={"deleteAutomountMap"}, dataProvider="deleteAutomountMapMultiple", dependsOnGroups={"deleteAutomountKey", "modifyIndirectAutomountMap","addAutomountKey_negative"},
 			description="delete multiple automount map")
 	public void deleteAutomountMapMultiple(String automountLocation,String automountMaps) throws Exception { 
 		browser.navigateTo(commonTasks.automountPage, true);
@@ -398,9 +398,9 @@ public class AutomountTests extends SahiTestScript{
 
 	
 	@Test (groups={"automountMapExpandCollapseTest"}, dataProvider="automountMap_ExpandCollapse", 
-			dependsOnGroups="addAutomountLocation")
+			dependsOnGroups={"addAutomountLocation","addAutomountMap"})
 		public void automountMapExpand_Collapse(String automountLocation, String automountMap) throws Exception { 
-		
+		browser.navigateTo(commonTasks.automountPage, true);//xdong
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();
 		browser.link("Settings").click();
@@ -662,10 +662,11 @@ public class AutomountTests extends SahiTestScript{
 	
 
 	/////////// delete indirect automount map /////////////////////////
-	@Test (groups={"deleteIndirectAutomountMap"}, dataProvider="deleteIndirectAutomountMapSingle", dependsOnGroups="modifyIndirectAutomountMap",
+	@Test (groups={"deleteIndirectAutomountMap"}, dataProvider="deleteIndirectAutomountMapSingle", dependsOnGroups={"modifyIndirectAutomountMap","deleteAutomountKey"},
 			description="delete single indirect automount map")
 	public void deleteIndirectAutomountMapSingle(String automountLocation,String indirectAutomountMap, String mountPoint, String parentMap) throws Exception { 
 		// the value : mountPoint and parentMap is not used intentionally 
+		browser.navigateTo(commonTasks.automountPage, true);//xdong
 		browser.link(automountLocation).click();
 		Assert.assertTrue(browser.link(indirectAutomountMap).exists(), "before delete, autoumount location (" + indirectAutomountMap + ")should exist in list");
 		CommonHelper.deleteEntry(browser, indirectAutomountMap);  
@@ -676,6 +677,7 @@ public class AutomountTests extends SahiTestScript{
 			description="delete multiple indirect automount map")
 	public void deleteIndirectAutomountMapMultiple(String automountLocation,String indirectAutomountMaps, String mountPoint, String parentMap) throws Exception { 
 		// the value : mountPoint and parentMap is not used intentionally 
+		browser.navigateTo(commonTasks.automountPage, true);//xdong
 		browser.link(automountLocation).click();
 		String[] maps = CommonHelper.stringToArray(indirectAutomountMaps);
 		for (String map:maps)
@@ -920,6 +922,7 @@ public class AutomountTests extends SahiTestScript{
 	@Test (groups={"deleteAutomountKey"}, dataProvider="deleteAutomountKeyMultiple", dependsOnGroups="modifyAutomountKey",
 			description = "delete multiple automount key")
 	public void deleteAutomountKeyMultiple(String automountLocation, String automountMap,String automountKeys) throws Exception { 
+		browser.navigateTo(commonTasks.automountPage, true);//xdong
 		browser.link(automountLocation).click();
 		browser.link(automountMap).click();
 		String[] keys = CommonHelper.stringToArray(automountKeys);
