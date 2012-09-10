@@ -47,6 +47,23 @@ public class DNSTasks {
 	}//addDNSzone
 	
 	/*
+	 * dNSzoneEnableDisable
+	 */
+	public static void dNSzoneEnableDisable(SahiTasks browser, String zoneName) {
+		//browser.checkbox(zoneName).click();
+		browser.checkbox(zoneName).click();
+		browser.span("Disable").click();		
+		//assertTrue(browser.div("Disabled").exists());
+		Assert.assertTrue(browser.div("Disabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is disabled sucessfully");
+		browser.span("Enable").click();
+		Assert.assertTrue(browser.div("Enabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is enabled sucessfully");
+		browser.checkbox(zoneName).click();
+			
+	}
+	
+	
+	
+	/*
 	 * DNS Zone add and another
 	 */
 	
@@ -548,6 +565,7 @@ public class DNSTasks {
 		}
 	
 		browser.link("DNS Zones").under(browser.div("DNS ZonesDNS Global ConfigurationDNS Resource Records")).click();
+		browser.span("Refresh").click();
 		browser.checkbox(zoneName).click();
 		browser.span("Delete").click();
 		browser.button("Delete").click();
@@ -1013,8 +1031,8 @@ public class DNSTasks {
 		if (browser.heading3("DNS Resource Record: " + record_name).exists()){
 			log.info("verified: we are in record detail editing mode");
 			// go back to zone record list
-			//browser.link("dnszone").click();
 			browser.link("DNS Zones").click();
+			browser.span("Refresh").click();
 			// self-check to verify the newly added record
 			Assert.assertTrue(browser.link(record_name).exists(),"ensure new record name: (" + record_name + ") in the list");
 			// delete the newly created record
@@ -1044,7 +1062,6 @@ public class DNSTasks {
 		browser.textbox("idnsname").setValue(record_name); 
 		browser.select("record_type").choose(record_type);
 		DNSTasks.recordType(browser, record_data, record_type, other_data1, other_data2, other_data3, other_data4, other_data5, other_data6, other_data7, other_data8, other_data9, other_data10, other_data11);
-		//browser.textbox("record_data").setValue(record_data);
 		browser.button("Cancel").click();   
 		Assert.assertFalse(browser.link(record_data).exists(),"make sure the data does not get into ipa server");  
 	
@@ -1058,17 +1075,24 @@ public class DNSTasks {
 	 * @param fieldName - dns setting field type name 
 	 * @param fieldValue - dns setting field value
 	 */
-	public static void zoneSettingsModification(SahiTasks browser, String zoneName,String reverseZoneName, String fieldName, String fieldValue) {
-
-		// get into setting page
-		browser.link("Settings").click();
 		
+	public static void zoneSettingsModification_SoaAndClass(SahiTasks browser, String zoneName,String reverseZoneName, String fieldName, String fieldValue) {
+		// get into setting page
+				browser.link("Settings").click();
 		// save the original value
 		String originalValue = browser.textbox(fieldName).getValue();
 		
 		// test for undo
+		if(fieldName.equals("dnsclass"))
+		{
+			browser.textbox("dnsclass").click();
+			browser.select("list").choose(fieldValue);
+		}
+		else
+		{
+			browser.textbox(fieldName).setValue(fieldValue);	
+		}
 		
-		browser.textbox(fieldName).setValue(fieldValue);
 		browser.span("undo").click(); 
 		String undoValue = browser.textbox(fieldName).getValue();
 		
@@ -1081,7 +1105,16 @@ public class DNSTasks {
 		}
 		
 		// test for reset
-		browser.textbox(fieldName).setValue(fieldValue);
+		if(fieldName.equals("dnsclass"))
+		{
+			browser.textbox("dnsclass").click();
+			browser.select("list").choose(fieldValue);
+		}
+		else
+		{
+			browser.textbox(fieldName).setValue(fieldValue);	
+		}
+	
 		browser.span("Reset").click(); 
 		String resetValue = browser.textbox(fieldName).getValue();
 		// check undo value with original value
@@ -1093,14 +1126,23 @@ public class DNSTasks {
 		}
 		
 		// test for update
-		browser.textbox(fieldName).setValue(fieldValue);
+		if(fieldName.equals("dnsclass"))
+		{
+			browser.textbox("dnsclass").click();
+			browser.select("list").choose(fieldValue);
+		}
+		else
+		{
+			browser.textbox(fieldName).setValue(fieldValue);	
+		}
+		
 		browser.span("Update").click();
 		if (browser.div("error_dialog").exists()){ 
 			String errormsg = browser.div("error_dialog").getText(); 
 			log.info("ERROR update failed: " + errormsg);
 			Assert.fail("Update failed");
 			browser.button("Cancel").click(); 
-			//Assert.assertTrue(false, "ipa error ( dialog )occurs");
+			
 		}else { 
 			String updateValue = browser.textbox(fieldName).getValue();
 			// check update value with original value
@@ -1111,7 +1153,251 @@ public class DNSTasks {
 				Assert.fail("Update failed, passin:"+fieldValue + " actual field :"+updateValue);
 			}
 		}// if no error appears, it should pass
+	}
+	
+	
+	
+	
+	/*
+	 * bindUpdatepolicy
+	 */
+	public static void zoneSettingsModification_bindUpdatePolicy(SahiTasks browser, String zoneName,String reverseZoneName, String fieldName, String fieldValue) {
+		// get into setting page
+				browser.link("Settings").click();
+		// save the original value
+		String originalValue = browser.textarea(fieldName).getValue();
 		
+		browser.textarea(fieldName).setValue(fieldValue);	
+		browser.span("undo").click(); 
+		String undoValue = browser.textarea(fieldName).getValue();
+		
+		// check undo value with original value
+		if (originalValue.equals(undoValue)){
+			log.info("Undo works");
+		}else{
+			log.info("Undo failed");
+			Assert.fail("Undo failed");
+		}
+		
+		// test for reset
+			browser.textarea(fieldName).setValue(fieldValue);	
+		browser.span("Reset").click(); 
+		String resetValue = browser.textarea(fieldName).getValue();
+		// check undo value with original value
+		if (originalValue.equals(resetValue)){
+			log.info("Reset works");
+		}else{
+			log.info("Reset failed");
+			Assert.fail("Reset failed");
+		}
+		
+		// test for update
+		
+			browser.textarea(fieldName).setValue(fieldValue);	
+		
+		//browser.textbox(fieldName).setValue(fieldValue);
+		browser.span("Update").click();
+		if (browser.div("error_dialog").exists()){ 
+			String errormsg = browser.div("error_dialog").getText(); 
+			log.info("ERROR update failed: " + errormsg);
+			Assert.fail("Update failed");
+			browser.button("Cancel").click(); 
+			
+		}else { 
+			String updateValue = browser.textarea(fieldName).getValue();
+			// check update value with original value
+			if (fieldValue.equals(updateValue)){
+				log.info("Update works, updated value matches");
+			}else{
+				log.info("Update failed, updated value does not match with passin value");
+				Assert.fail("Update failed, passin:"+fieldValue + " actual field :"+updateValue);
+			}
+		}// if no error appears, it should pass
+	}
+	
+		/*
+		 * radio
+		 */
+	public static void zoneSettingsModification_dynamicUpdateAndPolicy(SahiTasks browser, String zoneName,String reverseZoneName, String fieldName, String fieldValue) {
+		// get into setting page
+				browser.link("Settings").click();
+				
+				browser.radio(fieldName).click();
+				browser.span("undo").click();
+				Assert.assertFalse(browser.radio(fieldName).checked(),"Undo works");
+				
+				
+				browser.radio(fieldName).click();
+				browser.span("Reset").click();
+				Assert.assertFalse(browser.radio(fieldName).checked(),"Reset works");
+				
+				
+				browser.radio(fieldName).click();
+				browser.span("Update").click();
+				String expectedmsg="Are you sure you want to proceed with the action.";
+				browser.expectConfirm(expectedmsg, true);
+				Assert.assertTrue(browser.radio(fieldName).checked(),"Update Works");
+				
+				
+				//restore default setting
+				browser.radio(fieldValue).click();
+				browser.span("Update").click();
+				browser.expectConfirm(expectedmsg, true);
+				
+	}
+	/*
+	 * query forwarder trans
+	 */
+	
+	public static void addField(SahiTasks browser,String fieldName)
+	{
+		if(fieldName.equals("idnsallowquery-1"))
+		{
+		browser.link("Add").click();
+		}
+		if(fieldName.equals("idnsallowtransfer-1"))
+		{
+		browser.link("Add").near(browser.label("Allow transfer:")).click();
+		}		
+		if(fieldName.equals("idnsforwarders-0"))
+		{
+		browser.link("Add").near(browser.label("Zone forwarders:")).click();
+		}
+		
+	}
+	
+	public static void zoneSettingsModification_queryAndTransfer(SahiTasks browser, String zoneName,String reverseZoneName, String fieldName, String fieldValue) {
+		// get into setting page
+				browser.link("Settings").click();
+				
+				DNSTasks.addField(browser, fieldName);
+				browser.textbox(fieldName).setValue(fieldValue);
+				browser.span("undo").click();
+				log.info("Undo works");
+				
+				DNSTasks.addField(browser, fieldName);
+				browser.textbox(fieldName).setValue(fieldValue);
+				browser.span("undo all").click();
+				log.info("Undoall works");
+				
+				DNSTasks.addField(browser, fieldName);			
+				browser.textbox(fieldName).setValue(fieldValue);
+				browser.span("Update").click();
+				browser.expectConfirm("Are you sure you want to proceed with the action.", true);
+				log.info("Update works");
+				
+				browser.link("Delete").near(browser.textbox(fieldName)).click();
+				browser.span("Reset").click();
+				log.info("Reset works");
+				browser.link("Delete").near(browser.textbox(fieldName)).click();
+				browser.span("Update").click();
+				browser.expectConfirm("Are you sure you want to proceed with the action.", true);
+				log.info("Delete Works");
+	
+	
+	}
+	
+	
+	public static void dnsZoneAllowPTRSync(SahiTasks browser, String zoneName,String reverseZoneName, String fieldName, String fieldValue) 
+	{
+		String expectedMsg = fieldValue;
+		browser.link("Settings").click();
+		browser.checkbox("idnsallowsyncptr").click();
+		browser.span("undo").click();
+		Assert.assertFalse(browser.checkbox("idnsallowsyncptr").checked(),"Undo works successfully");
+		browser.checkbox("idnsallowsyncptr").click();
+		browser.span("Reset").click();
+		Assert.assertFalse(browser.checkbox("idnsallowsyncptr").checked(),"Reset works successfully");
+		browser.checkbox("idnsallowsyncptr").click();
+		browser.link("DNS Global Configuration").click();
+		//without saving changes...
+		browser.div(expectedMsg).click();
+		log.info("IPA error dialog appears:: ExpectedMsg ::"+expectedMsg);
+		browser.button("Reset").click();
+		browser.link("DNS Zones").click();
+		Assert.assertFalse(browser.checkbox("idnsallowsyncptr").checked(),"Allow PTR sync: not checked");
+		browser.checkbox("idnsallowsyncptr").click();
+		browser.span("Update").click();
+		browser.link("DNS Global Configuration").click();
+		browser.link("DNS Zones").click();
+		Assert.assertTrue(browser.checkbox("idnsallowsyncptr").checked(),"Update works successfully");
+		//restore Default setting
+		browser.checkbox("idnsallowsyncptr").click();
+		browser.span("Update").click();
+	}
+	
+	/*
+	 * DNS Setting Negative Test
+	 */
+	public static void textBoxOrTextArea(SahiTasks browser, String fieldName,String fieldValue)
+	{
+	if(!fieldName.equals("idnsupdatepolicy"))
+	{
+		browser.textbox(fieldName).setValue(fieldValue);
+	}
+	else 
+	{
+		browser.textarea(fieldName).setValue(fieldValue);
+	}
+	}
+	
+	public static void dnsZoneNegativeSetting(SahiTasks browser, String zoneName, String reverseZoneName,String fieldName, String fieldValue, String expectedError1, String expectedError2) 
+	{
+		browser.link("Settings").click();
+		DNSTasks.textBoxOrTextArea(browser, fieldName, fieldValue);
+		browser.span("Update").click();
+		browser.expectConfirm("Are you sure you want to proceed with the action.", true);
+		if (browser.span(expectedError1).exists())
+		{
+			log.info ("Required field msg appears:: "+expectedError1);
+			//browser.span("undo").click();
+			
+		}
+		if (browser.div(expectedError2).exists())
+		{
+			//log.info("IPA error dialog appears:: ExpectedError ::"+expectedError2);
+			if((browser.button("Cancel").isVisible()))
+			{
+				log.info("IPA error dialog appears:: ExpectedError ::"+expectedError2);
+				browser.button("Cancel").click();
+			}
+			else
+			{
+				log.info("IPA error dialog appears:: ExpectedError ::"+expectedError2);
+				browser.button("OK").click();			
+			}
+		}
+		
+		browser.span("Refresh").click();
+	}
+	
+	
+	
+	/*
+	 * enable disable
+	 */
+	public static void DNSZoneEnable_Disable(SahiTasks browser, String zoneName) 
+	{
+	
+	    
+	    browser.link("Settings").click();
+	    browser.select("action").choose("Disable");
+	    browser.span("Apply").click();
+	    browser.navigateTo(CommonTasks.dnsPage, true);
+	    Assert.assertTrue(browser.div("Disabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is disabled sucessfully");
+	    browser.link(zoneName).click();
+	    browser.link("Settings").click();
+	    browser.select("action").choose("Enable");
+	    browser.span("Apply").click();
+	    browser.navigateTo(CommonTasks.dnsPage, true);
+	    Assert.assertTrue(browser.div("Enabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is enabled sucessfully");
+	    browser.link(zoneName).click();
+	    browser.link("Settings").click();
+	    browser.select("action").choose("Delete");
+     	browser.span("Apply").click();
+		Assert.assertFalse(browser.link(zoneName).exists(), "Verify DNSZone " + zoneName + " deleted successfully");
+	
+	
 	}
 	
 	/*
