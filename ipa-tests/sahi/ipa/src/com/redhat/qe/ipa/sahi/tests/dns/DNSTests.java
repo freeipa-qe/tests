@@ -66,15 +66,26 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Add DNS zone - positive tests
 	 */
-	@Test (groups={"addDNSZoneTest"}, dataProvider="getDNSZoneObjects",dependsOnGroups="add_then_cancel_DNSZoneTest" )	
+	@Test (groups={"addDNSZoneTest"}, dataProvider="getDNSZoneObjects",dependsOnGroups={"add_then_cancel_DNSZoneTest","dnsZoneSettingsEnableDisableTest" })	
 	public void addDNSZoneTest(String testName, String zoneName, String authoritativeNameserver, String rootEmail) throws Exception {
 		DNSTasks.addDNSzone(sahiTasks, zoneName, authoritativeNameserver, rootEmail); 
 	}//addDNSZoneTest
 	
+	
+	/*
+	 *DNS zone - EnableDisable Test 
+	 */
+	@Test (groups={"zoneEnableDisableTest"}, dataProvider="getDNSZoneEnableDisableObjects",dependsOnGroups={"addDNSZoneTest"})	
+	public void dNSZoneEnableDisableTest(String testName, String zoneName) throws Exception {
+		
+		DNSTasks.dNSzoneEnableDisable(sahiTasks, zoneName);
+		
+	}
+	
 	/*
 	 * Add and Another DNS Zone
 	 */
-	@Test (groups={"addandanotherDNSZoneTest"}, dataProvider="getaddandanotherDNSZoneObjects")	
+	@Test (groups={"addandanotherDNSZoneTest"}, dataProvider="getaddandanotherDNSZoneObjects",dependsOnGroups={"zoneEnableDisableTest"})	
 	public void addandanotherDNSZoneTest(String testName, String zoneName1, String authoritativeNameserver, String rootEmail,String zoneName2) throws Exception {
 		DNSTasks.addandanotherDNSzone(sahiTasks, zoneName1, authoritativeNameserver, rootEmail,zoneName2); 
 	}
@@ -93,7 +104,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Delete DNS zone - positive tests
 	 */
-	@Test (groups={"delDNSZoneTest"}, dataProvider="getdelDNSZoneObjects",dependsOnGroups={"addDNSZoneTest","addandanotherDNSZoneTest","dnsZone_addandedit","recordType_NegativeTest","dnsZoneRecordsTest_add","dnsZoneRecordsTest_addandaddanother","dnsZoneRecordsTest_addandaddedit","dnsZoneRecordsTest_add_then_cancel","dnsZoneSettingsTest"})	
+	@Test (groups={"delDNSZoneTest"}, dataProvider="getdelDNSZoneObjects",dependsOnGroups={"addDNSZoneTest","addandanotherDNSZoneTest","dnsZone_addandedit","recordType_NegativeTest","dnsZoneRecordsTest_add","dnsZoneRecordsTest_addandaddanother","dnsZoneRecordsTest_addandaddedit","dnsZoneRecordsTest_add_then_cancel","dnsZoneSettingsTest","dnsZoneSettingsNagativeTest","zoneEnableDisableTest"})	
 	public void delDNSZoneTest(String testName, String zoneName, String authoritativeNameserver, String rootEmail) throws Exception {
 		DNSTasks.delDNSzone(sahiTasks, zoneName); 
 	}
@@ -101,7 +112,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Add DNS Test - Negative Test
 	 */
-	@Test (groups={"addDNSZoneNegativeTest"}, dataProvider="getDNSZoneNegativeObjects" ,dependsOnGroups="addDNSZoneTest")	
+	@Test (groups={"addDNSZoneNegativeTest"}, dataProvider="getDNSZoneNegativeObjects" ,dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
 	public void addNegativeDNSZoneTest(String testName, String zoneName, String authoritativeNameserver, String rootEmail, String expectedError) throws Exception {
 		DNSTasks.addDNSzoneNegativeTest(sahiTasks, zoneName, authoritativeNameserver, rootEmail,expectedError); 
 	}
@@ -113,8 +124,8 @@ public class DNSTests extends SahiTestScript{
 	 * 
 	 *  This tests covers DNS Zone add_and_edit, add_and_edit Record type, add and  add_and_another Record type, edit Record type, update Record type, update without modify Record type, delete  Record type , Expand and collapse test
 	 */
-	
-	 @Test (groups={"dnsZone_addandedit"}, dataProvider="getDNSZone_edit")	
+	//,dependsOnGroups={"addDNSZoneTest","addandanotherDNSZoneTest","addDNSZoneNegativeTest"}
+	 @Test (groups={"dnsZone_addandedit"}, dataProvider="getDNSZone_edit",dependsOnGroups={"zoneEnableDisableTest"})	
 		public void dnsZone_addandaddedit(String testName, String zoneName, String authoritativeNameserver, String rootEmail,
 										String first_record_name, String first_record_data, String first_record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 										String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11,
@@ -149,7 +160,7 @@ public class DNSTests extends SahiTestScript{
 	 * Negative Record Type 
 	 */
 
-	 @Test (groups={"recordType_NegativeTest"}, dataProvider="getDNSNegativeRecordType",dependsOnGroups="addDNSZoneTest")	
+	 @Test (groups={"recordType_NegativeTest"}, dataProvider="getDNSNegativeRecordType",dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
 		public void dnsRecordType_NegativeTest(String testName, String zoneName, String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 										String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11,String expectedError)throws Exception {
 			sahiTasks.link(zoneName).click();
@@ -165,12 +176,33 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify dns zone setting fields
 	 */
-	@Test (groups={"dnsZoneSettingsTest"}, dataProvider="getDNSSettings")	
-	public void dnsZoneSettingsTest(String testName, String zoneName, String reverseZoneName,String fieldName, String fieldValue) throws Exception {
+	@Test (groups={"dnsZoneSettingsTest"}, dataProvider="getDNSSettings", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
+	public void dnsZoneSettingsTest(String testName, String testNameGroup, String zoneName, String reverseZoneName,String fieldName, String fieldValue) throws Exception {
 		// get into DNS zone record modification page
 		sahiTasks.link(zoneName).click();
 		// performing the test
-		DNSTasks.zoneSettingsModification(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		if(testNameGroup.equals("SOA&class"))
+		{
+			DNSTasks.zoneSettingsModification_SoaAndClass(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		if(testNameGroup.equals("Bind Update policy"))
+		{
+			DNSTasks.zoneSettingsModification_bindUpdatePolicy(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		if(testNameGroup.equals("Dynamic Update&Policy"))
+		{
+			DNSTasks.zoneSettingsModification_dynamicUpdateAndPolicy(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		
+		if(testNameGroup.equals("Query&Transfer"))
+		{
+			DNSTasks.zoneSettingsModification_queryAndTransfer(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		
+		if(testNameGroup.equals("PTR Sync"))
+		{
+			DNSTasks.dnsZoneAllowPTRSync(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}		
 		// go back to dns zone list, prepare for next test
 		sahiTasks.link("DNS Zones").click();
 		if (sahiTasks.span("Dirty").exists()){
@@ -182,10 +214,38 @@ public class DNSTests extends SahiTestScript{
 		} 
 	}//dnsZoneSettingsTest
 	
+	
+	/*
+	 * negative test
+	 */
+	@Test (groups={"dnsZoneSettingsNagativeTest"}, dataProvider="getDNSSettings_Negative", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
+	public void testDnsZoneSettingsNagative(String testName, String zoneName, String reverseZoneName,String fieldName, String fieldValue, String expectedError1, String expectedError2) throws Exception {
+		// get into DNS zone record modification page
+		sahiTasks.link(zoneName).click();
+		DNSTasks.dnsZoneNegativeSetting(sahiTasks,zoneName,reverseZoneName,fieldName,fieldValue,expectedError1,expectedError2);
+		// performing the test
+	}
+	
+	
+	
+	
+	/*
+	 * DNS Zone Setting-Enable And Disable
+	 */
+	
+	@Test (groups={"dnsZoneSettingsEnableDisableTest"}, dataProvider="getDNSSettingsEnableDisableObject")	
+	public void dnsZoneSettingsEnableAndDisableTest(String testName, String zoneName,String authoritativeNameserver, String rootEmail) throws Exception {
+		
+		DNSTasks.addDNSzone(sahiTasks, zoneName, authoritativeNameserver, rootEmail);
+		sahiTasks.link(zoneName).click();
+		DNSTasks.DNSZoneEnable_Disable(sahiTasks,zoneName);
+	
+	}
+	
 	/*
 	 * Test for add one dns zone record
 	 */
-	@Test (groups={"dnsZoneRecordsTest_add"}, dataProvider="getDNSRecords", dependsOnGroups="addDNSZoneTest")	
+	@Test (groups={"dnsZoneRecordsTest_add"}, dataProvider="getDNSRecords", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
 	public void dnsZoneRecordsTest_add(String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
 									String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 									String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11) throws Exception {
@@ -202,7 +262,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify dns zone record fields
 	 */
-	 @Test (groups={"dnsZoneRecordsTest_addandaddanother"}, dataProvider="getDNSRecords_addanother", dependsOnGroups="addDNSZoneTest")	
+	 @Test (groups={"dnsZoneRecordsTest_addandaddanother"}, dataProvider="getDNSRecords_addanother", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
 	public void dnsZoneRecordsTest_addandaddanother(String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
 									String first_record_name, String first_record_data, String first_record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 									String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11,
@@ -223,7 +283,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify dns zone record fields : and one new record and switch to editing mode immediately 
 	 */
-	@Test (groups={"dnsZoneRecordsTest_addandaddedit"}, dataProvider="getDNSRecords", dependsOnGroups="addDNSZoneTest")	
+	@Test (groups={"dnsZoneRecordsTest_addandaddedit"}, dataProvider="getDNSRecords", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
 	public void dnsZoneRecordsTest_addandaddedit(String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
 									String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 									String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11) throws Exception { 
@@ -238,7 +298,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify dns zone record fields : and one new record and switch to editing mode immediately 
 	 */
-	@Test (groups={"dnsZoneRecordsTest_add_then_cancel"}, dataProvider="getDNSRecords", dependsOnGroups="addDNSZoneTest")	
+	@Test (groups={"dnsZoneRecordsTest_add_then_cancel"}, dataProvider="getDNSRecords", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
 	public void dnsZoneRecordsTest_add_then_cancel(String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
 									String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 			    					String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11) throws Exception {
@@ -297,7 +357,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Delete DNS reverse zone - positive tests
 	 */
-	@Test (groups={"deleteReverseDNSZone"}, dataProvider="getDelReverseDNSZoneObjects", dependsOnGroups={"addReverseDNSZone","addandanother_ReverseDNSZone","reverseDNSZoneRecordsTest_add","reverseDNSZoneRecordsTest_addandaddanother","reverseDNSZoneRecordsTest_addandedit","reverseDNSZoneRecordsTest_add_then_cancel","dnsReverseZoneSettingsTest"})	
+	@Test (groups={"deleteReverseDNSZone"}, dataProvider="getDelReverseDNSZoneObjects", dependsOnGroups={"addReverseDNSZone","addandanother_ReverseDNSZone","reverseDNSZoneRecordsTest_add","reverseDNSZoneRecordsTest_addandaddanother","reverseDNSZoneRecordsTest_addandedit","reverseDNSZoneRecordsTest_add_then_cancel","dnsReverseZoneSettingsTest","dnsReverseSettingsNagativeTest"})	
 	public void deleteReverseDNSZone(String testName, String zoneIP, String reverseZoneName, String authoritativeNameserver, String rootEmail) throws Exception {
  		DNSTasks.delDNSReversezone(sahiTasks, reverseZoneName);
 		Assert.assertFalse(sahiTasks.link(reverseZoneName).exists(),"assert new zone not in the zone list");
@@ -385,12 +445,35 @@ public class DNSTests extends SahiTestScript{
 	 * Modify dns reverse zone settings fields
 	 */
 	@Test (groups={"dnsReverseZoneSettingsTest"}, dataProvider="getDNSSettings", dependsOnGroups="addReverseDNSZone")	
-	public void reverseDNSZoneSettingsTest(String testName, String zoneName,String reverseZoneName, String fieldName, String fieldValue) throws Exception {
+	public void reverseDNSZoneSettingsTest(String testName,String testNameGroup, String zoneName,String reverseZoneName, String fieldName, String fieldValue) throws Exception {
 		//sahiTasks.navigateTo(url, true);
 		// get into DNS zone record modification page
 		sahiTasks.link(reverseZoneName).click();
+		
+		
 		// performing the test
-		DNSTasks.zoneSettingsModification(sahiTasks, zoneName,reverseZoneName, fieldName, fieldValue);
+		if(testNameGroup.equals("SOA&class"))
+		{
+			DNSTasks.zoneSettingsModification_SoaAndClass(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		if(testNameGroup.equals("Bind Update policy"))
+		{
+			DNSTasks.zoneSettingsModification_bindUpdatePolicy(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		if(testNameGroup.equals("Dynamic Update&Policy"))
+		{
+			DNSTasks.zoneSettingsModification_dynamicUpdateAndPolicy(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		
+		if(testNameGroup.equals("Query&Transfer"))
+		{
+			DNSTasks.zoneSettingsModification_queryAndTransfer(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}
+		
+		if(testNameGroup.equals("PTR Sync"))
+		{
+			DNSTasks.dnsZoneAllowPTRSync(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
+		}		
 		// go back to dns zone list, prepare for next test
 		sahiTasks.link("DNS Zones").click();
 		if (sahiTasks.span("Dirty").exists()){
@@ -400,7 +483,20 @@ public class DNSTests extends SahiTestScript{
 		}else{
 			log.info("no 'Dirty' dialog detected, test continue well");
 		} 
-	}//reverseDNSZoneSettingsTest 	
+				
+	}
+	
+	@Test (groups={"dnsReverseSettingsNagativeTest"}, dataProvider="getDNSSettings_Negative", dependsOnGroups="addReverseDNSZone")	
+	public void testDnsReverseSettingsNagative(String testName, String zoneName, String reverseZoneName,String fieldName, String fieldValue, String expectedError1, String expectedError2) throws Exception {
+		// get into DNS zone record modification page
+		sahiTasks.link(reverseZoneName).click();
+		DNSTasks.dnsZoneNegativeSetting(sahiTasks,zoneName,reverseZoneName,fieldName,fieldValue,expectedError1,expectedError2);
+		// performing the test
+	}
+	
+	
+	
+	
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ***********
@@ -423,8 +519,20 @@ public class DNSTests extends SahiTestScript{
 		return ll;	
 	}
 	
-	
-	
+	/*
+	 * getDNSZoneEnableDisableObjects
+	 */
+	@DataProvider(name="getDNSZoneEnableDisableObjects")
+	public Object[][] getDNSZoneEnableDisableObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDNSZoneEnableDisableObjects());
+	}
+	protected List<List<Object>> createDNSZoneEnableDisableObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		ll.add(Arrays.asList(new Object[]{
+				// testName,  zoneName
+				"dns zone Enable Disable", DNSTests.dnszone} ));
+		return ll;	
+	}
 	
 	/*
 	 * Add and another DNS Zone
@@ -451,41 +559,147 @@ public class DNSTests extends SahiTestScript{
 	protected List<List<Object>> createDNSSettings(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-		ll.add(Arrays.asList(new Object[]{"dns settings test: soa name",DNSTests.dnszone,reversezone,
+	  ll.add(Arrays.asList(new Object[]{"dns settings test: soa name","SOA&class",DNSTests.dnszone,reversezone,
 			"idnssoamname","modified.dhcp-121.sjc.redhat.com"}));
 		
-		ll.add(Arrays.asList(new Object[]{"dns settings test: soa r name ",DNSTests.dnszone,reversezone,
+		ll.add(Arrays.asList(new Object[]{"dns settings test: soa r name","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoarname","email.dhcp-121.sjc.redhat.com."}));
 		
-			ll.add(Arrays.asList(new Object[]{"dns settings: soa serial",DNSTests.dnszone,reversezone,
+			ll.add(Arrays.asList(new Object[]{"dns settings: soa serial","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoaserial","2147483646"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: soa refresh time",DNSTests.dnszone,reversezone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa refresh time","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoarefresh","2400"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: soa retry time",DNSTests.dnszone,reversezone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa retry time","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoaretry","600"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: soa expire time",DNSTests.dnszone,reversezone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa expire time","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoaexpire","243544645"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: soa minimum time",DNSTests.dnszone,reversezone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa minimum time","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoaminimum","2400"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: ttl: time to live",DNSTests.dnszone,reversezone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: ttl: time to live","SOA&class",DNSTests.dnszone,reversezone,
 				"dnsttl","1323324324"}));
-	/* mvarun : Not able to select classes from dropdown..	
-		// I should have negative data for class here
-		ll.add(Arrays.asList(new Object[]{"dns settings: class",DNSTests.dnszone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
 				"dnsclass","IN"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: class",DNSTests.dnszone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
 				"dnsclass","CS"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: class",DNSTests.dnszone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
 				"dnsclass","CH"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: class",DNSTests.dnszone,
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
 				"dnsclass","HS"}));
 		
-		ll.add(Arrays.asList(new Object[]{"dns settings: allow dynamic update",DNSTests.dnszone,
-				"idnsallowdynupdate-2-0","TRUE"}));
-		ll.add(Arrays.asList(new Object[]{"dns settings: update policy",DNSTests.dnszone,
-				"idnsupdatepolicy","grant SJC.REDHAT.COM krb5-self * AAAA; grant SJC.REDHAT.COM krb5-self * A;"}));*/
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow dynamic update","Dynamic Update&Policy",DNSTests.dnszone,reversezone,
+				"idnsallowdynupdate-1-0","idnsallowdynupdate-1-1"}));
+				
+		ll.add(Arrays.asList(new Object[]{"dns settings: update policy","Bind Update policy",DNSTests.dnszone,reversezone,
+				"idnsupdatepolicy","grant SJC.REDHAT.COM krb5-self * AAAA; grant SJC.REDHAT.COM krb5-self * A;"}));
+		
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow query","Query&Transfer",DNSTests.dnszone,reversezone,
+				"idnsallowquery-1","1.1.1.1"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow Transfer","Query&Transfer",DNSTests.dnszone,reversezone,
+				"idnsallowtransfer-1","2.2.2.2"}));
+				
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow Transfer","Query&Transfer",DNSTests.dnszone,reversezone,
+				"idnsforwarders-0","3.3.3.3"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: forward Policy","Dynamic Update&Policy",DNSTests.dnszone,reversezone,
+				"idnsforwardpolicy-2-1","idnsforwardpolicy-2-0"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: Allow_PTR_Sync_Test","PTR Sync",DNSTests.dnszone,reversezone,
+				"","This page has unsaved changes. Please save or revert."}));
+		
 		return ll;
+		
 	}//createDNSSettings
+	
+	//getDNSSettings_Negative 
+	
+	@DataProvider(name="getDNSSettings_Negative")
+	public Object[][] getDNSSettings_Negative(){
+		return TestNGUtils.convertListOfListsTo2dArray(createDNSSettings_Negative());
+	}
+	protected List<List<Object>> createDNSSettings_Negative(){
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+	  ll.add(Arrays.asList(new Object[]{"dns settings test: soa serial_wrongInput",DNSTests.dnszone,reversezone,
+			"idnssoaserial","abc","Must be an integer","Input form contains invalid or missing values."}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings test: soa serial_minValue",DNSTests.dnszone,reversezone,
+				"idnssoaserial","-1","Minimum value is 1","invalid 'refresh': must be at least 0"}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings test: soa serial_maxValue",DNSTests.dnszone,reversezone,
+				"idnssoaserial","2147483648","Maximum value is 2147483647","Input form contains invalid or missing values."}));
+	  
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa refresh_time_wrongInput",DNSTests.dnszone,reversezone,
+				"idnssoarefresh","xyz","Must be an integer","Input form contains invalid or missing values."}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa refresh_time_minValue",DNSTests.dnszone,reversezone,
+				"idnssoarefresh","-2","Minimum value is 1","invalid 'refresh': must be at least 0"}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa refresh_time_maxValue",DNSTests.dnszone,reversezone,
+				"idnssoarefresh","2147483648","Maximum value is 2147483647","Input form contains invalid or missing values."}));
+	  
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa retry_time_wrongInput",DNSTests.dnszone,reversezone,
+				"idnssoaretry","abc","Must be an integer","Input form contains invalid or missing values."}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa retry_time_minValue",DNSTests.dnszone,reversezone,
+				"idnssoaretry","-45","","invalid 'retry': must be at least 0"}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa retry_time_maxValue",DNSTests.dnszone,reversezone,
+				"idnssoaretry","2147483648","Maximum value is 2147483647","Input form contains invalid or missing values."}));
+	  
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa expire_time_wrongInput",DNSTests.dnszone,reversezone,
+				"idnssoaexpire","abc","Must be an integer","Input form contains invalid or missing values."}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa expire_time_minValue",DNSTests.dnszone,reversezone,
+				"idnssoaexpire","-60","","invalid 'expire': must be at least 0"}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa expire_time_maxValue",DNSTests.dnszone,reversezone,
+				"idnssoaexpire","2147483648","Maximum value is 2147483647","Input form contains invalid or missing values."}));
+	  
+	  
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa minimum_time_wrongInput",DNSTests.dnszone,reversezone,
+				"idnssoaminimum","qwert","Must be an integer","Input form contains invalid or missing values."}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa minimum_time_minValue",DNSTests.dnszone,reversezone,
+				"idnssoaminimum","-10","","invalid 'minimum': must be at least 0"}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: soa minimum_time_maxValue",DNSTests.dnszone,reversezone,
+				"idnssoaminimum","2147483648","Maximum value is 10800","Input form contains invalid or missing values."}));
+		
+		
+	  ll.add(Arrays.asList(new Object[]{"dns settings: ttl: time_to_live_wrongInput",DNSTests.dnszone,reversezone,
+				"dnsttl","asdf","Must be an integer","Input form contains invalid or missing values."}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: ttl: time_to_live_maxValue",DNSTests.dnszone,reversezone,
+				"dnsttl","2147483648","Maximum value is 2147483647","Input form contains invalid or missing values."}));
+	  
+	  ll.add(Arrays.asList(new Object[]{"dns settings:BIND_Update_policy_With_leading_space",DNSTests.dnszone,reversezone,
+			  "idnsupdatepolicy"," grant SJC.REDHAT.COM ;","invalid 'update_policy': Leading and trailing spaces are not allowed",""}));	  
+	  ll.add(Arrays.asList(new Object[]{"dns settings:BIND_Update_policy_With_trailing_space",DNSTests.dnszone,reversezone,
+			  "idnsupdatepolicy","grant SJC.REDHAT.COM ; ","invalid 'update_policy': Leading and trailing spaces are not allowed",""}));
+	  	
+	  ll.add(Arrays.asList(new Object[]{"dns settings: allow query_invalid _address",DNSTests.dnszone,reversezone,
+				"idnsallowquery-0","a","Not a valid network address","Input form contains invalid or missing values."}));
+	  ll.add(Arrays.asList(new Object[]{"dns settings: allow query_invalid_query",DNSTests.dnszone,reversezone,
+				"idnsallowquery-0","1","","invalid 'allow_query': failed to detect a valid IP address from u'1'"}));
+	 
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow Transfer_invalid _address",DNSTests.dnszone,reversezone,
+				"idnsallowtransfer-0","a","Not a valid network address","Input form contains invalid or missing values."}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow Transfer_invalid_query",DNSTests.dnszone,reversezone,
+				"idnsallowtransfer-0","1","","invalid 'allow_transfer': failed to detect a valid IP address from u'1'"}));
+	  
+	  
+	  return ll;
+		
+	}
+	
+	
+	
+	
+	
+	
+	@DataProvider(name="getDNSSettingsEnableDisableObject")
+	public Object[][] getDNSSettingsEnableDisableObject() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDNSSettingsEnableDisableObjects());
+	}
+	protected List<List<Object>> createDNSSettingsEnableDisableObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		ll.add(Arrays.asList(new Object[]{
+				// testName,  zoneName,  authoritativeNameserver,  rootEmail	
+				"dns zone test", "examples.dns.test.zone",nameserver,"root." + DNSTests.dummyHost} ));  
+		
+		return ll;	
+	}
 	
 	@DataProvider(name="getDNSRecords")
 	public Object[][] getDNSRecords() {
@@ -549,7 +763,7 @@ public class DNSTests extends SahiTestScript{
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NS test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
-				"ns_recordtest",nameserver,"NS","","","","","","","","","","",""}));
+				"ns_recordtest",nameserver+".","NS","","","","","","","","","","",""}));
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NSEC test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
@@ -627,7 +841,7 @@ public class DNSTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{"dns record NAPTR and NS test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
 				"naptr_recordtest","E2U+sip","NAPTR","100","10","P","!^.*$!sip:customer-service@example.com!","test","","","","","","",
-				"ns_recordtest",nameserver,"NS","","","","","","","","","","",""}));
+				"ns_recordtest",nameserver+".","NS","","","","","","","","","","",""}));
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NSEC and PTR test", 
 				DNSTests.dnszone2,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
@@ -646,7 +860,7 @@ public class DNSTests extends SahiTestScript{
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NS and TXT test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
-				"ns_recordtest",nameserver,"NS","","","","","","","","","","","",
+				"ns_recordtest",nameserver+".","NS","","","","","","","","","","","",
 				"txt_recordtest","MOE     MB      A.ISI.EDU.","TXT","","","","","","","","","","",""}));
 		
 		return ll;	
@@ -733,14 +947,15 @@ public class DNSTests extends SahiTestScript{
 				"afsdb_recordtest","zeta.lab.eng.pnq.redhat.com","AFSDB","2","","","","","","","","","","",
 				"afsdb_recordtest","tera.lab.eng.pnq.redhat.com","AFSDB","3","","","","","","","","","","","no modifications to be performed"}));
 		
-		/*ll.add(Arrays.asList(new Object[]{"Zone_edit_CERT", "demo.dns.test.zone",nameserver,"root." + DNSTests.dummyHost,				 
+		ll.add(Arrays.asList(new Object[]{"Zone_edit_CERT", "demo.dns.test.zone",nameserver,"root." + DNSTests.dummyHost,				 
 				"a_recordtest","10.0.0.4","A","","","","","","","","","","","" ,
-				"cert_recordtest","PGP FDASFDSAFDAfdafdafdsaWfdasfdasfff4324535435wefdsgdft43dgdf==","CERT","1","1","1","","","","","","","","",
-				"cert_recordtest","PGP FDASFDSAFDAfdafdafdsaWfdasfdasfff4324535435wefdsgdft43dgdf==","CERT","2","2","2","","","","","","","","",
-				"cert_recordtest","PGP FDASFDSAFDAfdafdafdsaWfdasfdasfff4324535435wefdsgdft43dgdf==","CERT","3","3","3","","","","","","","","","no modifications to be performed"}));*/
+				"cert_recordtest","1","CERT","1","1","1","","","","","","","","",
+				"cert_recordtest","2","CERT","2","2","2","","","","","","","","",
+				"cert_recordtest","3","CERT","3","3","3","","","","","","","","","no modifications to be performed"}));
 		
-		ll.add(Arrays.asList(new Object[]{"Zone_edit_CNAME ", "example.dns.test.zone",nameserver,"root." + DNSTests.dummyHost,				 
-				"aaaa_recordtest","fe80::216:36ff:fe23:9aa1","AAAA","","","","","","","","","","","",
+	ll.add(Arrays.asList(new Object[]{"Zone_edit_CNAME ", "200.65.10.in-addr.arpa.",nameserver,"root." + DNSTests.dummyHost,				 
+				
+				"ptr_recordtest","skyfire.lab.eng.pnq.redhat.com.","PTR","","","","","","","","","","","",
 				"cname_recordtest","also-dhcp-118.sjc.redhat.com","CNAME","","","","","","","","","","","",
 				"cname_recordtest","zetaprime.lab.eng.pnq.redhat.com","CNAME","","","","","","","","","","","",
 				"cname_recordtest","bumblebee.lab.eng.pnq.redhat.com","CNAME","","","","","","","","","","","","no modifications to be performed"}));
@@ -789,9 +1004,9 @@ public class DNSTests extends SahiTestScript{
 		
 		ll.add(Arrays.asList(new Object[]{"Zone_edit_NS ", "example.dns.test.zone",nameserver,"root." + DNSTests.dummyHost,				 
 				"aaaa_recordtest","fe80::216:36ff:fe23:9aa1","AAAA","","","","","","","","","","","",
-				"ns_recordtest","qe-blade-12.idm.lab.bos.redhat.com","NS","","","","","","","","","","","",
-				"ns_recordtest","bluesteak.lab.eng.pnq.redhat.com","NS","","","","","","","","","","","",
-				"ns_recordtest","zetaprime.lab.eng.pnq.redhat.com","NS","","","","","","","","","","","","no modifications to be performed"}));
+				"ns_recordtest","margo.idm.lab.bos.redhat.com.","NS","","","","","","","","","","","",
+				"ns_recordtest","ipaqa64vmb.idm.lab.bos.redhat.com.","NS","","","","","","","","","","","",
+				"ns_recordtest","zetaprime.lab.eng.pnq.redhat.com.","NS","","","","","","","","","","","","no modifications to be performed"}));
 		
 		ll.add(Arrays.asList(new Object[]{"Zone_edit_NSEC", "demo.dns.test.zone",nameserver,"root." + DNSTests.dummyHost,				 
 				"a_recordtest","10.0.0.4","A","","","","","","","","","","","" ,
