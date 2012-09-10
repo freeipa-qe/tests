@@ -9,8 +9,9 @@
             	    <run>
             	        <include name="setup" />
             	        <include name="init" />   
-            	       
+            	    
             	        <include name="addDNSZoneTest" />
+            	        <include name="zoneEnableDisableTest" />
             	        <include name="addandanotherDNSZoneTest" />
             	        <include name="add_then_cancel_DNSZoneTest" />
             	        <include name="addDNSZoneNegativeTest" />
@@ -21,7 +22,9 @@
                         <include name="dnsZoneRecordsTest_addandaddedit" />
                         <include name="dnsZoneRecordsTest_add_then_cancel" />
                         <include name="dnsZoneSettingsTest" />
-                       <include name="delDNSZoneTest" />
+                        <include name="dnsZoneSettingsNagativeTest" />
+                        <include name="dnsZoneSettingsEnableDisableTest" />
+                        <include name="delDNSZoneTest" />
                        
                         <include name="addReverseDNSZone" />
                         <include name="addandanother_ReverseDNSZone" />
@@ -32,6 +35,7 @@
                         <include name="reverseDNSZoneRecordsTest_add_then_cancel" />
                         <include name="dnsReverseZoneSettingsTest" />
                         <include name="deleteReverseDNSZone" />
+                        <include name="dnsReverseSettingsNagativeTest" />
             	        
             	        
             	        <!--  the following are premature, comment out 
@@ -40,15 +44,15 @@
             	        <include name="dnsReverseZoneBaseTest" />
              
                           end of comment out tests -->
-                         
+                       
             	    </run>
             	</groups>
             	<classes>
             	    <class name="com.redhat.qe.ipa.sahi.tests.dns.DNSTests" />
             	</classes>
     </test>
+   
     
-    <!--
     <test name="DNS Global configuration">
 		<groups>
 			<run>
@@ -69,8 +73,8 @@
 		</classes>
 	</test>
     
-    -->
     
+  
 	
     <listeners>        
   	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
