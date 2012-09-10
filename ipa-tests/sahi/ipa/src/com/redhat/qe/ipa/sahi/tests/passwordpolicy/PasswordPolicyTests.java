@@ -103,13 +103,15 @@ public class PasswordPolicyTests extends SahiTestScript{
 		
 		// scenario: lower bound of data range
 		String lowerThanMin = "-1";
-		String lowerThanMin_errorMsg = "invalid 'priority': must be at least 0";
+		//String lowerThanMin_errorMsg = "invalid 'priority': must be at least 0";
+		String lowerThanMin_errorMsg ="Minimum value is 0";
 		browser.textbox("cn").click();
 		browser.select("list").choose("passwordpolicygrp000");
 		browser.textbox("cospriority").setValue(lowerThanMin);
-		browser.button("Add").click();
-		Assert.assertTrue(browser.div(lowerThanMin_errorMsg).exists(),"data range check: lower than min");
-		browser.button("Cancel").near(browser.button("Retry")).click();
+		browser.button("Add").click();		
+		Assert.assertTrue(browser.span(lowerThanMin_errorMsg).exists(),"data range check: lower than min");
+		//Assert.assertTrue(browser.div(lowerThanMin_errorMsg).exists(),"data range check: lower than min");
+		//browser.button("Cancel").near(browser.button("Retry")).click();
 		browser.button("Cancel").near(browser.button("Add and Edit")).click();
 		
 		// Scenario: upper bound of data range
@@ -131,7 +133,7 @@ public class PasswordPolicyTests extends SahiTestScript{
 		browser.button("Cancel").click(); // click away the add policy dialog box, end of test
 	}//addPolicy_NegativeTest
 
-	@Test (groups={"deletePolicy"}, dataProvider="allTestPolicies", dependsOnGroups="modifyPolicy")	
+	@Test (groups={"deletePolicy"}, dataProvider="allTestPolicies", dependsOnGroups={"modifyPolicy","PolicyExpandCollapseTest"})	
 	public void deletePolicy(String policyName) throws Exception {
 		log.info("delete test policy:["+policyName+"]");
 		PasswordPolicyTasks.delete_Policy(browser, policyName);
@@ -220,35 +222,35 @@ public class PasswordPolicyTests extends SahiTestScript{
 			{	
 				{"krbmaxpwdlife: non-integer", 		  policy,"krbmaxpwdlife","abc", "Must be an integer"}, 
 				{"krbmaxpwdlife: upper range integer",policy,"krbmaxpwdlife","2147483648", "Maximum value is 2147483647"},
-				{"krbmaxpwdlife: lower range integer",policy,"krbmaxpwdlife","-1","invalid 'maxlife': must be at least 0"},		
+				{"krbmaxpwdlife: lower range integer",policy,"krbmaxpwdlife","-1","Minimum value is 0"},		
 				
 				{"krbminpwdlife: non-integer",		  policy,"krbminpwdlife","edf", "Must be an integer"},
 				{"krbminpwdlif1stPolicye: upper range integer",policy,"krbminpwdlife","2147483648", "Maximum value is 2147483647"},
-				{"krbminpwdlife: lower range integer",policy,"krbminpwdlife","-1","invalid 'minlife': must be at least 0"},
+				{"krbminpwdlife: lower range integer",policy,"krbminpwdlife","-1","Minimum value is 0"},
 		
 				{"krbpwdhistorylength: non-integer",	    policy,"krbpwdhistorylength","HIJ", "Must be an integer"}, 
 				{"krbpwdhistorylength: upper range integer",policy,"krbpwdhistorylength","2147483648", "Maximum value is 2147483647"},
-				{"krbpwdhistorylength: lower range integer",policy,"krbpwdhistorylength","-1","invalid 'history': must be at least 0"},
+				{"krbpwdhistorylength: lower range integer",policy,"krbpwdhistorylength","-1","Minimum value is 0"},
 		
 				{"krbpwdmindiffchars: non-integer",	   policy,"krbpwdmindiffchars","3lm", "Must be an integer"}, 
 				{"krbpwdmindiffchars: upper range integer",policy,"krbpwdmindiffchars","2147483648", "Maximum value is 5"},
-				{"krbpwdmindiffchars: lower range integer",policy,"krbpwdmindiffchars","-1","invalid 'minclasses': must be at least 0"},
+				{"krbpwdmindiffchars: lower range integer",policy,"krbpwdmindiffchars","-1","Minimum value is 0"},
 		
 				{"krbpwdminlength: non-integer",		policy,"krbpwdminlength","n0p", "Must be an integer"},  
 				{"krbpwdminlength: upper range integer",policy,"krbpwdminlength","2147483648", "Maximum value is 2147483647"},
-				{"krbpwdminlength: lower range integer",policy,"krbpwdminlength","-1","invalid 'minlength': must be at least 0"},
+				{"krbpwdminlength: lower range integer",policy,"krbpwdminlength","-1","Minimum value is 0"},
 								
 				{"krbpwdmaxfailure: non-integer",		 policy,"krbpwdmaxfailure","n0p", "Must be an integer"},  
 				{"krbpwdmaxfailure: upper range integer",policy,"krbpwdmaxfailure","2147483648", "Maximum value is 2147483647"},
-				{"krbpwdmaxfailure: lower range integer",policy,"krbpwdmaxfailure","-1","invalid 'maxfail': must be at least 0"},
+				{"krbpwdmaxfailure: lower range integer",policy,"krbpwdmaxfailure","-1","Minimum value is 0"},
 				
 				{"krbpwdfailurecountinterval: non-integer",		 policy,"krbpwdfailurecountinterval","n0p", "Must be an integer"},  
 				{"krbpwdfailurecountinterval: upper range integer",policy,"krbpwdfailurecountinterval","2147483648", "Maximum value is 2147483647"},
-				{"krbpwdfailurecountinterval: lower range integer",policy,"krbpwdfailurecountinterval","-1","invalid 'failinterval': must be at least 0"},
+				{"krbpwdfailurecountinterval: lower range integer",policy,"krbpwdfailurecountinterval","-1","Minimum value is 0"},
 				
 				{"krbpwdlockoutduration: non-integer",		 policy,"krbpwdlockoutduration","n0p", "Must be an integer"},  
 				{"krbpwdlockoutduration: upper range integer",policy,"krbpwdlockoutduration","2147483648", "Maximum value is 2147483647"},
-				{"krbpwdlockoutduration: lower range integer",policy,"krbpwdlockoutduration","-1","invalid 'lockouttime': must be at least 0"}
+				{"krbpwdlockoutduration: lower range integer",policy,"krbpwdlockoutduration","-1","Minimum value is 0"}
 				
 				
 				
