@@ -675,7 +675,7 @@ hbacsvc_client2_007() {
         rlPhaseStartTest "ipa-hbacsvc-client2-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd user7"
+                rlRun "ssh root@$CLIENT 'getent -s sss passwd user7'"
 		sleep 5
                 rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
 				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
@@ -1333,7 +1333,7 @@ hbacsvc_client2_013() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
-                rlRun "getent -s sss passwd user13"
+                rlRun "ssh root@$CLIENT 'getent -s sss passwd user13'"
                 rlRun "ssh_auth_success user13 testpw123@ipa.com $CLIENT"
 				rlRun "tail -20 /var/log/secure"
 				if [ $? -gt 0 ]; then
@@ -1418,7 +1418,7 @@ hbacsvc_client2_014() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
-                rlRun "getent -s sss passwd user14"
+                rlRun "ssh root@$CLIENT 'getent -s sss passwd user14'"
                 rlRun "ssh_auth_success user14 testpw123@ipa.com $CLIENT"
 				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
 				if [ $? -gt 0 ]; then
@@ -2424,7 +2424,7 @@ hbacsvc_client2_028() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
-                rlRun "getent -s sss passwd user28"
+                rlRun "ssh root@$CLIENT 'getent -s sss passwd user28'"
                 rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
 				if [ $? -gt 0 ]; then
 					DATE=$(date +%Y%m%d-%H%M%S)
