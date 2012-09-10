@@ -67,6 +67,7 @@ uninstall_fornexttest()
        ipa-client-install --uninstall -U 
        if [ $? -ne 0 ]; then
           rlLog "Unsuccessful uninstall"
+          rhts-submit-log -l /var/log/ipaclient-uninstall.log
        fi
     fi
     if [ -f $SSSD ] ; then
