@@ -95,14 +95,33 @@ public class PasswordPolicyTasks {
 											 String expectedErrorMsg){
 		
 		browser.textbox(textboxName).setValue(textboxValue_Negative);
-		if (!expectedErrorMsg.equals("")){
-			Assert.assertTrue(browser.span(expectedErrorMsg).exists(),
-								"error msg field triggered, error msg match as expected, test continue for error dialog box check");
+		if (!expectedErrorMsg.equals(""))
+		{
+			if(browser.span(expectedErrorMsg).exists())
+			{
+				log.info("error msg field triggered, error msg match as expected, test continue for error dialog box check");
+			}
+			else 
+			{
+				browser.span("Update").click();
+				Assert.assertTrue(browser.div(expectedErrorMsg).exists(),"error msg field triggered, error msg match as expected, test continue for error dialog box check");
+				browser.button("Cancel").click();
+
+			}
+			
 		}
 		
 		browser.span("Update").click();
-		Assert.assertTrue(browser.span("Validation error").exists());
-		browser.span("OK").click(); 
+		if(browser.span("Validation error").exists())
+		{
+			browser.span("OK").click(); 
+		}
+		else
+		{
+			browser.button("Cancel").click();
+			
+		}
+		
 		
 		browser.link("Password Policies").in(browser.div("content")).click();
 		Assert.assertTrue(browser.span("Unsaved Changes").near(browser.div("This page has unsaved changes. Please save or revert.")).exists(),
