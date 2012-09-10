@@ -908,35 +908,36 @@ ipa_install_client()
 
 		rlLog "RUN ipa dns-add for client?"
 
-		rlLog "Starting master ($MYMASTER) tcpdump"
-		ssh root@$MYMASTER "nohup tcpdump -s 0 -w /var/tmp/ipa-server.pcap > /tmp/nohup 2>&1 &"
+		#rlLog "Starting master ($MYMASTER) tcpdump"
+		#ssh root@$MYMASTER "nohup tcpdump -s 0 -w /var/tmp/ipa-server.pcap > /tmp/nohup 2>&1 &"
 
-		rlLog "Starting local ($HOSTNAME) tcpdump"
-		nohup tcpdump -s 0 -w /var/tmp/ipa-client.pcap > /tmp/nohup 2>&1 &
+		#rlLog "Starting local ($HOSTNAME) tcpdump"
+		#nohup tcpdump -s 0 -w /var/tmp/ipa-client.pcap > /tmp/nohup 2>&1 &
 		
 		rlLog "RUN ipa-client-install"
 		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
 
-		rlLog "Killing local ($HOSTNAME) tcpdump"
-		TCPDPID=""
-		TCPDPID=$(ps -ef|grep tcpdump.*i[p]a-client.pcap|awk '{print $2}')
-		if [ -n "$TCPDPID" ]; then
-			kill $TCPDPID
-		fi
+		#rlLog "Killing local ($HOSTNAME) tcpdump"
+		#TCPDPID=""
+		#TCPDPID=$(ps -ef|grep tcpdump.*i[p]a-client.pcap|awk '{print $2}')
+		#if [ -n "$TCPDPID" ]; then
+		#	kill $TCPDPID
+		#fi
 
-		rlLog "Killing master ($MYMASTER) tcpdump"
-		TCPDPID=""
-		TCPDPID=$(ssh root@$MYMASTER "ps -ef|grep tcpdump.*ip[a]-server.pcap|awk '{print \$2}'")
-		if [ -n "$TCPDPID" ]; then
-			ssh root@$MYMASTER "kill $TCPDPID"
-		fi
+		#rlLog "Killing master ($MYMASTER) tcpdump"
+		#TCPDPID=""
+		#TCPDPID=$(ssh root@$MYMASTER "ps -ef|grep tcpdump.*ip[a]-server.pcap|awk '{print \$2}'")
+		#if [ -n "$TCPDPID" ]; then
+		#	ssh root@$MYMASTER "kill $TCPDPID"
+		#fi
 
 		CHK=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
 		if [ $CHK -gt 0 ]; then
-			sftp root@$MYMASTER:/var/tmp/ipa-server.pcap /var/tmp
+			#sftp root@$MYMASTER:/var/tmp/ipa-server.pcap /var/tmp
+			rlFail "BZ 845691 found...ipa-client-install Failed to obtain host TGT"
 			submit_log /var/log/ipaclient-install.log
-			submit_log /var/tmp/ipa-server.pcap
-			submit_log /var/tmp/ipa-client.pcap
+			#submit_log /var/tmp/ipa-server.pcap
+			#submit_log /var/tmp/ipa-client.pcap
 		fi
 	rlPhaseEnd
 }
