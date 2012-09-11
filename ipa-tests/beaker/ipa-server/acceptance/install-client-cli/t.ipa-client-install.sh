@@ -406,7 +406,7 @@ ipaclientinstall_hostname()
 
        # clear the host record, there is no DNS record associated for this host
        if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
-          rlRun "ssh root@$MASTER \"echo $ADMINPW|kinit admin; ipa host-del $CLIENT.nonexistent\"" 0 "Deleting client record and DNS entry from server"
+          rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa host-del $CLIENT.nonexistent\"" 0 "Deleting client record and DNS entry from server"
        else
 	      rlRun "ipa host-del $CLIENT.nonexistent" 0 "Deleting client record and DNS entry from server"
        fi
@@ -601,8 +601,8 @@ ipaclientinstall_randompassword()
 {
     rlPhaseStartTest "ipa-client-install-XX- [Positive] Install with random password" 
         local tmpout=$TmpDir/ipaclientinstall_randompassword.out
-        rlRun "ssh root@$MASTER \"ipa host-del $CLIENT\"" 0 "Delete Client host record from Master"
-        rlRun "ssh root@$MASTER \"ipa host-add $CLIENT --random\" > $tmpout" 0 "Get random password"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"ipa host-del $CLIENT\"" 0 "Delete Client host record from Master"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"ipa host-add $CLIENT --random\" > $tmpout" 0 "Get random password"
         randomPassword=`grep "Random password:" $tmpout | cut -d ":" -f2 | sed s/"^ "//g`
         rlLog "randomPassword: $randomPassword"
         uninstall_fornexttest

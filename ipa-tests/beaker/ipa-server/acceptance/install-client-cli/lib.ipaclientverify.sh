@@ -462,8 +462,8 @@ verify_keytab_afteruninstall()
     client=$1
     out=$2
 	if [ $(grep 5\.[0-9] /etc/redhat-release |wc -l) -gt 0 ]; then
-		rlLog "Running: sh root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out"
-		rlRun "ssh root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out 2>&1"
+		rlLog "Running: ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out"
+		rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out 2>&1"
 	else
 		rlLog "Running: ipa  host-show --all $client > $out"
 		rlRun "ipa  host-show --all $client > $out 2>&1"
@@ -521,7 +521,7 @@ restoreResolv()
 verify_time()
 {
    clientTime=`date +%s`
-   serverTime=`ssh root@$MASTER date +%s`
+   serverTime=`ssh -o StrictHostKeyChecking=no root@$MASTER date +%s`
    diffInTime=`expr $clientTime - $serverTime`
 
    #Allow 2 min difference
@@ -529,7 +529,7 @@ verify_time()
      rlPass "Client time matches time on server"
    else
      rlFail "Client time does not match time on server"
-     rlLog "Client Time: `date`; and Server Time: `ssh root@$MASTER date`"
+     rlLog "Client Time: `date`; and Server Time: `ssh -o StrictHostKeyChecking=no root@$MASTER date`"
      date --set='-2 hours'
      rlLog "Reset time on Client: `date`"
    fi
@@ -538,7 +538,7 @@ verify_time()
 getRandomPassword()
 {
      out="$1"
-     ssh root@$MASTER "ipa host-add $CLIENT --random" > $out
+     ssh -o StrictHostKeyChecking=no root@$MASTER "ipa host-add $CLIENT --random" > $out
 
 #     $cmd > $out
      randomPassword=`grep "Random password:" $out | cut -d ":" -f2`
