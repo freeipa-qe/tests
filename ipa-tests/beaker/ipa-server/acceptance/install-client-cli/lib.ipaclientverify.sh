@@ -462,9 +462,11 @@ verify_keytab_afteruninstall()
     client=$1
     out=$2
 	if [ $(grep 5\.[0-9] /etc/redhat-release |wc -l) -gt 0 ]; then
-		ssh root@$MASTER "echo $ADMINPW|kinit admin; ipa  host-show --all $client" > $out
+		rlLog "Running: sh root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out"
+		rlRun "ssh root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out 2>&1"
 	else
-		ipa  host-show --all $client > $out
+		rlLog "Running: ipa  host-show --all $client > $out"
+		rlRun "ipa  host-show --all $client > $out 2>&1"
 	fi
     rlLog "Out: $out"
     chkkeytab="Keytab: False"
