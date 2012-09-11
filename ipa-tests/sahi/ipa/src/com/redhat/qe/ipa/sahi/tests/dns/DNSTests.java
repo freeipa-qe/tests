@@ -298,7 +298,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify dns zone record fields : and one new record and switch to editing mode immediately 
 	 */
-	@Test (groups={"dnsZoneRecordsTest_add_then_cancel"}, dataProvider="getDNSRecords", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
+	@Test (groups={"dnsZoneRecordsTest_add_then_cancel"}, dataProvider="getDNSRecords_AddAndCancel", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
 	public void dnsZoneRecordsTest_add_then_cancel(String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
 									String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 			    					String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11) throws Exception {
@@ -375,7 +375,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify reverse dns zone record fields
 	 */ 
-	@Test (groups={"reverseDNSZoneRecordsTest_add"}, dataProvider="getDNSRecords", dependsOnGroups="addReverseDNSZone")	
+	@Test (groups={"reverseDNSZoneRecordsTest_add"}, dataProvider="getReverseDNSRecords", dependsOnGroups="addReverseDNSZone")	
 	public void reverseDNSZoneRecordsTest_add(	String testName, String zoneName,String reverseZoneName, 
 											String authoritativeNameserver, String rootEmail,
 											String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
@@ -391,7 +391,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify reverse dns zone record fields : add one record and then add another record immediately
 	 */ 	
-	@Test (groups={"reverseDNSZoneRecordsTest_addandaddanother"}, dataProvider="getDNSRecords_addanother", dependsOnGroups="addReverseDNSZone")	
+	@Test (groups={"reverseDNSZoneRecordsTest_addandaddanother"}, dataProvider="getReverseDNSRecords_addanother", dependsOnGroups="addReverseDNSZone")	
 	public void reverseDNSZoneRecordsTest_addandaddanother(	String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
 															String first_record_name, String first_record_data, String first_record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 															String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11,
@@ -411,7 +411,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify reverse dns zone record fields : add one record then get into editing mode immediately 
 	 */ 	
-	@Test (groups={"reverseDNSZoneRecordsTest_addandedit"}, dataProvider="getDNSRecords", dependsOnGroups="addReverseDNSZone")	
+	@Test (groups={"reverseDNSZoneRecordsTest_addandedit"}, dataProvider="getReverseDNSRecordAddAndEdit", dependsOnGroups="addReverseDNSZone")	
 	public void reverseDNSZoneRecordsTest_addandedit(	String testName, String zoneName,String reverseZoneName, 
 											String authoritativeNameserver, String rootEmail,
 											String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
@@ -428,7 +428,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify reverse dns zone record fields: add and then cancel
 	 */ 	
-	@Test (groups={"reverseDNSZoneRecordsTest_add_then_cancel"}, dataProvider="getDNSRecords", dependsOnGroups="addReverseDNSZone")	
+	@Test (groups={"reverseDNSZoneRecordsTest_add_then_cancel"}, dataProvider="getDNSRecords_AddAndCancel", dependsOnGroups="addReverseDNSZone")	
 	public void reverseDNSZoneRecordsTest_add_then_cancel(	String testName, String zoneName,String reverseZoneName, 
 											String authoritativeNameserver, String rootEmail,
 											String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
@@ -797,6 +797,45 @@ public class DNSTests extends SahiTestScript{
 	}
 	
 	/*
+	 * DNS Zone add and cancel
+	 */
+	
+	@DataProvider(name="getDNSRecords_AddAndCancel")
+	public Object[][] getDNSRecords_AddAndCancel() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDNSRecords_AddAndCancel());
+	}
+	protected List<List<Object>> createDNSRecords_AddAndCancel() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+			
+		// testName,  zoneName, reverse_zone,authoritativeNameserver,rootEmail,recordName,recordData,recordType,otherData 1....otherData 11   
+		ll.add(Arrays.asList(new Object[]{"dns record A test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"a_recordtest","10.0.0.2","A","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record AAAA test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"aaaa_recordtest","fe80::216:36ff:fe23:9aa1","AAAA","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record A6 test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"a6_recordtest","48 0::0 subscriber-bar.ip6.isp2.baz.","A6","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record AFSDB test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"afsdb_recordtest",DNSTests.dummyHost,"AFSDB","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record CERT test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"cert_recordtest","PGP FDASFDSAFDAfdafdafdsaWfdasfdasfff4324535435wefdsgdft43dgdf==","CERT","1","1","1","","","","","","","",""}));
+					
+		return ll;	
+	}
+	
+	
+	
+	
+	
+	/*
 	 * DNSRecord Add And Another
 	 */
 	
@@ -1156,6 +1195,122 @@ public class DNSTests extends SahiTestScript{
 		
 		return ll;	
 	}//
+	
+	
+	/*
+	 *reverseDNSZoneRecordsTest_add 
+	 */
+	@DataProvider(name="getReverseDNSRecords")
+	public Object[][] getReverseDNSRecords() {
+		return TestNGUtils.convertListOfListsTo2dArray(createReverseDNSRecords());
+	}
+	protected List<List<Object>> createReverseDNSRecords() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+			
+		// testName,  zoneName, reverse_zone,authoritativeNameserver,rootEmail,recordName,recordData,recordType,otherData 1....otherData 11   
+		
+			
+		ll.add(Arrays.asList(new Object[]{"dns record MX test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"mx_recordtest","zetaprime.lab.eng.pnq.redhat.com","MX","10","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record NAPTR test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"naptr_recordtest","E2U+sip","NAPTR","100","10","P","!^.*$!sip:customer-service@example.com!","test","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record NS test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"ns_recordtest",nameserver+".","NS","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record NSEC test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"nsec_recordtest","host.example.com","NSEC","SOA","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record PTR test", 
+				DNSTests.dnszone2,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+		     	"ptr_recordtest","skyfire.lab.eng.pnq.redhat.com","PTR","","","","","","","","","","",""}));
+						
+		return ll;	
+	}
+	/*
+	 * reverseDNS Record add and another 
+	 */
+	@DataProvider(name="getReverseDNSRecords_addanother")
+	public Object[][] getReverseDNSRecords_addanother() {
+		return TestNGUtils.convertListOfListsTo2dArray(createReverseDNSRecords_addanother());
+	}
+	protected List<List<Object>> createReverseDNSRecords_addanother() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		// testName,  zoneName, reverse_zone,authoritativeNameserver,rootEmail,recordName,recordData,recordType,otherData 1....otherData 11
+				
+		ll.add(Arrays.asList(new Object[]{"dns record NAPTR and NS test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"naptr_recordtest","E2U+sip","NAPTR","100","10","P","!^.*$!sip:customer-service@example.com!","test","","","","","","",
+				"ns_recordtest",nameserver+".","NS","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record NSEC and PTR test", 
+				DNSTests.dnszone2,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"nsec_recordtest","host.example.com","NSEC","SOA","","","","","","","","","","",
+				"ptr_recordtest","skyfire.lab.eng.pnq.redhat.com","PTR","","","","","","","","","","",""}));  
+		
+		ll.add(Arrays.asList(new Object[]{"dns record RRSIG and SIG test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"rrsig_recordtest","RRSIG","RRSIG", "7", "2", "3600", "20150420235959", "20051021000000", "40430", "mvarun",  "KimG+rDd+7VA1zRsu0ITNAQUTRlpnsmqWrihFRnU+bRa93v2e5oFNFYCs3Rqgv62K93N7AhW6Jfqj/8NzWjvKg==","","","",
+				"sig_recordtest","SSHFP","SIG","1","1","60","20120501010101","20120201010101","9","shanks","123456789","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record SRV and SSHFP test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"srv_recordtest","server.example.com","SRV", "0", "100" ,"389","","","","","","","","",
+				"sshfp_recordtest","123456789abcdef67890123456789abcdef67890","SSHFP","2","1","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record NS and TXT test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"ns_recordtest",nameserver+".","NS","","","","","","","","","","","",
+				"txt_recordtest","MOE     MB      A.ISI.EDU.","TXT","","","","","","","","","","",""}));
+		
+		return ll;	
+	}
+	
+	/*
+	 * ReverseDnsZoneRecordAddAndEdit
+	 */
+	@DataProvider(name="getReverseDNSRecordAddAndEdit")
+	public Object[][] getReverseDNSRecordAddAndEdit() {
+		return TestNGUtils.convertListOfListsTo2dArray(createReverseDNSRecordAddAndEdit());
+	}
+	protected List<List<Object>> createReverseDNSRecordAddAndEdit() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+			
+		// testName,  zoneName, reverse_zone,authoritativeNameserver,rootEmail,recordName,recordData,recordType,otherData 1....otherData 11   
+				
+		ll.add(Arrays.asList(new Object[]{"dns record CNAME test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"cname_recordtest","also-dhcp-118.sjc.redhat.com","CNAME","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record DNAME test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"dname_recordtest","bar.dhcp-121.sjc.redhat.com","DNAME","","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record DS test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"ds_recordtest","asdf","DS","2","1","3","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record KEY test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"key_recordtest","AAAAB3NzaC1yc2EAAAABIwAAAQEApyb3ETzqAdduxDhOpODkohBKoqM4nKnGcss","KEY","1","1","1","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record KX test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"kx_recordtest","sjc.redhat.com","KX","10","","","","","","","","","",""}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns record LOC test", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"loc_recordtest","42","LOC","21", "54", "N", "71", "06", "18", "W", "2000", "2", "4", "567"}));
+		
+		
+		
+		return ll;	
+	}
 	
 	
 	/*
