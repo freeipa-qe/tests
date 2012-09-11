@@ -536,7 +536,7 @@ verify_time()
 getRandomPassword()
 {
      out="$1"
-     ssh root@$MASTER \"ipa host-add $CLIENT --random\" > $out
+     ssh root@$MASTER "ipa host-add $CLIENT --random" > $out
 
 #     $cmd > $out
      randomPassword=`grep "Random password:" $out | cut -d ":" -f2`
