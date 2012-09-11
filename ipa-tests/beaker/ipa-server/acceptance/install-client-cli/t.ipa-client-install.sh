@@ -402,6 +402,7 @@ ipaclientinstall_hostname()
        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
        local tmpout=$TmpDir/verify_keytab_afteruninstall.$RANDOM.out
        verify_keytab_afteruninstall $CLIENT.nonexistent $tmpout
+       rlRun "cat $tmpout"
 
        # clear the host record, there is no DNS record associated for this host
        if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
