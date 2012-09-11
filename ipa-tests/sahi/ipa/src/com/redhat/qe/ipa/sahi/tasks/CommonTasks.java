@@ -297,29 +297,63 @@ public class CommonTasks {
 			e.printStackTrace();
 			}
 			
-			FileInputStream fstream = new FileInputStream(hostname+".csr");
-			if (!System.getProperty("os.name").startsWith("Windows")) 
-				fstream = new FileInputStream("/tmp/"+hostname+".csr");
-		
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String strLine;
-			boolean createcsr = false;
-		  
-			while ((strLine = br.readLine()) != null)   {
-				if (strLine.equals("-----END NEW CERTIFICATE REQUEST-----") ){
-					createcsr = false;
+			if (System.getProperty("os.name").startsWith("Windows"))
+			{
+				FileInputStream fstream = new FileInputStream(hostname+".csr");
+				if (!System.getProperty("os.name").startsWith("Windows")) 
+					fstream = new FileInputStream("/tmp/"+hostname+".csr");
+			
+				DataInputStream in = new DataInputStream(fstream);
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				String strLine;
+				boolean createcsr = false;
+			  
+				while ((strLine = br.readLine()) != null)   {
+					if (strLine.equals("-----END NEW CERTIFICATE REQUEST-----") ){
+						createcsr = false;
+					}
+					if (createcsr) {
+						csr = csr + strLine + "\n"; 
+					}
+					if (strLine.equals("-----BEGIN NEW CERTIFICATE REQUEST-----")) {
+						createcsr = true;
+					}
 				}
-				if (createcsr) {
-					csr = csr + strLine + "\n"; 
+				
+				in.close();		
+			}
+			else
+			{
+			
+				FileInputStream fstream = new FileInputStream("/tmp/" + hostname+".csr");
+				if (!System.getProperty("os.name").startsWith("Windows")) 
+					fstream = new FileInputStream("/tmp/"+hostname+".csr");
+			
+				DataInputStream in = new DataInputStream(fstream);
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				String strLine;
+				boolean createcsr = false;
+			  
+				while ((strLine = br.readLine()) != null)   {
+					if (strLine.equals("-----END NEW CERTIFICATE REQUEST-----") ){
+						createcsr = false;
+					}
+					if (createcsr) {
+						csr = csr + strLine + "\n"; 
+					}
+					if (strLine.equals("-----BEGIN NEW CERTIFICATE REQUEST-----")) {
+						createcsr = true;
+					}
 				}
-				if (strLine.equals("-----BEGIN NEW CERTIFICATE REQUEST-----")) {
-					createcsr = true;
-				}
+				
+				in.close();
+				
 			}
 			
-			in.close();			    
-		} catch (IOException e) {
+			
+			
+		} 
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		
