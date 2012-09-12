@@ -853,14 +853,62 @@ bz829340()
 		tminimum=33
 		tttl=55
 		tzone="idnszone.com"
-		ipv6address='fe80::210:14ff:fe05:134'
+		ipv6address1='2002::210:14ff:fe05:134'
+		ipv6address2='2002::210:14ff:fe05:135'
+		ipv6address=$ipv6address1
+		ipv6host=$ipa6address1
 
 		# Add a zone to test with
 		rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
 		rlRun "ipa dnszone-mod $tzone --addattr=idnsForwarders='$ipv6address'" 0 "add a IPv6 address to the idns Forwarders field of a zone."
 		rlRun "ipa dnszone-find $tzone | grep Zone\ forwarders | grep '$ipv6address'" 0 "Make sure that the IPv6 address appears to be part of the zone."
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
-		
+
+		if [ ! -x $BEAKERSLAVE ]; then
+			rlLog "NOTICE - Slave detected as $BEAKERSLAVE"
+			# Figure out what interface to use for the next steps
+			cat /proc/net/dev | grep -v Inter | grep -v face | grep -v lo | grep -v br0 | cut -d : -f 1 | sed s/\ //g | while read if; do 
+				# Look for a internet interface taht has a address
+				ifconfig $if | grep inet\ addr
+				if [ $? -eq 0 ]; then 
+					inetinterface=$if
+				fi 
+			done	
+
+			hn=$(hostname -s)
+			echo $BEAKERMASTER | grep $hn
+			if [ $? -eq 0 ]; then
+				rlLog "This is the master. Setting rhts sync block"
+				rlRun "rhts-sync-set -s 'bz.dns.829340' -m $BEAKERMASTER"
+				rlLog "setting ipv6 address on interface $inetinterface to $ipv6address1"
+				/sbin/ip -6 addr add $ipv6address1/64 dev $inetinterface
+				ipa dnszone-del $tzone
+				rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+				rlRun "ipa dnszone-mod $tzone --addattr=idnsForwarders='$ipv6address2'" 0 "add a IPv6 address to the idns Forwarders field of a zone."
+	
+				rlRun "rhts-sync-block -s 'bz.dns.829340.b' $BEAKERSLAVE"
+
+				# ipv6 cleanup
+				/sbin/ip -6 addr del $ipv6address1/64 dev $inetinterface
+			else
+				rlLog "This is the slave. waiting for the master"
+				rlRun "rhts-sync-block -s 'bz.dns.829340' $BEAKERMASTER"
+				rlLog "setting ipv6 address on interface $inetinterface to $ipv6address2"
+				/sbin/ip -6 addr add $ipv6address2/64 dev $inetinterface
+				
+				rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+			 
+				# Add host
+				# verify resolvable from slave
+
+				rlRun "rhts-sync-set -s 'bz.dns.829340.b' -m $BEAKERSLAVE"
+
+				# ipv6 cleanup
+				/sbin/ip -6 addr del $ipv6address2/64 dev $inetinterface
+			fi
+		else
+			rlLog "NOTICE - No slave detected. Not running multi host tests for bug 829340"
+		fi
 	rlPhaseEnd
 }
 
