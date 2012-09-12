@@ -131,7 +131,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		HBACTasks.createInvalidService(sahiTasks, cn, description, expectedError);		
 	} 
 	
-	
+	 
 	/*
 	 * Search an HBAC Service Group
 	 */
@@ -140,8 +140,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 			dependsOnGroups={"hbacServiceGroupAddTests", "hbacServiceGroupAddAndEditTests", "hbacServiceGroupAddAndAddAnotherTests"})
 	public void testHBACServiceGroupSearch(String testName, String searchString, String multipleResult1, String multipleResult2, String multipleResult3, String multipleResult4) throws Exception {		
 		String[] multipleResults = {multipleResult1, multipleResult2, multipleResult3, multipleResult4}; 
-		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);
-		//sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();//xdong
+		
 		CommonTasks.search(sahiTasks, searchString);
 		
 	
@@ -175,7 +174,8 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		// the group added in a previous test - su-test - has 2 services enrolled - su and su-l
 			
 		HBACTasks.verifyHBACServiceGroupNavigation(sahiTasks, cn);
-		
+		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);//xdong
+		sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();//xdong
 	}
 	
 	/*
