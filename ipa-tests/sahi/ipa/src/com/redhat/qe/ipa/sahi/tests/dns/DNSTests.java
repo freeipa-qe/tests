@@ -176,7 +176,7 @@ public class DNSTests extends SahiTestScript{
 	/*
 	 * Modify dns zone setting fields
 	 */
-	@Test (groups={"dnsZoneSettingsTest"}, dataProvider="getDNSSettings", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
+	@Test (groups={"dnsZoneSettingsTest"}, dataProvider="getDNSSettings", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest","dnsZoneRecordsTest_add_then_cancel"})	
 	public void dnsZoneSettingsTest(String testName, String testNameGroup, String zoneName, String reverseZoneName,String fieldName, String fieldValue) throws Exception {
 		// get into DNS zone record modification page
 		sahiTasks.link(zoneName).click();
@@ -475,6 +475,8 @@ public class DNSTests extends SahiTestScript{
 			DNSTasks.dnsZoneAllowPTRSync(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
 		}		
 		// go back to dns zone list, prepare for next test
+		
+		
 		sahiTasks.link("DNS Zones").click();
 		if (sahiTasks.span("Dirty").exists()){
 			log.info("Dirty dialog detected, will click reset to make it continue");
