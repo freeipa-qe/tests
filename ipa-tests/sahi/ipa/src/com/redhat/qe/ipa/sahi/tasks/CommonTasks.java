@@ -159,6 +159,15 @@ public class CommonTasks {
 		}
 	}
 	
+	public static void formauth(SahiTasks sahiTasks, String userName, String password, boolean expect){
+		formauth(sahiTasks, userName,  password);
+		if (!expect)
+			Assert.assertTrue(sahiTasks.div("error-box").exists(), "Verify " + userName + " cannot login");	
+		else
+			Assert.assertTrue(sahiTasks.span("Logged In As").exists(), "Logged in successfully as " + userName);
+				
+	}
+	
 	public static void formauth(SahiTasks sahiTasks, String userName, String password){
 		try{
 			sahiTasks.open();
@@ -186,7 +195,6 @@ public class CommonTasks {
 			sahiTasks.password("password").setValue(password);
 			
 			sahiTasks.button("Login").click();
-			Assert.assertTrue(CommonTasks.kinitAsUser(userName, password), "Logged in successfully as " + userName);			
 		}
 		catch (IOException e) {
 			e.printStackTrace();
