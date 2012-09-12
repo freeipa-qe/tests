@@ -47,6 +47,7 @@ dnsbugs()
    bz829340
    bz798493
    bz809565
+   bz798355
    dnsbugcleanup
 }
 
@@ -964,6 +965,19 @@ bz809565()
 		rlRun "ipa dnszone-find $tzone | grep '$nameb'" 0 "Make sure that the new name exists in the zone."
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 		
+	rlPhaseEnd
+}
+
+bz798355()
+{
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=798355
+	rlPhaseStartTest "Bug 798355 -  Fill DNS update policy by default"
+		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=TRUE" 0 "Enable Dynamic update." 
+		rlRun "ipa dnszone-show --rights $DOMAIN --all | grep BIND\ update | grep 'grant $RELM krb5-self'" 0 "Make sure that the correct update string was added"
+		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=FALSE" 0 "Diable Dynamic update." 
+		rlRun "ipa dnszone-show --rights $DOMAIN --all | grep BIND\ update | grep 'grant $RELM krb5-self'" 2 "Make sure that the correct update string no longer exists"
+		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=TRUE" 0 "Enable Dynamic update." 
+
 	rlPhaseEnd
 }
 
