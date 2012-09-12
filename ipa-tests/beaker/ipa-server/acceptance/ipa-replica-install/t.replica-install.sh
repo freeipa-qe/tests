@@ -1081,6 +1081,7 @@ uninstall()
 			rlRun "rm /var/lib/sss/pubconf/kdcinfo.$RELM"
 		fi
 
+		rlRun "ls /var/lib/sss/pubconf/kdcinfo.$RELM" 2 "Make sure that uninstall removed /var/lib/sss/pubconf/kdcinfo.$RELM. Bug BZ 829070"
 		rlRun "cat /etc/resolv.conf"
 
 		rlLog "Waiting for 1 minute for everything to clear..."
