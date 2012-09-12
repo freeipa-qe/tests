@@ -272,11 +272,30 @@ public class UserTasks {
 		//click on user to edit
 		sahiTasks.link(uid).click();
 		
-		//verify mail address for user
-		Assert.assertEquals(sahiTasks.textbox("mail-0").value(), mail1, "Verified mail for user " + uid + ": " + mail1);
-		Assert.assertEquals(sahiTasks.textbox("mail-1").value(), mail2, "Verified mail for user " + uid + ": " + mail2);
-		Assert.assertEquals(sahiTasks.textbox("mail-2").value(), mail3, "Verified mail for user " + uid + ": " + mail3);
+		//verify mail address for user		
+		String mail0InUI = sahiTasks.textbox("mail-0").value();
+		String mail1InUI = sahiTasks.textbox("mail-1").value();
+		String mail2InUI = sahiTasks.textbox("mail-2").value();
 		
+		String mailsInUI[] = {mail0InUI, mail1InUI, mail2InUI};
+		String mails[] = {mail1, mail2, mail3};
+		boolean mailMatched = false;
+		
+		for (String mailInUI : mailsInUI) {
+			for (String mail : mails) {
+				if (mailInUI.equals(mail)) {
+					mailMatched = true;
+				}
+				if (mailMatched) {
+					Assert.assertEquals(mailInUI, mail, "Verified mail");
+					break;
+				}	
+			}
+			if (!mailMatched) {
+				Assert.assertEquals(true, false, "Not verified mail: " + mailInUI);
+			}
+			mailMatched = false;
+		}		
 		Assert.assertEquals(sahiTasks.textbox("telephonenumber-0").value(), phone1, "Verified phone for user " + uid + ": " + phone1);
 		Assert.assertEquals(sahiTasks.textbox("telephonenumber-1").value(), phone2, "Verified phone for user " + uid + ": " + phone2);
 		
@@ -420,7 +439,8 @@ public class UserTasks {
 			Assert.assertTrue("true".equals(sahiTasks.option("Enable").fetch("disabled")), "Verified Active status for user " + uid);
 		else
 			Assert.assertTrue("true".equals(sahiTasks.option("Disable").fetch("disabled")), "Verified Inactive status for user " + uid);
-	
+		
+			
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
 	
