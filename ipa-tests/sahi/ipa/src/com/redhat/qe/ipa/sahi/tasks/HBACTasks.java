@@ -178,7 +178,7 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();*/
 		
 		
-sahiTasks.link(cn).click();
+		sahiTasks.link(cn).click();
 		
 		//Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
 		//Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-0").checked(), "Verified rule is disabled");
@@ -187,13 +187,13 @@ sahiTasks.link(cn).click();
 		sahiTasks.span("Apply").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		//sahiTasks.link("Sudo Rules[1]").click();
-		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Varify rule is disabled sucessfully");
+		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Verify rule is disabled sucessfully");
 		sahiTasks.link(cn).click();
 		sahiTasks.select("action").choose("Enable");
 		sahiTasks.span("Apply").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		//sahiTasks.link("Sudo Rules[1]").click();
-		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Varify rule is enabled sucessfully");
+		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Verify rule is enabled sucessfully");
 		sahiTasks.link(cn).click();
 		sahiTasks.select("action").choose("Delete");
 		sahiTasks.span("Apply").click();
@@ -242,13 +242,13 @@ sahiTasks.link(cn).click();
 		sahiTasks.span("Apply").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		//sahiTasks.link("Sudo Rules[1]").click();
-		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Varify rule is disabled sucessfully");
+		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Verify rule is disabled sucessfully");
 		sahiTasks.link(cn).click();
 		sahiTasks.select("action").choose("Enable");
 		sahiTasks.span("Apply").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		//sahiTasks.link("Sudo Rules[1]").click();
-		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Varify rule is enabled sucessfully");
+		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Verify rule is enabled sucessfully");
 		sahiTasks.link(cn).click();
 		sahiTasks.select("action").choose("Delete");
 		sahiTasks.span("Apply").click();
@@ -301,8 +301,11 @@ sahiTasks.link(cn).click();
 	public static void modifyHBACRuleAccessingSection(SahiTasks sahiTasks, String cn, String fqdn, String hostgroupname ) {
 		sahiTasks.link(cn).click();
 		
-		
-		sahiTasks.radio("hostcategory-2-0").click();
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			sahiTasks.radio("hostcategory-2-0").click();
+		}else{ 
+			sahiTasks.radio("hostcategory-3-0").click();
+		} 	
 		sahiTasks.span("undo").near(sahiTasks.label("Specified Hosts and Groups")).click();
 
 		//sahiTasks.span("Add").under(sahiTasks.heading2(("Accessing"))).near(sahiTasks.tableHeader("HostsDeleteAdd")).click();
@@ -386,7 +389,6 @@ sahiTasks.link(cn).click();
 	 */
 	public static void undoResetUpdateHBACRuleSections(SahiTasks sahiTasks, String cn, String category, String action) {
 		sahiTasks.link(cn).click();
-		
 		sahiTasks.radio(category).click();
 		sahiTasks.span(action).click();
 		if ( (action.equals("undo")) || (action.equals("Reset")) )
@@ -399,8 +401,11 @@ sahiTasks.link(cn).click();
 	
 	public static void updateCategory(SahiTasks sahiTasks, String cn, String hostgroupName, boolean memberExists) {
 		sahiTasks.link(cn).click();
-		
-		sahiTasks.radio("sourcehostcategory-4-0").click();
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			sahiTasks.radio("sourcehostcategory-4-0").click();
+		}else{ 
+			sahiTasks.radio("sourcehostcategory-5-0").click();
+		} 	
 		sahiTasks.span("Update").click();
 		
 		//Assert.assertFalse(sahiTasks.checkbox(hostgroupName).under(sahiTasks.heading2(("From"))).near(sahiTasks.tableHeader("Source Host GroupsDeleteAdd")).exists(), "Verified when categorry was switch, entries got deleted");
@@ -539,24 +544,43 @@ sahiTasks.link(cn).click();
 		String originalDescription = sahiTasks.textarea("description").getValue();
 		String newDescription = "This description will be reset";		
 		sahiTasks.textarea("description").setValue(newDescription);		
-		sahiTasks.radio("usercategory-1-0").click();
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+	    	sahiTasks.radio("usercategory-1-0").click();
+	     }else{ 
+	    	sahiTasks.radio("usercategory-2-0").click(); 
+	     } 
 		
 		// TODO: nkrishnan - how to check Add/Delete are disabled when "all" is selected
 		
 		sahiTasks.span("Reset").click();
 	
 		Assert.assertEquals(sahiTasks.textarea("description").getText(), originalDescription, "Changes to Description are Reset");
-		Assert.assertTrue(sahiTasks.radio("usercategory-1-1").checked(), "Changes to UserCategory are Reset");
-		
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			Assert.assertTrue(sahiTasks.radio("usercategory-1-1").checked(), "Changes to UserCategory are Reset");
+		}else{ 
+			Assert.assertTrue(sahiTasks.radio("usercategory-2-1").checked(), "Changes to UserCategory are Reset"); 
+		} 	
 		sahiTasks.textarea("description").setValue("will undo this desc from here");
 		sahiTasks.span("undo").near(sahiTasks.textarea("description")).click();
 		Assert.assertEquals(sahiTasks.textarea("description").getText(), originalDescription, "Changes to Description are Undone");
 		
-		sahiTasks.radio("hostcategory-2-0").click();
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			sahiTasks.radio("hostcategory-2-0").click();
+		}else{ 
+			sahiTasks.radio("hostcategory-3-0").click(); 
+		} 	
 		sahiTasks.span("undo").near(sahiTasks.label("Specified Hosts and Groups")).click();
-		Assert.assertTrue(sahiTasks.radio("hostcategory-2-1").checked(), "Changes to HostCategory are Undone");
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			Assert.assertTrue(sahiTasks.radio("hostcategory-2-1").checked(), "Changes to HostCategory are Undone");
+		}else{ 
+			Assert.assertTrue(sahiTasks.radio("hostcategory-3-1").checked(), "Changes to HostCategory are Undone"); 
+		} 
 		
-		sahiTasks.radio("servicecategory-3-0").click();
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			sahiTasks.radio("servicecategory-3-0").click();
+		}else{ 
+			sahiTasks.radio("servicecategory-4-0").click();
+		}
 
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		sahiTasks.button("Reset").click();
@@ -591,6 +615,9 @@ sahiTasks.link(cn).click();
 	{
 		sahiTasks.checkbox(cn).click();
 		sahiTasks.span(buttonToClick).click();
+		if(sahiTasks.span("OK").exists()){
+			sahiTasks.span("OK").click();
+		}
 		Assert.assertTrue(sahiTasks.div(status).exists(),"verified rule "+cn+" "+ status+" successfully");
 		sahiTasks.checkbox(cn).click();
 				
@@ -827,16 +854,15 @@ sahiTasks.link(cn).click();
 	}
 
 	public static void verifyHBACServiceGroupNavigation(SahiTasks sahiTasks, String cn) {
-		sahiTasks.link(cn ).click();
-		sahiTasks.link("su").click();
+		sahiTasks.link(cn).click();
+		sahiTasks.link("su").click(); 
 		Assert.assertEquals(sahiTasks.textarea("description").value(), "su", "Verified description for service su");
 		sahiTasks.link("memberof_hbacsvcgroup").click();
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verified service group for service su");
 		//sahiTasks.link(cn ).click();
-
-		//sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();
-		
+			
 		sahiTasks.link("HBAC Services").in(sahiTasks.div("content")).click();
+					
 	}
 
 	public static void enrollServiceinServiceGroup(SahiTasks sahiTasks,	String svcgrp, String service) {
@@ -981,9 +1007,22 @@ sahiTasks.link(cn).click();
 	public static void modifyHBACMemberList(SahiTasks sahiTasks, String rule)
 	{
 		sahiTasks.link(rule).click();
-		sahiTasks.radio("hostcategory-2-0").click();
-		sahiTasks.radio("servicecategory-3-0").click();
-		sahiTasks.radio("sourcehostcategory-4-0").click();
+		if (sahiTasks.radio("hostcategory-2-0").exists()){ 
+			sahiTasks.radio("hostcategory-2-0").click();//xdong ,win is not stable for these radio buttons ,sometimes it starts with 2 sometimes 3...
+			
+			sahiTasks.radio("servicecategory-3-0").click();
+			
+			sahiTasks.radio("sourcehostcategory-4-0").click();
+		}else{
+			sahiTasks.radio("hostcategory-3-0").click();
+			
+			sahiTasks.radio("servicecategory-4-0").click();
+			
+			sahiTasks.radio("sourcehostcategory-5-0").click();
+		}
+		
+		
+		
 		sahiTasks.span("Update").click();
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
 		
@@ -1008,7 +1047,8 @@ sahiTasks.link(cn).click();
 	public static void modifyHBACRuleViaServiceSection_forHBACTest(SahiTasks sahiTasks, String cn, String searchString, String[] searchResult) {
 		sahiTasks.link(cn).click();
 		
-		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+		//sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();
+		sahiTasks.span("Add").under(sahiTasks.heading2(("Via Service"))).near(sahiTasks.div("Services")).click();
 		sahiTasks.textbox("filter").near(sahiTasks.span("Find")).setValue(searchString);
 		sahiTasks.link("Find").click();
 		
@@ -1040,6 +1080,7 @@ sahiTasks.link(cn).click();
 	
 	public static void testHBACRunTest (SahiTasks sahiTasks, String user, String hostname, String service, String fqdn0, String rules,String mrule1, String mrule2,String mrule3,String unmrule1, String unmrule2,String unmrule3, String expectedResult )
 	{
+		sahiTasks.link("Who").click();
 		sahiTasks.radio(user).click();
 		sahiTasks.span("Next").click();
 		sahiTasks.radio(hostname).click();
@@ -1048,13 +1089,21 @@ sahiTasks.link(cn).click();
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
 		sahiTasks.radio(fqdn0).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
-		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		if (!rules.isEmpty())
+			sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rules);
 		HBACTasks.isMatchedRule(sahiTasks, mrule1, mrule2, mrule3);
 		HBACTasks.isUnmatchedRule(sahiTasks, unmrule1, unmrule2, unmrule3);
+		
+		if (System.getProperty("os.name").startsWith("Windows")){//xdong.In win,need this to blank all the checkbox of the rules after every time the method is called.
+			sahiTasks.link("Rules").click();
+			sahiTasks.checkbox("cn").click();
+			sahiTasks.checkbox("cn").click();
+			sahiTasks.link("Run Test").click();
 		sahiTasks.span("New Test").click();
+		}
 	}
 	
 	/* @param sahitasks
@@ -1094,7 +1143,8 @@ sahiTasks.link(cn).click();
 		}
 		
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
-		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		if (!rules.isEmpty())
+			sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();		
 		//Assert.assertTrue(sahiTasks.div(expectedError1).exists(), "Verified expected error when running test");
@@ -1139,7 +1189,8 @@ sahiTasks.link(cn).click();
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
 		sahiTasks.radio(fqdn0).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
-		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		if (!rules.isEmpty())
+			sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Prev").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules").under(sahiTasks.div("hbac-test-button-panel")))).click();
 		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
@@ -1282,7 +1333,8 @@ sahiTasks.link(cn).click();
 		sahiTasks.textbox("hbactest-sourcehost-external").setValue(sourcehost);
 		sahiTasks.radio("hbactest-sourcehost-external").click();//xdong
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
-		sahiTasks.checkbox(rule).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		if (!rule.isEmpty())
+			sahiTasks.checkbox(rule).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult).exists(), "Verified "+ expectedResult+ " for " + rule);
@@ -1319,7 +1371,8 @@ sahiTasks.link(cn).click();
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external HBAC Service:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Via Service")))).click();
 		sahiTasks.radio(fromhost).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From"))).click();
 		sahiTasks.span("Next").under(sahiTasks.cell("Specify external Host:").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("From")))).click();
-		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		if (!rules.isEmpty())
+			sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
 		Assert.assertTrue(sahiTasks.div(expectedResult1).exists(), "rule smtp selected  and RUN TEST result is "+ expectedResult1);
@@ -1328,7 +1381,8 @@ sahiTasks.link(cn).click();
 		HBACTasks.isUnmatchedRule(sahiTasks, unmrule1a, unmrule2a, unmrule3a);
 		//changing rule and executing run test
 		sahiTasks.span("Prev").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules").under(sahiTasks.div("hbac-test-button-panel")))).click();
-		sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
+		if (!rules.isEmpty())
+			sahiTasks.checkbox(rules).in(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.checkbox("disabled").click();
 		sahiTasks.span("Next").under(sahiTasks.table("search-table content-table scrollable").under(sahiTasks.span("Rules"))).click();
 		sahiTasks.span("Run Test").in(sahiTasks.div("hbac-test-button-panel")).click();
