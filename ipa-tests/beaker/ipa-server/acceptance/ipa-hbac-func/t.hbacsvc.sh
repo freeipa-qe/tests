@@ -672,7 +672,7 @@ hbacsvc_client_007() {
 
 hbacsvc_client2_007() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
+        rlPhaseStartTest "ipa-hbacsvc-client2-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp (BZ 830347)"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ssh root@$CLIENT 'getent -s sss passwd user7'"
@@ -683,6 +683,9 @@ hbacsvc_client2_007() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 		sleep 5
                 rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
@@ -691,6 +694,9 @@ hbacsvc_client2_007() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 
         rlPhaseEnd
@@ -1340,6 +1346,9 @@ hbacsvc_client2_013() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 		sleep 5
                 rlRun "ssh_auth_success user13 testpw123@ipa.com $CLIENT"
@@ -1348,6 +1357,9 @@ hbacsvc_client2_013() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 
         rlPhaseEnd
@@ -1425,6 +1437,9 @@ hbacsvc_client2_014() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 		sleep 5
                 rlRun "ssh_auth_success user14 testpw123@ipa.com $CLIENT"
@@ -1433,6 +1448,9 @@ hbacsvc_client2_014() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 
         rlPhaseEnd
@@ -1910,6 +1928,9 @@ hbacsvc_client2_019() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 
         rlPhaseEnd
@@ -1992,6 +2013,9 @@ hbacsvc_client2_020() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 
         rlPhaseEnd
@@ -2430,6 +2454,9 @@ hbacsvc_client2_028() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 		sleep 5
                 rlRun "ssh_auth_success user28 testpw123@ipa.com $CLIENT"
@@ -2437,6 +2464,9 @@ hbacsvc_client2_028() {
 					DATE=$(date +%Y%m%d-%H%M%S)
 					sftp root@$CLIENT:/var/log/sssd/sssd_$DOMAIN.log /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
 					rhts-submit-log -l /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE
+					if [ $(grep "Paged Results Search already in progress on this connection" /var/tmp/sssd_$DOMAIN.log.$CLIENT.$DATE |wc -l) -gt 0 ]; then
+						rlFail "Found BZ 830347...389 DS does not support multiple paging controls on a single connection"
+					fi
 				fi
 
         rlPhaseEnd
