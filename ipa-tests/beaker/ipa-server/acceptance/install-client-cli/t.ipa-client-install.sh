@@ -688,7 +688,7 @@ ipaclientinstall_nokrb5offlinepasswords()
 #######################################################
 ipaclientinstall_preservesssd()
 {
-   rlPhaseStartTest "ipa-client-install-32- [Positive] Install with preserve-sssd"
+   rlPhaseStartTest "ipa-client-install-32- [Positive] Install with preserve-sssd (BZ 851318)"
         uninstall_fornexttest
         
         # To set up an sssd.conf that can be preserved: 
