@@ -232,6 +232,7 @@ certcli_basic()
 	rlPhaseEnd
 	
 	rlPhaseStartTest "Create a valid keyring, then try issuing a command that will fallback to kerberos auth. Verify that the fallback happens"
+		rlLog "This test tends to fail on the following bug https://fedorahosted.org/freeipa/ticket/2331"
 		kdestroy
 		keyctl purge user # Purging keys to be certain that the user-find populates the keyring properly.
 		rlRun "keyctl clear @s" 0 "Clear local session keyring"

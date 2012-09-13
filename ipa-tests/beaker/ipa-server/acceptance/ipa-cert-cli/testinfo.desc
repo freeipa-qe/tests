@@ -2,9 +2,9 @@ Owner:           Michael Gregg <mgregg@redhat.com>
 Name:            /CoreOS/ipa-server/acceptance/ipa-cert-cli
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-cert-cli
-Description:     IPA cert cli tests
+Description:     IPA ipa-cert-cli acceptance tests
 Type:            Regression
-TestTime:        30m
+TestTime:        15m
 RunFor:          ipa-server
 Requires:        ipa-admintools
 Requires:        expect
