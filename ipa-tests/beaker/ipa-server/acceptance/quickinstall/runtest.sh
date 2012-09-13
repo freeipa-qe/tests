@@ -2,13 +2,19 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-server/acceptance/quickinstall
-#   Description: Quick install for master slave and client acceptance tests
-#   Author: Jenny Galipeau <jgalipea@redhat.com>
+#   runtest.sh of /CoreOS/ipa-tests/acceptance/quickinstall
+#   Description: IPA quickinstall acceptance tests for new install
+#                functions.  This is the extended install version
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The following ipa will be tested:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
+#   Author: Scott Poore <spoore@redhat.com>
+#   Date  : Sep 13, 2012
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2012 Red Hat, Inc. All rights reserved.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -26,280 +32,44 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# Include data-driven test data file:
+
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
-. ./install-lib.sh
+. ./ipa-install.sh
 
-# include tests
-. ./t-install.sh
+PACKAGE="ipa-admin"
 
-COMMON_SERVER_PACKAGES="bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
-RHELIPA_SERVER_PACKAGES="ipa-server"
-COMMON_CLIENT_PACKAGES="httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate nmap"
-cat /etc/redhat-release | grep "5\.[0-9]"
-if [ $? -eq 0 ] ; then
-        RHELIPA_CLIENT_PACKAGES="ipa-client"
-else
-        RHELIPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
-fi
-FREEIPA_SERVER_PACKAGES="freeipa-server"
-FREEIPA_CLIENT_PACKAGES="freeipa-admintools freeipa-client"
+startDate=`date "+%F %r"`
+satrtEpoch=`date "+%s"`
+
+# Make sure TESTORDER is initialized or multihost may have issues
+TESTORDER=1
+
+##########################################
+#   test main 
+#########################################
 
 rlJournalStart
-        myhostname=`hostname`
-        rlLog "hostname command: $myhostname"
-        rlLog "HOSTNAME: $HOSTNAME"
-        rlLog "MASTER: $MASTER"
-        rlLog "SLAVE: $SLAVE"
-        rlLog "CLIENT: $CLIENT"
-        rlLog "CLIENT2: $CLIENT2"
-   
-        echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
-        echo "export BEAKERSLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
-	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
-	echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
+    rlPhaseStartSetup "Extended quickinstall startup: Check for ipa-server package"
+        #rlAssertRpm $PACKAGE
+		rlRun "env|sort"
+        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        rlRun "pushd $TmpDir"
+    rlPhaseEnd
 
-	I=0
-	for S in $SLAVE; do
-		I=$(( I += 1 ))
-		echo "export BEAKERSLAVE${I}=$S" >> /dev/shm/env.sh
-		echo "export BEAKERSLAVE${I}IP=$(dig +noquestion +short $S)" >> /dev/shm/env.sh
-	done
+	ipa_install_set_vars
+	ipa_install_envs
 
-	cat /etc/redhat-release | grep "Fedora"
-	if [ $? -eq 0 ] ; then
-		FLAVOR="Fedora"
-		rlLog "Automation is running against Fedora"
-	else
-		FLAVOR="RedHat"
-		rlLog "Automation is running against RedHat"
-	fi
+    rlPhaseStartCleanup "Extended quickinstall cleanup"
+        rlRun "popd"
+        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+    rlPhaseEnd
 
-	#####################################################################
-	# 		IS THIS MACHINE A MASTER?                           #
-	#####################################################################
-	rc=0
-	echo $MASTER | grep $HOSTNAME
-	if [ $? -eq 0 ] ; then
-	   	yum clean all
-	   	yum -y install $COMMON_SERVER_PACKAGES
-
-	   	if [ "$FLAVOR" == "Fedora" ] ; then
-			# Installing fastest mirrors yum plugin to speed up installs
-			yum -y install yum-plugin-fastestmirror
-			yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
-	   		yum clean all
-                	yum -y update
-
-	        	for item in $FREEIPA_SERVER_PACKAGES ; do
-				rpm -qa | grep $item
-				if [ $? -eq 0 ] ; then
-					rlLog "$item package is installed"
-				else
-					rlLog "ERROR: $item package is NOT installed"
-					rc=1
-				fi
-	   		done
-	   	else
-			yum -y install $RHELIPA_SERVER_PACKAGES
-                	yum -y update
-
-           		for item in $RHELIPA_SERVER_PACKAGES ; do
-                		rpm -qa | grep $item
-                		if [ $? -eq 0 ] ; then
-                        		rlLog "$item package is installed"
-                		else    
-                        		rlLog "ERROR: $item package is NOT installed"
-                        		rc=1    
-                		fi      
-           		done 
-	     	fi	
-
-			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
-				rlLog "Forcing debug logging in named.conf template"
-				sed -i 's/severity dynamic/severity debug 10/' /usr/share/ipa/bind.named.conf.template
-			fi
-
-	    	if [ $rc -eq 0 ] ; then
-			installMaster
-			rhts-sync-set -s READY
-			rlLog "Setting up Authorized keys"
-	        	SetUpAuthKeys
-        		rlLog "Setting up known hosts file"
-        		SetUpKnownHosts
-	    	fi
-	else
-		rlLog "Machine in recipe in not a MASTER"
-	fi
-
-	#####################################################################
-	# 		IS THIS MACHINE A SLAVE?                            #
-	#####################################################################
-	rc=0
-        echo $SLAVE | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-	   	yum clean all
-           	yum -y install $COMMON_SERVER_PACKAGES
-
-           	if [ "$FLAVOR" == "Fedora" ] ; then
-			# Installing fastest mirrors yum plugin to speed up installs
-			yum -y install yum-plugin-fastestmirror
-                	yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
-                	yum -y update
-
-                	for item in $FREEIPA_SERVER_PACKAGES ; do
-                        	rpm -qa | grep $item
-                        	if [ $? -eq 0 ] ; then
-                                	rlLog "$item package is installed"
-                        	else
-                                	rlLog "ERROR: $item package is NOT installed"
-                                	rc=1
-                        	fi
-                	done
-           	else
-                	yum -y install $RHELIPA_SERVER_PACKAGES
-                	yum -y update
-
-                	for item in $RHELIPA_SERVER_PACKAGES ; do
-                        	rpm -qa | grep $item
-                        	if [ $? -eq 0 ] ; then
-                                	rlLog "$item package is installed"
-                        	else
-                                	rlLog "ERROR: $item package is NOT installed"
-                                	rc=1
-                        	fi
-                	done
-             	fi
-
-			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
-				rlLog "Forcing debug logging in named.conf template"
-				sed -i 's/severity dynamic/severity debug 10/' /usr/share/ipa/bind.named.conf.template
-			fi
-
-
-		if [ $rc -eq 0 ] ; then
-			rhts-sync-block -s READY $MASTER
-                	installSlave
-			rhts-sync-set -s READY
-                        rlLog "Setting up Authorized keys"
-                        SetUpAuthKeys
-                        rlLog "Setting up known hosts file"
-                        SetUpKnownHosts
-        	fi
-        else
-                rlLog "Machine in recipe in not a SLAVE"
-        fi
-
-	#####################################################################
-	# 		IS THIS MACHINE A CLIENT?                           #
-	#####################################################################
-	rc=0
-        echo $CLIENT | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-	   	yum clean all
-           	yum -y install $COMMON_CLIENT_PACKAGES
-
-           	if [ "$FLAVOR" == "Fedora" ] ; then
-			# Installing fastest mirrors yum plugin to speed up installs
-			yum -y install yum-plugin-fastestmirror
-                	yum -y install --disablerepo=updates-testing $FREEIPA_CLIENT_PACKAGES
-                	yum -y update
-
-                	for item in $FREEIPA_CLIENT_PACKAGES ; do
-                        	rpm -qa | grep $item
-                        	if [ $? -eq 0 ] ; then
-                                	rlLog "$item package is installed"
-                        	else
-                                	rlLog "ERROR: $item package is NOT installed"
-                                	rc=1
-                        	fi
-                	done
-           	else
-                	yum -y install $RHELIPA_CLIENT_PACKAGES
-                	yum -y update
-
-                	for item in $RHELIPA_CLIENT_PACKAGES ; do
-                        	rpm -qa | grep $item
-                        	if [ $? -eq 0 ] ; then
-                                	rlLog "$item package is installed"
-                        	else
-                                	rlLog "ERROR: $item package is NOT installed"
-                                	rc=1
-                        	fi
-                	done
-             	fi
-
-		if [ $rc -eq 0 ] ; then
-                        rhts-sync-block -s READY $MASTER
-			if [ $SLAVE != "" ] ; then
-				rhts-sync-block -s READY $SLAVE
-			fi
-                	installClient
-        	fi
-        else
-                rlLog "Machine in recipe in not a CLIENT"
-        fi
-
-        #####################################################################
-        #               IS THIS MACHINE CLIENT2?                            #
-        #####################################################################
-        rc=0
-        echo $CLIENT2 | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
-	   	yum clean all
-           	yum -y install $COMMON_SERVER_PACKAGES
-
-           	if [ "$FLAVOR" == "Fedora" ] ; then
-                	yum -y install --disablerepo=updates-testing $FREEIPA_SERVER_PACKAGES
-                	yum -y update
-
-                	for item in $FREEIPA_SERVER_PACKAGES ; do
-                        	rpm -qa | grep $item
-                        	if [ $? -eq 0 ] ; then
-                                	rlLog "$item package is installed"
-                        	else
-                                	rlLog "ERROR: $item package is NOT installed"
-                                	rc=1
-                        	fi
-                	done
-            	else
-                	yum -y install $RHELIPA_SERVER_PACKAGES
-                	yum -y update
-
-                	for item in $RHELIPA_SERVER_PACKAGES ; do
-                        	rpm -qa | grep $item
-                        	if [ $? -eq 0 ] ; then
-                                	rlLog "$item package is installed"
-                        	else
-                                	rlLog "ERROR: $item package is NOT installed"
-                                	rc=1
-                        	fi
-                	done
-             	fi
-
-                if [ $rc -eq 0 ] ; then
-                        rhts-sync-block -s READY $MASTER
-                        if [ $SLAVE -ne "" ] ; then
-                                rhts-sync-block -s READY $SLAVE
-                        fi
-                        installClient
-                fi
-        else
-                rlLog "Machine in recipe in not a CLIENT2"
-        fi
-
-	# Back up /dev/shm for use after rebooting on the host machine
-	rlLog "Backing up /dev/shm to /root/dev-shm-backup"
-	mkdir -p  /root/dev-shm-backup
-	rsync -av /dev/shm/* /root/dev-shm-backup/.	
-	rlLog "/dev/shm backup complete"
-
-   rlJournalPrintText
-   report=/tmp/rhts.report.$RANDOM.txt
-   makereport $report
-   rhts-submit-log -l $report
+    makereport
 rlJournalEnd
 
+# manifest:

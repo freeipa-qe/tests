@@ -1,12 +1,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/ipa-server/acceptance/quickinstall
-#   Description: Basic install test for ipa master slave and client
-#   Author: Michael Gregg <jgalipea@redhat.com>
+#   Makefile of /CoreOS/tests/Regression/quickinstall
+#   Description: IPA Extended Quick Install
+#   Author: Scott Poore <spoore@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
+#   Copyright (c) 2012 Red Hat, Inc. All rights reserved.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -25,11 +25,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/quickinstall
-export TESTVERSION=1.1
+export TESTVERSION=2.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t-install.sh install-lib.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE ipa-install.sh
 
 .PHONY: all install download clean
 
@@ -42,18 +42,25 @@ build: $(BUILT_FILES)
 clean:
 	rm -f *~ $(BUILT_FILES)
 
+tests.d:
+	chmod 755 $@
+
+tests.d/%.sh:
+	chmod a+x $@
 
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Jenny Galipeau <jgalipea@redhat.com>" > $(METADATA)
+	@echo "Owner:           Scott Poore <spoore@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Quick installation for master, slave and client ipa domain machines" >> $(METADATA)
-	@echo "Type:            Acceptance" >> $(METADATA)
-	@echo "TestTime:        90m" >> $(METADATA)
+	@echo "Description:     IPA Extended quickinstall" >> $(METADATA)
+	@echo "Type:            Regression" >> $(METADATA)
+	@echo "TestTime:        180m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
+	@echo "Requires:        ipa-admintools" >> $(METADATA)
+	@echo "Requires:        expect" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
