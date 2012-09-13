@@ -775,7 +775,7 @@ public class UserTasks {
 	public static void deleteEditUser(SahiTasks sahiTasks, String uid) {
 		sahiTasks.select("action").choose("Delete");
 		sahiTasks.span("Apply").click();
-		
+		sahiTasks.waitFor(1000);
 	}
 
 
