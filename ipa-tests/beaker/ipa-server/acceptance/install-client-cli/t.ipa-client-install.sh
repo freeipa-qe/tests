@@ -716,6 +716,9 @@ ipaclientinstall_preservesssd()
           rlLog "Executing: perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5"
           rlRun "perl -pi -e 's/kerberos.example.com/$MASTER/g' $KRB5" 0 "Updating $KRB5"
 
+          rlLog "Check SELinux context of /etc/krb5.conf"
+          rlRun "ls -lZ /etc/krb5.conf"
+
      #   rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before installing"
 
         #install ipa-client with --preserve-sssd
@@ -724,8 +727,15 @@ ipaclientinstall_preservesssd()
        mv $TmpDir/sssd.conf $TmpDir/sssd.conf_beforeinstall
        cp $KRB5 $TmpDir
        mv $TmpDir/krb5.conf $TmpDir/krb5.conf_beforeinstall
+       AVCCHKTS=$(date +%H:%M:%S)
        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
+       AVCCHK=$(ausearch -m avc -ts $AVCCHKTS -su root:system_r:sssd_t:s0 -o root:object_r:etc_t:s0 |grep name=\"krb5.conf\"|wc -l)
+       if [ $AVCCHK -gt 0 ]; then
+           rlFail "BZ 851318 found...RHEL5 ipa-client-install creates krb5.conf with incorrect selinux context"
+       else
+           rlPass "BZ 851318 not found"
+       fi
        cp $SSSD $TmpDir
        mv $TmpDir/sssd.conf $TmpDir/sssd.conf_afterinstall
        cp $KRB5 $TmpDir
@@ -840,7 +850,7 @@ ipaclientinstall_withmasterdown()
 
 ipaclientinstall_client_hostname_localhost() #Added by Kaleem
 {
-    rlPhaseStartTest "ipa-client-install-38 (Negative) hostname=localhost or localhost.localdomain - BZ 753526"
+    rlPhaseStartTest "ipa-client-install-38 (Negative) hostname=localhost or localhost.localdomain - BZ 753526 and 857049(RHEL5)"
         uninstall_fornexttest
         rlRun "hostname localhost.localdomain"
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
