@@ -814,7 +814,7 @@ ipaclientinstall_joinreplica()
 {
     rlPhaseStartTest "ipa-client-install-36- [Positive] Install, and join REPLICA, then uninstall"
         uninstall_fornexttest
-       
+      	sleep 5 
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE  -p $ADMINID -w $ADMINPW --unattended "
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE  -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
         verify_install true
