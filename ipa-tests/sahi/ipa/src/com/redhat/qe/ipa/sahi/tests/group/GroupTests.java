@@ -178,7 +178,7 @@ public class GroupTests extends SahiTestScript{
 		
 	
 	///////////////////////// modifyGroup test cases (enroll user and groups ) //////////////////////
-     @Test(groups={"modifyGroup"},  dependsOnGroups="addGroup",
+     @Test(groups={"modifyGroup"},  dependsOnGroups={"searchGroup"},
 		description="this is a bridge test group.")
 	public void modifyGroupBridge()
 	{
@@ -234,7 +234,7 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupSingle" ,dependsOnGroups="modifyGroup",
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupSingle" ,dependsOnGroups="modifyGroup_enrolluser",
 		description = "add other (single) user groups as member, create nested group")
 	public void modifyGroup_member_group_single(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
@@ -247,7 +247,7 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupMultiple",dependsOnGroups="modifyGroup",
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupMultiple",dependsOnGroups="modifyGroup_enrolluser",
 		description = "add other (multiple) user groups as member, create nested group")
 	public void modifyGroup_member_group_multiple(String testScenario, String groupName, String childGroups){
 		browser.link(groupName).click();
@@ -263,7 +263,7 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupViaSearch",dependsOnGroups="modifyGroup",
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollGroupViaSearch",dependsOnGroups="modifyGroup_enrolluser",
 		description = "add other (multiple) user groups as member by using filter/search function, create nested group")
 	public void modifyGroup_member_group_viasearch(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
@@ -273,7 +273,7 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupSingle",
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupSingle",dependsOnGroups="modifyGroup_enrolluser",
 		description = "add other (single) user groups as member, create nested group")
 	public void modifyGroup_memberof_group_single(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
@@ -283,7 +283,7 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupMultiple",dependsOnGroups="modifyGroup",
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupMultiple",dependsOnGroups="modifyGroup_enrolluser",
 		description = "add other (multiple) user groups as member, create nested group")
 	public void modifyGroup_memberof_group_multiple(String testScenario, String groupName, String childGroups){
 		browser.link(groupName).click();
@@ -295,7 +295,7 @@ public class GroupTests extends SahiTestScript{
 		browser.link("User Groups").in(browser.span("back-link")).click();
 	}
 	
-	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupViaSearch",dependsOnGroups="modifyGroup",
+	@Test (groups={"modifyGroup_enrollgroup"}, dataProvider="enrollMemberofGroupViaSearch",dependsOnGroups="modifyGroup_enrolluser",
 		description = "add other (multiple) user groups as member by using filter/search function, create nested group")
 	public void modifyGroup_memberof_group_viasearch(String testScenario, String groupName, String childGroup){
 		browser.link(groupName).click();
@@ -382,11 +382,15 @@ public class GroupTests extends SahiTestScript{
 		} 
 	}
 	//xdong
-	@Test (groups={"modifyGroupType_settings"}, dataProvider="groupTypeSettings",dependsOnGroups="modifySettings",description = "modify group type detail settings")
+	@Test (groups={"modifyGroupType_settings"}, dataProvider="groupTypeSettings",dependsOnGroups="bugverification",description = "modify group type detail settings")
 		public void modifyGroupType_settings(String testScenario, String groupName,String groupDescription,String gid,String groupType){
+			browser.textbox("filter").setValue(groupName);
+			browser.span("icon search-icon").click();
 			Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
 			GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, groupType);
+			browser.span("icon search-icon").click();
 			Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
+			
 		    browser.link(groupName).click();
 		    browser.link("External").click();		
 			if (testScenario == "normalToPosix"){
@@ -425,6 +429,8 @@ public class GroupTests extends SahiTestScript{
 				browser.span("Apply").click();
 				Assert.assertFalse(browser.link(groupName).exists(),"Group Type External deleted as expected");
 			}
+			browser.textbox("filter").setValue("");
+			browser.span("icon search-icon").click();
 		}
 	
 	/////////////////////////////////// netgroup test //////////////////////////////////	
@@ -435,7 +441,7 @@ public class GroupTests extends SahiTestScript{
 		log.info("bridge method: after modifySettings test cases");
 	}
 
-	@Test (groups={"modifyGroup_netgroup_prepare"},dependsOnGroups="addGroup", dataProvider="netGroupsPrepare", 
+	@Test (groups={"modifyGroup_netgroup_prepare"},dependsOnGroups="netgroup", dataProvider="netGroupsPrepare", 
 			description = "prepare data for netgroup test")
 	public void modifyGroup_netgroup_prepareTestData(String netGroupName){
 		browser.navigateTo(commonTasks.netgroupPage);
@@ -792,7 +798,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups={"bugverification", "modifyGroup_settings_negative"})
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups={"bugverification","modifyGroupType_settings"})
 	public void deleteGroup_single(String testScenario, String groupName){
 		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		GroupTasks.deleteGroup(browser, groupName);
@@ -800,7 +806,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups={"bugverification", "modifyGroup_enrollgroup"})
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups={"bugverification","modifyGroupType_settings"})
 	public void deleteGroup_multiple(String testScenario, String groupNames){
 		String[] groups = groupNames.split(",");
 		for (String groupName:groups){
