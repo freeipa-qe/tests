@@ -435,6 +435,9 @@ public class UserTasks {
 		
 		//verify user's status
 		sahiTasks.span("Refresh").click();
+		System.out.println("Is Enable disabled? " + sahiTasks.option("Enable").fetch("disabled"));
+		System.out.println("Is Disable disabled? " + sahiTasks.option("Disable").fetch("disabled"));
+		
 		if (status)
 			Assert.assertTrue("true".equals(sahiTasks.option("Enable").fetch("disabled")), "Verified Active status for user " + uid);
 		else
@@ -785,6 +788,8 @@ public class UserTasks {
 		else
 			sahiTasks.span("Disable").click();
 		
+		sahiTasks.button("OK").click();
+		
 	}
 
 
@@ -792,7 +797,9 @@ public class UserTasks {
 	public static void modifyUserStatusNegative(SahiTasks sahiTasks, String uid) {
 		sahiTasks.checkbox(uid).check();
 		sahiTasks.span("Disable").click();
+		sahiTasks.button("OK").click();
 		sahiTasks.span("Disable").click();
+		sahiTasks.button("OK").click();
 	}
 
 }

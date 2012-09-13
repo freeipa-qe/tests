@@ -858,7 +858,7 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              		mail1			mail2			mail3 				phone1		phone2  		pager1		pager2			mobile1		mobile2			fax1		fax2
-		ll.add(Arrays.asList(new Object[]{ "add_multiple_contactdata",		"testuser", 			"one@testrelm",	"two@testrelm", "three@testrelm",   "1234567", 	"7654321",		"9876543",	"3456789",		"135790",	"097531", 		"1122334", 	"4332211"	 } ));
+		ll.add(Arrays.asList(new Object[]{ "add_multiple_contactdata",		"testuser", 			"one@testrelm.com",	"two@testrelm.com", "three@testrelm.com",   "1234567", 	"7654321",		"9876543",	"3456789",		"135790",	"097531", 		"1122334", 	"4332211"	 } ));
 		        
 		return ll;	
 	}
@@ -875,7 +875,7 @@ public class UserTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					uid              	mail1			mail2			mail3 				phone1		phone2  		pager1		pager2			mobile1		mobile2			fax1		fax2
-		ll.add(Arrays.asList(new Object[]{ "add_delete_undo_reset",			"testuser", 		"one@testrelm",	"two@testrelm", "three@testrelm",   "1234567", 	"7654321",		"9876543",	"3456789",		"135790",	"097531", 		"1122334", 	"4332211"	 } ));
+		ll.add(Arrays.asList(new Object[]{ "add_delete_undo_reset",			"testuser", 		"one@testrelm.com",	"two@testrelm.com", "three@testrelm.com",   "1234567", 	"7654321",		"9876543",	"3456789",		"135790",	"097531", 		"1122334", 	"4332211"	 } ));
 		        
 		return ll;	
 	}
