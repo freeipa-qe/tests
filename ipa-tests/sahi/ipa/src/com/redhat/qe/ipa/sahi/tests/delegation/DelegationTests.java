@@ -1,10 +1,13 @@
 package com.redhat.qe.ipa.sahi.tests.delegation;
 
 import java.util.logging.Logger;
+import java.lang.reflect.Constructor;
 
 
 import org.testng.annotations.*; 
 
+import com.redhat.qe.auto.testng.Assert;
+import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 import com.redhat.qe.ipa.sahi.tests.group.GroupTests; 
 import com.redhat.qe.ipa.sahi.pages.*;
@@ -13,6 +16,18 @@ import com.redhat.qe.ipa.sahi.*;
 public class DelegationTests extends IPAWebAutomation {
 	private static String packageName ="com.redhat.qe.ipa.sahi.pages.";  
 	private static Logger log = Logger.getLogger(GroupTests.class.getName());
+	
+
+	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
+	public void initialize() throws CloneNotSupportedException {	
+		
+		log.info("kinit as admin");
+		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
+		log.info("Opening browser");
+		browser.open();
+		log.info("Accessing: IPA Server URL");
+		browser.setStrictVisibilityCheck(true);
+	}
 	
 	@AfterMethod (alwaysRun=true)
 	public void checkPossibleError(){
@@ -63,7 +78,7 @@ public class DelegationTests extends IPAWebAutomation {
 	
 	// RHEL :: private String DelegationTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
 	// WIN::
-	private String DelegationTestDataFile = "C:\\test.delegation.properties";
+	private String DelegationTestDataFile = "C:\\delegation.properties";
 	
 	private String[] IPAServerPageDelegation = {"Delegation Tests","IPAServerPageDelegation", DelegationTestDataFile};
 
