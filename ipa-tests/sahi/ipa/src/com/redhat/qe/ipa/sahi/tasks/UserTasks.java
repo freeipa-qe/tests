@@ -490,9 +490,11 @@ public class UserTasks {
 	 * @param uid - the uid of user to be deleted
 	 */
 	public static void deleteUser(SahiTasks sahiTasks, String uid) {
-		sahiTasks.checkbox(uid).click();
-		sahiTasks.link("Delete").click();
-		sahiTasks.button("Delete").click();
+		if(sahiTasks.link(uid).exists()){
+			sahiTasks.checkbox(uid).click();
+			sahiTasks.link("Delete").click();
+			sahiTasks.button("Delete").click();
+		}
 	}
 	
 	/*
