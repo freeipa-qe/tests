@@ -1082,6 +1082,7 @@ uninstall()
 		fi
 
 		rlRun "ls /var/lib/sss/pubconf/kdcinfo.$RELM" 2 "Make sure that uninstall removed /var/lib/sss/pubconf/kdcinfo.$RELM. Bug BZ 829070"
+		rlRun "ps -ef|grep -v grep|grep sssd" 1 "Make sure that sssd appears to be stopped as per BZ 830598"
 		rlRun "cat /etc/resolv.conf"
 
 		rlLog "Waiting for 1 minute for everything to clear..."

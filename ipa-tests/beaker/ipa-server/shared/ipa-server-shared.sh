@@ -959,6 +959,7 @@ ipa_quick_uninstall(){
 		rlRun "/bin/rm -rf /var/lib/ipa/"
 	fi
 	rlRun "ls /var/lib/sss/pubconf/kdcinfo.$RELM" 2 "Make sure that uninstall removed /var/lib/sss/pubconf/kdcinfo.$RELM. Bug BZ 829070"
+	rlRun "ps -ef|grep -v grep|grep sssd" 1 "Make sure that sssd appears to be stopped as per BZ 830598"
 	if [ -d /var/lib/sss/ ]; then
 		rlRun "/bin/rm -rf /var/lib/sss/"
 	fi
