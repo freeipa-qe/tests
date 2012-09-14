@@ -659,14 +659,8 @@ ipa_install_topo()
 
 }
 
-ipa_install_prep() 
+ipa_install_prep_initVars()
 {
-	rlLog "$FUNCNAME"
-	if [ -z "$IPA_SERVER_PACKAGES" ]; then
-		rlFail "IPA_SERVER_PACKAGES variable not set.  Run ipa_install_set_vars first"
-		return 1
-	fi
-
 	tmpout=/tmp/error_msg.out
 	currenteth=$(route | grep ^default | awk '{print $8}')
 	ipaddr=$(ip -o -4 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
@@ -680,7 +674,10 @@ ipa_install_prep()
 		rrtype=""
 		netaddr="$ipaddr"
 	fi
+}
 
+ipa_install_prep_pkgInstalls()
+{
 	rlRun "yum clean all"
 	rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
 	if [ $(echo $MYROLE|grep CLIENT|wc -l) -gt 0 ]; then
@@ -689,41 +686,74 @@ ipa_install_prep()
 		rlRun "yum -y install $YUM_OPTIONS $IPA_SERVER_PACKAGES"
 	fi
 	rlRun "yum -y update"
+}
 
-	# Set time
+ipa_install_prep_setTime()
+{
 	rlLog "Stopping ntpd service"
 	rlRun "service ntpd stop"
 	rlLog "Synchronizing time to $NTPSERVER"
 	rlRun "ntpdate $NTPSERVER"
+}
 
-	# Fix /etc/hosts
+fixHostFile()
+{
+	ipa_install_prep_initVars
+
 	cp -af /etc/hosts /etc/hosts.ipabackup
 	rlRun "sed -i s/$hostname//g    /etc/hosts"
 	rlRun "sed -i s/$hostname_s//g  /etc/hosts"
-	rlRun "sed -i /$ipaddr/d    /etc/hosts"
-	if [ -n "$ipv6addr" ]; then 
-		for i6 in $(echo $ipv6addr); do
-			rlRun "sed -i '/$i6/d'  /etc/hosts"
-		done
-	fi
-	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
-	
-	# Other IPv6 fixes
-	if [ "$IPv6SETUP" = "TRUE" ] ; then
-		rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /dev/shm/env.sh"
-		. /dev/shm/env.sh
-		rlRun "/sbin/ip -4 addr del $ipaddr dev $currenteth"
-	fi
+	for i in $(echo $ipaddr); do
+		rlRun "sed -i /$i/d    /etc/hosts"
+	done
 
-	# Fix hostname
+	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+}
+
+fixHostFileIPv6()
+{
+	ipa_install_prep_initVars
+
+	cp -af /etc/hosts /etc/hosts.ipabackup
+	rlRun "sed -i s/$hostname//g    /etc/hosts"
+	rlRun "sed -i s/$hostname_s//g  /etc/hosts"
+	for i6 in $(echo $ipv6addr); do
+		rlRun "sed -i '/$i6/d'  /etc/hosts"
+	done
+	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+}
+
+fixhostname()
+{
+	ipa_install_prep_initVars
+	
 	if [ ! -f /etc/sysconfig/network-ipabackup ]; then
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
 	fi
 	rlRun "hostname $hostname_s.$DOMAIN"
 	rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
 	. /etc/sysconfig/network
+}
+
+fixForwarderIPv6()
+{
+	ipa_install_prep_initVars
 	
-	# Fix /etc/resolv.conf
+	rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /dev/shm/env.sh"
+	. /dev/shm/env.sh
+}
+
+rmIPv4addr()
+{
+	ipa_install_prep_initVars
+	
+	rlRun "/sbin/ip -4 addr del $ipaddr dev $currenteth"
+}
+
+fixResolv()
+{
+	ipa_install_prep_initVars
+	
 	# we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
 	if [ ! -f /etc/resolv.conf.ipabackup ]; then
 		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
@@ -737,8 +767,29 @@ ipa_install_prep()
 		rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
 		rlRun "rm -f /etc/resolv.conf.new"
 	fi
-		
-	# Disable Firewall
+}
+
+fixResolvIPv6()
+{
+	ipa_install_prep_initVars
+	
+	# we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
+	if [ ! -f /etc/resolv.conf.ipabackup ]; then
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
+	fi
+	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
+		for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
+			nsaddr=$(dig +short $ns $rrtype)
+			rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
+		done
+		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+		rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
+		rlRun "rm -f /etc/resolv.conf.new"
+	fi
+}
+
+ipa_install_prep_disableFirewall()
+{
 	rlRun "chkconfig iptables off"
 	rlRun "chkconfig ip6tables off"
 
@@ -763,13 +814,10 @@ ipa_install_prep()
 	else    
 		rlRun "service ip6tables stop" 0 "Stop the firewall on the client"
 	fi
+}
 
-	#if [ $(rpm -qa | grep ipa-server | wc -l) -eq 0 ]; then
-	#	rlFail "No ipa-server packages found"
-	#fi
-
-	# setup SSH keys
-	## Adding code from SetUpAuthKeys
+SetUpAuthKeys()
+{
 	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
 	chmod 700 /root/.ssh
 	restorecon -R /root/.ssh
@@ -780,15 +828,29 @@ ipa_install_prep()
 		for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
 			for server in $(eval echo \$$var); do
 				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
-				#AddToKnownHosts $server
-				if [ -f /root/.ssh/known_hosts ]; then
-					ssh-keygen -R $server
-				fi
-				ssh-keyscan $server >> /root/.ssh/known_hosts
 			done
 		done
 	fi
+}
 
+SetUpKnownHosts()
+{
+	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
+	chmod 700 /root/.ssh
+	restorecon -R /root/.ssh
+	for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
+		for server in $(eval echo \$$var); do
+			#AddToKnownHosts $server
+			if [ -f /root/.ssh/known_hosts ]; then
+				ssh-keygen -R $server
+			fi
+			ssh-keyscan $server >> /root/.ssh/known_hosts
+		done
+	done
+}
+
+configAbrt()
+{
 	# configure abrt
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]" |wc -l) -gt 0 ]; then
 		rlLog "configAbrt : Machine is a RHEL 5 machine - no abrt"
@@ -823,6 +885,38 @@ ipa_install_prep()
 
 		rlRun "service abrtd restart"
 	fi
+}
+
+ipa_install_prep() 
+{
+	rlLog "$FUNCNAME"
+	if [ -z "$IPA_SERVER_PACKAGES" ]; then
+		rlFail "IPA_SERVER_PACKAGES variable not set.  Run ipa_install_set_vars first"
+		return 1
+	fi
+
+	ipa_install_prep_pkgInstalls
+
+	ipa_install_prep_setTime
+
+	if [ "$IPv6SETUP" != "TRUE" ]; then
+		fixHostFile
+		fixhostname
+		fixResolv
+	else
+		fixHostFileIPv6
+		fixhostname
+		fixForwarderIPv6
+		rmIPv4addr
+		fixResolvIPv6
+	fi
+
+	ipa_install_prep_disableFirewall
+
+	SetUpAuthKeys
+	SetUpKnownHosts
+
+	configAbrt
 }
 
 ipa_install_master()
