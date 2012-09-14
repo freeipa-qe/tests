@@ -17,14 +17,19 @@ public class GroupTasks {
 	}
 	
 	public static void deleteGroup(SahiTasks sahiTasks, String groupName) {
-		sahiTasks.checkbox(groupName).click();
-		sahiTasks.link("Delete").click();
-		sahiTasks.button("Delete").click();
+		CommonTasks.search(sahiTasks, groupName);
+		if(sahiTasks.link(groupName).exists()){
+			sahiTasks.checkbox(groupName).click();
+			sahiTasks.link("Delete").click();
+			sahiTasks.button("Delete").click();
+		}
+		CommonTasks.clearSearch(sahiTasks);
 	}
 
 	public static void deleteGroup(SahiTasks sahiTasks, String [] groupnames) {
 		for (String groupname : groupnames) {
-			sahiTasks.checkbox(groupname).click();
+			if(sahiTasks.link(groupname).exists())
+				sahiTasks.checkbox(groupname).click();
 		}
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
@@ -108,7 +113,7 @@ public class GroupTasks {
 			sahiTasks.link("memberof_netgroup").click();
 		}
 		if (memberoftype == "roles"){
-			sahiTasks.link("memberof_rule").click();
+			sahiTasks.link("memberof_role").click();
 		}
 		if (memberoftype == "hbacrules"){
 			sahiTasks.link("memberof_hbacrule").click();
