@@ -276,8 +276,8 @@ public class RoleTasks {
 		Assert.assertTrue(sahiTasks.link(member).exists(), "Verified " + member + " is listed for " + name );
 		sahiTasks.link(member).click();		
 		sahiTasks.link("memberof_role").click();
-		Assert.assertTrue(sahiTasks.link(name.toLowerCase()).exists(), "Verified " + name + " is listed for " + member );
-		sahiTasks.link(name.toLowerCase()).click();
+		Assert.assertTrue(sahiTasks.link(name).exists(), "Verified " + name + " is listed for " + member );
+		sahiTasks.link(name).click();
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
@@ -289,8 +289,8 @@ public class RoleTasks {
 				sahiTasks.link("memberof_privilege").click();
 				sahiTasks.link(privilege).click();
 				sahiTasks.link("member_role").click();
-				Assert.assertTrue(sahiTasks.link(name.toLowerCase()).exists(), "Verified Role " + name + " is listed for " + privilege );
-				sahiTasks.link(name.toLowerCase()).click();
+				Assert.assertTrue(sahiTasks.link(name).exists(), "Verified Role " + name + " is listed for " + privilege );
+				sahiTasks.link(name).click();
 			}
 		}	
 		
