@@ -143,6 +143,7 @@ public class PrivilegeTasks {
 			CommonTasks.search(sahiTasks, name);
 			if (buttonToClick.equals("Update")){
 				verifyPrivilege(sahiTasks, name, newDescription);
+				CommonTasks.search(sahiTasks, name);
 				sahiTasks.link(name).click();
 				sahiTasks.link("Settings").click();
 				sahiTasks.textarea("description").setValue(description);
@@ -251,10 +252,16 @@ public class PrivilegeTasks {
 		for (String member : members) {
 			if (!member.isEmpty()) {
 				if (exists){
-					Assert.assertTrue(sahiTasks.link(member).exists(), "Verified " + member + " is listed for " + name );
+					if(membershipToCheckfor.equals("Permissions"))
+						Assert.assertTrue(sahiTasks.link(member.toLowerCase()).exists(), "Verified " + member + " is listed for " + name );
+					else
+						Assert.assertTrue(sahiTasks.link(member).exists(), "Verified " + member + " is listed for " + name );
 				}	
 				else {
-					Assert.assertFalse(sahiTasks.link(member).exists(), "Verified " + member + " is not listed for " + name );
+					if(membershipToCheckfor.equals("Permissions"))
+						Assert.assertFalse(sahiTasks.link(member.toLowerCase()).exists(), "Verified " + member + " is not listed for " + name );
+					else
+						Assert.assertFalse(sahiTasks.link(member).exists(), "Verified " + member + " is not listed for " + name );
 				}
 			}
 		}	
@@ -275,8 +282,10 @@ public class PrivilegeTasks {
 					sahiTasks.link("member_privilege").click();
 				else
 					sahiTasks.link("memberof_privilege").click();
-				Assert.assertTrue(sahiTasks.link(name.toLowerCase()).exists(), "Verified Privilege " + name + " is listed for " + member );
-				sahiTasks.link(name.toLowerCase()).click();
+				
+					Assert.assertTrue(sahiTasks.link(name).exists(), "Verified Privilege " + name + " is listed for " + member );
+					sahiTasks.link(name).click();
+				
 				if (memberType.equals("Permissions"))
 					sahiTasks.link("memberof_permission").click();
 				else
