@@ -119,7 +119,6 @@ bz750947()
 		aaaa="fec0:0:a10:6000:11:16ff:fe98:122"
 		rlRun "ipa dnsrecord-add $zone aaaa --aaaa-rec=\"$aaaa\""
 		rlRun "ipa dnsrecord-find $zone aaaa | grep $aaaa" 0 "make sure ipa recieved record type AAAA"
-		rlRun "service named restart" 0 "Restart named"
 		rlRun "dig aaaa.$zone AAAA | grep $aaaa" 0 "make sure dig can find the AAAA record"
 		rlRun "ipa dnsrecord-del $zone aaaa --aaaa-rec=\"$aaaa\"" 0 "delete the AAAA record added"
 	rlPhaseEnd
@@ -205,13 +204,11 @@ EOF
 
 		sleep 5
 		rlRun "dig +short -t A foo.example.com | grep 10.0.0.1"
-		rlRun "service named restart"
 		rlRun "dig +short -t A foo.example.com | grep 10.0.0.1"
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=751776"
 
 		rlRun "ipa dnszone-del example.com"
-		rlRun "service named restart"
 
 	rlPhaseEnd
 }
@@ -230,7 +227,6 @@ bz797561()
 		rlRun "ipa dnszone-show example.com --all --raw | grep -i \"idnsallowdynupdate: TRUE\""
 
 		rlRun "ipa dnszone-del example.com"
-                rlRun "service named restart"
 
 	rlPhaseEnd
 }
@@ -303,7 +299,6 @@ bz767494()
 
 		rlRun "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse"
 		rlRun "ipa dnsrecord-show $a174rev 10 | grep \"PTR record: foo.$DOMAIN\""
-		rlRun "service named restart"
 		sleep 5
 		rlRun "dig -x $a174 | grep foo.$DOMAIN"
 
@@ -318,7 +313,6 @@ bz767494()
 		rlRun "ipa dnszone-add $aaaa174rev --name-server=$MASTER --admin-email=$email"
 		rlRun "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse"
 		rlRun "ipa dnsrecord-show $aaaa174rev 4.b.6.1.6.8.e.f.f.f.e.5.1.2.2.0 | grep \"PTR record: bar.$DOMAIN\""
-		rlRun "service named restart"
 		sleep 5
 		rlRun "dig -x $aaaa174 | grep bar.$DOMAIN"
 
@@ -371,7 +365,6 @@ bz795414()
 	rlPhaseStartTest "bz795414 Dynamic database plug-in cannot change BIND root zone forwarders while plug-in start"
 		rlAssertGrep "forwarders" "/etc/named.conf"
 		rlRun "ipa dnszone-mod $DOMAIN --forwarder=10.65.202.128,10.65.202.129 --forward-policy=first" 
-		rlRun "service named restart"
 
 		rlRun "ipa dnszone-mod $DOMAIN --forwarder= --forward-policy=" 0 "Removing forwarders and forward-policy"
 
@@ -469,7 +462,6 @@ bz701677()
 		chmod +x /var/tmp/allow-query.sh
 		rlRun "/var/tmp/allow-query.sh"
 
-		rlRun "service named restart"
 
 		rlRun "dig @$MASTERIP -t soa example.com | grep -i \"ANSWER SECTION\"" 0 "Allow query from $MASTERIP passed, as expected"
 		rlRun "dig @$MASTERIP6 -t soa example.com | grep -i \"ANSWER SECTION\"" 1 "Allow query from $MASTERIP6 failed, as expected"
@@ -479,7 +471,6 @@ bz701677()
                 chmod +x /var/tmp/allow-query.sh
                 rlRun "/var/tmp/allow-query.sh"
 
-                rlRun "service named restart"
 
                 rlRun "dig @$MASTERIP -t soa example.com | grep -i \"ANSWER SECTION\"" 1 "Allow query from $MASTERIP failed, as expected"
                 rlRun "dig @$MASTERIP6 -t soa example.com | grep -i \"ANSWER SECTION\"" 0 "Allow query from $MASTERIP6 passed, as expected"
@@ -493,7 +484,6 @@ bz701677()
                 chmod +x /var/tmp/allow-transfer.sh
                 rlRun "/var/tmp/allow-transfer.sh"
 
-                rlRun "service named restart"
 
                 rlRun "dig @$MASTERIP example.com axfr | grep -i \"Transfer failed\"" 1 "Allow zone transfer from $MASTERIP failed, as expected"
                 rlRun "dig @$MASTERIP6 example.com axfr | grep -i \"Transfer failed\"" 0 "Allow zone transfer from $MASTERIP6 passed, as expected"
@@ -503,7 +493,6 @@ bz701677()
                 chmod +x /var/tmp/allow-query.sh
                 rlRun "/var/tmp/allow-query.sh"
 
-                rlRun "service named restart"
 
                 rlRun "dig @$MASTERIP example.com axfr | grep -i \"Transfer failed\"" 0 "Allow zone transfer from $MASTERIP passed, as expected" 
                 rlRun "dig @$MASTERIP6 example.com axfr | grep -i \"Transfer failed\"" 1 "Allow zone transfer from $MASTERIP6 failed, as expected"
@@ -547,7 +536,6 @@ bz772301()
         rlRun "ipa dnsrecord-del $a174rev $arev --del-all" 0 "Delete reverse record"
         rlRun "ipa dnszone-del $a174rev" 0 "Cleanup ipv4 reverse zone added"
         #rlRun "ipa dnsrecord-del $DOMAIN myhost --del-all" 0 "Delete forward record"
-        service named restart
         sleep 5
 
         # add dns record - reverse zone does exist - ipv6
@@ -561,7 +549,6 @@ bz772301()
         rlRun "ipa dnsrecord-del $aaaa174rev $aaaarev --del-all" 0 "Delete reverse record"
         rlRun "ipa dnszone-del $aaaa174rev" 0 "Delete reverse zone"
         rlRun "ipa dnsrecord-del $DOMAIN myhost --del-all" 0 "Delete forward record"
-        service named restart
         sleep 5
     rlPhaseEnd
 }
@@ -575,7 +562,6 @@ bz818933()
 	rlRun "dig foo,bar.$DOMAIN"
 	rlAssertGrep "bug in handle_connection_error" "/var/log/messages"
 
-        service named restart
         sleep 5
     rlPhaseEnd
 }

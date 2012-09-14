@@ -74,6 +74,11 @@ managedZone="qa.testrelm.com"
 managedZone1="dev.testrelm.com"
 nonexistentZone="nonexistent.testrelm.com"
 
+# These values are for testing persistent search
+zonepsearch="westford.$DOMAIN"
+newtxt="newip=5.6.7.8"
+newertxt="newip=8.7.6.5"
+
 #########################################
 # Test Suite
 #########################################
@@ -98,6 +103,7 @@ dnsacceptance()
    dnslocrecord
    dnskxrecord
    dnszonepermission
+   dnspsearch
    dnscleanup
 }
 #########################################
@@ -118,7 +124,6 @@ dnsreplicaprepare()
 		let newip=$ipoc4+1
 		rlLog "EXECUTING: ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN"
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$newfakehostip newfakehost$newip.$DOMAIN" 0
-		rlRun "service named restart"
 	rlPhaseEnd
 
 
@@ -134,7 +139,6 @@ dnsreplicaprepare()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-replicaprepare-04 check reverse entry of the replica was created in dns correctly with dig"
-		rlRun "service named restart" 0 "Restart named"
 		sleep 15
 		rlLog "EXECUTING: dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN"
 		rlRun "dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
@@ -264,7 +268,6 @@ dnsarecord()
 
 	rlPhaseStartTest "ipa-dns-arecord-04 delete record of type A"
 		rlRun "ipa dnsrecord-del $zone allll --a-rec $a" 0 "delete record type a"
-		rlRun "service named restart" 0 "Restart named"
 		rlRun "ipa dnsrecord-find $zone allll" 1 "make sure ipa deleted record type A"
 		rlRun "dig allll.$zone A | grep $a" 1 "make sure dig can not find the A record"
 	rlPhaseEnd
@@ -294,7 +297,6 @@ dnsarecord()
 
 	rlPhaseStartTest "ipa-dns-arecord-10 delete record of type multiple A"
 		rlRun "ipa dnsrecord-del $zone aa2 --a-rec $a2" 0 "delete record type multiple a"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-11 make sure that IPA removed the first type A record"
@@ -333,7 +335,6 @@ dnsaaaarecord()
 
 	rlPhaseStartTest "ipa-dns-aaaarecord-04 delete record of type AAAA"
 		rlRun "ipa dnsrecord-del $zone aaaa --aaaa-rec $aaaa" 0 "delete record type AAAA"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-aaaarecord-05 make sure that IPA deleted record type AAAA"
@@ -388,7 +389,6 @@ dnsafsbdrecord()
 
 	rlPhaseStartTest "ipa-dns-iafsbdrecord-04 delete record of type afsdb"
 		rlRun "ipa dnsrecord-del $zone afsdb --afsdb-rec='0 $afsdb'" 0 "delete record type afsdb"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-iafsbdrecord-05 make sure that IPA deleted record type afsdb"
@@ -418,7 +418,6 @@ dnscnamerecord()
 
 	rlPhaseStartTest "ipa-dns-cnamerecord-04 delete record of type cname"
 		rlRun "ipa dnsrecord-del $zone cname --cname-rec $cname" 0 "delete record type cname"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-cnamerecord-05 make sure that IPA deleted record type cname"
@@ -448,7 +447,6 @@ dnstxtrecord()
 
 	rlPhaseStartTest "ipa-dns-txtrecord-04 delete record of type txt"
 		rlRun "ipa dnsrecord-del $zone txt --txt-rec $txt" 0 "delete record type txt"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-txtrecord-05 make sure that IPA deleted record type txd"
@@ -477,7 +475,6 @@ dnssvrrecord()
 
 	rlPhaseStartTest "ipa-dns-svrrecord-04 delete record of type srv"
 		rlRun "ipa dnsrecord-del --del-all $zone _srv" 0 "delete record type srv"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-svrrecord-05 make sure that IPA deleted record type srv"
@@ -494,7 +491,6 @@ dnsmxrecord()
 	# MX record 
 	rlPhaseStartTest "ipa-dns-mxrecord-01 add record of type MX"
 		rlRun "ipa dnsrecord-add $zone @ --mx-rec '10 $mx.'" 0 "add record type MX"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-mxrecord-02 make sure that IPA saved record type MX"
@@ -511,7 +507,6 @@ dnsmxrecord()
 
 	rlPhaseStartTest "ipa-dns-mxrecord-05 make sure that IPA deleted record type MX"
 		rlRun "ipa dnsrecord-find $zone @ | grep $mx" 1 "make sure ipa deleted record type MX"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-mxrecord-06 make sure that dig can not find the record type MX"
@@ -535,7 +530,6 @@ dnsptrzone()
 # Create a PTR zone
 	rlPhaseStartTest "ipa-dns-ptrzone-03 try to create a new PTR zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$pemail --serial=$pserial --refresh=$prefresh --retry=$pretry --expire=$pexpire --minimum=$pminimum --ttl=$pttl $ptrzone" 0 "Creating a new PTR zone for use in following tests"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-ptrzone-04 checking to ensure that the new PTR zone got created with the correct name-server"
@@ -620,7 +614,6 @@ dnsptrrecord()
 
 	rlPhaseStartTest "ipa-dns-ptrrecord-04 delete record of type PTR"
 		rlRun "ipa dnsrecord-del $ptrzone $ptr --ptr-rec $ptrvalue" 0 "delete record type PTR"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-ptrrecord-05 make sure that IPA deleted record type PTR"
@@ -650,7 +643,6 @@ dnsnaptrrecord()
 
 	rlPhaseStartTest "ipa-dns-naptrrecord-04 delete record of type NAPTR"
 		rlRun "ipa dnsrecord-del $zone naptr --naptr-rec '$naptr'" 0 "delete record type NAPTR"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-naptrrecord-05 make sure that IPA deleted record type NAPTR"
@@ -679,7 +671,6 @@ dnsdnamerecord()
 
 	rlPhaseStartTest "ipa-dns-dnamerecord-04 delete record of type dname"
 		rlRun "ipa dnsrecord-del $zone dname --dname-rec $dname" 0 "delete record type dname"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-dnamerecord-05 make sure that IPA deleted record type dname"
@@ -709,7 +700,6 @@ dnscertrecord()
 
 	rlPhaseStartTest "ipa-dns-certrecord-04 delete record of type cert"
 		rlRun "ipa dnsrecord-del $zone cert --cert-rec=\"$certb $cert\"" 0 "delete record type cert"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-certrecord-05 make sure that IPA deleted record type cert"
@@ -729,7 +719,7 @@ dnslocrecord()
 		rlRun "ipa dnsrecord-add $zone @ --loc-rec '$loc'" 0 "add record type loc"
 	rlPhaseEnd
 
-	/etc/init.d/named restart
+#	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-locrecord-02 make sure that IPA saved record type loc"
 		rlRun "ipa dnsrecord-find $zone | grep '$loclong'" 0 "make sure ipa recieved record type loc"
@@ -745,7 +735,6 @@ dnslocrecord()
 
 	rlPhaseStartTest "ipa-dns-locrecord-04 delete record of type loc"
 		rlRun "ipa dnsrecord-del $zone @ --loc-rec '$loc'" 0 "delete record type loc"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-locrecord-05 make sure that IPA deleted record type loc"
@@ -765,7 +754,7 @@ dnskxrecord()
 		rlRun "ipa dnsrecord-add $zone @ --kx-rec \"$kxpref1 $ahost\"" 0 "add record type kx"
 	rlPhaseEnd
 
-	/etc/init.d/named restart
+#	/etc/init.d/named restart
 
 	rlPhaseStartTest "ipa-dns-kxrecord-02 make sure that IPA saved record type kx"
 		rlRun "ipa dnsrecord-show $zone @ | grep $kxpref1" 0 "make sure ipa recieved record type kx"
@@ -781,7 +770,6 @@ dnskxrecord()
 
 	rlPhaseStartTest "ipa-dns-kxrecord-05 make sure that IPA deleted record type kx"
 		rlRun "ipa dnsrecord-find $zone kx" 1 "make sure ipa deleted record type kx"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	sleepd
@@ -793,7 +781,6 @@ dnskxrecord()
 
 	rlPhaseStartTest "ipa-dns-kxrecord-07 add record of type bad kx"
 		rlRun "ipa dnsrecord-add $zone @ --kx-rec '$kxbadpref1 $a'" 1 "add record type bad kx"
-		rlRun "service named restart" 0 "Restart named"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-kxrecord-08 make sure that IPA saved record type kx"
@@ -867,6 +854,56 @@ dnszonepermission()
 
   # cleanup
      ipa dnszone-del $managedZone
+}
+
+dnspsearch()
+{
+# ref: https://fedoraproject.org/wiki/QA:Testcase_freeipav3_dns_persistent_search
+
+	rlPhaseStartTest "ipa-dns-psearch-01 psearch is enabled when ipa server is installed" 
+	      rlAssertGrep "psearch yes" "/etc/named.conf"
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-dns-psearch-02 create a new zone and check the zone with dig"
+		rlLog "Executing: ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zonepsearch"
+		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zonepsearch" 0 "Create a new zone"
+		rlLog "Executing: dig $zonepsearch SOA | grep NS | grep $ipaddr"
+		rlRun "dig $zonepsearch SOA | grep NS | grep $ipaddr" 0 "checking with dig to ensure that the new zone got created with the correct name server"
+	rlPhaseEnd
+
+        rlPhaseStartTest "ipa-dns-psearch-03 add record of type txt and check the record with dig"
+                rlLog "Executing: ipa dnsrecord-add $zonepsearch txt --txt-rec $txt"
+                rlRun "ipa dnsrecord-add $zonepsearch txt --txt-rec $txt" 0 "add record type txt"
+		rlLog "Executing: dig txt.$zonepsearch TXT | grep $txt"
+		rlRun "dig txt.$zonepsearch TXT | grep $txt" 0 "make sure dig can find the txt record"
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-dns-psearch-04 update record's txt value and check using dig"
+                rlLog "Executing: ipa dnsrecord-mod $zonepsearch txt --txt-rec=$txt --txt-data=$newtxt"
+                rlRun "ipa dnsrecord-mod $zonepsearch txt --txt-rec=$txt --txt-data=$newtxt" 0 "modify record type txt"
+		rlLog "Executing: dig txt.$zonepsearch TXT | grep $newtxt"
+		rlRun "dig txt.$zonepsearch TXT | grep $newtxt" 0 "make sure dig can find updated txt record"
+        rlPhaseEnd
+
+        rlPhaseStartTest "ipa-dns-psearch-05 update record's txt value again and check zone has a new serial that is higher than previous serial"
+		oldserial=`dig $zonepsearch +multiline -t SOA | grep serial | cut -d ";" -f1 | xargs echo`
+                rlLog "Executing: ipa dnsrecord-mod $zonepsearch txt --txt-rec=$newtxt --txt-data=$newertxt"
+                rlRun "ipa dnsrecord-mod $zonepsearch txt --txt-rec=$newtxt --txt-data=$newertxt" 0 "update record type txt"
+		newserial=`dig $zonepsearch +multiline -t SOA | grep serial | cut -d ";" -f1 | xargs echo`
+                if [ $oldserial -gt $newserial ]; then
+                        rlFail "new serial after updating record is not higher. Was: $oldserial; New: $newserial"
+                else
+                        rlPass "new serial after updating record is higher. Was: $oldserial; New: $newserial"
+                fi
+        rlPhaseEnd
+
+
+#  cleanup
+       rlLog "Executing: ipa dnszone-del $zonepsearch"
+       ipa dnszone-del $zonepsearch
+
+# test not for here: check upgrade
+# tasks 162, 606, 778, 784, 939, 783
 }
 
 dnscleanup()
