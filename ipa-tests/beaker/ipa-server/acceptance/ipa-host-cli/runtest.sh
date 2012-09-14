@@ -49,6 +49,7 @@
 # Include test case file
 . ./ipa-host-cli-ipv6.sh
 . ./ipa-host-cli-macaddress.sh
+. ./ipa-host-cli-bugzillas.sh
 
 ########################################################################
 # Test Suite Globals
@@ -1289,6 +1290,9 @@ rlPhaseStartTest "ipa-host-cli-38: find more hosts than exist"
 
 # Execute host-add with macaddress tests
   run_host_add_macaddress_tests
+
+# Execute bugzilla tests
+  bugzillas
 
     rlPhaseStartCleanup "ipa-host-cli-cleanup: Destroying admin credentials."
         i=1
