@@ -496,7 +496,7 @@ public class PermissionTests extends SahiTestScript {
 			//verify privilege was added successfully
 			CommonTasks.search(sahiTasks, cn);
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Added permission " + cn + "  successfully");
-			String privilegesToVerify[] = {privilege1.toLowerCase(), privilege2.toLowerCase()};
+			String privilegesToVerify[] = {privilege1, privilege2};
 			if (buttonToClick.equals("Add")) {
 				PermissionTasks.verifyPermissionMembership(sahiTasks, cn, privilegesToVerify, true);
 			}
@@ -519,7 +519,7 @@ public class PermissionTests extends SahiTestScript {
 			Assert.assertTrue(sahiTasks.link(cn).exists(), "Permission " + cn + "  exists");			
 			
 			
-			String members[] = {member1.toLowerCase(), member2.toLowerCase()};
+			String members[] = {member1, member2};
 			
 			
 			PermissionTasks.deleteMemberFromPermission(sahiTasks, cn, members, allOrOne, buttonToClick);
