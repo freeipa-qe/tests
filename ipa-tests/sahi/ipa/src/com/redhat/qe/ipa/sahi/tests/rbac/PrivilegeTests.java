@@ -230,7 +230,7 @@ public class PrivilegeTests extends SahiTestScript{
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
 		// Inconsistent - String permissionsToVerify[] = {permission1.toLowerCase(), permission2.toLowerCase()};
-		String permissionsToVerify[] = {permission1, permission2};
+		String permissionsToVerify[] = {permission1.toLowerCase(), permission2.toLowerCase()};
 		if (buttonToClick.equals("Add")) {
 			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Permissions", permissionsToVerify, true);
 			PrivilegeTasks.verifyPrivilegeMembershipInPermissionRole(sahiTasks, name, "Permissions", permissionsToVerify);
@@ -280,7 +280,7 @@ public class PrivilegeTests extends SahiTestScript{
 		//verify privilege was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
-		String rolesToVerify[] = {role1.toLowerCase(), role2.toLowerCase()};
+		String rolesToVerify[] = {role1, role2};
 		if (buttonToClick.equals("Add")) {
 			PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Roles", rolesToVerify, true);
 			PrivilegeTasks.verifyPrivilegeMembershipInPermissionRole(sahiTasks, name, "Roles", rolesToVerify);
@@ -306,7 +306,7 @@ public class PrivilegeTests extends SahiTestScript{
 		//verify privilege was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
-		String roles[] = {role1.toLowerCase()};		
+		String roles[] = {role1};		
 		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, name, "Roles", roles, true);
 				
 	}
@@ -326,7 +326,7 @@ public class PrivilegeTests extends SahiTestScript{
 		
 		
 		String members[] = {member1.toLowerCase(), member2.toLowerCase()};
-		if (memberType.equals("Permissions")) {
+		if (!memberType.equals("Permissions")) {
 			members[0] = member1;
 			members[1] = member2;
 		}
