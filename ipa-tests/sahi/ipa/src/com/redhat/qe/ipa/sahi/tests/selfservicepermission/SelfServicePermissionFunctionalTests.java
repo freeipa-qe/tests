@@ -63,7 +63,7 @@ public class SelfServicePermissionFunctionalTests extends SahiTestScript{
 			UserTasks.createUser(sahiTasks, uid, givenName, sn, password, password, "Add");
 		
 		
-		commonTasks.formauthNewUser(sahiTasks, uid, password);
+		commonTasks.formauthNewUser(sahiTasks, uid, password, password);
 		
 		String sshKey=CommonTasks.generateSSH(uid,keyType,fileName);
 		
