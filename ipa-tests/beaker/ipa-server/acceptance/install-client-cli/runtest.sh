@@ -39,6 +39,7 @@
 . ./t.ipa-client-install.sh
 . ./lib.ipaclientverify.sh
 . ../quickinstall/install-lib.sh
+. ../quickinstall/ipa-install.sh
 
 
 PACKAGE="ipa-client"
