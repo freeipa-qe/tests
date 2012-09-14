@@ -271,7 +271,7 @@ public class RoleTests extends SahiTestScript {
 		//verify role was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added role " + name + "  successfully");
-		String privilegesToVerify[] = {privilege1.toLowerCase(), privilege2.toLowerCase()};
+		String privilegesToVerify[] = {privilege1, privilege2};
 		if (buttonToClick.equals("Add")) {
 			RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privilegesToVerify, true);
 			RoleTasks.verifyRoleMembershipInPrivilege(sahiTasks, name, privilegesToVerify);
@@ -297,7 +297,7 @@ public class RoleTests extends SahiTestScript {
 		//verify privilege was added successfully
 		CommonTasks.search(sahiTasks, name);
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Added privilege " + name + "  successfully");
-		String privileges[] = {privilege1.toLowerCase()};		
+		String privileges[] = {privilege1};		
 		RoleTasks.verifyRoleMemberOfPrivilege(sahiTasks, name, "Privileges", privileges, true);		
 	}
 	
