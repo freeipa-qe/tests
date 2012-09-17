@@ -84,7 +84,7 @@ ipa_user_add_ssh_run()
 
 ipa_user_add_ssh_envsetup()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_user_add_ssh_envsetup - Setup environment for IPA user-add sshpubkey Tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
@@ -93,7 +93,10 @@ ipa_user_add_ssh_envsetup()
 
 		# Use BEAKERMASTER if BEAKERMASTER_env${MYENV} not set
 		MYBM1=$(eval echo \$BEAKERMASTER_env${MYENV}) 
-		MYBM1=${MYBM1:-$BEAKERMASTER} 
+		export MYBM1=${MYBM1:-$BEAKERMASTER} 
+		if [ $(echo $MYBM1|grep $hostname_s|wc -l) -gt 0 ]; then
+			MYROLE=MASTER
+		fi
 		
 		# User BEAKERSLAVE if BEAKERSLAVE_env${MYENV} not set
 		MYBRS=$(eval echo \$BEAKERREPLICA_env${MYENV})
@@ -102,6 +105,9 @@ ipa_user_add_ssh_envsetup()
 		for MYBR in $MYBRS; do
 			COUNT=$(( COUNT+=1 ))
 			eval export MYBR$COUNT=$MYBR
+			if [ $(echo $MYBR|grep $hostname_s|wc -l) -gt 0 ]; then
+				MYROLE=REPLICA$COUNT
+			fi
 		done
 		
 		# User BEAKERCLIENT if BEAKERCLIENT_env${MYENV} not set
@@ -111,31 +117,357 @@ ipa_user_add_ssh_envsetup()
 		for MYBC in $MYBCS; do
 			COUNT=$(( COUNT+=1 ))
 			eval export MYBC$COUNT=$MYBC
+			if [ $(echo $MYBC|grep $hostname_s|wc -l) -gt 0 ]; then
+				MYROLE=CLIENT$COUNT
+			fi
 		done
 
-		rlRun "rhts-sync-block -s '$TESTORDER.$FUNCNAME' "
+		rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME' "
 	rlPhaseEnd
 }
 
+# Add user with empty key field
 ipa_user_add_ssh_positive_0001()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "test_run - run test"
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_positive_0001 - Add user with empty key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "hostname"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "hostname"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "hostname"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Add user with blank key field
+ipa_user_add_ssh_positive_0002()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_positive_0002 - Add user with blank key field"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Add user with one valid key
+ipa_user_add_ssh_positive_0003()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_positive_0003 - Add user with one valid key"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Add user with two valid keys
+ipa_user_add_ssh_positive_0004()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_positive_0004 - Add user with two valid keys"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Add user with many valid keys -- how many should I test? 15 for now
+ipa_user_add_ssh_positive_0005()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_positive_0005 - Add user with many valid keys"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Invalid Space in Key field
+ipa_user_add_ssh_negative_0001()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0001 - Fail to add user with Invalid Space in Key field"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Missing equal signs at end of Key field
+ipa_user_add_ssh_negative_0002()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0002 - Fail to add user with Missing equal signs at end of Key field"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Invalid Key Only
+ipa_user_add_ssh_negative_0003()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0003 - Fail to add user with Invalid Key Only"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Invalid Key First of two
+ipa_user_add_ssh_negative_0004()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0004 - Fail to add user with Invalid Key First of two"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Invalid Key First of N # how many to test?
+ipa_user_add_ssh_negative_0005()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0005 - Fail to add user with Invalid Key First of N"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Invalid Key Second of two
+ipa_user_add_ssh_negative_0006()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0006 - Fail to add user with Invalid Key Second of two"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Invalid Key in Middle (Second of three)
+ipa_user_add_ssh_negative_0007()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0007 - Fail to add user with Invalid Key in Middle (Second of three)"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with Invalid Key Last (Third of three)
+ipa_user_add_ssh_negative_0008()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0008 - Fail to add user with Invalid Key Last (Third of three)"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Fail to add user with SAME Valid Key 
+ipa_user_add_ssh_negative_0009()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	rlPhaseStartTest "ipa_user_add_ssh_negative_0009 - Fail to add user with SAME Valid Key"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -146,23 +478,23 @@ ipa_user_add_ssh_positive_0001()
 
 test_envcleanup()
 {
-	TESTORDER=$(( TESTORDER += 1 ))
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "test_envcleanup - clean up test environment"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "hostname"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
 		rlRun "hostname"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
 		rlRun "hostname"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
