@@ -17,6 +17,11 @@
 			    <include name="configUserOptionInvalidEmailTests" />
 			    <include name="configUserOptionGroupTests" />
 			    <include name="configUserOptionHomeDirTests" />
+			    <include name="configUserOptionDefaultShell" />
+			    <include name="configUserOptionInvalidDefaultShell" />
+			    <include name="configPasswordPluginFeatureTests" />
+			    <include name="configDefaultuserclassesTests" />
+			    <include name="configDefaultGroupclassesTests" />			    
 			    <include name="configUserOptionInvalidHomeDirTests" />
 			    <include name="configUserOptionNameLengthTests" />
 			    <include name="configUserOptionInvalidNameLengthTests" />
