@@ -72,6 +72,14 @@ public class ConfigurationTasks {
 		else
 			Assert.assertFalse(sahiTasks.checkbox("ipamigrationenabled").checked(), "Verified Migration mode is disabled");
 	}
+	/*
+	 * 
+	 */
+	public static void setConfigPasswordPluginFeature(SahiTasks sahiTasks) {
+		sahiTasks.checkbox("AllowLMhash").click();
+		sahiTasks.span("Update").click();
+		Assert.assertTrue(sahiTasks.checkbox("AllowLMhash").checked(),"Additional config string successfully added");
+	}
 	
 	/*
 	 * Verify the search size limit brings back the expected number of entries
@@ -213,6 +221,31 @@ public class ConfigurationTasks {
 		sahiTasks.navigateTo(commonTasks.configurationPage);
 	}
 	
+	
+	
+	/*
+	 * shell
+	 */
+	
+	
+	public static void verifyUserDefaultShellFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String defaultshell, String user) {
+		sahiTasks.navigateTo(commonTasks.userPage);
+		UserTasks.createUser(sahiTasks, user, user, user, "Add");
+		//add an email for this user
+		sahiTasks.link(user).click();//
+		sahiTasks.span("Refresh").click();//IE problem.
+		Assert.assertEquals(sahiTasks.textbox("loginshell").value(), defaultshell, "Verified  Home directory for user " + user + ": " + defaultshell);
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		if (sahiTasks.div("This page has unsaved changes. Please save or revert.").exists()){
+			sahiTasks.button("Reset").click();//IE problem.
+		}
+		UserTasks.deleteUser(sahiTasks, user);
+		
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+	}
+	
+	
+	
 	/*
 	 * Verify max name length for user is as set in config
 	 *
@@ -261,6 +294,36 @@ public class ConfigurationTasks {
 		//buttonToClick is either Undo or Reset...so verify value is reverted
 		Assert.assertEquals(sahiTasks.textbox(field).value(), originalValue, "Verified config value for " + field + "  is " + originalValue);
 	}
+	public static void setConfigDefaultUserObjectClasses(SahiTasks sahiTasks,String field,String fieldValue) {
+		
+		sahiTasks.link("Add").near(sahiTasks.textbox("ipauserobjectclasses-10")).click();
+		sahiTasks.textbox(field).setValue(fieldValue);
+		sahiTasks.span("Update").click();
+		String UpdatedValue = sahiTasks.textbox(field).getValue();
+		if (UpdatedValue.equals(fieldValue)){
+			log.info("Additional user objectclass successfully added");
+		}else{
+			log.info("User object classes not as expected.");
+			//Assert.fail("");
+		}
+	}
+		
+		public static void setConfigDefaultGroupclasses(SahiTasks sahiTasks,String field,String fieldValue) {
+			
+			sahiTasks.link("Add").near(sahiTasks.textbox("ipagroupobjectclasses-4")).click();
+			sahiTasks.textbox(field).setValue(fieldValue);
+			sahiTasks.span("Update").click();
+			String UpdatedValue = sahiTasks.textbox(field).getValue();
+			if (UpdatedValue.equals(fieldValue)){
+				log.info("Additional Group objectclass successfully added");
+			}else{
+				log.info("Group object classes not as expected.");
+				//Assert.fail("");
+			}
+		
+	}
+	
+	
 	
 	
 	public static void restoreDefaults(SahiTasks sahiTasks, CommonTasks commonTasks) {
@@ -270,6 +333,7 @@ public class ConfigurationTasks {
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", "testrelm");
 	    ConfigurationTasks.setGroupConfigValue(sahiTasks, commonTasks, "ipausers");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipahomesrootdir", "/home");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultloginshell", "/bin/sh/");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipamaxusernamelength", "32");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipapwdexpadvnotify", "4");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipagroupsearchfields", "cn,description");
