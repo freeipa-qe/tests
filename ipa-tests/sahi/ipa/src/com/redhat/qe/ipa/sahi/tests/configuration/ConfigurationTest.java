@@ -292,7 +292,30 @@ public class ConfigurationTest extends SahiTestScript{
 	public void testConfigUserOptionInvalidHomeDir(String testName, String homedir, String expectedError) throws Exception {
 		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipahomesrootdir", homedir, expectedError, "");		
 	}
-		
+	/*
+	 * 
+	 */
+	
+	@Test (groups={"configUserOptionDefaultShell"}, description="Verify valid User  Default Shell", 
+			dataProvider="getConfigUserOptionDefaultShellTestObjects")	
+	public void testConfigUserOptionDefaultShell(String testName, String defaultshall) throws Exception {
+		 sahiTasks.navigateTo(commonTasks.configurationPage, true);
+		//restore defaults
+		 ConfigurationTasks.restoreDefaults(sahiTasks, commonTasks);
+		 
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultloginshell", defaultshall);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipadefaultloginshell", defaultshall);
+		String user = "configuser";
+		ConfigurationTasks.verifyUserDefaultShellFunctional(sahiTasks, commonTasks, defaultshall, user);
+	} 
+	/*
+	 * invalid
+	 */
+	@Test (groups={"configUserOptionInvalidDefaultShell"}, description="Verify invalid User  Default Shell", 
+			dataProvider="getConfigUserOptionInvalidDefaultShellObjects")	
+	public void testConfigUserOptionInvalidDefaultShell(String testName, String defaultshall, String expectedError) throws Exception {
+		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipadefaultloginshell", defaultshall, expectedError,"");		
+	}
 	
 	
 	/*
@@ -343,6 +366,19 @@ public class ConfigurationTest extends SahiTestScript{
 		ConfigurationTasks.setInvalidConfigValue(sahiTasks, "ipapwdexpadvnotify", pwdExpNotify, expectedError1, expectedError2);		
 	}
 	
+	
+	/*
+	 * password plugin featuresdataProvider="getConfigPasswordPluginFeatureTestObjects"
+	 */
+	@Test (groups={"configPasswordPluginFeatureTests"}, description="Verify PasswordPlugin" 
+			)	
+	public void testConfigPasswordPluginFeatureTest() throws Exception {
+		ConfigurationTasks.setConfigPasswordPluginFeature(sahiTasks);
+		//restore default  setConfigPasswordPluginFeature
+		sahiTasks.checkbox("AllowLMhash").click();
+	}
+	
+	
 	/*
 	 * Test User Options
 	 * Enable Migration mode
@@ -392,6 +428,26 @@ public class ConfigurationTest extends SahiTestScript{
 	 * 
 	 * TODO: nkrishnan: Add tests after bugs are addressed
 	 */
+	@Test (groups={"configDefaultuserclassesTests"}, description="Add additional allowed user object class", 
+			dataProvider="getConfigDefaultUser0bjectClassesObjects")	
+	public void testConfigConfigDefaultUserclasses(String testName,  String fieldValue) throws Exception {
+		ConfigurationTasks.setConfigDefaultUserObjectClasses(sahiTasks, "ipauserobjectclasses-11", fieldValue);
+		//restore default
+		sahiTasks.link("Delete").near(sahiTasks.textbox("ipauserobjectclasses-11")).click();
+		sahiTasks.span("Update").click();
+	}
+	
+	/*
+	 * 
+	 */
+	@Test (groups={"configDefaultGroupclassesTests"}, description="Add additional allowed group object class", 
+			dataProvider="getConfigDefaultGroupObjectClassesObjects")	
+	public void testConfigDefaultGroupclasses(String testName,  String fieldValue) throws Exception {
+		ConfigurationTasks.setConfigDefaultGroupclasses(sahiTasks, "ipagroupobjectclasses-5", fieldValue);
+		//restore default
+		sahiTasks.link("Delete").near(sahiTasks.textbox("ipagroupobjectclasses-5")).click();
+		sahiTasks.span("Update").click();
+	}
 	
 	
 	/*
@@ -667,6 +723,40 @@ public class ConfigurationTest extends SahiTestScript{
 	}
 	
 	/*
+	 * Shall
+	 */
+	
+	@DataProvider(name="getConfigUserOptionDefaultShellTestObjects")
+	public Object[][] getConfigUserOptionDefaultShellTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionDefaultShellTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionDefaultShellTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname					DefaultShell						uid			
+		ll.add(Arrays.asList(new Object[]{ "userDefaultShell_new",				"/bin/bash"					} ));
+		ll.add(Arrays.asList(new Object[]{ "userDefaultShell_specialchar",		"!/bin/perl"		} ));		
+		
+		
+		
+		return ll;	
+	}
+	
+	
+	@DataProvider(name="getConfigUserOptionInvalidDefaultShellObjects")
+	public Object[][] getConfigUserOptionInvalidDefaultShellObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionInvalidDefaultShellObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionInvalidDefaultShellObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname						       DefaultShell   			expectedError																} ));
+		ll.add(Arrays.asList(new Object[]{ "userDefaultShell_trailing_space",		    "/bin/bash ",                 "invalid 'defaultshell': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "userDefaultShell_leading_space",			" /bin/bash",                  "invalid 'defaultshell': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "userDefaultShell_blank",				       "",	         "Input form contains invalid or missing values." } ));
+		return ll;	    
+	}
+	/*
 	 * Test user options 
 	 * Username length
 	 */
@@ -812,6 +902,40 @@ public class ConfigurationTest extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_leading_space",	" uid",     "invalid 'groupsearch': Leading and trailing spaces are not allowed"	} ));
 		ll.add(Arrays.asList(new Object[]{ "groupsearchfield_notallowed",		"abc",     	"invalid 'ipagroupsearchfields': attribute \"abc\" not allowed"	} ));
 			
+		return ll;	
+	}
+	
+	/*
+	 * userclass
+	 */
+	
+	@DataProvider(name="getConfigDefaultUser0bjectClassesObjects")
+	public Object[][] getConfigDefaultUser0bjectClassesObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigDefaultUser0bjectClassesObjects());
+	}
+	protected List<List<Object>> createConfigDefaultUser0bjectClassesObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				value					
+		ll.add(Arrays.asList(new Object[]{ "Add_user_objectclass",	"krbPrincRefAux" } ));	
+		
+		return ll;	
+	}
+	
+	/*
+	 * groupobjectclass
+	 */
+	
+	@DataProvider(name="getConfigDefaultGroupObjectClassesObjects")
+	public Object[][] getConfigDefaultGroupObjectClassesObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigDefaultGroupObjectClassesObjects());
+	}
+	protected List<List<Object>> createConfigDefaultGroupObjectClassesObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				value					
+		ll.add(Arrays.asList(new Object[]{ "Add_Group_objectclass",	"posixgroup" } ));	
+		
 		return ll;	
 	}
 	
