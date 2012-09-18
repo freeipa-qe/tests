@@ -48,6 +48,7 @@ dnsbugs()
    bz798493
    bz809565
    bz798355
+   bz767496
    dnsbugcleanup
 }
 
@@ -612,6 +613,43 @@ bz802375()
 
     rlPhaseEnd
 }
+
+bz767496()
+{
+    # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=767496
+    rlPhaseStartTest "767496 assertion failure when using persistent search"
+
+        rlAssertGrep "psearch yes" "/etc/named.conf"
+        rlRun "service named status" 0 "get named status"
+        rlRun "cp /etc/named.conf /root/" 0 "make a copy of named.conf"
+        rlRun "service named stop" 0 "stop named"
+        rlRun "iptables-save > /tmp/iptables.backup" 0 "save iptables"
+        rlRun "iptables -I INPUT -p tcp --dport 389 -j REJECT" 0 "add rule for port 389"
+        rlRun "iptables -I INPUT -p tcp --dport 636 -j REJECT" 0 "add rule for port 636"
+        rlRun "service named start" 0 "start named"
+        rlRun "rndc-confgen > /etc/rndc.conf" 0 "set up rndc.conf"
+        rlRun "tail -11 /etc/rndc.conf >> /etc/named.conf" 0 "add rndc key to named.conf"
+        end1=`wc -l /etc/named.conf | cut -d " "  -f1 | xargs echo`
+        rlLog "end1 - $end1"
+        end=`expr $end1 - 1`
+        rlLog "end - $end"
+        start=`expr $end - 8` 
+        rlLog "start - $start"
+        rlLog "Executing: sed \"${start},${end} s/^#//g\" /etc/named.conf"
+        rlRun "sed -i \"${start},${end} s/^#//g\" /etc/named.conf" 0 "updated named.conf with rndc key"
+        rlRun "service named restart" 0 "restart named"
+        rlRun "rndc reload" 0 " rndc reload was successful"
+
+        #restore back:
+        rlRun "service named stop" 0 "stop named"
+        rlRun "iptables-restore -c /tmp/iptables.backup" 0 "restore iptables" 
+        rlRun "cp -f /root/named.conf /etc/"
+        rlRun "service named restart"
+
+    rlPhaseEnd
+
+}
+
 
 bz805430()
 {
