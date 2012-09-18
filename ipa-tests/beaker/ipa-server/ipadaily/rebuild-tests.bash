@@ -5,7 +5,7 @@ scriptname="rebuild-tests.bash"
 logger -t $scriptname "starting"
 
 # remove existing automation scripts
-HOME=$PWD
+#HOME=$PWD
 rm -rf $PWD/beaker
 
 SHAREDLIB=$PWD/beaker/ipa-server/shared
