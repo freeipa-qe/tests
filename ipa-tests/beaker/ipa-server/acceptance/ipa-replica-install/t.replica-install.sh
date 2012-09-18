@@ -1178,3 +1178,15 @@ miscDNSCheckup_negative(){
 	rlRun "sed -n '/_ntp._udp/,/^[[:space:]]*$/p' /tmp/remote_exec.out|grep $s_short" 1
 }
 
+# Enable IPv6
+diableIpv6(){
+	/sbin/sysctl -a | grep ipv6  | grep disable | cut -d\  -f1 | while read var; do sysctl $var=1; done
+	rmmod ipv6
+}
+
+# Disable IPv6
+enableIpv6(){
+	/sbin/sysctl -a | grep ipv6  | grep disable | cut -d\  -f1 | while read var; do sysctl $var=0; done
+	modprobe ipv6
+}
+

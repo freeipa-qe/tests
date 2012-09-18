@@ -153,3 +153,11 @@ replicaBugCheck_bz845405()
         fi
     rlPhaseEnd
 }
+
+installBug_bz839004()
+{
+	rlPhaseStartTest "Try installing Slave to test bug 839004"
+		installSlave
+	rlPhaseEnd
+}
+

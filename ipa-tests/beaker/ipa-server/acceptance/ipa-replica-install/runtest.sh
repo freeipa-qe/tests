@@ -193,6 +193,11 @@ rlJournalStart
 			replicaBugCheck_bz845405
 			uninstall
 
+			diableIpv6
+			installBug_bz839004
+			uninstall
+			enableIpv6
+
 			installSlave_nr1
 			uninstall
 			rhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
