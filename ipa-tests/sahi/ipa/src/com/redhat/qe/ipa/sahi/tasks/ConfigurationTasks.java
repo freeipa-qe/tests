@@ -164,7 +164,34 @@ public class ConfigurationTasks {
 		
 		sahiTasks.navigateTo(commonTasks.configurationPage);
 	}
+
+	/*
+	 * Verify negative domain for user's email is not set 
+	 *
+	 */
+	public static void verifyUserEmailNegativeFunctional(SahiTasks sahiTasks, CommonTasks commonTasks, String email, String user,String expectedError) {
+		sahiTasks.navigateTo(commonTasks.userPage);
+		//add an email for this user
+		sahiTasks.link(user).click();
+		sahiTasks.link("Add").near(sahiTasks.label("Email address:")).click();
+		//do not specify domain
+		sahiTasks.textbox("mail-0").setValue(user);
+		sahiTasks.link("Update").click();
+			
+		if (!expectedError.isEmpty())
+			Assert.assertTrue(sahiTasks.div(expectedError).exists(), "Verified expected error - " + expectedError);
 	
+		if (sahiTasks.button("OK").exists())
+			sahiTasks.button("OK").click();
+		else
+			if (sahiTasks.button("Cancel").exists())
+				sahiTasks.button("Cancel").click();
+	
+		sahiTasks.span("undo").near(sahiTasks.label("Email address:")).click();
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		sahiTasks.navigateTo(commonTasks.configurationPage);
+		
+}
 	
 	/*
 	 * Verify default group for user is as set in config
@@ -296,7 +323,7 @@ public class ConfigurationTasks {
 	}
 	public static void setConfigDefaultUserObjectClasses(SahiTasks sahiTasks,String field,String fieldValue) {
 		
-		sahiTasks.link("Add").near(sahiTasks.textbox("ipauserobjectclasses-10")).click();
+		sahiTasks.link("Add").near(sahiTasks.textbox("ipauserobjectclasses-9")).click();
 		sahiTasks.textbox(field).setValue(fieldValue);
 		sahiTasks.span("Update").click();
 		String UpdatedValue = sahiTasks.textbox(field).getValue();
@@ -330,7 +357,7 @@ public class ConfigurationTasks {
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchrecordslimit", "100");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipasearchtimelimit", "2");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipausersearchfields", "uid,givenname,sn,telephonenumber,ou,title");
-	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", "testrelm");
+	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", "testrelm.com");
 	    ConfigurationTasks.setGroupConfigValue(sahiTasks, commonTasks, "ipausers");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipahomesrootdir", "/home");
 	    ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultloginshell", "/bin/sh/");
