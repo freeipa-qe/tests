@@ -14,6 +14,7 @@
 			    <include name="configUserOptionSearchFieldTests" />
 			    <include name="configUserOptionInvalidSearchFieldTests" />
 			    <include name="configUserOptionEmailTests" />
+			    <include name="configUserOptionEmailNegativeTests" />
 			    <include name="configUserOptionInvalidEmailTests" />
 			    <include name="configUserOptionGroupTests" />
 			    <include name="configUserOptionHomeDirTests" />

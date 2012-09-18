@@ -237,6 +237,21 @@ public class ConfigurationTest extends SahiTestScript{
 		ConfigurationTasks.verifyUserEmailFunctional(sahiTasks, commonTasks, email, user);
 	} 
 	
+	/*
+	 * Test User Options - email - negative
+	 * 
+	 */
+	
+	@Test (groups={"configUserOptionEmailNegativeTests"}, description="Verify negative User Default Email values", 
+			dataProvider="getConfigUserOptionEmailNegativeTestObjects")	
+	public void testConfigUserOptionEmailNegative(String testName, String email, String expectedError) throws Exception {
+		ConfigurationTasks.setConfigValue(sahiTasks, "ipadefaultemaildomain", email);
+		ConfigurationTasks.verifyConfigValue(sahiTasks, "ipadefaultemaildomain", email);
+		String user = "user1";
+		ConfigurationTasks.verifyUserEmailNegativeFunctional(sahiTasks, commonTasks, email, user, expectedError);
+		ConfigurationTasks.restoreDefaults(sahiTasks,commonTasks);
+	}
+	
 	
 	/*
 	 * Test User Options - email - invalid
@@ -431,9 +446,9 @@ public class ConfigurationTest extends SahiTestScript{
 	@Test (groups={"configDefaultuserclassesTests"}, description="Add additional allowed user object class", 
 			dataProvider="getConfigDefaultUser0bjectClassesObjects")	
 	public void testConfigConfigDefaultUserclasses(String testName,  String fieldValue) throws Exception {
-		ConfigurationTasks.setConfigDefaultUserObjectClasses(sahiTasks, "ipauserobjectclasses-11", fieldValue);
+		ConfigurationTasks.setConfigDefaultUserObjectClasses(sahiTasks, "ipauserobjectclasses-10", fieldValue);
 		//restore default
-		sahiTasks.link("Delete").near(sahiTasks.textbox("ipauserobjectclasses-11")).click();
+		sahiTasks.link("Delete").near(sahiTasks.textbox("ipauserobjectclasses-10")).click();
 		sahiTasks.span("Update").click();
 	}
 	
@@ -637,11 +652,26 @@ public class ConfigurationTest extends SahiTestScript{
 		
         //										testname				email						uid			
 		ll.add(Arrays.asList(new Object[]{ "useremail_new",				"idmqe.redhat.com"			} ));
-		ll.add(Arrays.asList(new Object[]{ "useremail_specialchar",			"$idm-qe_redh@+.c^om~"		} ));		
-		ll.add(Arrays.asList(new Object[]{ "useremail_blank",			""							} ));
-		ll.add(Arrays.asList(new Object[]{ "useremail_numbers",			"12idm34qe"					} ));
-		ll.add(Arrays.asList(new Object[]{ "useremail_space_inbetween",	"12 34"						} ));
+	
 		
+		
+		return ll;	
+	}
+	
+	@DataProvider(name="getConfigUserOptionEmailNegativeTestObjects")
+	public Object[][] getConfigUserOptionEmailNegativeTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createConfigUserOptionEmailNegativeTestObjects());
+	}
+	protected List<List<Object>> createConfigUserOptionEmailNegativeTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				email						expectError		
+		
+		ll.add(Arrays.asList(new Object[]{ "useremail_specialchar",		"$idm-qe_redh@+.c^om~",      "invalid 'email': invalid e-mail format: user1@$idm-qe_redh@+.c^om~"   } ));		
+		ll.add(Arrays.asList(new Object[]{ "useremail_blank",			"",				             "invalid 'email': invalid e-mail format: user1"  } ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_numbers",			"12idm34qe",			     "invalid 'email': invalid e-mail format: user1@12idm34qe"     } ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_space_inbetween",	"12 34",				     "invalid 'email': invalid e-mail format: user1@12 34"    } ));
+		 
 		
 		return ll;	
 	}
@@ -658,8 +688,8 @@ public class ConfigurationTest extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname						email   			expectedError																} ));
-		ll.add(Arrays.asList(new Object[]{ "useremail_trailing_space",			"testrelm ",     "invalid 'emaildomain': Leading and trailing spaces are not allowed"	} ));
-		ll.add(Arrays.asList(new Object[]{ "useremail_leading_space",			" testrelm",     "invalid 'emaildomain': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_trailing_space",			"testrelm.com ",     "invalid 'emaildomain': Leading and trailing spaces are not allowed"	} ));
+		ll.add(Arrays.asList(new Object[]{ "useremail_leading_space",			" testrelm.com",     "invalid 'emaildomain': Leading and trailing spaces are not allowed"	} ));
 			
 		return ll;	
 	}
