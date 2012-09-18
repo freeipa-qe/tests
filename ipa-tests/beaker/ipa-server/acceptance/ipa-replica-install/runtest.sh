@@ -193,9 +193,11 @@ rlJournalStart
 			replicaBugCheck_bz845405
 			uninstall
 
+			rlLog "Disabling IPv6 to test bz 839004 with"
 			diableIpv6
 			installBug_bz839004
 			uninstall
+			rlLog "Re-enabling IPv6"
 			enableIpv6
 
 			installSlave_nr1
