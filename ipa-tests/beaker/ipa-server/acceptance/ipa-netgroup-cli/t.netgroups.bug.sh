@@ -41,6 +41,7 @@ netgroup_bugs()
 	netgroup_bz_813325
 	netgroup_bz_794882
 	netgroup_bz_798792
+	netgroup_bz_815481
 }
 
 netgroup_bz_772043()
@@ -640,3 +641,34 @@ netgroup_bz_798792()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+netgroup_bz_815481()
+{
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=815481
+	# 815481 -  hostgroup and netgroup names with one letter not allowed
+	
+	rlPhaseStartTest "netgroup_bz_815481_1 Test Adding a single char group named A"
+		rlRun "ipa netgroup-add A --desc=desc1" 0 "Try adding group named A"
+		rlRun "ipa netgroup-find A" 0 "Make sure that the group exists"
+		ipa netgroup-del A
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_815481_2 Test Adding a single char group named a"
+		rlRun "ipa netgroup-add a --desc=desc1" 0 "Try adding group named a"
+		rlRun "ipa netgroup-find a" 0 "Make sure that the group exists"
+		ipa netgroup-del a
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_815481_3 Test Adding a single char group named r"
+		rlRun "ipa netgroup-add r --desc=desc1" 0 "Try adding group named r"
+		rlRun "ipa netgroup-find r" 0 "Make sure that the group exists"
+		ipa netgroup-del r
+	rlPhaseEnd
+
+	rlPhaseStartTest "netgroup_bz_815481_4 Test Adding a single char group named z"
+		rlRun "ipa netgroup-add z --desc=desc1" 0 "Try adding group named z"
+		rlRun "ipa netgroup-find z" 0 "Make sure that the group exists"
+		ipa netgroup-del z
+	rlPhaseEnd
+}
+

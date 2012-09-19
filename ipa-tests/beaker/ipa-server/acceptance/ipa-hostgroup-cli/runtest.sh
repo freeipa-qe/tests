@@ -481,6 +481,8 @@ rlJournalStart
 	rlRun "ipa sudorule-del $sru" 0 "cleaning up the sudorule used in these tests"
     rlPhaseEnd
 
+    netgroup_bz_815481
+
     rlPhaseStartCleanup "ipa-hostgroup-cli-cleanup: Delete remaining hosts and Destroying admin credentials"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
         # delete remaining hosts added to test host members
@@ -502,3 +504,31 @@ report=$TmpDir/rhts.report.$RANDOM.txt
 makereport $report
 rhts-submit-log -l $report
 rlJournalEnd
+
+netgroup_bz_815481()
+    {
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=815481
+	# 815481 -  hostgroup and netgroup names with one letter not allowed
+	rlPhaseStartTest "ipa-hostgroup-bz-815481-1: Add hostgroup named A"
+		hgname=A
+		rlRun "ipa hostgroup-add --desc=desc $hgname" 0 "Attempt adding hostgroup named $hgname BZ 815481"
+		rlRun "ipa hostgroup-find $hgname" 0 "Ensure that hostgroup $hgname exists BZ 815481"
+		ipa hostgroup-del $hgname
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-hostgroup-bz-815481-1: Add hostgroup named a"
+		hgname=a
+		rlRun "ipa hostgroup-add --desc=desc $hgname" 0 "Attempt adding hostgroup named $hgname BZ 815481"
+		rlRun "ipa hostgroup-find $hgname" 0 "Ensure that hostgroup $hgname exists BZ 815481"
+		ipa hostgroup-del $hgname
+	rlPhaseEnd
+
+	rlPhaseStartTest "ipa-hostgroup-bz-815481-1: Add hostgroup named z"
+		hgname=z
+		rlRun "ipa hostgroup-add --desc=desc $hgname" 0 "Attempt adding hostgroup named $hgname BZ 815481"
+		rlRun "ipa hostgroup-find $hgname" 0 "Ensure that hostgroup $hgname exists BZ 815481"
+		ipa hostgroup-del $hgname
+	rlPhaseEnd
+
+    }
+
