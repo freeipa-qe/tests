@@ -366,6 +366,7 @@ ipaclientinstall_invalidrealm()
 #  Bug 690473 - Installing ipa-client indicates DNS is updated for this unknown hostname, but is not on server 
 #  Bug 714919 - ipa-client-install should configure hostname
 #  Bug 734013 - ipa-client-install breaks network configuration
+#  Bug 833505 - ipa-client-install crashes when --hostname is given
 ###############################################################################################
 #negative tests for --hostname option
 ## in the case below - client is installed, but a DNS entry is not available on server for this client.
