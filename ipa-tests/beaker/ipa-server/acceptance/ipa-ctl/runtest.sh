@@ -498,6 +498,15 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
 		rlRun "ipactl status" 0 "check after instance restart"
         rlPhaseEnd
 
+	rlPhaseStartTest "ipa-ctl bz 840381: At times ipactl fails to start DNS service and a crash is detected."
+		rlRun "ipactl stop" 0 "Stop all ipa services"
+		outfile=/dev/shm/bz840381.txt
+		rlRun "ipactl start &> $outfile" 0 "Start ipa services, direct output to $outfile"
+		rlRun "grep 'Failed to start DNS Service' $outfile" 1 "Ensure that a DNS failure is not in the output file BZ 840381"
+		rlRun "grep named /var/log/messages | grep 'bind to LDAP server failed'" 1 "Make sure that there appears to be no bad messages from named in /var/log/messages BZ 840381"
+		rlRun "grep named /var/log/messages | grep 'control process exited'" 1 "Make sure that bind has not crashed. BZ 840381"
+	rlPhaseEnd
+
 ##############################################################################################################
 #  Disabling test development unwilling to remove KPASSWD from output
 ###############################################################################################################
