@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-client-automount
+Description: IPA client side tool ipa-client-automount test
+Author: Yi Zhang <yzhang@redhat.com>
