@@ -27,6 +27,7 @@ public class DelegationTests extends IPAWebAutomation {
 		browser.open();
 		log.info("Accessing: IPA Server URL");
 		browser.setStrictVisibilityCheck(true);
+				
 	}
 	
 	@AfterMethod (alwaysRun=true)
@@ -76,9 +77,11 @@ public class DelegationTests extends IPAWebAutomation {
 	 *             Data providers                                                * 
 	 *****************************************************************************/
 	
-	// RHEL :: private String DelegationTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
+	// RHEL :: 
+	private String DelegationTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
 	// WIN::
-	private String DelegationTestDataFile = "C:\\delegation.properties";
+	//private String DelegationTestDataFile = "C:\\delegation.propertiesdelegation.properties";
+	
 	
 	private String[] IPAServerPageDelegation = {"Delegation Tests","IPAServerPageDelegation", DelegationTestDataFile};
 

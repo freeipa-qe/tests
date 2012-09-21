@@ -878,8 +878,8 @@ public class IPAWebPage implements StandardTest{
 		pageName=loginNewPassword;
 		String newPassword=factory.getModifyTestAccount(pageName);
 		
-		CommonTasks.kinitAsNewUserFirstTime(userName, oldPassword, newPassword);
-		CommonTasks.formauthNewUser(browser, userName, newPassword);
+		//CommonTasks.kinitAsNewUserFirstTime(userName, oldPassword, newPassword);
+		CommonTasks.formauthNewUser(browser, userName,oldPassword, newPassword);
 		//CommonTasks.formauth(browser, userName, newPassword);
 		
 		browser.link("Users").under(browser.div("Users")).click();

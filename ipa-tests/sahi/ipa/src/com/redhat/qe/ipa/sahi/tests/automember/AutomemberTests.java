@@ -30,7 +30,7 @@ public class AutomemberTests extends IPAWebAutomation {
 	private String user2 = "mscott";
 	private String [] users = {user1, user2};
 	
-	private String usergroup1 = "dev";
+	private String usergroup1 = "searchbug846754_dev";
 	private String usergroup2 = "defgroup";
 	private String usergroup3 = "a";
 	private String usergroup4 = "b";
@@ -39,7 +39,7 @@ public class AutomemberTests extends IPAWebAutomation {
 	
 	private String [] usergroups = {usergroup1, usergroup2, usergroup3, usergroup4, usergroup5, usergroup6};
 	
-	private String hostgroup1 = "qaservers";
+	private String hostgroup1 = "searchbug846754_qaservers";
 	private String hostgroup2 = "defhostgroup";
 	private String hostgroup3 = "dd";
 	private String hostgroup4 = "ee";
@@ -51,8 +51,9 @@ public class AutomemberTests extends IPAWebAutomation {
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
 	public void initialize() throws CloneNotSupportedException {	
 		
-		log.info("kinit as admin");
-		Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
+		//log.info("kinit as admin");
+		//Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
+		
 		log.info("Opening browser");
 		browser.open();
 		log.info("Accessing: IPA Server URL");
@@ -62,6 +63,7 @@ public class AutomemberTests extends IPAWebAutomation {
 		currentPage = browser.fetch("top.location.href");
 		alternateCurrentPage = browser.fetch("top.location.href") + "&netgroup-facet=search" ;
         
+		CommonTasks.formauth(browser, "admin", "Secret123");
 		
 		//add users for automember
 		browser.navigateTo(commonTasks.userPage, true);
@@ -99,6 +101,20 @@ public class AutomemberTests extends IPAWebAutomation {
 		//delete host groups
 		browser.navigateTo(commonTasks.hostgroupPage, true);
 		HostgroupTasks.deleteHostgroup(browser, hostgroups);
+		
+		browser.navigateTo(commonTasks.automemberUserGroupPage,true);
+		browser.checkbox("cn").click();
+		browser.span("Delete").click();
+		if(browser.button("Delete").exists())
+			browser.button("Delete").click();
+		browser.textbox("automemberdefaultgroup").setValue("");
+		
+		browser.navigateTo(commonTasks.automemberHostGroupPage,true);
+		browser.checkbox("cn").click();
+		browser.span("Delete").click();
+		if(browser.button("Delete").exists())
+			browser.button("Delete").click();
+		browser.textbox("automemberdefaultgroup").setValue("");
 	}
 	
 	@AfterMethod (alwaysRun=true)
@@ -145,9 +161,9 @@ public class AutomemberTests extends IPAWebAutomation {
 	 *             Data providers                                                * 
 	 *****************************************************************************/
 	//RHEL::
-	private String AutomemberTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
+	//private String AutomemberTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
 	//F17::
-	//private String AutomemberTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
+	private String AutomemberTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
 	//Win::
 	//private String AutomemberTestDataFile = "C:\\automembertest.properties";
 		
