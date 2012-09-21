@@ -64,7 +64,6 @@ host5="qe-blade-23."$DOMAIN
 ########################################################################
 
 PACKAGE="ipa-admintools"
-
 rlJournalStart
     rlPhaseStartSetup "ipa-host-cli-startup: Check for admintools package and Kinit"
 	rpm -qa | grep $PACKAGE

@@ -31,10 +31,91 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+bugzillas() {
+
 rlPhaseStartTest "BZ 807388 - Error message has not a user friendly 'u' character in it."
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=807388
 	cmd="ipa host-add --ip-address=2620:52:0:41c9:ffff:ff:fea:98eda mytestIPv6host.$RELM"
 	expmsg="ipa: ERROR: invalid 'ip_address': failed to detect a valid IP address from '2620:52:0:41c9:ffff:ff:fea:98eda'"
-	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message as per BZ 807388."
+	rlLog "Executing $cmd, expecting $expmsg"
+	rlRun "verifyErrorMsg \"$cmd\" \"$expmsg\"" 0 "Verify expected error message as per BZ 807388. The message should not return the \"u'2620\" bit"
+	ipa host-del mytestIPv6host.$RELM
 rlPhaseEnd
+
+rlPhaseStartTest "BZ 827392 - Random password characters should be limited."
+	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=827392
+	# get the ip address of that interface
+	ipaddr=$(hostname -i)
+	rlLog "Ip address is $ipaddr"
+	ipoc1=$(echo $ipaddr | cut -d\. -f1)
+	ipoc2=$(echo $ipaddr | cut -d\. -f2)
+	ipoc3=$(echo $ipaddr | cut -d\. -f3)
+	ipoc4=$(echo $ipaddr | cut -d\. -f4)
+	thost="thost332.$DOMAIN"
+	
+	firstip=243
+	ipa dnsrecord-find $DOMAIN | grep $ipoc1.$ipoc2.$ipoc3.$firstip
+	if [ $? -eq 0 ]; then 
+		rlLog "$ipoc1.$ipoc2.$ipoc3.$firstip seems taken, trying 1 ip higher"
+		let firstip=$firstip+1
+		ipa dnsrecord-find $DOMAIN | grep $ipoc1.$ipoc2.$ipoc3.$firstip
+		if [ $? -eq 0 ]; then 
+			rlLog "$ipoc1.$ipoc2.$ipoc3.$firstip seems taken, trying 1 ip higher"
+			let firstip=$firstip+1
+			ipa dnsrecord-find $DOMAIN | grep $ipoc1.$ipoc2.$ipoc3.$firstip
+			if [ $? -eq 0 ]; then 
+				rlLog "$ipoc1.$ipoc2.$ipoc3.$firstip seems taken, trying 1 ip higher"
+				let firstip=$firstip+1
+				ipa dnsrecord-find $DOMAIN | grep $ipoc1.$ipoc2.$ipoc3.$firstip
+				if [ $? -eq 0 ]; then 
+					rlLog "$ipoc1.$ipoc2.$ipoc3.$firstip seems taken, failing"
+					rlFail "No avaliable IP's. Perhaps I need to rewrite this test."
+				fi
+			fi
+		fi
+	fi
+
+	# Create dns entries for new test host for use later in this test
+	ipa host-add --ip-address=$ipoc1.$ipoc2.$ipoc3.$firstip $thost
+	ipa host-del $thost
+	
+	# generate some random password, then look for bad chars in them
+	iteration=0
+	while [ $iteration -lt 10 ]; do
+		thispassword=$(ipa host-add --random $thost | grep password | sed s/\ \ //g | cut -d\  -f3)
+		rlLog "Checking for bad characters in the random password $thispassword"
+		rlRun "checkpass" 0 "Check to make sure that no unfriendly characters do not exist in the generated random password."
+		ipa host-del $thost
+		let iteration=$iteration+1
+	done
+
+rlPhaseEnd
+
+}
+
+# Function to be used in BZ 827392 test
+checkpass () {
+	rlLog "passed var was $1"
+        echo $1 | grep "'" &> /dev/null
+        if [ $? -eq 0 ]; then
+                rlLog "' char detected"
+		return 1
+        fi
+        echo $1 | grep '\\' &> /dev/null
+        if [ $? -eq 0 ]; then
+                rlLog "\ char detected"
+		return 1
+        fi
+        echo $1 | grep '\$' &> /dev/null
+        if [ $? -eq 0 ]; then
+                rlLog "$ char detected"
+		return 1
+        fi
+        echo $1 | grep '"' &> /dev/null
+        if [ $? -eq 0 ]; then
+                rlLog '" char detected'
+		return 1
+        fi
+	return 0
+}
 
