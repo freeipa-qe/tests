@@ -3,27 +3,28 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   t.test-template.sh of /CoreOS/ipa-tests/acceptance/ipa-ssh-functional.sh
-#   Description: IPA User Add SSH Key tests
+#   Description: IPA Host Mod SSH Key tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following needs to be tested:
 #
-### user-add positive:
-# Add user with empty key field
-# Add user with blank key field
-# Add user with one valid key
-# Add user with two valid keys
-# Add user with many (15) valid keys 
-# Add user with space in key field
+### host-mod positive:
+# Mod host with empty key field
+# Mod host with blank key field
+# Mod host with one valid key
+# Mod host with two valid keys
+# Mod host with many valid keys -- how many should I test?
+# Mod host with blank key field to delete keys
+# Mod host with space in key field
 #
-### user-add negative:
-# Fail to add user with Missing equal signs at end of Key field
-# Fail to add user with Invalid Key Only
-# Fail to add user with Invalid Key First of two
-# Fail to add user with Invalid Key First of N # how many to test?
-# Fail to add user with Invalid Key Second of two
-# Fail to add user with Invalid Key in Middle (Second of three)
-# Fail to add user with Invalid Key Last (Third of three)
-# Fail to add user with SAME Valid Key 
+### host-mod negative:
+# Fail to mod host with Missing equal signs at end of Key field
+# Fail to mod host with Invalid Key Only
+# Fail to mod host with Invalid Key First of two
+# Fail to mod host with Invalid Key First of N # how many to test?
+# Fail to mod host with Invalid Key Second of two
+# Fail to mod host with Invalid Key in Middle (Second of three)
+# Fail to mod host with Invalid Key Last (Third of three)
+# Fail to mod host with SAME Valid Key 
 #   
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -59,33 +60,34 @@
 ######################################################################
 # test suite
 ######################################################################
-ipa_user_add_ssh_run()
+ipa_host_mod_ssh_run()
 {
-	ipa_user_add_ssh_envsetup
+	ipa_host_mod_ssh_envsetup
 	
-	ipa_user_add_ssh_positive_0001 # Add user with empty key field
-	ipa_user_add_ssh_positive_0002 # Add user with blank key field
-	ipa_user_add_ssh_positive_0003 # Add user with one valid key
-	ipa_user_add_ssh_positive_0004 # Add user with two valid keys
-	ipa_user_add_ssh_positive_0005 # Add user with many keys -- 20 for now
-	ipa_user_add_ssh_positive_0006 # Add user with space in key field
+	ipa_host_mod_ssh_positive_0001 # Mod host with empty key field
+	ipa_host_mod_ssh_positive_0002 # Mod host with blank key field
+	ipa_host_mod_ssh_positive_0003 # Mod host with one valid key
+	ipa_host_mod_ssh_positive_0004 # Mod host with two valid keys
+	ipa_host_mod_ssh_positive_0005 # Mod host with many (15) valid keys 
+	ipa_host_mod_ssh_positive_0006 # Mod host with blank key field to delete keys
+	ipa_host_mod_ssh_positive_0007 # Mod host with space in key field
 
-	ipa_user_add_ssh_negative_0002 # Fail to add user with Missing equal signs at end of Key field
-	ipa_user_add_ssh_negative_0003 # Fail to add user with Invalid Key Only
-	ipa_user_add_ssh_negative_0004 # Fail to add user with Invalid Key First of two
-	ipa_user_add_ssh_negative_0005 # Fail to add user with Invalid Key First of three
-	ipa_user_add_ssh_negative_0006 # Fail to add user with Invalid Key Second of two
-	ipa_user_add_ssh_negative_0007 # Fail to add user with Invalid Key in Middle (Second of three)
-	ipa_user_add_ssh_negative_0008 # Fail to add user with Invalid Key Last (Third of three)
-	ipa_user_add_ssh_negative_0009 # Fail to add user with SAME Valid Key
+	ipa_host_mod_ssh_negative_0001 # Fail to mod host with Missing equal signs at end of Key field
+	ipa_host_mod_ssh_negative_0002 # Fail to mod host with Invalid Key Only
+	ipa_host_mod_ssh_negative_0003 # Fail to mod host with Invalid Key First of two
+	ipa_host_mod_ssh_negative_0004 # Fail to mod host with Invalid Key First of N # how many to test?
+	ipa_host_mod_ssh_negative_0005 # Fail to mod host with Invalid Key Second of two
+	ipa_host_mod_ssh_negative_0006 # Fail to mod host with Invalid Key in Middle (Second of three)
+	ipa_host_mod_ssh_negative_0007 # Fail to mod host with Invalid Key Last (Third of three)
+	ipa_host_mod_ssh_negative_0008 # Fail to mod host with SAME Valid Key 
 
-	ipa_user_add_ssh_envcleanup
+	ipa_host_mod_ssh_envcleanup
 }
 
-ipa_user_add_ssh_envsetup()
+ipa_host_mod_ssh_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	rlPhaseStartTest "ipa_user_add_ssh_envsetup - Setup environment for IPA user-add sshpubkey Tests"
+	rlPhaseStartTest "ipa_host_mod_ssh_envsetup - Setup environment for IPA host-mod sshpubkey Tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
 		fi
@@ -122,24 +124,29 @@ ipa_user_add_ssh_envsetup()
 			fi
 		done
 
+		rlRun "ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=$MYBM1 --admin-email=ipaqar.redhat.com"
+
 		rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME' "
 	rlPhaseEnd
 }
 
-# Add user with empty key field
-ipa_user_add_ssh_positive_0001()
+# Mod host with empty key field
+ipa_host_mod_ssh_positive_0001()
 {
+	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_positive_0001 - Add user with empty key field"
+	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/'|sed 's/^[0]*//')
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0001 - Mod host with empty key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa user-add user$NUMBER --first=f --last=l --sshpubkey="
-		if [ $(ipa user-show user$NUMBER --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
-			rlPass "IPA user has no key, as expected"
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
+		rlRun "ipa host-mod host${NUMBER}.${DOMAIN} --sshpubkey="
+		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
+			rlPass "IPA host has no key, as expected"
 		else 
-			rlFail "IPA user has a key when it should not"
+			rlPass "IPA host has a key when it should not"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
@@ -158,139 +165,144 @@ ipa_user_add_ssh_positive_0001()
 	rlPhaseEnd
 }
 
-# Add user with blank key field
-ipa_user_add_ssh_positive_0002()
-{
-	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_positive_0002 - Add user with blank key field"
-	case "$MYROLE" in
-	MASTER*)
-		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa user-add user$NUMBER --first=f --last=l --sshpubkey=''"
-		if [ $(ipa user-show user$NUMBER --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
-			rlPass "IPA user has no key, as expected"
-		else 
-			rlFail "IPA user has a key when it should not"
-		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
-		;;
-	SLAVE*|REPLICA*)
-		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
-		;;
-	CLIENT*)
-		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
-		;;
-	*)
-		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
-		;;
-	esac
-	rlPhaseEnd
-}
-
-# Add user with one valid key
-ipa_user_add_ssh_positive_0003()
-{
-	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_positive_0003 - Add user with one valid key"
-	case "$MYROLE" in
-	MASTER*)
-		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ssh-keygen -t rsa -N '' -C 'user$NUMBER' -f /tmp/ssh_user${NUMBER}_rsa"
-		rlRun "ipa user-add user${NUMBER} --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_user${NUMBER}_rsa.pub)\""
-		#ipa_user_ssh_key_check user${NUMBER} /tmp/ssh_user${NUMBER}_rsa.pub
-		KEY="$(ssh-keygen -l -f /tmp/ssh_user${NUMBER}_rsa.pub | awk '{print $2}')"
-		if [ $(ipa user-show user${NUMBER} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ];  then
-			rlPass "IPA User has expected ssh key: $KEY"
-		else
-			rlFail "IPA User does not have expected ssh key: $KEY"
-		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
-		;;
-	SLAVE*|REPLICA*)
-		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
-		;;
-	CLIENT*)
-		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
-		;;
-	*)
-		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
-		;;
-	esac
-	rlPhaseEnd
-}
-
-# Add user with two valid keys
-ipa_user_add_ssh_positive_0004()
-{
-	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_positive_0004 - Add user with two valid keys"
-	case "$MYROLE" in
-	MASTER*)
-		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ssh-keygen -t rsa -N '' -C 'user$NUMBER' -f /tmp/ssh_user${NUMBER}_rsa"
-		rlRun "ssh-keygen -t dsa -N '' -C 'user$NUMBER' -f /tmp/ssh_user${NUMBER}_dsa"
-		rlRun "ipa user-add user$NUMBER --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_user${NUMBER}_rsa.pub)\" --sshpubkey=\"$(cat /tmp/ssh_user${NUMBER}_dsa.pub)\""
-		
-		KEY="$(ssh-keygen -l -f /tmp/ssh_user${NUMBER}_rsa.pub | awk '{print $2}')"
-		if [ $(ipa user-show user${NUMBER} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ];  then
-			rlPass "IPA User has expected ssh key: $KEY"
-		else
-			rlFail "IPA User does not have expected ssh key: $KEY"
-		fi
-		
-		KEY="$(ssh-keygen -l -f /tmp/ssh_user${NUMBER}_dsa.pub | awk '{print $2}')"
-		if [ $(ipa user-show user${NUMBER} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ];  then
-			rlPass "IPA User has expected ssh key: $KEY"
-		else
-			rlFail "IPA User does not have expected ssh key: $KEY"
-		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
-		;;
-	SLAVE*|REPLICA*)
-		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
-		;;
-	CLIENT*)
-		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
-		;;
-	*)
-		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
-		;;
-	esac
-	rlPhaseEnd
-}
-
-# Add user with many valid keys -- how many should I test? 15 for now
-ipa_user_add_ssh_positive_0005()
+# Mod host with blank key field
+ipa_host_mod_ssh_positive_0002()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_positive_0005 - Add user with many valid keys"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0002 - Mod host with blank key field"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
+		rlRun "ipa host-mod host${NUMBER}.${DOMAIN} --sshpubkey=''"
+		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
+			rlPass "IPA host has no key, as expected"
+		else 
+			rlPass "IPA host has a key when it should not"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Mod host with one valid key
+ipa_host_mod_ssh_positive_0003()
+{
+	tmpout=/tmp/tmpout.$FUNCNAME
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0003 - Mod host with one valid key"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod host${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
+		KEY="$(ssh-keygen -l -f /tmp/ssh_host${NUMBER}_rsa.pub|awk '{print $2}')"
+		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ]; then
+			rlPass "IPA host has expected ssh key fingerprint: $KEY"
+		else 
+			rlFail "IPA host does not have expected ssh key fingerprint: $KEY"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Mod host with two valid keys
+ipa_host_mod_ssh_positive_0004()
+{
+	tmpout=/tmp/tmpout.$FUNCNAME
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0004 - Mod host with two valid keys"
+	case "$MYROLE" in
+	MASTER*)
+		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
+		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_dsa"
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod host${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\" --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_dsa.pub)\""
+		KEY="$(ssh-keygen -l -f /tmp/ssh_host${NUMBER}_rsa.pub|awk '{print $2}')"
+		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ]; then
+			rlPass "IPA host has expected ssh key fingerprint: $KEY"
+		else 
+			rlFail "IPA host does not have expected ssh key fingerprint: $KEY"
+		fi
+		KEY="$(ssh-keygen -l -f /tmp/ssh_host${NUMBER}_dsa.pub|awk '{print $2}')"
+		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ]; then
+			rlPass "IPA host has expected ssh key fingerprint: $KEY"
+		else 
+			rlFail "IPA host does not have expected ssh key fingerprint: $KEY"
+		fi
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		;;
+	SLAVE*|REPLICA*)
+		rlLog "Machine in recipe is SLAVE ($SLAVE)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	CLIENT*)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+}
+
+# Mod host with many (15) valid keys 
+ipa_host_mod_ssh_positive_0005()
+{
+	tmpout=/tmp/tmpout.$FUNCNAME
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0005 - Mod host with many (15) valid keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		KEYS=""
 		for i in $(seq 1 15); do
-			ssh-keygen -t rsa -N "" -C "user${NUMBER}_${i}" -f /tmp/ssh_user${NUMBER}_${i}_rsa
-			KEYS="$KEYS --sshpubkey=\"$(cat /tmp/ssh_user${NUMBER}_${i}_rsa.pub)\""
+			ssh-keygen -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_${i}_rsa
+			KEYS="$KEYS --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_${i}_rsa.pub)\""
 		done
-		rlRun "ipa user-add user${NUMBER} --first=f --last=l $KEYS"
-		rlRun "ipa user-show user${NUMBER} --raw|grep sshpubkeyfp > $tmpout 2>&1"
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod host${NUMBER}.${DOMAIN} $KEYS"
+		rlRun "ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp > $tmpout 2>&1"
 		for i in $(seq 1 15); do
-			KEY="$(ssh-keygen -l -f /tmp/ssh_user${NUMBER}_${i}_rsa.pub | awk '{print $2}')"
+			KEY="$(ssh-keygen -l -f /tmp/ssh_host${NUMBER}_${i}_rsa.pub | awk '{print $2}')"
 			if [ $(cat $tmpout|grep -i "$KEY"|wc -l) -gt 0 ];  then
-				rlPass "IPA User has expected ssh key: $KEY"
+				rlPass "IPA host has expected ssh key: $KEY"
 			else
-				rlFail "IPA User does not have expected ssh key: $KEY"
+				rlFail "IPA host does not have expected ssh key: $KEY"
 			fi
 		done
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
@@ -310,21 +322,23 @@ ipa_user_add_ssh_positive_0005()
 	rlPhaseEnd
 }
 
-# Fail to add user with Invalid Space in Key field
-ipa_user_add_ssh_positive_0006()
+# Mod host with space in key field
+ipa_host_mod_ssh_positive_0006()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_positive_0006 - Add user with Space in Key field"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0006 - Mod host with space in key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa user-add user$NUMBER --first=f --last=l --sshpubkey=' '"
-		if [ $(ipa user-show user$NUMBER --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
-			rlPass "IPA user has no key, as expected"
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
+		rlRun "ipa host-mod host${NUMBER}.${DOMAIN} --sshpubkey=' '"
+		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
+			rlPass "IPA host has no key, as expected"
 		else 
-			rlFail "IPA user has a key when it should not"
+			rlPass "IPA host has a key when it should not"
 		fi
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
@@ -343,22 +357,24 @@ ipa_user_add_ssh_positive_0006()
 	rlPhaseEnd
 }
 
-# Fail to add user with Missing equal signs at end of Key field
-ipa_user_add_ssh_negative_0002()
+# Fail to mod host with Missing equal signs at end of Key field
+ipa_host_mod_ssh_negative_0001()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0002 - Fail to add user with Missing equal signs at end of Key field"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0001 - Fail to mod host with Missing equal signs at end of Key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		BADKEY="AAAAB3NzaC1yc2EAAAABIwAAAQEA2Vq7ocM+3CIgE9EpR61Yli0ayiw+BdzF3eKq3F44+mFj3gKBBpIIQY9SI74HUpaeahgC6pTsdGdxvqFwCQ5UMnn79YIw+rnkgfzTrD5p4BPxq6IadayMJaKZkhJR4+GGY99Wqp2cfIwWDnfY9QPOTCgOt2SsCZh/SefqXUjy+5O21gtged+59H/qyXeFMrqEhC+dNR2V2Y0l/k8TkNJKdbyVq5LCk3S9wJ5IlCBW8/hF3Nkus7WyLadqfVPoNWdOwfy8BPF4L+iU0AWIWTmGyXtMdwg5cKjWF1fwoh3T5DewQzIX1/2aGiHRueFCvyZU2u+4jI+wDa5HJRwTf9L+Ww"
-		rlRun "ipa user-add	baduser --first=f --last=l --sshpubkey=\"$BADKEY\" > $tmpout 2>&1" 1
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$BADKEY\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
+		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP" $tmpout
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
@@ -375,20 +391,20 @@ ipa_user_add_ssh_negative_0002()
 	rlPhaseEnd
 }
 
-# Fail to add user with Invalid Key Only
-ipa_user_add_ssh_negative_0003()
+# Fail to mod host with Invalid Key Only
+ipa_host_mod_ssh_negative_0002()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0003 - Fail to add user with Invalid Key Only"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0002 - Fail to mod host with Invalid Key Only"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa user-add baduser --first=f --last=l --sshpubkey=\"badkey\" > $tmpout 2>&1" 1
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"badkey\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
@@ -406,21 +422,20 @@ ipa_user_add_ssh_negative_0003()
 	rlPhaseEnd
 }
 
-# Fail to add user with Invalid Key First of two
-ipa_user_add_ssh_negative_0004()
+# Fail to mod host with Invalid Key First of two
+ipa_host_mod_ssh_negative_0003()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0004 - Fail to add user with Invalid Key First of two"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0003 - Fail to mod host with Invalid Key First of two"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ssh-keygen -t rsa -N '' -C 'user$NUMBER' -f /tmp/ssh_baduser${NUMBER}_rsa"
-		rlRun "ipa user-add baduser --first=f --last=l --sshpubkey=\"badkey,$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"badkey,$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
@@ -438,25 +453,24 @@ ipa_user_add_ssh_negative_0004()
 	rlPhaseEnd
 }
 
-# Fail to add user with Invalid Key First of N # how many to test?
-ipa_user_add_ssh_negative_0005()
+# Fail to mod host with Invalid Key First of N # how many to test?
+ipa_host_mod_ssh_negative_0004()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0005 - Fail to add user with Invalid Key First of N"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0004 - Fail to mod host with Invalid Key First of N"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		KEYS="--sshpubkey=\"badkey\""
 		for i in $(seq 1 15); do
-			ssh-keygen -t rsa -N "" -C "baduser${NUMBER}_${i}" -f /tmp/ssh_baduser${NUMBER}_${i}_rsa
-			KEYS="$KEYS --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_${i}_rsa.pub)\""
+			ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_${i}_rsa
+			KEYS="$KEYS --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_${i}_rsa.pub)\""
 		done
-		rlRun "ipa user-add baduser${NUMBER} --first=f --last=l $KEYS > $tmpout 2>&1" 1
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} $KEYS > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
@@ -474,21 +488,20 @@ ipa_user_add_ssh_negative_0005()
 	rlPhaseEnd
 }
 
-# Fail to add user with Invalid Key Second of two
-ipa_user_add_ssh_negative_0006()
+# Fail to mod host with Invalid Key Second of two
+ipa_host_mod_ssh_negative_0005()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0006 - Fail to add user with Invalid Key Second of two"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0005 - Fail to mod host with Invalid Key Second of two"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ssh-keygen -t rsa -N '' -C 'user$NUMBER' -f /tmp/ssh_baduser${NUMBER}_rsa"
-		rlRun "ipa user-add baduser --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub),badkey\" > $tmpout 2>&1" 1
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
@@ -506,22 +519,21 @@ ipa_user_add_ssh_negative_0006()
 	rlPhaseEnd
 }
 
-# Fail to add user with Invalid Key in Middle (Second of three)
-ipa_user_add_ssh_negative_0007()
+# Fail to mod host with Invalid Key in Middle (Second of three)
+ipa_host_mod_ssh_negative_0006()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0007 - Fail to add user with Invalid Key in Middle (Second of three)"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0006 - Fail to mod host with Invalid Key in Middle (Second of three)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ssh-keygen -t rsa -N '' -C 'user$NUMBER' -f /tmp/ssh_baduser${NUMBER}_rsa"
-		rlRun "ssh-keygen -t dsa -N '' -C 'user$NUMBER' -f /tmp/ssh_baduser${NUMBER}_dsa"
-		rlRun "ipa user-add baduser --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub),badkey,$(cat /tmp/ssh_baduser${NUMBER}_dsa.pub)\" > $tmpout 2>&1" 1
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
+		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_dsa"
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey,$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub)\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
@@ -539,22 +551,21 @@ ipa_user_add_ssh_negative_0007()
 	rlPhaseEnd
 }
 
-# Fail to add user with Invalid Key Last (Third of three)
-ipa_user_add_ssh_negative_0008()
+# Fail to mod host with Invalid Key Last (Third of three)
+ipa_host_mod_ssh_negative_0007()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0008 - Fail to add user with Invalid Key Last (Third of three)"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0007 - Fail to mod host with Invalid Key Last (Third of three)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ssh-keygen -t rsa -N '' -C 'user$NUMBER' -f /tmp/ssh_baduser${NUMBER}_rsa"
-		rlRun "ssh-keygen -t dsa -N '' -C 'user$NUMBER' -f /tmp/ssh_baduser${NUMBER}_dsa"
-		rlRun "ipa user-add baduser --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub),$(cat /tmp/ssh_baduser${NUMBER}_dsa.pub),badkey\" > $tmpout 2>&1" 1
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
+		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_dsa"
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub),badkey\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
@@ -572,20 +583,20 @@ ipa_user_add_ssh_negative_0008()
 	rlPhaseEnd
 }
 
-# Fail to add user with SAME Valid Key 
-ipa_user_add_ssh_negative_0009()
+# Fail to mod host with SAME Valid Key 
+ipa_host_mod_ssh_negative_0008()
 {
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
-	rlPhaseStartTest "ipa_user_add_ssh_negative_0009 - Fail to add user with SAME Valid Key"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0008 - Fail to mod host with SAME Valid Key"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ssh-keygen -t rsa -N '' -C 'user$NUMBER' -f /tmp/ssh_baduser${NUMBER}_rsa"
-		rlRun "ipa user-add baduser${NUMBER} --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub)\""
-		rlRun "ipa user-add baduser${NUMBER} --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: user with name \"baduser${NUMBER}\" already exists" $tmpout
+		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\"" 0
+		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: no modifications to be performed" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	SLAVE*|REPLICA*)
@@ -602,6 +613,7 @@ ipa_user_add_ssh_negative_0009()
 	esac
 	rlPhaseEnd
 }
+
 
 test_envcleanup()
 {
@@ -610,9 +622,10 @@ test_envcleanup()
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		for u in $(ipa user-find user --pkey-only --raw|grep uid:|awk '{print $2}'); do
-			rlRun "ipa user-del $u"
+		for h in $(ipa host-find host --pkey-only --raw|grep fqdn:.*host|awk '{print $2}'); do
+			rlRun "ipa host-del $h --updatedns"
 		done
+		rm -f /tmp/ssh_*host*
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
 		;;
 	"SLAVE")

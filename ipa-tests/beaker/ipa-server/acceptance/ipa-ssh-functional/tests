@@ -2,7 +2,6 @@
 # SSH USER KEY TEST:
 ##############################################################
 
-
 # On Client:
 
 sed -e '/AuthorizedKeysCommand/d' /etc/ssh/sshd_config
@@ -62,17 +61,6 @@ ssh -i id_rsa_user1 user1@vm2
 # Fail to mod user with Invalid Key Last (Third of three)
 # Fail to mod user with SAME Valid Key
 
-### user key functional test
-# User creates and uploads own keys
-# User ssh to host with keys
-# User deletes own key(s)
-# Admin revokes/removes keys uploaded by user
-# Should I test with and without passphrases?
-# user runs user-mod to upload keys after user-disable
-# user attempts to ssh with keys after user-disbable
-# user runs user-mod to upload keys after user account locked?
-# user attempts to ssh with keys after user account locked?
-
 ### selfservice tests needed? 
 # confirm selfservice rule exists
 # delete selfservice rule and confirm user cannot upload own keys
@@ -83,6 +71,17 @@ ssh -i id_rsa_user1 user1@vm2
 # user upload keys for other user
 # user fail to upload keys when doesn't have permission
 # admin forbid a user from uploading keys (even with selfservice in place)
+
+### user key functional test
+# User creates and uploads own keys
+# User ssh to host with keys
+# User deletes own key(s)
+# Admin revokes/removes keys uploaded by user
+# Should I test with and without passphrases?
+# user runs user-mod to upload keys after user-disable
+# user attempts to ssh with keys after user-disbable
+# user runs user-mod to upload keys after user account locked?
+# user attempts to ssh with keys after user account locked?
 
 ##############################################################
 # SSH HOST KEY TEST:
@@ -136,10 +135,9 @@ done
 # Add host with one valid key
 # Add host with two valid keys
 # Add host with many valid keys -- how many should I test?
-# Add host with blank key field to delete keys
+# Add host with space in key field
 
 ### host-add negative:
-# Fail to add host with Invalid Space in Key field
 # Fail to add host with Missing equal signs at end of Key field
 # Fail to add host with Invalid Key Only
 # Fail to add host with Invalid Key First of two
@@ -154,9 +152,9 @@ done
 # Mod host with one valid key
 # Mod host with two valid keys
 # Mod host with many valid keys
+# Mod host with space in key field
 
 ### host-mod negative:
-# Fail to mod host with Invalid Space in Key field
 # Fail to mod host with Missing equal signs at end of Key field
 # Fail to mod host with Invalid Key Only
 # Fail to mod host with Invalid Key First of two
