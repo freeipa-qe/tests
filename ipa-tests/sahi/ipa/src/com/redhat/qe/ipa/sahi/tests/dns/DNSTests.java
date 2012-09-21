@@ -76,9 +76,9 @@ public class DNSTests extends SahiTestScript{
 	 *DNS zone - EnableDisable Test 
 	 */
 	@Test (groups={"zoneEnableDisableTest"}, dataProvider="getDNSZoneEnableDisableObjects",dependsOnGroups={"addDNSZoneTest"})	
-	public void dNSZoneEnableDisableTest(String testName, String zoneName) throws Exception {
+	public void dNSZoneEnableDisableTest(String testName, String zoneName,String linkToCkick,String expectedMsg,String status) throws Exception {
 		
-		DNSTasks.dNSzoneEnableDisable(sahiTasks, zoneName);
+		DNSTasks.dNSzoneEnableDisable(sahiTasks, zoneName,linkToCkick,expectedMsg,status);
 		
 	}
 	
@@ -532,7 +532,9 @@ public class DNSTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		ll.add(Arrays.asList(new Object[]{
 				// testName,  zoneName
-				"dns zone Enable Disable", DNSTests.dnszone} ));
+				"dns zone Disable", DNSTests.dnszone,"Disable","Are you sure you want to disable selected entries?","Disabled"} ));
+		ll.add(Arrays.asList(new Object[]{
+				"dns zone Enable ", DNSTests.dnszone,"Enable","Are you sure you want to enable selected entries?","Enabled"} ));
 		return ll;	
 	}
 	
