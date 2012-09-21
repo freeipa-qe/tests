@@ -71,13 +71,13 @@ rlJournalStart
     rlPhaseEnd
 
 	ipa_user_add_ssh_run
-	#ipa_user_mod_ssh_run
+	ipa_user_mod_ssh_run
 	#ipa_selfservice_add_ssh_run
 	#ipa_selfservice_mod_ssh_run
 	#ipa_delegation_add_ssh_run
 	#ipa_delegation_mod_ssh_run
-	#ipa_host_add_ssh_run
-	#ipa_host_mod_ssh_run
+	ipa_host_add_ssh_run
+	ipa_host_mod_ssh_run
 
 	#ipa_user_func_ssh_run
 	#ipa_host_func_ssh_run
