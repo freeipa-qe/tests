@@ -400,21 +400,9 @@ public class CommonTasks {
 			boolean createssh = false;
 			int countspace=0;
 			while ((strLine=br.readLine()) != null)   {
-				for(int i=0;i<strLine.length();i++){
-					if(strLine.charAt(i)==' '){
-						if(countspace==0){
-							createssh=true;
-							countspace++;
-						}
-						else{
-							createssh = false;
-						}
-					}
-					if (createssh) {
-						if(strLine.charAt(i)!=' ')
-							sshpubkey = sshpubkey + strLine.charAt(i);
-					}
-				}
+				
+					sshpubkey = sshpubkey + strLine;
+					
 			}
 			in.close();			    
 		} catch (IOException e) {
