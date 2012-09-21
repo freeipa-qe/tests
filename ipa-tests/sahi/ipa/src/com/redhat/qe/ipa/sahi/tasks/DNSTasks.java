@@ -49,14 +49,13 @@ public class DNSTasks {
 	/*
 	 * dNSzoneEnableDisable
 	 */
-	public static void dNSzoneEnableDisable(SahiTasks browser, String zoneName) {
+	public static void dNSzoneEnableDisable(SahiTasks browser, String zoneName,String linkToCkick,String expectedMsg,String status) {
 		//browser.checkbox(zoneName).click();
 		browser.checkbox(zoneName).click();
-		browser.span("Disable").click();		
-		//assertTrue(browser.div("Disabled").exists());
-		Assert.assertTrue(browser.div("Disabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is disabled sucessfully");
-		browser.span("Enable").click();
-		Assert.assertTrue(browser.div("Enabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is enabled sucessfully");
+		browser.span(linkToCkick).click();	
+		Assert.assertTrue(browser.div(expectedMsg).exists(),"Expected Message :: "+expectedMsg);
+		browser.button("OK").click();
+		Assert.assertTrue(browser.div(status).near(browser.div(zoneName)).exists(),"Varify DNSZone is "+status+" sucessfully");
 		browser.checkbox(zoneName).click();
 			
 	}
