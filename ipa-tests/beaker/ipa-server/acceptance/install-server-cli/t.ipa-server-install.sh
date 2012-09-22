@@ -85,8 +85,10 @@ ipaserverinstall()
       ipaserverinstall_zonerefresh
 
 #     Add test to verify: bug 681978 : Uninstalling client if the server is installed should be prevented
-       ipaclient_uninstall
+      ipaclient_uninstall
 
+#     Bug 826152 - zonemgr is set to default for reverse zone even with --zonemgr 
+      ipaserverinstall_bz826152
 
 #     Add test to verify: bug 740403 : invalid Directory Manager password causes ipaserver-install to fail with "Exception in CertSubjectPanel(): java.lang.IndexOutOfBoundsException"
 #     Install using DM password with backslash
@@ -496,6 +498,22 @@ ipaclient_uninstall()
     rlPhaseEnd
 }
 
+####################################################################################
+#   Bug 826152 : zonemgr is set to default for reverse zone even with --zonemgr 
+####################################################################################
+ipaserverinstall_bz826152()
+{
+    rlPhaseStartTest "ipa-server-install - BZ 826152"
+	kdestroy
+	ipa-server-install --uninstall
+	ipa-server-install --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U
+	testemail="testemail@$DOMAIN"
+	KinitAsAdmin
+	ipa-dns-install --zonemgr $testemail -U --forwarder=10.14.63.12
+	rlRun "ipa dnszone-find | grep $testemail" 0 "Make sure that the test email seems to have been installed into the useful zone"
+	ipa-server-install --uninstall
+    rlPhaseEnd
+}
 
 ####################################################################################
 #    bug 742875 : named fails to start after installing ipa server when short 
