@@ -74,7 +74,7 @@ ipa_install_set_vars() {
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
 		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
 		export BEAKERMASTER_env${I}=$M
-		export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype)
+		export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
 		if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
 			export MYROLE=MASTER_env${I}
 			export MYENV=${I}
@@ -97,7 +97,7 @@ ipa_install_set_vars() {
 		for R in $(eval echo \$REPLICA_env${I}); do
 			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
 			export BEAKERREPLICA${J}_env${I}=$R
-			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype)
+			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype|tail -1)
 			if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
 				export MYROLE=REPLICA${J}_env${I}
 				export MYENV=${I}
@@ -125,7 +125,7 @@ ipa_install_set_vars() {
 		for C in $(eval echo \$CLIENT_env${I}); do
 			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN
 			export BEAKERCLIENT${J}_env${I}=$C
-			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype)
+			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype|tail -1)
 			if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
 				export MYROLE=CLIENT${J}_env${I}
 				export MYENV=${I}
@@ -772,7 +772,7 @@ fixResolv()
 	fi
 	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
 		for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
-			nsaddr=$(dig +short $ns $rrtype)
+			nsaddr=$(dig +short $ns $rrtype|tail -1)
 			rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
 		done
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
@@ -791,7 +791,7 @@ fixResolvIPv6()
 	fi
 	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
 		for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
-			nsaddr=$(dig +short $ns $rrtype)
+			nsaddr=$(dig +short $ns $rrtype|tail -1)
 			rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
 		done
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
