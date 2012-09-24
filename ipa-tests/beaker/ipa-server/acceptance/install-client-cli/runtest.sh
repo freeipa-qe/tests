@@ -37,8 +37,9 @@
 
 # Include test case file
 . ./t.ipa-client-install.sh
+. ./t.client-install-primary-server.sh
 . ./lib.ipaclientverify.sh
-. ../quickinstall/install-lib.sh
+#. ../quickinstall/install-lib.sh
 . ../quickinstall/ipa-install.sh
 
 
@@ -65,6 +66,7 @@ rlJournalStart
            # This machine is a client
 	   rlLog "I am a client"
            ipaclientinstall
+           clientinstall_primary_server
 	   rhts-sync-set -s DONE
 	else
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
