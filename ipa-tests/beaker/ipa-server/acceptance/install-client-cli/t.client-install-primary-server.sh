@@ -19,6 +19,9 @@ clientinstall_primary_server()
  ipaclientinstall_fixed_primary_param_with_MASTERSLAVE_and_invalidserver
  ipaclientinstall_fixed_primary_nosssd
  ipaclientinstall_fixed_primary_preservesssd
+ ipaclientinstall_fixed_primary_param_withMasteronly_MasterShutdown_no_communication
+ ipaclientinstall_fixed_primary_param_withMasterSlave_MasterShutdown_Slave_communication
+ ipaclientinstall_fixed_primary_param_withMasterSlave_BothShutdown_no_communication
 
 }
 
@@ -52,7 +55,6 @@ ipaclientinstall_fixed_primary_param_with_Master()
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
-        #sssd_config_check $MASTER
         rlAssertGrep "ipa_server = $MASTER" "$SSSD"
         sssd_set_config_level
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin"
@@ -235,6 +237,84 @@ ipaclientinstall_fixed_primary_preservesssd()
         verify_sssd true preserve
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before uninstalling"
+        #uninstall_fornexttest
+    rlPhaseEnd
+}
+
+ipaclientinstall_fixed_primary_param_withMasteronly_MasterShutdown_no_communication()
+{
+    rlPhaseStartTest "client-install-fixed-primary-server 11 [Positive] fixed primary with --server=Master only and No Slave communication"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
+        rlAssertGrep "ipa_server = $MASTER" "$SSSD"
+        sssd_set_config_level
+        # Stop the MASTER 
+        rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 1 "kinit failed"
+        rlAssertGrep "Option ipa_server has value $MASTER" "$sssd_log_file"
+        rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
+        rlAssertGrep "server '$MASTER' as 'not working'" "$sssd_log_file"
+        rlAssertNotGrep "Marking server '$SLAVE' as 'working'" "$sssd_log_file"
+        # Start the MASTER 
+        rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+    rlPhaseEnd
+}
+
+ipaclientinstall_fixed_primary_param_withMasterSlave_MasterShutdown_Slave_communication()
+{
+    rlPhaseStartTest "client-install-fixed-primary-server 12 [Positive] fixed primary with --server=Master --server=Slave and Slave communication only"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE --domain=$DOMAIN --realm=$RELM -U"
+        rlAssertGrep "ipa_server = $MASTER, $SLAVE" "$SSSD"
+        sssd_set_config_level
+        # Stop the MASTER 
+        rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
+        rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE" "$sssd_log_file"
+        rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
+        rlAssertGrep "Added Server $SLAVE" "$sssd_log_file"
+        rlAssertGrep "server '$MASTER' as 'not working'" "$sssd_log_file"
+        rlAssertGrep "Marking server '$SLAVE' as 'working'" "$sssd_log_file"
+        rlAssertNotGrep "server '$SLAVE' as 'not working'" "$sssd_log_file"
+        # Start the MASTER 
+        rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+    rlPhaseEnd
+}
+
+ipaclientinstall_fixed_primary_param_withMasterSlave_BothShutdown_no_communication()
+{
+    rlPhaseStartTest "client-install-fixed-primary-server 12 [Positive] fixed primary with --server=Master --server=Slave and no communication to MASTER and Slave"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE --domain=$DOMAIN --realm=$RELM -U"
+        rlAssertGrep "ipa_server = $MASTER, $SLAVE" "$SSSD"
+        sssd_set_config_level
+        # Stop the MASTER and Replica
+        rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA IPA server"
+        rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 1 "kinit failed"
+        rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE" "$sssd_log_file"
+        rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
+        rlAssertGrep "Added Server $SLAVE" "$sssd_log_file"
+        rlAssertGrep "server '$MASTER' as 'not working'" "$sssd_log_file"
+        rlAssertGrep "server '$SLAVE' as 'not working'" "$sssd_log_file"
+        # Start the MASTER and Replica
+        rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE 'bash -s' < $TmpDir/local.sh" 0 "Start SLAVE IPA server"
         uninstall_fornexttest
     rlPhaseEnd
 }
