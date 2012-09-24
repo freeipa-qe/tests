@@ -40,7 +40,9 @@ access_provider_permit="permit"
 #chpass_provider_force="ipa"
 #auth_provider_force="ipa"
 #cache_credentials_force="True"
-
+#Added by kaleem
+ipa_server_master=$MASTER
+ipa_server_slave=$SLAVE
 
 
 

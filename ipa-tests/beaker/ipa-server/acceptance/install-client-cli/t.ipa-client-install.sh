@@ -30,7 +30,7 @@ ipaclientinstall()
 #   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
    ipaclientinstall_allparam
 
-   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
+   #--uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
    ipaclientinstall_uninstall
 
    ipaclientinstall_noparam
