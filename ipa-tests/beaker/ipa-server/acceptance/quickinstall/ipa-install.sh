@@ -268,6 +268,11 @@ ipa_install_topo_default()
 		rlRun "grep '$MASTER' /etc/openldap/ldap.conf" 0 "Check to see the MASTER dns seems to be in ldap.conf"
 	rlPhaseEnd
 
+	rlPhaseStartTest "BZ 819629 - Enable persistent search in bind-dyndb-ldap during IPA upgrade"
+		rlRun "grep psearch /etc/named.conf  | grep yes" 0 "Make sure a psearch enabled line exists in named.conf"
+		rlRun "grep psearch /etc/named.conf  | grep no" 1 "Make sure a psearch is not disabled anywhere in named.conf"
+	rlPhaseEnd
+
 }
 
 ######################################################################
