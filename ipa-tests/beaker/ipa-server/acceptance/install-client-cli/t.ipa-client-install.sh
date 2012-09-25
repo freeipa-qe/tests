@@ -165,7 +165,6 @@ ipaclientinstall_adminpwd()
 }
 
 
-
 ############################################################
 
 ipaclientinstall_allparam()
@@ -234,7 +233,6 @@ ipaclientinstall_noNTP()
     rlPhaseEnd
     #TODO: Repeat for --no-ntp?
 }
-
 
 
 #################################################
@@ -359,7 +357,6 @@ ipaclientinstall_invalidrealm()
 
     rlPhaseEnd
 }
-
 
 ###############################################################################################
 #  --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
@@ -865,6 +862,38 @@ ipaclientinstall_client_hostname_localhost() #Added by Kaleem
         rlRun "cat $TmpDir/temp.out"
         rlAssertGrep "Invalid hostname, 'localhost.localdomain' must not be used" "$TmpDir/temp.out"
         rlRun "hostname $CLIENT" 
+    rlPhaseEnd
+}
+
+###############################################################################################
+#  Bug 817869 - Clean keytabs before installing new keys into them
+###############################################################################################
+ipaclientinstall_dirty_keytab()
+{
+    rlPhaseStartTest "ipa-client-install-02- "
+        uninstall_fornexttest
+        #rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
+        #rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
+        verify_install true
+	# Backup keytab 
+	bkup="/dev/shm/ipa-client-backup-keytab"
+	ktab="/etc/krb5.keytab"
+	rm -f $bkup
+	cp -a $ktab $bkup
+	command="ipa-client-install --uninstall -U"
+	rlRun "$command" 0 "Uninstalling ipa client - after a force install"
+	if [ ! -f $ktab ]; then
+		cp -a $kbup $ktab
+	fi
+	klist -kt /etc/krb5.keytab
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
+        verify_install true
+
+	klist -kt /etc/krb5.keytab
+	diff $bkup $ktab
+
     rlPhaseEnd
 }
 
