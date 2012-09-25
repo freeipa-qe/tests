@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE lib.clientautomount.sh ipa.setup.autofs.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-client-automount.sh lib.clientautomount.sh ipa.setup.autofs.sh
 
 .PHONY: all install download clean
 
