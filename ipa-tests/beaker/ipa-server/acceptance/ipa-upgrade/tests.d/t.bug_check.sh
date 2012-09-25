@@ -540,3 +540,51 @@ upgrade_bz_821176()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_819629_setup()
+{
+	# Setup section for BZ 819629
+	# Backup /etc/named.conf, then, remove any psearch line from the file.	
+	# Upgrade needs to be run after this setup section to ensure that psearch is enabled after upgrade.
+	
+	rlPhaseStartTest "backup/section for BZ 819629"
+	case "$MYROLE" in
+	"MASTER")
+		dc=$(date +%m-%d-%Y-%s)
+		cp -a /etc/named.conf /etc/named-conf-backup-$dc
+		cat /etc/named.conf | grep -v psearch > /dev/shm/named.conf-tmp
+		cat /dev/shm/named.conf-tmp > /etc/named.conf
+		# For fedora
+		systemctl restart named.service
+		# For RHEL
+		/etc/init.d/named restart
+		rlRun "grep psearch /etc/named.conf" 1 "Make sure a psearch is not anywhere in named.conf"
+		;;
+	*)
+		rlPass "Machine in recipe is not a ROLE that needs to be tested...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+
+}
+
+upgrade_bz_819629()
+{
+	# Make sure that psearch is reinserted into named.conf after a upgrade. 
+
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_819629 - Enable persistent search in bind-dyndb-ldap during IPA upgrade"
+	case "$MYROLE" in
+	"MASTER")
+		rlRun "grep psearch /etc/named.conf  | grep yes" 0 "Make sure a psearch enabled line exists in named.conf"
+		rlRun "grep psearch /etc/named.conf  | grep no" 1 "Make sure a psearch is not disabled anywhere in named.conf"
+		;;
+	*)
+		rlPass "Machine in recipe is not a ROLE that needs to be tested...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+

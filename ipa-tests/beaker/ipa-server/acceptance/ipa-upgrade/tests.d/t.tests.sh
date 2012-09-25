@@ -169,6 +169,9 @@ upgrade_test_master_bz_tests()
 		# Running start function for 772359 to capture info before upgrade
 		upgrade_bz_772359_start
 
+		# Alter the bind configuration to ensure that BZ 819629 will be tested properly
+		upgrade_bz_819629_setup
+
 		# upgrade master and check data
 		upgrade_master
 		upgrade_slave
@@ -184,6 +187,7 @@ upgrade_test_master_bz_tests()
 		upgrade_bz_803930
 		upgrade_bz_812391
 		upgrade_bz_821176
+		upgrade_bz_819629
 
 		# uninstall everything so we can start over
 		ipa_uninstall_slave
