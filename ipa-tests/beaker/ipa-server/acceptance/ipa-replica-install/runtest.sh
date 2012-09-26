@@ -67,6 +67,7 @@ else
 	MYROLE=UNKNOWN
 fi
 
+RESTARTDS=1
 PACKAGELIST="ipa-admintools ipa-client httpd mod_nss mod_auth_kerb 389-ds-base expect"
 
 rlJournalStart
@@ -200,9 +201,17 @@ rlJournalStart
 			rlLog "Re-enabling IPv6"
 			enableIpv6
 
+			installSlave
+			RESTARTDS=0
+			uninstall
+			installBug_bz830338
+			RESTARTDS=1
+			uninstall
+
 			installSlave_nr1
 			uninstall
 			rhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
+
 
 			# Installing slave with --no-forwarders
 			rhts-sync-block -s READY_REPLICA3 $BEAKERMASTER

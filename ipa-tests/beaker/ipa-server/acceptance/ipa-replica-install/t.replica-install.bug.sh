@@ -161,3 +161,24 @@ installBug_bz839004()
 	rlPhaseEnd
 }
 
+installBug_bz830338()
+{
+	rlPhaseStartTest "bz830338 - Change DS to purge ticket from krb cache in case of authentication error"
+		INSTALLTIME=$(date +%d/%b/%Y:%H:%M)
+		INSTANCE=$(echo $RELM|sed 's/\./-/g')
+		TESTUSER=$FUNCNAME
+		rlRun "sftp root@$MASTERIP:/var/log/dirsrv/slapd-$INSTANCE/errors /tmp/errors.$FUNCNAME.0"
+		installSlave
+		rlRun "remoteExec root $MASTERIP \"ipa user-add $TESTUSER --first=f --last=l\""
+		rlRun "sleep 30"
+		sftp root@$MASTERIP:/var/log/dirsrv/slapd-$INSTANCE/errors /tmp/errors.$FUNCNAME.1
+		DSCHK=$(ldapsearch -xLLL -D "$ROOTDN" -w "$ROOTDNPWD" -b "$BASEDN" cn=$FUNCNAME|wc -l)
+		LOGCHK=$(diff /tmp/errors.$FUNCNAME.0 /tmp/errors.$FUNCNAME.1|grep "NSMMReplicationPlugin.*$(hostname).*Replication bind with GSSAPI auth resumed"|wc -l)
+		if [ $DSCHK -gt 0 -a $LOGCHK -gt 0 ]; then
+			rlPass "bz830338 not found."
+		else
+			rlFail "bz830338 found...Change DS to purge ticket from krb cache in case of authentication error"
+			rlFail "dirsrv still using old Kerberos ticket...must be restarted"
+		fi
+	rlPhaseEndTest	
+}

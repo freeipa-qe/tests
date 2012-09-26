@@ -1064,8 +1064,12 @@ uninstall()
 		done
 
 ### restart ipa on master to clear out old kerberos ticket for replica
-		rlLog "restart dirsrv on master to clear out old kerberos ticket for replica"
-		rlRun "remoteExec root $MASTERIP \"service dirsrv restart; service named restart; ipactl status\""
+		if [ $RESTARTDS -eq 1 ]; then
+			rlLog "restart dirsrv on master to clear out old kerberos ticket for replica"
+			rlRun "remoteExec root $MASTERIP \"service dirsrv restart; service named restart; ipactl status\""
+		else
+			rlLog "skipping MASTER server dirsrv restart"
+		fi
 
 ### see if sssd is still running...should be down
 		rlLog "verifying https://bugzilla.redhat.com/show_bug.cgi?id=830598"
