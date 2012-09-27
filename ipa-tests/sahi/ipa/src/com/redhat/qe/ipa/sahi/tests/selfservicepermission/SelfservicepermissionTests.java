@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.testng.annotations.*;
 
 import com.redhat.qe.auto.testng.Assert; 
+import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonHelper;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
@@ -301,6 +302,14 @@ public class SelfservicepermissionTests extends SahiTestScript{
 			Assert.assertFalse(browser.link(permissionName).exists(), "after delete, permission should disappear");
 		}
 	
+	@Test (groups={"settingExpandCollapseTest"},dataProvider="getExpandCollapse",description="Expand and Collapse permission setting")
+	public void testSettingExpandCollapse(String testName,String permissionName) throws Exception {
+		sahiTasks.link(permissionName).click();
+		SelfservicepermissionTasks.settingExpandCollapse(browser);
+	}
+	
+	
+	
 	/***************************************************************************** 
 	 *             Data providers                                                * 
 	 *****************************************************************************/
@@ -433,4 +442,16 @@ public class SelfservicepermissionTests extends SahiTestScript{
 		String[][] permissions = {{testPermissions[6]}};
 		return permissions;
 	}
+	@DataProvider(name="getExpandCollapse")
+	public Object[][] getExpandCollapse() {
+		return TestNGUtils.convertListOfListsTo2dArray(createExpandCollapseObjects());
+	}
+	protected List<List<Object>> createExpandCollapseObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname		        permissionName			
+		ll.add(Arrays.asList(new Object[]{ "ExpandCollapseTest","Self can write own password"	 } ));
+		return ll;	
+	}
+	
 }//class SelfservicepermissionTests
