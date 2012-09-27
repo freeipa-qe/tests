@@ -14,7 +14,8 @@
             	        <include name="modifyPermission_undo" /> 
             	        <include name="modifyPermission_update" /> 
             	        <include name="modifyPermission_negative" />
-            	        <include name="deletePermission" /> 
+            	        <include name="deletePermission" />
+            	        <include name="settingExpandCollapseTest" />
                	    </run>
             	</groups>
             	<classes>
@@ -24,6 +25,7 @@
     <test name="Self Service Permission Functional Tests">
 		<groups>
 			<run>
+				
 				<include name="init" />  
 			    <include name="addUserSSHKey" />
 			    <include name="resetUserSSHKeyPermission" />
