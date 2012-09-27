@@ -79,5 +79,23 @@ public class SelfservicepermissionTasks {
 		browser.checkbox(attribute2).check();
 		browser.span("Update").click();
 	}
+	public static void settingExpandCollapse(SahiTasks browser) {
+		
+		browser.span("Collapse All").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Self-service name:").isVisible(),"No self-service Name is visible");
+		browser.span("Expand All").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Self-service name:").isVisible(),"self-service Name is visible");
+		
+		browser.heading2("General").click();
+		browser.waitFor(1000);
+		Assert.assertFalse(browser.label("Self-service name:").isVisible(),"No Attributes are visible");
+		browser.heading2("General").click();
+		browser.waitFor(1000);
+		Assert.assertTrue(browser.label("Self-service name:").isVisible(),"Attributes are visible");
+		
+		
+	}
 
 }
