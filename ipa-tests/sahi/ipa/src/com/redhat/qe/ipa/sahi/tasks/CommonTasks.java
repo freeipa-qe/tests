@@ -573,14 +573,17 @@ public class CommonTasks {
     		log.finer("Attempting to execute an IPA command on Windows");
     		return true;
     	} 
+    	else
+    		kinitAsAdmin();
     	try {
     		Process process = Runtime.getRuntime().exec(command);
     		
     		OutputStream stdin = process.getOutputStream ();    	    
     	    String line = command + "\n";   
     	    stdin.write(line.getBytes() );
+    	    //stdin.flush();
 	        System.out.println("Executing Command: " + line);
-    	    stdin.flush();
+    	    
     	    
     		BufferedReader input =
     	        new BufferedReader

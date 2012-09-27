@@ -75,6 +75,7 @@ public class HostTasks {
 		}
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.textarea("description").setValue(description);
+		sahiTasks.waitFor(500);
 		sahiTasks.textbox("l").setValue(local);
 		sahiTasks.textbox("nshostlocation").setValue(location);
 		sahiTasks.textbox("nshardwareplatform").setValue(platform);

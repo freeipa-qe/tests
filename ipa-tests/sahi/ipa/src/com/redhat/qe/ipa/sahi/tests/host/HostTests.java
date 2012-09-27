@@ -182,7 +182,7 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * Add and add another host - for positive tests
 	 */
-	@Test (groups={"addAndAddAnotherHostTests"}, dataProvider="getAddAndAddAnotherHostTests", dependsOnGroups="deleteHostTests")	
+	@Test (groups={"addAndAddAnotherHostTests"}, dataProvider="getAddAndAddAnotherHostTests", dependsOnGroups={"deleteHostTests","addAndEditHostTests"})	
 	public void testHostForceAdd(String testName, String hostname1, String hostname2, String hostname3) throws Exception {
 		String [] hostnames = {hostname1, hostname2, hostname3};
 		for (String hostname : hostnames){
@@ -220,7 +220,7 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * Add and edit hosts - for positive tests
 	 */
-	@Test (groups={"addAndEditHostTests"}, dataProvider="getAddEditHostTestObjects")	
+	@Test (groups={"addAndEditHostTests"}, dataProvider="getAddEditHostTestObjects", dependsOnGroups="deleteHostTests")	
 	public void testHostAddAndEdit(String testName, String hostname, String ipadr, String description, String local, String location, String platform, String os) throws Exception {
 		String fqdn = hostname + "." + domain;
 		String lowerdn = fqdn.toLowerCase();
@@ -233,7 +233,6 @@ public class HostTests extends SahiTestScript{
 		
 		//verify host was added
 		Assert.assertTrue(sahiTasks.link(lowerdn).exists(), "Added host " + hostname + "  successfully");
-		
 		//verify all host fields
 		HostTasks.verifyHostSettings(sahiTasks, lowerdn, description, local, location, platform, os);
 		
@@ -564,7 +563,7 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * sshpubkey Delete
 	 */
-	@Test (groups={"hostDeleteSSHPubKeyTests"}, dataProvider="getHostDeleteSSHPubKeyTestObjects",  dependsOnGroups={"hostEditNegativeSSHPubKeyTests","hostEditRefreshResetUpdateSSHPubKeyTests"})	
+	@Test (groups={"hostDeleteSSHPubKeyTests"}, dataProvider="getHostDeleteSSHPubKeyTestObjects",  dependsOnGroups={"hostEditNegativeSSHPubKeyTests","hostEditRefreshResetUpdateSSHPubKeyTests","hostEditUpdateResetCancelSSHPubKeyTests"})	
 	public void testDeleteSSHPubKey(String testName, String hostName) throws Exception {
 		
 		sahiTasks.navigateTo(CommonTasks.hostPage);
