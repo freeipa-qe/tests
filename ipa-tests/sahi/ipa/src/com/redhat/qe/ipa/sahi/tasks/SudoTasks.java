@@ -765,7 +765,8 @@ public class SudoTasks {
 		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button("Add and Edit").click();
 		sahiTasks.span("Add").click();
-		sahiTasks.checkbox(command).in(sahiTasks.table("search-table scrollable")).click();
+		sahiTasks.waitFor(5000);
+		sahiTasks.checkbox(command).near(sahiTasks.row(command)).click();
 		sahiTasks.span(">>").click();		
 		sahiTasks.span("Add").near(sahiTasks.button("Cancel")).click();
 		
