@@ -18,6 +18,7 @@ nfsServer="f17apple.yzhang.redhat.com"
 nfsSharedDir="/share/pub"
 autofsTopDir="/ipashare${id}"
 autofsSubDir="ipapublic${id}"
+autofsDir="$autofsTopDir/$autofsSubDir"
 
 paramMsg="configure ipa automount using "
 while getopts ":n:s:d:m:" opt ;do
@@ -54,12 +55,16 @@ if [ "$automountLocationName" != "" ] \
     && [ "$autofsSubDir" != "" ]
 then
     echo "$paramMsg"
-    configAutofs_indirect $automountLocationName $nfsServer $nfsSharedDir
+    if [ "$maptype" = "direct" ];then
+        configAutofs_direct $automountLocationName $nfsServer $nfsSharedDir $autofsDir
+    elif [ "$maptype" = "indirect" ];then
+        configAutofs_indirect2 $automountLocationName $nfsServer $nfsSharedDir
+    else
+        echo "wrong map type, please use 'direct' or 'indirect'"
+    fi
 else
     usage
     echo "$paramMsg"
     exit
 fi
 
-exit
- 
