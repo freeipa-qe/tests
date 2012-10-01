@@ -65,7 +65,7 @@ rlJournalStart
 	if [ $? -eq 0 ]; then
            # This machine is a client
 	   rlLog "I am a client"
-           ipaclientinstall
+           #ipaclientinstall
            clientinstall_primary_server
 	   rhts-sync-set -s DONE
 	else
@@ -90,13 +90,15 @@ rlJournalStart
         #               IS THIS MACHINE A SLAVE?                            #
         #####################################################################
         rc=0
-        echo $SLAVE | grep $HOSTNAME
-        if [ $? -eq 0 ] ; then
+        for R in $(eval echo $SLAVE); do
+         echo $R | grep $HOSTNAME
+          if [ $? -eq 0 ] ; then
                 rhts-sync-block -s DONE $BEAKERCLIENT
                 rlPass
-        else
+          else
                 rlLog "Machine in recipe in not a SLAVE"
-        fi
+          fi
+        done
 
 
    rlPhaseEnd
