@@ -65,7 +65,7 @@ rlJournalStart
 	if [ $? -eq 0 ]; then
            # This machine is a client
 	   rlLog "I am a client"
-           #ipaclientinstall
+           ipaclientinstall
            clientinstall_primary_server
 	   rhts-sync-set -s DONE
 	else
