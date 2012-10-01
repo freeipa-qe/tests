@@ -57,9 +57,9 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-    # r2d2_test_starts
-    ipa-client-automount
-    # r2d2_test_ends
+    # test_starts
+    ipaclientautomount
+    # test_ends
 
     rlPhaseStartCleanup "ipa-client-automount cleanup"
         rlRun "popd"
