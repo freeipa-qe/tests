@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE data.ipaclientinstall.acceptance ipaclientinstall.exp lib.ipaclientverify.sh t.ipa-client-install.sh 
+FILES=$(METADATA) runtest.sh Makefile PURPOSE data.ipaclientinstall.acceptance ipaclientinstall.exp lib.ipaclientverify.sh t.ipa-client-install.sh t.client-install-primary-server.sh 
 
 .PHONY: all install download clean
 
@@ -52,7 +52,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     install of a ipa client machine" >> $(METADATA)
 	@echo "Type:            Acceptance" >> $(METADATA)
-	@echo "TestTime:        45m" >> $(METADATA)
+	@echo "TestTime:        60m" >> $(METADATA)
 	@echo "RunFor:          ipa-client" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
