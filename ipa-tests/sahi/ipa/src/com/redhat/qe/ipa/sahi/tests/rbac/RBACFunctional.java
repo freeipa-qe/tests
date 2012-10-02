@@ -429,7 +429,7 @@ public class RBACFunctional extends SahiTestScript {
     public Object[][] getdnsListZoneTestObjects() {
             String[][] roles={
             // testName                     permissionName                  privilegeName                   roleName                        userName
-            { "dnsUpdateAdmin",     "Read DNS Entries",             "TestPrivilegeDNS",             "TestRoleDNS",          "testuserdns"   }
+            { "dnsListZone",     "Read DNS Entries",             "TestPrivilegeDNS",             "TestRoleDNS",          "testuserdns"   }
             };
 
             return roles;

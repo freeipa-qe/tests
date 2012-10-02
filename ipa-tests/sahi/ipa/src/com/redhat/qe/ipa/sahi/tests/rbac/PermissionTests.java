@@ -661,11 +661,11 @@ public class PermissionTests extends SahiTestScript {
 	        //	testname											cn  						right1,		right2,		right3,		Type		Attributes1			Attributes2		Attributes3 			
 			{ "add_permission_type_user_with_multiple_attr",		"Manage User1",				"write",	"",			"",			"User",		"description",		"carlicense",	"photo"		},
 			{ "add_permission_type_user_with_multiple_attr_right",	"Manage User2",				"write",	"add",		"",			"User",		"description",		"carlicense",	""		},
-		//	{ "add_permission_type_hostgroup_bug783502",			"Manage Hostgroup1",		"write",	"add",		"delete",	"Host Group","businesscategory",	"owner",		""			},
+			{ "add_permission_type_hostgroup_bug783502",			"Manage Hostgroup1",		"write",	"add",		"delete",	"Host Group","businesscategory",	"owner",		""			},
 			{ "add_permission_type_user_long",						"abcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789ANDAGAINabcdefghijklmnopqrstuvwxyz123456789",	"write",	"",			"",			"User Group","description",		"",				""			},
-			{ "add_permission_type_user_dash_underscore",			"Manage_User-",				"write",	"",			"",			"User",		"description",		"carlicense",	""	}
-		//	{ "add_permission_type_user_bug807304",	 				"Test < Permission > Bug",	"write",	"",			"",			"User",		"description",		"carlicense",	"photo"		} };
-			};	        
+			{ "add_permission_type_user_dash_underscore",			"Manage_User-",				"write",	"",			"",			"User",		"description",		"carlicense",	""	}};
+			//won't fix bug
+			//{ "add_permission_type_user_bug807304",	 				"Test < Permission > Bug",	"write",	"",			"",			"User",		"description",		"carlicense",	"photo"		} };     
 			return permissions;	
 		}	
 		
@@ -802,7 +802,7 @@ public class PermissionTests extends SahiTestScript {
 		@DataProvider(name="permissionBug815364TestObjects")
 		public Object[][] getpermissionBug815364TestObjects() {
 			String[][] permissions={
-			//	testname					filter  			 			
+			//	testname								filter  			 			
 			{ "add_permission_type_bug815364_search",	"dns"        }	};
 			
 			return permissions;	

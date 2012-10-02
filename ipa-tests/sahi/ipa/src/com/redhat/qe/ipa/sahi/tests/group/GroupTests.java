@@ -37,6 +37,9 @@ public class GroupTests extends SahiTestScript{
 			UserTasks.deleteUserService(browser, uid);
 		}
 		browser.navigateTo(commonTasks.groupPage, true);
+		for(String group:testUserGroups){
+				GroupTasks.deleteGroup(browser, group);
+		}
 	} 
 	
 	@BeforeMethod (alwaysRun=true)
@@ -130,7 +133,9 @@ public class GroupTests extends SahiTestScript{
 	public void addGroup_prepareData(String testScenario, String groupName, String groupDescription, String gid, String groupType){
 		Assert.assertFalse(browser.link(groupName).exists(),"before 'Add', group does NOT exists");
 		GroupTasks.add_UserGroup(browser, groupName, groupDescription, gid, groupType);
+		commonTasks.search(browser, groupName);
 		Assert.assertTrue(browser.link(groupName).exists(),"after 'Add', group exists");
+		commonTasks.clearSearch(browser);
 	}
 	
 	@Test (groups={"addGroup_negative"}, dataProvider="addGroupNegativeData", dependsOnGroups="addGroup", 
@@ -810,11 +815,15 @@ public class GroupTests extends SahiTestScript{
 	public void deleteGroup_multiple(String testScenario, String groupNames){
 		String[] groups = groupNames.split(",");
 		for (String groupName:groups){
+			commonTasks.search(browser, groupName);
 			Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
+			commonTasks.clearSearch(browser);
 		}
 		GroupTasks.deleteGroup(browser, groups);
 		for (String groupName:groups){			
+			commonTasks.search(browser, groupName);
 			Assert.assertFalse(browser.link(groupName).exists(),"after 'Delete', group should disappear");
+			commonTasks.clearSearch(browser);
 		}
 	}
 	
@@ -896,8 +905,11 @@ public class GroupTests extends SahiTestScript{
 	@DataProvider (name="remainingUserGroupData")
 	public Object[][] getMultipulGroups(){
 		StringBuffer buffer = new StringBuffer();
-		for(int i=1;i<GroupTests.testUserGroups.length;i++){
-			buffer.append(GroupTests.testUserGroups[i] + ",");
+		for(int i=1;i<5;i++){
+			if(i==4)
+				buffer.append(GroupTests.testUserGroups[i]);
+			else
+				buffer.append(GroupTests.testUserGroups[i] + ",");
 		}
 		String[][] multipulGroups = {{"multipul groups", buffer.toString()}};
 		return multipulGroups;

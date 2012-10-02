@@ -275,6 +275,7 @@ public class PermissionTasks {
 		CommonTasks.search(sahiTasks, cn);
 		if (sahiTasks.link(cn).exists()) {
 			sahiTasks.link(cn).click();
+			sahiTasks.span("Refresh").click();
 			for (String right : rights) {
 				if (!right.isEmpty()) {
 					Assert.assertTrue(sahiTasks.checkbox(right).checked(), "Verified permission " + right + " is checked for " + cn );
@@ -289,6 +290,8 @@ public class PermissionTasks {
 				}
 			}
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			if(sahiTasks.button("Reset").exists())
+				sahiTasks.button("Reset").click();
 			CommonTasks.clearSearch(sahiTasks);
 		}
 	}
@@ -334,6 +337,8 @@ public class PermissionTasks {
 			Assert.assertTrue(sahiTasks.checkbox("write").checked(), "Now Data is visible");
 			
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			if(sahiTasks.button("Reset").exists())
+				sahiTasks.button("Reset").click();
 		}
 		CommonTasks.clearSearch(sahiTasks);
 	}

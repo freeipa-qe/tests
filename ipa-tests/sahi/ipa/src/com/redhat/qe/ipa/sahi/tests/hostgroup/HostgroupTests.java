@@ -407,7 +407,7 @@ public class HostgroupTests extends SahiTestScript{
 	
 		//										testname							groupanme																button
 		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_cancel",			"NewHostGroup",															"Cancel" } ));  
-		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_cancel",			"NewHostGroup",															"Delete" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_mixedcase",			"NewHostGroup",															"Delete" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_longname",		"thisisahostgroupwithaveryveryveryveryveryveryveryveryverylongname", 	"Delete" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"delete_hostgroup_longdesc",		"long_description",			 											"Delete" } ));
 		return ll;	
@@ -548,8 +548,8 @@ public class HostgroupTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 	
 		//										testname						groupname	member	
-		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe",			enggroup,	qegroup } ));
-		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe",			enggroup,	devgroup } ));
+		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe_qe",			enggroup,	qegroup } ));
+		ll.add(Arrays.asList(new Object[]{ 		"removehostgroup_qe_dev",			enggroup,	devgroup } ));
 		return ll;	
 	}
 	
@@ -571,7 +571,7 @@ public class HostgroupTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_trailing_space",	"newgroup ",		"my description",	 	"may only include letters, numbers, _, -, and ." } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_desc_space",			"newgroup",			" ",	 				"invalid 'desc': Leading and trailing spaces are not allowed" } ));
 		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_desc_leading_space",	"newgroup",			" my description",	 	"invalid 'desc': Leading and trailing spaces are not allowed" } ));
-		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_name_trailing_space",	"newgroup",			"my description ",	 	"invalid 'desc': Leading and trailing spaces are not allowed" } ));
+		ll.add(Arrays.asList(new Object[]{ 		"addinvalid_desc_trailing_space",	"newgroup",			"my description ",	 	"invalid 'desc': Leading and trailing spaces are not allowed" } ));
 		return ll;	
 	}
 	

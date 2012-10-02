@@ -651,7 +651,7 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "delete_host_lowercase",		"myhost1."+domain 	} ));
 	    ll.add(Arrays.asList(new Object[]{ "delete_host_uppercase",		"myhost2."+domain 	} ));
 		ll.add(Arrays.asList(new Object[]{ "delete_host_mixedcase",		"myhost3."+domain 	} ));
-		ll.add(Arrays.asList(new Object[]{ "add_host_bz751529",		    "myhost4."+domain 	} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_host_bz751529",		    "myhost4."+domain 	} ));
 		
 		        
 		return ll;	

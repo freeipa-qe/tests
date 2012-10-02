@@ -28,8 +28,9 @@ public class GroupTasks {
 
 	public static void deleteGroup(SahiTasks sahiTasks, String [] groupnames) {
 		for (String groupname : groupnames) {
-			if(sahiTasks.link(groupname).exists())
+			if(sahiTasks.link(groupname).exists()){
 				sahiTasks.checkbox(groupname).click();
+			}
 		}
 		sahiTasks.link("Delete").click();
 		sahiTasks.button("Delete").click();
