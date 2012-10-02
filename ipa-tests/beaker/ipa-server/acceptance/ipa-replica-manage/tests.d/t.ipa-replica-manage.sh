@@ -1147,7 +1147,7 @@ irm_reinitialize_positive_0001()
 
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$SLAVE1 > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		irm_bugcheck_831661 $tmpout
+		irm_bugcheck_831661 $tmpout $SLAVE1
 		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1183,7 +1183,7 @@ irm_reinitialize_positive_0002()
 
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$SLAVE2 > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		irm_bugcheck_831661 $tmpout
+		irm_bugcheck_831661 $tmpout $SLAVE2
 		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
@@ -1219,7 +1219,7 @@ irm_reinitialize_positive_0003()
 		
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		irm_bugcheck_831661 $tmpout
+		irm_bugcheck_831661 $tmpout $MASTER
 		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE2"
@@ -1255,7 +1255,7 @@ irm_reinitialize_positive_0004()
 
 		rlRun "ipa-replica-manage -p $ADMINPW -H $MASTER re-initialize --from=$SLAVE1 > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		irm_bugcheck_831661 $tmpout
+		irm_bugcheck_831661 $tmpout $SLAVE1
 		rlAssertGrep "Update succeeded" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
