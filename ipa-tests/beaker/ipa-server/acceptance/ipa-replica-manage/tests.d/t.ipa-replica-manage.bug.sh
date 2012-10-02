@@ -68,3 +68,18 @@ test_bug_000000()
 	esac
 	rlPhaseEnd
 }
+
+irm_bugcheck_831661()
+{
+	tmpout=$1
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_bug_831661 - ipa-replica-manage re-initialize update failed due to named ldap timeout"
+		OUTPUTCHK=$(grep "reports: Update failed! Status.*System error" $tmpout|wc -l)
+		SYSLOGCHK=$(grep "named.*LDAP query timed out. Try to adjust.*timeout" /var/log/messages|wc -l)
+		if [ $OUTPUTCHK -gt 0 -a $SYSLOGCHK -gt 0 ]; then
+			rlFail "BZ 831661 found...ipa-replica-manage re-initialize update failed due to named ldap timeout"
+		else
+			rlPass "BZ 831661 not found."
+		fi
+	rlPhaseEnd
+}	
