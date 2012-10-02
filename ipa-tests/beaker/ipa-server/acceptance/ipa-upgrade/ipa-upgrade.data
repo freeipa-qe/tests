@@ -1,20 +1,24 @@
 # Yum Repos
-echo $FAMILY | grep Fedora17 
+echo $FAMILY | grep Fedora
 if [ $? -eq 0 ]; then
 	OS=fedora
 	VER=17
 fi
 
-echo $FAMILY | grep RedHatEnterpriseLinux6 
+echo $FAMILY | grep RedHatEnterpriseLinux
 if [ $? -eq 0 ]; then
 	OS=rhel
 	VER=6
 fi
 
 # Adding support only for Fedora 17 and Rhel 6 at this time. Maybe a case statemet will be required for other OS's in the future.
-if [ "$OS" -eq "fedora" ]; then
-	myrepo[1]=http://jdennis.fedorapeople.org/ipa-devel/fedora/17/x86_64/os/
-	myrepo[2]=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/x86_64/
+if [ "$OS" = "fedora" ]; then
+	# Disable fedora updates repo
+	sed -i s/^enabled=1/enabled=0/g /etc/yum.repos.d/fedora-updates.repo 
+	# Define some repos for Fedora 
+	myrepo[1]=http://jdennis.fedorapeople.org/ipa-devel/fedora/\$releasever/\$basearch/os/
+	myrepo[2]=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/$basearch/
+	myrepo[3]=http://download.fedoraproject.org/pub/fedora/linux/updates/\$releasever/\$basearch/
 else
 	myrepo[1]=http://download.devel.redhat.com/released/RHEL-6/6.3/Server/\$basearch/os/
 	myrepo[2]=http://download.devel.redhat.com/released/RHEL-6/6.3/Server/optional/\$basearch/os/
