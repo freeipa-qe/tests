@@ -64,76 +64,102 @@ show_autofs_configuration(){
 }
 
 check_autofs_sssd_configuration(){
-    check_sssd
-    check_nsswitch
-    check_sysconfig_nfs
-    check_idmapd
+    local configuration_status=$1
+    check_sssd $configuration_status
+    check_nsswitch $configuration_status
+    check_sysconfig_nfs $configuration_status
+    check_idmapd $configuration_status
 }
 
 check_autofs_no_sssd_configuration(){
-    check_sssd_no_sssd
-    check_autofs_ldap_auth_no_sssd
-    check_sysconfig_autofs_no_sssd
-    check_nsswitch_no_sssd    
-    check_sysconfig_nfs_no_sssd
-    check_idmapd_no_sssd
+    local configuration_status=$1
+    check_sssd_no_sssd $configuration_status
+    check_autofs_ldap_auth_no_sssd $configuration_status
+    check_sysconfig_autofs_no_sssd $configuration_status
+    check_nsswitch_no_sssd $configuration_status
+    check_sysconfig_nfs_no_sssd $configuration_status
+    check_idmapd_no_sssd $configuration_status
 }
 
 check_nsswitch(){
+    local configuration_status=$1
     local conf="/etc/nsswitch.conf"
     local message="^automount: sss"
-    check_expected_message_in_expected_conf "$conf" "$message"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_sysconfig_nfs(){
+    local configuration_status=$1
     local conf="/etc/sysconfig/nfs"
     local message="^SECURE_NFS=YES$"
-    check_expected_message_in_expected_conf "$conf" "$message"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_idmapd(){
+    local configuration_status=$1
     local conf="/etc/idmapd.conf"
     local message="^Domain=$domain$"
-    check_expected_message_in_expected_conf "$conf" "$message"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_sssd_no_sssd(){
+    local configuration_status=$1
     local conf="/etc/sssd/sssd.conf"
-    local message="ipa_automount_location = ${automountlocationName}"
-    check_expected_message_in_expected_conf "$conf" "$message"
+    local message="ipa_automount_location = ${currentLocation}"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_autofs_ldap_auth_no_sssd(){
+    local configuration_status=$1
     local conf="/etc/autofs_ldap_auth.conf"
-    message="authtype=\"GSSAPI\" clientprinc=\"${hostPrinciple}\""
-    check_expected_message_in_expected_conf "$conf" "$message"
+    local message="authtype=\"GSSAPI\" clientprinc=\"${hostPrinciple}\""
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_sysconfig_autofs_no_sssd(){
+    local configuration_status=$1
     local conf="/etc/sysconfig/autofs"
 
-    local message="SEARCH_BASE=cn=${automountlocationName},cn=automount,$suffix"
-    check_expected_message_in_expected_conf "$conf" "$message"
+    local message="SEARCH_BASE=cn=${currentLocation},cn=automount,$suffix"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 
-    message="LDAP_URI=ldap://${ipaServer}"
-    check_expected_message_in_expected_conf "$conf" "$message"
+    message="LDAP_URI=ldap://${currentIPAServer}"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_nsswitch_no_sssd(){
+    local configuration_status=$1
     local conf="/etc/nsswitch.conf"
     local message="^automount: ldap"
-    check_expected_message_in_expected_conf "$conf" "$message"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_sysconfig_nfs_no_sssd(){
-    check_sysconfig_nfs
+    local configuration_status=$1
+    check_sysconfig_nfs $configuration_status
 }
 
 check_idmapd_no_sssd(){
-    check_idmapd
+    local configuration_status=$1
+    check_idmapd $configuration_status
 }
 
-check_expected_message_in_expected_conf(){
+ensure_configuration_status()
+{
+    local conf="$1"
+    local message="$2"
+    local configuration_status="$3"
+    
+    if [ "$configuration_status" = "configured" ];then
+        ensure_expected_message_appears_in_expected_configuration_file "$conf" "$message"
+    elif [ "$configuration_status" = "not_configured" ];then
+        ensure_expected_message_not_appears_in_expected_configuration_file "$conf" "$message"
+    else
+        rlLog "unknow expected configuration status"
+    fi
+}
+
+ensure_expected_message_appears_in_expected_configuration_file(){
     local conf="$1"
     local message="$2"
     if grep "$message" $conf 2>&1 > /dev/null
@@ -144,3 +170,22 @@ check_expected_message_in_expected_conf(){
     fi
 }
 
+ensure_expected_message_not_appears_in_expected_configuration_file(){
+    local conf="$1"
+    local message="$2"
+    if grep "$message" $conf 2>&1 > /dev/null
+    then
+        echo "FAIL: [$conf] contain [$message], this is NOT expected"
+    else
+        echo "PASS: [$conf] does NOT contain [$message], this is expected"
+    fi
+}
+
+clean_up_installation()
+{
+    echo "#################################"
+    echo "# clean up ipa-client-automount #"
+    echo "#################################"
+    ipa-client-automount --uninstall -U
+    echo "done clean up"
+}
