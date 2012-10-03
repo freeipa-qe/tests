@@ -74,6 +74,9 @@ ipaserverinstall()
      ipaserverinstall_nohostsentry
      ipaserverinstall_nohostdns_nohostsentry
 
+#  Test for Bug 811295 - Installation fails when CN is set in certificate subject base 
+     ipaserverinstall_set_cn
+
 #  --no-ui-redirect      Do not automatically redirect to the Web UI.
      ipaserverinstall_nouiredirect
 
@@ -563,6 +566,23 @@ ipaserverinstall_selfsign()
         verify_selfsign_install tmpout
         verify_install true tmpout selfsign 
     rlPhaseEnd
+}
+
+####################################################################################
+# Test for Bug 811295 - Installation fails when CN is set in certificate subject base 
+# This test sets the --subject CN=test
+####################################################################################
+ipaserverinstall_set_cn()
+{
+    rlPhaseStartTest "ipa-server-install - 30 - [Positive] Install test incolving setting the CN subject value "
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_cnsubject.out
+        rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U --subject CN=Test"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U --subject CN=Test" 0 "Installing ipa server while setting --subject value" 
+        verify_selfsign_install tmpout
+        verify_install true tmpout selfsign 
+    rlPhaseEnd
+
 }
 
 ##############################################################
