@@ -539,17 +539,48 @@ verify_hbac()
 
 verify_833515()
 {
-	rlLog "Test for BZ 833515 :: permissions of replica files should be 0600"
-	rlRun "ls -al /var/lib/ipa | grep sysrestore | grep drwx------" 0 "Ensure that /var/lib/ipa/sysrestore appears to be set to a 600 permission set BZ 833515"
-	rlRun "ls -al /var/lib/ipa | grep sysupgrade | grep drwx------" 0 "Ensure that /var/lib/ipa/sysupgrade appears to be set to a 600 permission set BZ 833515"
+	if [ "$1" == "false" ]; then
+		return
+	fi
+
+  	if [ "$2" == "nodns" ] ; then
+		rlLog "DNS not configured with this install"
+	else
+		rlLog "Test for BZ 833515 :: permissions of replica files should be 0600"
+		rlRun "ls -al /var/lib/ipa | grep sysrestore | grep drwx------" 0 "Ensure that /var/lib/ipa/sysrestore appears to be set to a 600 permission set BZ 833515"
+		rlRun "ls -al /var/lib/ipa | grep sysupgrade | grep drwx------" 0 "Ensure that /var/lib/ipa/sysupgrade appears to be set to a 600 permission set BZ 833515"
+	fi
 }
 
 verify_782920()
 {
-	rlLog "Test for BZ 782920 - Make life easier to admins by configuring /etc/openldap/ldap.conf"
-	rlRun "ls /etc/openldap/ldap.conf" 0 "Make sure that ldap.conf was created"
-	rlRun "grep '$BASEDN' /etc/openldap/ldap.conf" 0 "Check to see if the Base DN seems to be in ldap.conf"
-	rlRun "grep '$MASTER' /etc/openldap/ldap.conf" 0 "Check to see the MASTER dns seems to be in ldap.conf"
+	if [ "$1" == "false" ]; then
+		return
+	fi
+
+  	if [ "$2" == "nodns" ] ; then
+		rlLog "DNS not configured with this install"
+	else
+		rlLog "Test for BZ 782920 - Make life easier to admins by configuring /etc/openldap/ldap.conf"
+		rlRun "ls /etc/openldap/ldap.conf" 0 "Make sure that ldap.conf was created"
+		rlRun "grep '$BASEDN' /etc/openldap/ldap.conf" 0 "Check to see if the Base DN seems to be in ldap.conf"
+		rlRun "grep '$MASTER' /etc/openldap/ldap.conf" 0 "Check to see the MASTER dns seems to be in ldap.conf"
+	fi
+}
+
+verify_819629()
+{
+	if [ "$1" == "false" ]; then
+		return
+	fi
+
+  	if [ "$2" == "nodns" ] ; then
+		rlLog "DNS not configured with this install"
+	else
+		rlLog "Test for BZ 819629 - Enable persistent search in bind-dyndb-ldap during IPA upgrade"
+		rlRun "grep psearch /etc/named.conf  | grep yes" 0 "Make sure a psearch enabled line exists in named.conf"
+		rlRun "grep psearch /etc/named.conf  | grep no" 1 "Make sure a psearch is not disabled anywhere in named.conf"
+	fi
 }
 
 verify_noredirect()

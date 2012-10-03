@@ -257,11 +257,6 @@ ipa_install_topo_default()
 		rlPhaseEnd
 	done
 
-	rlPhaseStartTest "BZ 819629 - Enable persistent search in bind-dyndb-ldap during IPA upgrade"
-		rlRun "grep psearch /etc/named.conf  | grep yes" 0 "Make sure a psearch enabled line exists in named.conf"
-		rlRun "grep psearch /etc/named.conf  | grep no" 1 "Make sure a psearch is not disabled anywhere in named.conf"
-	rlPhaseEnd
-
 }
 
 ######################################################################
