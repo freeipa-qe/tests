@@ -96,7 +96,7 @@ irm_run()
 	irm_disconnect_negative_0004
 	irm_disconnect_negative_0005
 
-	irm_del_positive_0001
+	irm_del_negative_0000
 	
 	irm_forcesync_negative_0004 # must run after delete
 	irm_reinitialize_negative_0004 # must run after delete
@@ -1732,6 +1732,51 @@ irm_del_positive_0002()
 		fi
 			
 		rlRun "ipa host-show $SLAVE1" 2
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+# irm_del_negative
+#     del s2 after s1 disconnected
+#      
+
+irm_del_negative_0000()
+{
+	local tmpout=/tmp/irmtest.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_del_negative_0000 - Fail to remove all replication agreements and data about Replica2 after Replica1 disconnect"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($(hostname))"
+			
+		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 -f > $tmpout 2>&1" 1
+		irm_bugcheck_826677 $tmpout
+		rlRun "sleep 10"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "$SLAVE2" $tmpout
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
+			rlPass "ipa-replica-manage not able to delete $SLAVE2 because $SLAVE1 would be orphaned"
+		else
+			rlFail "ipa-replica-manage reporting that $SLAVE2 no longer a replica of $MASTER.  $SLAVE1 has been orphaned"
+		fi
+			
+		rlRun "ipa host-show $SLAVE2" 2
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
