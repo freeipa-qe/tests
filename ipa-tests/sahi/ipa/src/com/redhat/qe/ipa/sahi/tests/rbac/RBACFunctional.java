@@ -342,9 +342,7 @@ public class RBACFunctional extends SahiTestScript {
      commonTasks.formauth(sahiTasks, "admin", System.getProperty("ipa.server.password"));
 
 }
-
-
-		//xdong
+	//xdong
 		@Test (groups={"PerDomainDNSPermissionSetup"}, description="perdomain DNS permission function test", 
 				dataProvider="PerDomainDNSPermissionSetupData")	
 		public void perdomainDNSPermissionSetup(String uid,String givenname,String sn,String passwd,String newpasswd,String zonename,String authoritativeNameserver,String privilegename, String privilegedescription, String rolename, String roledescription) throws Exception {
@@ -599,180 +597,179 @@ public class RBACFunctional extends SahiTestScript {
 			Assert.assertFalse(sahiTasks.link(rolename).exists(),"role " + privilegename + " deleted as expected");
 			CommonTasks.clearSearch(sahiTasks);
 			
-		}
-		
+		}	
+			
+	/*
+	 * Cleanup after tests are run
+	 */
+	 @AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
+     public void cleanup() throws CloneNotSupportedException {
+             sahiTasks.navigateTo(commonTasks.permissionPage, true);
+             String[] permissionTestObjects = {"Manage DNSRecord1", "bug784621_permission", "bug811211_permission"     
+             };
+             for (String permissionTestObject : permissionTestObjects) {
+                     log.fine("Cleaning Permission: " + permissionTestObject);
+                     PermissionTasks.deletePermission(sahiTasks, permissionTestObject, "Delete");
+             }
 
-		/*
-		 * Cleanup after tests are run
-		 */
-		 @AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
-	     public void cleanup() throws CloneNotSupportedException {
-	             sahiTasks.navigateTo(commonTasks.permissionPage, true);
-	             String[] permissionTestObjects = {"Manage DNSRecord1", "bug784621_permission", "bug811211_permission"     
-	             };
-	             for (String permissionTestObject : permissionTestObjects) {
-	                     log.fine("Cleaning Permission: " + permissionTestObject);
-	                     PermissionTasks.deletePermission(sahiTasks, permissionTestObject, "Delete");
-	             }
-
-	             sahiTasks.navigateTo(commonTasks.privilegePage, true);
-	             String[] privilegeTestObjects = {"TestPrivilegeDNS", "bug784621_privilege", "bug811211_privilege", "bug839008_privilege"
-	             };
-	             for (String privilegeTestObject : privilegeTestObjects) {
-	                     log.fine("Cleaning Privilege: " + privilegeTestObject);
-	                     PrivilegeTasks.deletePrivilege(sahiTasks, privilegeTestObject, "Delete");
-	             }
-
-
-	             sahiTasks.navigateTo(commonTasks.rolePage, true);
-	             String[] roleTestObjects = {"testroledns", "bug784621_role", "bug839008_role"
-	             };
-	             for (String roleTestObject : roleTestObjects) {
-	                     log.fine("Cleaning Role: " + roleTestObject);
-	                     RoleTasks.deleteRole(sahiTasks, roleTestObject, "Delete");
-	             }
+             sahiTasks.navigateTo(commonTasks.privilegePage, true);
+             String[] privilegeTestObjects = {"TestPrivilegeDNS", "bug784621_privilege", "bug811211_privilege", "bug839008_privilege"
+             };
+             for (String privilegeTestObject : privilegeTestObjects) {
+                     log.fine("Cleaning Privilege: " + privilegeTestObject);
+                     PrivilegeTasks.deletePrivilege(sahiTasks, privilegeTestObject, "Delete");
+             }
 
 
-	             sahiTasks.navigateTo(commonTasks.userPage, true);
-	             String[] userTestObjects = {"testuserdns", "bug784621_user", "xyz", "bug839008_user"                      
-	             };
-	             for (String userTestObject : userTestObjects) {
-	                     log.fine("Cleaning Role: " + userTestObject);
-	                     UserTasks.deleteUser(sahiTasks, userTestObject);
-	             }
+             sahiTasks.navigateTo(commonTasks.rolePage, true);
+             String[] roleTestObjects = {"testroledns", "bug784621_role", "bug839008_role"
+             };
+             for (String roleTestObject : roleTestObjects) {
+                     log.fine("Cleaning Role: " + roleTestObject);
+                     RoleTasks.deleteRole(sahiTasks, roleTestObject, "Delete");
+             }
 
-	             sahiTasks.navigateTo(commonTasks.groupPage, true);
-	             String[] groupTestObjects = {"bug839008_group", "testgroupdns"
-	             };
-	             for (String groupTestObject : groupTestObjects) {
-	                     log.fine("Cleaning Role: " + groupTestObject);
-	                     GroupTasks.deleteGroup(sahiTasks, groupTestObject);
-	             }
 
-	     }
-	                                                              
-		
-		/*******************************************************
-		 ************      DATA PROVIDERS     ******************
-		 *******************************************************/
-		/*
-		 * Data to be used when adding roles
-		 */		
-		@DataProvider(name="hostAddsUserTestObjects")
-		public Object[][] gethostAddsUserTestObjects() {
-			String[][] roles={
-	        //	testname			Role Name		Role Description  	Privilege				Host Name 			
-			{ "host_add_user",		"TestRole1",	"TestRole1",		"User Administrators",	"testhost"	}
-			};
-	        
-			return roles;	
-		}
-		
-		/*
-	     * Data to be used when testing bug 785152
-	     */
-	    @DataProvider(name="dnsUpdateAdminTestObjects")
-	    public Object[][] getdnsUpdateAdminTestObjects() {
-	            String[][] roles={
-	            // testName                     permissionName1                 permissionName2                 privilegeName           privilegeDescription    roleName                roleDescription         userName  
-	            { "dnsUpdateAdmin",     		"update dns entries",		   "Read DNS Entries",             "TestPrivilegeDNS",     "TestPrivilegeDNS",      "testroledns",		    "testroledns",          "testuserdns"      }
-	            };
+             sahiTasks.navigateTo(commonTasks.userPage, true);
+             String[] userTestObjects = {"testuserdns", "bug784621_user", "xyz", "bug839008_user"                      
+             };
+             for (String userTestObject : userTestObjects) {
+                     log.fine("Cleaning Role: " + userTestObject);
+                     UserTasks.deleteUser(sahiTasks, userTestObject);
+             }
 
-	            return roles;
-	    }
+             sahiTasks.navigateTo(commonTasks.groupPage, true);
+             String[] groupTestObjects = {"bug839008_group", "testgroupdns"
+             };
+             for (String groupTestObject : groupTestObjects) {
+                     log.fine("Cleaning Role: " + groupTestObject);
+                     GroupTasks.deleteGroup(sahiTasks, groupTestObject);
+             }
 
-	    /*
-	     * Data to be used when testing bug 807361
-	     */
-	    @DataProvider(name="dnsListZoneTestObjects")
-	    public Object[][] getdnsListZoneTestObjects() {
-	            String[][] roles={
-	            // testName                     permissionName                  privilegeName                   roleName                        userName
-	            { "dnsUpdateAdmin",     "Read DNS Entries",             "TestPrivilegeDNS",             "TestRoleDNS",          "testuserdns"   }
-	            };
-
-	            return roles;
-	    }
-
-		
-	    /*
-	     * Data to be used when testing bug 784621
-	     */
-	    @DataProvider(name="ResetPasswordBug784621TestObjects")
-	    public Object[][] getResetPasswordBug784621TestObjects() {
-	            String[][] roles={
-	            // testName                                             permissionName                  permission      filter                          attribute               privilegeName                   privilegedesc                                   roleName                        roledesc                                uidloginuser            givennameloginuser      snloginuser                     userpassword    userpassword2   uid             givenname       sn              
-	            { "bug784621_ResetPassword",    "bug784621_permission", "write",        "(givenname=xyz)",      "carlicense",   "bug784621_privilege",  "bug784621_privilege desc",     "bug784621_role",       "bug784621_role desc",  "bug784621_user",       "bug784621_user",       "bug784621_test",       "Secret123",    "Secret123",    "xyz",  "xyz",          "test"  }
-	            };
-
-	            return roles;
-	    }
-
-	    /*
-	     * Data to be used when testing bug 811211
-	     */
-	    @DataProvider(name="ReaddingPrivilegeBug811211TestObjects")
-	    public Object[][] getReaddingPrivilegeBug811211TestObjects() {
-	            String[][] roles={
-	            // testName                                             permissionName                  permission      filter                          attribute               privilegeName                   privilegedesc                                           
-	            { "bug811211_ReaddingPrivilege","bug811211_permission", "write",        "(givenname=abc)",      "carlicense",   "bug811211_privilege",  "bug811211_privilege desc"      }
-	            };
-
-	            return roles;
-	    }
-
-		
-	    /*
-	     * Data to be used when testing bug 839008
-	     */
-	    @DataProvider(name="IndirectRolesBug839008TestObjects")
-	    public Object[][] getIndirectRolesBug839008TestObjects() {
-	            String[][] roles={
-	            // testName                                             permissionName          privilegeName                   privilegedesc                           roleName                        roleDesc                                uid                                     givenname                               sn                              "password"                      groupName                       groupDesc
-	            { "bug839008_IndirectRoles",    "Read DNS Entries",     "bug839008_privilege",  "bug839008_privilege desc", "bug839008_role",   "bug839008_roleDesc",   "bug839008_user",       "bug839008_givenname",  "bug839008_sn", "Secret123",             "bug839008_group",     "bug839008_group desc"}
-	            };
-
-	            return roles;
-	    }
-
-	    /*
-	     * Perdomain set up data
-	     */
-	    @DataProvider(name="PerDomainDNSPermissionSetupData")
-	    public Object[][] PerDomainDNSPermissionSetupData() {
-	            String[][] roles={
-	            //   uid,         givenname,       sn,         passwd,        newpasswd,        zoneName,            authoritativeNameserver,      privilegename,     privilegedescription,     rolename,        roledescription
-	            {  "perdomain1",    "per",       "domain",      "a",         "Secret123",    "a.testrelm.com",      "ipaqavmc.testrelm.com" ,   "perdomain1p",        "perdomain1p",       "perdomain1r",     "perdomain1r"  },
-	            {  "perdomain2",    "per",       "domain",      "b",         "Secret123",    "b.testrelm.com",      "ipaqavmc.testrelm.com" ,   "perdomain2p",        "perdomain2p",       "perdomain2r",     "perdomain2r"  }
-	            };
-
-	            return roles;
-	    }
-	    
-	    /*
-	     * Perdomain verification data
-	     */
-	    @DataProvider(name="PerDomainDNSPermissionVerifyData")
-	    public Object[][] PerDomainDNSPermissionVerifyData() {
-	            String[][] roles={
-	            //     uid,          passwd,      newpasswd,          zoneName,        not_managed_zoneName,     new_zoneName,               new_authoritativeNameserver 
-	            {   "perdomain1",     "a",       "Secret123",      "a.testrelm.com",      "b.testrelm.com" ,      "newa.testrelm.com",        "ipaqavmc.testrelm.com"    },
-	            {   "perdomain2",     "b",       "Secret123",      "b.testrelm.com",      "a.testrelm.com" ,      "newb.testrelm.com",        "ipaqavmc.testrelm.com"    }
-	            };
-	            return roles;
-	    }
-	    
-	    /*
-	     * Perdomain delete data
-	     */
-	    @DataProvider(name="PerDomainDNSPermissionDeleteData")
-	    public Object[][] PerDomainDNSPermissionDeleteData() {
-	            String[][] roles={
-	            //     uid,             zoneName,         privilegename,      rolename     
-	            {   "perdomain1",    "a.testrelm.com",   "perdomain1p",     "perdomain1r"    },
-	            {   "perdomain2",    "b.testrelm.com",   "perdomain2p",     "perdomain2r"    }
-	            };
-	            return roles;
-	    }
+     }
+                                                              
 	
+	/*******************************************************
+	 ************      DATA PROVIDERS     ******************
+	 *******************************************************/
+	/*
+	 * Data to be used when adding roles
+	 */		
+	@DataProvider(name="hostAddsUserTestObjects")
+	public Object[][] gethostAddsUserTestObjects() {
+		String[][] roles={
+        //	testname			Role Name		Role Description  	Privilege				Host Name 			
+		{ "host_add_user",		"TestRole1",	"TestRole1",		"User Administrators",	"testhost"	}
+		};
+        
+		return roles;	
+	}
+	
+	/*
+     * Data to be used when testing bug 785152
+     */
+    @DataProvider(name="dnsUpdateAdminTestObjects")
+    public Object[][] getdnsUpdateAdminTestObjects() {
+            String[][] roles={
+            // testName                     permissionName1                 permissionName2                 privilegeName           privilegeDescription    roleName                roleDescription         userName  
+            { "dnsUpdateAdmin",     		"update dns entries",		   "Read DNS Entries",             "TestPrivilegeDNS",     "TestPrivilegeDNS",      "testroledns",		    "testroledns",          "testuserdns"      }
+            };
+
+            return roles;
+    }
+
+    /*
+     * Data to be used when testing bug 807361
+     */
+    @DataProvider(name="dnsListZoneTestObjects")
+    public Object[][] getdnsListZoneTestObjects() {
+            String[][] roles={
+            // testName                     permissionName                  privilegeName                   roleName                        userName
+            { "dnsListZone",     "Read DNS Entries",             "TestPrivilegeDNS",             "TestRoleDNS",          "testuserdns"   }
+            };
+
+            return roles;
+    }
+
+	
+    /*
+     * Data to be used when testing bug 784621
+     */
+    @DataProvider(name="ResetPasswordBug784621TestObjects")
+    public Object[][] getResetPasswordBug784621TestObjects() {
+            String[][] roles={
+            // testName                                             permissionName                  permission      filter                          attribute               privilegeName                   privilegedesc                                   roleName                        roledesc                                uidloginuser            givennameloginuser      snloginuser                     userpassword    userpassword2   uid             givenname       sn              
+            { "bug784621_ResetPassword",    "bug784621_permission", "write",        "(givenname=xyz)",      "carlicense",   "bug784621_privilege",  "bug784621_privilege desc",     "bug784621_role",       "bug784621_role desc",  "bug784621_user",       "bug784621_user",       "bug784621_test",       "Secret123",    "Secret123",    "xyz",  "xyz",          "test"  }
+            };
+
+            return roles;
+    }
+
+    /*
+     * Data to be used when testing bug 811211
+     */
+    @DataProvider(name="ReaddingPrivilegeBug811211TestObjects")
+    public Object[][] getReaddingPrivilegeBug811211TestObjects() {
+            String[][] roles={
+            // testName                                             permissionName                  permission      filter                          attribute               privilegeName                   privilegedesc                                           
+            { "bug811211_ReaddingPrivilege","bug811211_permission", "write",        "(givenname=abc)",      "carlicense",   "bug811211_privilege",  "bug811211_privilege desc"      }
+            };
+
+            return roles;
+    }
+
+	
+    /*
+     * Data to be used when testing bug 839008
+     */
+    @DataProvider(name="IndirectRolesBug839008TestObjects")
+    public Object[][] getIndirectRolesBug839008TestObjects() {
+            String[][] roles={
+            // testName                                             permissionName          privilegeName                   privilegedesc                           roleName                        roleDesc                                uid                                     givenname                               sn                              "password"                      groupName                       groupDesc
+            { "bug839008_IndirectRoles",    "Read DNS Entries",     "bug839008_privilege",  "bug839008_privilege desc", "bug839008_role",   "bug839008_roleDesc",   "bug839008_user",       "bug839008_givenname",  "bug839008_sn", "Secret123",             "bug839008_group",     "bug839008_group desc"}
+            };
+
+            return roles;
+    }
+    
+    /*
+     * Perdomain set up data
+     */
+    @DataProvider(name="PerDomainDNSPermissionSetupData")
+    public Object[][] PerDomainDNSPermissionSetupData() {
+            String[][] roles={
+            //   uid,         givenname,       sn,         passwd,        newpasswd,        zoneName,            authoritativeNameserver,      privilegename,     privilegedescription,     rolename,        roledescription
+            {  "perdomain1",    "per",       "domain",      "a",         "Secret123",    "a.testrelm.com",      "ipaqavmc.testrelm.com" ,   "perdomain1p",        "perdomain1p",       "perdomain1r",     "perdomain1r"  },
+            {  "perdomain2",    "per",       "domain",      "b",         "Secret123",    "b.testrelm.com",      "ipaqavmc.testrelm.com" ,   "perdomain2p",        "perdomain2p",       "perdomain2r",     "perdomain2r"  }
+            };
+
+            return roles;
+    }
+    
+    /*
+     * Perdomain verification data
+     */
+    @DataProvider(name="PerDomainDNSPermissionVerifyData")
+    public Object[][] PerDomainDNSPermissionVerifyData() {
+            String[][] roles={
+            //     uid,          passwd,      newpasswd,          zoneName,        not_managed_zoneName,     new_zoneName,               new_authoritativeNameserver 
+            {   "perdomain1",     "a",       "Secret123",      "a.testrelm.com",      "b.testrelm.com" ,      "newa.testrelm.com",        "ipaqavmc.testrelm.com"    },
+            {   "perdomain2",     "b",       "Secret123",      "b.testrelm.com",      "a.testrelm.com" ,      "newb.testrelm.com",        "ipaqavmc.testrelm.com"    }
+            };
+            return roles;
+    }
+    
+    /*
+     * Perdomain delete data
+     */
+    @DataProvider(name="PerDomainDNSPermissionDeleteData")
+    public Object[][] PerDomainDNSPermissionDeleteData() {
+            String[][] roles={
+            //     uid,             zoneName,         privilegename,      rolename     
+            {   "perdomain1",    "a.testrelm.com",   "perdomain1p",     "perdomain1r"    },
+            {   "perdomain2",    "b.testrelm.com",   "perdomain2p",     "perdomain2r"    }
+            };
+            return roles;
+    }
+       
 }
