@@ -870,7 +870,7 @@ ipaclientinstall_client_hostname_localhost() #Added by Kaleem
 ###############################################################################################
 ipaclientinstall_dirty_keytab()
 {
-    rlPhaseStartTest "ipa-client-install-02- "
+    rlPhaseStartTest "ipa-client-install-39-dirty-keytab "
         uninstall_fornexttest
         #rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
         #rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
@@ -893,6 +893,13 @@ ipaclientinstall_dirty_keytab()
 
 	klist -kt /etc/krb5.keytab
 	diff $bkup $ktab
+	if [ $? -ne 0 ]; then 
+		rlFail "FAIL - $bkup and $ktab do not seem to match."
+		cont=$(cat $bkup)
+		rlLog "Contents of $bkup are $cont"
+		cont=$(cat $ktab)
+		rlLog "Contents of $ktab are $cont"
+	fi
 
     rlPhaseEnd
 }
