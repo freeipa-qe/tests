@@ -62,7 +62,8 @@ named_conf_bkp="/etc/named.conf.adtrust"
 krb5_conf="/etc/krb5.conf"
 krb5_conf_bkp="/etc/krb5.conf.bkp"
 IPAhost="`hostname`"
-IPAhostIP="`host $IPAhost | awk '{print $NF}'`"
+IPAhostIP=`ip addr | egrep 'inet ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
+IPAhostIP6=`ip addr | egrep 'inet6 ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 IPAdomain="testrelm.com"
 IPARealm="TESTRELM.COM"
 NBname="TESTRELM"
@@ -72,7 +73,6 @@ spchnm='Te!5@relm'
 TID="10999"
 STID="332233991"
 fakeIP="10.25.11.21"
-V6IP=`ip addr | egrep 'inet6 ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 invalid_V6IP="3632:51:0:c41c:7054:ff:ae3c:c981"
 
 setup() {
@@ -169,7 +169,7 @@ adtrust_test_0006() {
 
 rlPhaseStartTest "0006 Adtrust install with wrong IP address"
 	rlRun "IP_Exp" 0 "Creating expect script"
-	rlRun "echo \"IPA server IP is $IPAhostip\", but using and invalid IP to configure adtrust"
+	rlRun "echo \"IPA server IP is $IPAhostIP\", but using and invalid IP to configure adtrust"
         rlRun "$exp $expfile ip-address $fakeIP" 2 "$fakeIP does not belong to this server. Adtrust install failed as expected"
 
 rlPhaseEnd
@@ -179,7 +179,7 @@ adtrust_test_0007() {
 
 rlPhaseStartTest "0007 Adtrust install with invalid IPv6 address"
 	rlRun "IP_Exp" 0 "Creating expect script"
-	rlRun "echo \"Server IPv6 address is $V6IP, but using an invalid IPv6 address to configure adtrust\""
+	rlRun "echo \"Server IPv6 address is $IPAhostIP6, but using an invalid IPv6 address to configure adtrust\""
 	rlRun "$exp $expfile ip-address \"$invalid_V6IP\"" 2 "Invalid IPv6 Address exited with an error"
 
 rlPhaseEnd
@@ -198,8 +198,8 @@ rlPhaseEnd
 adtrust_test_0009() {
 
 rlPhaseStartTest "0009 Adtrust install as a non-root user"
-	rlRun "create_ipauser test user $user $userpw"
-	rlRun "NonRoot_Exp" 0 "Createing expect script"
+	rlRun "create_ipauser $user test user $userpw"
+	rlRun "NonRoot_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 2 "Failed as expected. Must be root to setup AD trusts on server"
 
 rlPhaseEnd
@@ -335,20 +335,20 @@ rlPhaseEnd
 
 adtrust_test_0022() {
 
-rlPhaseStartTest "0022 Adtrust install on IPA server with no DNS integrated"
-        rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
-        rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
-	rlRun "No_SRV_Exp" 0 "Creating expect script"
-        rlRun "$exp $expfile" 0 "SRV records not created without integrated DNS"
+rlPhaseStartTest "0022 Adtrust install with --no-msdcs without integrated DNS"
+	rlRun "No_SRV_Exp no-msdcs" 0 "Creating expect script"
+        rlRun "$exp $expfile" 0 "SRV records not created with --no-msdcs"
 
 rlPhaseEnd
 }
 
 adtrust_test_0023() {
 
-rlPhaseStartTest "0023 Adtrust install with --no-msdcs without integrated DNS"
-	rlRun "No_SRV_Exp no-msdcs" 0 "Creating expect script"
-        rlRun "$exp $expfile" 0 "SRV records not created with --no-msdcs"
+rlPhaseStartTest "0023 Adtrust install on IPA server with no DNS integrated"
+        rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+        rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
+	rlRun "No_SRV_Exp" 0 "Creating expect script"
+        rlRun "$exp $expfile" 0 "SRV records not created without integrated DNS"
 
 rlPhaseEnd
 }
@@ -358,9 +358,9 @@ cleanup() {
 rlPhaseStartTest "Clean up for adtrust sanity tests"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
-	rlRun "rm -f $named_conf && cp -p $named_conf_bkp $named_conf" 0 "Restoring $named_conf file from backup"
-	rlServiceStop "named"
-        rlServiceStart "named"
+#	rlRun "rm -f $named_conf && cp -p $named_conf_bkp $named_conf" 0 "Restoring $named_conf file from backup"
+#	rlServiceStop "named"
+#        rlServiceStart "named"
 
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "rm -fr /tmp/krb5cc_*"

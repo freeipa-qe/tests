@@ -39,12 +39,12 @@ rec3="_kerberos._tcp.Default-First-Site-Name._sites.dc._msdcs"
 rec4="_kerberos._tcp.dc._msdcs"
 rec5="_kerberos._udp.Default-First-Site-Name._sites.dc._msdcs"
 rec6="_kerberos._udp.dc._msdcs"
-rec1re='\_ldap\.\_tcp\.Default\-First\-Site\-Name\.\_sites\.dc\.\_msdcs'
-rec2re='\_ldap\.\_tcp\.dc\.\_msdcs'
-rec3re='\_kerberos\.\_tcp\.Default\-First\-Site\-Name\.\_sites\.dc\.\_msdcs'
-rec4re='\_kerberos\.\_tcp\.dc\.\_msdcs'
-rec5re='\_kerberos\.\_udp\.Default\-\First\-\Site\-Name\.\_sites\.dc\.\_msdcs'
-rec6re='\_kerberos\.\_udp\.dc\.\_msdcs'
+#rec1re='\_ldap\.\_tcp\.Default\-First\-Site\-Name\.\_sites\.dc\.\_msdcs'
+#rec2re='\_ldap\.\_tcp\.dc\.\_msdcs'
+#rec3re='\_kerberos\.\_tcp\.Default\-First\-Site\-Name\.\_sites\.dc\.\_msdcs'
+#rec4re='\_kerberos\.\_tcp\.dc\.\_msdcs'
+#rec5re='\_kerberos\.\_udp\.Default\-\First\-\Site\-Name\.\_sites\.dc\.\_msdcs'
+#rec6re='\_kerberos\.\_udp\.dc\.\_msdcs'
 expfile="/tmp/adtrust_install.exp"
 exp=`which expect`
 user="tuser"
@@ -123,7 +123,7 @@ RID_Exp() {
         echo 'set timeout 10
         set send_slow {1 .1}
         spawn /bin/bash
-        expect "*#"' > $expfile
+        expect "*#"' >> $expfile
         echo "send \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
         echo 'expect "invalid integer value:*"
         expect "*#" {' >> $expfile
@@ -138,11 +138,11 @@ No_SRV_Exp() {
 	set send_slow {1 .1}' > $expfile
 	if [ -n $1 ]; then
 	  echo 'set var1 [lindex $argv 0]' >> $expfile
-	  echo "spawn $trust_bin --$var1" >> $expfile
-	  echo 'expect "*]: "' >> $expfile
-	  echo 'send -s -- "y\r"' >> $expfile
+	  echo "spawn $trust_bin --\$var1" >> $expfile
 	else
 	  echo "spawn $trust_bin" >> $expfile
+	  echo 'expect "*]: "' >> $expfile
+	  echo 'send -s -- "y\r"' >> $expfile
 	fi
 	echo 'expect "*]: "' >> $expfile
 	echo 'send -s -- "\r"' >> $expfile
@@ -151,17 +151,25 @@ No_SRV_Exp() {
 	echo 'expect {
 	    timeout { send_user "\nExpected message not received\n"; exit 1 }
 	    eof { send_user "\nSome issue\n"; exit 1 }
-	"Setup*complete" {
-	expect "DNS*management*was*not*enabled"' >> $expfile
-	echo "expect '$rec1re'" >> $expfile
-	echo "expect '$rec2re'" >> $expfile
-	echo "expect '$rec3re'" >> $expfile
-	echo "expect '$rec4re'" >> $expfile
-	echo "expect '$rec5re'" >> $expfile
-	echo "expect '$rec6re'" >> $expfile
-	echo '} }
-	send_user "\nAdtrust installed successfully without service records\n"  
-	expect eof' >> $expfile
+	"DNS*management*was*not*enabled" {' >> $expfile
+	echo 'send_user "------------------\n"' >> $expfile
+	echo "expect \"*$rec1\"" >> $expfile
+	echo 'send_user "------------------\n"' >> $expfile
+	echo "expect \"*$rec2\"" >> $expfile
+	echo 'send_user "------------------\n"' >> $expfile
+	echo "expect \"*$rec3\"" >> $expfile
+	echo 'send_user "------------------\n"' >> $expfile
+	echo "expect \"*$rec4\"" >> $expfile
+	echo 'send_user "------------------\n"' >> $expfile
+	echo "expect \"*$rec5\"" >> $expfile
+	echo 'send_user "------------------\n"' >> $expfile
+	echo "expect \"*$rec6\"" >> $expfile
+	echo 'send_user "------------------\n"' >> $expfile
+	echo 'expect "Setup*complete" {
+	expect "*# " }
+	} }
+	send_user "\nAdtrust installed successfully without service records\n"
+	exit' >> $expfile
 }
 
 Intractive_Exp() {
@@ -254,12 +262,14 @@ Valid_RID_Exp() {
 	rm -rf $expfile
 	echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]
+        set var3 [lindex $argv 2]
+        set var4 [lindex $argv 3]
         set timeout 300
         set send_slow {1 .1}' > $expfile
-	if [ $1 != both ]; then
-	  echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
-	else
+	if [ -n $1 -a $1 = both ]; then
 	  echo "spawn $trust_bin --\$var1=\$var2 --\$var3=\$var4" >> $expfile
+	else
+	  echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
 	fi
         echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
         echo 'expect "*assword: "' >> $expfile
