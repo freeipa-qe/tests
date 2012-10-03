@@ -52,7 +52,7 @@ userpw="Secret123"
 adminpw="Secret123"
 
 
-NB_Exp () {
+NB_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]' > $expfile
         echo 'set var2 [lindex $argv 1]' >> $expfile
@@ -67,7 +67,7 @@ NB_Exp () {
         echo "send_user \"\n$var2 name not permitted for netbios name.\n\" ; exit 2" >> $expfile
 }
 
-IP_Exp () {
+IP_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]' > $expfile
         echo 'set var2 [lindex $argv 1]' >> $expfile
@@ -82,7 +82,7 @@ IP_Exp () {
         echo 'send_user "\n$var2 is not a valid ip address\n" ; exit 2' >> $expfile
 }
 
-NBIP_Exp () {
+NBIP_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]' > $expfile
         echo 'set var2 [lindex $argv 1]' >> $expfile
@@ -101,7 +101,7 @@ NBIP_Exp () {
    }' >>  $expfile
 }
 
-NonRoot_Exp () {
+NonRoot_Exp() {
 	rm -rf $expfile
         echo 'set timeout 10
         set send_slow {1 .1}' > $expfile
@@ -115,7 +115,7 @@ NonRoot_Exp () {
         echo 'send_user "\nUser is not root\n" ; exit 2 }' >> $expfile
 }
 
-RID_Exp () {
+RID_Exp() {
 	rm -rf $expfile
 	echo 'set var1 [lindex $argv 0]' > $expfile
         echo 'set var2 [lindex $argv 1]' >> $expfile
@@ -132,7 +132,7 @@ RID_Exp () {
         echo 'send_user "\n\nOnly intergers accepted\n" ; exit 2' >> $expfile
 }
 
-No_SRV_Exp () {
+No_SRV_Exp() {
 	rm -rf $expfile
 	echo 'set timeout 300
 	set send_slow {1 .1}' > $expfile
@@ -164,7 +164,7 @@ No_SRV_Exp () {
 	expect eof' >> $expfile
 }
 
-Intractive_Exp () {
+Intractive_Exp() {
 	rm -rf $expfile
         echo 'set timeout 300
         set send_slow {1 .1}' > $expfile
@@ -186,7 +186,7 @@ Intractive_Exp () {
   exit 0' >> $expfile
 }
 
-Valid_NB_Exp () {
+Valid_NB_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]
@@ -206,7 +206,7 @@ Valid_NB_Exp () {
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
 
-Valid_IP_Exp () {
+Valid_IP_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]
@@ -228,7 +228,7 @@ Valid_IP_Exp () {
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
 
-Valid_NBIP_Exp () {
+Valid_NBIP_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]
@@ -250,7 +250,7 @@ Valid_NBIP_Exp () {
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
 
-Valid_RID_Exp () {
+Valid_RID_Exp() {
 	rm -rf $expfile
 	echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]

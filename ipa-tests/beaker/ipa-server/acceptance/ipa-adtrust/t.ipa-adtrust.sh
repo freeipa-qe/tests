@@ -37,9 +37,6 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
-# AD values
-#. ./Config
-
 # AD libs
 . ./adlib.sh
 ########################################################################

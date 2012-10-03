@@ -108,7 +108,21 @@ rlJournalStart
 		"adtrust_test_0006"
 		"adtrust_test_0007"
 		"adtrust_test_0008"
-#		"adtrust_test_0009"
+		"adtrust_test_0009"
+		"adtrust_test_0010"
+		"adtrust_test_0011"
+		"adtrust_test_0012"
+		"adtrust_test_0013"
+		"adtrust_test_0014"
+		"adtrust_test_0015"
+		"adtrust_test_0016"
+		"adtrust_test_0017"
+		"adtrust_test_0018"
+		"adtrust_test_0019"
+		"adtrust_test_0020"
+		"adtrust_test_0021"
+		"adtrust_test_0022"
+		"adtrust_test_0023"
 	}
 
 
@@ -120,7 +134,7 @@ rlJournalStart
 adtrust_connect
 	# tests end...
 
-    rlPhaseStartCleanup "ipa-adtrust-cleanup: Destroying admin credentials & removing certificates."
+    rlPhaseStartCleanup "ipa-adtrust-cleanup: Destroying admin credentials."
 		rlRun "cleanup"
     rlPhaseEnd
 
