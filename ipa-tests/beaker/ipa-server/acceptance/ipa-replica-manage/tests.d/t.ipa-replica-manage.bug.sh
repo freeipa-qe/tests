@@ -86,3 +86,18 @@ irm_bugcheck_831661()
 		fi
 	rlPhaseEnd
 }	
+
+irm_bugcheck_839638()
+{
+	tmpout=$1
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_bugcheck_839638 - ipa-replica-manage allows disconnect of last connection for a single replica"
+		OUTPUTCHK1=$(grep "Deleted replication agreement" $tmpout|wc -l)
+		OUTPUTCHK2=$(grep "Cannot remove the last replication link" $tmpout | wc -l)
+		if [ $OUTPUTCHK1 -gt 0 -a $OUTPUTCHK2 -eq 0 ]; then
+			rlFail "BZ 839638 found...ipa-replica-manage allows disconnect of last connection for a single replica"
+		else
+			rlPass "BZ 839638 not found."
+		fi
+	rlPhaseEnd
+}

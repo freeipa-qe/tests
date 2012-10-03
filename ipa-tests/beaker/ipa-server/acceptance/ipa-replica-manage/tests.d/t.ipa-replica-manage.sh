@@ -88,7 +88,7 @@ irm_run()
 	irm_connect_positive_0003
 
 	irm_disconnect_positive_0001
-	irm_disconnect_positive_0002
+	irm_disconnect_negative_0000
 
 	irm_disconnect_negative_0001
 	irm_disconnect_negative_0002
@@ -1445,18 +1445,20 @@ irm_disconnect_positive_0001()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
-irm_disconnect_positive_0002()
+irm_disconnect_negative_0000()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_disconnect_positive_0002 - Disconnect Master to Replica1 agreement"
+	rlPhaseStartTest "irm_disconnect_negative_0000 - Disconnect Master to Replica1 agreement"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE1 > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		rlAssertGrep "Deleted replication agreement from '$MASTER' to '$SLAVE1'" $tmpout
+		rlAssertGrep "Cannot remove the last replication link of '$SLAVE1'" $tmpout
+		rlAssertGrep "Please use the 'del' command to remove it from the domain" $tmpout
+		irm_bugcheck_839638 $tmpout
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE1"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
