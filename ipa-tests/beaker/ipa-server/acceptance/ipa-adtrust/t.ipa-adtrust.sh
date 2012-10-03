@@ -98,12 +98,12 @@ rlPhaseStartTest "Setup for adtrust sanity tests"
 	rlServiceStop "ip6tables"
 
 	# Adding conditional forwarder
-        rlRun "cp -p $named_conf $named_conf_bkp" 0 "Backup $named_conf before adding conditional forwarder for AD"
-        echo -e "\nzone \"$ADdomain\" IN {\n\ttype forward;\n\tforwarders { $ADip; };\n\tforward only;\n};" >> $named_conf
-        rlServiceStop "named"
-        rlServiceStart "named"
-        sleep 30
-        rlRun "host $ADhost"
+#        rlRun "cp -p $named_conf $named_conf_bkp" 0 "Backup $named_conf before adding conditional forwarder for AD"
+#        echo -e "\nzone \"$ADdomain\" IN {\n\ttype forward;\n\tforwarders { $ADip; };\n\tforward only;\n};" >> $named_conf
+#        rlServiceStop "named"
+#        rlServiceStart "named"
+#        sleep 30
+#        rlRun "host $ADhost"
 
 #	rlRun "./adsetup.exp add $ADadmin $ADpswd $ADip $IPAhost $IPAhostIP > /dev/null 2>&1" 0 "Adding conditional forwarder for IPA domain in ADS"
 
