@@ -595,6 +595,7 @@ verify_install()
     verify_hbac $1 $3
     verify_noredirect $1 $3
     verify_zonerefresh $1 $3
+    verify_833515
 }
 
 

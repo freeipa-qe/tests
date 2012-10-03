@@ -257,11 +257,6 @@ ipa_install_topo_default()
 		rlPhaseEnd
 	done
 
-	rlPhaseStartTest "BZ 833515 :: permissions of replica files should be 0600"
-		rlRun "ls -al /var/lib/ipa | grep sysrestore | grep drwx------" 0 "Ensure that /var/lib/ipa/sysrestore appears to be set to a 600 permission set BZ 833515"
-		rlRun "ls -al /var/lib/ipa | grep sysupgrade | grep drwx------" 0 "Ensure that /var/lib/ipa/sysupgrade appears to be set to a 600 permission set BZ 833515"
-	rlPhaseEnd
-
 	rlPhaseStartTest "BZ 782920 - Make life easier to admins by configuring /etc/openldap/ldap.conf"
 		rlRun "ls /etc/openldap/ldap.conf" 0 "Make sure that ldap.conf was created"
 		rlRun "grep '$BASEDN' /etc/openldap/ldap.conf" 0 "Check to see if the Base DN seems to be in ldap.conf"
