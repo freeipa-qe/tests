@@ -38,7 +38,7 @@
 . /dev/shm/env.sh
 
 # AD values
-. ./Config
+#. ./Config
 
 # AD libs
 . ./adlib.sh
@@ -192,7 +192,7 @@ adtrust_test_0008() {
 
 rlPhaseStartTest "0008 Adtrust install with invalid IP Address but valid Netbios Name and vice versa"
 	rlRun "NBIP_Exp" 0 "Creating expect script"
-	rlRun "$exp $expfile ip-address 10.31.10.0 netbios-name $NBname" 2 "Valid Netbios-name and Invalid IP Address fails"
+	rlRun "$exp $expfile ip-address 10.31.10.10 netbios-name $NBname" 2 "Valid Netbios-name and Invalid IP Address fails"
 	rlRun "$exp $expfile ip-address $IPAhostIP netbios-name TESTrELm" 2 "Valid IP Address and Invalid Netbios Name fails"
 
 rlPhaseEnd
