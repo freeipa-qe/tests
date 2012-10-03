@@ -544,6 +544,14 @@ verify_833515()
 	rlRun "ls -al /var/lib/ipa | grep sysupgrade | grep drwx------" 0 "Ensure that /var/lib/ipa/sysupgrade appears to be set to a 600 permission set BZ 833515"
 }
 
+verify_782920()
+{
+	rlLog "Test for BZ 782920 - Make life easier to admins by configuring /etc/openldap/ldap.conf"
+	rlRun "ls /etc/openldap/ldap.conf" 0 "Make sure that ldap.conf was created"
+	rlRun "grep '$BASEDN' /etc/openldap/ldap.conf" 0 "Check to see if the Base DN seems to be in ldap.conf"
+	rlRun "grep '$MASTER' /etc/openldap/ldap.conf" 0 "Check to see the MASTER dns seems to be in ldap.conf"
+}
+
 verify_noredirect()
 {
   rlLog "Verify ipa-rewrite to verify for redirect"

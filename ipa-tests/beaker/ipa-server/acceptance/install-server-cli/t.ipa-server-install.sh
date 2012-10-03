@@ -596,6 +596,7 @@ verify_install()
     verify_noredirect $1 $3
     verify_zonerefresh $1 $3
     verify_833515
+    verify_782920
 }
 
 
