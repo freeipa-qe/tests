@@ -117,3 +117,17 @@ irm_bugcheck_826677()
 		fi
 	rlPhaseEnd
 }
+
+irm_bugcheck_754539()
+{
+	tmpout=$1
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_bugcheck_754539 - Connect after del using ipa-replica-manage fails"
+		OUTPUTCHK1=$(grep "You cannot connect to a previously deleted master" $tmpout|wc -l)
+		if [ $OUTPUTCHK1 -gt 0 ]; then
+			rlPass "BZ 754539 not found."
+		else
+			rlFail "BZ 754539 found...Connect after del using ipa-replica-manage fails"
+		fi
+	rlPhaseEnd
+}

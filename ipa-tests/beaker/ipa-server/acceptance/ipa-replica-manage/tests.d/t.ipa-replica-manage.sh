@@ -82,6 +82,8 @@ irm_run()
 	irm_del_positive_0001
 	irm_del_positive_0002
 
+	irm_connect_negative_0003
+
 	reconnect_slave1
 	reconnect_slave2
 
@@ -899,6 +901,44 @@ irm_connect_negative_0002()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
+# irm_connect_negative
+#     connect m-previously deleted s1
+# 
+
+irm_connect_negative_0003()
+{
+	local tmpout=/tmp/errormsg.out
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_connect_negative_0003 - Fail to connect Master to Replica1 after Replica1 deleted"
+	case "$MYROLE" in
+	MASTER)
+		rlLog "Machine in recipe is MASTER ($(hostname))"
+
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE1|wc -l) -gt 0 ]; then
+			rlLog "Found $MASTER - $SLAVE1 replica agreement...deleting"
+			rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE1"
+		fi
+		rlRun "ipa-replica-manage -p $ADMINPW connect $MASTER $SLAVE1 > $tmpout 2>&1" 1
+		rlAssertGrep "You cannot connect to a previously deleted master" $tmpout
+		irm_bugcheck_754539 $tmpout
+		
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
+		;;
+	SLAVE*)
+		rlLog "Machine in recipe is SLAVE ($(hostname))"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
+	CLIENT)
+		rlLog "Machine in recipe is CLIENT ($CLIENT)"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
 # irm_forcesync_positive
 #     force-sync --from=s1 # on master
 #     force-sync --from=s2 # on s1
