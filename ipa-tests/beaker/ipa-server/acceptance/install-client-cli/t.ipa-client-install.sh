@@ -913,6 +913,11 @@ ipaclientinstall_dirty_keytab()
 ##############################################################
 verify_install()
 {
+# check for bug 845691
+	if [ "$1" == "true" ]; then
+		ipaclientinstall_bugcheck_845691
+	fi
+
 # verify files changed during install/uninstall
    verify_nsswitch $1 $2
    if [ "$1" == "true" ] ; then

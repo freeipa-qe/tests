@@ -39,6 +39,7 @@
 . ./t.ipa-client-install.sh
 . ./t.client-install-primary-server.sh
 . ./lib.ipaclientverify.sh
+. ./t.ipa-client-install.bug.sh
 #. ../quickinstall/install-lib.sh
 . ../quickinstall/ipa-install.sh
 
