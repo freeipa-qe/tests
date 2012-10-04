@@ -61,7 +61,6 @@ named_conf="/etc/named.conf"
 named_conf_bkp="/etc/named.conf.adtrust"
 krb5_conf="/etc/krb5.conf"
 krb5_conf_bkp="/etc/krb5.conf.bkp"
-IPAhost="`hostname`"
 IPAhostIP=`ip addr | egrep 'inet ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 IPAhostIP6=`ip addr | egrep 'inet6 ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 IPAdomain="testrelm.com"
@@ -335,7 +334,9 @@ rlPhaseEnd
 
 adtrust_test_0022() {
 
-rlPhaseStartTest "0022 Adtrust install with --no-msdcs without integrated DNS"
+rlPhaseStartTest "0022 Adtrust install with --no-msdcs on Non DNS integrated server"
+        rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+        rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install without DNS"
 	rlRun "No_SRV_Exp no-msdcs" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created with --no-msdcs"
 
@@ -344,9 +345,7 @@ rlPhaseEnd
 
 adtrust_test_0023() {
 
-rlPhaseStartTest "0023 Adtrust install on IPA server with no DNS integrated"
-        rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
-        rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
+rlPhaseStartTest "0023 Adtrust install on IPA server with DNS not integrated"
 	rlRun "No_SRV_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created without integrated DNS"
 

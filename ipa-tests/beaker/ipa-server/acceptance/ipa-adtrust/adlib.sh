@@ -33,6 +33,7 @@
 . /dev/shm/env.sh
 
 trust_bin=`which ipa-adtrust-install`
+IPAhost=`hostname`
 rec1="_ldap._tcp.Default-First-Site-Name._sites.dc._msdcs"
 rec2="_ldap._tcp.dc._msdcs"
 rec3="_kerberos._tcp.Default-First-Site-Name._sites.dc._msdcs"
@@ -136,9 +137,8 @@ No_SRV_Exp() {
 	rm -rf $expfile
 	echo 'set timeout 300
 	set send_slow {1 .1}' > $expfile
-	if [ -n $1 ]; then
-	  echo 'set var1 [lindex $argv 0]' >> $expfile
-	  echo "spawn $trust_bin --\$var1" >> $expfile
+	if [ "$1" = "no-msdcs" ]; then
+	  echo "spawn $trust_bin --no-msdcs" >> $expfile
 	else
 	  echo "spawn $trust_bin" >> $expfile
 	  echo 'expect "*]: "' >> $expfile
