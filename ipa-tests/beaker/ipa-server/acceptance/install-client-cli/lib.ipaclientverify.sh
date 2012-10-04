@@ -156,7 +156,7 @@ verify_sssd()
        fi
        testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1" 
-       testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | xargs echo`
+       testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | sed 's/_srv_,//g' | xargs echo`
        ipacompare_forinstalluninstall_withmasterslave "ipa_server " "$ipa_server_master" "$ipa_server_slave" "$testipaserver" "$1"
        if [ "$2" == "enablednsupdates" ] ; then
           testipadyndnsupdate=`grep "^ipa_dyndns_update" $SSSD | cut -d "=" -f2 | xargs echo`
