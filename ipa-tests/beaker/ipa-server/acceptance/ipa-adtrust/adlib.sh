@@ -152,19 +152,19 @@ No_SRV_Exp() {
 	    timeout { send_user "\nExpected message not received\n"; exit 1 }
 	    eof { send_user "\nSome issue\n"; exit 1 }
 	"DNS*management*was*not*enabled" {' >> $expfile
-	echo 'send_user "------------------\n"' >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec1\"" >> $expfile
-	echo 'send_user "------------------\n"' >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec2\"" >> $expfile
-	echo 'send_user "------------------\n"' >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec3\"" >> $expfile
-	echo 'send_user "------------------\n"' >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec4\"" >> $expfile
-	echo 'send_user "------------------\n"' >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec5\"" >> $expfile
-	echo 'send_user "------------------\n"' >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec6\"" >> $expfile
-	echo 'send_user "------------------\n"' >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo 'expect "Setup*complete" {
 	expect "*# " }
 	} }
@@ -271,6 +271,9 @@ Valid_RID_Exp() {
 	else
 	  echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
 	fi
+#        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
+#        echo 'sleep .5' >> $expfile
+#        echo 'send -s -- "y\r"' >> $expfile
         echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile

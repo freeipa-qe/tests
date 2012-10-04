@@ -207,6 +207,7 @@ rlPhaseEnd
 adtrust_test_0010() {
 
 rlPhaseStartTest "0010 Adtrust install by a user with administrative privileges"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa group-add-member --users=$user admins" 0 "Adding tuser to the admins group"
 	rlRun "NonRoot_Exp" 0 "Createing expect script"
 	rlRun "$exp $expfile" 2 "Failed as expected. Still need to be root to setup AD trusts"
