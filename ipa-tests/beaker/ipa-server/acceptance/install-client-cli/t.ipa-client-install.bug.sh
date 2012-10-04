@@ -29,7 +29,8 @@
 ipaclientinstall_bugcheck_845691()
 {
 	rlPhaseStartTest "ipaclientinstall_bugcheck_845691 - ipa-client-install Failed to obtain host TGT"	
-        CHK=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+        #CHK=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+        CHK=$(grep "Error obtaining initial credentials: Client not found in Kerberos database" /var/log/ipaclient-install.log|wc -l)
         if [ $CHK -gt 0 ]; then
             rlFail "BZ 845691 found...ipa-client-install Failed to obtain host TGT"
             submit_log /var/log/ipaclient-install.log
