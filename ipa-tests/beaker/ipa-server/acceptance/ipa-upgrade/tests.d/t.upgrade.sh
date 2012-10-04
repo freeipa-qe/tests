@@ -50,7 +50,7 @@ upgrade_master()
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 
 		# Setup new yum repos from ipa-upgrade.data datafile
 		for url in ${myrepo[@]}; do
@@ -69,7 +69,7 @@ upgrade_master()
 		rlRun "yum -y update 'ipa*'"	
 		rlRun "ipactl status"
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
-		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 		#submit_log /var/log/ipaupgrade.log
 		#if [ -f /var/log/ipaupgrade.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
@@ -106,7 +106,7 @@ upgrade_slave()
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 
 		# Setup new yum repos from ipa-upgrade.data datafile
 		for url in ${myrepo[@]}; do
@@ -134,7 +134,7 @@ upgrade_slave()
 		rlRun "ipactl status"
 
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
-		rlRun "rpm -q ipa-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 		#submit_log /var/log/ipaupgrade.log
 		#if [ -f /var/log/ipaupgrade.log ]; then
 		#	DATE=$(date +%Y%m%d-%H%M%S)
@@ -172,7 +172,7 @@ upgrade_client()
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
 
-		rlRun "rpm -q ipa-client sssd selinux-policy"
+		rlRun "rpm -q $PKG-client sssd selinux-policy"
 		rlLog "backing up SLAVE log files before uninstall"
 
 		# Setup new yum repos from ipa-upgrade.data datafile
@@ -193,7 +193,7 @@ upgrade_client()
 		#rlRun "yum -y update selinux-policy selinux-policy-targeted"
 		rlRun "yum -y update 'ipa*'"	
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
-		rlRun "rpm -q ipa-client sssd"
+		rlRun "rpm -q $PKG-client sssd"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $CLIENT_IP"
 		;;

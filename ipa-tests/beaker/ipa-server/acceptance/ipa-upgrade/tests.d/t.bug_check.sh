@@ -94,7 +94,7 @@ upgrade_bz_746589()
 		rlLog "Machine in recipe is MASTER"
 		KinitAsAdmin
 		rlLog "checking if upgrade"
-		isUpgrade=$(yum history package  ipa-server|head -5|grep Update|wc -l)
+		isUpgrade=$(yum history package  $PKG-server|head -5|grep Update|wc -l)
 		if [ $isUpgrade -eq 0 ]; then
 			rlPass "IPA not an upgrade...skipping test"
 		else

@@ -29,7 +29,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect"/>
+					<param name="PKGARGNAME" value="expect freeipa-server"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
@@ -68,7 +68,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect"/>
+					<param name="PKGARGNAME" value="expect freeipa-server"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
@@ -108,7 +108,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect"/>
+					<param name="PKGARGNAME" value="expect freeipa-client"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">

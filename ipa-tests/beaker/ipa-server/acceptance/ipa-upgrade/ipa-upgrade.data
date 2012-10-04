@@ -3,13 +3,17 @@ echo $FAMILY | grep Fedora
 if [ $? -eq 0 ]; then
 	OS=fedora
 	VER=17
+        PKG="freeipa"
 fi
 
 echo $FAMILY | grep RedHatEnterpriseLinux
 if [ $? -eq 0 ]; then
 	OS=rhel
 	VER=6
+        PKG="freeipa"
 fi
+
+export OS VER PKG
 
 # Adding support only for Fedora 17 and Rhel 6 at this time. Maybe a case statemet will be required for other OS's in the future.
 if [ "$OS" = "fedora" ]; then
