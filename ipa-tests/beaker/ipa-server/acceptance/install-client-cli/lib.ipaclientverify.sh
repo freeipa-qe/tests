@@ -70,6 +70,8 @@ uninstall_fornexttest()
           rhts-submit-log -l /var/log/ipaclient-uninstall.log
        fi
     fi
+    # Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
+    rlRun "ls $SSSD" 1 "Making sure that $SSSD does not exist. BZ 819982"
     if [ -f $SSSD ] ; then
        rlLog "renaming last sssd.conf"
        mv $SSSD $SSSD.old

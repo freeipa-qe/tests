@@ -111,9 +111,11 @@ ipaclientinstall()
 #  --preserve-sssd     Preserve old SSSD configuration if possible
       ipaclientinstall_preservesssd
 
-# Bug 753526  - ipa-client-install rejects machines with hostname as localhost or localhost.localdomain #Added by Kaleem
+# Bug 753526 - ipa-client-install rejects machines with hostname as localhost or localhost.localdomain #Added by Kaleem
       ipaclientinstall_client_hostname_localhost
 
+# Bug 817869 - Clean keytabs before installing new keys into them 
+      ipaclientinstall_dirty_keytab
 # Moved it to be last test
    ipaclientinstall_server_unreachableserver
 
@@ -862,45 +864,6 @@ ipaclientinstall_client_hostname_localhost() #Added by Kaleem
         rlRun "cat $TmpDir/temp.out"
         rlAssertGrep "Invalid hostname, 'localhost.localdomain' must not be used" "$TmpDir/temp.out"
         rlRun "hostname $CLIENT" 
-    rlPhaseEnd
-}
-
-###############################################################################################
-#  Bug 817869 - Clean keytabs before installing new keys into them
-###############################################################################################
-ipaclientinstall_dirty_keytab()
-{
-    rlPhaseStartTest "ipa-client-install-39-dirty-keytab "
-        uninstall_fornexttest
-        #rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
-        #rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
-        verify_install true
-	# Backup keytab 
-	bkup="/dev/shm/ipa-client-backup-keytab"
-	ktab="/etc/krb5.keytab"
-	rm -f $bkup
-	cp -a $ktab $bkup
-	command="ipa-client-install --uninstall -U"
-	rlRun "$command" 0 "Uninstalling ipa client - after a force install"
-	if [ ! -f $ktab ]; then
-		cp -a $kbup $ktab
-	fi
-	klist -kt /etc/krb5.keytab
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
-        verify_install true
-
-	klist -kt /etc/krb5.keytab
-	diff $bkup $ktab
-	if [ $? -ne 0 ]; then 
-		rlFail "FAIL - $bkup and $ktab do not seem to match."
-		cont=$(cat $bkup)
-		rlLog "Contents of $bkup are $cont"
-		cont=$(cat $ktab)
-		rlLog "Contents of $ktab are $cont"
-	fi
-
     rlPhaseEnd
 }
 
