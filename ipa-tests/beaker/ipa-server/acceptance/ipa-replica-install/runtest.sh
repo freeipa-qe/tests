@@ -148,6 +148,13 @@ rlJournalStart
 	
 			replicaBugCheck_bz769545
 
+			rhts-sync-set -s READY_REPLICA5 $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
+	
+			replicaBugTest_bz823657
+
+			rhts-sync-set -s COMPLETE_REPLICA5 $BEAKERMASTER
+
 		rlPhaseEnd
 
 		rlPhaseStartCleanup "ipa-ca-install: ipa-server clean up."
@@ -258,6 +265,17 @@ rlJournalStart
 			# Test other bugs not covered directly in above tests
 
 			rhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
+
+			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+
+			installSlave
+
+			rhts-sync-set -s DONE_REPLICA5 $BEAKERSLAVE
+
+			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+
+			uninstall
+
 		rlPhaseEnd
 
 		rlPhaseStartCleanup "ipa-ca-install: ipa-server clean up."

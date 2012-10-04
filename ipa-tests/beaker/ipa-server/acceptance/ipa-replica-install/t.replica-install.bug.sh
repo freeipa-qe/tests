@@ -182,3 +182,14 @@ installBug_bz830338()
 		fi
 	rlPhaseEndTest	
 }
+
+replicaBugTest_bz823657()
+{
+	rlPhaseStartTest "bz823657 - ipa-replica-manage connect fails with GSSAPI error after delete if using previous kerberos ticket "
+		# This test is to be run on a MASTER with a already connected SLAVE.
+		file=/dev/shm/bz823657-output.txt # Output file to be used in next tests
+		rlRun "ipa-replica-manage del $SLAVE" 0 "Disconnect the slave agreement"
+		rlRun "ipa-replica-manage connect $SLAVE $> $file" 0 "Reconnect the SLAVE."
+		rlRun "grep 'Unspecified GSS failure' $file" 2 "Ensure that a failure specified in BZ 82365 does not appear to be in teh output file $file"
+	rlPhaseEndTest
+}
