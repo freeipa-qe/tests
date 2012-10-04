@@ -1032,7 +1032,7 @@ ipa_install_client()
 			submit_log /var/log/ipaclient-install.log
 		fi
 
-		CHK2=$(grep "Error obtaining initial credentials: Client not found in Kerberos database" /var/log/ipaclient-install.log|wc -l)
+		CHK2=$(grep "kinit: Client.*not found in Kerberos database while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
 		if [ $CHK2 -gt 0 ]; then
 			rlLog "[FAIL2] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
 			submit_log /var/log/ipaclient-install.log
