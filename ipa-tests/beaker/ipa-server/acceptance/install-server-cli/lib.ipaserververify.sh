@@ -36,7 +36,10 @@ uninstall_fornexttest()
     if [ -f $DEFAULT  ] ; then
        rlLog "Uninstall for next test"
        rlRun "ipa-server-install --uninstall -U " 0 "Uninstalling ipa server for next test"
+       # Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
+       rlRun "ls $SSSD" 1 "Making sure that $SSSD does not exist. BZ 819982"
     fi
+
 }
 
 install_fornexttest()
