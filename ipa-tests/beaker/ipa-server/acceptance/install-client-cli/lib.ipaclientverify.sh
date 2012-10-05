@@ -57,38 +57,40 @@ ipacompare_forinstalluninstall_withmasterslave()
 
 uninstall_fornexttest()
 {
-    if [ -f $DEFAULT  ] ; then
-       rlLog "Uninstall for next test"
-       # before uninstalling ipa client, first remove its references from server
+	if [ -f $DEFAULT  ] ; then
+		rlLog "Uninstall for next test"
+	       # before uninstalling ipa client, first remove its references from server
 #       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
 #       rlRun "ipa host-del $CLIENT --updatedns" 0 "Deleting client record and DNS entry from server"
-       # now uninstall
-       rlLog "Uninstalling ipa client for next test"
-       ipa-client-install --uninstall -U 
-       if [ $? -ne 0 ]; then
-          rlLog "Unsuccessful uninstall"
-          rhts-submit-log -l /var/log/ipaclient-uninstall.log
-       fi
-    fi
-    # Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
-    if [ -f $SSSD ];then
-       grep -e LDAP-KRB5 $SSSD 
-       if [ $? -eq 0 ];then
-        rlLog "BZ 819982 does not exists.This is preserve sssd scenario"
-       fi
-    else 
-      rlLog "BZ 819982 does not exists"
-    fi
+		# now uninstall
+		rlLog "Uninstalling ipa client for next test"
+		ipa-client-install --uninstall -U 
+			if [ $? -ne 0 ]; then
+				rlLog "Unsuccessful uninstall"
+				rhts-submit-log -l /var/log/ipaclient-uninstall.log
+			fi
+		fi
+	# Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
+	if [ -f $SSSD ];then
+		rlRun "grep $RELM $SSSD" 1 "Making sure that $SSSD does not contain the IPA relm. BZ 819982"
+		rlRun "grep $DOMAIN $SSSD" 1 "Making sure that $SSSD does not contain the IPA DOMAIN. BZ 819982"
 
-#    rlRun "ls $SSSD" 2 "Making sure that $SSSD does not exist. BZ 819982"
-    if [ -f $SSSD ] ; then
-       rlLog "renaming last sssd.conf"
-       mv $SSSD $SSSD.old
-    fi
-    if [ -f $DEFAULT ] ; then
-       rlLog "renaming last default.conf"
-       mv $DEFAULT $DEFAULT.old
-    fi
+		grep -e LDAP-KRB5 $SSSD 
+		if [ $? -eq 0 ];then
+			rlLog "BZ 819982 does not exists. This is preserve sssd scenario"
+		fi
+	else 
+		rlLog "sssd.conf for testing BZ 819982 does not exists"
+	fi
+
+	if [ -f $SSSD ] ; then
+		rlLog "renaming last sssd.conf"
+		mv $SSSD $SSSD.old
+	fi
+	if [ -f $DEFAULT ] ; then
+		rlLog "renaming last default.conf"
+		mv $DEFAULT $DEFAULT.old
+	fi
 }
 
 install_fornexttest()
