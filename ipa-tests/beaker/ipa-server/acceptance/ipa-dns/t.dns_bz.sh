@@ -49,6 +49,7 @@ dnsbugs()
    bz809565
    bz798355
    bz767496
+   bz829388
    dnsbugcleanup
 }
 
@@ -1002,6 +1003,19 @@ bz798355()
 		rlRun "ipa dnszone-show --rights $DOMAIN --all | grep BIND\ update | grep 'grant $RELM krb5-self'" 2 "Make sure that the correct update string no longer exists"
 		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=TRUE" 0 "Enable Dynamic update." 
 
+	rlPhaseEnd
+}
+
+bz829388()
+{
+	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=829388
+	rlPhaseStartTest "Bug 829388 - Zone transfers fail for certain non-FQDNs"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa dnszone-mod $DOMAIN --allow-transfer='any;'" 0 "Enable DNS zone transfers"
+		host="bz829388"
+		rlRun "ipa dnsrecord-add $DOMAIN $host --cname-rec=$host" 0 "Add a dns record to test zone transfers with"
+		rlRun "dig -t AXFR @$MASTER $DOMAIN | grep $host.$DOMAIN." 0 "Ensure that $host.$DOMAIN is in the list of AXFR records as a FQDN BZ 829388"
+		rlRun "ipa dnsrecord-del $DOMAIN $host --cname-rec=$host" 0 "Cleanup added DNS record."
 	rlPhaseEnd
 }
 
