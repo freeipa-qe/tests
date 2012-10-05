@@ -36,8 +36,6 @@ dnsbugs()
    bz804572
    bz772301
    bz818933
-   bz767489
-   bz802375
    bz805430
    bz819635
    bz809562
@@ -50,6 +48,8 @@ dnsbugs()
    bz798355
    bz767496
    bz829388
+   bz767489
+   bz802375
    dnsbugcleanup
 }
 
@@ -562,7 +562,7 @@ bz818933()
     rlPhaseStartTest "818933 bind-dyndb-ldap doesn't escape non-ASCII characters correctly"
 
 	rlRun "dig foo,bar.$DOMAIN"
-	rlAssertGrep "bug in handle_connection_error" "/var/log/messages"
+	rlRun "grep 'bug in handle_connection_error' /var/log/messages" 1 "Make sure bug has not shown up in /var/log/messages BA 818933"
 
         sleep 5
     rlPhaseEnd
