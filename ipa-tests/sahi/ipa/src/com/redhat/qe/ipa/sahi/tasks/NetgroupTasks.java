@@ -133,14 +133,17 @@ public class NetgroupTasks {
 		if (button.equals("Add")) {
 			sahiTasks.span("Add").under(sahiTasks.heading2(section)).near(sahiTasks.div(type)).click();
 			for (String name : names) {
-				sahiTasks.textbox("filter").near(sahiTasks.span("Find")).setValue(name);
-				sahiTasks.span("Find").click();
-				sahiTasks.checkbox(name).click();
-				sahiTasks.link(">>").click();
+				if(!name.equals("")){
+					sahiTasks.textbox("filter").near(sahiTasks.span("Find")).setValue(name);
+					sahiTasks.span("Find").click();
+					sahiTasks.checkbox(name).click();
+					sahiTasks.link(">>").click();
+				}
 			}			
 			sahiTasks.button(action).click();
 		}
-		
+		//for(String name:names)
+		//	Assert.assertTrue(sahiTasks.link(name).exists(), "User " + name + " added succesfully");
 		
 		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
 	}
@@ -397,5 +400,18 @@ public class NetgroupTasks {
 		sahiTasks.textbox("filter").setValue("");
 		sahiTasks.span("icon search-icon").click();
 		
+	}
+
+	public static void addNetgroupMember(SahiTasks sahiTasks, String[] groupNames, String buttonToClick) {
+		
+		sahiTasks.span("Add").click();
+		for(String name:groupNames){
+			sahiTasks.textbox("filter").near(sahiTasks.span("Find")).setValue(name);
+			sahiTasks.span("Find").click();
+			sahiTasks.checkbox(name).click();
+			sahiTasks.link(">>").click();
+		}
+		sahiTasks.button(buttonToClick).click();
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();	
 	}
 }

@@ -40,7 +40,7 @@ public class NetgroupTests extends SahiTestScript{
 	private String qegroup = "quality";
 	private String enggroup = "engineering";
 	
-	private String [] netgroups = {devgroup, qegroup, enggroup};
+	private String [] netgroups = {devgroup, qegroup, enggroup, "bug815494_netgroup", "bug814785_netgroup", "netgroupmembership1", "netgroupmembership2", "netgroupmembership3"};
 	private String [] nestedmembers = {devgroup, qegroup};
 	
 	private String [] devhosts = {devwebserver + "." + domain, devhost + "." + domain};
@@ -68,11 +68,12 @@ public class NetgroupTests extends SahiTestScript{
 	private String user1 = "devuser1";
 	private String user2 = "devuser2";
 	private String user3 = "qeuser";
+	private String user4 = "bug815494_user";
 	
 	private String [] devusers = {user1, user2};
 	private String [] qeusers = {user3};
 	
-	private String [] users = {user1, user2, user3};
+	private String [] users = {user1, user2, user3, user4};
 	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
@@ -352,6 +353,84 @@ public class NetgroupTests extends SahiTestScript{
 		NetgroupTasks.clearSearch(sahiTasks);
 	}
 	
+	
+	/*
+	 * Bug 815494
+	 */
+	@Test (groups={"NetgroupUser_bug815494"}, dataProvider="getNetgroupUser_bug815494TestObjects")	
+	public void testNetgroupUser_bug815494(String testName, String groupName) throws Exception {
+		
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
+		String names[]={user4};
+		NetgroupTasks.addMembers(sahiTasks, groupName, "User", "Users", names, "Add", "Add");
+		sahiTasks.link(groupName).click();
+		Assert.assertTrue(sahiTasks.link(user4).exists(),"User " + user4 + " successfully added");
+		sahiTasks.link("Netgroups").near(sahiTasks.span(groupName)).click();
+	}
+	
+	/*
+	 * Bug 814785
+	 */
+	@Test (groups={"NetgroupEdit_bug814785"}, dataProvider="getNetgroupEdit_bug814785TestObjects")	
+	public void testNetgroupEdit_bug814785(String testName, String groupName, String newDescription) throws Exception {
+		
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
+		sahiTasks.link(groupName).click();
+		sahiTasks.textarea("description").setValue(newDescription);
+		sahiTasks.link("Netgroups").near(sahiTasks.span(groupName)).click();
+		sahiTasks.button("Update").click();
+		Assert.assertTrue(sahiTasks.link(groupName).exists(), "Redirected back to Netgroup listing page");
+		sahiTasks.link(groupName).click();
+		Assert.assertEquals(sahiTasks.textarea("description").getValue(), newDescription, "Netgroup description updated successfully");
+		sahiTasks.link("Netgroups").near(sahiTasks.span(groupName)).click();
+	}
+	
+	/*
+	 * Bug 814785
+	 */
+	@Test (groups={"NetgroupMembership"}, dataProvider="getNetgroupMembershipTestObjects")	
+	public void testNetgroupMembership(String testName, String groupName1, String groupName2, String groupName3) throws Exception {
+		
+		sahiTasks.navigateTo(commonTasks.netgroupPage, true);
+		sahiTasks.link(groupName1).click();
+		sahiTasks.link("member_netgroup").click();
+		String groupNames[]={groupName2};
+		NetgroupTasks.addNetgroupMember(sahiTasks, groupNames, "Add");
+		
+		sahiTasks.link(groupName1).click();
+		sahiTasks.link("memberof_netgroup").click();
+		String groupNames1[]={groupName3};
+		NetgroupTasks.addNetgroupMember(sahiTasks, groupNames1, "Add");
+		
+		sahiTasks.link(groupName1).click();
+		sahiTasks.link("member_netgroup").click();
+		for(String name:groupNames)
+			Assert.assertTrue(sahiTasks.link(name).exists(), groupName1 + " has members " + name);
+		
+		sahiTasks.link("memberof_netgroup").click();
+		for(String name:groupNames1)
+			Assert.assertTrue(sahiTasks.link(name).exists(), groupName1 + " is a member of " + name);
+		
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();	
+		
+		sahiTasks.link(groupName2).click();
+		sahiTasks.link("memberof_netgroup").click();
+		for(String name:groupNames1)
+			Assert.assertTrue(sahiTasks.link(name).exists(), groupName2 + " is a member of " + name);
+		Assert.assertTrue(sahiTasks.link(groupName1).exists(), groupName2 + " is a member of " + groupName1);
+		
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+		
+		sahiTasks.link(groupName3).click();
+		sahiTasks.link("member_netgroup").click();
+		Assert.assertTrue(sahiTasks.link(groupName1).exists(), groupName3 + " has members " + groupName1);
+		sahiTasks.radio("indirect").click();
+		for(String name:groupNames)
+			Assert.assertTrue(sahiTasks.link(name).exists(), groupName3 + " has indirect members " + name + ",");
+		
+		
+		
+	}
 		
 	
 
@@ -539,6 +618,54 @@ public class NetgroupTests extends SahiTestScript{
 		
         //										testname				netgroup
 		ll.add(Arrays.asList(new Object[]{ "search_netgroup_negative",	"finance" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used for bug 815494
+	 */
+	@DataProvider(name="getNetgroupUser_bug815494TestObjects")
+	public Object[][] getNetgroupUser_bug815494TestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetgroupUser_bug815494TestObjects());
+	}
+	protected List<List<Object>> createNetgroupUser_bug815494TestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname					groupName
+		ll.add(Arrays.asList(new Object[]{ 	"NetgroupUser_bug815494", 	"bug815494_netgroup" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used for bug 815494
+	 */
+	@DataProvider(name="getNetgroupEdit_bug814785TestObjects")
+	public Object[][] getNetgroupEdit_bug814785TestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetgroupEdit_bug814785TestObjects());
+	}
+	protected List<List<Object>> createNetgroupEdit_bug814785TestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname					groupName				newDescription
+		ll.add(Arrays.asList(new Object[]{ 	"NetgroupEdit_bug814785",	"bug814785_netgroup",	"bug814785_netgroup description" } ));
+		        
+		return ll;	
+	}
+	
+	/*
+	 * Data to be used for Netgroup Membership
+	 */
+	@DataProvider(name="getNetgroupMembershipTestObjects")
+	public Object[][] getNetgroupMembershipTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNetgroupMembershipTestObjects());
+	}
+	protected List<List<Object>> createNetgroupMembershipTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname						groupName1				groupName2				groupName3
+		ll.add(Arrays.asList(new Object[]{ 	"NetgroupMembership",	"netgroupmembership1",	"netgroupmembership2",	"netgroupmembership3" } ));
 		        
 		return ll;	
 	}
