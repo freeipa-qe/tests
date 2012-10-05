@@ -56,7 +56,7 @@ $(METADATA): Makefile
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     IPA ipa-replica-manage Acceptance Tests" >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
+	@echo "Type:            Functional" >> $(METADATA)
 	@echo "TestTime:        120m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)

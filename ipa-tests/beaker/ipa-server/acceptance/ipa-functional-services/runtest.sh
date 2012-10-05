@@ -74,9 +74,19 @@ rlJournalStart
                 	done
 		fi
                 	rlRun "service iptables stop" 0 "Stop the firewall on the client"
+			http_testsetup
 			ipafunctionalservices_http
+			ldap_testsetup
 			ipafunctionalservices_ldap
-			rhts-sync-set -s DONE
+			rhts-sync-set -s DEFAULT
+			rhts-sync-block -s SECURESETUP $BEAKERMASTER
+			ipafunctionalservices_http
+			disable_httpservice
+			http_testcleanup
+                        ipafunctionalservices_ldap
+			revoke_ldapcert
+			ldap_testcleanup
+			rhts-sync-set -s SECURE
                 fi
         else
                 rlLog "Machine in recipe in not a CLIENT"
@@ -89,7 +99,25 @@ rlJournalStart
 	rc=0
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
-		rhts-sync-block -s DONE $BEAKERCLIENT
+		rhts-sync-block -s DEFAULT $BEAKERCLIENT
+		# set minsssf and anon access on master
+		/usr/bin/ldapmodify -x -D "cn=Directory Manager" -w "$ADMINPW" << EOF
+dn: cn=config
+changetype: modify
+replace: nsslapd-minssf
+nssldap-minssf: 56
+EOF
+
+		/usr/bin/ldapmodify -x -D "cn=Directory Manager" -w "$ADMINPW" << EOF
+dn: cn=config
+changetype: modify
+replace: nsslapd-allow-anonymous-access
+nsslapd-allow-anonymous-access: off
+EOF
+
+		service dirsrv restart
+		rhts-sync-set -s SECURESETUP
+		rhts-sync-block -s SECURE $BEAKERCLIENT
 		rlPass
 	else
 		rlLog "Machine in recipe in not a MASTER"
@@ -101,7 +129,7 @@ rlJournalStart
 	rc=0
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-		rhts-sync-block -s DONE $BEAKERCLIENT
+		rhts-sync-block -s SECURE $BEAKERCLIENT
 		rlPass
         else
                 rlLog "Machine in recipe in not a SLAVE"

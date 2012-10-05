@@ -16,14 +16,29 @@ echo " HTTP keytab: $HTTPKEYTAB"
 ######################
 # test suite         #
 ######################
-ipafunctionalservices_http()
+http_testsetup()
 {
     setup_ipa_http
     setup_http
+}
+
+ipafunctionalservices_http()
+{
     http_tests
     cleanup_http
     cleanup_ipa_http
 } 
+
+http_testcleanup()
+{
+    cleanup_http
+    cleanup_ipa_http
+}
+
+disable_httpservice()
+{
+    disable_service
+}
 
 ######################
 # SETUP              #
@@ -34,17 +49,17 @@ setup_ipa_http()
 	rlPhaseStartTest "SETUP: IPA server - HTTP"
 		
 		# create a test http user
-		rlRun "create_ipauser httpuser1 httpuser1 httpuser1 Secret123" 0 "Creating a test http user"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER create_ipauser httpuser1 httpuser1 httpuser1 Secret123" 0 "Creating a test http user"
 
 		# kinit as admin
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
 		# add HTTP service for this client host	
-		rlRun "ipa service-add $HTTPPRINC" 0 "Add HTTP service for this client host"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-add $HTTPPRINC" 0 "Add HTTP service for this client host"
 
 		# get a keytab
 		cd $HTTPCFGDIR
-		rlRun "ipa-getkeytab -s $MASTER -k $HTTPKEYTAB -p $HTTPPRINC" 0 "Get keytab for this host's http service"
+		rlRun "ipa-getkeytab -s $MASTER -k /tmp/$HOSTNAME.keytab -p $HTTPPRINC" 0 "Get keytab for this host's http service"
 		rlRun "chown apache.apache $HTTPKEYTAB" 0 "Change keytab ownership to apache.apache."
 
 	rlPhaseEnd
@@ -83,7 +98,7 @@ setup_http()
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
         	# Get certificate subject
-        	certsubj=`ipa config-show | grep "Certificate Subject base" | cut -d ":" -f2`
+        	certsubj=`ssh -o StrictHostKeyChecking=no admin@$MASTER ipa config-show | grep "Certificate Subject base" | cut -d ":" -f2`
         	# trim whitespace
         	certsubj=`echo $certsubj`
         	rlLog "Certificate Subject: $certsubj"
@@ -93,10 +108,12 @@ setup_http()
         	cat $HOSTNAME.csr
 
         	# submit the certificate request
-        	rlRun "ipa cert-request --principal=$HTTPPRINC $HOSTNAME.csr" 0 "Submitting certificate request for HTTP server"
+		scp /tmp/$HOSTNAME.csr admin@$MASTER:/tmp/$HOSTNAME.csr
+        	rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa cert-request --principal=$HTTPPRINC /tmp/$HOSTNAME.csr" 0 "Submitting certificate request for HTTP server"
         	# get certificate into PEM file
 		cd /etc/httpd/alias/
-        	rlRun "ipa service-show $HTTPPRINC --out=$HOSTNAME.crt" 0 "Get HTTP server cert into a PEM file"
+        	rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-show $HTTPPRINC --out=/tmp/$HOSTNAME.crt" 0 "Get HTTP server cert into a PEM file"
+		sftp admin@$MASTER:/tmp/$HOSTNAME.crt .
 
         	# add the HTTP server cert to the certificate database
         	certutil -A -n $HOSTNAME -d . -t u,u,u -a < $HOSTNAME.crt
@@ -163,12 +180,18 @@ http_tests()
 		rlAssertGrep "401 Authorization Required" "/tmp/curl_004.out"
         rlPhaseEnd
 
+}
+
+disable_service()
+{
 	rlPhaseStartTest "ipa-functionalservices-http-005: Disable Service"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		rlRun "ipa service-disable $HTTPPRINC > /tmp/disable_service.out 2>&1" 0 "Disable HTTP service for this client host"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-disable $HTTPPRINC > /tmp/disable_service.out 2>&1" 0 "Disable HTTP service for this client host"
+		sftp admin@$MASTER:/tmp/disable_service.out /tmp/disable_service.out
 		rlAssertGrep "Disabled service \"$HTTPPRINC@$RELM\"" "/tmp/disable_service.out"
 		# verify service is disabled and certificate removed
-		rlRun "ipa service-show --all $HTTPPRINC > /tmp/disable_http.out"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTERipa service-show --all $HTTPPRINC > /tmp/disable_http.out"
+		sftp admin@MASTER:/tmp/disable_http.out /tmp/disable_http.out
 		rlAssertGrep "Keytab: False" "/tmp/disable_http.out"
 		rlAssertNotGrep "Certificate" "/tmp/disable_http.out"
 		rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
@@ -177,6 +200,9 @@ http_tests()
 		output=`cat /tmp/curl_005.out`
                 rlLog "OUTPUT: $output"
 		rlAssertGrep "401 Authorization Required" "/tmp/curl_005.out"
+		#re-enable service
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-disable $HTTPPRINC" 0 "Re-enable HTTP service for this client host"
 	rlPhaseEnd
 }
 
@@ -206,12 +232,12 @@ cleanup_ipa_http()
 {
 	rlPhaseStartTest "CLEANUP: IPA Server - HTTP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		rlRun "ipa user-del httpuser1" 0 "Delete the http test user"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa user-del httpuser1" 0 "Delete the http test user"
 		rlRun "service httpd stop" 0 "stopping apache server"
 		rlRun "ipa-rmkeytab -p $HTTPPRINC -k $HTTPKEYTAB" 0 "removing http keytab"
 		# delete keytab file
                 rlRun "rm -rf $HTTPKEYTAB" 0 "Delete the HTTP keytab file"
-		rlRun "ipa service-del $HTTPPRINC" 0 "Remove the HTTP service for this client host"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-del $HTTPPRINC" 0 "Remove the HTTP service for this client host"
 	rlPhaseEnd
 }
 	

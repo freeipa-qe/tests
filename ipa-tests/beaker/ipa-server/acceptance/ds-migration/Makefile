@@ -50,7 +50,7 @@ $(METADATA): Makefile
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     IPA ds-migration acceptance tests" >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
+	@echo "Type:            Functional" >> $(METADATA)
 	@echo "TestTime:        60m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)

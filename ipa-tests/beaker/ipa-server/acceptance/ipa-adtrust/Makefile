@@ -51,7 +51,7 @@ $(METADATA): Makefile
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     ipa-adtrust-install CLI test cases" >> $(METADATA)
-	@echo "Type:            acceptance" >> $(METADATA)
+	@echo "Type:            Functional" >> $(METADATA)
 	@echo "TestTime:        60m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)

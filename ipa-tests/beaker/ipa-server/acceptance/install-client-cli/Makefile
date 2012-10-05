@@ -51,7 +51,7 @@ $(METADATA): Makefile
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     install of a ipa client machine" >> $(METADATA)
-	@echo "Type:            Acceptance" >> $(METADATA)
+	@echo "Type:            Functional" >> $(METADATA)
 	@echo "TestTime:        60m" >> $(METADATA)
 	@echo "RunFor:          ipa-client" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)

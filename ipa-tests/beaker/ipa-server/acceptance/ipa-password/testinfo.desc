@@ -3,7 +3,7 @@ Name:            /CoreOS/ipa-server/acceptance/ipa-password
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-password
 Description:     IPA ipapassword acceptance tests
-Type:            Regression
+Type:            Functional
 TestTime:        15m
 RunFor:          ipa-server
 Requires:        ipa-admintools

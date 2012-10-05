@@ -36,14 +36,27 @@ echo "OSCP test client is $OCSPCLT"
 ######################
 # test suite         #
 ######################
-ipafunctionalservices_ldap()
+ldap_testsetup()
 {
     setup_ipa_ldap
     setup_ldap
-    ldap_tests
+}
+
+ldap_testcleanup()
+{
     cleanup_ldap
     cleanup_ipa_ldap
+}
+
+ipafunctionalservices_ldap()
+{
+    ldap_tests
 } 
+
+revoke_ldapcert()
+{
+    revoke_cert
+}
 
 ######################
 # SETUP              #
@@ -53,25 +66,25 @@ setup_ipa_ldap()
 {
 	rlPhaseStartTest "SETUP: IPA server - LDAP"
                 # create a test ldap user
-                rlRun "create_ipauser ldapuser1 ldapuser1 ldapuser1 Secret123" 0 "Creating a test ldap user"
+                rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER create_ipauser ldapuser1 ldapuser1 ldapuser1 Secret123" 0 "Creating a test ldap user"
 
 		# kinit as admin
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
                 #  add LDAP service for this client host
-                rlRun "ipa service-add $LDAPPRINC" 0 "Add LDAP service for this client host"
+                rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-add $LDAPPRINC" 0 "Add LDAP service for this client host"
 
 		# semanage ldap ssl port
 		rlRun "semanage port -a -t ldap_port_t -p tcp $LDAPSPORT" 0 "Semanage - add LDAP SSL port"
 		
 	rlPhaseEnd
-}
+} 
 
 setup_ldap()
 {
 	rlPhaseStartTest "SETUP: LDAP server"
 		cd /etc/dirsrv
-		rlRun "ipa-getkeytab -s $MASTER -k $LDAPKEYTAB -p $LDAPPRINC" 0 "Get keytab for this host's ldap service"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa-getkeytab -s $MASTER -k $LDAPKEYTAB -p $LDAPPRINC" 0 "Get keytab for this host's ldap service"
 		rlRun "chown nobody:nobody $LDAPKEYTAB" 0 "Change keytab ownership to nobody.nobody"
 		rlRun "chmod 0400 $LDAPKEYTAB" 0 "Change keytab permissions to 0400"
 
@@ -185,7 +198,7 @@ setup_ldap()
  		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
                 # Get certificate subject
-                certsubj=`ipa config-show | grep "Certificate Subject base" | cut -d ":" -f2`
+                certsubj=`ssh -o StrictHostKeyChecking=no admin@$MASTER ipa config-show | grep "Certificate Subject base" | cut -d ":" -f2`
                 # trim whitespace
                 certsubj=`echo $certsubj`
                 rlLog "Certificate Subject: $certsubj"
@@ -193,12 +206,13 @@ setup_ldap()
                 # generate a certificate request for the web server
                 certutil -R -s "CN=$HOSTNAME,$certsubj" -d . -a -z /tmp/noise.txt -f $PWDFILE > $HOSTNAME.csr
                 cat $HOSTNAME.csr
-
+		scp $HOSTNAME.csr admin@$MASTER:/tmp/$HOSTNAME.csr
                 # submit the certificate request
-                rlRun "ipa cert-request --principal=$LDAPPRINC $HOSTNAME.csr" 0 "Submitting certificate request for LDAP server"
+                rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa cert-request --principal=$LDAPPRINC /tmp/$HOSTNAME.csr" 0 "Submitting certificate request for LDAP server"
                 # get certificate into PEM file
                 cd /etc/dirsrv/$INSTANCE
-                rlRun "ipa service-show $LDAPPRINC --out=$HOSTNAME.crt" 0 "Get LDAP server cert into a PEM file"
+                rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-show $LDAPPRINC --out=/tmp/$HOSTNAME.crt" 0 "Get LDAP server cert into a PEM file"
+		sftp admin@$MASTER:/tmp/$HOSTNAME.csr .
 
                 # add the LDAP server cert to the certificate database
                 certutil -A -n $HOSTNAME -d . -t u,u,u -a -f $PWDFILE < $HOSTNAME.crt
@@ -299,15 +313,19 @@ ldap_tests()
                 rlLog "Executing: ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\""
                 rlRun "ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\"" 0 "Verify ldapsearch SSL Simple Bind"
         rlPhaseEnd
+}
 
+revoke_cert()
+{
         rlPhaseStartTest "ipa-functionalservices-ldap-006: Revoke certificate"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		# revoke the HTTP server's certificate - first need the certificate's serial number
-                ipa service-show --all $LDAPPRINC > /tmp/certout.txt
+                rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-show --all $LDAPPRINC > /tmp/certout.txt"
+		sftp admin@$MASTER:/tmp/certout.txt /tmp/certout.txt
                 serialnos=`cat /tmp/certout.txt | grep "Serial Number" | cut -d ":" -f 2 | cut -d ":" -f 2`
                 serialno=`echo $serialnos | cut -d " " -f 1`
                 rlLog "$LDAPPRINC certificate serial number: $serialno"
-                rlRun "ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
+                rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
 		rlLog "Checking certificate revokation via OCSP"
 		rlLog "EXECUTING: $OCSPCLT -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/"
 		rlRun "$OCSPCLT -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/ > /tmp/ocsp.out" 0 "Running ocspclnt"
@@ -327,10 +345,10 @@ cleanup_ipa_ldap()
 {
 	rlPhaseStartTest "CLEANUP: IPA Server - LDAP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		rlRun "ipa user-del ldapuser1" 0 "Delete the ldap test user"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa user-del ldapuser1" 0 "Delete the ldap test user"
 		rlRun "ipa-rmkeytab -p $LDAPPRINC -k $LDAPKEYTAB" 0 "removing http keytab"
 		rlRun "rm -rf $LDAPKEYTAB" 0 "removing ldap keytab file"
-		rlRun "ipa service-del $LDAPPRINC" 0 "Remove the LDAP service for this client host"
+		rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-del $LDAPPRINC" 0 "Remove the LDAP service for this client host"
 		# restore ldap configuration file
                 cp -f /etc/openldap/ldap.conf.orig /etc/openldap/ldap.conf
 		rm -rf /etc/openldap/ldap.conf.orig

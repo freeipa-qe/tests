@@ -3,7 +3,7 @@ Name:            /CoreOS/ipa-server/acceptance/forms-cli
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/forms-cli
 Description:     Tests creation and usage of kerberos forms
-Type:            Acceptance
+Type:            Functional
 TestTime:        10m
 RunFor:          ipa-server
 Requires:        ipa-admintools

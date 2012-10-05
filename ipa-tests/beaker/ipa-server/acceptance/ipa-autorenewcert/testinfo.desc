@@ -3,7 +3,7 @@ Name:            /CoreOS/ipa-server/acceptance/ipa-autorenewcert
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-autorenewcert
 Description:     IPA auto-renew certificate test suite
-Type:            Regression
+Type:            Functional
 TestTime:        30m
 RunFor:          ipa-server
 Requires:        ipa-admintools
