@@ -42,7 +42,7 @@
 # Include test case file
 . ./t.ipa-client-automount.sh
 
-PACKAGE="ipa-server"
+PACKAGE="freeipa-client"
 
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`

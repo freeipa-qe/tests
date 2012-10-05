@@ -102,6 +102,13 @@ check_idmapd(){
     ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
+check_sssd(){
+    local configuration_status=$1
+    local conf="/etc/sssd/sssd.conf"
+    local message="ipa_automount_location = ${currentLocation}"
+    ensure_configuration_status "$conf" "$message" "$configuration_status"
+}
+
 check_sssd_no_sssd(){
     local configuration_status=$1
     local conf="/etc/sssd/sssd.conf"
@@ -151,41 +158,47 @@ ensure_configuration_status()
     local configuration_status="$3"
     
     if [ "$configuration_status" = "configured" ];then
-        ensure_expected_message_appears_in_expected_configuration_file "$conf" "$message"
+        ensure_expected_message_appears_in_configuration_file "$conf" "$message"
     elif [ "$configuration_status" = "not_configured" ];then
-        ensure_expected_message_not_appears_in_expected_configuration_file "$conf" "$message"
+        ensure_message_not_appears_in_configuration_file "$conf" "$message"
     else
-        rlLog "unknow expected configuration status"
+        rlLog "unknow configuration status"
     fi
 }
 
-ensure_expected_message_appears_in_expected_configuration_file(){
+ensure_expected_message_appears_in_configuration_file(){
     local conf="$1"
     local message="$2"
     if grep "$message" $conf 2>&1 > /dev/null
     then
-        echo "PASS: [$conf] contains expected [$message]"
+        #echo "PASS: [$conf] contains expected [$message]"
+        rlPass "[$conf] contains expected [$message]"
     else
-        echo "FAIL: [$conf] does NOT contains expected [$message]"
+        #echo "FAIL: [$conf] does NOT contains expected [$message]"
+        rlFail "[$conf] does NOT contains expected [$message]"
     fi
 }
 
-ensure_expected_message_not_appears_in_expected_configuration_file(){
+ensure_message_not_appears_in_configuration_file(){
     local conf="$1"
     local message="$2"
     if grep "$message" $conf 2>&1 > /dev/null
     then
-        echo "FAIL: [$conf] contain [$message], this is NOT expected"
+        #echo "FAIL: [$conf] contain [$message], this is NOT expected"
+        rlFail "[$conf] contain [$message], this is NOT expected"
     else
-        echo "PASS: [$conf] does NOT contain [$message], this is expected"
+        #echo "PASS: [$conf] does NOT contain [$message], this is expected"
+        rlPass "[$conf] does NOT contain [$message], this is expected"
     fi
 }
 
-clean_up_installation()
+clean_up_automount_installation()
 {
     echo "#################################"
     echo "# clean up ipa-client-automount #"
-    echo "#################################"
+    echo "#                               #"
     ipa-client-automount --uninstall -U
-    echo "done clean up"
+    echo "#                               #"
+    echo "# clean up done                 #"
+    echo "#################################"
 }

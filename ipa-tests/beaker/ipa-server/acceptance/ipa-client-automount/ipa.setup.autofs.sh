@@ -56,9 +56,9 @@ if [ "$automountLocationName" != "" ] \
 then
     echo "$paramMsg"
     if [ "$maptype" = "direct" ];then
-        configAutofs_direct $automountLocationName $nfsServer $nfsSharedDir $autofsDir
+        configure_autofs_direct $automountLocationName $nfsServer $nfsSharedDir $autofsDir
     elif [ "$maptype" = "indirect" ];then
-        configAutofs_indirect2 $automountLocationName $nfsServer $nfsSharedDir
+        configure_autofs_indirect2 $automountLocationName $nfsServer $nfsSharedDir
     else
         echo "wrong map type, please use 'direct' or 'indirect'"
     fi
