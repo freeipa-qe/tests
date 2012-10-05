@@ -193,3 +193,17 @@ replicaBugTest_bz823657()
 		rlRun "grep 'Unspecified GSS failure' $file" 2 "Ensure that a failure specified in BZ 82365 does not appear to be in teh output file $file"
 	rlPhaseEndTest
 }
+
+ireplicaBugTest_bz824492()
+{
+	rlPhaseStartTest "bz824492 - Cannot re-connect replica to previously disconnected master."
+		# This test is to be run on a MASTER with a already connected SLAVE.
+		rlLog "This test may fail if bz823567 fails."
+		file=/dev/shm/bz824492-output.txt # Output file to be used in next tests
+		rlRun "ipa-replica-manage disconnect $SLAVE" 0 "Disconnect the slave agreement"
+		rlRun "ipa-replica-manage connect $SLAVE $> $file" 0 "Reconnect the SLAVE."
+		rlRun "grep 'You cannot connect to a previously deleted master' $file" 2 "Ensure that a failure specified in BZ 823567 does not appear to be in teh output file $file"
+		rlRun "grep 'list index out of range' $file" 2 "Ensure that a failure specified in BZ 823567 does not appear to be in teh output file $file"
+	rlPhaseEndTest
+}
+

@@ -156,6 +156,7 @@ rlJournalStart
 			rhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
 	
 			replicaBugTest_bz823657
+			replicaBugTest_bz824492
 
 			rhts-sync-set -s COMPLETE_REPLICA5 $BEAKERMASTER
 
