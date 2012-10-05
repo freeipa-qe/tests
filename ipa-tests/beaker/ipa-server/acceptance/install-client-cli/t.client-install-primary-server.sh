@@ -32,7 +32,8 @@ clientinstall_primary_server()
  ipaclientinstall_fixed_primary_param_TC_17
  ipaclientinstall_fixed_primary_param_TC_18
  ipaclientinstall_fixed_primary_param_TC_19
- ipaclientinstall_server_unreachableserver 
+ #Added following test cases from t.ipa-client-install.sh here because it enables iptables on IPA Servers
+ ipaclientinstall_server_unreachableserver  
 }
 
 setup()
