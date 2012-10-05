@@ -1,4 +1,3 @@
-
 ##################################################################
 #                      test suite                                #
 #   perform the various combinations of install and uninstall    #
@@ -22,7 +21,7 @@ ipamastercleanup()
 ipaclientinstall()
 {
 
-   setup
+   install_setup
 #   -U, --unattended  Unattended installation. The user will not be prompted.
    ipaclientinstall_adminpwd
 
@@ -44,8 +43,6 @@ ipaclientinstall()
 #   --server=SERVER Set the IPA server to connect to
    ipaclientinstall_server_nodomain 
    ipaclientinstall_server_invalidserver
-#   ipaclientinstall_server_unreachableserver
-
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
    ipaclientinstall_realm_casesensitive 
@@ -116,13 +113,33 @@ ipaclientinstall()
 
 # Bug 817869 - Clean keytabs before installing new keys into them 
       ipaclientinstall_dirty_keytab
-# Moved it to be last test
+
+# Moved it to be last test because it causes connection failure to IPA Servers, so thats why moved it to last test case even after fixed-primary server test cases
+   if [ $slave_count -eq 1 ];then
    ipaclientinstall_server_unreachableserver
+   fi
+
+   install_cleanup
 
 }
 
-setup()
+install_setup()
 {
+        echo $SLAVE
+        if [ $slave_count -eq 3 ]; then
+         SLAVE1=`echo $SLAVE|cut -d " " -f1 | xargs echo`
+         SLAVE2=`echo $SLAVE|cut -d " " -f2 | xargs echo`
+         SLAVE3=`echo $SLAVE|cut -d " " -f3 | xargs echo`
+         SLAVE_ACTIVE=$SLAVE1
+         #Stoping ipa sevice on $SLAVE2 and $SLAVE3
+         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
+         rlRun "chmod +x $TmpDir/local.sh"
+         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"         
+         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA3 IPA server"         
+        else
+         SLAVE_ACTIVE=`echo $SLAVE|cut -d " " -f1 | xargs echo`
+        fi
+        echo "Active Slave is $SLAVE_ACTIVE "
     rlPhaseStartSetup "ipa-client-install-Setup "
         rlLog "Setting up Authorized keys"
         SetUpAuthKeys
@@ -140,18 +157,29 @@ setup()
 			RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
 			domain_realm_force_master="$MASTER:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
 		fi
-        slavetoverify=`echo $SLAVE | sed 's/\"//g' | sed 's/^ //g'`
+        slavetoverify=`echo $SLAVE_ACTIVE | sed 's/\"//g' | sed 's/^ //g'`
         ipa_server_slave="_srv_, $slavetoverify" # sssd.conf updates
 		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
-			domain_realm_force_slave="$SLAVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+			domain_realm_force_slave="$SLAVE_ACTIVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
 		else
 			RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
-			domain_realm_force_slave="$SLAVE:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
+			domain_realm_force_slave="$SLAVE_ACTIVE:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
 		fi
 
     rlPhaseEnd
 }
 
+install_cleanup()
+{
+
+         #Starting ipa sevice on $SLAVE2 and $SLAVE3
+        if [ $slave_count -eq 3 ]; then
+         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
+         rlRun "chmod +x $TmpDir/local.sh"
+         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"         
+         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA3 IPA server"         
+        fi
+}
 
 #############################################################################
 #   -U, --unattended  Unattended installation. The user will not be prompted.
@@ -296,18 +324,22 @@ ipaclientinstall_server_unreachableserver()
     rlPhaseStartTest "ipa-client-install-10- [Negative] Install with unreachable server"
        uninstall_fornexttest
        ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
-       rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
-       rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
+       #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
+       rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
+       #rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
+       rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
        rlLog "EXECUTING: ipa-client-install -U"
        command="ipa-client-install -p $ADMINID -w $ADMINPW -U"
        expmsg="Unable to discover domain, not provided on command line
 Installation failed. Rolling back changes.
 IPA client is not configured on this system."
        local tmpout=$TmpDir/ipaclientinstall_server_unreachableserver.out
-       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server" 
+       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server"
 
-#        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
-#        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
+       #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
+       rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
+       #rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
+       rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
     rlPhaseEnd
 }
 
@@ -425,9 +457,10 @@ ipaclientinstall_password()
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --password=$ADMINPW"
        command="ipa-client-install --password $ADMINPW -U"
-       expmsg="Joining realm failed: Incorrect password.
-Installation failed. Rolling back changes."
-       local tmpout=$TmpDir/ipaclientinstall_password
+       expmsg="Joining realm failed: Incorrect password."
+       #expmsg="Joining realm failed: Incorrect password.
+#Installation failed. Rolling back changes."
+       local tmpout=$TmpDir/ipaclientinstall_password.out
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with password, but missing principal" 
     rlPhaseEnd
 }
@@ -450,13 +483,13 @@ ipaclientinstall_nonexistentprincipal()
 {
     rlPhaseStartTest "ipa-client-install-15- [Negative] Install with non-existent principal"
         uninstall_fornexttest
-        command="ipa-client-install  -p $testuserbad -w $testpwd -U" 
+        command="ipa-client-install -p $testuserbad -w $testpwd -U" 
 		if [ $(grep 5\.[0-9] /etc/redhat-release | wc -l) -gt 0 ]; then
 			expmsg="kinit(v5): Client not found in Kerberos database while getting initial credentials"
 		else
 			expmsg="kinit: Client '$testuserbad@$RELM' not found in Kerberos database while getting initial credentials"
 		fi
-        local tmpout=$TmpDir/ipaclientinstall_password
+        local tmpout=$TmpDir/ipaclientinstall_nonexistentprincipal.out
         qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with non-existent principal"
        # rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with non-existent principal"
     rlPhaseEnd
@@ -815,8 +848,8 @@ ipaclientinstall_joinreplica()
     rlPhaseStartTest "ipa-client-install-36- [Positive] Install, and join REPLICA, then uninstall"
         uninstall_fornexttest
       	sleep 5 
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE  -p $ADMINID -w $ADMINPW --unattended "
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE  -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE_ACTIVE  -p $ADMINID -w $ADMINPW --unattended "
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE_ACTIVE  -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
         verify_install true
   
         # Now uninstall
@@ -842,7 +875,8 @@ ipaclientinstall_withmasterdown()
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
 
         # Start the MASTER back
-        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
+        #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
+        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"ipactl start\"" 0 "Start MASTER IPA server"
 
         verify_install true
     rlPhaseEnd
