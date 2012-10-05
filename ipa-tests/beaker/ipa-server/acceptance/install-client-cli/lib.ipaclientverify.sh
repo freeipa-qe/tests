@@ -71,7 +71,16 @@ uninstall_fornexttest()
        fi
     fi
     # Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
-    rlRun "ls $SSSD" 1 "Making sure that $SSSD does not exist. BZ 819982"
+    if [ -f $SSSD ];then
+       grep -e LDAP-KRB5 $SSSD 
+       if [ $? -eq 0 ];then
+        rlLog "BZ 819982 does not exists.This is preserve sssd scenario"
+       fi
+    else 
+      rlLog "BZ 819982 does not exists"
+    fi
+
+#    rlRun "ls $SSSD" 2 "Making sure that $SSSD does not exist. BZ 819982"
     if [ -f $SSSD ] ; then
        rlLog "renaming last sssd.conf"
        mv $SSSD $SSSD.old
