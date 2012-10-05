@@ -35,6 +35,9 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-install" role="MASTER">
 				<params/>
 			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+				<params/>
+			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="SLAVE for IPA Replica Install Tests">
 			<autopick random="false"/>
@@ -66,6 +69,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-install" role="SLAVE">
+				<params/>
+			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
 				<params/>
 			</task>
 		</recipe>

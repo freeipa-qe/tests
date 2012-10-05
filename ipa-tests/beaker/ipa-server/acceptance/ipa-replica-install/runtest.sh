@@ -128,6 +128,10 @@ rlJournalStart
 			installMaster
 			createReplica1
 
+			# Backing up /dev/shm/
+			mkdir -p /root/dev-shm-backup
+			cp -a /dev/shm/* /root/dev-shm-backup
+
 			rhts-sync-set -s READY_REPLICA1 $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
 

@@ -56,10 +56,22 @@ installMaster()
 
 	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
 
-	# Including --idstart=3000 --idmax=50000 to verify bug 782979.
-	echo "ipa-server-install --idstart=3000 --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+	# Determine my IP address
+	currenteth=$(route | grep ^default | awk '{print $8}')
+	# get the ip address of that interface
+	ipaddr=$(hostname -i)
+	echo $ipaddr | grep : # test the returned string to see if it contains a IPv6 address
+	if [ $? -eq 0 ]; then 
+		rlLog "IP contains a IPv6 address"; 
+		ipv4=$(echo $ipaddr | cut -d\  -f2); 
+		rlLog "Now using $ipv4 as IP address"
+		ipaddr=$ipv4
+	fi
 
-	rlLog "EXECUTING: ipa-server-install --idstart=3000 --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+	# Including --idstart=3000 --idmax=50000 to verify bug 782979.
+	echo "ipa-server-install --idstart=3000 --ip-address $ipaddr --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+
+	rlLog "EXECUTING: $(cat /dev/shm/installipa.bash)"
 
         rlRun "setenforce 1" 0 "Making sure selinux is enforced"
         rlRun "chmod 755 /dev/shm/installipa.bash" 0 "Making ipa install script executable"
@@ -75,6 +87,7 @@ installMaster()
         fi
 
 	rlRun "service ipa status"
+	
    rlPhaseEnd
 }
 
