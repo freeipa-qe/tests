@@ -57,7 +57,8 @@ rlJournalStart
         rlLog "Creating tmp directory"
         TmpDir=`mktemp -d`
         pushd $TmpDir
-
+        slave_count=$(echo $SLAVE | wc -w)
+        echo "Slave count is $slave_count"
         #####################################################################
         #               IS THIS MACHINE A CLIENT?                           #
         #####################################################################
@@ -66,8 +67,14 @@ rlJournalStart
 	if [ $? -eq 0 ]; then
            # This machine is a client
 	   rlLog "I am a client"
+          if [ $slave_count -eq 3 ];then
+           rlLog "Executing test cases with 1 Master and 3 Replicas"
            ipaclientinstall
            clientinstall_primary_server
+          else
+           rlLog "Executing test cases with 1 Master and 1 Replica"
+           ipaclientinstall
+          fi
 	   rhts-sync-set -s DONE
 	else
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
