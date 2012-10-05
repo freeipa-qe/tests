@@ -194,7 +194,7 @@ replicaBugTest_bz823657()
 	rlPhaseEndTest
 }
 
-ireplicaBugTest_bz824492()
+replicaBugTest_bz824492()
 {
 	rlPhaseStartTest "bz824492 - Cannot re-connect replica to previously disconnected master."
 		# This test is to be run on a MASTER with a already connected SLAVE.
