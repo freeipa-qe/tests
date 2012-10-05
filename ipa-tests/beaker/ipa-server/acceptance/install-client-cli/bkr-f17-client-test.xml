@@ -56,7 +56,7 @@
 				</params>
 			</task>
 		</recipe>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="CLIENT1 for IPA Replica Install Tests">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="CLIENT1 for IPA Replica Install Tests">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>
