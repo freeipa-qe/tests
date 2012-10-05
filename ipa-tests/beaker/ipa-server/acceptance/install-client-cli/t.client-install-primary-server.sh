@@ -32,7 +32,7 @@ clientinstall_primary_server()
  ipaclientinstall_fixed_primary_param_TC_17
  ipaclientinstall_fixed_primary_param_TC_18
  ipaclientinstall_fixed_primary_param_TC_19
- 
+ ipaclientinstall_server_unreachableserver 
 }
 
 setup()
@@ -47,6 +47,7 @@ ipaclientinstall_fixed_primary_param_TC_1()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 01 [Positive] fixed primary with no param"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary -U"
         rlAssertNotGrep "_srv_" "$SSSD"
@@ -79,6 +80,7 @@ ipaclientinstall_fixed_primary_param_TC_3()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 03 [Negative] fixed primary with invalid server"
        uninstall_fornexttest
+        host_del
        rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=invalid --domain=$DOMAIN -U"
        command="ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=invalid --domain=$DOMAIN -U"
        expmsg="invalid is not an IPA v2 Server.
@@ -108,6 +110,7 @@ ipaclientinstall_fixed_primary_param_TC_5()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 05 [Positive] fixed primary with --server=MASTER --server=SLAVE"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE2" "$SSSD"
@@ -125,6 +128,7 @@ ipaclientinstall_fixed_primary_param_TC_6()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 06 [Positive] fixed primary with --server=SLAVE --server=MASTER"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$SLAVE3 --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$SLAVE3 --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $SLAVE3, $MASTER" "$SSSD"
@@ -174,6 +178,7 @@ ipaclientinstall_fixed_primary_param_TC_9()
 {
    rlPhaseStartTest "client-install-fixed-primary-server 09 [Positive] fixed primary with preserve-sssd"
         uninstall_fornexttest
+        host_del
 
         # To set up an sssd.conf that can be preserved: 
         # create a sssd.conf
@@ -242,6 +247,7 @@ ipaclientinstall_fixed_primary_param_TC_10()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 10 [Positive] fixed primary with --server=Master only and No Slave communication"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER" "$SSSD"
@@ -266,6 +272,7 @@ ipaclientinstall_fixed_primary_param_TC_11()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 11 [Positive] fixed primary with --server=Master --server=Slave and Slave communication only"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE2" "$SSSD"
@@ -292,6 +299,7 @@ ipaclientinstall_fixed_primary_param_TC_12()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 12 [Positive] fixed primary with --server=Master --server=Slave and no communication to MASTER and Slave"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1" "$SSSD"
@@ -314,7 +322,6 @@ ipaclientinstall_fixed_primary_param_TC_12()
         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start SLAVE IPA server"
         
         uninstall_fornexttest
-        host_del
     rlPhaseEnd
 }
 
@@ -322,6 +329,7 @@ ipaclientinstall_fixed_primary_param_TC_13()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 13 [Positive] fixed primary with --server=Master --server=Replica1 and No Replica2 communication"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1" "$SSSD"
@@ -351,6 +359,7 @@ ipaclientinstall_fixed_primary_param_TC_14()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 14 [Positive] fixed primary with --server=Master --server=Replica1 --server=Replica2 and communication to Replica2 only"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2" "$SSSD"
@@ -413,6 +422,7 @@ ipaclientinstall_fixed_primary_param_TC_16()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 16 [Positive] fixed primary with --server=Master --server=Replica1 --server=Replica2 --server=Replica3 and communication to Replica3 only"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
@@ -446,6 +456,7 @@ ipaclientinstall_fixed_primary_param_TC_17()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 17 [Positive] fixed primary with --server=Master --server=Replica1 --server=Replica2 --server=Replica3 and no communication to any IPA Server"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
@@ -481,6 +492,7 @@ ipaclientinstall_fixed_primary_param_TC_18()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 18 [Positive] fixed primary with --server=Master --server=Replica1 --server=Replica2 --server=Replica3 and first communication to Replica3 and then with MASTER"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
@@ -527,6 +539,7 @@ ipaclientinstall_fixed_primary_param_TC_19()
 {
     rlPhaseStartTest "client-install-fixed-primary-server 19 [Positive] fixed primary with --server=Master --server=Replica1 --server=Replica2 --server=Replica3 and communication fallbacks to MASTER from Repica3"
         uninstall_fornexttest
+        host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
@@ -581,5 +594,5 @@ host_del()
 {
         rlRun "echo \"echo Secret123|kinit admin;ipa host-del $CLIENT\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Deleting host from MASTER IPA server"
 }
