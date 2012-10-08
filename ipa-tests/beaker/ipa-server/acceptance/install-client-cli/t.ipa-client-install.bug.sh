@@ -61,7 +61,7 @@ ipaclientinstall_bugcheck_845691_fulltest()
 		rlRun "ssh $MASTER \"iptables -A INPUT -j DROP -p all --source $SLAVEIP\""
 		
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER > $tmpout" 0 "Installing ipa client and configuring - with all params"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER > $tmpout 2>&1" 0 "Installing ipa client and configuring - with all params"
 		if [ $(grep "Failed to obtain host TGT" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 845691 found...ipa-client-install Failed to obtain host TGT"
 		else
@@ -80,6 +80,7 @@ ipaclientinstall_bugcheck_845691_fulltest()
 			submit_log /var/log/ipaclient-install.log
 		fi
 
+		rlLog "Putting MASTER DNS and Firewall settings back"
 		SRVS="$MASTER_S $SLAVE_S"
 		for REC in '_kerberos-master._tcp:88' '_kerberos-master._udp:88' '_kerberos._tcp:88' '_kerberos._udp:88' '_kpasswd._tcp:464' '_kpasswd._udp:464'; do
 			REC_NAME=$(echo $REC|cut -f1 -d:)
