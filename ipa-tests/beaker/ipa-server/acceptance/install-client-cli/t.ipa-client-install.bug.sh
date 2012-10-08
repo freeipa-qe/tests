@@ -42,6 +42,67 @@ ipaclientinstall_bugcheck_845691()
 		fi
 	rlPhaseEnd
 }
+
+ipaclientinstall_bugcheck_845691_fulltest()
+{
+	tmpout=/tmp/bz845691.testout
+	rlPhaseStartTest "ipaclientinstall_bugcheck_845691_fulltest - ipa-client-install Failed to obtain host TGT"	
+			
+		uninstall_fornexttest
+		for REC in '_kerberos-master._tcp:88' '_kerberos-master._udp:88' '_kerberos._tcp:88' '_kerberos._udp:88' '_kpasswd._tcp:464' '_kpasswd._udp:464'; do
+			REC_NAME=$(echo $REC|cut -f1 -d:)
+			REC_PORT=$(echo $REC|cut -f2 -d:)
+			REC_ENTRY="0 100 $REC_PORT $SLAVE_S"
+			rlRun "ssh $MASTER \"ipa dnsrecord-mod $DOMAIN $REC_NAME --srv-rec='$REC_ENTRY'\""	
+		done
+		rlRun "ssh $MASTER \"ipa dnsrecord-mod $DOMAIN _ldap._tcp --srv-rec='0 100 389 $MASTER_S'\""
+
+		rlRun "ssh $MASTER \"service iptables stop\""
+		rlRun "ssh $MASTER \"iptables -A INPUT -j DROP -p all --source $SLAVEIP\""
+		
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER > $tmpout" 0 "Installing ipa client and configuring - with all params"
+		if [ $(grep "Failed to obtain host TGT" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 845691 found...ipa-client-install Failed to obtain host TGT"
+		else
+			rlPass "BZ 845691 not found"
+		fi
+
+		CHK1=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+		if [ $CHK1 -gt 0 ]; then
+			rlLog "[FAIL1] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
+			submit_log /var/log/ipaclient-install.log
+		fi
+
+		CHK2=$(grep "kinit: Client.*not found in Kerberos database while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+		if [ $CHK2 -gt 0 ]; then
+			rlLog "[FAIL2] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
+			submit_log /var/log/ipaclient-install.log
+		fi
+
+		SRVS="$MASTER_S $SLAVE_S"
+		for REC in '_kerberos-master._tcp:88' '_kerberos-master._udp:88' '_kerberos._tcp:88' '_kerberos._udp:88' '_kpasswd._tcp:464' '_kpasswd._udp:464'; do
+			REC_NAME=$(echo $REC|cut -f1 -d:)
+			REC_PORT=$(echo $REC|cut -f2 -d:)
+			REC_ENTRY=""
+			for SRV in $SRVS; do
+				REC_ENTRY="$REC_ENTRY, 0 100 $REC_PORT $SRV"
+			done
+			REC_ENTRY=$(echo $REC_ENTRY|sed 's/^, //')
+			rlRun "ssh $MASTER \"ipa dnsrecord-mod $DOMAIN $REC_NAME --srv-rec='$REC_ENTRY'\""	
+		done
+		REC_NAME="_ldap._tcp"
+		REC_PORT=389
+		REC_ENTRY=""
+		for SRV in $SRVS; do
+			REC_ENTRY="$REC_ENTRY, 0 100 $REC_PORT $SRV"
+		done
+		REC_ENTRY=$(echo $REC_ENTRY|sed 's/^, //')
+		rlRun "ssh $MASTER \"ipa dnsrecord-mod $DOMAIN $REC_NAME --srv-rec='$REC_ENTRY'\""
+		rlRun "ssh $MASTER \"service iptables stop\""
+	
+	rlPhaseEnd
+}
 	
 ###############################################################################################
 #  Bug 817869 - Clean keytabs before installing new keys into them
