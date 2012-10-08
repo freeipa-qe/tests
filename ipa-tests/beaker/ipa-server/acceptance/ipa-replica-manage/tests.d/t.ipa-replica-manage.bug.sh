@@ -131,3 +131,18 @@ irm_bugcheck_754539()
 		fi
 	rlPhaseEnd
 }
+
+irm_bugcheck_823657()
+{
+	tmpout=$1
+	TESTORDER=$(( TESTORDER += 1 ))
+	rlPhaseStartTest "irm_bugcheck_823657 - ipa-replica-manage connect fails with GSSAPI error after delete if using previous kerberos ticket"
+		OUTPUTCHK1=$(grep "SASL(-1): generic failure: GSSAPI Error: Unspecified GSS failure" $tmpout|wc -l)
+		OUTPUTCHK2=$(grep "You cannot connect to a previously deleted master" $tmpout|wc -l)
+		if [ $OUTPUTCHK1 -gt 0 -a $OUTPUTCHK2 -eq 0 ]; then
+			rlFail "BZ 823657 found...ipa-replica-manage connect fails with GSSAPI error after delete if using previous kerberos ticket"
+		else
+			rlPass "BZ 823657 not found."
+		fi
+	rlPhaseEnd
+}

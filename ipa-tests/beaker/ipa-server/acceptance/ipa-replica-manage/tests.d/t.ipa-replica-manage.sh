@@ -921,6 +921,7 @@ irm_connect_negative_0003()
 		rlRun "ipa-replica-manage -p $ADMINPW connect $MASTER $SLAVE1 > $tmpout 2>&1" 1
 		rlAssertGrep "You cannot connect to a previously deleted master" $tmpout
 		irm_bugcheck_754539 $tmpout
+		irm_bugcheck_823657 $tmpout
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
