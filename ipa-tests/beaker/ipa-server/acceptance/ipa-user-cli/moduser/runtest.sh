@@ -443,6 +443,7 @@ rlJournalStart
     rlPhaseStartTest "ipa-user-cli-mod-055: Rename user"
         rlRun "ipa user-mod --rename=$rename_user $superuser" 0 "Renaming user login to $rename_user"
         rlRun "verifyUserAttr $rename_user \"User login\" $rename_user " 0 "Verify user Login attribute."
+        rlRun "ipa user-show $rename_user --all --raw | grep krbprincipalname | cut -d ":" -f2 | grep $rename_user" 0 "Verify krbprincipalname is renamed as well"
 	command="ipa user-show $superuser"
         expmsg="ipa: ERROR: $superuser: user not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for $superuser"
