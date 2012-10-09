@@ -10,7 +10,7 @@ echo $FAMILY | grep RedHatEnterpriseLinux
 if [ $? -eq 0 ]; then
 	OS=rhel
 	VER=6
-        PKG="freeipa"
+        PKG="ipa"
 fi
 
 export OS VER PKG
