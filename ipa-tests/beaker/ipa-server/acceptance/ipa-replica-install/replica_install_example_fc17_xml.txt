@@ -29,6 +29,11 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ntpdate"/>
+				</params>
+			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
@@ -64,6 +69,11 @@
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
+			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ntpdate"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>

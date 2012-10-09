@@ -101,6 +101,21 @@ rlJournalStart
 
 	. /dev/shm/env.sh
 
+	# Determine it's RHEL/Fedora
+	echo $FAMILY | grep Fedora
+	if [ $? -eq 0 ]; then
+		OS=fedora
+		VER=17
+	        PKG="freeipa"
+	fi
+
+	echo $FAMILY | grep RedHatEnterpriseLinux
+	if [ $? -eq 0 ]; then
+		OS=rhel
+		VER=6
+        	PKG="ipa"
+	fi
+
 	ipofm=`dig +short $BEAKERMASTER`
 	ipofs=`dig +short $BEAKERSLAVE`
 

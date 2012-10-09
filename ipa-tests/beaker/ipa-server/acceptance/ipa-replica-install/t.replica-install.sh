@@ -54,7 +54,7 @@ installMaster()
         ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
 	rlLog "IP address of SLAVE: $SLAVE is $ipofs"
 
-	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
+	rlRun "yum install -y $PKG-server bind-dyndb-ldap bind"
 
 	# Determine my IP address
 	currenteth=$(route | grep ^default | awk '{print $8}')
@@ -271,7 +271,7 @@ installSlave()
 	rlPhaseStartSetup "Install IPA REPLICA Server"
 
 		rlRun "yum install -y openssh-clients"
-		rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
+		rlRun "yum install -y $PKG-server bind-dyndb-ldap bind"
 
 		rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 

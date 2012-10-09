@@ -54,7 +54,7 @@ installMaster()
         ipofs=$(dig +noquestion $SLAVE  | grep $SLAVE | grep IN | grep A | awk '{print $5}')
 	rlLog "IP address of SLAVE: $SLAVE is $ipofs"
 
-	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
+	rlRun "yum install -y $PKG-server bind-dyndb-ldap bind"
 
 	# Including --idstart=3000 --idmax=50000 to verify bug 782979.
 	echo "ipa-server-install --idstart=3000 --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
@@ -334,7 +334,7 @@ installSlave()
    rlPhaseStartSetup "Install IPA REPLICA Server"
 	
 	rlRun "yum install -y openssh-clients"
-	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
+	rlRun "yum install -y $PKG-server bind-dyndb-ldap bind"
         
 	rlRun "/etc/init.d/ntpd stop" 0 "Stopping the ntp server"
 
