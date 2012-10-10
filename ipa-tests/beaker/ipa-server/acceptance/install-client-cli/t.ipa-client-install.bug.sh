@@ -137,8 +137,8 @@ ipaclientinstall_dirty_keytab()
 
 	klist -kt /etc/krb5.keytab
 	diff $bkup $ktab
-	if [ $? -ne 0 ]; then 
-		rlFail "FAIL - $bkup and $ktab do not seem to match."
+	if [ $? -eq 0 ]; then 
+		rlFail "FAIL - $bkup and $ktab match when they should not."
 		cont=$(cat $bkup)
 		rlLog "Contents of $bkup are $cont"
 		cont=$(cat $ktab)
