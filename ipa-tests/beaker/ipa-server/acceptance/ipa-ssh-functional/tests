@@ -70,6 +70,8 @@ ssh -i id_rsa_user1 user1@vm2
 # add delegation for user to modify ipasshpubkey
 # user upload keys for other user
 # user fail to upload keys when doesn't have permission
+# delete delegation for user to modify ipasshpubkey
+# user can no longer upload keys for other user after delete
 # admin forbid a user from uploading keys (even with selfservice in place)
 
 ### user key functional test
