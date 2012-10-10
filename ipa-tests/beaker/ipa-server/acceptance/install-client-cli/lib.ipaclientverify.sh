@@ -168,7 +168,7 @@ verify_sssd()
          ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
        fi
        testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1" 
+       ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1"
        testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | sed 's/_srv_,//g' | xargs echo`
        ipacompare_forinstalluninstall_withmasterslave "ipa_server " "$ipa_server_master" "$ipa_server_slave" "$testipaserver" "$1"
        if [ "$2" == "enablednsupdates" ] ; then
@@ -213,7 +213,8 @@ verify_krb5()
 	klist -ekt /etc/krb5.keytab | grep $HOSTNAME
 	if [ $? -ne 0 ] ; then
 		if [ -f /etc/fedora-release ] ; then
-			rlAssertGrep "# default_realm = $RELM" $KRB5
+			#rlAssertGrep "# default_realm = $RELM" $KRB5
+			rlAssertNotGrep "default_realm = $RELM" $KRB5
 		else
 			testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
 	    		ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
@@ -241,7 +242,8 @@ verify_krb5()
        ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc" "$testdnslookupkdc" "$1" 
        testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_realm " "$dns_lookup_realm" "$testdnslookuprealm" "$1" 
-       testdomain=`grep "$DOMAIN" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       #testdomain=`grep "$DOMAIN" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       testdomain=`grep "$DOMAIN = " $KRB5 | cut -d "=" -f2 | xargs echo` 
        if [ "$2" == "nonexistent" ] ; then
           ipacompare_forinstalluninstall "domain_realm " "$domain_realm_nonexistent" "$testdomain" "$1" 
        else
