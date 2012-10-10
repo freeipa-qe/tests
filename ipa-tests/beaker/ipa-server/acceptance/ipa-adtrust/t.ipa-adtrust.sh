@@ -73,6 +73,7 @@ TID="10999"
 STID="332233991"
 fakeIP="10.25.11.21"
 invalid_V6IP="3632:51:0:c41c:7054:ff:ae3c:c981"
+smbfile=`/bin/rpm -ql $PACKAGE4 | grep "smb.conf" | grep etc`
 
 setup() {
 rlPhaseStartTest "Setup for adtrust sanity tests"
@@ -209,7 +210,7 @@ adtrust_test_0010() {
 rlPhaseStartTest "0010 Adtrust install by a user with administrative privileges"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa group-add-member --users=$user admins" 0 "Adding tuser to the admins group"
-	rlRun "NonRoot_Exp" 0 "Createing expect script"
+	rlRun "NonRoot_Exp" 0 "Creating expect script"
 	rlRun "$exp $expfile" 2 "Failed as expected. Still need to be root to setup AD trusts"
 
 rlPhaseEnd
@@ -301,6 +302,7 @@ adtrust_test_0019() {
 rlPhaseStartTest "0019 Adtrust install with start value of RID Base"
 	rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
 	rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
+	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "Valid_RID_Exp" 0 "Creating expect script"
 	rlRun "$exp $expfile rid-base $TID" 0 "Adtrust install with start value for mapping UIDs and GIDs to RIDs"
 	rlRun "ipa idrange-find | grep corresponding | grep $TID" 0 "ADtrust installed with preferred rid base."
@@ -313,6 +315,7 @@ adtrust_test_0020() {
 rlPhaseStartTest "0020 Adtrust with start value of Secondary RID Base"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
+	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "Valid_RID_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile secondary-rid-base $STID" 0 "Adtrust install with start value of secondary range"
         rlRun "ipa idrange-find | grep secondary | grep $STID" 0 "ADtrust installed with preferred secondary rid base."
@@ -325,6 +328,7 @@ adtrust_test_0021() {
 rlPhaseStartTest "0021 Adtrust install with both base and secondary RIDs"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
+	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "Valid_RID_Exp both" 0 "Creating expect script"
         rlRun "$exp $expfile rid-base $TID secondary-rid-base $STID" 0 "Adtrust install with start value of RID Base"
 	rlRun "ipa idrange-find | grep corresponding | grep $TID" 0 "ADtrust installed with preferred rid base."
@@ -338,6 +342,7 @@ adtrust_test_0022() {
 rlPhaseStartTest "0022 Adtrust install with --no-msdcs on Non DNS integrated server"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install without DNS"
+	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "No_SRV_Exp no-msdcs" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created with --no-msdcs"
 

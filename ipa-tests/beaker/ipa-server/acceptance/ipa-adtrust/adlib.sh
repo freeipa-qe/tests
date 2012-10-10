@@ -151,8 +151,11 @@ No_SRV_Exp() {
 	echo 'expect {
 	    timeout { send_user "\nExpected message not received\n"; exit 1 }
 	    eof { send_user "\nSome issue\n"; exit 1 }
-	"DNS*management*was*not*enabled" {' >> $expfile
-	echo 'send_user "\n------------------\n"' >> $expfile
+	"DNS*management*was*not*enabled" {
+	send_user "\n------------------\n" }
+	"\-\-no\-msdcs was given*" {
+	send_user "\n------------------\n" }
+	}' >> $expfile
 	echo "expect \"*$rec1\"" >> $expfile
 	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec2\"" >> $expfile
@@ -167,7 +170,6 @@ No_SRV_Exp() {
 	echo 'send_user "\n------------------\n"' >> $expfile
 	echo 'expect "Setup*complete" {
 	expect "*# " }
-	} }
 	send_user "\nAdtrust installed successfully without service records\n"
 	exit' >> $expfile
 }
