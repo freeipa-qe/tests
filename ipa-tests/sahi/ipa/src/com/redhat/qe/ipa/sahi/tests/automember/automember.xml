@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAAutomemberTestSuite">	
-    <test name="IPAAutomember Tests">
+   <test name="IPAAutomember Tests">
             	<groups>
             	    <run>
          				<include name="add" />
@@ -8,11 +8,24 @@
 						<include name="delete" />
 						<include name="search" />
 						<include name="nonStandardAutomember" />
-						<!-- <include name="report" />-->
+						
             	    </run>
             	</groups>
             	<classes>
             	    <class name="com.redhat.qe.ipa.sahi.tests.automember.AutomemberTests" />
+            	</classes>
+    </test>
+   
+    
+    <test name="IPAAutomember Bug Verification Tests">
+            	<groups>
+            	    <run>
+            	    	<include name="setup" />
+         				<include name="MissingSpecifiedName_Bug818258" />
+					</run>
+            	</groups>
+            	<classes>
+            	    <class name="com.redhat.qe.ipa.sahi.tests.automember.Automember_Bug_Verification" />
             	</classes>
     </test>
 	
