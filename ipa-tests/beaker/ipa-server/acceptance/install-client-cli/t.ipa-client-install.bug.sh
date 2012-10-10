@@ -110,7 +110,7 @@ ipaclientinstall_bugcheck_845691_fulltest()
 ###############################################################################################
 ipaclientinstall_dirty_keytab()
 {
-    rlPhaseStartTest "ipa-client-install-39 - Install with a dirty keytab"
+    rlPhaseStartTest "ipa_client_install-39 - Install with a dirty keytab"
 	rlLog "Test for BZ 817869, install ipa-client with a dirty keytab"
         uninstall_fornexttest
         #rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
