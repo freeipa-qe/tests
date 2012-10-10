@@ -588,3 +588,22 @@ upgrade_bz_819629()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
+upgrade_bz_824074()
+{
+	# 824074 - Create ipaserver-upgrade.log on upgrades
+
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	rlPhaseStartTest "upgrade_bz_824074 - Create ipaserver-upgrade.log on upgrades"
+	case "$MYROLE" in
+	"MASTER")
+		rlRun "ls /var/log/ipaupgrade.log" 0 "Basic sanity check to ensure that /var/log/ipaupgrade.log was created"
+		;;
+	*)
+		rlPass "Machine in recipe is not a ROLE that needs to be tested...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
