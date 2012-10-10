@@ -110,7 +110,8 @@ ipaclientinstall_bugcheck_845691_fulltest()
 ###############################################################################################
 ipaclientinstall_dirty_keytab()
 {
-    rlPhaseStartTest "ipa-client-install-39-dirty-keytab "
+    rlPhaseStartTest "ipa-client-install-39 - Install with a dirty keytab"
+	rlLog "Test for BZ 817869, install ipa-client with a dirty keytab"
         uninstall_fornexttest
         #rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
         #rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
@@ -126,6 +127,7 @@ ipaclientinstall_dirty_keytab()
         uninstall_fornexttest
         verify_install false 
 	rlRun "$command" 0 "Uninstalling ipa client - after a force install"
+	rm -f $ktab
 	if [ ! -f $ktab ]; then
 		cp -a $kbup $ktab
 	fi
