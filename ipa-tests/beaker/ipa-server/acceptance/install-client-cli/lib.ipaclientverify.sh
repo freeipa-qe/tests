@@ -139,6 +139,7 @@ verify_default()
 
 verify_sssd()
 {
+echo "verify_sssd"
     local installcheck="$1"
 
     if [ "$2" == "nosssd" ] ; then

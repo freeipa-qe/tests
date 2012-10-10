@@ -105,14 +105,14 @@ ipaclientinstall()
 # Bug 736617 - ipa-client-install mishandles ntp service configuration
        ipaclientinstall_ntpservice     
 
+# Bug 817869 - Clean keytabs before installing new keys into them 
+      ipaclientinstall_dirty_keytab
+
 #  --preserve-sssd     Preserve old SSSD configuration if possible
       ipaclientinstall_preservesssd
 
 # Bug 753526 - ipa-client-install rejects machines with hostname as localhost or localhost.localdomain #Added by Kaleem
       ipaclientinstall_client_hostname_localhost
-
-# Bug 817869 - Clean keytabs before installing new keys into them 
-      ipaclientinstall_dirty_keytab
 
 # Bug 845691 - ipa-client-install Failed to obtain host TGT
 	ipaclientinstall_bugcheck_845691_fulltest
@@ -176,7 +176,6 @@ install_setup()
 
 install_cleanup()
 {
-
          #Starting ipa sevice on $SLAVE2 and $SLAVE3
         if [ $slave_count -eq 3 ]; then
          rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
