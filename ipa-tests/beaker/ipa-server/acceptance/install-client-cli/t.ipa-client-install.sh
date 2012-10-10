@@ -153,7 +153,8 @@ install_setup()
         ## Lines to expect to be changed during the isnatllation process
         ## which reference the MASTER. 
         ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
-        ipa_server_master="_srv_, $MASTER" # sssd.conf updates
+        #ipa_server_master="_srv_, $MASTER" # sssd.conf updates
+        ipa_server_master="$MASTER" # sssd.conf updates
 		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
 			domain_realm_force_master="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
 		else
@@ -161,7 +162,8 @@ install_setup()
 			domain_realm_force_master="$MASTER:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
 		fi
         slavetoverify=`echo $SLAVE_ACTIVE | sed 's/\"//g' | sed 's/^ //g'`
-        ipa_server_slave="_srv_, $slavetoverify" # sssd.conf updates
+        #ipa_server_slave="_srv_, $slavetoverify" # sssd.conf updates
+        ipa_server_slave="$slavetoverify" # sssd.conf updates
 		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
 			domain_realm_force_slave="$SLAVE_ACTIVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
 		else
