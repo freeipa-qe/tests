@@ -24,7 +24,7 @@
 			<hostRequires>
 				<and>
 					<system_type value="Machine"/>
-					<memory op="&gt;=" value="1900"/>
+					<memory op="&gt;=" value="1000"/>
 				</and>
 			</hostRequires>
 			<partitions/>
@@ -74,7 +74,7 @@
 			<hostRequires>
 				<and>
 					<system_type value="Machine"/>
-					<memory op="&gt;=" value="1900"/>
+					<memory op="&gt;=" value="1000"/>
 				</and>
 			</hostRequires>
 			<partitions/>
