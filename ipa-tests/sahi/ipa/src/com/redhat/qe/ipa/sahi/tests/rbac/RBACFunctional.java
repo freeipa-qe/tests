@@ -345,7 +345,7 @@ public class RBACFunctional extends SahiTestScript {
 	//xdong
 		@Test (groups={"PerDomainDNSPermissionSetup"}, description="perdomain DNS permission function test", 
 				dataProvider="PerDomainDNSPermissionSetupData")	
-		public void perdomainDNSPermissionSetup(String uid,String givenname,String sn,String passwd,String newpasswd,String zonename,String authoritativeNameserver,String privilegename, String privilegedescription, String rolename, String roledescription) throws Exception {
+		public void perdomainDNSPermissionSetup(String uid,String givenname,String sn,String passwd,String newpasswd,String zonename,String privilegename, String privilegedescription, String rolename, String roledescription) throws Exception {
 			//add user
 			sahiTasks.navigateTo(commonTasks.userPage, true);
 			sahiTasks.link("Add").click();
@@ -357,8 +357,9 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.button("Add").click();
 			Assert.assertTrue(sahiTasks.link(uid).exists(), "User added successfully");
 			//add dns zone
+			String fqdn = System.getProperty("ipa.server.fqdn");
 			sahiTasks.navigateTo(commonTasks.dnsPage, true);
-			DNSTasks.addDNSzone(sahiTasks,zonename,authoritativeNameserver,"");
+			DNSTasks.addDNSzone(sahiTasks,zonename,fqdn,"");
 			Assert.assertTrue(sahiTasks.link(zonename).exists(), "DNS zone added successfully");
 			//Add Permission via DNS and verify
 			sahiTasks.link(zonename).click();
@@ -412,7 +413,7 @@ public class RBACFunctional extends SahiTestScript {
 		
 		@Test (groups={"PerDomainDNSPermissionVerify"}, description="perdomain DNS permission function test", 
 				dataProvider="PerDomainDNSPermissionVerifyData",dependsOnGroups="PerDomainDNSPermissionSetup")	
-		public void perdomainDNSPermissionVerify(String uid,String passwd,String newpasswd,String zoneName,String not_managed_zoneName,String new_zoneName,String new_authoritativeNameserver) throws Exception {
+		public void perdomainDNSPermissionVerify(String uid,String passwd,String newpasswd,String zoneName,String not_managed_zoneName,String new_zoneName) throws Exception {
 			
 			//verify that can't remove permission in permission page 
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
@@ -438,9 +439,10 @@ public class RBACFunctional extends SahiTestScript {
 			//verify that can't list not managed by user.
 			Assert.assertFalse(sahiTasks.link(not_managed_zoneName).exists(),"can't list zone " + not_managed_zoneName + "not managed by user " + uid + " as expected");
 			//verify that can't add a new zone
+			String fqdn = System.getProperty("ipa.server.fqdn");
 			sahiTasks.span("Add").click();
 			sahiTasks.textbox("idnsname").setValue(new_zoneName);
-			sahiTasks.textbox("idnssoamname").setValue(new_authoritativeNameserver);
+			sahiTasks.textbox("idnssoamname").setValue(fqdn);
 			sahiTasks.button("Add").click();  
 			if (sahiTasks.div("error_dialog").exists()){ 
 				String errormsg = sahiTasks.div("error_dialog").getText(); 
@@ -738,9 +740,9 @@ public class RBACFunctional extends SahiTestScript {
     @DataProvider(name="PerDomainDNSPermissionSetupData")
     public Object[][] PerDomainDNSPermissionSetupData() {
             String[][] roles={
-            //   uid,         givenname,       sn,         passwd,        newpasswd,        zoneName,            authoritativeNameserver,      privilegename,     privilegedescription,     rolename,        roledescription
-            {  "perdomain1",    "per",       "domain",      "a",         "Secret123",    "a.testrelm.com",      "ipaqavmc.testrelm.com" ,   "perdomain1p",        "perdomain1p",       "perdomain1r",     "perdomain1r"  },
-            {  "perdomain2",    "per",       "domain",      "b",         "Secret123",    "b.testrelm.com",      "ipaqavmc.testrelm.com" ,   "perdomain2p",        "perdomain2p",       "perdomain2r",     "perdomain2r"  }
+            //   uid,         givenname,       sn,         passwd,        newpasswd,        zoneName,           privilegename,     privilegedescription,     rolename,        roledescription
+            {  "perdomain1",    "per",       "domain",      "a",         "Secret123",    "a.testrelm.com",      "perdomain1p",        "perdomain1p",       "perdomain1r",     "perdomain1r"  },
+            {  "perdomain2",    "per",       "domain",      "b",         "Secret123",    "b.testrelm.com",      "perdomain2p",        "perdomain2p",       "perdomain2r",     "perdomain2r"  }
             };
 
             return roles;
@@ -752,9 +754,9 @@ public class RBACFunctional extends SahiTestScript {
     @DataProvider(name="PerDomainDNSPermissionVerifyData")
     public Object[][] PerDomainDNSPermissionVerifyData() {
             String[][] roles={
-            //     uid,          passwd,      newpasswd,          zoneName,        not_managed_zoneName,     new_zoneName,               new_authoritativeNameserver 
-            {   "perdomain1",     "a",       "Secret123",      "a.testrelm.com",      "b.testrelm.com" ,      "newa.testrelm.com",        "ipaqavmc.testrelm.com"    },
-            {   "perdomain2",     "b",       "Secret123",      "b.testrelm.com",      "a.testrelm.com" ,      "newb.testrelm.com",        "ipaqavmc.testrelm.com"    }
+            //     uid,          passwd,      newpasswd,          zoneName,        not_managed_zoneName,     new_zoneName,               
+            {   "perdomain1",     "a",       "Secret123",      "a.testrelm.com",      "b.testrelm.com" ,      "newa.testrelm.com"},
+            {   "perdomain2",     "b",       "Secret123",      "b.testrelm.com",      "a.testrelm.com" ,      "newb.testrelm.com"}
             };
             return roles;
     }
