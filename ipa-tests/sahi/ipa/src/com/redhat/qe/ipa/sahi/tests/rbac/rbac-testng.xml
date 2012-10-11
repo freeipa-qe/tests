@@ -72,8 +72,9 @@
 	 <test name="Role Tests">
                 <groups>
                         <run>
-                                <include name="roleAddTests" />
-                                <include name="roleAddAndAddAnotherTests" /> 
+                            <include name="setup" />
+                            <include name="roleAddTests" />
+                            <include name="roleAddAndAddAnotherTests" /> 
                             <include name="roleAddAndEditTests" />
                             <include name="roleAddCancelTests" /> 
                             <include name="roleInvalidAddTests" />
@@ -92,6 +93,7 @@
                     <class name="com.redhat.qe.ipa.sahi.tests.rbac.RoleTests" />
                 </classes>
         </test>
+
 
 
 	<test name="RBAC Functional Tests">
