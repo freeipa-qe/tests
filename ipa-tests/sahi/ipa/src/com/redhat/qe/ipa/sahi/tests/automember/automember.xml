@@ -15,20 +15,7 @@
             	    <class name="com.redhat.qe.ipa.sahi.tests.automember.AutomemberTests" />
             	</classes>
     </test>
-   
-    
-    <test name="IPAAutomember Bug Verification Tests">
-            	<groups>
-            	    <run>
-            	    	<include name="setup" />
-         				<include name="MissingSpecifiedName_Bug818258" />
-					</run>
-            	</groups>
-            	<classes>
-            	    <class name="com.redhat.qe.ipa.sahi.tests.automember.Automember_Bug_Verification" />
-            	</classes>
-    </test>
-	
+  
     <listeners>        
   	             <listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
     </listeners>
