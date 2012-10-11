@@ -955,6 +955,7 @@ ipa_quick_uninstall(){
 	rlRun "yum -y remove 'ipa*' '389-ds-base*' bind krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd httpd-tools"
 	rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client 'pki*' 'tomcat6*' mod_nss"
 	rlRun "yum -y remove memcached python-memcached"
+	rlRun "yum -y remove libldb"
 	if [ -d /var/lib/ipa ]; then
 		rlRun "/bin/rm -rf /var/lib/ipa/"
 	fi
