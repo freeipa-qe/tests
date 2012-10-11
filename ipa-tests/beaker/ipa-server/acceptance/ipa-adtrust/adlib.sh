@@ -151,9 +151,9 @@ No_SRV_Exp() {
 	echo 'expect {
 	    timeout { send_user "\nExpected message not received\n"; exit 1 }
 	    eof { send_user "\nSome issue\n"; exit 1 }
-	"DNS*management*was*not*enabled" {
+	"DNS management was not enabled" {
 	send_user "\n------------------\n" }
-	"\-\-no\-msdcs was given*" {
+	"no-msdcs was given" {
 	send_user "\n------------------\n" }
 	}' >> $expfile
 	echo "expect \"*$rec1\"" >> $expfile
