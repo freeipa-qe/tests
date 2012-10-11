@@ -274,7 +274,8 @@ public class RoleTasks {
 			sahiTasks.link("member_hostgroup").click();
 		
 		Assert.assertTrue(sahiTasks.link(member).exists(), "Verified " + member + " is listed for " + name );
-		sahiTasks.link(member).click();		
+		sahiTasks.link(member).click();	
+		//missing memberof_role in hostgroup,bug812109
 		sahiTasks.link("memberof_role").click();
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Verified " + name + " is listed for " + member );
 		sahiTasks.link(name).click();
