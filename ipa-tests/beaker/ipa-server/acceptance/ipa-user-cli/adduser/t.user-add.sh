@@ -712,7 +712,16 @@ disableuser.ldif_EOF
 
     rlPhaseEnd
 
-
+    rlPhaseStartTest "BZ 835642 - mail attribute not automatically populated"
+	rlLog "Test for https://bugzilla.redhat.com/show_bug.cgi?id=835642"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as administrator"
+	usr="642user"
+	rlRun "ipa user-add --first=f1 --last=l1 $usr" 0 "adding user $usr"
+	rlRun "ipa user-find $usr | grep Email | grep $usr@$domain" 0 "Ensure that the full email address '$usr@$domain' is stored for user $usr"
+	rlRun "ipa user-mod --email=teml $usr" 0 "changing the email for $usr without specifing the complete email address"
+	rlRun "ipa user-find $usr | grep Email | grep teml@$domain" 0 "Ensure that the full email address 'tmel@$domain' is stored for user $usr"
+	rlRun "ipa user-del $usr" 0 "Cleanup the added user"
+    rlPhaseEnd
 }
 
 addcleanup()
