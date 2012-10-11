@@ -621,6 +621,11 @@ public class PermissionTests extends SahiTestScript {
 			sahiTasks.select("list").choose("");
 			sahiTasks.span("Update").click();	
 			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			//win specific ::error showed up because of ticket3028 ,and when hitting the backlink ,it will say unsaved changes ,have to click reset in win .otherwise it will lead to upcoming failures 
+		    if (sahiTasks.span("Reset[1]").exists()) {
+		    	sahiTasks.span("Reset[1]").click();
+		    	sahiTasks.span("Cancel").click();
+		    }
 			
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.search(sahiTasks, "Enroll a host");
