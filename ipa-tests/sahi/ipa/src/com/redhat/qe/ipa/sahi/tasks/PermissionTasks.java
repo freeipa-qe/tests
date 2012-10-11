@@ -360,6 +360,11 @@ public class PermissionTasks {
 		}
 		sahiTasks.span("Update").click();	
 		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+		//win specific ::error showed up because of ticket3028 ,and when hitting the backlink ,it will say unsaved changes ,have to click reset in win .otherwise it will lead to upcoming failures 
+	    if (sahiTasks.span("Reset[1]").exists()) {
+	    	sahiTasks.span("Reset[1]").click();
+	    	sahiTasks.span("Cancel").click();
+	    }
 	}
 	
 	public static void invalidModifyPermission(SahiTasks sahiTasks, String cn, String right, String type, String expectedError) {
