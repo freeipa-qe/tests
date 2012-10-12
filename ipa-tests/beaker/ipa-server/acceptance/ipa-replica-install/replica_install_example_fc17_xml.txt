@@ -24,6 +24,7 @@
 			</distroRequires>
 			<hostRequires>
 				<system_type value="Machine"/>
+				<memory op="&gt;=" value="1800"/>
 			</hostRequires>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
@@ -31,7 +32,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect ntpdate"/>
+					<param name="PKGARGNAME" value="expect ntpdate freeipa-server"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
@@ -65,6 +66,7 @@
 			</distroRequires>
 			<hostRequires>
 				<system_type value="Machine"/>
+				<memory op="&gt;=" value="1800"/>
 			</hostRequires>
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
@@ -72,7 +74,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect ntpdate"/>
+					<param name="PKGARGNAME" value="expect ntpdate freeipa-server"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">

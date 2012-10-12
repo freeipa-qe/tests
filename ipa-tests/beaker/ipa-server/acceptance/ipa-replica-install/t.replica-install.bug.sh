@@ -207,3 +207,16 @@ replicaBugTest_bz824492()
 	rlPhaseEndTest
 }
 
+replicaInstallBug748987()
+{
+	rlPhaseStartTest "Bug 748987 - If master has leftover replica agreement from a previous failed attempt, next replica install can fail"
+		rlLog "Test for https://bugzilla.redhat.com/show_bug.cgi?id=748987"
+		# This test attempts to install a replica. The install should fail because the a and ptr dns records on the master has been deleted
+		# A pass will be seeing a error message  
+		file=/dev/shm/replica-install-output
+		rlLog "Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+		Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg &> $file
+		rlRun "grep 'A replication agreement for this host already exists. It needs to be removed' $file" 0 "Make sure that expected warning message appears in ipa-replica-install output"
+	rlPhaseEndTest
+}
+

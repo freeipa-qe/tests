@@ -173,7 +173,22 @@ rlJournalStart
 			replicaBugTest_bz823657
 			replicaBugTest_bz824492
 
-			rhts-sync-set -s COMPLETE_REPLICA5 $BEAKERMASTER
+			rhts-sync-set -s READY_REPLICA6 $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA6 $BEAKERSLAVE
+
+			# Delete dns entires for slave
+			slavename=$(echo $SLAVE | sed s/.$DOMAIN//g)
+			rlLog "Deleting a record of slave with ipa dnsrecord-del --a-rec=$SLAVEIP $DOMAIN $slavename"
+			ipa dnsrecord-del --a-rec=$SLAVEIP $DOMAIN $slavename			
+			awk1=$(echo $SLAVEIP | cut -d\. -f1)		
+			awk2=$(echo $SLAVEIP | cut -d\. -f2)		
+			awk3=$(echo $SLAVEIP | cut -d\. -f3)		
+			awk4=$(echo $SLAVEIP | cut -d\. -f4)		
+			ptrzone="$awk3.$awk2.$awk1.in-addr.arpa."
+			rlLog "Deleting reverse entry with ipa dnsrecord-del $ptrzone $awk4 --ptr-rec=\"$SLAVE.\""
+			ipa dnsrecord-del $ptrzone $awk4 --ptr-rec="$SLAVE."
+			
+			rhts-sync-set -s CONTINUE_REPLICA6 $BEAKERMASTER
 
 		rlPhaseEnd
 
@@ -295,6 +310,16 @@ rlJournalStart
 			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
 
 			uninstall
+
+			installSlave
+
+			rhts-sync-set -s DONE_REPLICA6 $BEAKERSLAVE
+
+			rhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
+
+			rhts-sync-block -s CONTINUE_REPLICA6 $BEAKERMASTER
+
+			replicaInstallBug748987	
 
 		rlPhaseEnd
 
