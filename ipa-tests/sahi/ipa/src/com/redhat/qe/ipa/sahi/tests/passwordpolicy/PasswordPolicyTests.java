@@ -2,6 +2,7 @@ package com.redhat.qe.ipa.sahi.tests.passwordpolicy;
 
 import java.util.logging.Logger;
 import org.testng.annotations.*;
+
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.*;
 import com.redhat.qe.auto.testng.*;
@@ -190,6 +191,40 @@ public class PasswordPolicyTests extends SahiTestScript{
 		Assert.assertTrue(browser.label("Group:").isVisible(),"All fields are visible");
 	}
 	
+	@Test (groups={"PriorityNotOrdered_Bug817407"}, description="Bug 817407 -Passwd Policy Should Be Ordered By COS Priority Not Name", 
+			dataProvider="PriorityNotOrderedBug817407TestObjects",dependsOnGroups="deletePolicy")
+	
+	public void testPriorityNotOrdered_Bug817407(String testname) throws Exception {
+	//add 4 groups
+		browser.navigateTo(commonTasks.groupPage, true);
+		String groupName[]={"highest","second","third","fourth"};
+		PasswordPolicyTasks.createUserGroupsForTest(browser, groupName);
+		
+	//add password policy
+		browser.navigateTo(commonTasks.passwordPolicyPage, true);
+		for(int i=0;i<4;i++){
+			Assert.assertFalse(browser.link(groupName[i]).exists(),"policy ["+groupName[i] + "] does not exist before add");
+			String s = ""+i;
+			PasswordPolicyTasks.add_Policy(browser, groupName[i],s);
+			Assert.assertTrue(browser.link(groupName[i]).exists(),"new policy ["+groupName[i] + "] has been added");
+		}
+			
+	//verify they are ordered by COS priority	
+		for(int i=0;i<3;i++){
+			Assert.assertTrue(browser.link(groupName[i+1]).under(browser.link(groupName[i])).exists(),"Passwd Policies Are Ordered By COS Priority");
+		}	
+	//delete password policy
+		for(int i=0;i<4;i++){
+		PasswordPolicyTasks.delete_Policy(browser, groupName[i]);
+		Assert.assertFalse(browser.link(groupName[i]).exists(), "policy ["+ groupName[i]  + "] does not exist after test");
+		}
+	//delelte 4 groups
+		browser.navigateTo(commonTasks.groupPage, true);
+		PasswordPolicyTasks.deleteUserGroupsForTest(browser, groupName);
+			
+	}
+	
+	
 	/***************************************************************************
 	 *                          Data providers                                 *
 	 ***************************************************************************/
@@ -306,4 +341,9 @@ public class PasswordPolicyTests extends SahiTestScript{
 		return policy; 
 	}
 	
+	@DataProvider(name="PriorityNotOrderedBug817407TestObjects")
+	public Object[][] getPriorityNotOrderedBug817407TestObjects() {
+		String[][] policy =  { {"bug817407"}};
+		return policy; 
+	}
 }//class PasswordPolicyTests
