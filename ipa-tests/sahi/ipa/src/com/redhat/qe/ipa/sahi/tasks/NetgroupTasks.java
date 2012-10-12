@@ -123,9 +123,19 @@ public class NetgroupTasks {
 		if (button.equals("All")) {
 			String categoryToChoose="";
 			if (section.equals("User"))
-				categoryToChoose = "usercategory" + "-1";
-			else
-				categoryToChoose = "hostcategory" +"-2";
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToChoose = "usercategory" + "-1";
+				}else{
+					categoryToChoose = "usercategory" + "-4";
+				}
+				
+			else{
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToChoose = "hostcategory" +"-2";
+				}else{
+					categoryToChoose = "hostcategory" +"-5";
+				}
+			}	
 			sahiTasks.radio(categoryToChoose+"-0").click();
 			sahiTasks.span(action).click();
 		}
@@ -156,14 +166,24 @@ public class NetgroupTasks {
 			String categoryToVerify = "";
 			String memberToVerify = "";
 			if (section.equals("User")) {
-				categoryToVerify = "usercategory" + "-1";
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToVerify = "usercategory" + "-1";
+				}else{
+					categoryToVerify = "usercategory" + "-4";
+				}
+				
 				if (type.equals("Users"))
 					memberToVerify = "memberuser_user";
 				else	
 					memberToVerify = "memberuser_group";
 			}
 			else {
-				categoryToVerify = "hostcategory" +"-2";
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToVerify = "hostcategory" +"-2";
+				}else{
+					categoryToVerify = "hostcategory" +"-5";
+				}
+				
 				if (type.equals("Hosts"))
 					memberToVerify = "memberhost_host";
 				else	
