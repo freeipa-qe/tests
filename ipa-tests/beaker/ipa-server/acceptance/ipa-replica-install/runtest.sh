@@ -38,6 +38,7 @@ ZONE2=3.2.2.in-addr.arpa.
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
+. ./lib.ipa-rhts.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include tests file
@@ -116,6 +117,9 @@ rlJournalStart
         	PKG="ipa"
 	fi
 
+	# Setting up iparhts sync server
+	setup_iparhts_sync
+
 	ipofm=`dig +short $BEAKERMASTER`
 	ipofs=`dig +short $BEAKERSLAVE`
 
@@ -147,34 +151,34 @@ rlJournalStart
 			mkdir -p /root/dev-shm-backup
 			cp -a /dev/shm/* /root/dev-shm-backup
 
-			rhts-sync-set -s READY_REPLICA1 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
+			iparhts-sync-set -s READY_REPLICA1 $BEAKERMASTER
+			iparhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
 
 			createReplica3
 
-			rhts-sync-set -s READY_REPLICA3 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA3 $BEAKERSLAVE
+			iparhts-sync-set -s READY_REPLICA3 $BEAKERMASTER
+			iparhts-sync-block -s DONE_REPLICA3 $BEAKERSLAVE
 
 			createReplica4
 
-			rhts-sync-set -s READY_REPLICA4 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA4 $BEAKERSLAVE
+			iparhts-sync-set -s READY_REPLICA4 $BEAKERMASTER
+			iparhts-sync-block -s DONE_REPLICA4 $BEAKERSLAVE
 
 			createReplica2
 
-			rhts-sync-set -s READY_REPLICA2 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
+			iparhts-sync-set -s READY_REPLICA2 $BEAKERMASTER
+			iparhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
 	
 			replicaBugCheck_bz769545
 
-			rhts-sync-set -s READY_REPLICA5 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
+			iparhts-sync-set -s READY_REPLICA5 $BEAKERMASTER
+			iparhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
 	
 			replicaBugTest_bz823657
 			replicaBugTest_bz824492
 
-			rhts-sync-set -s READY_REPLICA6 $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA6 $BEAKERSLAVE
+			iparhts-sync-set -s READY_REPLICA6 $BEAKERMASTER
+			iparhts-sync-block -s DONE_REPLICA6 $BEAKERSLAVE
 
 			# Delete dns entires for slave
 			slavename=$(echo $SLAVE | sed s/.$DOMAIN//g)
@@ -188,7 +192,7 @@ rlJournalStart
 			rlLog "Deleting reverse entry with ipa dnsrecord-del $ptrzone $awk4 --ptr-rec=\"$SLAVE.\""
 			ipa dnsrecord-del $ptrzone $awk4 --ptr-rec="$SLAVE."
 			
-			rhts-sync-set -s CONTINUE_REPLICA6 $BEAKERMASTER
+			iparhts-sync-set -s CONTINUE_REPLICA6 $BEAKERSLAVE
 
 		rlPhaseEnd
 
@@ -229,7 +233,7 @@ rlJournalStart
 			SetUpAuthKeys
 			SetUpKnownHosts
 
-			rhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
+			iparhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
 			installSlave
 			installCA
 			replicaBugCheck_bz784696
@@ -252,25 +256,25 @@ rlJournalStart
 
 			installSlave_nr1
 			uninstall
-			rhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
+			iparhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
 
 
 			# Installing slave with --no-forwarders
-			rhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
+			iparhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
 			installSlave_nf
 			uninstall
-			rhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
+			iparhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
 			
-			rhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
+			iparhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
 			# Installing slave with --no-reverse
 			installSlave_nr2
 			uninstall
 
 			installSlave_nr3
 			uninstall
-			rhts-sync-set -s DONE_REPLICA4 $BEAKERSLAVE
+			iparhts-sync-set -s DONE_REPLICA4 $BEAKERSLAVE
 
-			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
+			iparhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
 			# Installing with --ssh-trust-dns
 			installSlave_sshtrustdns
 			uninstall
@@ -299,25 +303,25 @@ rlJournalStart
 				
 			# Test other bugs not covered directly in above tests
 
-			rhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
+			iparhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
 
-			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+			iparhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
 
 			installSlave
 
-			rhts-sync-set -s DONE_REPLICA5 $BEAKERSLAVE
+			iparhts-sync-set -s DONE_REPLICA5 $BEAKERSLAVE
 
-			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+			iparhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
 
 			uninstall
 
 			installSlave
 
-			rhts-sync-set -s DONE_REPLICA6 $BEAKERSLAVE
+			iparhts-sync-set -s DONE_REPLICA6 $BEAKERSLAVE
 
-			rhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
+			iparhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
 
-			rhts-sync-block -s CONTINUE_REPLICA6 $BEAKERMASTER
+			iparhts-sync-block -s CONTINUE_REPLICA6 $BEAKERMASTER
 
 			replicaInstallBug748987	
 
