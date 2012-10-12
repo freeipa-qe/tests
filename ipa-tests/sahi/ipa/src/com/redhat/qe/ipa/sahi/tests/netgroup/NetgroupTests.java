@@ -427,9 +427,8 @@ public class NetgroupTests extends SahiTestScript{
 		sahiTasks.radio("indirect").click();
 		for(String name:groupNames)
 			Assert.assertTrue(sahiTasks.link(name).exists(), groupName3 + " has indirect members " + name + ",");
-		
-		
-		
+		sahiTasks.link("Netgroups").in(sahiTasks.div("content")).click();
+			
 	}
 		
 	
