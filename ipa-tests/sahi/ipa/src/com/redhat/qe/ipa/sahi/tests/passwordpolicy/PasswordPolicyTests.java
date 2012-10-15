@@ -224,6 +224,33 @@ public class PasswordPolicyTests extends SahiTestScript{
 			
 	}
 	
+	@Test (groups={"MeasurementUnitAdded_Bug798363"}, description="Bug798363 -Measurement Unit For History size,Failure reset interval,Failure reset interval Added ", 
+			dataProvider="MeasurementUnitAddedBug798363TestObjects",dependsOnGroups="PriorityNotOrdered_Bug817407")
+	public void testMeasurementUnitAdded_Bug798363(String testname) throws Exception {
+		//add 4 groups
+		browser.navigateTo(commonTasks.groupPage, true);
+		String groupName[]={"bug798363"};
+		PasswordPolicyTasks.createUserGroupsForTest(browser, groupName);
+		//add password policy
+		browser.navigateTo(commonTasks.passwordPolicyPage, true);
+		Assert.assertFalse(browser.link(groupName[0]).exists(),"policy ["+groupName[0] + "] does not exist before add");
+		PasswordPolicyTasks.add_Policy(browser, groupName[0],"0");
+		Assert.assertTrue(browser.link(groupName[0]).exists(),"new policy ["+groupName[0] + "] has been added");
+		//verify that the measurement units have been added
+		browser.link(groupName[0]).click();
+		Assert.assertTrue(browser.label("History size (number of passwords):").exists(),"measurement unit for History size added as expected");
+		Assert.assertTrue(browser.label("Failure reset interval (seconds):").exists(),"measurement unit for Failure reset added as expected");
+		Assert.assertTrue(browser.label("Lockout duration (seconds):").exists(),"measurement unit for Lockout duration added as expected");
+		browser.link("Password Policies").in(sahiTasks.div("content")).click();
+		//delete password policy
+		PasswordPolicyTasks.delete_Policy(browser, groupName[0]);
+		Assert.assertFalse(browser.link(groupName[0]).exists(), "policy ["+ groupName[0]  + "] does not exist after test");
+		//delelte the group
+		browser.navigateTo(commonTasks.groupPage, true);
+		PasswordPolicyTasks.deleteUserGroupsForTest(browser, groupName);
+		
+	}
+	
 	
 	/***************************************************************************
 	 *                          Data providers                                 *
@@ -346,4 +373,12 @@ public class PasswordPolicyTests extends SahiTestScript{
 		String[][] policy =  { {"bug817407"}};
 		return policy; 
 	}
+	
+	@DataProvider(name="MeasurementUnitAddedBug798363TestObjects")
+	public Object[][] getMeasurementUnitAddedBug7983637407TestObjects() {
+		String[][] policy =  { {"bug798363"}};
+		return policy; 
+	}
+	
+	
 }//class PasswordPolicyTests
