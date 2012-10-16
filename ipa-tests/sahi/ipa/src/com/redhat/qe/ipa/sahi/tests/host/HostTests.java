@@ -591,7 +591,20 @@ public class HostTests extends SahiTestScript{
 		
 	}
 	
-	
+	/*
+	 * Bug835640 verification 
+	 */
+	@Test (groups={"ManagedByHostMembershipAdded_Bug835640"}, description="Bug835640 -Managed By Host Membership Added In Host Page", 
+			dataProvider="ManagedByHostMembershipAddedBug835640TestObjects",dependsOnGroups="hostRemoveKeytabTests")
+	public void testManagedByHostMembershipAdded_Bug835640(String testname) throws Exception {
+		sahiTasks.navigateTo(commonTasks.hostPage, true);
+		String fqdn = System.getProperty("ipa.server.fqdn"); 
+		Assert.assertTrue(sahiTasks.link(fqdn).exists(),"fqdn exists as expected");
+		sahiTasks.link(fqdn).click();
+		//verify that the membership is added
+		Assert.assertTrue(sahiTasks.link("managedby_host").exists(),"Managed By Host Membership added as expected");
+		sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+	}
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
 	 *******************************************************/
@@ -1043,4 +1056,9 @@ public class HostTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	@DataProvider(name="ManagedByHostMembershipAddedBug835640TestObjects")
+	public Object[][] getManagedByHostMembershipAddedBug835640TestObjects() {
+		String[][] policy =  { {"bug835640"}};
+		return policy; 
+	}
 }
