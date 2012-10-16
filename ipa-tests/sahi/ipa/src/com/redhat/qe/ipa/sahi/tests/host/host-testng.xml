@@ -32,6 +32,7 @@
 			    <include name="hostEditUndoSSHPubKeyTests" />
 			    <include name="hostDeleteSSHPubKeyTests" />
 			    <include name="hostRemoveKeytabTests" /> 
+			    <include name="ManagedByHostMembershipAdded_Bug835640" />
 			</run>
 		</groups>
 		<classes>
