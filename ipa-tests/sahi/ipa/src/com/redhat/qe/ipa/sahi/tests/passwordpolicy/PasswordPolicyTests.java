@@ -375,7 +375,7 @@ public class PasswordPolicyTests extends SahiTestScript{
 	}
 	
 	@DataProvider(name="MeasurementUnitAddedBug798363TestObjects")
-	public Object[][] getMeasurementUnitAddedBug7983637407TestObjects() {
+	public Object[][] getMeasurementUnitAddedBug798363TestObjects() {
 		String[][] policy =  { {"bug798363"}};
 		return policy; 
 	}
