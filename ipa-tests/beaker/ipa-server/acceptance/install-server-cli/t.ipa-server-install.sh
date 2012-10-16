@@ -93,6 +93,9 @@ ipaserverinstall()
 #     Bug 826152 - zonemgr is set to default for reverse zone even with --zonemgr 
       ipaserverinstall_bz826152
 
+#     Bug 827321 - ipa-server-install does not fill the default value for --subject option and it crashes later.
+      ipaserverinstall_bz827321
+
 #     Add test to verify: bug 740403 : invalid Directory Manager password causes ipaserver-install to fail with "Exception in CertSubjectPanel(): java.lang.IndexOutOfBoundsException"
 #     Install using DM password with backslash
 
@@ -508,13 +511,29 @@ ipaserverinstall_bz826152()
 {
     rlPhaseStartTest "ipa-server-install - BZ 826152"
 	kdestroy
-	ipa-server-install --uninstall
+	ipa-server-install --uninstall -U
 	ipa-server-install --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U
 	testemail="testemail@$DOMAIN"
 	KinitAsAdmin
 	ipa-dns-install --zonemgr $testemail -U --forwarder=10.14.63.12
 	rlRun "ipa dnszone-find | grep $testemail" 0 "Make sure that the test email seems to have been installed into the useful zone"
-	ipa-server-install --uninstall
+	ipa-server-install --uninstall -U
+    rlPhaseEnd
+}
+
+####################################################################################
+# Bug 827321 : ipa-server-install does not fill the default value for --subject option and it crashes later.
+####################################################################################
+ipaserverinstall_bz827321()
+{
+    rlPhaseStartTest "ipa-server-install - BZ 827321 : ipa-server-install does not fill the default value for --subject option and it crashes later."
+	kdestroy
+	ipa-server-install --uninstall -U
+	fileout="/dev/shm/bz827321out.txt"
+	ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p Secret123 -U -a Secret123 -r TESTRELM.COM &> $fileout
+	rlRun "grep 'Unexpected error' $fileout" 1 "See if install failed as specified in BZ 827321."
+	rlRun "grep 'DEBUG must be str,unicode,tuple, or RDN' /var/log/ipaserver-install.log" 1 "See if ipaserver-install log contains error reported in BZ 827321"
+	ipa-server-install --uninstall -U # Cleanup
     rlPhaseEnd
 }
 
