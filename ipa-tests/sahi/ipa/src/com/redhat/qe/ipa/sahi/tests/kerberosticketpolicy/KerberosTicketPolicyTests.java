@@ -11,6 +11,7 @@ import com.redhat.qe.auto.testng.TestNGUtils;
 import com.redhat.qe.ipa.sahi.base.SahiTestScript;
 import com.redhat.qe.ipa.sahi.tasks.CommonTasks;
 import com.redhat.qe.ipa.sahi.tasks.KerberosTicketPolicyTasks;
+import com.redhat.qe.ipa.sahi.tasks.PasswordPolicyTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 
 public class KerberosTicketPolicyTests extends SahiTestScript{
@@ -116,6 +117,17 @@ public class KerberosTicketPolicyTests extends SahiTestScript{
 	}//modifyPolicy_NegativeTest
 	
 	
+	/*
+	 * Bug798365 verification 
+	 */
+	@Test (groups={"MeasurementUnitAdded_Bug798365"}, description="Bug798365 -Measurement Unit For Max renew and Max life Added ", 
+			dataProvider="MeasurementUnitAddedBug798365TestObjects")
+	public void testMeasurementUnitAdded_Bug798365(String testname) throws Exception {
+		//verify that the measurement units have been added
+		browser.navigateTo(commonTasks.kerberosTicketPolicyPage, true);
+		Assert.assertTrue("measurement unit for Max renew added as expected",browser.label("Max renew (seconds):").exists());
+		Assert.assertTrue("measurement unit for Max life added as expected",browser.label("Max life (seconds):").exists());
+	}
 	/***************************************************************************
 	 *                                                                         *
 	 *                          Data providers                                 *
@@ -172,5 +184,11 @@ public class KerberosTicketPolicyTests extends SahiTestScript{
 											KerberosTicketPolicyTests.errmsg_minValue}));
 		return ll;	
 	}// negativeData
+	
+	@DataProvider(name="MeasurementUnitAddedBug798365TestObjects")
+	public Object[][] getMeasurementUnitAddedBug798365TestObjects() {
+		String[][] policy =  { {"bug798365"}};
+		return policy; 
+	}
 	 
 }//class KerberosTicketPolicyTests
