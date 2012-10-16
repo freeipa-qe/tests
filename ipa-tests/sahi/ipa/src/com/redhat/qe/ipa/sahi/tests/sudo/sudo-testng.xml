@@ -47,6 +47,7 @@
 			    <include name="sudoCommandDeleteEnrolledTests" />
 				<include name="sudoCommandDelTests" />
 				<include name="sudoCommandCancelDelTests" />
+				<include name="QuestionMarkAddFixed_Bug855278" />				  
 			</run>
 		</groups>
 		<classes>
