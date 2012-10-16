@@ -74,6 +74,7 @@ ipa_install_set_vars() {
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
 		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
 		export BEAKERMASTER_env${I}=$M
+		echo "export BEAKERMASTER_env${I}=$M" >> /dev/shm/env.sh
 		export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
 		if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
 			export MYROLE=MASTER_env${I}
@@ -97,6 +98,7 @@ ipa_install_set_vars() {
 		for R in $(eval echo \$REPLICA_env${I}); do
 			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
 			export BEAKERREPLICA${J}_env${I}=$R
+			echo "export BEAKERREPLICA${J}_env${I}=$R" >> /dev/shm/env.sh
 			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype|tail -1)
 			if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
 				export MYROLE=REPLICA${J}_env${I}
@@ -125,6 +127,7 @@ ipa_install_set_vars() {
 		for C in $(eval echo \$CLIENT_env${I}); do
 			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN
 			export BEAKERCLIENT${J}_env${I}=$C
+			echo "export BEAKERCLIENT${J}_env${I}=$C" >> /dev/shm/env.sh
 			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype|tail -1)
 			if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
 				export MYROLE=CLIENT${J}_env${I}
