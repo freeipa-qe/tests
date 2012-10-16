@@ -323,6 +323,19 @@ public class SudoCommandTests extends SahiTestScript {
 	}
 	// Add a command to a command group
 	
+	/*
+	 * Bug855278 verification 
+	 */
+	@Test (groups={"QuestionMarkAddFixed_Bug855278"}, description="Bug798365 -Question Mark Add As Sudo Command Fixed ", 
+			dataProvider="QuestionMarkAddFixedBug855278TestObjects")
+	public void testQuestionMarkAddFixed_Bug855278(String testname) throws Exception {
+		//add "??" sudo command and verify
+		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
+		Assert.assertFalse(sahiTasks.link("??").exists(), "Verify sudocommand ?? doesn't already exist");
+		SudoTasks.createSudoCommandAdd(sahiTasks, "??", "", "Add");
+		Assert.assertTrue(sahiTasks.link("??").exists(), "Added Sudorule Command ??  successfully");
+	}
+	
 	
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
@@ -348,6 +361,7 @@ public class SudoCommandTests extends SahiTestScript {
 		if (sahiTasks.link(commandGroup).exists())
 			SudoTasks.deleteSudoCommandGroupDel(sahiTasks, commandGroup, "Delete");
 	}
+	
 	
 	/*******************************************************
 	 ************      DATA PROVIDERS     ******************
@@ -599,5 +613,11 @@ public class SudoCommandTests extends SahiTestScript {
 		ll.add(Arrays.asList(new Object[]{ "edit_command_update_with_blank_desc",		"/bin/ln",		""      	} ));
 		
 		return ll;	
+	}
+	
+	@DataProvider(name="QuestionMarkAddFixedBug855278TestObjects")
+	public Object[][] getQuestionMarkAddFixedBug855278TestObjects() {
+		String[][] policy =  { {"bug855278"}};
+		return policy; 
 	}
 }
