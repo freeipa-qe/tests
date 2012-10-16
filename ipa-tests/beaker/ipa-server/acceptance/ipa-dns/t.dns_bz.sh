@@ -50,6 +50,9 @@ dnsbugs()
    bz829388
    bz767489
    bz802375
+   bz829353
+   bz840383
+   bz829728
    dnsbugcleanup
 }
 
@@ -1018,6 +1021,72 @@ bz829388()
 		rlRun "ipa dnsrecord-del $DOMAIN $host --cname-rec=$host" 0 "Cleanup added DNS record."
 	rlPhaseEnd
 }
+
+bz829353()
+{
+     rlPhaseStartTest "bz829353 - bind-dyndb-ldap crashes when NS is not resolvable"
+        rlLog "Executing: ipa dnszone-add --name-server=unused-4-107.brq.redhat.com --admin-email=$email e.test"
+        rlRun "ipa dnszone-add --name-server=unused-4-107.brq.redhat.com --admin-email=$email e.test" 0 "Add zone with non-resolvable name server"
+        rlLog "Executing: ipa dnszone-del e.test"
+        rlRun "ipa dnszone-del e.test" 0 "Delete this zone"
+        rlLog "Executing: dig @$MASTERIP e.test | grep \"no servers could be reached\" "
+        rlRun "dig @$MASTERIP e.test | grep \"no servers could be reached\" " 1 "Verify service named is running"
+        rlLog "Executing: dig @$MASTERIP e.test | grep \"SERVFAIL\" "
+        rlRun "dig @$MASTERIP e.test | grep \"SERVFAIL\" " 1 "Verify tkt #92 Incorrect DNS zones are not unloaded correctly (e.g. with invalid NS records)"
+     rlPhaseEnd
+
+}
+
+bz840383()
+{
+     zone840383="zone840383.testrelm.com"
+     txt="\"bug test\""
+     newtxt="\"Bug Test for 840383\""
+     rlPhaseStartTest "bz840383 - Implement SOA serial number increments for external changes"
+       	rlLog "Executing: ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone840383" 
+       	rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone840383" 0 "Add a new zone to test with"
+        rlLog "Executing: ipa dnsrecord-add $zone840383 txt --txt-rec $txt"
+        rlRun "ipa dnsrecord-add $zone840383 txt --txt-rec $txt" 0 "add record type txt"
+        rlLog "Executing: ipa dnszone-mod $zone840383 --allow-transfer='any;'"
+        rlRun "ipa dnszone-mod $zone840383 --allow-transfer='any;'" 0 "Allow zone transfers"
+        rlLog "Executing: dig @$MASTERIP -t AXFR $zone840383 | grep \"TXT\" "
+        rlRun "dig @$MASTERIP -t AXFR $zone840383 | grep \"TXT\" " 0 "Verify the TXT record is part of zone transfer"
+	oldserial=`dig $zone840383 +multiline -t SOA | grep serial | cut -d ";" -f1 | xargs echo`
+        rlLog "Executing: ipa dnsrecord-mod $zone840383 txt --txt-rec=$txt --txt-data=$newtxt"
+        rlRun "ipa dnsrecord-mod $zone840383 txt --txt-rec=$txt --txt-data=$newtxt" 0 "update record type txt"
+	newserial=`dig $zone840383 +multiline -t SOA | grep serial | cut -d ";" -f1 | xargs echo`
+        if [ $oldserial -gt $newserial ]; then
+             rlFail "new serial after updating record is not higher. Was: $oldserial; New: $newserial"
+        else
+             rlPass "new serial after updating record is higher. Was: $oldserial; New: $newserial"
+        fi
+        rlLog "Executing: ipa dnszone-mod --dynamic-update=true $zone840383"
+        rlRun "ipa dnszone-mod --dynamic-update=true $zone840383" 0 "Update idnsAllowDynUpdate attribute" 
+	currentserial=`dig $zone840383 +multiline -t SOA | grep serial | cut -d ";" -f1 | xargs echo`
+        if [ $currentserial -eq $newserial ]; then
+             rlPass "serial was not updated when idnsAllowDynUpdate attr was updated "
+        else
+             rlFail "new serial after updating idnsAllowDynUpdate attribute. Was: $newserial; New: $currentserial"
+        fi
+     rlPhaseEnd
+     # Cleanup
+     ipa dnszone-del $zone840383
+}
+
+bz829728()
+{
+    rlPhaseStartTest "bz829728 - Crash on reload with persistent search enabled"
+       rlLog "Executing: export KRB5_KTNAME=\"/etc/named.keytab\""
+       rlRun "export KRB5_KTNAME=\"/etc/named.keytab\"" 0 "export KRB5_KTNAME"
+       rlLog "Executing: named -u named -d 0"
+       rlRun "named -u named -d 0" 0 "run named as user named"
+       rlLog "Executing: rndc reload"
+       rlRun "rndc reload" 0 " rndc reload was successful"
+       rlLog "Executing: service named status"
+       rlRun "service named status" 0 "Verifying that named is running"
+    rlPhaseEnd
+}
+
 
 dnsbugcleanup()
 {
