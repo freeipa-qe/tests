@@ -47,12 +47,12 @@ dnsbugs()
    bz809565
    bz798355
    bz767496
-   bz829388
-   bz767489
    bz802375
    bz829353
    bz840383
    bz829728
+   bz829388
+   bz767489
    dnsbugcleanup
 }
 
