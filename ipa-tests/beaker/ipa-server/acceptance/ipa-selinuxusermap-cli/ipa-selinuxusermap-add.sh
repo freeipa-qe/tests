@@ -69,7 +69,7 @@ selinuxusermap_disabledhbacrule="testselinuxusermap_disabledhbacrule"
 selinuxusermap_sytaxcheck1="testselinuxusermap_syntaxcheck1"
 selinuxusermap_sytaxcheck2="testselinuxusermap_syntaxcheck2"
 
-default_selinuxuser="guest_u:s0"
+default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
 host1="devhost."$DOMAIN
 user1="dev"
 usergroup1="dev_ugrp"

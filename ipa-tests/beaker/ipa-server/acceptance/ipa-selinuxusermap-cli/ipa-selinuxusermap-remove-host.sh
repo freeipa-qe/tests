@@ -54,7 +54,7 @@ selinuxusermap1="testselinuxusermap1"
 selinuxusermap2="testselinuxusermap2"
 selinuxusermap3="testselinuxusermap3"
 
-default_selinuxuser="guest_u:s0"
+default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
 host1="devhost."$DOMAIN
 host2="qe-blade-0008."$DOMAIN
 host3="switch."$DOMAIN

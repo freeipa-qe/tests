@@ -54,7 +54,7 @@ selinuxusermap2="testselinuxusermap2"
 selinuxusermap3="testselinuxusermap3"
 selinuxusermap4="testselinuxusermap4"
 
-default_selinuxuser="guest_u:s0"
+default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
 host1="devhost."$DOMAIN
 user1="dev"
 usergroup1="dev_ugrp"

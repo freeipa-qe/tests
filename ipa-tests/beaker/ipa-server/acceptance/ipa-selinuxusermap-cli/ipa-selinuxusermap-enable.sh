@@ -51,7 +51,7 @@ DOMAIN=`os_getdomainname`
 
 selinuxusermap1="testselinuxusermap1"
 
-default_selinuxuser="guest_u:s0"
+default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
 host1="devhost."$DOMAIN
 user1="dev"
 usergroup1="dev_ugrp"

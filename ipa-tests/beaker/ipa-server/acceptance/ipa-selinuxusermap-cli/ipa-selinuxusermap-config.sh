@@ -47,7 +47,7 @@
 
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
-default_selinuxuser="guest_u:s0"
+default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
 default_selinuxusermap_order_config="guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
 
 
