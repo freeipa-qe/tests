@@ -55,7 +55,7 @@ public class DNSTasks {
 		browser.span(linkToCkick).click();	
 		Assert.assertTrue(browser.div(expectedMsg).exists(),"Expected Message :: "+expectedMsg);
 		browser.button("OK").click();
-		Assert.assertTrue(browser.div(status).near(browser.div(zoneName)).exists(),"Varify DNSZone is "+status+" sucessfully");
+		Assert.assertTrue(browser.div(status).near(browser.div(zoneName)).exists(),"Verify DNSZone is "+status+" sucessfully");
 		browser.checkbox(zoneName).click();
 			
 	}
@@ -563,11 +563,14 @@ public class DNSTasks {
 			Assert.assertFalse(browser.label("A6:").isVisible(),"When other Record Types section is clicked, can't see its contents");			
 		}
 	
-		browser.link("DNS Zones").under(browser.div("DNS ZonesDNS Global ConfigurationDNS Resource Records")).click();
+		//browser.link("DNS Zones").under(browser.div("DNS ZonesDNS Global ConfigurationDNS Resource Records")).click();
+		browser.link("DNS Zones").in(browser.div("content")).click();
 		browser.span("Refresh").click();
+		browser.waitFor(1000);
 		browser.checkbox(zoneName).click();
 		browser.span("Delete").click();
 		browser.button("Delete").click();
+		browser.span("Refresh").click();
 }
 	/*
 	 * DNS Record Type Negative Test
@@ -1383,13 +1386,13 @@ public class DNSTasks {
 	    browser.select("action").choose("Disable");
 	    browser.span("Apply").click();
 	    browser.navigateTo(CommonTasks.dnsPage, true);
-	    Assert.assertTrue(browser.div("Disabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is disabled sucessfully");
+	    Assert.assertTrue(browser.div("Disabled").near(browser.div(zoneName)).exists(),"Verify DNSZone is disabled sucessfully");
 	    browser.link(zoneName).click();
 	    browser.link("Settings").click();
 	    browser.select("action").choose("Enable");
 	    browser.span("Apply").click();
 	    browser.navigateTo(CommonTasks.dnsPage, true);
-	    Assert.assertTrue(browser.div("Enabled").near(browser.div(zoneName)).exists(),"Varify DNSZone is enabled sucessfully");
+	    Assert.assertTrue(browser.div("Enabled").near(browser.div(zoneName)).exists(),"Verify DNSZone is enabled sucessfully");
 	    browser.link(zoneName).click();
 	    browser.link("Settings").click();
 	    browser.select("action").choose("Delete");
@@ -1593,28 +1596,28 @@ public class DNSTasks {
 			browser.span("Update").click();
 			Assert.assertTrue(browser.radio("idnsforwardpolicy-1-0").checked(), "Changes to Forward First are Updated....Update works successfully");
 		}else{
-			browser.radio("idnsforwardpolicy-45-1").click();
+			browser.radio("idnsforwardpolicy-47-1").click();
 			browser.span("undo").click();
-			Assert.assertFalse(browser.radio("idnsforwardpolicy-45-1").checked(), "Changes to Forward only are Undo.....Undo works successfully");
-			browser.radio("idnsforwardpolicy-45-1").click();
+			Assert.assertFalse(browser.radio("idnsforwardpolicy-47-1").checked(), "Changes to Forward only are Undo.....Undo works successfully");
+			browser.radio("idnsforwardpolicy-47-1").click();
 			browser.link("DNS Zones").click();
 			//without saving changes...
 			browser.div(expectedMsg).click();
 			log.info("IPA error dialog appears:: ExpectedMsg ::"+expectedMsg);
 			browser.button("Cancel").click();
 			browser.span("Reset").click();
-			Assert.assertFalse(browser.radio("idnsforwardpolicy-45-1").checked(), "Changes to Forward only are Reset.....Reset works successfully");
-			browser.radio("idnsforwardpolicy-45-1").click();
+			Assert.assertFalse(browser.radio("idnsforwardpolicy-47-1").checked(), "Changes to Forward only are Reset.....Reset works successfully");
+			browser.radio("idnsforwardpolicy-47-1").click();
 			browser.link("DNS Zones").click();
 			//without saving changes...
 			browser.div(expectedMsg).click();
 			log.info("IPA error dialog appears:: ExpectedMsg ::"+expectedMsg);
 			browser.button("Update").click();
 			browser.link("DNS Global Configuration").click();
-			Assert.assertTrue(browser.radio("idnsforwardpolicy-45-1").checked(), "Dialogbox Update works successfully.....Changes to Forward only are Updated");
-			browser.radio("idnsforwardpolicy-45-0").click();
+			Assert.assertTrue(browser.radio("idnsforwardpolicy-47-1").checked(), "Dialogbox Update works successfully.....Changes to Forward only are Updated");
+			browser.radio("idnsforwardpolicy-47-0").click();
 			browser.span("Update").click();
-			Assert.assertTrue(browser.radio("idnsforwardpolicy-45-0").checked(), "Changes to Forward First are Updated....Update works successfully");
+			Assert.assertTrue(browser.radio("idnsforwardpolicy-47-0").checked(), "Changes to Forward First are Updated....Update works successfully");
 		}
 	}
 	
