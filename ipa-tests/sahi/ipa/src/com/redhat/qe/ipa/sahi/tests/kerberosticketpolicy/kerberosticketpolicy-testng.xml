@@ -11,6 +11,7 @@
             	        <include name="modifyPolicy_PositiveTest" />
             	        <include name="modifyPolicy_NegativeTest" />
             	         <include name="restoreDefault" />
+            	         <include name="MeasurementUnitAdded_Bug798365" />
             	    </run>
             	</groups>
             	<classes>
