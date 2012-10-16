@@ -50,6 +50,10 @@ public class DNSTests extends SahiTestScript{
 		if (!currentURL.equals(commonTasks.dnsPage)){
 			log.info("current url=("+currentURL + "), is not a starting position, move to url=("+ commonTasks.dnsPage +")");
 			sahiTasks.navigateTo(commonTasks.dnsPage, true);
+		//win specific:if don't click OK for validation error, when enable/disable dns zones ,the click OK for that method will misclick the OK for validation error. 
+			if(sahiTasks.div("validation_error").exists()){
+			sahiTasks.span("OK").click();
+			}
 		}
 	}//checkURL
 	
@@ -170,7 +174,7 @@ public class DNSTests extends SahiTestScript{
 		 
 		 
 			// go back to dns zone list, prepare for next test
-			sahiTasks.link("DNS Zones").click();  
+			sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click(); 
 		}	 
 	
 	/*
@@ -204,7 +208,7 @@ public class DNSTests extends SahiTestScript{
 			DNSTasks.dnsZoneAllowPTRSync(sahiTasks, zoneName, reverseZoneName,fieldName, fieldValue);
 		}		
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click(); 
 		if (sahiTasks.span("Dirty").exists()){
 			log.info("Dirty dialog detected, will click reset to make it continue");
 			// some failed changes might occurred, need some protection here
@@ -256,7 +260,8 @@ public class DNSTests extends SahiTestScript{
 		DNSTasks.zoneRecords_add(sahiTasks,record_name,record_data,record_type,other_data1,other_data2,other_data3, other_data4, other_data5,
 									other_data6, other_data7, other_data8, other_data9, other_data10, other_data11); 
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").under(sahiTasks.div("DNS ZonesDNS Global ConfigurationDNS Resource Records")).click();  
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+		
 	}
 	
 	/*
@@ -277,7 +282,7 @@ public class DNSTests extends SahiTestScript{
 														second_record_name, second_record_data, second_record_type,sec_other_data1,sec_other_data2,sec_other_data3, sec_other_data4, sec_other_data5,
 														sec_other_data6, sec_other_data7, sec_other_data8, sec_other_data9, sec_other_data10, sec_other_data11); 
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();  
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();  
 	} 
 	
 	/*
@@ -292,7 +297,8 @@ public class DNSTests extends SahiTestScript{
 		// performing the test
 		DNSTasks.zoneRecords_addandedit(sahiTasks,record_name,record_data,record_type, other_data1, other_data2, other_data3, other_data4, other_data5, other_data6, other_data7, other_data8, other_data9, other_data10, other_data11); 
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();  
+		//sahiTasks.link("DNS Zones").under(sahiTasks.div("DNS ZonesDNS Global ConfigurationDNS Resource Records")).click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
 	}
 	
 	/*
@@ -307,7 +313,7 @@ public class DNSTests extends SahiTestScript{
 		// performing the test
 		DNSTasks.zoneRecords_add_then_cancel(sahiTasks,record_name,record_data,record_type, other_data1, other_data2, other_data3, other_data4, other_data5, other_data6, other_data7, other_data8, other_data9, other_data10, other_data11); 
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();  
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
 	}//dnsZoneRecordsTest_add_then_cancel
 	
 	
@@ -385,7 +391,7 @@ public class DNSTests extends SahiTestScript{
 		DNSTasks.zoneRecords_add(sahiTasks, record_name,record_data,record_type,other_data1,other_data2,other_data3, other_data4, other_data5,
 				other_data6, other_data7, other_data8, other_data9, other_data10, other_data11);
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click(); 
 	}
 	
 	/*
@@ -405,7 +411,7 @@ public class DNSTests extends SahiTestScript{
 														second_record_name, second_record_data, second_record_type,sec_other_data1,sec_other_data2,sec_other_data3, sec_other_data4, sec_other_data5,
 														sec_other_data6, sec_other_data7, sec_other_data8, sec_other_data9, sec_other_data10, sec_other_data11);
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
 	}    
 	
 	/*
@@ -421,7 +427,7 @@ public class DNSTests extends SahiTestScript{
 		// performing the test
 		DNSTasks.zoneRecords_addandedit(sahiTasks, record_name,record_data,record_type, other_data1, other_data2, other_data3, other_data4, other_data5, other_data6, other_data7, other_data8, other_data9, other_data10, other_data11);
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click(); 
 	}//reverseDNSZoneRecordsTest_addandedit  
 	
 	
@@ -438,7 +444,7 @@ public class DNSTests extends SahiTestScript{
 		// performing the test
 		DNSTasks.zoneRecords_add_then_cancel(sahiTasks, record_name,record_data,record_type, other_data1, other_data2, other_data3, other_data4, other_data5, other_data6, other_data7, other_data8, other_data9, other_data10, other_data11);
 		// go back to dns zone list, prepare for next test
-		sahiTasks.link("DNS Zones").click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click(); 
 	}//reverseDNSZoneRecordsTest_add_then_cancel 
 	
 	/*
@@ -477,7 +483,7 @@ public class DNSTests extends SahiTestScript{
 		// go back to dns zone list, prepare for next test
 		
 		
-		sahiTasks.link("DNS Zones").click();
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click(); 
 		if (sahiTasks.span("Dirty").exists()){
 			log.info("Dirty dialog detected, will click reset to make it continue");
 			// some failed changes might occurred, need some protection here
@@ -558,7 +564,10 @@ public class DNSTests extends SahiTestScript{
 	
 	@DataProvider(name="getDNSSettings")
 	public Object[][] getDNSSettings(){
-		return TestNGUtils.convertListOfListsTo2dArray(createDNSSettings());
+		if (!System.getProperty("os.name").startsWith("Windows"))
+			return TestNGUtils.convertListOfListsTo2dArray(createDNSSettings());
+		else
+			return TestNGUtils.convertListOfListsTo2dArray(createDNSSettings_win());
 	}
 	protected List<List<Object>> createDNSSettings(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
@@ -614,13 +623,70 @@ public class DNSTests extends SahiTestScript{
 		
 		return ll;
 		
-	}//createDNSSettings
+	}
+	
+	protected List<List<Object>> createDNSSettings_win(){
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+	  ll.add(Arrays.asList(new Object[]{"dns settings test: soa name","SOA&class",DNSTests.dnszone,reversezone,
+			"idnssoamname","modified.dhcp-121.sjc.redhat.com"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings test: soa r name","SOA&class",DNSTests.dnszone,reversezone,
+				"idnssoarname","email.dhcp-121.sjc.redhat.com."}));
+		
+			ll.add(Arrays.asList(new Object[]{"dns settings: soa serial","SOA&class",DNSTests.dnszone,reversezone,
+				"idnssoaserial","2147483646"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa refresh time","SOA&class",DNSTests.dnszone,reversezone,
+				"idnssoarefresh","2400"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa retry time","SOA&class",DNSTests.dnszone,reversezone,
+				"idnssoaretry","600"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa expire time","SOA&class",DNSTests.dnszone,reversezone,
+				"idnssoaexpire","243544645"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: soa minimum time","SOA&class",DNSTests.dnszone,reversezone,
+				"idnssoaminimum","2400"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: ttl: time to live","SOA&class",DNSTests.dnszone,reversezone,
+				"dnsttl","1323324324"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
+				"dnsclass","IN"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
+				"dnsclass","CS"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
+				"dnsclass","CH"}));
+		ll.add(Arrays.asList(new Object[]{"dns settings: class","SOA&class",DNSTests.dnszone,reversezone,
+				"dnsclass","HS"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow dynamic update","Dynamic Update&Policy",DNSTests.dnszone,reversezone,
+				"idnsallowdynupdate-3-0","idnsallowdynupdate-3-1"}));
+				
+		ll.add(Arrays.asList(new Object[]{"dns settings: update policy","Bind Update policy",DNSTests.dnszone,reversezone,
+				"idnsupdatepolicy","grant SJC.REDHAT.COM krb5-self * AAAA; grant SJC.REDHAT.COM krb5-self * A;"}));
+		
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow query","Query&Transfer",DNSTests.dnszone,reversezone,
+				"idnsallowquery-1","1.1.1.1"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow Transfer","Query&Transfer",DNSTests.dnszone,reversezone,
+				"idnsallowtransfer-1","2.2.2.2"}));
+				
+		ll.add(Arrays.asList(new Object[]{"dns settings: allow Transfer","Query&Transfer",DNSTests.dnszone,reversezone,
+				"idnsforwarders-0","3.3.3.3"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: forward Policy","Dynamic Update&Policy",DNSTests.dnszone,reversezone,
+				"idnsforwardpolicy-4-1","idnsforwardpolicy-4-0"}));
+		
+		ll.add(Arrays.asList(new Object[]{"dns settings: Allow_PTR_Sync_Test","PTR Sync",DNSTests.dnszone,reversezone,
+				"","This page has unsaved changes. Please save or revert."}));
+		
+		return ll;
+		
+	}
 	
 	//getDNSSettings_Negative 
 	
 	@DataProvider(name="getDNSSettings_Negative")
 	public Object[][] getDNSSettings_Negative(){
 		return TestNGUtils.convertListOfListsTo2dArray(createDNSSettings_Negative());
+		
 	}
 	protected List<List<Object>> createDNSSettings_Negative(){
 		List<List<Object>> ll = new ArrayList<List<Object>>();
@@ -686,9 +752,6 @@ public class DNSTests extends SahiTestScript{
 	  return ll;
 		
 	}
-	
-	
-	
 	
 	
 	
