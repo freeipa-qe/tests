@@ -57,7 +57,7 @@
 ######################################################################
 ipa_ssh_host_func_run()
 {
-	#ipa_ssh_host_func_envsetup
+	ipa_ssh_host_func_envsetup
 
 	ipa_ssh_host_func_0001 # New client added and host keys uploaded automatically to DNS
 	ipa_ssh_host_func_0002 # User ssh to client and sees valid keys match from DNS.
