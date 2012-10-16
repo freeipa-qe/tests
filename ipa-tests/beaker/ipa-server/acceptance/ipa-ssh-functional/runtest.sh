@@ -79,8 +79,8 @@ rlJournalStart
 	#ipa_host_add_ssh_run
 	#ipa_host_mod_ssh_run
 
-	#ipa_user_func_ssh_run
-	ipa_host_func_ssh_run
+	#ipa_ssh_user_func_run
+	ipa_ssh_host_func_run
 
     rlPhaseStartCleanup "ipa-test-template cleanup"
         rlRun "popd"
