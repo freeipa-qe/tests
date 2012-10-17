@@ -66,7 +66,7 @@ ipa_ssh_user_func_run()
 	ipa_ssh_user_func_0008 # user runs user-mod to upload keys after user account locked?
 	ipa_ssh_user_func_0009 # user attempts to ssh with keys after user account locked?
 
-	ipa_ssh_user_func_envcleanup
+	#ipa_ssh_user_func_envcleanup
 }
 
 ipa_ssh_user_func_envsetup()
