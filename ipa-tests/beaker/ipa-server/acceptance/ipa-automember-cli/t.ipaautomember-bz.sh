@@ -52,7 +52,7 @@ ipaautomember_bz()
 ######################################################################
 ipaautomember_bz_746589()
 {
-	rlPhaseStartTest "ipa-automember-bz-746589: automember functionality not available for upgraded IPA server"
+	rlPhaseStartTest "ipa-automember-bz-746589 automember functionality not available for upgraded IPA server"
 		KinitAsAdmin
 		local tmpout=$TmpDir/automember_bz_746589.$RANDOM.out
 		# Need some code to test if a version was from upgrade??? 
@@ -78,7 +78,7 @@ ipaautomember_bz_746589()
 #  $(ipa help automember|grep "Set the default target group:" | wc -l) -gt 1 ] && rlFail
 ipaautomember_bz_772659()
 {
-	rlPhaseStartTest "ipaautomember_bz_772659: Typo in example description for automember-default-group-remove"
+	rlPhaseStartTest "ipaautomember_bz_772659 Typo in example description for automember-default-group-remove"
 		KinitAsAdmin
 		if [ $(ipa help automember|grep "Set the default target group:" | wc -l) -gt 1 ]; then
 			rlFail "BZ 772659 found...Typo in example description for automember-default-group-remove"
@@ -91,7 +91,7 @@ ipaautomember_bz_772659()
 #  BZ 782460 -- Clone of 772659 --Typo in example description for automember-default-group-remove
 ipaautomember_bz_782460()
 {
-	rlPhaseStartTest "ipaautomember_bz_782460: Clone of 772659 --Typo in example description for automember-default-group-remove"
+	rlPhaseStartTest "ipaautomember_bz_782460 Clone of 772659 --Typo in example description for automember-default-group-remove"
 		ipaautomember_bz_772659
 	rlPhaseEnd
 }

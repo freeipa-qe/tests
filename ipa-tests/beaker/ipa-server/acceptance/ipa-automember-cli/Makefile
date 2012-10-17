@@ -55,7 +55,7 @@ $(METADATA): Makefile
 	@echo "Description:     IPA automember CLI acceptance tests" >> $(METADATA)
 	@echo "Type:            Functional" >> $(METADATA)
 	@echo "TestTime:        60m" >> $(METADATA)
-	@echo "RunFor:          ipa-server" >> $(METADATA)
+	@echo "RunFor:          ipa" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
