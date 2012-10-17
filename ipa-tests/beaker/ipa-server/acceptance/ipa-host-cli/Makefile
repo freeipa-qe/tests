@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE ipa-host-cli-ipv6.sh ipa-host-cli-macaddress.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE ipa-host-cli-ipv6.sh ipa-host-cli-macaddress.sh ipa-host-cli-bugzillas.sh
 
 .PHONY: all install download clean
 
@@ -51,7 +51,7 @@ $(METADATA): Makefile
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     IPA host CLI acceptance tests" >> $(METADATA)
-	@echo "Type:            Regression" >> $(METADATA)
+	@echo "Type:            Functional" >> $(METADATA)
 	@echo "TestTime:        60m" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)

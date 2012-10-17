@@ -62,12 +62,12 @@ oct8=$(echo $ipv6addr | awk -F : '{print $8}')
 
  run_host_add_ipv6_tests(){
 
-    rlPhaseStartSetup "ipa-host-cli-ipv6-startup: Create temp directory"
+    rlPhaseStartSetup 
 	rlRun "tmpDir=\`mktemp -d\`" 0 "Creating temp directory"
         rlRun "pushd $tmpDir"
     rlPhaseEnd
 
-rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-reverse"
+rlPhaseStartTest "ipa-host-cli-87 Add host with IPv6 address DNS Record --no-reverse"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
         new_oct5="ffff"
@@ -164,7 +164,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
 
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-88: Add host with IPv6 address and DNS Record"
+    rlPhaseStartTest "ipa-host-cli-88 Add host with IPv6 address and DNS Record"
        short=mytestIPv6host
        myhost=$short.$DOMAIN
        new_oct5="ffff"
@@ -229,7 +229,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
     rlPhaseEnd
 
 
-   rlPhaseStartTest "ipa-host-cli-89: Delete host without deleting DNS Record"
+   rlPhaseStartTest "ipa-host-cli-89 Delete host without deleting DNS Record"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
         new_oct5="ffff"
@@ -259,7 +259,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
     	 rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-90: Add host without force option - DNS Record Exists"
+    rlPhaseStartTest "ipa-host-cli-90 Add host without force option - DNS Record Exists"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
         new_oct5="ffff"
@@ -310,7 +310,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
 
     rlPhaseEnd
 
-   rlPhaseStartTest "ipa-host-cli-91: Add host with force option - DNS Record Exists"
+   rlPhaseStartTest "ipa-host-cli-91 Add host with force option - DNS Record Exists"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
         new_oct5="ffff"
@@ -353,7 +353,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
         rlRun "ipa dnsrecord-find $rzone_IPv6 $recordname_ipv6" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-92: Delete Host and Update DNS"
+    rlPhaseStartTest "ipa-host-cli-92 Delete Host and Update DNS"
         short=mytestIPv6host
         myhost=$short.$DOMAIN
 	rzone_IPv6=`getReverseZone_IPv6 $ipv6addr`
@@ -387,7 +387,7 @@ rlPhaseStartTest "ipa-host-cli-87: Add host with IPv6 address DNS Record --no-re
 	rlRun "ipa dnszone-del $rzone_IPv6" 0 "cleanup - delete dnszone"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-93: Negative - Add host with invalid IPv6 address"
+    rlPhaseStartTest "ipa-host-cli-93 Negative - Add host with invalid IPv6 address"
        short=mytestIPv6host
        myhost=$short.$DOMAIN
        ipv6_addr="some:ipv6addr"
