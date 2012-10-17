@@ -124,15 +124,15 @@ run_selinuxusermap_mod_tests(){
     rlPhaseStartTest "ipa-selinuxusermap-mod-001: Modify a selinuxuser"
         rlRun "addSelinuxusermap $default_selinuxuser $selinuxusermap1" 0 "Add a selinuxusermap"
 	rlRun "ipa selinuxusermap-find --name=$selinuxusermap1" 0 "Verifying selinuxusermap was added."
-	rlRun "ipa selinuxusermap-mod --selinuxuser=unconfined_u:s0-s0:c0.c1023 $selinuxusermap1 > $TmpDir/selinuxusermap-mod_test1.out" 0 "Modify selinuxusermap with --selinuxuser=unconfined_u:s0-s0:c0.c1023"
+	rlRun "ipa selinuxusermap-mod --selinuxuser=guest_u:s0 $selinuxusermap1 > $TmpDir/selinuxusermap-mod_test1.out" 0 "Modify selinuxusermap with --selinuxuser=guest_u:s0"
 	rlRun "cat $TmpDir/selinuxusermap-mod_test1.out"
 	rlAssertGrep "Rule name: $selinuxusermap1" "$TmpDir/selinuxusermap-mod_test1.out"
-	rlRun "ipa selinuxusermap-find --selinuxuser=unconfined_u:s0-s0:c0.c1023 $selinuxusermap1" 0 "Verifying selinuxusermap was added with selinuxuser unconfined_u:s0-s0:c0.c1023"
+	rlRun "ipa selinuxusermap-find --selinuxuser=guest_u:s0 $selinuxusermap1" 0 "Verifying selinuxusermap was added with selinuxuser guest_u:s0"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-mod-002: Modify with a selinuxuser that does not exist"
 	command="ipa selinuxusermap-mod --selinuxuser=doesntexist $selinuxusermap1"
-        expmsg="ipa: ERROR: SELinux user doesntexist not found in ordering list (in config)"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for selinuxuser type that does not exist"
     rlPhaseEnd
 
@@ -157,7 +157,7 @@ run_selinuxusermap_mod_tests(){
 
     rlPhaseStartTest "ipa-selinuxusermap-mod-006: Modify selinuxusermap with unknown User Category"
         command="ipa selinuxusermap-mod --usercat=deny $selinuxusermap1"
-        expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
+        expmsg="ipa: ERROR: invalid 'usercat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for selinuxusermap with unknown User Category"
 	rlRun "ipa selinuxusermap-find --usercat=all $selinuxusermap1" 0 "Verifying selinuxusermap with --usercat=all is not modifed."
     rlPhaseEnd
@@ -178,7 +178,7 @@ run_selinuxusermap_mod_tests(){
 
     rlPhaseStartTest "ipa-selinuxusermap-mod-009: Modify selinuxusermap with unknown Host Category"
         command="ipa selinuxusermap-mod --hostcat=deny $selinuxusermap1"
-        expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
+        expmsg="ipa: ERROR: invalid 'hostcat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for selinuxusermap with unknown Host Category"
 	rlRun "ipa selinuxusermap-find --hostcat=all $selinuxusermap1" 0 "Verifying selinuxusermap with --hostcat=all is not modifed."
     rlPhaseEnd
@@ -334,7 +334,7 @@ run_selinuxusermap_mod_tests(){
      rlPhaseEnd
  
      rlPhaseStartTest "ipa-selinuxusermap-mod-020: Modify with --setattr - use non existing ipaselinuxuser"
- 	expmsg="ipa: ERROR: "
+ 	expmsg="ipa: ERROR: invalid 'ipaselinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
          command="ipa selinuxusermap-mod --setattr=ipaselinuxuser=deny $selinuxusermap8"
          rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
          rlRun "ipa selinuxusermap-find $selinuxusermap8 > $TmpDir/selinuxusermap-mod_test20.out" 0 "find selinuxuser"
@@ -359,7 +359,8 @@ run_selinuxusermap_mod_tests(){
         command="ipa selinuxusermap-mod --addattr=description=newselinuxusermapdescription  $selinuxusermap11"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 
-	rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=newHbacRule $selinuxusermap12" 0 "Add selinuxuser rule"
+	#rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=newHbacRule $selinuxusermap12" 0 "Add selinuxuser rule"
+	rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap12" 0 "Add selinuxuser rule"
 
 	#get hbacrule DN for hbacrule allow_all
         rlRun "ipa hbacrule-show --all allow_all > $TmpDir/selinuxusermap-mod_test22_2.out" 0 "hbacrule show for allow_all"
