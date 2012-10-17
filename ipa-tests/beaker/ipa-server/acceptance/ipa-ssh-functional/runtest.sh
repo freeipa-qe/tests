@@ -72,7 +72,7 @@ rlJournalStart
 
 	ipa_user_add_ssh_run
 	ipa_user_mod_ssh_run
-	ipa_selfservice__ssh_run
+	ipa_selfservice_ssh_run
 	ipa_delegation_ssh_run
 
 	ipa_host_add_ssh_run

@@ -79,6 +79,9 @@ ipa_ssh_host_func_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	rlPhaseStartTest "ipa_ssh_host_func_envsetup - Setup environment for IPA User Functional tests"
+		rlLog "===================================================================="
+		env|sort
+		rlLog "===================================================================="
 		case "$MYROLE" in
 		MASTER*)
 			rlLog "Machine in recipe is MASTER ($(hostname))"
