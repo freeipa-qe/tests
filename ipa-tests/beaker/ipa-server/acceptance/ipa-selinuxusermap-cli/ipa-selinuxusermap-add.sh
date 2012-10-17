@@ -146,7 +146,7 @@ run_selinuxusermap_add_tests(){
 
     rlPhaseStartTest "ipa-selinuxusermap-add-cli-005: selinuxuser option - unknown"
 	command="ipa selinuxusermap-add --selinuxuser=unknown $selinuxusermap2"
-        expmsg="ipa: ERROR: SELinux user unknown not found in ordering list (in config)"
+        expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for unknown selinuxuser type"
     rlPhaseEnd
 
@@ -182,7 +182,7 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
 
     rlPhaseStartTest "ipa-selinuxusermap-add-cli-010: selinuxuser User Category - unknown"
         command="ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --usercat=unknown $selinuxusermap4"
-        expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
+        expmsg="ipa: ERROR: invalid 'usercat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for unknown user category"
     rlPhaseEnd
 
@@ -275,12 +275,13 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
     rlPhaseEnd
      
     rlPhaseStartTest "ipa-selinuxusermap-add-cli-023: Add a selinuxuser map with all the options set"
-	rlRun "ipa selinuxusermap-add --selinuxuser=guest_u:s0 --hbacrule=allow_all --usercat=all --hostcat=all --desc='selinuxuser map with all options set' $selinuxusermap11 > $TmpDir/selinuxusermap11.out"
+	#rlRun "ipa selinuxusermap-add --selinuxuser=unconfined_u:s0-s0:c0.c1023 --hbacrule=allow_all --usercat=all --hostcat=all --desc='selinuxuser map with all options set' $selinuxusermap11 > $TmpDir/selinuxusermap11.out"
+	rlRun "ipa selinuxusermap-add --selinuxuser=unconfined_u:s0-s0:c0.c1023 --hbacrule=allow_all --desc='selinuxuser map with all options set' $selinuxusermap11 > $TmpDir/selinuxusermap11.out"
         rlRun "findSelinuxusermap $selinuxusermap11" 0 "Verifying selinuxusermap was added with ipa selinuxusermap-find"
-        rlRun "findSelinuxusermapByOption selinuxuser guest_u:s0 $selinuxusermap11" 0 "Verifying selinuxusermap was added with given selinuxuser"
+        rlRun "findSelinuxusermapByOption selinuxuser unconfined_u:s0-s0:c0.c1023 $selinuxusermap11" 0 "Verifying selinuxusermap was added with given selinuxuser"
         rlRun "findSelinuxusermapByOption hbacrule "allow_all" $selinuxusermap11" 0 "Verifying selinuxusermap was added with given HbacRule"
-        rlRun "findSelinuxusermapByOption usercat all $selinuxusermap11" 0 "Verifying selinuxusermap was added with usercat all"
-        rlRun "findSelinuxusermapByOption hostcat all $selinuxusermap11" 0 "Verifying selinuxusermap was added with hostcat all"
+        #rlRun "findSelinuxusermapByOption usercat all $selinuxusermap11" 0 "Verifying selinuxusermap was added with usercat all"
+        #rlRun "findSelinuxusermapByOption hostcat all $selinuxusermap11" 0 "Verifying selinuxusermap was added with hostcat all"
 	rlAssertGrep "Description: selinuxuser map with all options set" "$TmpDir/selinuxusermap11.out"
     rlPhaseEnd
 
@@ -374,8 +375,8 @@ rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with inv
 
     rlPhaseStartTest "ipa-selinuxusermap-add-cli-035: Add a selinuxuser map - syntax check - selinuxuser name MLS MCS"
 	rlLog "Executing: Syntax check - user:MLS:MCS - selinuxuser name does not end in traditional _u"
-	rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$guest_u:s0"
-	ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$guest_u:s0
+	rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$unconfined_u:s0-s0:c0.c1023"
+	ipa config-mod --setattr=ipaselinuxusermaporder=newuser:s0\$unconfined_u:s0-s0:c0.c1023
         rlLog "ipa selinuxusermap-add --selinuxuser=\"newuser:s0\"  $selinuxusermap_sytaxcheck1"
 	rlRun "ipa selinuxusermap-add --selinuxuser=\"newuser:s0\" $selinuxusermap_sytaxcheck1" 0 "Add a selinuxusermap with selinuxuser syntax does not end in traditional _u "
 	rlRun "findSelinuxusermapByOption selinuxuser \"newuser:s0\" $selinuxusermap_sytaxcheck1" 0 "Verifying selinuxusermap was added with given selinuxuser"
