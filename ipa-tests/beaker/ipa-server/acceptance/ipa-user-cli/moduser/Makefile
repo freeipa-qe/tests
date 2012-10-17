@@ -53,7 +53,7 @@ $(METADATA): Makefile
 	@echo "Description:     IPA user cli acceptance tests - modify user" >> $(METADATA)
 	@echo "Type:            Regression" >> $(METADATA)
 	@echo "TestTime:        30m" >> $(METADATA)
-	@echo "RunFor:          ipa-server" >> $(METADATA)
+	@echo "RunFor:          ipa" >> $(METADATA)
 	@echo "Requires:        ipa-admintools" >> $(METADATA)
 	@echo "Requires:        expect" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
