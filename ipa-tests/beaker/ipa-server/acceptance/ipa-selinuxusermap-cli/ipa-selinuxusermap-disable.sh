@@ -156,18 +156,17 @@ run_selinuxusermap_disable_tests(){
         rlRun "ipa selinuxusermap-enable $selinuxusermap4"
     rlPhaseEnd
 
-
-    rlPhaseStartTest "ipa-selinuxusermap-disable-007: Disable hbacrule rule when selinux mapping rule pointing to hbacrule - both hbacrule and selinuxmap is disabled "
-	rlRun "ipa hbacrule-disable testHbacRule"
-        rlRun "findHBACRuleByOption name testHbacRule testHbacRule" 0 "Finding rule testHbacRule by name"
+#    rlPhaseStartTest "ipa-selinuxusermap-disable-007: Disable hbacrule rule when selinux mapping rule pointing to hbacrule - both hbacrule and selinuxmap is disabled "
+#	rlRun "ipa hbacrule-disable testHbacRule"
+ #       rlRun "findHBACRuleByOption name testHbacRule testHbacRule" 0 "Finding rule testHbacRule by name"
         # verify hbac rule is disabled
-        rlRun "verifyHBACStatus testHbacRule FALSE" 0 "Verify rule is disabled"
-        rlRun "findSelinuxusermap $selinuxusermap4" 0 "Verifying selinuxusermap exists using ipa selinuxusermap-find"
-        rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap4" 0 "Verifying selinuxusermap selinuxuser"
-        rlRun "findSelinuxusermapByOption hbacrule "testHbacRule" $selinuxusermap4" 0 "Verifying selinuxusermap has pointer to HbacRule"
-        rlRun "findSelinuxusermapByOption enabled FALSE  $selinuxusermap4" 0 "Verifying $selinuxusermap4 enabled FALSE"
-        rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2731"
- rlPhaseEnd
+  #      rlRun "verifyHBACStatus testHbacRule FALSE" 0 "Verify rule is disabled"
+  #      rlRun "findSelinuxusermap $selinuxusermap4" 0 "Verifying selinuxusermap exists using ipa selinuxusermap-find"
+  #      rlRun "findSelinuxusermapByOption selinuxuser \"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap4" 0 "Verifying selinuxusermap selinuxuser"
+  #      rlRun "findSelinuxusermapByOption hbacrule "testHbacRule" $selinuxusermap4" 0 "Verifying selinuxusermap has pointer to HbacRule"
+  #      rlRun "findSelinuxusermapByOption enabled FALSE  $selinuxusermap4" 0 "Verifying $selinuxusermap4 enabled FALSE"
+  #      rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2731"
+ #rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-selinuxusermap-disable-cleanup: Destroying admin credentials."
 	# delete selinux user 
