@@ -177,19 +177,19 @@ run_selinuxusermap_config_tests(){
         rlRun "ipa config-show > $TmpDir/selinuxusermap_default.out" 0 "Show ipa config"
         rlRun "cat  $TmpDir/selinuxusermap_default.out"
         expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': SELinux user map default user not in order list"
-	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-	ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023 
-	if [ $? -eq 0 ] ; then
-		rlFail "ERROR: Command expected to fail."	
-	else
-		ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023 2> $TmpDir/selinuxusermap_no_defaultuser.out
-		actual=`cat $TmpDir/selinuxusermap_no_defaultuser.out`
-		if [[ "$actual" = "$expmsg" ]] ; then
-			rlPass "Error message $expmsg is as expected"
-		else
-			rlFail "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
-		fi	
-	fi
+        rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023
+        if [ $? -eq 0 ] ; then
+                rlFail "ERROR: Command expected to fail."
+        else
+                ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023 2> $TmpDir/selinuxusermap_no_defaultuser.out
+                actual=`cat $TmpDir/selinuxusermap_no_defaultuser.out`
+                if [[ "$actual" = "$expmsg" ]] ; then
+                        rlPass "Error message $expmsg is as expected"
+                else
+                        rlFail "ERROR: Message not as expected. GOT: $actual  EXP: $expmsg"
+                fi
+        fi
         rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_chkconfig.out" 0 "Show ipa config"
         rlRun "cat  $TmpDir/selinuxusermap_setattr_chkconfig.out"
         rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_chkconfig.out"
