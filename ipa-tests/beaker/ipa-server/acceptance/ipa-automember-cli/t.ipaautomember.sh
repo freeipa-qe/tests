@@ -193,7 +193,8 @@ ipaautomember_addAutomember_negative()
 	rlPhaseStartTest "ipa-automember-cli-1103 create rule for invalid type"
 		rlRun "addAutomember badtype devel" 1 "Verify error code for $desc"
 		command="ipa automember-add --type=badtype devel"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -297,7 +298,8 @@ ipaautomember_addAutomemberCondition_negative_badtype()
 		rlRun "addAutomemberCondition badtype devel manager inclusive ^uid=mjohn" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-add-condition --type=badtype devel --key=manager --inclusive-regex=^uid=mjohn"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -306,7 +308,8 @@ ipaautomember_addAutomemberCondition_negative_badtype()
 		rlRun "addAutomemberCondition badtype devel manager exclusive ^uid=mjohn" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-add-condition --type=badtype devel --key=manager --exclusive-regex=^uid=mjohn"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -315,7 +318,8 @@ ipaautomember_addAutomemberCondition_negative_badtype()
 		rlRun "addAutomemberCondition badtype qaservers fqdn inclusive ^qa[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-add-condition --type=badtype qaservers --key=fqdn --inclusive-regex=^qa[0-9]+.example.com"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -324,7 +328,8 @@ ipaautomember_addAutomemberCondition_negative_badtype()
 		rlRun "addAutomemberCondition badtype qaservers fqdn exclusive ^eng[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-add-condition --type=badtype qaservers --key=fqdn --exclusive-regex=^eng[0-9]+.example.com"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -452,7 +457,8 @@ ipaautomember_findAutomember_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-1901 find existing group rule with invalid type"
 		rlRun "findAutomember group eng" 1 "Verify error code for $desc"
 		command="ipa automember-find --type=badtype devel"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -513,7 +519,8 @@ ipaautomember_showAutomember_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-2201 show existing group rule with invalid type"
 		rlRun "showAutomember badtype devel" 1 "Verify error code for $desc"
 		command="ipa automember-show --type=badtype devel"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -521,7 +528,8 @@ ipaautomember_showAutomember_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-2202 show existing hostgroup rule with invalid type"
 		rlRun "showAutomember badtype engservers" 1 "Verify error code for $desc"
 		command="ipa automember-show --type=badtype qaservers"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
@@ -599,7 +607,8 @@ ipaautomember_modifyAutomember_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-2601 modify existing group rule with invalid type"
 		rlRun "modifyAutomember badtype devel desc \"DEV_USERS\"" 1 "Verify error code for $desc"
 		command="ipa automember-mod --type=badtype devel --desc=\"DEV_USERS\""
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -607,7 +616,8 @@ ipaautomember_modifyAutomember_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-2602 modify existing hostgroup rule with invalid type"
 		rlRun "modifyAutomember badtype qaservers desc \"WEB_SERVERS\"" 1 "Verify error code for $desc"
 		command="ipa automember-mod --type=badtype qaservers --desc=\"WEB_SERVERS\""
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
@@ -693,7 +703,8 @@ ipaautomember_verifyAutomemberAttr_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-3002 verify existing hostgroup rule with invalid type"
 		rlRun "verifyAutomemberAttr badtype qaservers desc WEB_SERVERS" 1 "Verify error code for $desc"
 		command="ipa automember-show --type=badtype qaservers"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
@@ -819,7 +830,8 @@ ipaautomember_setAutomemberDefaultGroup_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-3601 set default group with invalid type"
 		rlRun "setAutomemberDefaultGroup badtype defgroup" 1 "Verify error code for $desc"
 		command="ipa automember-default-group-set --type=badtype --default-group=defgroup"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -827,7 +839,8 @@ ipaautomember_setAutomemberDefaultGroup_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-3601 set default hostgroup with invalid type"
 		rlRun "setAutomemberDefaultGroup badtype defhostgroup" 1 "Verify error code for $desc"
 		command="ipa automember-default-group-set --type=badtype --default-group=defhostgroup"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
@@ -857,7 +870,8 @@ ipaautomember_showAutomemberDefaultGroup_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-3801 show default group for invalid type"
 		rlRun "showAutomemberDefaultGroup badtype" 1 "Verify error code for $desc"
 		command="ipa automember-default-group-show --type=badtype"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
@@ -887,7 +901,8 @@ ipaautomember_removeAutomemberDefaultGroup_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-4001 remove default group for invalid type"
 		rlRun "removeAutomemberDefaultGroup badtype" 1 "Verify error code for $desc"
 		command="ipa automember-default-group-remove --type=badtype"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
@@ -1023,7 +1038,8 @@ ipaautomember_removeAutomemberCondition_negative_badtype()
 		rlRun "removeAutomemberCondition badtype devel manager inclusive ^uid=mjohn" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-remove-condition --type=badtype devel --key=manager --inclusive-regex=^uid=mjohn"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -1032,7 +1048,8 @@ ipaautomember_removeAutomemberCondition_negative_badtype()
 		rlRun "removeAutomemberCondition badtype devel manager exclusive ^uid=mjohn" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-remove-condition --type=badtype devel --key=manager --exclusive-regex=^uid=mjohn"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -1041,7 +1058,8 @@ ipaautomember_removeAutomemberCondition_negative_badtype()
 		rlRun "removeAutomemberCondition badtype qaservers fqdn inclusive ^qa[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-remove-condition --type=badtype qaservers --key=fqdn --inclusive-regex=^qa[0-9]+.example.com"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -1050,7 +1068,8 @@ ipaautomember_removeAutomemberCondition_negative_badtype()
 		rlRun "removeAutomemberCondition badtype qaservers fqdn exclusive ^eng[0-9]+\.example\.com" 1 \
 			"Verify error code for $desc"
 		command="ipa automember-remove-condition --type=badtype qaservers --key=fqdn --exclusive-regex=^eng[0-9]+.example.com"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
@@ -1231,7 +1250,8 @@ ipaautomember_deleteAutomember_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-5101 delete existing group rule with invalid type"
 		rlRun "deleteAutomember badtype devel" 1 "Verify return code for $desc"
 		command="ipa automember-del --type=badtype devel"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
