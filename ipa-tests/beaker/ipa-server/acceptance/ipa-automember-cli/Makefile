@@ -25,7 +25,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/ipa-automember-cli
-export TESTVERSION=1.1
+export TESTVERSION=1.2
 
 BUILT_FILES=
 

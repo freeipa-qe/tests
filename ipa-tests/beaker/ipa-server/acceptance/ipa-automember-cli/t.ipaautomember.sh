@@ -466,7 +466,8 @@ ipaautomember_findAutomember_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-1902 find existing hostgroup rule with invalid type"
 		rlRun "findAutomember hostgroup engservers" 1 "Verify error code for $desc"
 		command="ipa automember-find --type=badtype engservers"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 }
@@ -695,7 +696,8 @@ ipaautomember_verifyAutomemberAttr_negative_badtype()
 	rlPhaseStartTest "ipa-automember-cli-3001 verify existing group rule with invalid type"
 		rlRun "verifyAutomemberAttr badtype devel desc DEV_USERS" 1 "Verify error code for $desc"
 		command="ipa automember-show --type=badtype devel"
-		expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		#expmsg="ipa: ERROR: invalid 'type': must be one of (u'group', u'hostgroup')"
+		expmsg="ipa: ERROR: invalid 'type': must be one of 'group', 'hostgroup'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify error message for $desc"
 	rlPhaseEnd
 
