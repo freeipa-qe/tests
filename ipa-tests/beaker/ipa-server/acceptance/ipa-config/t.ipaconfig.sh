@@ -49,6 +49,7 @@ ipaconfig_mod()
     ipaconfig_mod_defaultgroup_negative
     ipaconfig_mod_emaildomain_default
     ipaconfig_mod_emaildomain_negative
+    ipaconfig_mod_base_dn_mod_negative
     ipaconfig_mod_pwdexpiration
     ipaconfig_mod_envcleanup
 } #ipaconfig_mod
@@ -1026,6 +1027,16 @@ ipaconfig_server_subject_negative()
         rm $out
     rlPhaseEnd
 } #ipaconfig_server_subject_negative
+
+ipaconfig_mod_base_dn_mod_negative()
+{
+	# Test for BZ 807018 ipa config-mod should not be allowed to modify certificate subject base
+	rlPhaseStartTest "ipaconfig_mod_base_dn_mod_negative"
+		rlLog "Test for https://bugzilla.redhat.com/show_bug.cgi?id=807018"
+        	KinitAsAdmin
+		rlRun "ipa config-mod --setattr=ipacertificatesubjectbase='OU=Bogus'" 2 "Ensure that setting the base DN fails"
+	rlPhaseEnd
+}
 
 ipaconfig_server_subject_negative_logic()
 {
