@@ -64,7 +64,7 @@ getServicePIDs()
 #########################################
 
 rlJournalStart
-    rlPhaseStartSetup "ipa-ctl-setup: Check for ipa-server package and add test user"
+    rlPhaseStartSetup 
         rpm -qa | grep $PACKAGE
         if [ $? -eq 0 ] ; then
                 rlPass "ipa-server package is installed"
@@ -76,19 +76,19 @@ rlJournalStart
 	getServicePIDs
     rlPhaseEnd
 	
-	rlPhaseStartTest "ipa-ctl-01: ensure that ipactl gets installed"
+	rlPhaseStartTest "ipa-ctl-01 ensure that ipactl gets installed"
 		rlRun "ls /usr/sbin/ipactl" 0 "Checking to ensure that ipactl got installed"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-02: ensure that ipactl stop runs with a zero return code"
+	rlPhaseStartTest "ipa-ctl-02 ensure that ipactl stop runs with a zero return code"
 		rlRun "/usr/sbin/ipactl stop" 0 "Checking to ensure that ipactl stop returns a zero return code"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-03: ensure that ipactl stop stopped httpd"
+	rlPhaseStartTest "ipa-ctl-03 ensure that ipactl stop stopped httpd"
 		rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that ipactl stop stopped httpd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-04A: ensure that ipactl stop stopped krb5kdc"
+	rlPhaseStartTest "ipa-ctl-04A ensure that ipactl stop stopped krb5kdc"
                 rlRun "ps xa | grep -v grep |grep krb5kdc" 1 "Checking to ensure that ipactl stop stopped krb5kdc"
                 PID=`cat /tmp/krb5kdc.out`
                 ps -e | grep $PID
@@ -99,7 +99,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-04B: ensure that ipactl stop stopped kadmind"
+	rlPhaseStartTest "ipa-ctl-04B ensure that ipactl stop stopped kadmind"
                 rlRun "ps xa | grep -v grep |grep kadmind" 1 "Checking to ensure that ipactl stop stopped kadmind"
                 PID=`cat /tmp/kadmind.out`
                 ps -e | grep $PID
@@ -110,7 +110,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-04C: ensure that ipactl stop stopped memcached"
+	rlPhaseStartTest "ipa-ctl-04C ensure that ipactl stop stopped memcached"
                 rlRun "ps xa | grep -v grep |grep memcached" 1 "Checking to ensure that ipactl stop stopped memcached"
                 PID=`cat /tmp/memcached.out`
                 ps -e | grep $PID
@@ -121,7 +121,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-05: ensure that ipactl stop stopped named"
+	rlPhaseStartTest "ipa-ctl-05 ensure that ipactl stop stopped named"
 		rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that ipactl stop stopped named"
 		PID=`cat /tmp/named.out`
                 ps -e | grep $PID
@@ -132,7 +132,7 @@ rlJournalStart
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-06: ensure that ipactl stop stopped the PKI instance of dirsrv"
+	rlPhaseStartTest "ipa-ctl-06 ensure that ipactl stop stopped the PKI instance of dirsrv"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep PKI" 1 "Checking to ensure that ipactl stop stopped PKI"
 		PID=`cat /tmp/slapd_PKI.out`
 		ps -e | grep $PID
@@ -143,7 +143,7 @@ rlJournalStart
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-07: ensure that ipactl stop stopped the $INSTANCE instance of dirsrv"
+	rlPhaseStartTest "ipa-ctl-07 ensure that ipactl stop stopped the $INSTANCE instance of dirsrv"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 1 "Checking to ensure that ipactl stop stopped $INSTANCE DS instance"
 		tmpfile=/tmp/slapd_$INSTANCE.out
                 PID=`cat $tmpfile`
@@ -155,7 +155,7 @@ rlJournalStart
 		fi 
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-08: ensure that ipactl stop stopped pki-cad"
+        rlPhaseStartTest "ipa-ctl-08 ensure that ipactl stop stopped pki-cad"
                 rlRun "ps xa | grep -v grep |grep pki-ca" 1 "Checking to ensure that ipactl stop stopped pki-cad"
                 PID=`cat /tmp/pki-ca.out`
                 ps -e | grep $PID
@@ -166,15 +166,15 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-09: ensure that ipactl start runs with a zero return code"
+	rlPhaseStartTest "ipa-ctl-09 ensure that ipactl start runs with a zero return code"
 		rlRun "/usr/sbin/ipactl start" 0 "Checking to ensure that ipactl start returns a zero return code"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-10: ensure that ipactl start started httpd"
+	rlPhaseStartTest "ipa-ctl-10 ensure that ipactl start started httpd"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that ipactl start started httpd"
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-11A: ensure that ipactl start started krb5kdc"
+        rlPhaseStartTest "ipa-ctl-11A ensure that ipactl start started krb5kdc"
                 rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that ipactl start started krb5kdc"
                 newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
                 rlLog "New krb5kdc pid is $newPID"
@@ -187,7 +187,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-11B: ensure that ipactl start started kadmind"
+        rlPhaseStartTest "ipa-ctl-11B ensure that ipactl start started kadmind"
                 rlRun "ps xa | grep -v grep |grep kadmind" 0 "Checking to ensure that ipactl start started kadmind"
                 newPID=`ps -e | grep kadmind | awk '{print $1}'`
                 rlLog "New kadmind pid is $newPID"
@@ -200,7 +200,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-11C: ensure that ipactl start started memcached"
+        rlPhaseStartTest "ipa-ctl-11C ensure that ipactl start started memcached"
                 rlRun "ps xa | grep -v grep |grep memcached" 0 "Checking to ensure that ipactl start started memcached"
                 newPID=`ps -e | grep memcached | awk '{print $1}'`
                 rlLog "New memcached pid is $newPID"
@@ -214,7 +214,7 @@ rlJournalStart
         rlPhaseEnd
 
 
-	rlPhaseStartTest "ipa-ctl-12: ensure that ipactl start started named"
+	rlPhaseStartTest "ipa-ctl-12 ensure that ipactl start started named"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that ipactl start started named"
 		newPID=`ps -e | grep named | awk '{print $1}'`
                 rlLog "New named pid is $newPID"
@@ -227,7 +227,7 @@ rlJournalStart
                 fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-13: ensure that ipactl start started the $INSTANCE instance of dirsrv"
+	rlPhaseStartTest "ipa-ctl-13 ensure that ipactl start started the $INSTANCE instance of dirsrv"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 0 "Checking to ensure that ipactl start started $INSTANCE DS instance"
 		tmpfile=/tmp/slapd_$INSTANCE.out
 		newPID=`ps -ef | grep slapd | grep -i $INSTANCE | awk '{print $2}'`
@@ -241,7 +241,7 @@ rlJournalStart
                 fi
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-14: ensure that ipactl start started the PKI instance of dirsrv"
+        rlPhaseStartTest "ipa-ctl-14 ensure that ipactl start started the PKI instance of dirsrv"
                 rlRun "ps xa | grep -v grep |grep dirsrv| grep -i PKI" 0 "Checking to ensure that ipactl start started PKI DS instance"
                 newPID=`ps -ef | grep slapd | grep PKI | awk '{print $2}'`
                 rlLog "New PKI DS instance pid is $newPID"
@@ -254,7 +254,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-15: ensure that ipactl start started pki-cad"
+        rlPhaseStartTest "ipa-ctl-15 ensure that ipactl start started pki-cad"
                 rlRun "ps xa | grep -v grep |grep pki-ca" 0 "Checking to ensure that ipactl start started pki-cad"
 		newPID=`ps -ef | grep pki-ca | grep tomcat | awk '{print $2}'`
                 rlLog "New pki-ca pid is $newPID"
@@ -267,16 +267,16 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-16: ensure that ipactl restart runs with a zero return code"
+	rlPhaseStartTest "ipa-ctl-16 ensure that ipactl restart runs with a zero return code"
 		getServicePIDs
 		rlRun "/usr/sbin/ipactl restart" 0 "Checking to ensure that ipactl start returns a zero return code"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-17: ensure that ipactl restart started httpd"
+	rlPhaseStartTest "ipa-ctl-17 ensure that ipactl restart started httpd"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that ipactl start restarted httpd"
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-18A: ensure that ipactl restart started krb5kdcd"
+        rlPhaseStartTest "ipa-ctl-18A ensure that ipactl restart started krb5kdcd"
                 rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that ipactl start restarted krb5kdc"
                 newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
                 rlLog "New krb5kdc pid is $newPID"
@@ -289,7 +289,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-18B: ensure that ipactl restart started kadmind"
+        rlPhaseStartTest "ipa-ctl-18B ensure that ipactl restart started kadmind"
                 rlRun "ps xa | grep -v grep |grep kadmind" 0 "Checking to ensure that ipactl start restarted kadmind"
                 newPID=`ps -e | grep kadmind | awk '{print $1}'`
                 rlLog "New kadmind pid is $newPID"
@@ -302,7 +302,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-18C: ensure that ipactl restart started memcached"
+        rlPhaseStartTest "ipa-ctl-18C ensure that ipactl restart started memcached"
                 rlRun "ps xa | grep -v grep |grep memcached" 0 "Checking to ensure that ipactl start restarted memcached"
                 newPID=`ps -e | grep memcached | awk '{print $1}'`
                 rlLog "New memcached pid is $newPID"
@@ -315,7 +315,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-19: ensure that ipactl restart started named"
+	rlPhaseStartTest "ipa-ctl-19 ensure that ipactl restart started named"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that ipactl start restarted named"
                 newPID=`ps -ef | grep named | awk '{print $2}'`
                 rlLog "New named pid is $newPID"
@@ -328,7 +328,7 @@ rlJournalStart
                 fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-20: ensure that ipactl restart started the $INSTANCE instance of dirsrv"
+	rlPhaseStartTest "ipa-ctl-20 ensure that ipactl restart started the $INSTANCE instance of dirsrv"
 		rlRun "ps xa | grep -v grep |grep dirsrv| grep -i $INSTANCE" 0 "Checking to ensure that ipactl restart started $INSTANCE DS instance"
                 tmpfile=/tmp/slapd_$INSTANCE.out
                 newPID=`ps -ef | grep slapd | grep -i $INSTANCE | awk '{print $2}'`
@@ -342,7 +342,7 @@ rlJournalStart
                 fi
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-21: ensure that ipactl restart started the PKI instance of dirsrv"
+        rlPhaseStartTest "ipa-ctl-21 ensure that ipactl restart started the PKI instance of dirsrv"
                 rlRun "ps xa | grep -v grep |grep dirsrv| grep -i PKI" 0 "Checking to ensure that ipactl restart started PKI DS instance"
                 newPID=`ps -ef | grep slapd | grep PKI | awk '{print $2}'`
                 rlLog "New PKI DS instance pid is $newPID"
@@ -355,7 +355,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-22: ensure that ipactl restart started pki-cad"
+        rlPhaseStartTest "ipa-ctl-22 ensure that ipactl restart started pki-cad"
                 rlRun "ps xa | grep -v grep |grep pki-ca" 0 "Checking to ensure that ipactl restart started pki-cad"
                 newPID=`ps -ef | grep pki-ca | grep tomcat | awk '{print $2}'`
                 rlLog "New pki-ca pid is $newPID"
@@ -368,7 +368,7 @@ rlJournalStart
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-23: stop services as non-root user"
+	rlPhaseStartTest "ipa-ctl-23 stop services as non-root user"
 		rlRun "su testuserqa -c 'ipactl stop' > /tmp/stopnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/stopnonroot.out"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that httpd is still running"
@@ -382,7 +382,7 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep pki-ca" 0 "Checking to ensure that pki-cad is still running"	
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-24: start services as non-root user"
+        rlPhaseStartTest "ipa-ctl-24 start services as non-root user"
 		rlRun "ipactl stop" 0 "Stop services as root first"
                 rlRun "su testuserqa -c 'ipactl start' > /tmp/startnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/startnonroot.out"
@@ -397,7 +397,7 @@ rlJournalStart
                 rlRun "ps xa | grep -v grep |grep pki-ca" 1 "Checking to ensure that pki-cad is NOT running"
         rlPhaseEnd
 
-rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
+rlPhaseStartTest "ipa-ctl-25 restart services as non-root user"
                 rlRun "ipactl start" 0 "Start services as root first"
 		getServicePIDs
                 rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
@@ -479,7 +479,7 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-26: verify status when directory server pki instance not running"
+        rlPhaseStartTest "ipa-ctl-26 verify status when directory server pki instance not running"
 		rlRun "service dirsrv stop PKI-IPA" 0 "stop the directory server PKI-IPA instance"
 		rlRun "ipactl status > /tmp/status.out" 0 "get ipa services status"
 		cat /tmp/status.out | grep "Directory Service: STOPPED"
@@ -491,14 +491,14 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
 		rlRun "service dirsrv start PKI-IPA" 0 "restart the directory server PKI-IPA instance"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-ctl-27: verify ipactl status non zero return code on error"
+        rlPhaseStartTest "ipa-ctl-27 verify ipactl status non zero return code on error"
 		rlRun "service dirsrv stop $INSTANCE" 0 "stop the $INSTANCE directory server instance"
 		rlRun "ipactl status" 1 "Get the status of ipactl service and verify non zero return code"
 		rlRun "service dirsrv start $INSTANCE" 0 "restart the $INSTANCE directory server instance"
 		rlRun "ipactl status" 0 "check after instance restart"
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl bz 840381: At times ipactl fails to start DNS service and a crash is detected."
+	rlPhaseStartTest "ipa-ctl bz840381 At times ipactl fails to start DNS service and a crash is detected."
 		rlRun "ipactl stop" 0 "Stop all ipa services"
 		outfile=/dev/shm/bz840381.txt
 		rlRun "ipactl start &> $outfile" 0 "Start ipa services, direct output to $outfile"
@@ -548,7 +548,7 @@ rlPhaseStartTest "ipa-ctl-25: restart services as non-root user"
 #
 #        rlPhaseEnd
 
-    rlPhaseStartCleanup "ipa-ctl cleanup"
+    rlPhaseStartCleanup
 	rlRun "userdel -fr testuserqa" 0 "Remove test user"
 	ipactl restart
     rlPhaseEnd
