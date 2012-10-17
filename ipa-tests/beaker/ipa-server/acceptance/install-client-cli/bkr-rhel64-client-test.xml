@@ -1,0 +1,111 @@
+<job retention_tag="scratch">
+	<whiteboard>
+		IPA rhel 6.4 x86_64 EXECUTION :: ipa-client-cli
+	</whiteboard>
+	<recipeSet priority="Normal">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="MASTER for IPA Replica Install Tests">
+			<autopick random="false"/>
+			<watchdog panic="None"/>
+			<packages/>
+			<ks_appends/>
+			<repos>
+				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
+				<repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
+			</repos>
+			<distroRequires>
+				<and>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_variant op="=" value="Server"/>
+					<distro_name op="=" value="RHEL6.4-20121015.n.1"/>
+					<distro_arch op="=" value="x86_64"/>
+				</and>
+				<distro_virt op="=" value=""/>
+			</distroRequires>
+			<hostRequires>
+				<and>
+					<system_type value="Machine"/>
+					<memory op="&gt;=" value="1000"/>
+				</and>
+			</hostRequires>
+			<partitions/>
+			<task name="/distribution/install" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ntpdate freeipa-server"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/distribution/command" role="STANDALONE">
+				<params>
+					<param name="CMDS_TO_RUN" value="sleep 1"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="MASTER">
+				<params/>
+			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+				<params>
+					<param name="RESERVETIME" value="6400"/>
+				</params>
+			</task>
+		</recipe>
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="CLIENT1 for IPA Replica Install Tests">
+			<autopick random="false"/>
+			<watchdog panic="None"/>
+			<packages/>
+			<ks_appends/>
+			<repos>
+				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64/"/>
+				<repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch"/>
+			</repos>
+			<distroRequires>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_variant op="=" value="Server"/>
+					<distro_name op="=" value="RHEL6.4-20121015.n.1"/>
+					<distro_arch op="=" value="x86_64"/>
+			</distroRequires>
+			<hostRequires>
+				<and>
+					<system_type value="Machine"/>
+					<memory op="&gt;=" value="1000"/>
+				</and>
+			</hostRequires>
+			<partitions/>
+			<task name="/distribution/install" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ntpdate freeipa-client"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/distribution/command" role="STANDALONE">
+				<params>
+					<param name="CMDS_TO_RUN" value="sleep 300"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="CLIENT">
+				<params/>
+			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+				<params>
+					<param name="RESERVETIME" value="6400"/>
+				</params>
+			</task>
+		</recipe>
+	</recipeSet>
+</job>
+
