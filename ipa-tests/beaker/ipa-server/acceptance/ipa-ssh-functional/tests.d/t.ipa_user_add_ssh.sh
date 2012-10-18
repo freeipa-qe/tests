@@ -122,6 +122,9 @@ ipa_user_add_ssh_envsetup()
 			fi
 		done
 
+		rlLog "===================================================================="
+		rlRun "env|sort"
+		rlLog "===================================================================="
 		#rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME' "
 	rlPhaseEnd
 }
@@ -141,6 +144,7 @@ ipa_user_add_ssh_positive_0001()
 		else 
 			rlFail "IPA user has a key when it should not"
 		fi
+		rlLog "RUNNING: rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
 		;;
 	SLAVE*|REPLICA*)
