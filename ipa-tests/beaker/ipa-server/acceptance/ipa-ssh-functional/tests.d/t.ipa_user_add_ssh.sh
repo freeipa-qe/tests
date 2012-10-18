@@ -134,6 +134,7 @@ ipa_user_add_ssh_positive_0001()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_positive_0001 - Add user with empty key field"
 	case "$MYROLE" in
 	MASTER*)
@@ -144,16 +145,16 @@ ipa_user_add_ssh_positive_0001()
 		else 
 			rlFail "IPA user has a key when it should not"
 		fi
-		rlLog "RUNNING: rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlLog "RUNNING: rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -167,6 +168,7 @@ ipa_user_add_ssh_positive_0002()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_positive_0002 - Add user with blank key field"
 	case "$MYROLE" in
 	MASTER*)
@@ -177,15 +179,15 @@ ipa_user_add_ssh_positive_0002()
 		else 
 			rlFail "IPA user has a key when it should not"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -199,6 +201,7 @@ ipa_user_add_ssh_positive_0003()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_positive_0003 - Add user with one valid key"
 	case "$MYROLE" in
 	MASTER*)
@@ -212,15 +215,15 @@ ipa_user_add_ssh_positive_0003()
 		else
 			rlFail "IPA User does not have expected ssh key: $KEY"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -234,6 +237,7 @@ ipa_user_add_ssh_positive_0004()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_positive_0004 - Add user with two valid keys"
 	case "$MYROLE" in
 	MASTER*)
@@ -255,15 +259,15 @@ ipa_user_add_ssh_positive_0004()
 		else
 			rlFail "IPA User does not have expected ssh key: $KEY"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -278,6 +282,7 @@ ipa_user_add_ssh_positive_0005()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_positive_0005 - Add user with many valid keys"
 	case "$MYROLE" in
 	MASTER*)
@@ -297,15 +302,15 @@ ipa_user_add_ssh_positive_0005()
 				rlFail "IPA User does not have expected ssh key: $KEY"
 			fi
 		done
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -320,6 +325,7 @@ ipa_user_add_ssh_positive_0006()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_positive_0006 - Add user with Space in Key field"
 	case "$MYROLE" in
 	MASTER*)
@@ -330,15 +336,15 @@ ipa_user_add_ssh_positive_0006()
 		else 
 			rlFail "IPA user has a key when it should not"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -353,6 +359,7 @@ ipa_user_add_ssh_negative_0002()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0002 - Fail to add user with Missing equal signs at end of Key field"
 	case "$MYROLE" in
 	MASTER*)
@@ -362,15 +369,15 @@ ipa_user_add_ssh_negative_0002()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -385,6 +392,7 @@ ipa_user_add_ssh_negative_0003()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0003 - Fail to add user with Invalid Key Only"
 	case "$MYROLE" in
 	MASTER*)
@@ -393,15 +401,15 @@ ipa_user_add_ssh_negative_0003()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -416,6 +424,7 @@ ipa_user_add_ssh_negative_0004()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0004 - Fail to add user with Invalid Key First of two"
 	case "$MYROLE" in
 	MASTER*)
@@ -425,15 +434,15 @@ ipa_user_add_ssh_negative_0004()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -448,6 +457,7 @@ ipa_user_add_ssh_negative_0005()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0005 - Fail to add user with Invalid Key First of N"
 	case "$MYROLE" in
 	MASTER*)
@@ -461,15 +471,15 @@ ipa_user_add_ssh_negative_0005()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -484,6 +494,7 @@ ipa_user_add_ssh_negative_0006()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0006 - Fail to add user with Invalid Key Second of two"
 	case "$MYROLE" in
 	MASTER*)
@@ -493,15 +504,15 @@ ipa_user_add_ssh_negative_0006()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -516,6 +527,7 @@ ipa_user_add_ssh_negative_0007()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0007 - Fail to add user with Invalid Key in Middle (Second of three)"
 	case "$MYROLE" in
 	MASTER*)
@@ -526,15 +538,15 @@ ipa_user_add_ssh_negative_0007()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -549,6 +561,7 @@ ipa_user_add_ssh_negative_0008()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0008 - Fail to add user with Invalid Key Last (Third of three)"
 	case "$MYROLE" in
 	MASTER*)
@@ -559,15 +572,15 @@ ipa_user_add_ssh_negative_0008()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa user-show baduser > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: baduser: user not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -582,6 +595,7 @@ ipa_user_add_ssh_negative_0009()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_user_add_ssh_negative_0009 - Fail to add user with SAME Valid Key"
 	case "$MYROLE" in
 	MASTER*)
@@ -590,15 +604,15 @@ ipa_user_add_ssh_negative_0009()
 		rlRun "ipa user-add baduser${NUMBER} --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub)\""
 		rlRun "ipa user-add baduser${NUMBER} --first=f --last=l --sshpubkey=\"$(cat /tmp/ssh_baduser${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: user with name \"baduser${NUMBER}\" already exists" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -610,6 +624,7 @@ ipa_user_add_ssh_negative_0009()
 test_envcleanup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "test_envcleanup - clean up test environment"
 	case "$MYROLE" in
 	"MASTER")
@@ -617,15 +632,15 @@ test_envcleanup()
 		for u in $(ipa user-find user --pkey-only --raw|grep uid:|awk '{print $2}'); do
 			rlRun "ipa user-del $u"
 		done
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"

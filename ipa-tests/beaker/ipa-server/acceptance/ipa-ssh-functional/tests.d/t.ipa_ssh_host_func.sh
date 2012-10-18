@@ -78,6 +78,7 @@ ipa_ssh_host_func_run()
 ipa_ssh_host_func_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_envsetup - Setup environment for IPA User Functional tests"
 		rlLog "===================================================================="
 		env|sort
@@ -89,17 +90,17 @@ ipa_ssh_host_func_envsetup()
 			rlRun "create_ipauser sshuser ssh user Passw0rd1"
 			rlRun "create_ipauser sshuser2 ssh user2 Passw0rd1"
 			rlRun "authconfig --enablemkhomedir --updateall"
-			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_env${MYENV}"
+			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 			;;
 		REPLICA*)
 			rlLog "Machine in recipe is REPLICA ($(hostname))"
 			rlRun "authconfig --enablemkhomedir --updateall"
-			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		CLIENT*)
 			rlLog "Machine in recipe is CLIENT ($(hostname))"
 			rlRun "authconfig --enablemkhomedir --updateall"
-			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_env${MYENV}"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		*)
 			rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -114,15 +115,16 @@ ipa_ssh_host_func_0001()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERCLIENT1_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0001 - New client added and host keys uploaded automatically to DNS"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERCLIENT1_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERCLIENT1_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT1)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
@@ -148,12 +150,11 @@ ipa_ssh_host_func_0001()
 			rlFail "DSA Key FP on host does not match FP in DNS"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT'"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERCLIENT1_env${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERCLIENT1_env${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -168,6 +169,7 @@ ipa_ssh_host_func_0002()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0002 - User ssh to client and sees valid keys match from DNS"
 	case "$MYROLE" in
 	MASTER*)
@@ -214,15 +216,15 @@ ipa_ssh_host_func_0002()
 			rlFail "RSA Key FP on host does not match FP in DNS"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -237,6 +239,7 @@ ipa_ssh_host_func_0003()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0003 - Admin revokes/removes host keys"
 	case "$MYROLE" in
 	MASTER*)
@@ -252,15 +255,15 @@ ipa_ssh_host_func_0003()
 		else
 			rlFail "IPA Host has an associated Public SSH Host Key when it should not"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -275,6 +278,7 @@ ipa_ssh_host_func_0004()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0004 - User does not see key match from DNS"
 	case "$MYROLE" in
 	MASTER*)
@@ -297,15 +301,15 @@ ipa_ssh_host_func_0004()
 		rlAssertGrep "No RSA host key is known for $CLIENT" $tmpout
 		rlAssertGrep "Host key verification failed." $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -320,6 +324,7 @@ ipa_ssh_host_func_0005()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0005 - Admin re-adds keys"
 	case "$MYROLE" in
 	MASTER*)
@@ -349,15 +354,15 @@ ipa_ssh_host_func_0005()
 			rlFail "DSA Key FP on host does not match FP in DNS"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -372,15 +377,16 @@ ipa_ssh_host_func_0006()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERCLIENT1_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0006 - Host replaces keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERCLIENT1_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERCLIENT1_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT1)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
@@ -390,11 +396,11 @@ ipa_ssh_host_func_0006()
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /etc/ssh/ssh_host_rsa_key"
 		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /etc/ssh/ssh_host_dsa_key"
 
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERCLIENT1_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERCLIENT1_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -409,6 +415,7 @@ ipa_ssh_host_func_0007()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0007 - User gets error/warning about key mismatch"
 	case "$MYROLE" in
 	MASTER*)
@@ -433,15 +440,15 @@ ipa_ssh_host_func_0007()
 		rlAssertGrep "RSA host key for $CLIENT has changed and you have requested strict checking." $tmpout
 		rlAssertGrep "Host key verification failed." $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -456,6 +463,7 @@ ipa_ssh_host_func_0008()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0008 - host-mod add keys after host-disable"
 	case "$MYROLE" in
 	MASTER*)
@@ -486,15 +494,15 @@ ipa_ssh_host_func_0008()
 			rlFail "DSA Key FP on host does not match FP in DNS"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -509,6 +517,7 @@ ipa_ssh_host_func_0009()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0009 - ssh to/from host after host-disable"
 	case "$MYROLE" in
 	MASTER*)
@@ -530,15 +539,15 @@ ipa_ssh_host_func_0009()
 
 		rlAssertGrep "^login successful" $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -553,6 +562,7 @@ ipa_ssh_host_func_0010()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0010 - host-mod add keys after host-del"
 	case "$MYROLE" in
 	MASTER*)
@@ -568,15 +578,15 @@ ipa_ssh_host_func_0010()
 		
 		rlAssertGrep "ipa: ERROR:.*DNS resource record not found" $tmpout
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -591,6 +601,7 @@ ipa_ssh_host_func_0011()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_host_func_0011 - ssh to/from host after host-del"
 	case "$MYROLE" in
 	MASTER*)
@@ -613,15 +624,15 @@ ipa_ssh_host_func_0011()
 		rlAssertGrep "No RSA host key is known for $CLIENT" $tmpout
 		rlAssertGrep "Host key verification failed." $tmpout
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	REPLICA*)
 		rlLog "Machine in recipe is REPLICA ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($(hostname))"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BEAKERMASTER_ENV${MYENV}"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"

@@ -74,6 +74,7 @@ ipa_ssh_user_func_envsetup()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	TESTUSER="sshuser1"
 	TESTUSERPW="passw0rd1"
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_envsetup - Setup environment for IPA User Functional tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
@@ -119,15 +120,15 @@ ipa_ssh_user_func_envsetup()
 			rlRun "KinitAsAdmin"
 			rlRun "mkdir /home/$TESTUSER"
 			rlRun "chown $TESTUSER:$TESTUSER /home/$TESTUSER"
-			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 			;;
 		SLAVE*|REPLICA*)
 			rlLog "Machine in recipe is SLAVE ($SLAVE)"
-			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		CLIENT*)
 			rlLog "Machine in recipe is CLIENT ($CLIENT)"
-			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		*)
 			rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -142,6 +143,7 @@ ipa_ssh_user_func_0001()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0001 - User creates and uploads own keys"
 	case "$MYROLE" in
 	MASTER*)
@@ -149,15 +151,15 @@ ipa_ssh_user_func_0001()
 		rlRun "su - $TESTUSER -c \"ssh-keygen -t rsa -N '' -C '$TESTUSER.$DOMAIN' -f /tmp/ssh_user_rsa_${TESTUSER}\""
 		rlRun "su - $TESTUSER -c \"echo $TESTUSERPW|kinit $TESTUSER\""
 		rlRun "su - $TESTUSER -c \"ipa user-mod $TESTUSER --sshpubkey='$(cat /tmp/ssh_user_rsa_${TESTUSER}.pub)'\""
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -172,6 +174,7 @@ ipa_ssh_user_func_0002()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0002 - User ssh to host with keys"
 	case "$MYROLE" in
 	MASTER*)
@@ -179,15 +182,15 @@ ipa_ssh_user_func_0002()
 		rlRun "su - $TESTUSER -c \"ssh $SLAVE hostname\" > $tmpout 2>&1"
 		rlRun "cat $tmpout"
 		rlAssertGrep "$SLAVE" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -202,6 +205,7 @@ ipa_ssh_user_func_0003()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0003 - User deletes own key(s)"
 	case "$MYROLE" in
 	MASTER*)
@@ -213,15 +217,15 @@ ipa_ssh_user_func_0003()
 		else
 			rlFail "IPA user has a key when it should not"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -236,20 +240,21 @@ ipa_ssh_user_func_0004()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0004 - Admin revokes/removes keys uploaded by user"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "su - $TESTUSER -c \"ipa user-mod $TESTUSER --sshpubkey='$(cat /tmp/ssh_user_rsa_${TESTUSER}.pub)'\""
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -264,6 +269,7 @@ ipa_ssh_user_func_0005()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0005 - User creates key with passphrase and ssh to host"
 	case "$MYROLE" in
 	MASTER*)
@@ -278,15 +284,15 @@ expect "*assphrase for key*:"
 send -s -- "sshtestpassword\r"
 expect eof
 EOF
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -301,19 +307,20 @@ ipa_ssh_user_func_0006()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0006 - user runs user-mod to upload keys after user-disable"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -328,19 +335,20 @@ ipa_ssh_user_func_0007()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0007 - user attempts to ssh with keys after user-disbable"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -355,19 +363,20 @@ ipa_ssh_user_func_0008()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0008 - user runs user-mod to upload keys after user account locked"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -382,19 +391,20 @@ ipa_ssh_user_func_0009()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_ssh_user_func_0009 - user attempts to ssh with keys after user account locked"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MASTER_IP"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MASTER_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
