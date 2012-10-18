@@ -122,6 +122,9 @@ ipa_user_mod_ssh_envsetup()
 			fi
 		done
 
+		rlLog "clean up any tmp ssh user keys found first"
+		rlRun "rm -f /tmp/ssh_user*_rsa*"
+		rlRun "rm -f /tmp/ssh_user*_dsa*"
 		#rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME' "
 	rlPhaseEnd
 }
