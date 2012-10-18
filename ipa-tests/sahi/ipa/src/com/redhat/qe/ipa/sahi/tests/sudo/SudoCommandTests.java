@@ -331,9 +331,12 @@ public class SudoCommandTests extends SahiTestScript {
 	public void testQuestionMarkAddFixed_Bug855278(String testname) throws Exception {
 		//add "??" sudo command and verify
 		sahiTasks.navigateTo(commonTasks.sudoCommandPage, true);
-		Assert.assertFalse(sahiTasks.link("??").exists(), "Verify sudocommand ?? doesn't already exist");
+		Assert.assertFalse(sahiTasks.link("??").exists(), "Verify sudocommand ?? doesn't exist");
 		SudoTasks.createSudoCommandAdd(sahiTasks, "??", "", "Add");
 		Assert.assertTrue(sahiTasks.link("??").exists(), "Added Sudorule Command ??  successfully");
+		//delete sudo command rule
+		SudoTasks.deleteSudo(sahiTasks,"??", "Delete");
+		Assert.assertFalse(sahiTasks.link("??").exists(), "Verify sudocommand ?? doesn't already exist");
 	}
 	
 	
