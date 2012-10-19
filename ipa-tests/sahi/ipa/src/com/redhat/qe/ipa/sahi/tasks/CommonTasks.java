@@ -54,7 +54,7 @@ public class CommonTasks {
 	public static String automemberUserGroupPage = serverUrl + "/ipa/ui/#automember=amgroup&policy=automember&navigation=policy&automember-facet=searchgroup";//xdong ,have to add"automember-facet=searchgroup" otherwise there will be a problem for automation test
 	public static String automemberHostGroupPage = serverUrl + "/ipa/ui/#automember=amhostgroup&policy=automember&navigation=policy&automember-facet=searchhostgroup";//xdong,same above
 	public static String trustsPage =  serverUrl + "/ipa/ui/#ipaserver=trust&navigation=ipaserver";
-	
+	public static String selinuxPage = serverUrl + "/ipa/ui/#policy=selinuxusermap&navigation=policy";
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";
