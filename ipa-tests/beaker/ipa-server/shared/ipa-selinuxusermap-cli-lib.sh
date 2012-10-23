@@ -355,18 +355,32 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-	SELINUX_POLICY=$( expect -f - <<-EOF 
-        	spawn ssh -l "$user" $host id -Z 
-                expect {
-                	"*assword: " {
-                        send -- "$passwd\r"
-                        	}
-                       }
-                expect eof
-	EOF )
+#	SELINUX_POLICY=$( expect -f - <<-EOF 
+#        	spawn ssh -l "$user" $host id -Z 
+#                expect {
+#                	"*assword: " {
+#                        send -- "$passwd\r"
+#                        	}
+#                       }
+#                expect eof
+#	EOF )
+             
+ exp=/tmp/expfile.out
+ tmpout=/tmp/tmpfile.out
+             local cmd="ssh -l $user $host id -Z"
+             echo "set timeout 5" > $exp
+             echo "set force_conservative 0" >> $exp
+             echo "set send_slow {1 .1}" >> $exp
+             echo "spawn $cmd" >> $exp
+             echo 'expect "*assword: "' >> $exp
+             echo "send -s -- \"$passwd\r\"" >> $exp
+             echo 'expect eof ' >> $exp
+             /usr/bin/expect $exp > $tmpout 2>&1
+
 	if [ $? = 0 ]; then
                 rlPass "Authentication successful for $user"
-		echo $SELINUX_POLICY
+                rlRun "cat $tmpout"
+                SELINUX_POLICY=$(cat $tmpout |grep _u)
 		echo $SELINUX_POLICY | grep $selinuxuser
 		if [ $? = 0 ]; then
 	                rlPass "Selinuxuser $selinuxuser as expected"
@@ -390,22 +404,36 @@ passwd=$2
 host=$3
 selinuxuser=$4
         rc=0
-	SELINUX_POLICY=$( expect -f - <<-EOF 
-                spawn ssh -l "$user" $host id -Z
-                expect {
-                        "*assword: " {
-                        send -- "$passwd\r"
-                                }
-                       }
-                expect eof
-        EOF )
+#	SELINUX_POLICY=$( expect -f - <<-EOF 
+#                spawn ssh -l "$user" $host id -Z
+#                expect {
+#                        "*assword: " {
+#                        send -- "$passwd\r"
+#                                }
+#                       }
+#                expect eof
+#        EOF )
+ exp=/tmp/expfile.out
+ tmpout=/tmp/tmpfile.out
+             local cmd="ssh -l $user $host id -Z"
+             echo "set timeout 5" > $exp
+             echo "set force_conservative 0" >> $exp
+             echo "set send_slow {1 .1}" >> $exp
+             echo "spawn $cmd" >> $exp
+             echo 'expect "*assword: "' >> $exp
+             echo "send -s -- \"$passwd\r\"" >> $exp
+             echo 'expect eof ' >> $exp
+             /usr/bin/expect $exp > $tmpout 2>&1
+
         if [ $? = 0 ]; then
                 rlPass "Authentication successful for $user"
-                echo $SELINUX_POLICY
+                rlRun "cat $tmpout"
+                SELINUX_POLICY=$(cat $tmpout |grep _u)
                 echo $SELINUX_POLICY | grep $selinuxuser
                 if [ $? = 0 ]; then
                 	rlFail "ERROR: Selinuxuser policy is $selinuxuser, this is not expected."
                 else
+                        selinuxuser=$(cat $tmpout |grep _u|cut -d":" -f1)
                 	rlPass "Selinuxuser $selinuxuser as expected"
                 fi
         else
