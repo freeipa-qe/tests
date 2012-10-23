@@ -161,9 +161,9 @@ public class AutomemberTests extends IPAWebAutomation {
 	 *             Data providers                                                * 
 	 *****************************************************************************/
 	//RHEL::
-	//private String AutomemberTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
+	private String AutomemberTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
 	//F17::
-	private String AutomemberTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
+	//private String AutomemberTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/automember/automembertest.properties";
 	//Win::
 	//private String AutomemberTestDataFile = "C:\\automembertest.properties";
 		
