@@ -1145,9 +1145,9 @@ selinuxusermapsvc_master_007_cleanup() {
         done
         rlRun "ipa hostgroup-del hostgrp1"
         rlRun "rm -fr /tmp/krb5cc_*_*"
+        rlRun "ipa selinuxusermap-del test_user_specific_hostgroup"
         rlRun "ipa hbacrule-del rule6"
         rlRun "ipa hbacrule-enable allow_all"
-        rlRun "ipa selinuxusermap-del test_user_specific_hostgroup"
 }
 
 selinuxusermapsvc_client_007_2() {
@@ -1215,7 +1215,7 @@ selinuxusermapsvc_master_008() {
                 rlRun "ipa hbacrule-add-sourcehost rule8 --hostgroups=hostgrp8-2"
                 rlRun "ipa hbacrule-show rule8 --all"
 
-		rlRun "ipa selinuxusermap-add test_user_specific_hostgroup_from_hostgroup --selinuxuser=$t1_ipa_selinuxuser --hbacrule=rule6"
+		rlRun "ipa selinuxusermap-add test_user_specific_hostgroup_from_hostgroup --selinuxuser=$t1_ipa_selinuxuser --hbacrule=rule8"
 	        rlRun "ipa selinuxusermap-show test_user_specific_hostgroup_from_hostgroup --all"
 
 	 # ipa selinuxusermaptest:
@@ -1296,9 +1296,9 @@ selinuxusermapsvc_master_008_cleanup() {
         rlRun "ipa hostgroup-del hostgrp8-1"
         rlRun "ipa hostgroup-del hostgrp8-2"
         rlRun "rm -fr /tmp/krb5cc_*_*"
+        rlRun "ipa selinuxusermap-del test_user_specific_hostgroup_from_hostgroup"
         rlRun "ipa hbacrule-del rule8"
         rlRun "ipa hbacrule-enable allow_all"
-        rlRun "ipa selinuxusermap-del test_user_specific_hostgroup_from_hostgroup"
 }
 
 selinuxusermapsvc_client_008_2() {
