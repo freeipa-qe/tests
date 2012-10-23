@@ -37,16 +37,18 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
+. /dev/shm/ipa-selinuxusermap-cli-lib.sh
 
 # Test Suite Globals
 ipa_default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
 ipa_default_selinuxuser_verif="unconfined_u:.*s0-s0:c0.c1023"
 t1_ipa_selinuxuser="staff_u:s0-s0:c0.c1023"
 t1_ipa_selinuxuser_verif="staff_u:.*s0-s0:c0.c1023"
-t2_ipa_selinuxuser="user_u:s0-s0:c0.c102"
-t2_ipa_selinuxuser_verif="user_u:.*s0-s0:c0.c102"
+t2_ipa_selinuxuser="user_u:s0-s0:c0.c1023"
+t2_ipa_selinuxuser_verif="user_u:.*s0-s0:c0.c1023"
 t3_ipa_selinuxuser="xguest_u:s0"
 t3_ipa_selinuxuser_verif="xguest_u:.*s0"
+userpw="testpw123@ipa.com"
 
 selinuxusermapsvc_master_001() {
 
@@ -259,24 +261,24 @@ selinuxusermapsvc_master_003_cleanup() {
 
 selinuxusermapsvc_client_003() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-003: $user1 accessing $CLIENT from $CLIENT with selinuxusermap -- using SSHD service."
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-003: user1 accessing $CLIENT from $CLIENT with selinuxusermap -- using SSHD service."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
 		sleep 5
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
-                rlRun "ssh_auth_failure $user2 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT"
         rlPhaseEnd
 }
 
 selinuxusermapsvc_client2_003() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-003: $user1 accessing $CLIENT from $CLIENT2 with selinuxusermap -- using SSHD service."
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-003: user1 accessing $CLIENT from $CLIENT2 with selinuxusermap -- using SSHD service."
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
 		sleep 5
-                rlRun "ssh_auth_failure $user1 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user1 testpw123@ipa.com $CLIENT2"
         rlPhaseEnd
 }
 
@@ -297,7 +299,7 @@ selinuxusermapsvc_master_004() {
         rlRun "ipa hbacrule-disable allow_all"
 
 	# Selinuxusermap0 - all users access all services from all hosts
-	rlRun "ipa selinuxusermap-add selinuxusermap0 --selinuxuser=t3_ipa_selinuxuser"
+	rlRun "ipa selinuxusermap-add selinuxusermap0 --selinuxuser=$t3_ipa_selinuxuser"
 	rlRun "ipa selinuxusermap-mod selinuxusermap0 --hbacrule=allow_all"
 
 	# HBAC rule for $user1 to access all hosts from all services.
@@ -305,7 +307,7 @@ selinuxusermapsvc_master_004() {
 	rlRun "ipa hbacrule-add-user rule1 --users=$user1" 
 
 	# Selinuxusermap1 - with rule1
-	rlRun "ipa selinuxusermap-add selinuxusermap1 --selinuxuser=t2_ipa_selinuxuser"
+	rlRun "ipa selinuxusermap-add selinuxusermap1 --selinuxuser=$t2_ipa_selinuxuser"
 	rlRun "ipa selinuxusermap-mod selinuxusermap1 --hbacrule=rule1"
 
 	# HBAC rule for $user1 to access specific host.
@@ -316,7 +318,7 @@ selinuxusermapsvc_master_004() {
 	rlRun "ipa hbacrule-show rule2 --all"
 	
 	# Selinuxusermap2 - with rule2
-	rlRun "ipa selinuxusermap-add selinuxusermaprule2 --selinuxuser=t1_ipa_selinuxuser --hbacrule=rule2"
+	rlRun "ipa selinuxusermap-add selinuxusermaprule2 --selinuxuser=$t1_ipa_selinuxuser --hbacrule=rule2"
         rlRun "ipa selinuxusermap-show selinuxusermaprule2 --all"
 
 	# ipa selinuxusermaptest:
@@ -325,7 +327,7 @@ selinuxusermapsvc_master_004() {
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT has selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT does not have selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $MASTER $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER has selinux policy $t2_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t2_ipa_selinuxuser"
 
         rlRun "rlDistroDiff keyctl"
@@ -343,16 +345,16 @@ selinuxusermapsvc_client_004() {
 	rlPhaseStartTest "ipa-selinuxusermapsvc-client1-004: $user1 accessing $CLIENT -sshd service"
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
 		sleep 5
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
 		sleep 5
-		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
-		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+		rlRun "ftp_auth_failure user2 testpw123@ipa.com $MASTER"
+		rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
 	rlPhaseEnd
 }
 
@@ -361,16 +363,16 @@ selinuxusermapsvc_client2_004() {
 	rlPhaseStartTest "ipa-selinuxusermapsvc-client2-004: $user1 accessing $MASTER from $CLIENT2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
 		sleep 5
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
 		sleep 5
-                rlRun "ftp_auth_success $user2 testpw123@ipa.com $MASTER"
-		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_success user2 testpw123@ipa.com $MASTER"
+		rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
         rlPhaseEnd
 
 }
@@ -387,8 +389,8 @@ selinuxusermapsvc_master_004_2() {
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT does not have selinux policy $t1_ipa_selinuxuser "
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER does not have selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER does not have selinux policy $t2_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_success_selinuxuser_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t2_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t2_ipa_selinuxuser"
         rlRun "rlDistroDiff keyctl"
         rlRun "kinitAs $user2 $userpw" 0 "Kinit as $user2"
 	rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT"
@@ -404,16 +406,16 @@ selinuxusermapsvc_client_004_2() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-004-2: $user1 accessing $CLIENT - SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $MASTER"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
         rlPhaseEnd
 }
 
@@ -422,16 +424,16 @@ selinuxusermapsvc_client2_004_2() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-004-2: $user1 accessing $MASTER from $CLIENT2 using SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
-                rlRun "ftp_auth_success $user2 testpw123@ipa.com $MASTER"
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_success user2 testpw123@ipa.com $MASTER"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
         rlPhaseEnd
 
 }
@@ -439,7 +441,7 @@ selinuxusermapsvc_client2_004_2() {
 selinuxusermapsvc_master_004_3() {
     rlPhaseStartTest "ipa-selinuxusermapsvc-004-3: $user1 associated with different selinuxusermap to access $CLIENT - delete selinuxusermap1 from the prev test"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "ipa selinuxusermap-del selinuxusermaprule1"
+        rlRun "ipa selinuxusermap-del selinuxusermap1"
 	rlRun "ipa hbacrule-enable allow_all"
 
 	 # ipa selinuxusermaptest:
@@ -453,8 +455,8 @@ selinuxusermapsvc_master_004_3() {
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER does not have selinux policy $t2_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $MASTER $t3_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER has selinux policy $t3_ipa_selinuxuser"
 
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t2_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t2_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $t3_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t3_ipa_selinuxuser"
         rlRun "rlDistroDiff keyctl"
 
@@ -470,17 +472,17 @@ selinuxusermapsvc_master_004_3() {
 
 selinuxusermapsvc_client_004_3() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-004-3: $user1 accessing $CLIENT - SSHD service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-004-3: user1 accessing $CLIENT - SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t3_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT2 $t3_ipa_selinuxuser_verif"
@@ -493,14 +495,14 @@ selinuxusermapsvc_client2_004_3() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-004-3: $user1 accessing $MASTER from $CLIENT2 using SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t3_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $MASTER $t3_ipa_selinuxuser_verif"
@@ -511,7 +513,7 @@ selinuxusermapsvc_client2_004_3() {
 selinuxusermapsvc_master_004_4() {
     rlPhaseStartTest "ipa-selinuxusermapsvc-004-4: $user1 associated with different selinuxusermap to access $CLIENT - delete selinuxusermap0 from the prev test"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "ipa selinuxusermap-del selinuxusermaprule0"
+        rlRun "ipa selinuxusermap-del selinuxusermap0"
 
          # ipa selinuxusermaptest:
         rlRun "rlDistroDiff keyctl"
@@ -549,12 +551,12 @@ selinuxusermapsvc_client_004_4() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-004-4: $user1 accessing $CLIENT - SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
@@ -567,12 +569,12 @@ selinuxusermapsvc_client2_004_4() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-004-4: $user1 accessing $MASTER from $CLIENT2 using SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
@@ -580,27 +582,28 @@ selinuxusermapsvc_client2_004_4() {
         rlPhaseEnd
 }
 
-
 selinuxusermapsvc_master_005() {
 	rlPhaseStartTest "ipa-selinuxusermapsvc-005: user1 part of user group associated with different selinuxusermap to access $CLIENT - evaluating rules applies correctly."
 
        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-	rlRun "ipa group-add --desc="selinuxusermap test group" group1"
+	rlRun "ipa group-add --desc=\"selinuxusermap test group\" group1"
         rlRun "export group1=group1"
         for i in {1..2}; do
                 rlRun "create_ipauser user$i user$i user$i $userpw"
                 sleep 5
                 rlRun "export user$i=user$i"
         done
-	rlRun "ipa group-add-member --users=$user1 $group1
+       	
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "ipa group-add-member --users=$user1 $group1"
 		
 	rlRun "ipa hbacrule-add admin_allow_all --hostcat=all --srchostcat=all --servicecat=all"
 	rlRun "ipa hbacrule-add-user admin_allow_all --groups=admins"
         rlRun "ipa hbacrule-disable allow_all"
 
 	# Selinuxusermap0 - all user groups access all services from all hosts
-	rlRun "ipa selinuxusermap-add selinuxusermap0 --selinuxuser=t3_ipa_selinuxuser"
+	rlRun "ipa selinuxusermap-add selinuxusermap0 --selinuxuser=$t3_ipa_selinuxuser"
 	rlRun "ipa selinuxusermap-mod selinuxusermap0 --hbacrule=allow_all"
 
 	# HBAC rule for $group1 to access all hosts from all services.
@@ -608,7 +611,7 @@ selinuxusermapsvc_master_005() {
 	rlRun "ipa hbacrule-add-user rule1 --groups=$group1" 
 
 	# Selinuxusermap1 - with rule1
-	rlRun "ipa selinuxusermap-add selinuxusermap1 --selinuxuser=t2_ipa_selinuxuser"
+	rlRun "ipa selinuxusermap-add selinuxusermap1 --selinuxuser=$t2_ipa_selinuxuser"
 	rlRun "ipa selinuxusermap-mod selinuxusermap1 --hbacrule=rule1"
 
 	# HBAC rule for $group1 to access specific host.
@@ -619,7 +622,7 @@ selinuxusermapsvc_master_005() {
 	rlRun "ipa hbacrule-show rule2 --all"
 	
 	# Selinuxusermap2 - with rule2
-	rlRun "ipa selinuxusermap-add selinuxusermaprule2 --selinuxuser=t1_ipa_selinuxuser --hbacrule=rule2"
+	rlRun "ipa selinuxusermap-add selinuxusermaprule2 --selinuxuser=$t1_ipa_selinuxuser --hbacrule=rule2"
         rlRun "ipa selinuxusermap-show selinuxusermaprule2 --all"
 
 	# ipa selinuxusermaptest:
@@ -628,7 +631,7 @@ selinuxusermapsvc_master_005() {
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT has selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT does not have selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $MASTER $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER has selinux policy $t2_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t2_ipa_selinuxuser"
 
         rlRun "rlDistroDiff keyctl"
@@ -646,17 +649,17 @@ selinuxusermapsvc_client_005() {
 	rlPhaseStartTest "ipa-selinuxusermapsvc-client1-005: $user1 part of $group1 accessing $CLIENT -sshd service"
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
 		sleep 5
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
 		sleep 5
-		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT"
-		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
-		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+		rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT"
+		rlRun "ftp_auth_failure user2 testpw123@ipa.com $MASTER"
+		rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
 	rlPhaseEnd
 }
 
@@ -665,17 +668,17 @@ selinuxusermapsvc_client2_005() {
 	rlPhaseStartTest "ipa-selinuxusermapsvc-client2-005: $user1 part of $group1 accessing $MASTER from $CLIENT2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
 		sleep 5
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
 		sleep 5
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT"
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
-		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $MASTER"
+		rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
         rlPhaseEnd
 
 }
@@ -692,8 +695,8 @@ selinuxusermapsvc_master_005_2() {
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT does not have selinux policy $t1_ipa_selinuxuser "
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER does not have selinux policy $t1_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER does not have selinux policy $t2_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_success_selinuxuser_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t2_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t2_ipa_selinuxuser"
         rlRun "rlDistroDiff keyctl"
         rlRun "kinitAs $user2 $userpw" 0 "Kinit as $user2"
 	rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT"
@@ -709,17 +712,17 @@ selinuxusermapsvc_client_005_2() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-005-2: $user1 part of $group1 accessing $CLIENT - SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT"
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $MASTER"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
         rlPhaseEnd
 }
 
@@ -728,24 +731,24 @@ selinuxusermapsvc_client2_005_2() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-005-2: $user1 part of $group1 accessing $MASTER from $CLIENT2 using SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t2_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
-                rlRun "ftp_auth_success $user2 testpw123@ipa.com $CLIENT"
-                rlRun "ftp_auth_success $user2 testpw123@ipa.com $MASTER"
-                rlRun "ftp_auth_failure $user2 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_success user2 testpw123@ipa.com $CLIENT"
+                rlRun "ftp_auth_success user2 testpw123@ipa.com $MASTER"
+                rlRun "ftp_auth_failure user2 testpw123@ipa.com $CLIENT2"
         rlPhaseEnd
 
 }
 
 selinuxusermapsvc_master_005_3() {
     rlPhaseStartTest "ipa-selinuxusermapsvc-005-3: $user1 part of $group1 associated with different selinuxusermap to access $CLIENT - delete selinuxusermap1 from the prev test"
-        rlRun "ipa selinuxusermap-del selinuxusermaprule1"
+        rlRun "ipa selinuxusermap-del selinuxusermap1"
 	rlRun "ipa hbacrule-enable allow_all"
 
 	 # ipa selinuxusermaptest:
@@ -759,8 +762,8 @@ selinuxusermapsvc_master_005_3() {
         rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $MASTER $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER does not have selinux policy $t2_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $MASTER $t3_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER has selinux policy $t3_ipa_selinuxuser"
 
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
-        rlRun "verify_ssh_auth_failure_selinuxuser_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t2_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+        rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t2_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t2_ipa_selinuxuser"
         rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $t3_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $t3_ipa_selinuxuser"
         rlRun "rlDistroDiff keyctl"
 
@@ -781,14 +784,14 @@ selinuxusermapsvc_client_005_3() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-005-3: $user1 part of $group1 accessing $CLIENT - SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t3_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT2 $t3_ipa_selinuxuser_verif"
@@ -801,14 +804,14 @@ selinuxusermapsvc_client2_005_3() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-005-3: $user1 part of $group1 accessing $MASTER from $CLIENT2 using SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT $t2_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t3_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $t3_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $MASTER $t3_ipa_selinuxuser_verif"
@@ -819,7 +822,7 @@ selinuxusermapsvc_client2_005_3() {
 selinuxusermapsvc_master_005_4() {
     rlPhaseStartTest "ipa-selinuxusermapsvc-005-4: $user1 part of $group1 associated with different selinuxusermap to access $CLIENT - delete selinuxusermap0 from the prev test"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-        rlRun "ipa selinuxusermap-del selinuxusermaprule0"
+        rlRun "ipa selinuxusermap-del selinuxusermap0"
 
          # ipa selinuxusermaptest:
         rlRun "rlDistroDiff keyctl"
@@ -858,12 +861,12 @@ selinuxusermapsvc_client_005_4() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-005-4: $user1 part of $group1 accessing $CLIENT - SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
@@ -876,12 +879,12 @@ selinuxusermapsvc_client2_005_4() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-005-4: $user1 part of $group1 accessing $MASTER from $CLIENT2 using SSHD service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user1"
+                rlRun "getent -s sss passwd user1"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user2"
+                rlRun "getent -s sss passwd user2"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
@@ -935,12 +938,12 @@ selinuxusermapsvc_client_006() {
 
         rlPhaseStartTest "ipa-selinuxusermapsvc-client1-006: $user6 accessing $CLIENT2 - sshd service"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user6 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_failure_selinuxuser user6 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_failure_selinuxuser user6 testpw123@ipa.com $MASTER $t1_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
 		rlRun "verify_ssh_auth_failure_selinuxuser user5 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user5 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
@@ -954,12 +957,12 @@ selinuxusermapsvc_client2_006() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-client2-006: $user6 accessing hostgroup from $CLIENT2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user6 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_failure_selinuxuser user6 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_failure_selinuxuser user6 testpw123@ipa.com $MASTER $t1_ipa_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
 		rlRun "verify_ssh_auth_failure_selinuxuser user5 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
 		rlRun "verify_ssh_auth_success_selinuxuser user5 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
@@ -969,7 +972,7 @@ selinuxusermapsvc_client2_006() {
 
 }
 
-selinuxusermapsvc_master_00_6_2() {
+selinuxusermapsvc_master_006_2() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-006_2: $user6 removed from selinuxusermap"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa selinuxusermap-remove-user test_user_specific_hostgroup --users=$user6"
@@ -1004,14 +1007,14 @@ selinuxusermapsvc_master_006_cleanup() {
 
 selinuxusermapsvc_client_006_2() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-006_2: $user6 accessing $CLIENT2 - sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-006_2: user6 accessing $CLIENT2 - sshd service"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
 		rlRun "verify_ssh_auth_failure_selinuxuser user6 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user6 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user6 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user5 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user5 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
@@ -1020,15 +1023,15 @@ selinuxusermapsvc_client_006_2() {
 
 selinuxusermapsvc_client2_006_2() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-006_2: $user6 accessing hostgroup from $CLIENT2 using sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-006_2: user6 accessing hostgroup from $CLIENT2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
 		rlRun "verify_ssh_auth_failure_selinuxuser user6 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user6 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user6 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
                 rlRun "verify_ssh_auth_success_selinuxuser user5 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
                 rlRun "verify_ssh_auth_success_selinuxuser user5 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
@@ -1082,39 +1085,39 @@ selinuxusermapsvc_master_007() {
 
 selinuxusermapsvc_client_007() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-007: $user6 accessing $CLIENT2 - sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-007: user6 accessing $CLIENT2 - sshd service"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
-                rlRun "verify_ssh_auth_success_selinuxuser $user6 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "verify_ssh_auth_success_selinuxuser user6 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $MASTER"
 	rlPhaseEnd
 }
 
 selinuxusermapsvc_client2_007() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-007: $user6 accessing hostgroup from $CLIENT2 using sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-007: user6 accessing hostgroup from $CLIENT2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $MASTER"
         rlPhaseEnd
 
 }
 
-selinuxusermapsvc_master_00_7_2() {
+selinuxusermapsvc_master_007_2() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-007_2: $user6 removed from rule6"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-remove-user rule6 --users=$user6"
@@ -1149,34 +1152,34 @@ selinuxusermapsvc_master_007_cleanup() {
 
 selinuxusermapsvc_client_007_2() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-007_2: $user6 accessing $CLIENT2 - sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-007_2: user6 accessing $CLIENT2 - sshd service"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $MASTER"
         rlPhaseEnd
 }
 
 selinuxusermapsvc_client2_007_2() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-007_2: $user6 accessing hostgroup from $CLIENT2 using sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-007_2: user6 accessing hostgroup from $CLIENT2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user6"
+                rlRun "getent -s sss passwd user6"
                 sleep 5
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user6 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user5"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user6 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user5"
                 sleep 5
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user5 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user5 testpw123@ipa.com $MASTER"
         rlPhaseEnd
 
 }
@@ -1210,7 +1213,6 @@ selinuxusermapsvc_master_008() {
                 rlRun "ipa hbacrule-add-user rule8 --users=$user8"
                 rlRun "ipa hbacrule-add-host rule8 --hostgroups=hostgrp8-1"
                 rlRun "ipa hbacrule-add-sourcehost rule8 --hostgroups=hostgrp8-2"
-		rlRun "ipa hbacrule-add-service rule8 --hbavsvcs=sshd"
                 rlRun "ipa hbacrule-show rule8 --all"
 
 		rlRun "ipa selinuxusermap-add test_user_specific_hostgroup_from_hostgroup --selinuxuser=$t1_ipa_selinuxuser --hbacrule=rule6"
@@ -1232,40 +1234,40 @@ selinuxusermapsvc_master_008() {
 
 selinuxusermapsvc_client_008() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-008: $user8 accessing hostgroup2 from hostgroup - sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-008: user8 accessing hostgroup2 from hostgroup - sshd service"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
+                rlRun "getent -s sss passwd user8"
                 sleep 5
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT2"
-                rlRun "verify_ssh_auth_success_selinuxuser $user8 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user9"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
+                rlRun "verify_ssh_auth_success_selinuxuser user8 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user9"
                 sleep 5
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $MASTER"
 	rlPhaseEnd
 }
 
 selinuxusermapsvc_client2_008() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-008: $user8 accessing hostgroup from hostgroup2 using sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-008: user8 accessing hostgroup from hostgroup2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
+                rlRun "getent -s sss passwd user8"
                 sleep 5
-                rlRun "verify_ssh_auth_success_selinuxuser $user8 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user9"
+                rlRun "verify_ssh_auth_success_selinuxuser user8 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user9"
                 sleep 5
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $MASTER"
         rlPhaseEnd
 
 }
 
-selinuxusermapsvc_master_00_8_2() {
+selinuxusermapsvc_master_008_2() {
         rlPhaseStartTest "ipa-selinuxusermapsvc-008_2: $user8 removed from rule8 which was allowed to access hostgroup from hostgroup2"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-remove-user rule8 --users=$user8"
@@ -1301,36 +1303,33 @@ selinuxusermapsvc_master_008_cleanup() {
 
 selinuxusermapsvc_client_008_2() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-008_2: $user8 accessing hostgroup from hostgroup2 - sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-008_2: user8 accessing hostgroup from hostgroup2 - sshd service"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
+                rlRun "getent -s sss passwd user8"
                 sleep 5
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user9"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user9"
                 sleep 5
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT2"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $MASTER"
         rlPhaseEnd
 }
 
 selinuxusermapsvc_client2_008_2() {
 
-        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-008_2: $user8 accessing hostgroup from hostgroup2 using sshd service"
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-008_2: user8 accessing hostgroup from hostgroup2 using sshd service"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "getent -s sss passwd $user8"
+                rlRun "getent -s sss passwd user8"
                 sleep 5
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user8 testpw123@ipa.com $MASTER"
-                rlRun "getent -s sss passwd $user9"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user8 testpw123@ipa.com $MASTER"
+                rlRun "getent -s sss passwd user9"
                 sleep 5
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $CLIENT"
-                rlRun "ssh_auth_failure $user9 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user9 testpw123@ipa.com $MASTER"
         rlPhaseEnd
-
 }
-
-
