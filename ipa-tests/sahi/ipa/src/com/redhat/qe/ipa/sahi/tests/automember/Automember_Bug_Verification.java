@@ -39,6 +39,7 @@ public class Automember_Bug_Verification extends SahiTestScript {
 		if (!currentPageNow.equals(currentPage) && !currentPageNow.equals(alternateCurrentPage)) {
 			System.out.println("Not on expected Page....navigating back from : " + currentPageNow);
 			sahiTasks.navigateTo(commonTasks.rolePage, true);
+			CommonTasks.clearSearch(sahiTasks);
 		}		
 	}
 	
@@ -49,59 +50,79 @@ public class Automember_Bug_Verification extends SahiTestScript {
 	@Test (groups={"MissingSpecifiedName_Bug818258"}, description="Bug 818258 -Missing Specified Name In Error Msg", 
 			dataProvider="MissingSpecifiedNameBug818258TestObjects")	
 	
-	public void testMissingSpecifiedName_Bug8182581(String groupName,String groupDescription,String gid,String groupType,String hostgroupName,String description) throws Exception {
-	
-	    //add a group
-		sahiTasks.navigateTo(commonTasks.groupPage, true);
-		Assert.assertFalse(sahiTasks.link(groupName).exists(),"before 'Add', group does NOT exists");
-		GroupTasks.add_UserGroup(sahiTasks, groupName, groupDescription, gid, groupType);
-		Assert.assertTrue(sahiTasks.link(groupName).exists(),"after 'Add', group exists");
-		//add and add another automember user group rule and verify the bug
-		sahiTasks.navigateTo(commonTasks.automemberUserGroupPage, true);
-		Assert.assertFalse(sahiTasks.link(groupName).exists(),"before 'Add', usergroup role does NOT exists");
-		AutomemberTasks.automember_AddDuplicate(sahiTasks,groupName);
-		Assert.assertTrue(sahiTasks.link(groupName).exists(),"after 'Add', usergroup role exists");
-		//delete the rule
-		sahiTasks.navigateTo(commonTasks.automemberUserGroupPage, true);
-		Assert.assertTrue(sahiTasks.link(groupName).exists(),"before 'Delete', usergroup role exists");
-		AutomemberTasks.automember_Delete(sahiTasks,groupName);
-		Assert.assertFalse(sahiTasks.link(groupName).exists(),"after 'Delete', usergroup role does NOT exists");
-		//delete the group
-		sahiTasks.navigateTo(commonTasks.groupPage, true);
-		Assert.assertTrue(sahiTasks.link(groupName).exists(),"before 'Delete', usergroup exists");
-		GroupTasks.deleteGroup(sahiTasks, groupName);
-		Assert.assertFalse(sahiTasks.link(groupName).exists(),"after 'Delete', usergroup does NOT exists");
-		
-		//add a hostgroup
-		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
-		Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"before 'Add', hostgroup does NOT exists");
-		HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
-		Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"after 'Add', hostgroup exists");
-		//add and add another automember hostgroup rule and verify the bug
-		sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
-		Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"before 'Add', hostgroup role does NOT exists");
-		AutomemberTasks.automember_AddDuplicate(sahiTasks,hostgroupName);
-		Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"after 'Add', hostgroup role exists");
-		//delete the rule
-		sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
-		Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"before 'Delete', usergroup role exists");
-		AutomemberTasks.automember_Delete(sahiTasks,hostgroupName);
-		Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"after 'Delete', usergroup role does NOT exists");
-		//delete the hostgroup
-		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
-		Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"before 'Delete', hostgroup exists");
-		HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName,"Delete");
-		Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"after 'Delete', hostgroup does NOT exists");
-				
+	public void testMissingSpecifiedName_Bug8182581(String testname,String groupName,String groupDescription,String gid,String groupType,String hostgroupName,String description) throws Exception {
+	    if (testname == "groupRule"){
+	    	//add a group
+	    	sahiTasks.navigateTo(commonTasks.groupPage, true);
+	    	Assert.assertFalse(sahiTasks.link(groupName).exists(),"before 'Add', group does NOT exists");
+	    	GroupTasks.add_UserGroup(sahiTasks, groupName, groupDescription, gid, groupType);
+	    	Assert.assertTrue(sahiTasks.link(groupName).exists(),"after 'Add', group exists");
+	    	//add and add another automember user group rule and verify the bug
+	    	sahiTasks.navigateTo(commonTasks.automemberUserGroupPage, true);
+	    	Assert.assertFalse(sahiTasks.link(groupName).exists(),"before 'Add', usergroup role does NOT exists");
+	    	AutomemberTasks.automember_AddDuplicate(sahiTasks,groupName);
+	    	Assert.assertTrue(sahiTasks.link(groupName).exists(),"after 'Add', usergroup role exists");
+	    	
+	    }else{
+	    	//add a hostgroup
+	    	sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+	    	Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"before 'Add', hostgroup does NOT exists");
+	    	HostgroupTasks.addHostGroup(sahiTasks, hostgroupName, description, "Add");
+	    	Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"after 'Add', hostgroup exists");
+	    	//add and add another automember hostgroup rule and verify the bug
+	    	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
+	    	Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"before 'Add', hostgroup role does NOT exists");
+	    	AutomemberTasks.automember_AddDuplicate(sahiTasks,hostgroupName);
+	    	Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"after 'Add', hostgroup role exists");
+	    }
 	}
+	
+	@Test (groups={"MissingSpecifiedName_Bug818258_Cleanup"}, description="Bug 818258 Clean Up", 
+			dataProvider="MissingSpecifiedNameBug818258CleanUpTestObjects")	
+	
+	public void testMissingSpecifiedName_Bug8182581_Cleanup(String testname,String groupName,String hostgroupName) throws Exception {
+	    if (testname == "groupRule"){
+	    	//delete the rule
+	    	sahiTasks.navigateTo(commonTasks.automemberUserGroupPage, true);
+	    	Assert.assertTrue(sahiTasks.link(groupName).exists(),"before 'Delete', usergroup role exists");
+	    	AutomemberTasks.automember_Delete(sahiTasks,groupName);
+	    	Assert.assertFalse(sahiTasks.link(groupName).exists(),"after 'Delete', usergroup role does NOT exists");
+	    	//delete the group
+	    	sahiTasks.navigateTo(commonTasks.groupPage, true);
+	    	Assert.assertTrue(sahiTasks.link(groupName).exists(),"before 'Delete', usergroup exists");
+	    	GroupTasks.deleteGroup(sahiTasks, groupName);
+	    	Assert.assertFalse(sahiTasks.link(groupName).exists(),"after 'Delete', usergroup does NOT exists");
+	    }else{
+	    	//delete the rule
+	    	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
+	    	Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"before 'Delete', usergroup role exists");
+			AutomemberTasks.automember_Delete(sahiTasks,hostgroupName);
+			Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"after 'Delete', usergroup role does NOT exists");
+			//delete the hostgroup
+			sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
+			Assert.assertTrue(sahiTasks.link(hostgroupName).exists(),"before 'Delete', hostgroup exists");
+			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName,"Delete");
+			Assert.assertFalse(sahiTasks.link(hostgroupName).exists(),"after 'Delete', hostgroup does NOT exists");
+	    }
+	    }
 	
 	@DataProvider(name="MissingSpecifiedNameBug818258TestObjects")
     public Object[][] MissingSpecifiedNameBug818258TestObjects() {
             String[][] roles={
-            //   groupName          groupDescription        gid   groupType      hostgroupName         description    
-            {  "bug818258_grp",      "bug818258_grp",       "",   "normal" ,  "bug818258_hstgrp" ,  "bug818258_hstgrp" }
+            //  testname       groupName          groupDescription        gid   groupType      hostgroupName         description    
+            { "groupRule"  ,   "bug818258_grp",      "bug818258_grp",       "",   "normal" ,  "bug818258_hstgrp" ,  "bug818258_hstgrp" },
+            {"hostgroupRule" ,   "bug818258_grp",      "bug818258_grp",       "",   "normal" ,  "bug818258_hstgrp" ,  "bug818258_hstgrp"}
             };
             return roles;
     }
 	
+	@DataProvider(name="MissingSpecifiedNameBug818258CleanUpTestObjects")
+    public Object[][] MissingSpecifiedNameBug818258CleanUpTestObjects() {
+            String[][] roles={
+            //  testname       groupName             hostgroupName         
+            { "groupRule"  ,   "bug818258_grp" ,  "bug818258_hstgrp"  },
+            {"hostgroupRule" ,  "bug818258_grp",  "bug818258_hstgrp" }
+            };
+            return roles;
+    }
 }
