@@ -11,7 +11,7 @@ public class SelinuxUserMapTasks {
 	private static Logger log = Logger.getLogger(UserTasks.class.getName());
 	
 	/*
-	 * Create a net group
+	 * Create a selinux user maps
 	 * @param sahiTasks 
 	 * @param groupname - groupname
 	 * @param description -  description for group
@@ -25,7 +25,7 @@ public class SelinuxUserMapTasks {
 	}
 	
 	/*
-	 * add a net group and add another
+	 * add a selinux user maps and add another
 	 * @param sahiTasks 
 	 * @param groupName1
 	 * @param groupName2
@@ -47,9 +47,9 @@ public class SelinuxUserMapTasks {
 	}
 	
 	/*
-	 * add and edit a net group
+	 * add and edit a selinux user maps
 	 * @param sahiTasks 
-	 * @param groupName - name of net group
+	 * @param groupName - name of selinux user maps
 	 * @param description1 - first description
 	 * @param description2 - new description for edit
 	 * @param undo - YES NO
@@ -69,7 +69,7 @@ public class SelinuxUserMapTasks {
 	/*
 	 * verify host group settings
 	 * @param sahiTasks 
-	 * @param groupName - name of net group
+	 * @param groupName - name of selinux user maps
 	 * @param description
 	 * @param nisdomain - nis domain
 	 */
@@ -81,9 +81,9 @@ public class SelinuxUserMapTasks {
 	}
 	
 	/*
-	 * Delete the net group.
+	 * Delete the selinux user maps.
 	 * @param sahiTasks
-	 * @param groupName - name of the net group
+	 * @param groupName - name of the selinux user maps
 	 * @param button - Delete or Cancel
 	 */
 	public static void deleteNetgroup(SahiTasks sahiTasks, String groupName, String button) {
@@ -97,7 +97,7 @@ public class SelinuxUserMapTasks {
 	}
 	
 	/*
-	 * Delete multiple net groups.
+	 * Delete multiple selinux user maps.
 	 * @param sahiTasks
 	 * @param groupnames - the array of groupnames to delete
 	 */
