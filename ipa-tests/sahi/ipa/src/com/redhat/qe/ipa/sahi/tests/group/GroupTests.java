@@ -426,7 +426,40 @@ public class GroupTests extends SahiTestScript{
 				Assert.assertFalse(browser.link(groupName).exists(),"Group Type Posix deleted as expected");
 			}else if (testScenario == "External") {
 				Assert.assertTrue(browser.span("Add").exists(),"Verified external grouptype can add external members");
-				//TODO :add/add another/canel tests for adding external members
+				//add 4 external members in ad and get their SIDs
+				String aduser1 = "s-1-5-21-2048782538-2375889789-2933420090-1175";
+				String aduser2 = "s-1-5-21-2048782538-2375889789-2933420090-1176";
+				String aduser3 = "s-1-5-21-2048782538-2375889789-2933420090-1177";
+				String aduser4 = "s-1-5-21-2048782538-2375889789-2933420090-1178";
+				//check Add button
+				browser.span("Add").click();
+				browser.textbox("ipaexternalmember").setValue(aduser1);
+				browser.button("Add").click();
+				Assert.assertTrue(browser.div(aduser1).exists(),"External member aduser1 added as expected");
+				//check Add and Add Another button
+				browser.span("Add").click();
+				browser.textbox("ipaexternalmember").setValue(aduser2);
+				browser.button("Add and Add Another").click();
+				browser.textbox("ipaexternalmember").setValue(aduser3);
+				browser.button("Add").click();
+				Assert.assertTrue(browser.div(aduser2).exists(),"External member aduser2 added as expected");
+				Assert.assertTrue(browser.div(aduser3).exists(),"External member aduser3 added as expected");
+				//check Cancel button
+				browser.span("Add").click();
+				browser.textbox("ipaexternalmember").setValue(aduser4);
+				browser.button("Cancel").click();
+				Assert.assertFalse(browser.div(aduser4).exists(),"External member aduser4 cancelled as expected");
+				//add duplicate external member TODO::bug869616
+				//add invalid external member  TODO::bug869616
+				//check Delete button
+				String[] adusers = {aduser1,aduser2,aduser3};
+				for(String aduser:adusers){
+					browser.checkbox(aduser).click();
+					browser.span("Delete").click();
+					browser.button("Delete").click();
+					Assert.assertFalse(browser.div(aduser).exists(),"External member " + aduser + " deleted as expected");
+				}
+				
 				browser.link("Settings").click();
 				browser.select("action").choose("Change to POSIX group");
 				Assert.assertFalse(browser.span("POSIX").exists(),"Verified external grouptype can't be changed to Posix group type");
