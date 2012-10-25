@@ -63,12 +63,12 @@ if [ -z "$REPLICA_IP" ]; then
 	export REPLICA_IP=$(getent ahostsv4 $REPLICA_env1 | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
 
-export CLIENT1_IP=$(dig +short $CLIENT_env1)
+export CLIENT1_IP=$(dig +short $CLIENT1_env1)
 if [ -z "$CLIENT1_IP" ]; then
 	export CLIENT1_IP=$(getent ahostsv4 $CLIENT1_IP| grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
 
-export CLIENT2_IP=$(dig +short $CLIENT_env2)
+export CLIENT2_IP=$(dig +short $CLIENT2_env1)
 if [ -z "$CLIENT2_IP" ]; then
 	export CLIENT2_IP=$(getent ahostsv4 $CLIENT2_IP| grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
@@ -78,8 +78,8 @@ HOSTNAME=$(hostname)
 case $HOSTNAME in
 "$MASTER_env1")    MYROLE="MASTER"  ;;
 "$REPLICA_env1")   MYROLE="REPLICA" ;;
-"$CLIENT_env1")    MYROLE="CLIENT1" ;;
-"$CLIENT_env2")    MYROLE="CLIENT2" ;;
+"$CLIENT1_env1")   MYROLE="CLIENT1" ;;
+"$CLIENT2_env1")   MYROLE="CLIENT2" ;;
 *)                 MYROLE="UNKNOWN" ;;
 esac
 

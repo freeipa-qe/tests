@@ -1,20 +1,20 @@
 #!/bin/bash
 # this is a temp script to verify functional test logic
 
+. ./echoline.sh
+
 id=$RANDOM
+log="/tmp/test.indirect.$id.log"
 hostname=`hostname`
 domain=`hostname -d`
 realm="YZHANG.REDHAT.COM"
 hostPrinciple="host/${hostname}@${realm}"
 suffix="dc=yzhang,dc=redhat,dc=com"
 
-automountLocationA="yztest25388"
-automountLocationB="yztest12881"
-ipaServerMaster="f17apple.yzhang.redhat.com"
-ipaServerMasterIP="192.168.122.171"
-ipaServerReplica="f17aqua.yzhang.redhat.com"
-ipaServerReplicaIP="192.168.122.173"
-dnsServer="192.168.122.171"
+automountLocationA="yztest${id}"
+ipaServerMaster="apple.yzhang.redhat.com"
+ipaServerMasterIP="192.168.122.101"
+dnsServer="192.168.122.101"
 nfsServer=$ipaServerMaster
 nfsExportTopDir="/share"
 nfsExportSubDir="pub"
@@ -53,13 +53,14 @@ configure_autofs_indirect(){
     ipa automountlocation-add $name
     ipa automountmap-add $name auto.share
     ipa automountkey-add $name auto.master --key=${autofsTopDir} --info=auto.share
-    ipa automountkey-add $name auto.share --key=${autofsSubDir} --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsDir}"
+    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
     show_autofs_configuration $name
 }
 
 verify_autofs_mounting(){
     local p=`pwd`
-    cd $autofsDir
+    cd $autofsTopDir
+    echo `pwd`
     ls -l
     show_file_content $currentNFSFileName
     echo "-----the secret should be --"
@@ -68,9 +69,11 @@ verify_autofs_mounting(){
     echo $currentNFSFileSecret > $TmpDir/secret.txt
     if diff $TmpDir/secret.txt $currentNFSFileName 
     then
-        echobold "$FUNCNAME PASS file content matches"
+        echoboldgreen "[$FUNCNAME] :::::::: PASS file content matches"
+        echo "test round [$c] pass" >> $log
     else
-        echobold "$FUNCNAME FAIL file content does NOT match"
+        echoboldred "[$FUNCNAME] :::::::: FAIL file content does NOT match"
+        echo "test round [$c] failed" >> $log
     fi
     cd $p
 }
@@ -125,7 +128,7 @@ show_file_content(){
         echo ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
         echo ""
     else
-        echobold ":::::::::::: [$file] does NOT exist :::::::::::::"
+        echoboldred ":::::::::::: [$file] does NOT exist :::::::::::::"
     fi
 }
 
@@ -143,18 +146,44 @@ add_indirect_map()
         local automounLocation="ipa_indirect_${RANDOM}"
         currentLocation=$automounLocation
         configure_autofs_indirect $currentLocation $currentNFSServer $nfsDir $autofsDir
+        sleep 3
+        ipa-client-automount --uninstall -U 2>&1 > $tmp
         echo "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U"
-        #pause
         ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U
-        #pause
+        service sssd stop
+        sss_cache -A
+        #cat /etc/sssd/sssd.conf
+        service sssd start
+        service sssd status
+        service autofs restart
         verify_autofs_mounting
         clean_up_indirect_map $currentLocation $autofsTopDir $autofsSubDir
         clean_up_automount_installation
 }
 
+install_ipa_client()
+{
+    ipa-client-install --domain=yzhang.redhat.com --server=apple.yzhang.redhat.com --unattended --principal=admin --password=Secret123 --hostname=banana.yzhang.redhat.com --mkhomedir 
+    echo Secret123 | kinit admin
+}
 
+uninstall_ipa_client()
+{
+    ipa-client-install --uninstall -U
+}
 
 ################### main ####################
-echobold "test starts"
-add_indirect_map
-echobold "test finished"
+c=0
+max=1
+while [ $c -lt $max ];do
+    echobold ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    echobold "                            test ($c) starts"
+    echobold ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    #install_ipa_client
+    add_indirect_map
+    #uninstall_ipa_client
+    echobold "::::::::::::::::::::::::::::: test finished::::::::::::::::::::::::::::::::::"
+    c=$((c+1))
+done
+echo "log file: $log"
+cat $log

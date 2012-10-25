@@ -6,7 +6,7 @@
 usage(){
     echo " -------- "
     echo "| USAGE: |"
-    echo "|  $0 -h <nfs server fqdn> -i <nfs server ip address>  |"
+    echo "|  $0 -h <nfs server fqdn> -i <nfs server ip address> -s <ipa server> -r <realm> -k <output keytab file> |"
     echo " ------------------------------------------------------ "
 }
 
@@ -122,7 +122,7 @@ start_nfs_in_kereberized_mode(){
         cp /var/log/messages /tmp/message.before
         # the following works find in Fedora 17, we might have to change in RHEL
         systemctl enable nfs-server.service
-        systemctl start nfs-server.service
+        #systemctl start nfs-server.service  # will start nfs-secure-server.service also start nfs-server.service?
         systemctl start nfs-secure-server.service 
         systemctl status nfs-server.service
         cp /var/log/messages /tmp/message.after
