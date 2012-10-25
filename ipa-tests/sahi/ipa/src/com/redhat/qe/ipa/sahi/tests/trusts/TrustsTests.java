@@ -294,8 +294,8 @@ public void testPreSharedPassword(String testName, String realmName,String passw
 	protected List<List<Object>> addTrustsAddAndAnotherTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname	realmName1	    account1		  password1	    buttonToClick1 			   realmName2	    account2	  password2        buttonToClick2     		buttonToClick3
-		ll.add(Arrays.asList(new Object[]{ "add_trusts1",	addomain,  "administrator", "Secret123",  	"Add and Add Another",	     addomain,  "administrator", "Secret123",  	"Add"   			,"Delete"} ));
+        //										testname	          realmName1	    account1		  password1	    buttonToClick1 			   realmName2	    account2	  password2        buttonToClick2     		buttonToClick3
+		ll.add(Arrays.asList(new Object[]{ "addAndAddAnother_trusts",	addomain,  "administrator", "Secret123",  	"Add and Add Another",	     addomain,  "administrator", "Secret123",  	"Add"   			,"Delete"} ));
 		
 		        
 		return ll;	
@@ -313,7 +313,7 @@ public void testPreSharedPassword(String testName, String realmName,String passw
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname	realmName	    account		  password	    buttonToClick 		domainNBName          domainSecurity						trustDirection			trustType	              		
-		ll.add(Arrays.asList(new Object[]{ "add_trusts",	addomain,  "administrator", "Secret123",  	"Add and Edit",  "IPAQE",      "S-1-5-21-2048782538-2375889789-2933420090",  "Two-way trust",  "Active Directory domain","Delete"} ));
+		ll.add(Arrays.asList(new Object[]{ "addAndEdit_trusts",	addomain,  "administrator", "Secret123",  	"Add and Edit",  "IPAQE",      "S-1-5-21-2048782538-2375889789-2933420090",  "Two-way trust",  "Active Directory domain","Delete"} ));
 		        
 		return ll;	
 	}
