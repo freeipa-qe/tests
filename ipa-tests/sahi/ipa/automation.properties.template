@@ -9,6 +9,7 @@ ipa.server.realm=TESTRELM.COM
 ipa.server.domain=testrelm.com
 ipa.server.reversezone=187.16.10.in-addr.arpa.
 ipa.server.fqdn=grape.yzhang.redhat.com
+ad.domain=ipaqe.com
 
 #ipa.server.url=http://rhel62-server.testrelm
 ipa.browser.path=/usr/bin/firefox
