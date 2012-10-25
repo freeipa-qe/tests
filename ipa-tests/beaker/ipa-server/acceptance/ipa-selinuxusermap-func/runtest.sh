@@ -201,6 +201,18 @@ rlJournalStart
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_008_2 -m $BEAKERCLIENT"
         rlPhaseEnd
 
+	# selinuxusermapsvc_client_009
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_009 $BEAKERMASTER"
+                selinuxusermapsvc_client_009
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_009 -m $BEAKERCLIENT"
+        rlPhaseEnd
+
+        # selinuxusermapsvc_client_010
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_010 $BEAKERMASTER"
+                selinuxusermapsvc_client_010
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_010 -m $BEAKERCLIENT"
+        rlPhaseEnd
+
         rlPhaseStartCleanup "ipa-selinuxusermap-func-cleanup: Destroying admin credentials."
                 rlRun "kdestroy" 0 "Destroying admin credentials."
                 rlRun "cat /var/log/secure | grep \"pam_sss(sshd:auth)\""
@@ -323,6 +335,18 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_008_2 $BEAKERMASTER"
                 selinuxusermapsvc_client2_008_2
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_008_2 -m $BEAKERCLIENT2"
+        rlPhaseEnd
+
+	# selinuxusermapsvc_client2_009
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_009 $BEAKERMASTER"
+                selinuxusermapsvc_client2_009
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_009 -m $BEAKERCLIENT2"
+        rlPhaseEnd
+
+        # selinuxusermapsvc_client2_010
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_010 -s DONE_selinuxusermapsvc_client_010 $BEAKERCLIENT $BEAKERMASTER"
+                selinuxusermapsvc_client2_010
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_010 -m $BEAKERCLIENT2"
         rlPhaseEnd
 
         rlPhaseStartCleanup "ipa-selinuxusermap-func-cleanup: Destroying admin credentials."
@@ -487,6 +511,22 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_008_2 -s DONE_selinuxusermapsvc_client2_008_2 $BEAKERCLIENT $BEAKERCLIENT2"
                 selinuxusermapsvc_master_008_cleanup
         rlPhaseEnd
+	
+      # selinuxusermapsvc_master_009
+                selinuxusermapsvc_master_009
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_master_009 -m $BEAKERMASTER"
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_009 -s DONE_selinuxusermapsvc_client2_009 $BEAKERCLIENT $BEAKERCLIENT2"
+
+                selinuxusermapsvc_master_009_cleanup
+        rlPhaseEnd
+
+      # selinuxusermapsvc_master_010
+                selinuxusermapsvc_master_010
+                rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_master_010 -m $BEAKERMASTER"
+                rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_010 -s DONE_selinuxusermapsvc_client2_010 $BEAKERCLIENT $BEAKERCLIENT2"
+
+                selinuxusermapsvc_master_010_cleanup
+        rlPhaseEnd
 
 	rlPhaseStartCleanup "ipa-selunxusermap-func-cleanup: Destroying admin credentials."
 
@@ -507,3 +547,4 @@ report=$TmpDir/rhts.report.$RANDOM.txt
 makereport $report
 rhts-submit-log -l $report
 rlJournalEnd
+
