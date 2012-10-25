@@ -118,9 +118,18 @@ public class SelinuxUserMapTasks {
 		if (button.equals("All")) {
 			String categoryToChoose="";
 			if (section.equals("User"))
-				categoryToChoose = "usercategory" + "-1";
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToChoose = "usercategory" + "-1";
+				}else{
+					categoryToChoose = "usercategory" + "-8";
+				}
 			else
-				categoryToChoose = "hostcategory" +"-2";
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToChoose = "hostcategory" +"-2";
+				}else{
+					categoryToChoose = "hostcategory" +"-9";
+				}
+
 			sahiTasks.radio(categoryToChoose+"-0").click();
 			sahiTasks.span(action).click();
 		}
@@ -151,14 +160,22 @@ public class SelinuxUserMapTasks {
 			String categoryToVerify = "";
 			String memberToVerify = "";
 			if (section.equals("User")) {
-				categoryToVerify = "usercategory" + "-1";
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToVerify = "usercategory" + "-1";
+				}else{
+					categoryToVerify = "usercategory" + "-8";
+				}
 				if (type.equals("Users"))
 					memberToVerify = "memberuser_user";
 				else	
 					memberToVerify = "memberuser_group";
 			}
 			else {
-				categoryToVerify = "hostcategory" +"-2";
+				if (!System.getProperty("os.name").startsWith("Windows")){
+					categoryToVerify = "hostcategory" +"-2";
+				}else{
+					categoryToVerify = "hostcategory" +"-9";
+				}
 				if (type.equals("Hosts"))
 					memberToVerify = "memberhost_host";
 				else	
@@ -226,14 +243,14 @@ public class SelinuxUserMapTasks {
 			if (!System.getProperty("os.name").startsWith("Windows")){
 				categoryToChoose = category + "-1";
 			}else{
-				categoryToChoose = category + "-4";
+				categoryToChoose = category + "-8";
 			}
 		
 		else
 			if (!System.getProperty("os.name").startsWith("Windows")){
 				categoryToChoose = category + "-2";
 			}else{
-				categoryToChoose = category + "-5";
+				categoryToChoose = category + "-9";
 			}
 		sahiTasks.radio(categoryToChoose+"-1").click();
 		sahiTasks.span("Update").click();		
