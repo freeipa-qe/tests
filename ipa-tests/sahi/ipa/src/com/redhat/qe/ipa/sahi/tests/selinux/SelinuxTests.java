@@ -90,7 +90,8 @@ public class SelinuxTests extends SahiTestScript {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue("selinux_hbacrule1");
 		sahiTasks.button("Add and Edit").click();
-		sahiTasks.span("Add").near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
+		//sahiTasks.span("Add").near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
+		sahiTasks.span("Add").near(sahiTasks.div("Users")).click();
 		sahiTasks.textbox("filter").setValue(usernames[0]);
 		sahiTasks.span("Find").click();
 		sahiTasks.checkbox(usernames[0]).click();
@@ -464,10 +465,19 @@ public class SelinuxTests extends SahiTestScript {
 	public void testselinuxUserMapMemberCategory(String testName, String rulename, String user, String host) throws Exception {
 		
 		sahiTasks.navigateTo(commonTasks.selinuxPage, true);
-		
 		sahiTasks.link(rulename).click();
-		sahiTasks.radio("usercategory-1-0").click();
-		sahiTasks.radio("hostcategory-2-0").click();
+		if (!System.getProperty("os.name").startsWith("Windows")){
+			sahiTasks.radio("usercategory-1-0").click();
+		}else{
+			sahiTasks.radio("usercategory-8-0").click();
+		}
+		if (!System.getProperty("os.name").startsWith("Windows")){
+			sahiTasks.radio("hostcategory-2-0").click();
+		}else{
+			sahiTasks.radio("hostcategory-9-0").click();
+		}
+		
+		
 		sahiTasks.span("Update").click();
 		Assert.assertFalse(sahiTasks.checkbox(user).exists(), "User Category changed successfully");
 		Assert.assertFalse(sahiTasks.checkbox(host).exists(), "Host Category changed successfully");
