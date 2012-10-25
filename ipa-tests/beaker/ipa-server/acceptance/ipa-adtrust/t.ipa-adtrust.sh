@@ -66,6 +66,7 @@ IPAhostIP6=`ip addr | egrep 'inet6 ' | grep "global" | cut -f1 -d/ | awk '{print
 IPAdomain="testrelm.com"
 IPARealm="TESTRELM.COM"
 NBname="TESTRELM"
+NBname2="TESTRELM2"
 dothypn=".TESTREM-"
 lwnbnm="testrelm"
 spchnm='Te!5@relm'
@@ -91,6 +92,7 @@ rlPhaseStartTest "Setup for adtrust sanity tests"
 	done
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "create_ipauser $user1 new user $userpw"
 
 	# stopping firewall
 #	rlRun "service iptables stop"
@@ -198,6 +200,7 @@ rlPhaseEnd
 adtrust_test_0009() {
 
 rlPhaseStartTest "0009 Adtrust install as a non-root user"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "create_ipauser $user test user $userpw"
 	rlRun "NonRoot_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 2 "Failed as expected. Must be root to setup AD trusts on server"
@@ -207,7 +210,17 @@ rlPhaseEnd
 
 adtrust_test_0010() {
 
-rlPhaseStartTest "0010 Adtrust install by a user with administrative privileges"
+rlPhaseStartTest "0010 Login as root, adtrust install by user without administrative privileges"
+	rlRun "kdestroy" 0 "Destroying admin credentials."
+	rlRun "NoAdminPriv_Exp A" 0 "Creating expect script"
+	rlRun "$exp $expfile A $user" 2 "Failed as expected. $user does not have admin priviliges"
+
+rlPhaseEnd
+}
+
+adtrust_test_0011() {
+
+rlPhaseStartTest "0011 Login as user, adtrust install with administrative privileges"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa group-add-member --users=$user admins" 0 "Adding tuser to the admins group"
 	rlRun "NonRoot_Exp" 0 "Creating expect script"
@@ -216,27 +229,38 @@ rlPhaseStartTest "0010 Adtrust install by a user with administrative privileges"
 rlPhaseEnd
 }
 
-adtrust_test_0011() {
-
-rlPhaseStartTest "0011 Adtrust with invalid value for RID"
-	rlRun "RID_Exp" 0 "Creating expect Script"
-	rlRun "$exp $expfile rid-base RIDBase 63.3" 2 "--rid-base only accepts integers"
-
-rlPhaseEnd
-}
-
 adtrust_test_0012() {
 
-rlPhaseStartTest "0012 Adtrust with invalid value for Secondary RIDs"
-	rlRun "RID_Exp" 0 "Creating expect Script"
-        rlRun "$exp $expfile secondary-rid-base SRIDBase 23.7" 2 "--secondary-rid-base only accepts integers"
+rlPhaseStartTest "0012 Adtrust install with wrong admin passwd on cli"
+	rlRun "kdestroy" 0 "Destroying admin credentials."
+	rlRun "NoAdminPriv_Exp" 0 "Creating expect script"
+	# using $user as wrong password
+	rlRun "$exp $expfile a $user" 2 "Failed as expected. admin user password incorrect"
 
 rlPhaseEnd
 }
 
 adtrust_test_0013() {
 
-rlPhaseStartTest "0013 Adtrust install without creating DNS Service records"
+rlPhaseStartTest "0013 Adtrust with invalid value for RID"
+	rlRun "RID_Exp" 0 "Creating expect Script"
+	rlRun "$exp $expfile rid-base RIDBase 63.3" 2 "--rid-base only accepts integers"
+
+rlPhaseEnd
+}
+
+adtrust_test_0014() {
+
+rlPhaseStartTest "0014 Adtrust with invalid value for Secondary RIDs"
+	rlRun "RID_Exp" 0 "Creating expect Script"
+        rlRun "$exp $expfile secondary-rid-base SRIDBase 23.7" 2 "--secondary-rid-base only accepts integers"
+
+rlPhaseEnd
+}
+
+adtrust_test_0015() {
+
+rlPhaseStartTest "0015 Adtrust install without creating DNS Service records"
 	rlRun "No_SRV_Exp no-msdcs" 0 "Creating expect script"
         rlRun "$exp $expfile no-msdcs" 0 "Running $trust_bin with --no-msdcs option"
 
@@ -247,9 +271,9 @@ rlPhaseStartTest "0013 Adtrust install without creating DNS Service records"
 rlPhaseEnd
 }
 
-adtrust_test_0014() {
+adtrust_test_0016() {
 
-rlPhaseStartTest "0014 Install adtrust without options on CLI"
+rlPhaseStartTest "0016 Install adtrust without options on CLI. Check srv records"
 	rlRun "Intractive_Exp" 0 "Creating expect script"
 	rlRun "$exp $expfile" 0 "Running $trust_bin without cli options"
 	if [ $? -eq 0 ]; then
@@ -261,45 +285,94 @@ rlPhaseStartTest "0014 Install adtrust without options on CLI"
 rlPhaseEnd
 }
 
-adtrust_test_0015() {
-
-rlPhaseStartTest "0015 Adtrust install with uppercase alphanumeric netbios name"
-	rlRun "Valid_NB_Exp" 0 "Creating expect script"
-	rlRun "$exp $expfile netbios-name $NBname" 0 "ADtrust installed with uppercase alphanumberic netbios name"
-
-rlPhaseEnd
-}
-
-adtrust_test_0016() {
-
-rlPhaseStartTest "0016 Adtrust install with valid IP Address"
-	rlRun "Valid_IP_Exp" 0 "Creating expect script"
-	rlRun "$exp $expfile ip-address $IPAhostIP" 0 "ADtrust installed with valid server IPv4 address"
-
-rlPhaseEnd
-}
-
 adtrust_test_0017() {
 
-rlPhaseStartTest "0017 Adtrust install with valid IP Address and Netbios Name on CLI"
-	rlRun "Valid_NBIP_Exp" 0 "Creating expect script"
-	rlRun "$exp $expfile ip-address $IPAhostIP netbios-name $NBname" 0 "ADtrust installed with valid server IPv4 address and Netbios name."
+rlPhaseStartTest "0017 Login as root, adtrust install by a user with administrative privileges"
+        rlRun "kdestroy" 0 "Destroying admin credentials."
+        rlRun "AdminPriv_Exp A" 0 "Creating expect script"
+        rlRun "$exp $expfile A $user" 0 "Adtrust installed by $user with admin priviliges"
 
 rlPhaseEnd
 }
 
 adtrust_test_0018() {
 
-rlPhaseStartTest "0018 Adtrust with valid IPv6 address"
-	rlRun "Valid_IP_Exp" 0 "Creating expect script"
-	rlRun "$exp $expfile ip-address $IPAhostIP6" 0 "ADtrust installed with valid server IPv6 address"
+rlPhaseStartTest "0018 Adtrust install with correct admin passwd on cli"
+        rlRun "kdestroy" 0 "Destroying admin credentials."
+        rlRun "AdminPriv_Exp" 0 "Creating expect script"
+        rlRun "$exp $expfile a $adminpw" 0 "Adtrust installed by providing correct admin passwd on cli"
 
 rlPhaseEnd
 }
 
 adtrust_test_0019() {
 
-rlPhaseStartTest "0019 Adtrust install with start value of RID Base"
+rlPhaseStartTest "0019 Adtrust install with uppercase alphanumeric netbios name"
+	rlRun "Valid_NB_Exp" 0 "Creating expect script"
+	rlRun "$exp $expfile netbios-name $NBname" 0 "ADtrust installed with uppercase alphanumberic netbios name"
+
+rlPhaseEnd
+}
+
+adtrust_test_0020() {
+
+rlPhaseStartTest "0020 Adtrust install when re-run with new netbios name should reset ipaNTFlatName attribute - BZ 867447"
+	rlRun "Valid_NB_Exp" 0 "Creating expect script"
+	rlRun "$exp $expfile netbios-name $NBname2" 0 "ADtrust re-run with new netbios name"
+	ldapsearch -H ldapi://%2fvar%2frun%2fslapd-TESTRELM-COM.socket objectclass=ipaNTDomainAttrs | grep $NBname2
+	if [ $? -eq 0 ]; then
+	  rlPass "Adtrust install re-run with new netbios name resets ipaNTFlatName attribute"
+	else
+	  rlFail "Adtrust install re-run with new netbios name does not resets ipaNTFlatName attribute - BZ 867447"
+	fi
+
+rlPhaseEnd
+}
+
+
+adtrust_test_0021() {
+
+rlPhaseStartTest "0021 Adtrust install with valid IP Address"
+	rlRun "Valid_IP_Exp" 0 "Creating expect script"
+	rlRun "$exp $expfile ip-address $IPAhostIP" 0 "ADtrust installed with valid server IPv4 address"
+
+rlPhaseEnd
+}
+
+adtrust_test_0022() {
+
+rlPhaseStartTest "0022 Adtrust install with valid IP Address and Netbios Name on CLI"
+	rlRun "Valid_NBIP_Exp" 0 "Creating expect script"
+	rlRun "$exp $expfile ip-address $IPAhostIP netbios-name $NBname" 0 "ADtrust installed with valid server IPv4 address and Netbios name."
+
+rlPhaseEnd
+}
+
+adtrust_test_0023() {
+
+rlPhaseStartTest "0023 Adtrust with valid IPv6 address"
+	rlRun "Valid_IP_Exp" 0 "Creating expect script"
+	rlRun "$exp $expfile ip-address $IPAhostIP6" 0 "ADtrust installed with valid server IPv6 address"
+
+rlPhaseEnd
+}
+
+adtrust_test_0024() {
+
+rlPhaseStartTest "0024 Creating SIDs with adtrust install"
+        rlRun "SID_Exp" 0 "Creating expect script"
+        rlRun "$exp $expfile" 0 "ADtrust installed without populating SIDs"
+	rlRun "ipa user-show $user1 --all | grep ipantsecurityidentifier" 1 "SID not created for $user1 as expected"
+        rlRun "SID_Exp add-sids" 0 "Creating expect script"
+	rlRun "$exp $expfile" 0 "ADtrust installed with populating SIDS for existing users"
+	rlRun "ipa user-show $user1 --all | grep ipantsecurityidentifier" 0 "SID created for $user1 as expected"
+
+rlPhaseEnd
+}
+
+adtrust_test_0025() {
+
+rlPhaseStartTest "0025 Adtrust install with start value of RID Base"
 	rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
 	rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
@@ -310,9 +383,9 @@ rlPhaseStartTest "0019 Adtrust install with start value of RID Base"
 rlPhaseEnd
 }
 
-adtrust_test_0020() {
+adtrust_test_0026() {
 
-rlPhaseStartTest "0020 Adtrust with start value of Secondary RID Base"
+rlPhaseStartTest "0026 Adtrust with start value of Secondary RID Base"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
@@ -323,9 +396,9 @@ rlPhaseStartTest "0020 Adtrust with start value of Secondary RID Base"
 rlPhaseEnd
 }
 
-adtrust_test_0021() {
+adtrust_test_0027() {
 
-rlPhaseStartTest "0021 Adtrust install with both base and secondary RIDs"
+rlPhaseStartTest "0027 Adtrust install with both base and secondary RIDs"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
@@ -337,9 +410,9 @@ rlPhaseStartTest "0021 Adtrust install with both base and secondary RIDs"
 rlPhaseEnd
 }
 
-adtrust_test_0022() {
+adtrust_test_0028() {
 
-rlPhaseStartTest "0022 Adtrust install with --no-msdcs on Non DNS integrated server"
+rlPhaseStartTest "0028 Adtrust install with --no-msdcs on Non DNS integrated server"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install without DNS"
 	[ -e $smbfile ] && rm -f $smbfile
@@ -349,9 +422,9 @@ rlPhaseStartTest "0022 Adtrust install with --no-msdcs on Non DNS integrated ser
 rlPhaseEnd
 }
 
-adtrust_test_0023() {
+adtrust_test_0029() {
 
-rlPhaseStartTest "0023 Adtrust install on IPA server with DNS not integrated"
+rlPhaseStartTest "0029 Adtrust install on IPA server with DNS not integrated"
 	rlRun "No_SRV_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created without integrated DNS"
 

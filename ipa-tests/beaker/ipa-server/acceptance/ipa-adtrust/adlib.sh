@@ -49,6 +49,7 @@ rec6="_kerberos._udp.dc._msdcs"
 expfile="/tmp/adtrust_install.exp"
 exp=`which expect`
 user="tuser"
+user1="nuser"
 userpw="Secret123"
 adminpw="Secret123"
 
@@ -283,6 +284,73 @@ Valid_RID_Exp() {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
         "Setup*complete" { expect "*#" }
+} ' >> $expfile
+        echo 'send_user "\nADtrust installed.\n"' >> $expfile
+}
+
+NoAdminPriv_Exp() {
+	rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]
+	set var2 [lindex $argv 1]
+        set timeout 300
+        set send_slow {1 .1}' > $expfile
+        echo "spawn $trust_bin -\$var1 \$var2 " >> $expfile
+        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
+	if [ $1 = A ]; then 
+          echo 'expect "*assword: "' >> $expfile
+          echo "send -s -- \"$adminpw\r\"" >> $expfile
+	fi
+        echo 'expect {
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+        "error to automatically re-kinit your admin user ticket" { expect "*#" }
+} ' >> $expfile
+        echo 'send_user "\nWrong Kerberos credentials to setup AD trusts\n" ; exit 2' >> $expfile
+}
+
+AdminPriv_Exp() {
+	rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]
+	set var2 [lindex $argv 1]
+        set timeout 300
+        set send_slow {1 .1}' > $expfile
+        echo "spawn $trust_bin -\$var1 \$var2 " >> $expfile
+	echo 'expect "Overwrite smb.conf?*: "' >> $expfile
+        echo 'sleep .5' >> $expfile
+        echo 'send -s -- "y\r"' >> $expfile
+        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
+	if [ $1 = A ]; then 
+          echo 'expect "*assword: "' >> $expfile
+          echo "send -s -- \"$adminpw\r\"" >> $expfile
+	fi
+        echo 'expect {
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+        "Setup complete" { expect "*#" }
+} ' >> $expfile
+	echo 'send_user "\nADtrust installed.\n"' >> $expfile
+}
+
+SID_Exp() {
+	rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]
+        set timeout 300
+        set send_slow {1 .1}' > $expfile
+	if [ $1 = "add-sids" ]; then
+          echo "spawn $trust_bin --add-sids" >> $expfile
+	else
+	  echo "spawn $trust_bin" >> $expfile
+	fi
+        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
+        echo 'sleep .5' >> $expfile
+        echo 'send -s -- "y\r"' >> $expfile
+        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
+        echo 'expect "*assword: "' >> $expfile
+        echo "send -s -- \"$adminpw\r\"" >> $expfile
+        echo 'expect {
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+        "Setup complete" { expect "*#" }
 } ' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }

@@ -123,6 +123,12 @@ rlJournalStart
 		"adtrust_test_0021"
 		"adtrust_test_0022"
 		"adtrust_test_0023"
+		"adtrust_test_0024"
+		"adtrust_test_0025"
+		"adtrust_test_0026"
+		"adtrust_test_0027"
+		"adtrust_test_0028"
+		"adtrust_test_0029"
 	}
 
 
