@@ -9,12 +9,14 @@
 			
 			<include name="setup" />
 			<include name="trustsAddTests" />
+			<include name="duplicateTrustTests" />
 			<include name="trustsAddAndCancelTests" />
 			<include name="trustsAddNegativeTests" />
 			<include name="trustsAddAndAnotherTests" />
 			<include name="trustsAddAndEditTests" />
 			<include name="trustsSettingTests" />
 			<include name="trustsExpandCollapseTests" />
+			<include name="preSharedPasswordTests" />
 			<include name="trustsdeleteAndCancelTests" />
 			<include name="trustsdeleteTests" />
 			
