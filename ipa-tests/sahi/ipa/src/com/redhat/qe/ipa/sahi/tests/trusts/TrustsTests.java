@@ -18,22 +18,13 @@ import com.redhat.qe.ipa.sahi.tasks.TrustsTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
 
 
-/*
- * TODO:
- 1.mvarun : trustsAddAndAnotherTests :: Have to provide different domain names for adding trusts
- 2.mvarun-add Negative test : trustsAddNegativeTests :: duplicate trust test should be added.
- 3.mvarun- add test :: pre-shared-password test should be added. 
- 
- 
- 
- 
- */
-
 public class TrustsTests extends SahiTestScript{
 private static Logger log = Logger.getLogger(TrustsTests.class.getName());
 	
 	private String currentPage = "";
 	private String alternateCurrentPage = "";
+	public static String addomain=CommonTasks.adDomain;
+	
 	
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
@@ -65,7 +56,19 @@ private static Logger log = Logger.getLogger(TrustsTests.class.getName());
 		Assert.assertTrue(sahiTasks.link(realmName).exists(), "Added RealmName " + realmName + " successfully");
 	}
 	
-	//TODO : 2 
+	//Bug reference : https://bugzilla.redhat.com/show_bug.cgi?id=869741.
+	@Test (groups={"duplicateTrustTests"}, dataProvider="getDuplicateTrustTestObjects")	
+
+	public void testDuplicateTrust(String testName, String firstRealmName, String firstAccount,String firstPassword,String firstButtonToClick,String secondRealmName, String secondAccount,String secondPassword,String secondButtonToClick,String buttonToClick3 ) throws Exception {
+	//new trust can be added now
+	TrustsTasks.addAndAddAnotheTrusts(sahiTasks,firstRealmName,firstAccount,firstPassword,firstButtonToClick,secondRealmName,secondAccount,secondPassword,secondButtonToClick);
+	//verify trust was added successfully
+	Assert.assertTrue(sahiTasks.link(firstRealmName).exists(), "Added RealmName " + firstRealmName + " successfully");
+	Assert.assertTrue(sahiTasks.link(secondRealmName).exists(), "Added duplicate RealmName " + secondRealmName + " successfully");
+	//delete trust 
+	TrustsTasks.deleteTrusts(sahiTasks, firstRealmName,buttonToClick3);
+}
+	 
 	 
 @Test (groups={"trustsAddNegativeTests"}, dataProvider="getTrustsAddNegativeTestObjects")	
 	
@@ -92,9 +95,7 @@ private static Logger log = Logger.getLogger(TrustsTests.class.getName());
 		Assert.assertFalse(sahiTasks.link(realmName).exists(), "Verify RealmName " + realmName + " doesn't added");
 	}
 
-/*
- * TODO : 1
- */
+
 @Test (groups={"trustsAddAndAnotherTests"}, dataProvider="getTrustsAddAndAnotherTestObjects")	
 
 	public void testTrustsAddAndAnother(String testName, String firstRealmName, String firstAccount,String firstPassword,String firstButtonToClick,String secondRealmName, String secondAccount,String secondPassword,String secondButtonToClick,String buttonToClick3 ) throws Exception {
@@ -143,6 +144,22 @@ public void testTrustsAddAndEdit(String testName, String realmName,String domain
 public void testTrustsExpandCollapse(String testName, String realmName) throws Exception {
 	sahiTasks.link(realmName).click();
 	TrustsTasks.expandCollapseTest(sahiTasks);
+}
+
+//get added but password will not be validated - will update later : TODO
+@Test (groups={"preSharedPasswordTests"}, dataProvider="getPreSharedPasswordObjects")	
+
+public void testPreSharedPassword(String testName, String realmName,String password,String verifyPassword,String buttonToClick,String buttonToClick1 ) throws Exception {
+	//verify Trust doesn't already exist
+	Assert.assertFalse(sahiTasks.link(realmName).exists(), "Verify RealmName " + realmName + " doesn't already exist");
+	//new trust can be added now
+	TrustsTasks.preSharedPassword(sahiTasks,realmName,password,verifyPassword,buttonToClick);
+	//verify trust was added successfully
+	Assert.assertTrue(sahiTasks.link(realmName).exists(), "Added RealmName " + realmName + " successfully");
+	//Delete trust
+	TrustsTasks.deleteTrusts(sahiTasks, realmName,buttonToClick1);
+	//verify Trust is deleted
+	Assert.assertFalse(sahiTasks.link(realmName).exists(), "RealmName " + realmName + "  deleted successfully");
 }
 		
 
@@ -194,12 +211,28 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 	protected List<List<Object>> addTrustsTestObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //										testname	realmName	    account		  password	    buttonToClick	              		
-		ll.add(Arrays.asList(new Object[]{ "add_trusts",	"ipaqe.com",  "administrator", "Secret123",  	"Add"   } ));
+        //										testname	       realmName	    account		  password	    buttonToClick	              		
+		ll.add(Arrays.asList(new Object[]{ "add_trusts",	        addomain,  "administrator", "Secret123",  	"Add"   } ));
+		//ll.add(Arrays.asList(new Object[]{ "add_duplicate_trusts",	addomain,  "administrator", "Secret123",  	"Add"   } ));
 		        
 		return ll;	
 	}
-	
+	/*
+	 * Data to be used when adding duplicate Trusts
+	 */
+	@DataProvider(name="getDuplicateTrustTestObjects")
+	public Object[][] getDuplicateTrustTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(addDuplicateTrustTestObjects());
+	}
+	protected List<List<Object>> addDuplicateTrustTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname				         realmName1	    account1		  password1	    buttonToClick1 			   realmName2	    account2	  password2        buttonToClick2     		buttonToClick3
+		ll.add(Arrays.asList(new Object[]{ "duplicate_trust_add_test_bug869741",	addomain,  "administrator", "Secret123",  	"Add and Add Another",	     addomain,  "administrator", "Secret123",  	"Add"   			,"Delete"} ));
+		
+		        
+		return ll;	
+	}
 	
 	/*
 	 * Data to be used when negative add trusts
@@ -212,18 +245,18 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname	              realmName	        account		     password	     expectedError                                                      buttonToClick	              		
-		ll.add(Arrays.asList(new Object[]{ "wrong_domain",	                "newipaqe.com",   "administrator", "Secret123",  "IPA Error 4001close"                                                  		,"Add"   } ));
-		ll.add(Arrays.asList(new Object[]{ "domain_with_leadingspace",   	" newipaqe.com",  "administrator", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"          		,"Add"   } ));
-		ll.add(Arrays.asList(new Object[]{ "domain_with_traillingspace",	"newipaqe.com ",  "administrator", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"     	        ,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "wrong_domain",	                "new"+addomain,   "administrator", "Secret123",  "IPA Error 4001close"                                                  		,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "domain_with_leadingspace",   	" new"+addomain,  "administrator", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"          		,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "domain_with_traillingspace",	"new"+addomain+" ",  "administrator", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"     	        ,"Add"   } ));
 		ll.add(Arrays.asList(new Object[]{ "domain_with_blankspace",	      "",             "administrator", "Secret123",  "Required field"                             							       	,"Add"   } ));
 		
-		ll.add(Arrays.asList(new Object[]{ "wrong_Account",	                "ipaqe.com",      "administrators", "Secret123",  "Insufficient access: CIFS server ipaindia.ipaqe.com denied your credentials" ,"Add"   } ));
-		ll.add(Arrays.asList(new Object[]{ "Account_with_leadingspace",   	"ipaqe.com",      " administrator", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"          		,"Add"   } ));
-		ll.add(Arrays.asList(new Object[]{ "Account_with_traillingspace",	"ipaqe.com ",     "administrator ", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"            	,"Add"   } ));
-		ll.add(Arrays.asList(new Object[]{ "Account_with_blankspace",	    "ipaqe.com",      "",               "Secret123",  "Required field"                             							   		,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "wrong_Account",	                addomain,      "administrators", "Secret123",  "Insufficient access: CIFS server ipaindia.ipaqe.com denied your credentials" ,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "Account_with_leadingspace",   	addomain,      " administrator", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"          		,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "Account_with_traillingspace",	addomain,     "administrator ", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"            	,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "Account_with_blankspace",	    addomain,      "",               "Secret123",  "Required field"                             							   		,"Add"   } ));
 		
-		ll.add(Arrays.asList(new Object[]{ "wrong_Password",	            "ipaqe.com",      "administrator",  "Secret1234",  "Insufficient access: CIFS server ipaindia.ipaqe.com denied your credentials","Add"   } ));
-		ll.add(Arrays.asList(new Object[]{ "password_with_blankspace",	    "ipaqe.com",       "administrator", "",  "Required field"                             							      		  	,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "wrong_Password",	            addomain,      "administrator",  "Secret1234",  "Insufficient access: CIFS server ipaindia.ipaqe.com denied your credentials","Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "password_with_blankspace",	    addomain,       "administrator", "",  "Required field"                             							      		  	,"Add"   } ));
 		         
 		return ll;	
 	}
@@ -245,7 +278,7 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname        	realmName	    account		  password	    buttonToClick	              		
-		ll.add(Arrays.asList(new Object[]{ "addAndCancel_trusts",	"ipaqe.com",  "administrator", "Secret123",  	"Cancel"   } ));
+		ll.add(Arrays.asList(new Object[]{ "addAndCancel_trusts",	addomain,  "administrator", "Secret123",  	"Cancel"   } ));
 		        
 		return ll;	
 	}
@@ -262,7 +295,7 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname	realmName1	    account1		  password1	    buttonToClick1 			   realmName2	    account2	  password2        buttonToClick2     		buttonToClick3
-		ll.add(Arrays.asList(new Object[]{ "add_trusts1",	"ipaqe.com",  "administrator", "Secret123",  	"Add and Add Another",	"ipaqe.com",  "administrator", "Secret123",  	"Add"   			,"Delete"} ));
+		ll.add(Arrays.asList(new Object[]{ "add_trusts1",	addomain,  "administrator", "Secret123",  	"Add and Add Another",	     addomain,  "administrator", "Secret123",  	"Add"   			,"Delete"} ));
 		
 		        
 		return ll;	
@@ -280,7 +313,7 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname	realmName	    account		  password	    buttonToClick 		domainNBName          domainSecurity						trustDirection			trustType	              		
-		ll.add(Arrays.asList(new Object[]{ "add_trusts",	"ipaqe.com",  "administrator", "Secret123",  	"Add and Edit",  "IPAQE",      "S-1-5-21-2048782538-2375889789-2933420090",  "Two-way trust",  "Active Directory domain","Delete"} ));
+		ll.add(Arrays.asList(new Object[]{ "add_trusts",	addomain,  "administrator", "Secret123",  	"Add and Edit",  "IPAQE",      "S-1-5-21-2048782538-2375889789-2933420090",  "Two-way trust",  "Active Directory domain","Delete"} ));
 		        
 		return ll;	
 	}
@@ -297,7 +330,7 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname	       realmName	  domainNBName          domainSecurity						trustDirection			trustType	              		
-		ll.add(Arrays.asList(new Object[]{ "trusts_Setting_test",	"ipaqe.com",  "IPAQE",      "S-1-5-21-2048782538-2375889789-2933420090",  "Two-way trust",  "Active Directory domain"} ));
+		ll.add(Arrays.asList(new Object[]{ "trusts_Setting_test",	addomain,  "IPAQE",      "S-1-5-21-2048782538-2375889789-2933420090",  "Two-way trust",  "Active Directory domain"} ));
 		        
 		return ll;	
 	}
@@ -313,10 +346,27 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname	               realmName	               		
-		ll.add(Arrays.asList(new Object[]{ "trusts_ExpandCollapse_test",	"ipaqe.com"} ));
+		ll.add(Arrays.asList(new Object[]{ "trusts_ExpandCollapse_test",	addomain} ));
 		        
 		return ll;	
 	}
+	/*
+	 * Data to be used when pre-shared-password test
+	 */
+	@DataProvider(name="getPreSharedPasswordObjects")
+	public Object[][] getPreSharedPasswordObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createPreSharedPassworObjects());
+	}
+	protected List<List<Object>> createPreSharedPassworObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //										testname	                 realmName	    password		verifyPassword	    buttonToClick	              		
+		ll.add(Arrays.asList(new Object[]{ "pre_shared_password_test",	        addomain,  "Secret123",     "Secret123",  	"Add" ,"Delete"  } ));
+		
+		        
+		return ll;	
+		}
+
 	
 	/*
 	 * Data to be used when deleting Trusts
@@ -329,7 +379,7 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					realmName    buttonToClick          		
-		ll.add(Arrays.asList(new Object[]{ "delete_single_trusts",			"ipaqe.com",  "Delete"   } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_single_trusts",			addomain,  "Delete"   } ));
 		        
 		return ll;	
 	}
@@ -346,7 +396,7 @@ public void testTrustsExpandCollapse(String testName, String realmName) throws E
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //										testname					realmName    buttonToClick          		
-		ll.add(Arrays.asList(new Object[]{ "deleteAndCancel_trusts",			"ipaqe.com",    "Cancel" } ));
+		ll.add(Arrays.asList(new Object[]{ "deleteAndCancel_trusts",			addomain,    "Cancel" } ));
 		        
 		return ll;	
 	}
