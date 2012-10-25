@@ -23,6 +23,7 @@ public class CommonTasks {
 	
 	//public static String serverUrl = System.getProperty("ipa.server.url");
 	public static String serverUrl = System.getProperty("ipa.server.url");
+	public static String adDomain = System.getProperty("ad.domain");
 	
 	public static String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
 	public static String groupPage = serverUrl + "/ipa/ui/#identity=group&navigation=identity";
@@ -61,14 +62,17 @@ public class CommonTasks {
 	public static String reversezone = "";
 	public static String realm="";
 	
+	
 	public CommonTasks() {
 		setErrorFlag(false);
 		serverUrl = System.getProperty("ipa.server.url");
 		setIpadomain(System.getProperty("ipa.server.domain"));
 		setIpafqdn(System.getProperty("ipa.server.fqdn"));
 		setReversezone(System.getProperty("ipa.server.reversezone"));
-		setIPARealm(System.getProperty("ipa.server.realm"));
+		setIPARealm(System.getProperty("ipa.server.realm"));		
 	}
+	
+	
 
 
 	// to check if unexpected error was thrown in a test
