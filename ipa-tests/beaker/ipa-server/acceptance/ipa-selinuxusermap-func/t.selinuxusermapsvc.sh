@@ -1333,3 +1333,184 @@ selinuxusermapsvc_client2_008_2() {
                 rlRun "ssh_auth_failure user9 testpw123@ipa.com $MASTER"
         rlPhaseEnd
 }
+selinuxusermapsvc_master_009() {
+	rlPhaseStartTest "ipa-selinuxusermapsvc-009: $user1 associated with empty selinuxusermap on $MASTER"
+
+        tmpout=/tmp/tmpout.txt
+       	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+                rlRun "create_ipauser user1 user1 user1 $userpw"
+                sleep 5
+                rlRun "export user1=user1"
+
+       	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+ 
+        rlRun "ipa config-mod --ipaselinuxusermapdefault= > $tmpout 2>&1" 0 "Default selinux user is set to empty"
+        rlRun "ipa config-show"
+        rlAssertNotGrep "Default SELinux user" "$tmpout"
+
+	# ipa selinuxusermaptest:
+        rlRun "rlDistroDiff keyctl"
+        rlRun "kinitAs $user1 $userpw" 0 "Kinit as $user1"
+        rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT $ipa_default_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT has selinux policy $ipa_default_selinuxuser_verif"
+        rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $MASTER $ipa_default_selinuxuser_verif" 0 "Authentication of $user1 to $MASTER has selinux policy $ipa_default_selinuxuser_verif"
+        rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $ipa_default_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $ipa_default_selinuxuser_verif"
+
+}
+
+selinuxusermapsvc_client_009() {
+
+	rlPhaseStartTest "ipa-selinuxusermapsvc-client1-009: user1 accessing $CLIENT -sshd service"
+
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user1"
+		sleep 5
+		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
+		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+	rlPhaseEnd
+}
+
+selinuxusermapsvc_client2_009() {
+
+	rlPhaseStartTest "ipa-selinuxusermapsvc-client2-009: user1 accessing $MASTER from $CLIENT2 using sshd service"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user1"
+		sleep 5
+		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
+		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+		rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+        rlPhaseEnd
+}
+
+selinuxusermapsvc_master_009_cleanup() {
+        # Cleanup
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "ipa user-del user1"
+        rlRun "ipa config-mod --ipaselinuxusermapdefault=unconfined_u:s0-s0:c0.c1023" 0 "Default selinuxusermap is being setup"
+
+        rlRun "rm -fr /tmp/krb5cc_*_*"
+        rlRun "rm /tmp/tmpout.txt"
+}
+
+selinuxusermapsvc_master_010() {
+
+	rlPhaseStartTest "ipa-selinuxusermapsvc-010: Cached selinuxusermap data is used if IPA Server not reachable"
+
+                # kinit as admin and creating users
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        	for i in {1..2}; do
+                	rlRun "create_ipauser user$i user$i user$i $userpw"
+                	sleep 5
+                	rlRun "export user$i=user$i"
+	        done
+
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
+		rlRun "ssh_auth_success $user2 testpw123@ipa.com $MASTER"
+		userpw="testpw123@ipa.com"
+
+		rlRun "ipa selinuxusermap-add selinuxusermaprule1 --selinuxuser=$t1_ipa_selinuxuser"
+		rlRun "ipa selinuxusermap-add-user selinuxusermaprule1 --users=$user1"
+		rlRun "ipa selinuxusermap-add-host selinuxusermaprule1 --hosts=$CLIENT"
+		rlRun "ipa selinuxusermap-show selinuxusermaprule1 --all"
+
+		# ipa selinuxusermap test:
+		rlRun "rlDistroDiff keyctl" 
+		rlRun "kinitAs $user1 $userpw" 0 "Kinit as $user1"	
+		rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT has selinux policy $t1_ipa_selinuxuser"
+		rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user1 $CLIENT2 $t1_ipa_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 does not have selinux policy $t1_ipa_selinuxuser"
+                rlRun "verify_ssh_selinuxuser_success_with_krbcred $user1 $CLIENT2 $ipa_default_selinuxuser_verif" 0 "Authentication of $user1 to $CLIENT2 has selinux policy $ipa_default_selinuxuser"
+
+		rlRun "rlDistroDiff keyctl" 
+		rlRun "kinitAs $user2 $userpw" 0 "Kinit as $user2"       
+                rlRun "verify_ssh_selinuxuser_failure_with_krbcred $user2 $CLIENT $t1_ipa_selinuxuser_verif" 0 "Authentication of $user2 to $CLIENT does not have selinux policy $t1_ipa_selinuxuser "
+		rlRun "verify_ssh_selinuxuser_success_with_krbcred $user2 $CLIENT $ipa_default_selinuxuser_verif" 0 "Authentication of $user2 to $CLIENT has selinux policy $ipa_default_selinuxuser"
+
+                rlRun "rlDistroDiff keyctl"
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlPhaseEnd
+}
+
+selinuxusermapsvc_master_010_cleanup() {
+        # Cleanup
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	for i in {1..2}; do
+		rlRun "ipa user-del user$i"
+        done
+	rlRun "rm -fr /tmp/krb5cc_*_*"
+	rlRun "ipa selinuxusermap-del selinuxusermaprule1"
+}
+
+selinuxusermapsvc_client_010() {
+
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client1-010: user1 accessing $CLIENT from $CLIENT using SSHD service."
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user1"
+		sleep 5
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+                rlRun "getent -s sss passwd user2"
+		sleep 5
+                rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+ 
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+		sleep 10
+                 
+                rlRun "getent -s sss passwd user1"
+		sleep 5
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+                rlRun "getent -s sss passwd user2"
+		sleep 5
+                rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user2 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+                #Starting ipa sevice on $MASTER
+
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+                rlRun "rm -rf $TmpDir"
+
+        rlPhaseEnd
+}
+
+selinuxusermapsvc_client2_010() {
+
+        rlPhaseStartTest "ipa-selinuxusermapsvc-client2-010: user1 accessing $CLIENT from $CLIENT2 using SSHD service."
+                sleep 35
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user1"
+                rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+		sleep 10
+
+                rlRun "verify_ssh_auth_failure_selinuxuser user1 testpw123@ipa.com $CLIENT2 $t1_ipa_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT2 $ipa_default_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $CLIENT $t1_ipa_selinuxuser_verif"
+                rlRun "verify_ssh_auth_success_selinuxuser user1 testpw123@ipa.com $MASTER $ipa_default_selinuxuser_verif"
+
+                #Starting ipa sevice on $MASTER
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+
+        rlPhaseEnd
+}
+
