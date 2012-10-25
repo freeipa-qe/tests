@@ -121,6 +121,23 @@ public class TrustsTasks {
 		sahiTasks.link("Trusts").near(sahiTasks.div("facet")).click();
 	}
 	
+	/*
+	 * @param sahiTasks
+	 * @param relamName - the realmName of Trust to be add
+	 * @param password - Password for Trust Secret
+	 * @param verifyPassword - Password for Trust secret verify
+	 */
+	public static void preSharedPassword(SahiTasks sahiTasks, String realmName,String password,String verifyPassword,String buttonToClick) {
+		sahiTasks.span("Add").click();
+		sahiTasks.textbox("realm_server").setValue(realmName);
+		sahiTasks.radio("method_preshared_password").click();
+		sahiTasks.password("trust_secret").setValue(password);
+		sahiTasks.password("trust_secret_verify").setValue(verifyPassword);
+		sahiTasks.button(buttonToClick).click();
+		}
+			
+	
+	
 	
 	/*
 	 * Delete the trust. Check if realmName is available for deleting before calling this.
