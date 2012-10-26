@@ -73,6 +73,7 @@
 		    <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automember" includes="automember_bug_verification.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/delegation" includes="delegation-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selinux" includes="selinux-testng.xml"/>
+			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/trusts" includes="trust-testng.xml"/>
 		</testng>
 	</target>
 
