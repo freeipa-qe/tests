@@ -69,7 +69,7 @@ CURRENT_HOST=$(hostname)
 Current_hostname=`echo $CURRENT_HOST | cut -d'.' -f1`
 case $Current_hostname in
     "$Master_hostname")    MYROLE="MASTER"  ;;
-    "$Rreplica_hostname")  MYROLE="REPLICA" ;;
+    "$Replica_hostname")  MYROLE="REPLICA" ;;
     "$Nfs_hostname")       MYROLE="NFS"     ;;
     "$Client_hostname")    MYROLE="CLIENT"  ;;
     *)                     MYROLE="UNKNOWN" ;;
