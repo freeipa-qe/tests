@@ -22,7 +22,7 @@ members()
 
 memberships()
 {
-    rlPhaseStartSetup "ipa-group-members-setup Kinit"
+    rlPhaseStartSetup
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
     rlPhaseEnd
 
@@ -432,7 +432,7 @@ memberships()
 	rlRun "verifyGroupMember guser1 group dinasaurs" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartCleanup "ipa-group-members-cleanup Delete Test Groups and Users"
+    rlPhaseStartCleanup 
 	# lets clean up
 	for item in disneyworld animalkingdom epcot japan germany fish ; do
 		rlRun "deleteGroup $item" 0 "Deleting group $item"

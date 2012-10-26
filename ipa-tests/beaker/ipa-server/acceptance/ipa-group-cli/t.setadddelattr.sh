@@ -18,7 +18,7 @@ user2="user2"
 attrsetup()
 {
 
-    rlPhaseStartSetup "ipa-group-setadddelattr-setup Add test objects and kinit as admin"
+    rlPhaseStartSetup 
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
 	rlRun "ipa group-add --desc=j-test $grp" 0 "Adding Test Group $grp"
 	rlRun "ipa user-add --first=$user1 --last=$user1 $user1" 0 "Add test user $user1"
@@ -243,7 +243,7 @@ multiop()
 
 attrcleanup()
 {
-    rlPhaseStartCleanup "ipa-group-setadddelattr-cleanup Delete Test Group and Destroy admin credentials"
+    rlPhaseStartCleanup 
         rlRun "ipa group-del $grp" 0 "Deleting Test Group" 
 	rlRun "ipa user-del $user1 $user2" 0 "Deleting Test Users"
 	rlRun "kdestroy" 0 "Destroying admin credentials."

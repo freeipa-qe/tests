@@ -32,7 +32,7 @@ admrole="adminrole"
 
 groupfindsetup()
 {
-    rlPhaseStartTest "ipa-group-find-startup Kinit as Admin"
+    rlPhaseStartSetup
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
         i=1
         while [ $i -le 10 ] ; do
@@ -323,7 +323,7 @@ groupsinroles()
 
 groupfindcleanup()
 {
-    rlPhaseStartTest "ipa-group-find-cleanup: Delete remaining users and group and Destroying admin credentials"
+    rlPhaseStartCleanup
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "setting search records limit back to default"
         rlRun "ipa group-del $group1 $group2 $group3 group4 group5 group6 group7 group8 group9 group10 $hgroup $sgroup" 0 "Deleting test groups" 
 	rlRun "ipa user-del $user1 $user2" 0 "Deleting test users"

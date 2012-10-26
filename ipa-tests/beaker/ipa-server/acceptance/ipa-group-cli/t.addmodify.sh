@@ -13,7 +13,7 @@ addmodify()
 
 addsetup()
 {
-    rlPhaseStartSetup "ipa-group-addmodify-setup: Kinit As Admin"
+    rlPhaseStartSetup 
         rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
     rlPhaseEnd
 }
@@ -229,7 +229,7 @@ pkey()
 
 addcleanup()
 {
-    rlPhaseStartCleanup "ipa-group-addmodify-cleanup Destroy Admin Credentials"
+    rlPhaseStartCleanup
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 }

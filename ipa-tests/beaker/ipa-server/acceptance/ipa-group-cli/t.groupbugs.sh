@@ -15,7 +15,7 @@ groupbugs()
 grpbugsetup()
 {
 
-    rlPhaseStartTest "ipa-group-bugzillas-startup Kinit As Admin"
+    rlPhaseStartSetup
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
     rlPhaseEnd
 }
@@ -42,7 +42,7 @@ grpbugzillas()
 
 grpbugcleanup()
 {
-    rlPhaseStartTest "ipa-group-bugzillas-cleanup Destroy admin credentials"
+    rlPhaseStartCleanup
 	rlRun "kdestroy" 0 "Destroying admin credentials."
     rlPhaseEnd
 }
