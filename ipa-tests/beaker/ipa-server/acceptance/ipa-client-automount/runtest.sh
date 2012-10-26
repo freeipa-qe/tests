@@ -54,17 +54,25 @@ satrtEpoch=`date "+%s"`
 # MASTER_env1 ; REPLICA_env1 ; CLIENT1: first host in queue CLIENT_env1; CLIENT2 : second host in uque of CLIENT_env1
 
 MASTER="$MASTER_env1"
-REPLICA="$REPLICA_env1"
-CLIENT=`echo $CLIENT_env1 | cut -d' ' -f1`
-NFS=`echo $CLIENT_env1 | cut -d' ' -f2`
+Master_hostname=`echo $MASTER | cut -d' ' -f1`
 
-HOSTNAME=$(hostname)
-case $HOSTNAME in
-"$MASTER_env1")   MYROLE="MASTER"  ;;
-"$REPLICA_env1")  MYROLE="REPLICA" ;;
-"$NFS")           MYROLE="NFS"     ;;
-"$CLIENT")        MYROLE="CLIENT"  ;;
-*)                MYROLE="UNKNOWN" ;;
+REPLICA="$REPLICA_env1"
+Replica_hostname=`echo $REPLICA | cut -d' ' -f1`
+
+CLIENT=`echo $CLIENT_env1 | cut -d' ' -f1`
+Client_hostname=`echo $CLIENT | cut -d' ' -f1`
+
+NFS=`echo $CLIENT_env1 | cut -d' ' -f2`
+Nfs_hostname=`echo $NFS | cut -d' ' -f1`
+
+CURRENT_HOST=$(hostname)
+Current_hostname=`echo $CURRENT_HOST | cut -d' ' -f1`
+case $Current_hostname in
+    "$Master_hostname")    MYROLE="MASTER"  ;;
+    "$Rreplica_hostname")  MYROLE="REPLICA" ;;
+    "$Nfs_hostname")       MYROLE="NFS"     ;;
+    "$Client_hostname")    MYROLE="CLIENT"  ;;
+    *)                     MYROLE="UNKNOWN" ;;
 esac
 
 export MASTER_IP=$(dig +short $MASTER)
@@ -104,10 +112,10 @@ rlLog_hostnames()
     local currentHost=`hostname`
     rlLog "--------- test host used ----------------"
     rlLog " current host [$currentHost], role [$MYROLE]"
-    rlLog " MASTER : [$MASTER]"
-    rlLog " REPLICA: [$REPLICA]"
-    rlLog " NFS    : [$NFS]"
-    rlLog " CLIENT : [$CLIENT]"
+    rlLog " MASTER : [$MASTER] [$Master_hostname]"
+    rlLog " REPLICA: [$REPLICA] [$Replica_hostname]"
+    rlLog " NFS    : [$NFS] [$Nfs_hostname]"
+    rlLog " CLIENT : [$CLIENT] [$Client_hostname]"
     rlLog "-----------------------------------------"
 }
 
@@ -123,7 +131,7 @@ rlJournalStart
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
         rlLog_hostnames
-        rlLOg "kinit as admin"
+        rlLog "kinit as admin"
         KinitAsAdmin
     rlPhaseEnd
 
