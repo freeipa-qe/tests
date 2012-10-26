@@ -90,8 +90,7 @@ public class SelinuxTests extends SahiTestScript {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue("selinux_hbacrule1");
 		sahiTasks.button("Add and Edit").click();
-		//sahiTasks.span("Add").near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
-		sahiTasks.span("Add").near(sahiTasks.div("Users")).click();
+		sahiTasks.span("Add").near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
 		sahiTasks.textbox("filter").setValue(usernames[0]);
 		sahiTasks.span("Find").click();
 		sahiTasks.checkbox(usernames[0]).click();
@@ -115,7 +114,7 @@ public class SelinuxTests extends SahiTestScript {
 		sahiTasks.textbox("ipaselinuxusermaporder").setValue(selinuxUsersOld);
 		sahiTasks.span("Update").click();
 		sahiTasks.navigateTo(commonTasks.selinuxPage, true);
-		String [] selinuxusermaps={"selinux_rule1", "selinux_rule5", "selinux_rule7", "selinux_rule8", "selinux_rule9", "selinux_rule10", "selinux_rule11", "selinux_rule12", "selinux_rule13", "selinux_rule@", "selinuxruleveryveryveryveryveryveryveryveryveryverylongname"};
+		String [] selinuxusermaps={"selinux_rule1", "selinux_rule5", "selinux_rule7", "selinux_rule8", "selinux_rule9", "selinux_rule10", "selinux_rule11", "selinux_rule12", "selinux_rule13", "selinux_rule14", "selinux_rule@", "selinuxruleveryveryveryveryveryveryveryveryveryverylongname"};
 		SelinuxUserMapTasks.deleteSelinuxUserMaps(sahiTasks, selinuxusermaps);
 		
 		sahiTasks.navigateTo(commonTasks.hbacRulesPolicyPage, true);
@@ -331,9 +330,26 @@ public class SelinuxTests extends SahiTestScript {
 	}
 	
 	/*
+	 * Enable/Disable multiple selinux user map
+	 */
+	@Test (groups={"selinuxUserMapEnableDisableMultipleTests"}, dataProvider="getselinuxUserMapEnableDisableMultipleTestObjects", dependsOnGroups={"addAndAddAnotherSelinuxUserMapTests"})	
+	public void testSelinuxUserMapEnableDisableMultiple(String testName, String rulename1, String rulename2, String action) throws Exception {
+		
+		sahiTasks.navigateTo(commonTasks.selinuxPage, true);
+		String[] rulenames={rulename1, rulename2};
+		SelinuxUserMapTasks.selinuxUserMapEnableDisable(sahiTasks, rulenames, action);
+		for(String rules:rulenames){
+			if(action.equals("Disable"))
+				Assert.assertTrue(sahiTasks.cell("Disabled").exists(), "Selinux User Map " + rules + " disabled successfully");
+			else
+				Assert.assertTrue(sahiTasks.cell("Enabled").exists(), "Selinux User Map " + rules + " enabled successfully");
+		}
+	}
+	
+	/*
 	 * Delete Multiple selinux user map
 	 */
-	@Test (groups={"selinuxUserMapDeleteMultipleTests"}, dataProvider="getselinuxUserMapDeleteMultipleTestObjects", dependsOnGroups={"addSelinuxUserMapTests", "addAndAddAnotherSelinuxUserMapTests", "selinuxUserMapDeleteNegativeHBACRuleTests", "selinuxUserMapSearchTests"})	
+	@Test (groups={"selinuxUserMapDeleteMultipleTests"}, dataProvider="getselinuxUserMapDeleteMultipleTestObjects", dependsOnGroups={"addSelinuxUserMapTests", "addAndAddAnotherSelinuxUserMapTests", "selinuxUserMapEnableDisableMultipleTests", "selinuxUserMapDeleteNegativeHBACRuleTests", "selinuxUserMapSearchTests"})	
 	public void testSelinuxUserMapDeleteMultiple(String testName) throws Exception {
 		
 		sahiTasks.navigateTo(commonTasks.selinuxPage, true);
@@ -346,7 +362,7 @@ public class SelinuxTests extends SahiTestScript {
 	/*
 	 * Add user member details of a SELinux User Maps
 	 */
-	@Test (groups={"selinuxUserMapMemberTests"}, description="Add a member to a SELinux User Map", dependsOnGroups="addAndAddAnotherSelinuxUserMapTests",
+	@Test (groups={"selinuxUserMapMemberTests"}, description="Add a member to a SELinux User Map", dependsOnGroups={"addAndAddAnotherSelinuxUserMapTests","selinuxUserMapEnableDisableMultipleTests"},
 			dataProvider="getSelinuxUserMapMemberTestObjects")
 	public void testselinuxUserMapMember(String testName, String cn, String section, String type, String name1, String name2, String button, String action) throws Exception {
 		String names[] = {name1, name2};
@@ -430,7 +446,7 @@ public class SelinuxTests extends SahiTestScript {
 	/*
 	 * Search SELinux User Map
 	 */
-	@Test (groups={"selinuxUserMapSearchTests"}, dependsOnGroups="addAndAddAnotherSelinuxUserMapTests",
+	@Test (groups={"selinuxUserMapSearchTests"}, dependsOnGroups={"addAndAddAnotherSelinuxUserMapTests","selinuxUserMapEnableDisableMultipleTests"},
 			dataProvider="getSelinuxUserMapSearchTestObjects")
 	public void testselinuxUserMapSearch(String testName, String rulename) throws Exception {
 		
@@ -465,19 +481,10 @@ public class SelinuxTests extends SahiTestScript {
 	public void testselinuxUserMapMemberCategory(String testName, String rulename, String user, String host) throws Exception {
 		
 		sahiTasks.navigateTo(commonTasks.selinuxPage, true);
+		
 		sahiTasks.link(rulename).click();
-		if (!System.getProperty("os.name").startsWith("Windows")){
-			sahiTasks.radio("usercategory-1-0").click();
-		}else{
-			sahiTasks.radio("usercategory-8-0").click();
-		}
-		if (!System.getProperty("os.name").startsWith("Windows")){
-			sahiTasks.radio("hostcategory-2-0").click();
-		}else{
-			sahiTasks.radio("hostcategory-9-0").click();
-		}
-		
-		
+		sahiTasks.radio("usercategory-1-0").click();
+		sahiTasks.radio("hostcategory-2-0").click();
 		sahiTasks.span("Update").click();
 		Assert.assertFalse(sahiTasks.checkbox(user).exists(), "User Category changed successfully");
 		Assert.assertFalse(sahiTasks.checkbox(host).exists(), "Host Category changed successfully");
@@ -895,6 +902,22 @@ public class SelinuxTests extends SahiTestScript {
 			//										testname							rulename			user																			
 			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_modifyuser_tkt3119","selinux_rule14",	"user_u:s0"	 } ));
 			
+			return ll;	
+		}
+		
+		/*
+		 * Data to be used for modify selinux user 
+		 */
+		@DataProvider(name="getselinuxUserMapEnableDisableMultipleTestObjects")
+		public Object[][] getselinuxUserMapEnableDisableMultipleTestObjects() {
+			return TestNGUtils.convertListOfListsTo2dArray(createselinuxUserMapEnableDisableMultipleTestObjects());
+		}
+		protected List<List<Object>> createselinuxUserMapEnableDisableMultipleTestObjects() {		
+			List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+			//										testname								rulename1			rulename2			action																			
+			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_disablemultiple",	"selinux_rule2",	"selinux_rule3",	"Disable"	 } ));
+			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_enablemultiple",	"selinux_rule2",	"selinux_rule3",	"Enable"	 } ));
 			return ll;	
 		}
 }

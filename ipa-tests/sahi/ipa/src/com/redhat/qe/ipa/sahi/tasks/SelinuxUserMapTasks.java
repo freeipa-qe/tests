@@ -318,5 +318,12 @@ public class SelinuxUserMapTasks {
 		
 		
 	}
+public static void selinuxUserMapEnableDisable(SahiTasks sahiTasks,	String[] rulenames, String action) {
+		for(String rule:rulenames){
+			sahiTasks.checkbox(rule).click();
+		}
+		sahiTasks.span(action).click();
+		sahiTasks.button("OK").click();
+	}
 
 }
