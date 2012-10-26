@@ -19,6 +19,7 @@ ds-migration-functional()
     setup
     hashedpwdmigration_sssd
     hashedpwdmigration_http
+    bz_tests
     cleanup
 }
 
@@ -51,6 +52,7 @@ hashedpwdmigration_sssd()
         rlPhaseStartTest "ds-migration-functional-002 SSSD password migration $USER1"
 		rlRun "ssh_auth_success $USER1 $USER1PWD $HOSTNAME"
 		rlRun "verifyUserAttr $USER1 \"Kerberos keys available\" True" 0 "Verify migrated user $USER1 now has a keytab"
+		KinitAsUser $USER1 $USER1PWD 
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-functional-003 SSSD password migration $USER2"
@@ -106,6 +108,23 @@ hashedpwdmigration_http()
                 rlRun "ipa user-show $USER2" 2 "Make sure $USER2 was deleted"
                 rlRun "ipa group-show $GROUP1" 2 "Make sure $GROUP1 was deleted"
                 rlRun "ipa group-show $GROUP2" 2 "Make sure $GROUP2 was deleted"
+        rlPhaseEnd
+}
+
+bz_tests()
+{
+        rlPhaseStartTest "ds-migration-functional-008 bz 822608 part 1 password test for migrated user $USER1"
+		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
+		KinitAsUser $USER1 $USER1PWD 
+		rlRun "klist | grep $USER1@RELM" 0 "Ensuring that kinit as $USER1 worked" 
+		KinitAsUser $USER1 $USER1PWD 
+        rlPhaseEnd
+
+        rlPhaseStartTest "ds-migration-functional-009 bz 822608 part 2 password test for migrated user $USER2"
+		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
+		KinitAsUser $USER2 $USER2PWD 
+		rlRun "klist | grep $USER2@RELM" 0 "Ensuring that kinit as $USER2 worked" 
+		KinitAsUser $USER1 $USER1PWD 
         rlPhaseEnd
 }
 

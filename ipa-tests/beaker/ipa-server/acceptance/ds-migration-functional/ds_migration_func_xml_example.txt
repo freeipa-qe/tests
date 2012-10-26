@@ -1,7 +1,6 @@
-
-b product="cpe:/o:redhat:enterprise_linux:6:update2" retention_tag="audit">
-	<whiteboard>
-		IPA :: DS MIGRATION FUNCTIONAL :: x86_64 :: RHEL 6.2
+<job>
+        <whiteboard>
+		IPA :: DS MIGRATION FUNCTIONAL :: x86_64 :: RHEL 6.4
 	</whiteboard>
 	<recipeSet priority="Normal">
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="None" whiteboard="IPA MASTER">
@@ -9,12 +8,14 @@ b product="cpe:/o:redhat:enterprise_linux:6:update2" retention_tag="audit">
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+			<repos>
+				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
+				<repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch//"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_tag op="=" value="STABLE"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 				<distro_virt op="=" value=""/>
@@ -46,12 +47,14 @@ b product="cpe:/o:redhat:enterprise_linux:6:update2" retention_tag="audit">
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+			<repos>
+				<repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
+				<repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch//"/>
+			</repos>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_tag op="=" value="STABLE"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 				<distro_virt op="=" value=""/>
