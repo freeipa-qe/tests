@@ -18,8 +18,8 @@
 ######################
 ipaclientautomount()
 {
-#    clientautomount_script_install_and_uninstall #done script writing
-#    clientautomount_script_install_option_combinations # done script writing, need debug in official environment
+    clientautomount_script_install_and_uninstall #done script writing
+    clientautomount_script_install_option_combinations # done script writing, need debug in official environment
     clientautomount_autofs_functional_test
 } #ipaclientautomount 
 

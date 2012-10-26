@@ -339,3 +339,30 @@ replace_line()
         echo "something wrong, no change made"
     fi
 }
+
+configurate_non_secure_NFS_Server()
+{
+    rlPhaseStartTest "configure non secure nfs server on [`hostname`]"
+        rlLog "verify my role: acutal role is [$MYROLE], I should be (non-secure) NFS server "
+        if [ "$MYROLE" = "NFS" ];then
+            rlRun "mkdir -p $nfsDir" 0 "prepare nfs export directory [$nfsDir]"
+            echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
+            echo "========= content of secret file content ======="
+            cat $nfsDir/$currentNFSFileName
+            echo "===== end of content of [$nfsDir/$currentNFSFileName] ====="
+
+            echo "$nfsConfiguration_NonSecure" > $nfsConf
+            echo "====== configuration [$nfsConf ] ============"
+            cat $nfsConf
+            echo "============================================="
+
+            rlRun "service nfs restart" 0 "start nfs service"
+            rlRun "service iptables stop" 0 "shutdown firewall"
+            echo "========  check rpcinfo [`hostname`] ======"
+            rpcinfo -p `hostname`
+            echo "=================================================="
+        else
+            rlFail "role does not match, expect [NFS], actual [$MYROLE]"
+        fi
+    rlPhaseEnd
+}

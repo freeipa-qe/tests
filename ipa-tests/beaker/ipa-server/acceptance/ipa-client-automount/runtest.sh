@@ -51,47 +51,63 @@ satrtEpoch=`date "+%s"`
 # topology veriables
 #########################################
 # roles in this multi-host test:
-# MASTER_env1 ; REPLICA_env1 ; CLIENT_env1 ; CLIENT_env2
+# MASTER_env1 ; REPLICA_env1 ; CLIENT1: first host in queue CLIENT_env1; CLIENT2 : second host in uque of CLIENT_env1
 
-export MASTER_IP=$(dig +short $MASTER)
-if [ -z "$MASTER_IP" ]; then
-	export MASTER_IP=$(getent ahostsv4 $MASTER_env1 | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
-fi
-
-export REPLICA_IP=$(dig +short $REPLICA_env1)
-if [ -z "$REPLICA_IP" ]; then
-	export REPLICA_IP=$(getent ahostsv4 $REPLICA_env1 | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
-fi
-
-export CLIENT1_IP=$(dig +short $CLIENT1_env1)
-if [ -z "$CLIENT1_IP" ]; then
-	export CLIENT1_IP=$(getent ahostsv4 $CLIENT1_IP| grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
-fi
-
-export CLIENT2_IP=$(dig +short $CLIENT2_env1)
-if [ -z "$CLIENT2_IP" ]; then
-	export CLIENT2_IP=$(getent ahostsv4 $CLIENT2_IP| grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
-fi
-
+MASTER="$MASTER_env1"
+REPLICA="$REPLICA_env1"
+CLIENT=`echo $CLIENT_env1 | cut -d' ' -f1`
+NFS=`echo $CLIENT_env1 | cut -d' ' -f2`
 
 HOSTNAME=$(hostname)
 case $HOSTNAME in
-"$MASTER_env1")    MYROLE="MASTER"  ;;
-"$REPLICA_env1")   MYROLE="REPLICA" ;;
-"$CLIENT1_env1")   MYROLE="CLIENT1" ;;
-"$CLIENT2_env1")   MYROLE="CLIENT2" ;;
-*)                 MYROLE="UNKNOWN" ;;
+"$MASTER_env1")   MYROLE="MASTER"  ;;
+"$REPLICA_env1")  MYROLE="REPLICA" ;;
+"$NFS")           MYROLE="NFS"     ;;
+"$CLIENT")        MYROLE="CLIENT"  ;;
+*)                MYROLE="UNKNOWN" ;;
 esac
+
+export MASTER_IP=$(dig +short $MASTER)
+if [ -z "$MASTER_IP" ]; then
+	export MASTER_IP=$(getent ahostsv4 $MASTER | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+fi
+
+export REPLICA_IP=$(dig +short $REPLICA)
+if [ -z "$REPLICA_IP" ]; then
+	export REPLICA_IP=$(getent ahostsv4 $REPLICA | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+fi
+
+export CLIENT_IP=$(dig +short $CLIENT)
+if [ -z "$CLIENT_IP" ]; then
+	export CLIENT_IP=$(getent ahostsv4 $CLIENT | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+fi
+
+export NFS_IP=$(dig +short $NFS)
+if [ -z "$NFS_IP" ]; then
+	export NFS_IP=$(getent ahostsv4 $NFS | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+fi
+
+ipaServerMaster="$MASTER"
+ipaServerMasterIP="$MASTER_IP"
+ipaServerReplica="$REPLICA"
+ipaServerReplicaIP="$REPLICA_IP"
+dnsServer="$MASTER"
+nfsServer="$NFS"
+
+currentLocation=$automountLocationA
+currentIPAServer=$ipaServerMaster
+currentDNSServer=$dnsServer
+currentNFSServer=$nfsServer
 
 rlLog_hostnames()
 {
     local currentHost=`hostname`
     rlLog "--------- test host used ----------------"
-    rlLog " current host [$currentHost]"
-    rlLog " MASTER:  [$MASTER_env1]"
-    rlLog " REPLICA: [$REPLICA_env1]"
-    rlLog " CLIENT1: [$CLIENT_env1]"
-    rlLog " CLIENT2: [$CLIENT_env2]"
+    rlLog " current host [$currentHost], role [$MYROLE]"
+    rlLog " MASTER : [$MASTER]"
+    rlLog " REPLICA: [$REPLICA]"
+    rlLog " NFS    : [$NFS]"
+    rlLog " CLIENT : [$CLIENT]"
     rlLog "-----------------------------------------"
 }
 
@@ -107,6 +123,8 @@ rlJournalStart
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
         rlLog_hostnames
+        rlLOg "kinit as admin"
+        KinitAsAdmin
     rlPhaseEnd
 
     # test_starts
@@ -116,26 +134,27 @@ rlJournalStart
         rlLog "Master setup [$MASTER]"
         rlLog "if ipa-server setup is automatic in beaker job xml file, then do nothing"
         rhts-sync-set -s 'master done'
-        rlPass "master done setup"
         ;;
     "REPLICA" ) 
         rlLog "Replica setup [$REPLICA]"
         rlts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
         rlLog "install replica, this is also should be done"
         rhts-sync-set -s "replica done" 
-        rlPass "replica done setup"
         ;;
-    "CLIENT1" )
-        rlLog "doing some job on client 1 [$CLIENT1]"
+    "NFS" )
+        rlLog "NFS setup [$NFS]"
         rhts-sync-block -s "master done" $MASTER
         rhts-sync-block -s "replica done" $REPLICA
+        #setup_secure_NFS_Server #next step
+        setup_non_secure_NFS_Server
+        rhts-sync-set -s "nfs done"
+        ;;
+    "CLIENT" )
+        rlLog "doing some job on client [$CLIENT]"
+        rhts-sync-block -s "master done" $MASTER
+        rhts-sync-block -s "replica done" $REPLICA
+        rhts-sync-block -s "nfs done" $NFS
         ipaclientautomount
-        ;;
-    "CLEINT2" )
-        rlLog "doing some job on client 1 [$CLIENT1]"
-        rhts-sync-block -s "master done" $MASTER
-        rhts-sync-block -s "replica done" $REPLICA
-        rlPass "I am just a bystander, doing nothing"
         ;;
     *)
         rlFail "UNKNOW ROLE [$MYROLE]"
