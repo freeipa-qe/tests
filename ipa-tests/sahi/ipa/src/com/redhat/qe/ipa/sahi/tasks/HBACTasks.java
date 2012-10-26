@@ -827,7 +827,13 @@ public class HBACTasks {
 		sahiTasks.button("Add and Edit").click();
 		
 		sahiTasks.span("Add").click();
+		sahiTasks.textbox("filter").setValue("su");
+		sahiTasks.span("Find").click();
 		sahiTasks.checkbox("su").click();
+		sahiTasks.span(">>").click();
+		
+		sahiTasks.textbox("filter").setValue("su-l");
+		sahiTasks.span("Find").click();
 		sahiTasks.checkbox("su-l").click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Add").click();

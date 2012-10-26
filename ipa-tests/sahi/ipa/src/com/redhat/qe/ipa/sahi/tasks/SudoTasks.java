@@ -591,12 +591,14 @@ public class SudoTasks {
 	
 
 	public static void verifySudoCommandUpdates(SahiTasks sahiTasks, String cn,	String newdescription) {
-		sahiTasks.link(cn).click();
-		
+		CommonTasks.search(sahiTasks, cn);
+		if(sahiTasks.link(cn).exists())
+			sahiTasks.link(cn).click();
 		//verify comamnd description
 		Assert.assertEquals(sahiTasks.textarea("description").value(), newdescription, "Verified description for command " + cn);
 
 		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		CommonTasks.clearSearch(sahiTasks);
 	}
 	
 
@@ -764,8 +766,8 @@ public class SudoTasks {
 		sahiTasks.textbox("cn").setValue(cn);
 		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.button("Add and Edit").click();
+		sahiTasks.waitFor(1000);
 		sahiTasks.span("Add").click();
-		sahiTasks.waitFor(5000);
 		sahiTasks.checkbox(command).near(sahiTasks.row(command)).click();
 		sahiTasks.span(">>").click();		
 		sahiTasks.span("Add").near(sahiTasks.button("Cancel")).click();
