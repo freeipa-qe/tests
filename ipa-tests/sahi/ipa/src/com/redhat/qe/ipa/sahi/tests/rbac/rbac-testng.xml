@@ -1,5 +1,29 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPARBACTestSuite">	
+
+<test name="RBAC Functional Tests">
+                <groups>
+                        <run>
+                                <include name="setup" />
+                                        <!--<include name="hostAddsUser" />                                                     
+                                                <include name="permissionAddSubtreeTests" />  -->
+                                <include name="dnsUpdateAdmin" />
+                                <include name="dnsListZone" />
+                                <include name="ResetPassword_Bug784621" />
+                                <include name="ReaddingPrivilege_Bug811211" />
+                                <include name="IndirectRoles_Bug839008"/> 
+                                <include name="PerDomainDNSPermissionSetup"/>
+                                <include name="PerDomainDNSPermissionVerify"/>
+                                <include name="PerDomainDNSPermissionDelete"/>
+                                
+                        </run>
+                </groups>
+                <classes>
+                    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
+                    <class name="com.redhat.qe.ipa.sahi.tests.rbac.RBACFunctional" />
+                </classes>
+        </test>
+
 	<test name="Permission Tests">
                 <packages>
                      <package name="com.redhat.qe.ipa.sahi.*" />
