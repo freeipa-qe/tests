@@ -250,10 +250,10 @@ rlJournalStart
     rlPhaseEnd
 
    rlPhaseStartTest "ipa-hostgroup-cli-24 Negative - setattr and addattr on dn"
-        command="ipa hostgroup-mod --setattr dn=mynewDN $group1"
+        command="ipa hostgroup-mod --setattr dn=\"cn=mynewDN,cn=hostgroups,cn=accounts,dc=testrelm,dc=com\" $group1"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa hostgroup-mod --addattr dn=anothernewDN $group1"
+        command="ipa hostgroup-mod --addattr dn=\"cn=anothernewDN,cn=hostgroups,cn=accounts,dc=testrelm,dc=com\" $group1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
