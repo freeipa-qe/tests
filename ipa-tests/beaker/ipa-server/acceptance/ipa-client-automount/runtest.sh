@@ -95,12 +95,10 @@ if [ -z "$NFS_IP" ]; then
 	export NFS_IP=$(getent ahostsv4 $NFS | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
 fi
 
-ipaServerMaster="$MASTER"
-ipaServerMasterIP="$MASTER_IP"
-ipaServerReplica="$REPLICA"
-ipaServerReplicaIP="$REPLICA_IP"
-dnsServer="$MASTER"
-nfsServer="$NFS"
+ipaServerMaster="$MASTER_IP"
+ipaServerReplica="$REPLICA_IP"
+dnsServer="$MASTER_IP"
+nfsServer="$NFS_IP"
 
 currentLocation=$automountLocationA
 currentIPAServer=$ipaServerMaster
@@ -111,10 +109,10 @@ rlLog_hostnames()
 {
     rlLog "--------- test host used ----------------"
     rlLog " current host [$CURRENT_HOST], role [$MYROLE]"
-    rlLog " MASTER : [$MASTER] [$Master_hostname]"
-    rlLog " REPLICA: [$REPLICA] [$Replica_hostname]"
-    rlLog " NFS    : [$NFS] [$Nfs_hostname]"
-    rlLog " CLIENT : [$CLIENT] [$Client_hostname]"
+    rlLog " MASTER : [$MASTER] [$Master_hostname] [$MASTER_IP]"
+    rlLog " REPLICA: [$REPLICA] [$Replica_hostname] [$REPLICA_IP]"
+    rlLog " NFS    : [$NFS] [$Nfs_hostname] [$NFS_IP]"
+    rlLog " CLIENT : [$CLIENT] [$Client_hostname] [$CLIENT_IP]"
     rlLog "-----------------------------------------"
 }
 
