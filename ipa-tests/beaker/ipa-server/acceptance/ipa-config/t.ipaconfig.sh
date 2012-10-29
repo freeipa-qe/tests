@@ -17,7 +17,7 @@ default_config_migrationmode="FALSE"
 ipaconfig()
 {
     ipaconfig_envsetup
-    #ipaconfig_show
+    ipaconfig_show
     ipaconfig_mod
     ipaconfig_searchlimit
     ipaconfig_searchfields
@@ -79,8 +79,10 @@ ipaconfig_server()
     ipaconfig_server_envsetup
     ipaconfig_server_enablemigration
     ipaconfig_server_enablemigration_negative
-    #ipaconfig_server_subject
-    #ipaconfig_server_subject_negative - tests no longer valid option to configure has been removed
+    # Test for BZ 807018 ipa config-mod should not be allowed to modify certificate subject base
+    # tests no longer valid  - option to modify --subject has been removed
+    # ipaconfig_server_subject
+    # ipaconfig_server_subject_negative
     ipaconfig_server_envcleanup
 } #ipaconfig_server
 
@@ -141,7 +143,7 @@ ipaconfig_show_default_logic()
         local out=$TmpDir/ipaconfig.show.all.$RANDOM.out
         kinitAs $ADMINID $ADMINPW 
         rlRun "ipa config-show --all > $out" 0 "save show --all in [$out]"
-        string_exist_infile "Max username length:" $out
+        string_exist_infile "Maximum username length:" $out
         string_exist_infile "Home directory base:" $out
         string_exist_infile "Default shell:" $out
         string_exist_infile "Default users group:" $out
@@ -150,10 +152,10 @@ ipaconfig_show_default_logic()
         string_exist_infile "Search size limit:" $out
         string_exist_infile "User search fields:" $out
         string_exist_infile "Group search fields:" $out
-        string_exist_infile "Migration mode:" $out
+        string_exist_infile "Enable migration mode:" $out
         string_exist_infile "Certificate Subject base:" $out
         string_exist_infile "Password plugin features:" $out
-        string_exist_infile "Password Expiration Notification:" $out
+        string_exist_infile "Password Expiration Notification (days):" $out
         rm $out; 
 
         rlLog "test for --raw option"
@@ -945,6 +947,25 @@ ipaconfig_server_enablemigration()
                 rlFail "set to migration mode to $value failed"
             fi
         done
+        for value in 0 1
+        do
+            ipa config-mod --enable-migration=$value 2>&1 >/dev/null
+            ipa config-show > $out
+            if [ $value -eq 0 ];then
+               valueToCheck="FALSE"
+            fi
+            if [ $value -eq 1 ];then
+               valueToCheck="TRUE"
+            fi
+     
+
+            if grep -i "Migration mode: $valueToCheck" $out 2>&1 >/dev/null 
+            then
+                rlPass "set migration mode to $valueToCheck success"
+            else
+                rlFail "set to migration mode to $valueToCheck failed"
+            fi
+        done
         rm $out
     rlPhaseEnd
 } #ipaconfig_server_enablemigration
@@ -963,7 +984,7 @@ ipaconfig_server_enablemigration_negative()
 # non-loop data : 
     rlPhaseStartTest "ipaconfig_server_enablemigration_negative"
         rlLog "negative test case"
-        for value in T F a 0 -1 
+        for value in T F a -1 
         do
             rlRun "ipa config-mod --enable-migration=$value" 1 "set migration mode to [$value] should fail"
         done
@@ -1034,7 +1055,7 @@ ipaconfig_mod_base_dn_mod_negative()
 	rlPhaseStartTest "ipaconfig_mod_base_dn_mod_negative"
 		rlLog "Test for https://bugzilla.redhat.com/show_bug.cgi?id=807018"
         	KinitAsAdmin
-		rlRun "ipa config-mod --setattr=ipacertificatesubjectbase='OU=Bogus'" 2 "Ensure that setting the base DN fails"
+		rlRun "ipa config-mod --setattr=ipacertificatesubjectbase='OU=Bogus'" 1 "Ensure that setting the base DN fails"
 	rlPhaseEnd
 }
 
