@@ -231,11 +231,14 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-028 setattr and addattr on dn"
-        command="ipa user-mod --setattr dn=mynewDN $superuser"
+        command="ipa user-mod --setattr dn=\"uid=mynewDN,cn=users,cn=accounts,$BASEDN\" $superuser"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa user-mod --addattr dn=anothernewDN $superuser"
+        command="ipa user-mod --addattr dn=\"uid=anothernewDN,cn=users,cn=accounts,$BASEDN\" $superuser"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+        command="ipa user-mod --setattr dn=mynewDN $superuser"
+        expmsg="ipa: ERROR: dn: Invalid syntax."
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for invalid DN syntax"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-029 setattr on cn"
@@ -275,11 +278,14 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-034 setattr and addattr krbPwdPolicyReference"
-        command="ipa user-mod --setattr krbPwdPolicyReference=test $superuser"
+        command="ipa user-mod --setattr krbPwdPolicyReference=\"uid=test,cn=users,cn=accounts,$BASEDN\" $superuser"
         expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'krbPwdPolicyReference' attribute of entry 'uid=$superuser,cn=users,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa user-mod --setattr krbPwdPolicyReference=test $superuser"
+        command="ipa user-mod --setattr krbPwdPolicyReference=\"uid=test,cn=users,cn=accounts,$BASEDN\" $superuser"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+        command="ipa user-mod --setattr krbPwdPolicyReference=test $superuser"
+        expmsg="ipa: ERROR: krbpwdpolicyreference: Invalid syntax."
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for invalid syntax."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-user-cli-mod-035 setattr and addattr krbPrincipalName"
