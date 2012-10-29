@@ -353,3 +353,14 @@ configurate_non_secure_NFS_Server()
     fi
 }
 
+configurate_dns_server()
+{
+    rlLog "change /etc/resolv.conf"
+    rlLog "original content"
+    cat /etc/resolv.conf
+    echo "domain testrelm.com" > /etc/resolv.conf
+    echo "search testrelm.com"a>> /etc/resolv.conf
+    echo "nameserver $MASTER_IP" >> /etcc/resolv.conf
+    rlLog "new content"
+    cat /etc/resolv.conf
+}
