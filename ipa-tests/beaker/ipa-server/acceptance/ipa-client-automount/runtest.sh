@@ -59,11 +59,11 @@ Master_hostname=`echo $MASTER | cut -d'.' -f1`
 REPLICA="$REPLICA_env1"
 Replica_hostname=`echo $REPLICA | cut -d'.' -f1`
 
-CLIENT=`echo $CLIENT_env1 | cut -d' ' -f1`
-Client_hostname=`echo $CLIENT | cut -d'.' -f1`
-
-NFS=`echo $CLIENT_env1 | cut -d' ' -f2`
+NFS=`echo $CLIENT_env1 | cut -d' ' -f1`
 Nfs_hostname=`echo $NFS | cut -d'.' -f1`
+
+CLIENT=`echo $CLIENT_env1 | cut -d' ' -f2`
+Client_hostname=`echo $CLIENT | cut -d'.' -f1`
 
 CURRENT_HOST=$(hostname)
 Current_hostname=`echo $CURRENT_HOST | cut -d'.' -f1`
@@ -139,23 +139,30 @@ rlJournalStart
     rlPhaseStartTest "role setup for ipa-client-automount testing"
     case "$MYROLE" in
     "MASTER" )
-        rlLog "Master setup [$MASTER]"
-        rlLog "if ipa-server setup is automatic in beaker job xml file, then do nothing"
-        rhts-sync-set -s 'master done'
+        rlPhaseStartTest "Setup Master [$MASTER]"
+            rlLog "Current host [$currentHost], role [$MYROLE]"
+            rlPass "Master setup [$MASTER], no action necessary"
+            rhts-sync-set -s 'master done'
+        rlPhaseEnd 
         ;;
     "REPLICA" ) 
-        rlLog "Replica setup [$REPLICA]"
-        rlts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
-        rlLog "install replica, this is also should be done"
-        rhts-sync-set -s "replica done" 
+        rlPhaseStartTest "Setup Replica [$REPLICA]"
+            rlLog "Current host [$currentHost], role [$MYROLE]"
+            rlPass "Replica setup [$REPLICA], no action necessary"
+            rhts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
+            rhts-sync-set -s 'replica done'
+        rlPhaseEnd 
         ;;
     "NFS" )
-        rlLog "NFS setup [$NFS]"
-        rhts-sync-block -s "master done" $MASTER
-        rhts-sync-block -s "replica done" $REPLICA
-        #setup_secure_NFS_Server #next step
-        setup_non_secure_NFS_Server
-        rhts-sync-set -s "nfs done"
+        rlPhaseStartTest "Setup NFS [$NFS]"
+            rlLog "Current host [$currentHost], role [$MYROLE]"
+            rlLog "NFS setup [$NFS]"
+            rhts-sync-block -s "master done" $MASTER
+            rhts-sync-block -s "replica done" $REPLICA
+            #setup_secure_NFS_Server #next step
+            configurate_non_secure_NFS_Server
+            rhts-sync-set -s "nfs done"
+        rlPhaseEnd
         ;;
     "CLIENT" )
         rlLog "doing some job on client [$CLIENT]"
