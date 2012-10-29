@@ -254,19 +254,19 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-21  Negative - setattr and addattr on enrolledBy"
-        command="ipa host-mod --setattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
+        command="ipa host-mod --setattr enrolledBy=\"uid=user,cn=users,cn=accounts,$BASEDN\" $host1"
         expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa host-mod --addattr enrolledBy=\"uid=user,cn=users,cn=accounts,dc=bos,dc=redhat,dc=com\" $host1"
+        command="ipa host-mod --addattr enrolledBy=\"uid=user,cn=users,cn=accounts,$BASEDN\" $host1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-22  Negative - setattr and addattr on enrolledBy - invalid syntax"
         command="ipa host-mod --setattr enrolledBy=me $host1"
-        expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,$BASEDN'."
+        expmsg="ipa: ERROR: enrolledby: Invalid syntax."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
         command="ipa host-mod --addattr enrolledBy=you $host1"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for invalid enrolledby syntax"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-23 setattr and addattr on description"
@@ -323,14 +323,14 @@ rlJournalStart
      rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-31 Negative - setattr and addattr on dn"
-	myhost="mytest.$DOMAIN"
-	addHost $myhost
-        command="ipa host-mod --setattr dn=mynewDN $myhost"
+        myhost="mytest.$DOMAIN"
+        addHost $myhost
+        command="ipa host-mod --setattr dn=\"cn=mynewDN,cn=computers,cn=accounts,$BASEDN\" $myhost"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa host-mod --addattr dn=anothernewDN $myhost"
+        command="ipa host-mod --addattr dn=\"cn=anothernewDN,cn=computers,cn=accounts,$BASEDN\" $myhost"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
-	deleteHost $myhost
+        deleteHost $myhost
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-host-cli-32 Negative - setattr and addattr on cn"
