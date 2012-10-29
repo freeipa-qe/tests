@@ -138,7 +138,9 @@ rlJournalStart
         rlPhaseStartTest "Setup Master [$MASTER]"
             rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlRun "service iptables stop" 0 "stop friewall"
+            configurate_dns_server
             KinitAsAdmin
+            ipa user-find
             rlPass "Master setup [$MASTER], no action necessary"
             rhts-sync-set -s 'master done'
         rlPhaseEnd 
@@ -147,7 +149,9 @@ rlJournalStart
         rlPhaseStartTest "Setup Replica [$REPLICA]"
             rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlRun "service iptables stop" 0 "stop friewall"
+            configurate_dns_server
             KinitAsAdmin
+            ipa user-find
             rlPass "Replica setup [$REPLICA], no action necessary"
             rhts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
             rhts-sync-set -s 'replica done'
@@ -158,7 +162,9 @@ rlJournalStart
             rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlLog "NFS setup [$NFS]"
             rlRun "service iptables stop" 0 "stop friewall"
+            configurate_dns_server
             KinitAsAdmin
+            ipa user-find
             rhts-sync-block -s "master done" $MASTER
             rhts-sync-block -s "replica done" $REPLICA
             #setup_secure_NFS_Server #next step
@@ -172,7 +178,9 @@ rlJournalStart
         rhts-sync-block -s "replica done" $REPLICA
         rhts-sync-block -s "nfs done" $NFS
         rlRun "service iptables stop" 0 "stop friewall"
+        configurate_dns_server
         KinitAsAdmin
+        ipa user-find
         ipaclientautomount
         ;;
     *)
