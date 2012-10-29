@@ -1,18 +1,6 @@
 #!/bin/bash
 # helping functions for ipa client automount script
 
-configure_nfs_non_secure(){
-    local nfsConf=/etc/exports
-    local nfsConf_bk=/etc/exports.bk
-    local configuration=$1
-    if [ "$configuration" != "" ];then
-        echo "configurate NFS ($nfsConf) using [$configuration]"
-        cp $nfsConf $nfsConf_bk
-        echo "$configuration" > $nfsConf
-        echo "done , now restart nfs"
-    fi
-}
-
 configure_autofs_indirect(){
     local name=$1
     local nfsHost=$2
@@ -349,9 +337,9 @@ configurate_non_secure_NFS_Server()
         cat $nfsDir/$currentNFSFileName
         echo "===== end of content of [$nfsDir/$currentNFSFileName] ====="
 
-        echo "$nfsConfiguration_NonSecure" > $nfsConf
-        echo "====== configuration [$nfsConf ] ============"
-        cat $nfsConf
+        echo "$nfsConfiguration_NonSecure" > $nfsConfigFile
+        echo "====== configuration [$nfsConfigFile ] ============"
+        cat $nfsConfigFile
         echo "============================================="
 
         rlRun "service nfs restart" 0 "start nfs service"
@@ -364,3 +352,4 @@ configurate_non_secure_NFS_Server()
         rlFail "role does not match, expect [NFS], actual [$MYROLE]"
     fi
 }
+

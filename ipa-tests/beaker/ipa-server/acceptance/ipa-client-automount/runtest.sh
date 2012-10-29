@@ -109,9 +109,8 @@ currentNFSServer=$nfsServer
 
 rlLog_hostnames()
 {
-    local currentHost=`hostname`
     rlLog "--------- test host used ----------------"
-    rlLog " current host [$currentHost], role [$MYROLE]"
+    rlLog " current host [$CURRENT_HOST], role [$MYROLE]"
     rlLog " MASTER : [$MASTER] [$Master_hostname]"
     rlLog " REPLICA: [$REPLICA] [$Replica_hostname]"
     rlLog " NFS    : [$NFS] [$Nfs_hostname]"
@@ -136,18 +135,17 @@ rlJournalStart
     rlPhaseEnd
 
     # test_starts
-    rlPhaseStartTest "role setup for ipa-client-automount testing"
     case "$MYROLE" in
     "MASTER" )
         rlPhaseStartTest "Setup Master [$MASTER]"
-            rlLog "Current host [$currentHost], role [$MYROLE]"
+            rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlPass "Master setup [$MASTER], no action necessary"
             rhts-sync-set -s 'master done'
         rlPhaseEnd 
         ;;
     "REPLICA" ) 
         rlPhaseStartTest "Setup Replica [$REPLICA]"
-            rlLog "Current host [$currentHost], role [$MYROLE]"
+            rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlPass "Replica setup [$REPLICA], no action necessary"
             rhts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
             rhts-sync-set -s 'replica done'
@@ -155,7 +153,7 @@ rlJournalStart
         ;;
     "NFS" )
         rlPhaseStartTest "Setup NFS [$NFS]"
-            rlLog "Current host [$currentHost], role [$MYROLE]"
+            rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlLog "NFS setup [$NFS]"
             rhts-sync-block -s "master done" $MASTER
             rhts-sync-block -s "replica done" $REPLICA
