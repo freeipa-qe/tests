@@ -151,7 +151,8 @@ rlJournalStart
             rlRun "service iptables stop" 0 "stop friewall"
             configurate_dns_server
             KinitAsAdmin
-            ipa user-find
+            $add_dns_record -s $MASTER_IP -h `hostname` -i $REPLICA_IP
+            ipa host-find `hostname`
             rlPass "Replica setup [$REPLICA], no action necessary"
             rhts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
             rhts-sync-set -s 'replica done'
@@ -164,7 +165,8 @@ rlJournalStart
             rlRun "service iptables stop" 0 "stop friewall"
             configurate_dns_server
             KinitAsAdmin
-            ipa user-find
+            $add_dns_record -s $MASTER_IP -h `hostname` -i $NFS_IP
+            ipa host-find `hostname`
             rhts-sync-block -s "master done" $MASTER
             rhts-sync-block -s "replica done" $REPLICA
             #setup_secure_NFS_Server #next step
@@ -180,7 +182,8 @@ rlJournalStart
         rlRun "service iptables stop" 0 "stop friewall"
         configurate_dns_server
         KinitAsAdmin
-        ipa user-find
+        $add_dns_record -s $MASTER_IP -h `hostname` -i $CLIENT_IP
+        ipa host-find `hostname`
         ipaclientautomount
         ;;
     *)

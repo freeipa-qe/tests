@@ -8,6 +8,8 @@ HOSTNAME=`hostname`
 #realm="YZHANG.REDHAT.COM"
 #suffix="dc=yzhang,dc=redhat,dc=com"
 
+# help script
+add_dns_record="./add.dns.records.sh"
 hostPrinciple="host/${HOSTNAME}@${REALM}"
 suffix="$BASEDN"
 
