@@ -138,10 +138,11 @@ verifyGroupAttr()
    ipa group-show --all $mygroup > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
+         cat $tmpfile
         cat $tmpfile | grep "$attribute: $value"
         rc=$?
         if [ $rc -ne 0 ] ; then
-                rlLog "ERROR: $mygroup verification failed: Value of $attribute is $value."
+                rlLog "ERROR: $mygroup verification failed: Value of $attribute is not $value."
         else
                 rlLog "Value of $attribute for $mygroup is as expected: $value."
         fi

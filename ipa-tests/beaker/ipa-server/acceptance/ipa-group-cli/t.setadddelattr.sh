@@ -29,16 +29,16 @@ attrsetup()
 setaddattr()
 {
     rlPhaseStartTest "ipa-group-setaddattr-001 - setattr group that doesn't exist"
-        command="ipa group-mod --setattr dn=mynewDN doesntexist"
+        command="ipa group-mod --setattr dn=\"cn=mynewDN,cn=groups,cn=accounts,dc=testrelm,dc=com\" doesntexist"
         expmsg="ipa: ERROR: doesntexist: group not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-group-setaddattr-002 setattr and addattr on dn"
-        command="ipa group-mod --setattr dn=mynewDN $grp"
+        command="ipa group-mod --setattr dn=\"cn=mynewDN,cn=groups,cn=accounts,dc=testrelm,dc=com\" $grp"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa group-mod --addattr dn=anothernewDN $grp"
+        command="ipa group-mod --addattr dn=\"cn=anothernewDN,cn=groups,cn=accounts,dc=testrelm,dc=com\" $grp"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -193,7 +193,7 @@ multiop()
     rlPhaseStartTest "ipa-group-multiop-005 group-mod --delattr + --addattr null op for gidnumber"
 	var=gidnumber
 	val=$(ipa group-find --all --raw $grp | grep $var | cut -d: -f2 | sed s/\ //g)
-	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value manipulation for $var"
+	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 0 "Testing a multi-value manipulation for $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
