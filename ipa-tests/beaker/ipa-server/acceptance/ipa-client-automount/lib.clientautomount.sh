@@ -357,17 +357,3 @@ configurate_non_secure_NFS_Server()
     fi
 }
 
-set_ipa_master_as_dns_server()
-{
-    rlLog "configurate_dns_server"
-    local resolv="/etc/resolv.conf"
-    rlLog "change $resolv"
-    rlLog "original content"
-    cat $resolv
-    echo "domain testrelm.com" > $resolv
-    echo "search testrelm.com" >> $resolv
-    echo "nameserver $MASTER_IP" >> $resolv
-    rlLog "new content"
-    cat $resolv
-    echo "----------------------------------"
-}
