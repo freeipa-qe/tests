@@ -53,7 +53,7 @@ public class RBACFunctional extends SahiTestScript {
 	 *  add a user - passes
 	 */		
 	@Test (groups={"hostAddsUser"}, description="Host has a role to add user", 
-			dataProvider="hostAddsUserTestObjects")	
+			dataProvider="hostAddsUserTestObjects",dependsOnGroups="PerDomainDNSPermissionDelete")	
 	public void testHostAddsUser(String testName, String roleName, String roleDescription, String privilege, String hostName) throws Exception {		
 		//add host		
 		log.info("Adding new host");
@@ -99,7 +99,7 @@ public class RBACFunctional extends SahiTestScript {
 	 * Bug 785152
 	 */
 	@Test (groups={"dnsUpdateAdmin"}, description="Bug 785152 - User with permission to update dnsrecord, cannot open it", 
-			dataProvider="dnsUpdateAdminTestObjects")
+			dataProvider="dnsUpdateAdminTestObjects",dependsOnGroups="PerDomainDNSPermissionDelete")
 			//, dependsOnGroups="permissionAddSubtreeTests")	
 	public void testDNSUpdateAdmin(String testName, String permissionName1, String permissionName2, String privilegeName, String privilegeDescription,
 			String roleName, String roleDescription, String userName) throws Exception {
@@ -167,7 +167,7 @@ public class RBACFunctional extends SahiTestScript {
 	 * Bug 807361
 	 */
 	@Test (groups={"dnsListZone"}, description="Bug 807361 - DNS records in LDAP are publicly accessible", 
-			dataProvider="dnsListZoneTestObjects", dependsOnGroups="dnsUpdateAdmin")	
+			dataProvider="dnsListZoneTestObjects", dependsOnGroups={"dnsUpdateAdmin","PerDomainDNSPermissionDelete"})	
 	public void testDNSListZone(String testName, String permissionName, String privilegeName,
 			String roleName, String userName) throws Exception {
 	
@@ -200,7 +200,7 @@ public class RBACFunctional extends SahiTestScript {
 	 * Bug 784621
 	 */
 	@Test (groups={"ResetPassword_Bug784621"}, description="Bug 784621 - Reset Password", 
-			dataProvider="ResetPasswordBug784621TestObjects")	
+			dataProvider="ResetPasswordBug784621TestObjects",dependsOnGroups="PerDomainDNSPermissionDelete")	
 	
 	public void testResetPassword_Bug784621(String testName, String permissionName, String right, String filter, String attribute, String privilegeName, String privilegedesc,
 			String roleName,  String roleDesc, String uidloginuser, String givennameloginuser, String snloginuser, String userpassword, String userpassword2, String uid, String givenname, String sn) throws Exception {
@@ -255,7 +255,7 @@ public class RBACFunctional extends SahiTestScript {
 	 * Bug 811211
 	 */
 	@Test (groups={"ReaddingPrivilege_Bug811211"}, description="Bug 811211 - Readding privilege", 
-			dataProvider="ReaddingPrivilegeBug811211TestObjects")	
+			dataProvider="ReaddingPrivilegeBug811211TestObjects",dependsOnGroups="PerDomainDNSPermissionDelete")	
 	
 	public void testReaddingPrivilege_Bug811211(String testName, String permissionName, String right, String filter, String attribute, String privilegeName, String privilegedesc) throws Exception {
 	
@@ -291,7 +291,7 @@ public class RBACFunctional extends SahiTestScript {
 	
 	//Bug 839008
 	 @Test (groups={"IndirectRoles_Bug839008"}, description="Bug 839008 - Indirect Roles",
-             dataProvider="IndirectRolesBug839008TestObjects")
+             dataProvider="IndirectRolesBug839008TestObjects",dependsOnGroups="PerDomainDNSPermissionDelete")
 
 	 public void testIndirectRoles_Bug839008(String testName, String permissionName, String privilegeName, String privilegedesc,
              String roleName, String roleDesc, String uid, String givenName, String sn, String password, String groupName, String groupDesc) throws Exception {
