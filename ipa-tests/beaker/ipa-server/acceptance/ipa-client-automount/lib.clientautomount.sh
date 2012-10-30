@@ -357,3 +357,66 @@ configurate_non_secure_NFS_Server()
     fi
 }
 
+verify_nfs_service_keytabfile(){
+    if kvno -k $keytabFile $principle | grep "keytab entry valid" 
+    then
+        echo "keytab file [$keytabFile] is valid"
+    else
+        echo "keytab file [$keytabFile] is NOT valid"
+    fi
+}
+
+replace_line(){
+    local file=$1
+    local line="$2"
+    local newline="$3"
+    local fileName=`basename $file`
+    local file_bk=/tmp/$fileName.bk.$RANDOM
+    local file_modified=/tmp/$fileName.modified.$RANDOM
+    cp $file $file_bk
+    cat $file | sed -e "s/^$line$/$newline/" > $file_modified
+    cp -f $file_modified $file
+    rm $file_modified
+    echo "original file backup at [$file_bk]"
+    echo "check new line in the [$file]"
+    echo "-----------------------------------------"
+    grep "$newline" $file
+    echo "-----------------------------------------"
+}
+
+modify_sysconfig_nfs()
+{
+    replace_line $nfsSystemConf "RPCGSSDARGS=\"\"" "RPCGSSDARGS=\"-vvv\""
+    replace_line $nfsSystemConf "RPCSVCGSSDARGS=\"\"" "RPCSVCGSSDARGS=\"-vvv\""
+}
+
+start_nfs_in_kereberized_mode(){
+    if kvno -k /etc/krb5.keytab $principle | grep "keytab entry valid"
+    then
+        echo "keytab file /etc/krb5.keytab is valid, continue"
+        cp /var/log/messages /tmp/message.before
+        service nfs restart
+        cp /var/log/messages /tmp/message.after
+        if diff /tmp/message.before /tmp/message.after | grep "rpc.svcgssd.* libnfsidmap: Realms .* " 2>&1 >/dev/null \
+           && diff /tmp/message.before /tmp/message.after | grep "rpc.svcgssd.*: libnfsidmap: using (default) domain: $domain" 2>&1 >/dev/null
+        then
+            echo "NFS starts in kerberized mode success"
+        else
+            echo "NFS failed to start in kerberized mode"
+        fi
+        rm /tmp/message.after  /tmp/message.before
+    else
+        echo "default keytab file /etc/krb5.keytab is INVALID, test can not continue"
+    fi
+}
+
+configure_kerberized_nfs_server()
+{
+    rlLog "configure host as kerberized nfs server"
+    KinitAsAdmin
+    rlRun "ssh -o StrictHostKeyChecking=no admin@$MASTER ipa service-add $nfsServicePrinciple" 0 "add nfs service"
+    rlRun "ipa-getkeytab -s $MASTER -k $keytabFile -p $nfsServicePrinciple" 0 "get keytab file, save as $keytabFile"
+    verify_nfs_service_keytabfile 
+    modify_sysconfig_nfs
+    start_nfs_in_kereberized_mode
+}

@@ -8,15 +8,16 @@ HOSTNAME=`hostname`
 #realm="YZHANG.REDHAT.COM"
 #suffix="dc=yzhang,dc=redhat,dc=com"
 
-# help script
-add_dns_record="./add.dns.records.sh"
 hostPrinciple="host/${HOSTNAME}@${REALM}"
+nfsServicePrinciple="nfs/${HOSTNAME}@${REALM}"
 suffix="$BASEDN"
 
 automountLocationA="Location__A"
 automountLocationB="Location__B"
 
+keytabFile="/etc/krb5.keytab"
 nfsConfigFile="/etc/exports"
+nfsSystemConf="/etc/sysconfig/nfs"
 nfsExportTopDir="/share"
 nfsExportSubDir="pub"
 nfsDir="$nfsExportTopDir/$nfsExportSubDir"
