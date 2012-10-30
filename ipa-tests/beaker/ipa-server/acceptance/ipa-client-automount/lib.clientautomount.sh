@@ -223,7 +223,8 @@ ensure_configuration_status()
     fi
 }
 
-ensure_expected_message_appears_in_configuration_file(){
+ensure_expected_message_appears_in_configuration_file()
+{
     local conf="$1"
     local message="$2"
     if grep "$message" $conf 2>&1 > /dev/null
@@ -235,7 +236,8 @@ ensure_expected_message_appears_in_configuration_file(){
     fi
 }
 
-ensure_message_not_appears_in_configuration_file(){
+ensure_message_not_appears_in_configuration_file()
+{
     local conf="$1"
     local message="$2"
     if grep "$message" $conf 2>&1 > /dev/null
@@ -262,7 +264,8 @@ clean_up_automount_installation()
     rm $tmp
 }
 
-show_file_content(){
+show_file_content()
+{
     local file=$1
     if [ -f $file ];then
         echo ""
@@ -276,7 +279,8 @@ show_file_content(){
 }
 
 
-pause(){
+pause()
+{
     local choice="y"
     echo -n "continue? (y/n) "
     read choice
@@ -353,7 +357,7 @@ configurate_non_secure_NFS_Server()
     fi
 }
 
-configurate_dns_server()
+set_ipa_master_as_dns_server()
 {
     rlLog "configurate_dns_server"
     local resolv="/etc/resolv.conf"

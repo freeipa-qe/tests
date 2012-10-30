@@ -138,7 +138,7 @@ rlJournalStart
         rlPhaseStartTest "Setup Master [$MASTER]"
             rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlRun "service iptables stop" 0 "stop friewall"
-            configurate_dns_server
+            set_ipa_master_as_dns_server
             KinitAsAdmin
             ipa user-find
             rlPass "Master setup [$MASTER], no action necessary"
@@ -149,7 +149,7 @@ rlJournalStart
         rlPhaseStartTest "Setup Replica [$REPLICA]"
             rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlRun "service iptables stop" 0 "stop friewall"
-            configurate_dns_server
+            set_ipa_master_as_dns_server
             KinitAsAdmin
             $add_dns_record -s $MASTER_IP -h `hostname` -i $REPLICA_IP
             ipa host-find `hostname`
@@ -163,7 +163,7 @@ rlJournalStart
             rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlLog "NFS setup [$NFS]"
             rlRun "service iptables stop" 0 "stop friewall"
-            configurate_dns_server
+            set_ipa_master_as_dns_server
             KinitAsAdmin
             $add_dns_record -s $MASTER_IP -h `hostname` -i $NFS_IP
             ipa host-find `hostname`
@@ -180,7 +180,7 @@ rlJournalStart
         rhts-sync-block -s "replica done" $REPLICA
         rhts-sync-block -s "nfs done" $NFS
         rlRun "service iptables stop" 0 "stop friewall"
-        configurate_dns_server
+        set_ipa_master_as_dns_server
         KinitAsAdmin
         $add_dns_record -s $MASTER_IP -h `hostname` -i $CLIENT_IP
         ipa host-find `hostname`
