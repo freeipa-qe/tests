@@ -420,3 +420,61 @@ configure_kerberized_nfs_server()
     modify_sysconfig_nfs
     start_nfs_in_kereberized_mode
 }
+
+parse_test_roles_from_beaker_job_xml_file()
+{
+    MASTER="$MASTER_env1"
+    Master_hostname=`echo $MASTER | cut -d'.' -f1`
+    MASTER_IP=$(dig +short $MASTER)
+    if [ -z "$MASTER_IP" ]; then
+	    MASTER_IP=$(getent ahostsv4 $MASTER | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+    fi
+
+    REPLICA="$REPLICA_env1"
+    Replica_hostname=`echo $REPLICA | cut -d'.' -f1`
+    REPLICA_IP=$(dig +short $REPLICA)
+    if [ -z "$REPLICA_IP" ]; then
+	    REPLICA_IP=$(getent ahostsv4 $REPLICA | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+    fi
+
+    NFS=`echo $CLIENT_env1 | cut -d' ' -f1`
+    Nfs_hostname=`echo $NFS | cut -d'.' -f1`
+    NFS_IP=$(dig +short $NFS)
+    if [ -z "$NFS_IP" ]; then
+	    NFS_IP=$(getent ahostsv4 $NFS | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+    fi
+
+    CLIENT=`echo $CLIENT_env1 | cut -d' ' -f2`
+    Client_hostname=`echo $CLIENT | cut -d'.' -f1`
+    CLIENT_IP=$(dig +short $CLIENT)
+    if [ -z "$CLIENT_IP" ]; then
+	    CLIENT_IP=$(getent ahostsv4 $CLIENT | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+    fi
+
+}
+
+map_hostname_with_role()
+{
+    CURRENT_HOST=$(hostname)
+    Current_hostname=`echo $CURRENT_HOST | cut -d'.' -f1`
+    case $Current_hostname in
+        "$Master_hostname")    MYROLE="MASTER"  ;;
+        "$Replica_hostname")   MYROLE="REPLICA" ;;
+        "$Nfs_hostname")       MYROLE="NFS"     ;;
+        "$Client_hostname")    MYROLE="CLIENT"  ;;
+        *)                     MYROLE="UNKNOWN" ;;
+    esac
+}
+
+print_hostname_role_mapping()
+{
+    rlLog "--------- test host used ----------------"
+    rlLog " current host [$CURRENT_HOST], role [$MYROLE]"
+    rlLog " MASTER : [$MASTER] [$Master_hostname] [$MASTER_IP]"
+    rlLog " REPLICA: [$REPLICA] [$Replica_hostname] [$REPLICA_IP]"
+    rlLog " NFS    : [$NFS] [$Nfs_hostname] [$NFS_IP]"
+    rlLog " CLIENT : [$CLIENT] [$Client_hostname] [$CLIENT_IP]"
+    rlLog "-----------------------------------------"
+}
+
+
