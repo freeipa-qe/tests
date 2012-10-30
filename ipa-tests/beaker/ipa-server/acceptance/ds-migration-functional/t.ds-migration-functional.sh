@@ -117,6 +117,8 @@ bz_tests()
 		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
 		KinitAsUser $USER1 $USER1PWD 
 		rlRun "klist | grep $USER1@RELM" 0 "Ensuring that kinit as $USER1 worked" 
+		rlLog "Running kinit"
+		kinit
 		KinitAsUser $USER1 $USER1PWD 
         rlPhaseEnd
 
@@ -124,6 +126,8 @@ bz_tests()
 		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
 		KinitAsUser $USER2 $USER2PWD 
 		rlRun "klist | grep $USER2@RELM" 0 "Ensuring that kinit as $USER2 worked" 
+		rlLog "Running kinit"
+		kinit
 		KinitAsUser $USER1 $USER1PWD 
         rlPhaseEnd
 }
