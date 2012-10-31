@@ -176,21 +176,27 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-11A ensure that ipactl start started krb5kdc"
                 rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that ipactl start started krb5kdc"
-                newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
-                rlLog "New krb5kdc pid is $newPID"
-                oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
-                rlLog "Old krb5kdc pid is $oldPID"
-                if [ "$newPID" -eq "$oldPID" ] ; then
+                numberOfProcesses=`ps -e | grep krb5kdc | wc -l`
+                if [ $numberOfProcesses -eq 1 ] ; then
+                   newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
+                   rlLog "New krb5kdc pid is $newPID"
+                   oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
+                   rlLog "Old krb5kdc pid is $oldPID"
+                  if [ $newPID -eq $oldPID ] ; then
                         rlFail "krb5kdc did not restart"
-                else
+                   else
                         rlPass "krb5kdc was restarted"
+                   fi
+                else
+                   rlFail "Bug 871524 - orphaned krb5kdc processes restarting IPA services"
                 fi
         rlPhaseEnd
+
 
         rlPhaseStartTest "ipa-ctl-11B ensure that ipactl start started kadmind"
                 rlRun "ps xa | grep -v grep |grep kadmind" 0 "Checking to ensure that ipactl start started kadmind"
                 newPID=`ps -e | grep kadmind | awk '{print $1}'`
-                rlLog "New kadmind pid is $newPID"
+               rlLog "New kadmind pid is $newPID"
                 oldPID=`cat /tmp/kadmind.out | awk '{print $1}'`
                 rlLog "Old kadmind pid is $oldPID"
                 if [ $newPID -eq $oldPID ] ; then
