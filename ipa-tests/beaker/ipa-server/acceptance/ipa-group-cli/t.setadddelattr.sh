@@ -190,10 +190,10 @@ multiop()
     rlPhaseEnd
 
     var=gidnumber
-    rlPhaseStartTest "ipa-group-multiop-005 group-mod --delattr + --addattr null op for gidnumber"
+    rlPhaseStartTest "ipa-group-multiop-005 group-mod --delattr + --addattr null op for gidnumber  - bug 870446"
 	var=gidnumber
 	val=$(ipa group-find --all --raw $grp | grep $var | cut -d: -f2 | sed s/\ //g)
-	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 0 "Testing a multi-value manipulation for $var"
+	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value manipulation for $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
