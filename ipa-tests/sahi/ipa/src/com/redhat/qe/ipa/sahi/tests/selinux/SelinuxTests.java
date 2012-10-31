@@ -482,10 +482,17 @@ public class SelinuxTests extends SahiTestScript {
 	public void testselinuxUserMapMemberCategory(String testName, String rulename, String user, String host) throws Exception {
 		
 		sahiTasks.navigateTo(commonTasks.selinuxPage, true);
-		
 		sahiTasks.link(rulename).click();
-		sahiTasks.radio("usercategory-1-0").click();
-		sahiTasks.radio("hostcategory-2-0").click();
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			sahiTasks.radio("usercategory-1-0").click(); 
+		}else{ 
+		    sahiTasks.radio("usercategory-8-0").click(); 
+		} 
+		if (!System.getProperty("os.name").startsWith("Windows")){ 
+			sahiTasks.radio("hostcategory-2-0").click(); 
+		}else{ 
+			sahiTasks.radio("hostcategory-9-0").click(); 
+		} 
 		sahiTasks.span("Update").click();
 		Assert.assertFalse(sahiTasks.checkbox(user).exists(), "User Category changed successfully");
 		Assert.assertFalse(sahiTasks.checkbox(host).exists(), "Host Category changed successfully");
