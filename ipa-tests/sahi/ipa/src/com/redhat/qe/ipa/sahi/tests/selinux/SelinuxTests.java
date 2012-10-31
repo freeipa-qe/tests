@@ -90,7 +90,8 @@ public class SelinuxTests extends SahiTestScript {
 		sahiTasks.span("Add").click();
 		sahiTasks.textbox("cn").setValue("selinux_hbacrule1");
 		sahiTasks.button("Add and Edit").click();
-		sahiTasks.span("Add").near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
+		//sahiTasks.span("Add").near(sahiTasks.tableHeader("UsersDeleteAdd")).click();
+		sahiTasks.span("Add").near(sahiTasks.div("Users")).click();
 		sahiTasks.textbox("filter").setValue(usernames[0]);
 		sahiTasks.span("Find").click();
 		sahiTasks.checkbox(usernames[0]).click();
