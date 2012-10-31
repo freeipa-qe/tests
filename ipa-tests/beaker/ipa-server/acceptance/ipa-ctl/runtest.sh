@@ -88,7 +88,7 @@ rlJournalStart
 		rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that ipactl stop stopped httpd"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-ctl-04A ensure that ipactl stop stopped krb5kdc"
+	rlPhaseStartTest "ipa-ctl-04A ensure that ipactl stop stopped krb5kdc -- bug 871524 "
                 rlRun "ps xa | grep -v grep |grep krb5kdc" 1 "Checking to ensure that ipactl stop stopped krb5kdc"
                 PID=`cat /tmp/krb5kdc.out`
                 ps -e | grep $PID
@@ -180,7 +180,7 @@ rlJournalStart
                 rlLog "New krb5kdc pid is $newPID"
                 oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
                 rlLog "Old krb5kdc pid is $oldPID"
-                if [ $newPID -eq $oldPID ] ; then
+                if [ "$newPID" -eq "$oldPID" ] ; then
                         rlFail "krb5kdc did not restart"
                 else
                         rlPass "krb5kdc was restarted"
@@ -369,7 +369,7 @@ rlJournalStart
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-ctl-23 stop services as non-root user"
-		rlRun "su testuserqa -c 'ipactl stop' > /tmp/stopnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
+		rlRun "su testuserqa -c 'ipactl stop' > /tmp/stopnonroot.out 2>&1" 4 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/stopnonroot.out"
 		rlRun "ps xa | grep -v grep |grep httpd" 0 "Checking to ensure that httpd is still running"
 		rlRun "ps xa | grep -v grep |grep named" 0 "Checking to ensure that named is still running"
@@ -384,11 +384,11 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-24 start services as non-root user"
 		rlRun "ipactl stop" 0 "Stop services as root first"
-                rlRun "su testuserqa -c 'ipactl start' > /tmp/startnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl start' > /tmp/startnonroot.out 2>&1" 4 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/startnonroot.out"
                 rlRun "ps xa | grep -v grep |grep httpd" 1 "Checking to ensure that httpd is NOT running"
                 rlRun "ps xa | grep -v grep |grep named" 1 "Checking to ensure that named is NOT running"
-		rlRun "ps xa | grep -v grep |grep krb5kdc" 1 "Checking to ensure that krb5kdc is NOT running"
+		rlRun "ps xa | grep -v grep |grep krb5kdc" 1 "Checking to ensure that krb5kdc is NOT running -- bug 871524"
 		rlRun "ps xa | grep -v grep |grep kadmind" 1 "Checking to ensure that kadmind is NOT running"
 		rlRun "ps xa | grep -v grep |grep memcached" 1 "Checking to ensure that memcached is NOT running"
                 #rlRun "ps xa | grep -v grep |grep ipa_kpasswd" 1 "Checking to ensure that is NOT running"
@@ -400,7 +400,7 @@ rlJournalStart
 rlPhaseStartTest "ipa-ctl-25 restart services as non-root user"
                 rlRun "ipactl start" 0 "Start services as root first"
 		getServicePIDs
-                rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 0 "Insufficient rights, starting service as nonprivileged user"
+                rlRun "su testuserqa -c 'ipactl restart' > /tmp/restartnonroot.out 2>&1" 4 "Insufficient rights, starting service as nonprivileged user"
 		rlAssertGrep "You must be root to run ipactl." "/tmp/restartnonroot.out"
 
                 #verify krb5kdc was not restarted
@@ -481,7 +481,7 @@ rlPhaseStartTest "ipa-ctl-25 restart services as non-root user"
 
         rlPhaseStartTest "ipa-ctl-26 verify status when directory server pki instance not running"
 		rlRun "service dirsrv stop PKI-IPA" 0 "stop the directory server PKI-IPA instance"
-		rlRun "ipactl status > /tmp/status.out" 0 "get ipa services status"
+		rlRun "ipactl status > /tmp/status.out" 3 "get ipa services status"
 		cat /tmp/status.out | grep "Directory Service: STOPPED"
 		if [ $? -eq 0 ] ; then
 			rlPass "Found: \"Directory Service: STOPPED\""
@@ -493,7 +493,7 @@ rlPhaseStartTest "ipa-ctl-25 restart services as non-root user"
 
         rlPhaseStartTest "ipa-ctl-27 verify ipactl status non zero return code on error"
 		rlRun "service dirsrv stop $INSTANCE" 0 "stop the $INSTANCE directory server instance"
-		rlRun "ipactl status" 1 "Get the status of ipactl service and verify non zero return code"
+		rlRun "ipactl status" 3 "Get the status of ipactl service and verify non zero return code"
 		rlRun "service dirsrv start $INSTANCE" 0 "restart the $INSTANCE directory server instance"
 		rlRun "ipactl status" 0 "check after instance restart"
         rlPhaseEnd
