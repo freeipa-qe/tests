@@ -463,10 +463,31 @@ public class CommonTasks {
 		if ( (sahiTasks.div("/IPA Error */").exists()) || (sahiTasks.span("Required field").exists()) ){
 			log.fine("IPA error dialog appears, usually this is data format error");
 			// there will be multiple cancel button here
-			while (sahiTasks.button("Cancel").exists()) {
-				sahiTasks.button("Cancel").click();
-			}
-			
+			if (!System.getProperty("os.name").startsWith("Windows")){
+				while (sahiTasks.span("Cancel").exists()) {// cancel some error prompts existing on top of add prompt
+					sahiTasks.span("Cancel").click();
+				}
+				while (sahiTasks.button("Cancel").exists()) {
+					sahiTasks.button("Cancel").click();
+				}
+				
+			}else{
+				
+				while (sahiTasks.span("Cancel").near(sahiTasks.span("Retry")).exists()) {
+					sahiTasks.span("Cancel").click();
+				}
+				while (sahiTasks.button("Cancel").exists()) {
+					sahiTasks.button("Cancel").click();
+				}
+			}/*
+				for (int i=0;i<10;i++){
+					while (sahiTasks.button("Cancel" + [i]).exists()) {
+						sahiTasks.button("Cancel").click();
+				
+				while (sahiTasks.span("Cancel").exists()) {// cancel some add prompts existing prior to the error prompt
+					sahiTasks.span("Cancel").click();
+				}
+			}*/
 			setErrorFlag(true);
 			return true;
 		}	
