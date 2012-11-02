@@ -91,12 +91,7 @@ rlPhaseStartTest "service_add_002: ipa service-add : add service for $SERVICE wi
 	rlAssertGrep "Added service \"$SERVICE\/$HOSTNAME@$RELM\"" "$TmpDir/service_add_002.out"
 	rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_add_002.out"
 	rlAssertGrep "Managed by: $HOSTNAME" "$TmpDir/service_add_002.out"
-
-if [ -f /etc/fedora-release ] ; then
 	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_add_002.out"
-else
-	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_add_002.out"
-fi
 
 	rlRun "cat $TmpDir/service_add_002.out"
 
@@ -111,12 +106,14 @@ service_add_003() {
 rlPhaseStartTest "service_add_003: ipa service-add : add service for $SERVICE with cert bytes"
 
 	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --certificate=wrong > $TmpDir/service_add_003A.out 2>&1" 1
-	rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_add_003A.out"
+	#rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_add_003A.out"
+	rlAssertGrep "ipa: ERROR: Base64 decoding failed: Incorrect padding" "$TmpDir/service_add_003A.out"
 	rlRun "cat $TmpDir/service_add_003A.out"
 
 	rlRun "ipa service-add $SERVICE/$HOSTNAME@$RELM --certificate=MIIC9jCCAd6gAwIBAgIBCTANBgkqhkiG9w0BAQ0FADA5MRIwEAYDVQQKEwlzaWxlbnRkb20xIzAhBgNVBAMTGkNlcnRpZmljYXRlIEF1dGhvcml0eWNhLXQxMB4XDTExMDExOTEyMjc1M1oXDTEzMDEwODEyMjc1M1owJjERMA8GA1UEAxMIYWNjb3VudHMxETAPBgNVBAMTCHNlcnZpY2VzMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDbcRxo0/tfpoJEzCLmfTDy9AYQIyubgwo2ErV+6unEKY2OW3YHIBW6Th6xg62tMzqQatIqqJKse9AnVoObWAiqhpjPdr2FuL6LiyRb1Aez9E5MVndfbsto0F7OYSs6y1yICSBAfA1CFAdRm+WOnBDI1e3hcg3UHXUukifKg4XaLQIDAQABo4GfMIGcMB8GA1UdIwQYMBaAFEoAQIQqOuqP8Ilyez9pzQCblEmWMEoGCCsGAQUFBwEBBD4wPDA6BggrBgEFBQcwAYYuaHR0cDovL2JldGEuZHNkZXYuc2pjLnJlZGhhdC5jb206NDgxODAvY2Evb2NzcDAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBDQUAA4IBAQCWk7YuyH6NTqILzmGK3qjIkreCpXnbNE99yrc7UQka9btrq2FWoFSxteU2JFD3+EGG8tXuDyDuWlgs8F3X/CBB4N+ZV4fAzHpIp2aIRQMapLKvu/mEiGPjFWFYJqk/HiNSQk8qefI6XqLvWIVY4LxMn4m1ZsQ/XXBzNbWsf9W3jnwCY0cLygJIgZZt2uQH/KxoQ3/oE0gp1wYITeKAKvaQrwUc4YgshlxMZAN4z5FuXdtDQqAIrJYcg9q+j6zYHNtXTcLuCFO0CcFto8CaUGXUJ0B5IrV2xsnRegHRxBy+C+3lfYiW2DelWI3exiYgdlU5wJSlkX37HQxA9cP+/kIib > $TmpDir/service_add_003B.out 2>&1" 1
 
-	rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_add_003B.out"
+	#rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_add_003B.out"
+	rlAssertGrep "ipa: ERROR: Base64 decoding failed: Incorrect padding" "$TmpDir/service_add_003B.out"
 	rlRun "cat $TmpDir/service_add_003B.out"
 
 	ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
@@ -138,7 +135,8 @@ service_add_004() {
 rlPhaseStartTest "service_add_004: ipa service-add : add service for $SERVICE with cert bytes and --force option"
 	rlRun "ipa host-add --force $TESTHOST" 0 "Adding dummy host with no DNS records"
         rlRun "ipa service-add $SERVICE/$TESTHOST@$RELM --force --certificate=wrong > $TmpDir/service_add_004A.out 2>&1" 1
-        rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_add_004A.out"
+        #rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_add_004A.out"
+	rlAssertGrep "ipa: ERROR: Base64 decoding failed: Incorrect padding" "$TmpDir/service_add_004A.out"
         rlRun "cat $TmpDir/service_add_004A.out"
         rlRun "ipa service-add $SERVICE/$TESTHOST@$RELM --force --certificate=MIIC9jCCAd6gAwIBAgIBCTANBgkqhkiG9w0BAQ0FADA5MRIwEAYDVQQKEwlzaWxlbnRkb20xIzAhBgNVBAMTGkNlcnRpZmljYXRlIEF1dGhvcml0eWNhLXQxMB4XDTExMDExOTEyMjc1M1oXDTEzMDEwODEyMjc1M1owJjERMA8GA1UEAxMIYWNjb3VudHMxETAPBgNVBAMTCHNlcnZpY2VzMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDbcRxo0/tfpoJEzCLmfTDy9AYQIyubgwo2ErV+6unEKY2OW3YHIBW6Th6xg62tMzqQatIqqJKse9AnVoObWAiqhpjPdr2FuL6LiyRb1Aez9E5MVndfbsto0F7OYSs6y1yICSBAfA1CFAdRm+WOnBDI1e3hcg3UHXUukifKg4XaLQIDAQABo4GfMIGcMB8GA1UdIwQYMBaAFEoAQIQqOuqP8Ilyez9pzQCblEmWMEoGCCsGAQUFBwEBBD4wPDA6BggrBgEFBQcwAYYuaHR0cDovL2JldGEuZHNkZXYuc2pjLnJlZGhhdC5jb206NDgxODAvY2Evb2NzcDAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBDQUAA4IBAQCWk7YuyH6NTqILzmGK3qjIkreCpXnbNE99yrc7UQka9btrq2FWoFSxteU2JFD3+EGG8tXuDyDuWlgs8F3X/CBB4N+ZV4fAzHpIp2aIRQMapLKvu/mEiGPjFWFYJqk/HiNSQk8qefI6XqLvWIVY4LxMn4m1ZsQ/XXBzNbWsf9W3jnwCY0cLygJIgZZt2uQH/KxoQ3/oE0gp1wYITeKAKvaQrwUc4YgshlxMZAN4z5FuXdtDQqAIrJYcg9q+j6zYHNtXTcLuCFO0CcFto8CaUGXUJ0B5IrV2xsnRegHRxBy+C+3lfYiW2DelWI3exiYgdlU5wJSlkX37HQxA9cP+/kIb > $TmpDir/service_add_004B.out 2>&1" 1
 
@@ -184,11 +182,15 @@ rlPhaseStartTest "service_add_006: ipa service-add: verifying the help message"
 	rlRun "ipa help service-add > $TmpDir/service_add_006.out 2>&1"
 	rlAssertGrep "Purpose: Add a new IPA new service." "$TmpDir/service_add_006.out"
 	rlAssertGrep "Usage: ipa \[global-options\] service-add PRINCIPAL" "$TmpDir/service_add_006.out"
-	rlAssertGrep "\-h, --help           show this help message and exit" "$TmpDir/service_add_006.out"
-	rlAssertGrep "\--certificate=BYTES  Base-64 encoded server certificate" "$TmpDir/service_add_006.out"
-	rlAssertGrep "\--force              force principal name even if not in DNS" "$TmpDir/service_add_006.out"
-	rlAssertGrep "\--all                Retrieve and print all attributes from the server." "$TmpDir/service_add_006.out"
-	rlAssertGrep "\--raw                Print entries as stored on the server." "$TmpDir/service_add_006.out"
+	rlAssertGrep "\-h, --help            show this help message and exit" "$TmpDir/service_add_006.out"
+	rlAssertGrep "\--certificate=BYTES   Base-64 encoded server certificate" "$TmpDir/service_add_006.out"
+	rlAssertGrep "\--pac-type=\['MS-PAC', 'PAD', 'NONE'\]" "$TmpDir/service_add_006.out"
+	rlAssertGrep "Override default list of supported PAC types." "$TmpDir/service_add_006.out"
+	rlAssertGrep "\--setattr=STR         Set an attribute to a name/value pair." "$TmpDir/service_add_006.out"
+	rlAssertGrep "\--addattr=STR         Add an attribute/value pair. Format is attr=value." "$TmpDir/service_add_006.out"
+	rlAssertGrep "\--force               force principal name even if not in DNS" "$TmpDir/service_add_006.out"
+	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/service_add_006.out"
+	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/service_add_006.out"
 	rlRun "cat $TmpDir/service_add_006.out"
 rlPhaseEnd
 }
@@ -282,12 +284,7 @@ rlPhaseStartTest "service_add_host_003: ipa service-add-host : add host to manag
         rlRun "ipa service-add-host --hosts=$TESTHOST $SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_add_host_003.out 2>&1"
         rlAssertGrep "Managed by: $HOSTNAME, $TESTHOST" "$TmpDir/service_add_host_003.out"
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_add_host_003.out"
-
-if [ -f /etc/fedora-release ] ; then
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_add_host_003.out"
-else
-        rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_add_host_003.out"
-fi
         rlAssertGrep "Number of members added 1" "$TmpDir/service_add_host_003.out"
         rlRun "cat $TmpDir/service_add_host_003.out"
 
@@ -408,7 +405,8 @@ service_del_003() {
 
 rlPhaseStartTest "service_del_003: re-delete the same or unknown service."
         rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_del_003.out 2>&1" 2
-        rlAssertGrep "ipa: ERROR: no such entry" "$TmpDir/service_del_003.out"
+        #rlAssertGrep "ipa: ERROR: no such entry" "$TmpDir/service_del_003.out"
+	rlAssertGrep "ipa: ERROR: vpn/qe-blade-11.testrelm.com@TESTRELM.COM: service not found" "$TmpDir/service_del_003.out"
         rlRun "cat $TmpDir/service_del_003.out"
 rlPhaseEnd
 }
@@ -510,11 +508,7 @@ service_find_003() {
         # ipa service-find with --principal and --all options
 rlPhaseStartTest "service_find_003: ipa service-find with --principal and --all options."
         rlRun "ipa service-find --principal=$SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_find_003.out 2>&1"
-if [ -f /etc/fedora-release ] ; then
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_find_003.out"
-else
-        rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_find_003.out"
-fi
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_find_003.out"
         rlAssertGrep "Keytab:" "$TmpDir/service_find_003.out"
         rlRun "cat $TmpDir/service_find_003.out"
@@ -563,6 +557,7 @@ rlPhaseStartTest "service_find_006: ipa service-find with --sizelimit option"
         rlRun "ipa service-find --sizelimit=1 > $TmpDir/service_find_006.out 2>&1"
         rlAssertGrep "Number of entries returned 1" "$TmpDir/service_find_006.out"
         rlRun "cat $TmpDir/service_find_006.out"
+rlPhaseEnd
 }
 
 service_find_007() {
@@ -639,13 +634,15 @@ rlPhaseStartTest "service_mod_001: ipa service-mod check help"
 	rlRun "cat $TmpDir/service_mod_001.out"
 	rlAssertGrep "Purpose: Modify an existing IPA service." "$TmpDir/service_mod_001.out"
 	rlAssertGrep "Usage: ipa \[global-options\] service-mod PRINCIPAL \[options\]" "$TmpDir/service_mod_001.out"
-	rlAssertGrep "\-h, \--help           show this help message and exit" "$TmpDir/service_mod_001.out"
-	rlAssertGrep "\--certificate=BYTES  Base-64 encoded server certificate" "$TmpDir/service_mod_001.out"
-	rlAssertGrep "\--addattr=STR        Add an attribute/value pair. Format is attr=value." "$TmpDir/service_mod_001.out"
-	rlAssertGrep "\--setattr=STR        Set an attribute to a name/value pair." "$TmpDir/service_mod_001.out"
-	rlAssertGrep "\--rights             Display the access rights of this entry" "$TmpDir/service_mod_001.out"
-	rlAssertGrep "\--all                Retrieve and print all attributes from the server." "$TmpDir/service_mod_001.out"
-	rlAssertGrep "\--raw                Print entries as stored on the server." "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\-h, --help            show this help message and exit" "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\--certificate=BYTES   Base-64 encoded server certificate" "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\--pac-type=\['MS-PAC', 'PAD', 'NONE'\]" "$TmpDir/service_mod_001.out"
+	rlAssertGrep "Override default list of supported PAC types." "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\--addattr=STR         Add an attribute/value pair. Format is attr=value." "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\--setattr=STR         Set an attribute to a name/value pair." "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\--rights              Display the access rights of this entry" "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\--all                 Retrieve and print all attributes from the server." "$TmpDir/service_mod_001.out"
+	rlAssertGrep "\--raw                 Print entries as stored on the server." "$TmpDir/service_mod_001.out"
 rlPhaseEnd
 }
 
@@ -658,13 +655,8 @@ rlPhaseStartTest "service_mod_002: ipa service-mod --rights, to display the righ
        rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIIDmDCCAoCgAwIBAgIBATANBgkqhkiG9w0BAQsFADA3MRUwEwYDVQQKEwxURVNUUkVMTS5DT00xHjAcBgNVBAMTFUNlcnRpZmljYXRlIEF1dGhvcml0eTAeFw0xMjAyMDIxNTQzMjJaFw0yMDAyMDIxNTQzMjJaMDcxFTATBgNVBAoTDFRFU1RSRUxNLkNPTTEeMBwGA1UEAxMVQ2VydGlmaWNhdGUgQXV0aG9yaXR5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAox29UcpdSpeCQuthJ/IAA5V59xRUcY3Oio3JYxgC5D/fUIMKV/Qwmd0EvaMNZXncfmcUsX5YrfAUSiKb2rfaSOLluR5NJ3QcNVVyw0O0hYbwWILjnMTUYilYeA7HsuVYigLxw0uHf23b49IuUDPCb13tot8m0wboN0XX+TiUsvchtRuKzlB2xr1Ix0apevs2pTeZkTmV1aUMcM6GfgkVKLpoX2OeIQMFUCgdeoca9Yjo8fUDjhQ+LrpC0UWUp4jRyjmCKCQ/m9+bUIpQBFXcW3z+CixyybBkOkWuLkXNYI2iWXajkVwSqBw86d3vXQZXfQYtsdwYpKl79leaRh9mawIDAQABo4GuMIGrMB8GA1UdIwQYMBaAFL5+6T4HKYVSPkm5zfIANFd5JvHdMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgHGMB0GA1UdDgQWBBS+fuk+BymFUj5Juc3yADRXeSbx3TBIBggrBgEFBQcBAQQ8MDowOAYIKwYBBQUHMAGGLGh0dHA6Ly9yaGVsNjItc2VydmVyLnRlc3RyZWxtLmNvbTo4MC9jYS9vY3NwMA0GCSqGSIb3DQEBCwUAA4IBAQBDXwR7r4jH79fIUtqChyDCrqMfAt1qVGQweKhF8Mcm7W1WotbUvYXG3O7Xq5nlwUHKrYRhpqOAKshLQ/O8eSY+BOzoYYqT40zgxNodKXFpmj0IdQ5Bk0D/kergRX69V1ZEEsyeKqEQqC8V2f40+vUvp2QLjJZmMVXT5i/AB+7wDvCgdzKfmb8iUqfVayRtIWcMkcHU8XnV/D1HTuAgAmfkFApxXShGFaINXJ5jrCj+QzQWPp+DvazpJVdstYWjj4TbCxIfDVbSx79xdogquLA1ja3M6+psyOx6fIqM6NMuUYau8hFTi6GwIIcCZNgh1jph8GrQyC8qwnicgGaDTreb --rights --all > $TmpDir/service_mod_002.out"
 	rlRun "cat $TmpDir/service_mod_002.out"
 	rlAssertGrep "Modified service \"$SERVICE/$HOSTNAME@$RELM\"" "$TmpDir/service_mod_002.out"
-if [ -f /etc/fedora-release ] ; then
-	rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'ipakrbprincipalalias': u'rscwo', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'krbmaxticketlife': u'rscwo', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'ipauniqueid': u'rsc'}" "$TmpDir/service_mod_002.out"
+	rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'ipakrbprincipalalias': u'rscwo', 'krbprincipalkey': u'swo', 'ipakrbauthzdata': u'rscwo', 'memberof': u'rsc', 'krbmaxticketlife': u'rscwo', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'ipauniqueid': u'rsc'}" "$TmpDir/service_mod_002.out"
 	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_mod_002.out"
-else
-	rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'krbmaxticketlife': u'rscwo', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'ipauniqueid': u'rsc'}" "$TmpDir/service_mod_002.out"
-	rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_mod_002.out"
-fi
 
 	#deleting for the added service for the next test case
         ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
@@ -708,7 +700,8 @@ service_mod_004() {
 rlPhaseStartTest "service_mod_004: ipa service-mod: updating service with a non-standard certificate format."
 	rlRun "ipa service-mod $SERVICE/$HOSTNAME@$RELM --certificate=MIICdzCCAeCgAwIBAgICA+4wDQYJKoZIhvcNAQEFBQAwKTEnMCUGA1UEAxMeVEVTVFJFTE0gQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTExMDIwOTA5MzE1M1oXDTIxMDIwOTA5MzE1M1owMTERMA8GA1UEChMIVEVTVFJFTE0xHDAaBgNVBAMTE2dzcmYxNGlwYXMudGVzdHJlbG0wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiHg3uWywDB1BWm7dy005eQGPecuOcpjp1ZX7Bc7FHxarF03IIsBT4DWvZlp1TbCDuHESBgTWExvr > $TmpDir/service_mod_004.out 2>&1" 1
 	rlRun "cat $TmpDir/service_mod_004.out"
-	rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_mod_004.out"
+	#rlAssertGrep "ipa: ERROR: invalid 'certificate': must be binary data" "$TmpDir/service_mod_004.out"
+	rlAssertGrep "ipa: ERROR: Base64 decoding failed: Incorrect padding" "$TmpDir/service_mod_004.out"
 
         #deleting for the added service for the next test case
         ipa service-del $SERVICE/$HOSTNAME@$RELM > /tmp/certerr.out 2>&1
@@ -822,11 +815,7 @@ rlPhaseStartTest "service_remove_host_003: ipa service-remove-host for services 
         rlRun "ipa service-remove-host --hosts=test.example.com $SERVICE/$HOSTNAME@$RELM --all > $TmpDir/service_remove_host_003.out 2>&1"
         rlAssertGrep "Principal: $SERVICE/$HOSTNAME@$RELM" "$TmpDir/service_remove_host_003.out"
         rlAssertGrep "ipauniqueid:" "$TmpDir/service_remove_host_003.out"
-if [ -f /etc/fedora-release ] ; then
         rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, ipakrbprincipal, top" "$TmpDir/service_remove_host_003.out"
-else
-        rlAssertGrep "objectclass: krbprincipal, krbprincipalaux, krbticketpolicyaux, ipaobject, ipaservice, pkiuser, top" "$TmpDir/service_remove_host_003.out"
-fi
         rlAssertGrep "Number of members removed 1" "$TmpDir/service_remove_host_003.out"
         rlRun "cat $TmpDir/service_remove_host_003.out"
 rlPhaseEnd
@@ -882,11 +871,7 @@ rlPhaseStartTest "service_show_002: ipa service-show with --all option"
         rlRun "ipa service-show http/$MASTER@$RELM  --all > $TmpDir/service_show_002.out 2>&1"
         rlAssertGrep "Principal: http/$MASTER@$RELM" "$TmpDir/service_show_002.out" -i 
         rlAssertGrep "Keytab: True" "$TmpDir/service_show_002.out"
-if [ -f /etc/fedora-release ] ; then
         rlAssertGrep "objectclass: ipaobject, top, ipaservice, pkiuser, ipakrbprincipal, krbprincipal, krbprincipalaux, krbTicketPolicyAux" "$TmpDir/service_show_002.out"
-else
-        rlAssertGrep "objectclass: ipaobject, top, ipaservice, pkiuser, krbprincipal, krbprincipalaux, krbTicketPolicyAux" "$TmpDir/service_show_002.out"
-fi
         #rlAssertGrep "valid_not_after:" "$TmpDir/service_show_002.out"
         #rlAssertGrep "valid_not_before:" "$TmpDir/service_show_002.out"
         rlAssertGrep "Not Before:" "$TmpDir/service_show_002.out"
@@ -926,11 +911,7 @@ service_show_005() {
         # ipa service-show with --rights options (requires --all)
 rlPhaseStartTest "service_show_005: ipa service-show with --rights options (requires --all)"
         rlRun "ipa service-show http/$MASTER@$RELM --rights --all > $TmpDir/service_show_005.out 2>&1"
-if [ -f /etc/fedora-release ] ; then
-        rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'ipakrbprincipalalias': u'rscwo', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'ipauniqueid': u'rsc', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'krbmaxticketlife': u'rscwo'}" "$TmpDir/service_show_005.out" -i
-else
-        rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'krbprincipalkey': u'swo', 'memberof': u'rsc', 'ipauniqueid': u'rsc', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'krbmaxticketlife': u'rscwo'}" "$TmpDir/service_show_005.out" -i
-fi
+        rlAssertGrep "attributelevelrights: {'krbextradata': u'rsc', 'krbcanonicalname': u'rsc', 'usercertificate': u'rscwo', 'krbupenabled': u'rsc', 'krbticketflags': u'rsc', 'krbprincipalexpiration': u'rsc', 'krbobjectreferences': u'rscwo', 'krbmaxrenewableage': u'rscwo', 'nsaccountlock': u'rscwo', 'managedby': u'rscwo', 'krblastsuccessfulauth': u'rsc', 'krbprincipaltype': u'rsc', 'ipakrbprincipalalias': u'rscwo', 'krbprincipalkey': u'swo', 'ipakrbauthzdata': u'rscwo', 'memberof': u'rsc', 'ipauniqueid': u'rsc', 'krbpwdpolicyreference': u'rsc', 'krbprincipalname': u'rsc', 'krbticketpolicyreference': u'rsc', 'krblastadminunlock': u'rscwo', 'krbpasswordexpiration': u'rsc', 'krblastfailedauth': u'rsc', 'objectclass': u'rscwo', 'aci': u'rscwo', 'krbpwdhistory': u'rsc', 'krbprincipalaliases': u'rsc', 'krbloginfailedcount': u'rsc', 'krblastpwdchange': u'rscwo', 'krbmaxticketlife': u'rscwo'}" "$TmpDir/service_show_005.out"
         rlRun "cat $TmpDir/service_show_005.out"
 rlPhaseEnd
 }
