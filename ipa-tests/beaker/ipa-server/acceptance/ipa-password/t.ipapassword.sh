@@ -3162,6 +3162,7 @@ bz_818836()
 {
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=818836
 	rlPhaseStartTest "Bug 818836 - ipa pwpolicy-find displays incorrect max and min lifetime."
+        Local_KinitAsAdmin
 		# Add a group to test on
 		grp="tgroup1"
 		ipa group-add --desc=desc $grp
@@ -3180,5 +3181,5 @@ bz_818836()
 		# Cleanup	
 		ipa group-del $grp
 	rlPhaseEnd
-} bz_818836
+} #bz_818836
 
