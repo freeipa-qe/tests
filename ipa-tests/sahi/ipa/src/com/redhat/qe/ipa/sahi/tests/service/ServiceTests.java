@@ -370,8 +370,11 @@ public class ServiceTests extends SahiTestScript {
 			CommonTasks.clearSearch(sahiTasks);
 			
 			if (searchString == "smtp5"){
+				String delservices = "smtp";
+				CommonTasks.search(sahiTasks, delservices);				
 				ServiceTasks.deleteService(sahiTasks, myserviceprincs);
 			}
+			CommonTasks.clearSearch(sahiTasks);
 		}
 	
 	/*******************************************************
