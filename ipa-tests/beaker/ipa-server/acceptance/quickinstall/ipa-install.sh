@@ -936,6 +936,12 @@ ipa_install_master()
 		done
 		
 		rlRun "ipa-server-install $IPAOPTIONS --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        if [ $(dig +short download.devel.redhat.com|wc -l) -eq 0 ]; then 
+            rlLog "[FAIL]: BZ 872372 found...IPA server DNS forwarding broken with bind-dyndb-ldap-2.2-1.el6.x86_64"
+            rlLog "Adding workaround for BZ 872372 to fix broken forwarding"
+            rlRun "ipa dnsconfig-mod --forwarder=$DNSFORWARD"
+            rlRun "service named restart"
+        fi
 
 		if [ $IPADEBUG ]; then
 			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
