@@ -391,6 +391,7 @@ public class ConfigurationTest extends SahiTestScript{
 		ConfigurationTasks.setConfigPasswordPluginFeature(sahiTasks);
 		//restore default  setConfigPasswordPluginFeature
 		sahiTasks.checkbox("AllowLMhash").click();
+		sahiTasks.span("Update").click();
 	}
 	
 	
