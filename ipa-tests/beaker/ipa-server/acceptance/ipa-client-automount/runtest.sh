@@ -77,7 +77,7 @@ rlJournalStart
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
         rlLog "kinit as admin, this is required for other ipa operations"
-        KinitAsAdmin
+        echo $ADMINPW | $KINITEXEC $ADMINID
         rlRun "service iptables stop" 0 "stop friewall, this is required for rest of test"
         rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
     rlPhaseEnd
