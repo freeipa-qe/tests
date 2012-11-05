@@ -211,6 +211,7 @@ public class PrivilegeTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button(buttonToClick).click();
 		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
 
