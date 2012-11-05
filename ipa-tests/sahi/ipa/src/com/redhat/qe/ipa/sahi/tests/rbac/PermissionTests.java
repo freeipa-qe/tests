@@ -358,7 +358,7 @@ public class PermissionTests extends SahiTestScript {
 				dataProvider="permissionBug815364TestObjects")	
 		public void testPermissionBug815364(String testName, String filter) throws Exception {		
 			CommonTasks.search(sahiTasks, filter);		
-			String[] dnsEntries={"Read DNS Entries", "Add DNS Entries", "Remove DNS Entries", "Update DNS Entries", "Write DNS Configuration"};
+			String[] dnsEntries={"Read DNS Entries", "add dns entries", "remove dns entries", "update dns entries", "Write DNS Configuration"};
 			for(String dns:dnsEntries){
 					Assert.assertTrue(sahiTasks.link(dns).exists(), "" + dns + " exists");
 			}
