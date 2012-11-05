@@ -236,6 +236,7 @@ public class RoleTasks {
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Add").click();
 		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.span("Refresh").click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
