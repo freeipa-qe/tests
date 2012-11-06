@@ -25,11 +25,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/ipa-default
-export TESTVERSION=1.1
+export TESTVERSION=1.2
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipadefault.sh data.ipadefault.acceptance t.ipadefault.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipadefault.sh data.ipadefault.acceptance lib.ipadefault.sh
 
 .PHONY: all install download clean
 
