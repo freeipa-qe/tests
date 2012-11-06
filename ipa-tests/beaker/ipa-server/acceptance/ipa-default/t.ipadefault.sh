@@ -223,6 +223,15 @@ ipadefault_config_all_logic()
         certsubjectbase=`grep "Certificate Subject base" $out | cut -d":" -f2| xargs echo`
         ipacompare "cert subject base" "$default_config_certsubjectbase" "$certsubjectbase"
 
+        selinuxmaporder=`grep "SELinux user map order" $out | cut -d" " -f7| xargs echo`
+        ipacompare "selinux user map order" "$default_config_selinuxmaporder" "$selinuxmaporder"
+
+        selinuxuser=`grep "Default SELinux user" $out | cut -d" " -f6| xargs echo`
+        ipacompare "default selinux user context" "$default_config_selinuxuser" "$selinuxuser"
+
+        pactype=`grep "Default PAC types" $out | cut -d":" -f2| xargs echo`
+        ipacompare "pac type" "$default_config_pactype" "$pactype"
+
         rm $out
     # test logic ends
 } # ipadefault_config_all_logic 
