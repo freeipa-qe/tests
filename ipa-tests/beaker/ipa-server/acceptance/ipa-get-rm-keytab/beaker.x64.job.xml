@@ -2,6 +2,7 @@
 	<whiteboard>
 		IPA get-rm-keytab RHEL6.4 X86_64
 	</whiteboard>
+	    <recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="ipa-get-rm-keytab Client">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
