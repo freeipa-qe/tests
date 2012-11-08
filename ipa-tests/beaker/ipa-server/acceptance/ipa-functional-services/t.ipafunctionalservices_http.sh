@@ -49,7 +49,7 @@ setup_ipa_http()
 	rlPhaseStartTest "SETUP: IPA server - HTTP"
 
 		ssh -o StrictHostKeyChecking=no root@$MASTER mkdir /home/admin
-		ssh -o StrictHostKeyChecking=no root@$MASTER chown admin:admin /home/admin
+		ssh -o StrictHostKeyChecking=no root@$MASTER chown admin:admins /home/admin
 	
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"	
 		# create a test http user
