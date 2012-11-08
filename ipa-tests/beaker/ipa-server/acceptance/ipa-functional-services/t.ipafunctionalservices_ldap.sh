@@ -67,7 +67,7 @@ setup_ipa_ldap()
 	rlPhaseStartTest "SETUP: IPA server - LDAP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 # create a test ldap user
-                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER create_ipauser ldapuser1 ldapuser1 ldapuser1 Secret123" 0 "Creating a test ldap user"
+                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER echo 123passworD | ipa user-add --first=ldapuser1 --last=ldapuser1 --password ldapuser1" 0 "Creating a test ldap user"
 
 		# kinit as admin
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
@@ -77,6 +77,30 @@ setup_ipa_ldap()
 
 		# semanage ldap ssl port
 		rlRun "semanage port -a -t ldap_port_t -p tcp $LDAPSPORT" 0 "Semanage - add LDAP SSL port"
+
+                local expfile=/tmp/kinit.exp
+
+                rm -rf $expfile
+                echo 'set timeout 30
+                set send_slow {1 .1}' > $expfile
+                echo "spawn kinit -V httpuser1" >> $expfile
+                echo 'match_max 100000' >> $expfile
+                echo 'expect "*: "' >> $expfile
+                echo 'sleep .5' >> $expfile
+                echo "send -s -- 123passworD" >> $expfile
+                echo 'send -s -- "\r"' >> $expfile
+                echo 'expect "*: "' >> $expfile
+                echo 'sleep .5' >> $expfile
+                echo "send -s -- Secret123" >> $expfile
+                echo 'send -s -- "\r"' >> $expfile
+                echo 'expect "*: "' >> $expfile
+                echo 'sleep .5' >> $expfile
+                echo "send -s -- Secret123" >> $expfile
+                echo 'send -s -- "\r"' >> $expfile
+                echo 'expect eof ' >> $expfile
+
+                /usr/bin/expect $expfile
+
 		
 	rlPhaseEnd
 } 
@@ -85,6 +109,7 @@ setup_ldap()
 {
 	rlPhaseStartTest "SETUP: LDAP server"
 		cd /etc/dirsrv
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa-getkeytab -s $MASTER -k $LDAPKEYTAB -p $LDAPPRINC" 0 "Get keytab for this host's ldap service"
 		rlRun "chown nobody:nobody $LDAPKEYTAB" 0 "Change keytab ownership to nobody.nobody"
 		rlRun "chmod 0400 $LDAPKEYTAB" 0 "Change keytab permissions to 0400"

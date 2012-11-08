@@ -53,7 +53,7 @@ setup_ipa_http()
 	
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"	
 		# create a test http user
-		rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER create_ipauser httpuser1 httpuser1 httpuser1 Secret123" 0 "Creating a test http user"
+		rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER echo 123passworD | ipa user-add --first=httpuser1 --last=httpuser1 --password httpuser1 " 0 "Creating a test http user"
 
 		# kinit as admin
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
@@ -66,6 +66,28 @@ setup_ipa_http()
 		rlRun "ipa-getkeytab -s $MASTER -k /tmp/$HOSTNAME.keytab -p $HTTPPRINC" 0 "Get keytab for this host's http service"
 		rlRun "chown apache.apache $HTTPKEYTAB" 0 "Change keytab ownership to apache.apache."
 
+    		local expfile=/tmp/kinit.exp
+
+		rm -rf $expfile
+    		echo 'set timeout 30
+		set send_slow {1 .1}' > $expfile
+    		echo "spawn kinit -V httpuser1" >> $expfile
+    		echo 'match_max 100000' >> $expfile
+    		echo 'expect "*: "' >> $expfile
+    		echo 'sleep .5' >> $expfile
+    		echo "send -s -- 123passworD" >> $expfile
+    		echo 'send -s -- "\r"' >> $expfile
+    		echo 'expect "*: "' >> $expfile
+    		echo 'sleep .5' >> $expfile
+    		echo "send -s -- Secret123" >> $expfile
+    		echo 'send -s -- "\r"' >> $expfile
+    		echo 'expect "*: "' >> $expfile
+    		echo 'sleep .5' >> $expfile
+    		echo "send -s -- Secret123" >> $expfile
+    		echo 'send -s -- "\r"' >> $expfile
+    		echo 'expect eof ' >> $expfile
+
+    		/usr/bin/expect $expfile
 	rlPhaseEnd
 }
 
