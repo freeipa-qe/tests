@@ -292,32 +292,32 @@ netgroup_add_negative()
 
 	rlPhaseStartTest "netgroup_add_negative_005: Verify fail on netgroup-add with invalid usercat"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --usercat=badcat > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be one of (u'all',)" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be 'all'" $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_006: Verify fail on netgroup-add with space for usercat"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --usercat=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be one of (u'all',)" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be 'all'" $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_007: Verify fail on netgroup-add with invalid hostcat"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --hostcat=badcat > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: invalid 'hostcat': must be one of (u'all',)" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'hostcat': must be 'all'" $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_008: Verify fail on netgroup-add with space for hostcat"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --hostcat=\" \" > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: invalid 'hostcat': must be one of (u'all',)" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'hostcat': must be 'all'" $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_009: Verify fail on netgroup-add with invalid usercat and valid hostcat"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --usercat=badcat --hostcat=all > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be one of (u'all',)" $tmpout
+		rlAssertGrep "ipa: ERROR: invalid 'usercat': must be 'all'" $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_010: Verify fail on netgroup-add with invalid setattr value"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=badvalue > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: value #0 invalid per syntax: Invalid syntax." $tmpout
+		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_011: Verify fail on netgroup-add with invalid setattr attr"
@@ -327,7 +327,7 @@ netgroup_add_negative()
 	
 	rlPhaseStartTest "netgroup_add_negative_012: Verify fail on netgroup-add with invalid addattr value"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=memberHost=badvalue > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: value #0 invalid per syntax: Invalid syntax." $tmpout
+		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_013: Verify fail on netgroup-add with invalid addattr attr"
@@ -352,17 +352,17 @@ netgroup_add_negative()
 
 	rlPhaseStartTest "netgroup_add_negative_016: Verify fail on netgroup-add with setattr invalid value, valid addattr and all"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=badvalue --addattr=memberHost=fqdn=hostname.$DOMAIN --all > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: value #0 invalid per syntax: Invalid syntax." $tmpout
+		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_add_negative_017: Verify fail on netgroup-add with valid setattr, invalid addattr value, and raw"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=fqdn=hostname.$DOMAIN --addattr=memberHost=badvalue --raw > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: value #1 invalid per syntax: Invalid syntax." $tmpout
+		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_add_negative_018: Verify fail on netgroup-add with valid setattr, invalid addattr value, all and raw"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=fqdn=hostname.$DOMAIN --addattr=memberHost=badvalue --all --raw > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: value #1 invalid per syntax: Invalid syntax." $tmpout
+		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
@@ -736,6 +736,7 @@ netgroup_mod_positive()
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_mod_positive_018: Remove memberUser attributes with setattr on netgroup"
+		rlLog "Executing: ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1"
 		rlRun "ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1" 0 "removing memberUser attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
 	rlPhaseEnd
@@ -757,6 +758,7 @@ netgroup_mod_positive()
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_mod_positive_022: Remove memberuser attributes with setattr on netgroup"
+		rlLog "Exceuting: ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1"
 		rlRun "ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1" 0 "removing memberUser attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
 	rlPhaseEnd
@@ -786,6 +788,7 @@ netgroup_mod_positive()
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_mod_positive_026: Remove memberHost attributes with setattr on netgroup"
+		rlLog "Executing: ipa netgroup-mod --setattr=memberHost=\"\" $ngroup1"
 		rlRun "ipa netgroup-mod --setattr=memberHost=\"\" $ngroup1" 0 "removing memberHost attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\"" 1 "Verifying setattr removed all member hosts on $ngroup1"
 	rlPhaseEnd
@@ -829,6 +832,7 @@ netgroup_mod_positive()
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_mod_positive_034: Modify netgroup to clear member hostgroup"
+		rlLog "Executing: ipa netgroup-mod $ngroup1 --setattr=memberhost=\"\"" 
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberhost=\"\"" 0 "Set initial memberhost to hostgroup for $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1|grep -v \"Member Hostgroup:\"" 0 "Verify hostgroup set for initial member host"
 	rlPhaseEnd
@@ -853,6 +857,7 @@ netgroup_mod_positive()
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_mod_positive_038: Modify netgroup to clear member netgroup"
+		rlLog "Executing: ipa netgroup-mod $ngroup1 --setattr=member=\"\"" 
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=\"\"" 0 "Modify netgroup to set initial member to netgroup"
 		rlRun "ipa netgroup-show $ngroup1|grep -v \"Member netgroups:\"" 0 "Verify netgroup set for initial member host"
 	rlPhaseEnd
@@ -865,14 +870,14 @@ netgroup_mod_negative()
 #### usercat
 	rlPhaseStartTest "netgroup_mod_negative_001: Invalid User Catagory"
 		command="ipa netgroup-mod --usercat=dummy $ngroup1"
-		expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
+		expmsg="ipa: ERROR: invalid 'usercat': must be 'all'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	rlPhaseEnd
 
 #### hostcat
 	rlPhaseStartTest "netgroup_mod_negative_002: Invalid Host Catagory"
 		command="ipa netgroup-mod --hostcat=dummy $ngroup1"
-		expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
+		expmsg="ipa: ERROR: invalid 'hostcat': must be 'all'"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	rlPhaseEnd
 
@@ -969,7 +974,7 @@ netgroup_mod_negative()
 	rlPhaseStartTest "netgroup_mod_negative_013: setattr and addattr on memberUser - Invalid Syntax"
 		#### test1
 		command="ipa netgroup-mod --setattr memberUser=$user1 $ngroup1"
-		expmsg="ipa: ERROR: memberUser: value #0 invalid per syntax: Invalid syntax."
+		expmsg="ipa: ERROR: memberUser: Invalid syntax."
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		#### test2
@@ -1006,7 +1011,7 @@ netgroup_mod_negative()
 		local HOSTNAME=`hostname`
 		#### test1 
 		command="ipa netgroup-mod --setattr memberHost=$HOSTNAME $ngroup1"
-		expmsg="ipa: ERROR: memberHost: value #0 invalid per syntax: Invalid syntax."
+		expmsg="ipa: ERROR: memberHost: Invalid syntax."
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		#### test2
