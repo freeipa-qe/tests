@@ -67,13 +67,13 @@ setup_ipa_ldap()
 	rlPhaseStartTest "SETUP: IPA server - LDAP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 # create a test ldap user
-                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER echo 123passworD | ipa user-add --first=ldapuser1 --last=ldapuser1 --password ldapuser1" 0 "Creating a test ldap user"
+                rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER echo 123passworD | ipa user-add --first=ldapuser1 --last=ldapuser1 --password ldapuser1" 0 "Creating a test ldap user"
 
 		# kinit as admin
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
                 #  add LDAP service for this client host
-                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa service-add $LDAPPRINC" 0 "Add LDAP service for this client host"
+                rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-add $LDAPPRINC" 0 "Add LDAP service for this client host"
 
 		# semanage ldap ssl port
 		rlRun "semanage port -a -t ldap_port_t -p tcp $LDAPSPORT" 0 "Semanage - add LDAP SSL port"
@@ -110,7 +110,7 @@ setup_ldap()
 	rlPhaseStartTest "SETUP: LDAP server"
 		cd /etc/dirsrv
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa-getkeytab -s $MASTER -k $LDAPKEYTAB -p $LDAPPRINC" 0 "Get keytab for this host's ldap service"
+		rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa-getkeytab -s $MASTER -k $LDAPKEYTAB -p $LDAPPRINC" 0 "Get keytab for this host's ldap service"
 		rlRun "chown nobody:nobody $LDAPKEYTAB" 0 "Change keytab ownership to nobody.nobody"
 		rlRun "chmod 0400 $LDAPKEYTAB" 0 "Change keytab permissions to 0400"
 
@@ -234,10 +234,10 @@ setup_ldap()
                 cat $HOSTNAME.csr
 		scp $HOSTNAME.csr admin@$MASTER:/tmp/$HOSTNAME.csr
                 # submit the certificate request
-                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa cert-request --principal=$LDAPPRINC /tmp/$HOSTNAME.csr" 0 "Submitting certificate request for LDAP server"
+                rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa cert-request --principal=$LDAPPRINC /tmp/$HOSTNAME.csr" 0 "Submitting certificate request for LDAP server"
                 # get certificate into PEM file
                 cd /etc/dirsrv/$INSTANCE
-                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa service-show $LDAPPRINC --out=/tmp/$HOSTNAME.crt" 0 "Get LDAP server cert into a PEM file"
+                rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-show $LDAPPRINC --out=/tmp/$HOSTNAME.crt" 0 "Get LDAP server cert into a PEM file"
 		sftp admin@$MASTER:/tmp/$HOSTNAME.csr .
 
                 # add the LDAP server cert to the certificate database
@@ -307,15 +307,15 @@ ldap_tests()
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
 		klist
 		klist -ekt $LDAPKEYTAB
-		rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
-		rlRun "ldapsearch -d1 -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
+		rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -o GSSAPIAuthentication=yes -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
+		rlRun "ldapsearch -d1 -h $HOSTNAME -p $LDAPPORT -o GSSAPIAuthentication=yes -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-functionalservices-ldap-002: Access LDAP service with out credentials"
         
         rlRun "kdestroy" 0 "destroy kerberos credentials"
-                rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
-                rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_006.out 2>&1" 254 "Verify ldapsearch with out valid credentials"
+                rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -o GSSAPIAuthentication=yes -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
+                rlRun "ldapsearch -h $HOSTNAME -p $LDAPPORT -o GSSAPIAuthentication=yes -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_006.out 2>&1" 254 "Verify ldapsearch with out valid credentials"
 		cat /tmp/ldapsearch_006.out | grep "Credentials cache file '/tmp/krb5cc_0' not found"
 		if [ $? -eq 0 ] ; then
 			rlPass "Error as expected Credentials not found"
@@ -326,14 +326,14 @@ ldap_tests()
 
 	rlPhaseStartTest "ipa-functionalservices-ldap-003: Access LDAPS service with credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
-                rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b  \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn"
-                rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
+                rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -o GSSAPIAuthentication=yes -s sub -b  \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn"
+                rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -o GSSAPIAuthentication=yes -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
         rlPhaseEnd
 
 	rlPhaseStartTest "ipa-functionalservices-ldap-004: Access LDAPS service without credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
-                rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
-                rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_008.out 2>&1" 254 "Verify ldapsearch with valid credentials"
+                rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -o GSSAPIAuthentication=yes -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
+                rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -o GSSAPIAuthentication=yes -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_008.out 2>&1" 254 "Verify ldapsearch with valid credentials"
                 cat /tmp/ldapsearch_008.out | grep "Credentials cache file '/tmp/krb5cc_0' not found"
                 if [ $? -eq 0 ] ; then
                         rlPass "Error as expected Credentials not found"
@@ -354,12 +354,12 @@ revoke_cert()
         rlPhaseStartTest "ipa-functionalservices-ldap-006: Revoke certificate"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		# revoke the HTTP server's certificate - first need the certificate's serial number
-                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa service-show --all $LDAPPRINC > /tmp/certout.txt"
+                rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-show --all $LDAPPRINC > /tmp/certout.txt"
 		sftp admin@$MASTER:/tmp/certout.txt /tmp/certout.txt
                 serialnos=`cat /tmp/certout.txt | grep "Serial Number" | cut -d ":" -f 2 | cut -d ":" -f 2`
                 serialno=`echo $serialnos | cut -d " " -f 1`
                 rlLog "$LDAPPRINC certificate serial number: $serialno"
-                rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
+                rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa cert-revoke $serialno" 0 "Revoke LDAP server's certificate"
 		rlLog "Checking certificate revokation via OCSP"
 		rlLog "EXECUTING: $OCSPCLT -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/"
 		rlRun "$OCSPCLT -S \"$HOSTNAME\" -d /etc/dirsrv/$INSTANCE/ > /tmp/ocsp.out" 0 "Running ocspclnt"
@@ -379,10 +379,10 @@ cleanup_ipa_ldap()
 {
 	rlPhaseStartTest "CLEANUP: IPA Server - LDAP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-		rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa user-del ldapuser1" 0 "Delete the ldap test user"
+		rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa user-del ldapuser1" 0 "Delete the ldap test user"
 		rlRun "ipa-rmkeytab -p $LDAPPRINC -k $LDAPKEYTAB" 0 "removing http keytab"
 		rlRun "rm -rf $LDAPKEYTAB" 0 "removing ldap keytab file"
-		rlRun "ssh -Y GSSAPI -o StrictHostKeyChecking=no admin@$MASTER ipa service-del $LDAPPRINC" 0 "Remove the LDAP service for this client host"
+		rlRun "ssh -o GSSAPIAuthentication=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-del $LDAPPRINC" 0 "Remove the LDAP service for this client host"
 		# restore ldap configuration file
                 cp -f /etc/openldap/ldap.conf.orig /etc/openldap/ldap.conf
 		rm -rf /etc/openldap/ldap.conf.orig
