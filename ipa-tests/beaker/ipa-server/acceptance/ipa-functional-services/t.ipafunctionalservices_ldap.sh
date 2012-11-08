@@ -269,6 +269,14 @@ EOF
 
 ldap_tests()
 {
+
+        rlPhaseStartTest "Check master ldap configuration"
+                minssf=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b \"cn=config\" | grep nsslapd-minssf:`
+                rlLog "Master minssf configuration: $minssf"
+                anonaccess=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b \"cn=config\" | grep nsslapd-allow-anonymous-access:`
+                rlLog "Master anonymous access configuration: $anonaccess"
+        rlPhaseEnd
+
 	rlPhaseStartTest "ipa-functionalservices-ldap-001: Access LDAP service with valid credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
 		klist
