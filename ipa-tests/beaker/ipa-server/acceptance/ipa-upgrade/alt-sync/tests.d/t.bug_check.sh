@@ -65,15 +65,15 @@ upgrade_bz_766096()
 			rlFail "BZ 766096 found...Handle schema upgrades from IPA v2 to v3"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -109,15 +109,15 @@ upgrade_bz_746589()
 			ipa group-del ipa-automember-bz-746589 > /dev/null
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -142,15 +142,15 @@ upgrade_bz_782918()
 			rlLog "Man page for ipa-upgradeconfig found"
 			rlPass "BZ 782918 not found"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -178,15 +178,15 @@ upgrade_bz_803054()
 		else
 			rlFail "Unknown error found.  Manually check upgrade"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -234,15 +234,15 @@ upgrade_bz_809262()
 			rlPass "BZ 809262 not found...WebUI did not return Internal Server Error"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -277,15 +277,15 @@ upgrade_bz_808201()
 			rlPass "BZ 808201 not found...ipa user-find after upgrade succeeded.  No error returned."
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -331,15 +331,15 @@ upgrade_bz_803930()
 			rlPass "BZ 803930 not found."
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -361,22 +361,22 @@ upgrade_bz_772359_start()
 		rlLog "capture LDAP mapping tree data before upgrade from MASTER ($MASTER)"
 		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree.out"
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 
 		rlLog "capture LDAP mapping tree data before upgrade from SLAVE ($SLAVE)"
 		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree.out"
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -406,12 +406,12 @@ upgrade_bz_772359_finish()
 			rlFail "BZ 772359 found."
 		fi
 		
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 
 		rlLog "capture LDAP mapping tree data after upgrade from SLAVE ($SLAVE)"
 		rlRun "ldapsearch -x -D '$ROOTDN' -w '$ROOTDNPWD' -b 'cn=mapping tree,cn=config' > /tmp/ldap_mapping_tree_after_upgrade.out"
@@ -424,12 +424,12 @@ upgrade_bz_772359_finish()
 			rlFail "BZ 772359 found."
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -458,12 +458,12 @@ upgrade_bz_812391()
 			rlPass "BZ 812391 not found...installation state errors not found in ipaserver-uninstall.log"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 
 		rlLog "Checking ipaserver-uninstall.log on MASTER ($MASTER) for BZ 812391 Errors"
 		if [ $(grep "ERROR Some installation state for dirsrv has not been restored" /var/log/ipaserver-uninstall.log | wc -l) -gt 0 ]; then
@@ -474,12 +474,12 @@ upgrade_bz_812391()
 			rlPass "BZ 812391 not found...installation state errors not found in ipaserver-uninstall.log"
 		fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -499,8 +499,8 @@ upgrade_bz_821176()
 		rlLog "Machine in recipe is MASTER"
 		rlLog "Restarting IPA services"
 		rlRun "ipactl restart"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		rlLog "Checking /var/log/messages for ns-slapd segfault"
 		if [ $(grep "ns-slapd.*segfault.*at.*error 4 in libreplication-plugin.so" /var/log/messages|wc -l) -gt 0 ]; then
 			rlFail "BZ 821176 found...ns-slapd segfault in libreplication-plugin after IPA upgrade from 2.1.3 to 2.2.0"
@@ -517,21 +517,21 @@ upgrade_bz_821176()
 		else
 			rlPass "BZ 821176 not found...didn't find LDAP error in dirsrv log"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.3' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 		rlLog "Running ipa-replica-manage force-sync to make sure that works"
 		rlRun "ipa-replica-manage force-sync --from=$MASTER_S.$DOMAIN --password=$ROOTDNPWD"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"

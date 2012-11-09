@@ -130,15 +130,15 @@ ipa_install_master_all(){
 		#	rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
 		#fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -167,15 +167,15 @@ ipa_install_master_nodns(){
 		#	rhts-submit-log -l /var/log/ipaserver-install.log.$DATE
 		#fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -197,12 +197,12 @@ ipa_install_slave_all(){
 		else
 			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 		if [ -f ~/.ssh/known_hosts ]; then
 			rlRun "sed -i /$MASTER_S/d ~/.ssh/known_hosts"
 			rlRun "sed -i /$MASTER_IP/d ~/.ssh/known_hosts"
@@ -231,12 +231,12 @@ ipa_install_slave_all(){
 		#fi
 		rlLog "popd"
 		popd	
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -261,12 +261,12 @@ ipa_install_slave_nodns()
 			rlRun "echo '$SLAVE_IP $SLAVE $SLAVE_S' >> /etc/hosts"
 			rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE"
 		fi
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
 		if [ -f ~/.ssh/known_hosts ]; then
 			rlRun "sed -i /$MASTER_S/d ~/.ssh/known_hosts"
 			rlRun "sed -i /$MASTER_IP/d ~/.ssh/known_hosts"
@@ -297,12 +297,12 @@ ipa_install_slave_nodns()
 			
 		rlLog popd
 		popd
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $SLAVE_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $MASTER_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -320,11 +320,11 @@ ipa_install_client(){
 		#commenting out debugging code
 		#rlRun "cat /etc/hosts"
 		#rlRun "nslookup $CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
+		rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER' $CLIENT_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
@@ -358,7 +358,7 @@ ipa_install_client(){
 		#	rhts-submit-log -l /var/log/ipaclient-install.log.$DATE
 		#fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $CLIENT_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $CLIENT_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"

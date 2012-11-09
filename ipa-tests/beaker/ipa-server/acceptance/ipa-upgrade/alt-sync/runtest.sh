@@ -36,6 +36,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
+. ./lib.ipa-rhts.sh
 
 # Include test case files
 for file in $(ls tests.d/t.*.sh); do
@@ -75,6 +76,9 @@ case $(hostname) in
 "$CLIENT")  MYROLE="CLIENT"    ;;
 *)          MYROLE="UNKNOWN"   ;;
 esac
+
+# Setup ipa rhts sync dir
+setup_iparhts_sync
 
 ##########################################
 #   test main 

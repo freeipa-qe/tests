@@ -77,8 +77,8 @@ data_check()
 	if [ "$TARGET_IP" != "$ipaddr" ]; then
 		rlPhaseStartTest "data_check_other: checking test data on another server right now"
 			rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
-			rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
-			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+			rlLog "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+			rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
 		rlPhaseEnd
 		return 0
 	fi
@@ -176,7 +176,7 @@ data_check()
 		#	rhts-submit-log -l /var/log/httpd/error_log.$DATE
 		#fi
 
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
+		rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 	rlPhaseEnd	
 }
 
@@ -190,8 +190,8 @@ data_check_2() {
 	if [ "$TARGET_IP" != "$ipaddr" ]; then
 		rlPhaseStartTest "data_check_other: checking test data on another server right now"
 			rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
-			rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
-			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+			rlLog "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
+			rlRun "iparhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $TARGET_IP"
 		rlPhaseEnd
 		return 0
 	fi
@@ -210,5 +210,5 @@ data_check_2() {
 		fi
 	rlPhaseEnd
 
-	rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
+	rlRun "iparhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $TARGET_IP"
 }
