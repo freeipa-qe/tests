@@ -29,12 +29,12 @@ certcli_envsetup()
 	rlPhaseStartTest "enable debug mode"
 		if [ -f /etc/ipa/server.conf ]; then
 			dc=$(date +%s)
-			mv /etc/ipa/server.conf-original-$dc
+			mv /etc/ipa/server.conf /etc/ipa/server.conf-original-${dc}
 		fi
-		if [ -f /etc/ipa/default.conf-original-$dc ]; then
-			rm -f /etc/ipa/default.conf-original-$dc
+		if [ -f /etc/ipa/default.conf-original-${dc} ]; then
+			rm -f /etc/ipa/default.conf-original-${dc}
 		fi		
-		mv /etc/ipa/default.conf-original-$dc
+		mv /etc/ipa/server.conf /etc/ipa/default.conf-original-${dc}
 		echo '[global]' >> /etc/ipa/server.conf
 		echo 'debug=True' >> /etc/ipa/server.conf
 		echo 'debug=True' >> /etc/ipa/default.conf
@@ -153,18 +153,18 @@ certcli_basic()
 		kdestroy
 		KinitAsAdmin
 		ipa user-find $u1 &> /dev/null
-		rlRun "keyctl show @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
+        rlRun "keyctl list @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
 	rlPhaseEnd
 
 	rlPhaseStartTest "clear out admin keyring."
 		rlRun "keyctl clear @s" 0 "Clear local session keyring"
 		rlRun "keyctl clear @u" 0 "Clear local user keyring"
-		rlRun "keyctl show @s | grep ipa_session_cookie | grep admin" 1 "Make sure that a admin key is not in the local keyring"
+		rlRun "keyctl list @s | grep ipa_session_cookie | grep admin" 1 "Make sure that a admin key is not in the local keyring"
 	rlPhaseEnd
 
 	rlPhaseStartTest "Repopulate admin keyring"
 		ipa user-find admin &> /dev/null
-		rlRun "keyctl show @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
+		rlRun "keyctl list @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
 	rlPhaseEnd
 	
 	# This Section verifies that multiple principals are supported at the same time 
@@ -175,8 +175,8 @@ certcli_basic()
 		ipa user-find $u1 &> /dev/null
 		KinitAsUser $u2 $u2pass
 		ipa user-find $u2 &> /dev/null
-		rlRun "keyctl show @s | grep ipa_session_cookie | grep $u1" 0 "Verify that u1 has a valid session key"
-		rlRun "keyctl show @s | grep ipa_session_cookie | grep $u2" 0 "Verify that u2 has a valid session key"
+		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "Verify that u1 has a valid session key"
+		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u2" 0 "Verify that u2 has a valid session key"
 	rlPhaseEnd
 
 	rlPhaseStartTest "Populate keyring for u1. restart ipa_memcache. Ensure that the ipa session id changes"
@@ -192,7 +192,8 @@ certcli_basic()
 			sessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
 		fi
 		rlLog "current session ID is $sessid"
-		rlRun "/bin/systemctl restart ipa_memcached.service" 0 "Restart memcached to break current session keys"
+		#rlRun "/bin/systemctl restart ipa_memcached.service" 0 "Restart memcached to break current session keys"
+		rlRun "service ipa_memcached restart" 0 "Restart memcached to break current session keys"
 		rlRun "ipa user-find $u1 &> /dev/null" 0 "rerun user find to generate new session ID"
 		newsessid=$(keyctl list @s | grep ipa_session_cookie | grep $u1 |cut -d\  -f1) # Get new session ID
 		if [ -x $newsessid	]; then
@@ -213,17 +214,18 @@ certcli_basic()
 		sessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
 		if [ -x $sessid	]; then
 			# sometimes the grep and cut do not work, do it again.
-			sleep 1
+			sleep 3
 			sessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
 		fi
 		keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1
 		rlLog "current session ID is $sessid"
-		rlRun "/bin/systemctl restart ipa_memcached.service" 0 "Restart memcached to break current session keys"
+		#rlRun "/bin/systemctl restart ipa_memcached.service" 0 "Restart memcached to break current session keys"
+		rlRun "service ipa_memcached restart" 0 "Restart memcached to break current session keys"
 		rlRun "ipa user-find $u1 &> /dev/null" 0 "rerun user find to generate new session ID"
 		newsessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1) # Get new session ID
 		if [ -x $newsessid	]; then
 			# sometimes the grep and cut do not work, do it again.
-			sleep 1
+			sleep 3
 			newsessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
 		fi
 		keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1
@@ -247,15 +249,24 @@ certcli_basic()
 		outf="/dev/shm/outfileh.txt"
 		sleep 5
 		ipa -vv user-find $u1 &>/dev/shm/1
+        sleep 3
 		ipa -vv user-find $u1 &> $outf # This command should work off of the current session.
 		ipa -vv user-find $u1 &>/dev/shm/2
-		ipa -vv user-find $u1 &>/dev/shm/3
-		sleep 30
-		ipa -vv user-find $u1 &>/dev/shm/4
-		sleep 30
-		ipa -vv user-find $u1 &>/dev/shm/5
+		#ipa -vv user-find $u1 &>/dev/shm/3
+		#sleep 30
+		#ipa -vv user-find $u1 &>/dev/shm/4
+		#sleep 30
+		#ipa -vv user-find $u1 &>/dev/shm/5
 
 		rlRun "grep Authorization:\ negotiate $outf" 1 "Re-verify that a normal user-find does not do a full kerberos auth"
+        rlLog "yi debug starts"
+        rlLog ";:::::::::::::::::: 1 :::::::::::::::::::::::"
+        cat /dev/shm/1
+        rlLog "::::::::::::::::::: outfile :::::::::::::::::"
+        cat $outf
+        rlLog "::::::::::::::::::: 2 :::::::::::::::::::::::"
+        cat /dev/shm/2
+        rlLog "yi debug end"
 		outf="/dev/shm/outfilei.txt"
 		ipa -vv --delegate user-find &> $outf # this command should force a full kerberos auth
 		rlRun "grep Authorization:\ negotiate $outf" 0 "ipa delegate should force a full kerberos auth. Verify that it happened."
