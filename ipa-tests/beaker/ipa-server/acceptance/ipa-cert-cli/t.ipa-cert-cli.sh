@@ -4,6 +4,19 @@ u2=crtu2
 u1pass=56tyguigy78
 u2pass=9675656pass
 
+read_session_id()
+{
+    local user=$1
+    local sessionid=`keyctl list @s | grep ipa_session_cookie | grep $user | cut -d":"  -f1`
+    if [ -z $sessionid ];then
+        sleep 3
+        sessionid=`keyctl list @s | grep ipa_session_cookie | grep $user | cut -d":"  -f1`
+        echo $sessionid
+    else
+        echo $sessionid
+    fi
+}
+
 ######################
 # test suite		 #
 ######################
@@ -26,6 +39,7 @@ certcli_envsetup()
 		create_ipauser $u2 user1 user1 $u2pass
 		#environment setup ends   here
 	rlPhaseEnd
+
 	rlPhaseStartTest "enable debug mode"
 		if [ -f /etc/ipa/server.conf ]; then
 			dc=$(date +%s)
@@ -47,7 +61,9 @@ certcli_basic()
 {
 	rlPhaseStartTest "kinit as u1 and verify that the keyring gets created"
 		kdestroy
-		keyctl purge user # Purging keys to be certain that the user-find populates the keyring properly.
+		#keyctl purge user # Fedora only command: Purging keys to be certain that the user-find populates the keyring properly.
+		rlRun "keyctl clear @s" 0 "Clear local session keyring"
+		rlRun "keyctl clear @u" 0 "Clear local user keyring"
 		KinitAsUser $u1 $u1pass
 		rlRun "ipa user-find $u1" 0 "user-find this user to populate the keyring"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
@@ -154,6 +170,7 @@ certcli_basic()
 		KinitAsAdmin
 		ipa user-find $u1 &> /dev/null
         rlRun "keyctl list @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
+        
 	rlPhaseEnd
 
 	rlPhaseStartTest "clear out admin keyring."
@@ -170,8 +187,11 @@ certcli_basic()
 	# This Section verifies that multiple principals are supported at the same time 
 	rlPhaseStartTest "Populate keyring with keys from two different users"
 		kdestroy
-		keyctl purge user # Purging keys to be certain that the user-find populates the keyring properly.
+		#keyctl purge user # Fedora only command: Purging keys to be certain that the user-find populates the keyring properly.
+		rlRun "keyctl clear @s" 0 "Clear local session keyring"
+		rlRun "keyctl clear @u" 0 "Clear local user keyring"
 		KinitAsUser $u1 $u1pass
+        
 		ipa user-find $u1 &> /dev/null
 		KinitAsUser $u2 $u2pass
 		ipa user-find $u2 &> /dev/null
@@ -181,99 +201,75 @@ certcli_basic()
 
 	rlPhaseStartTest "Populate keyring for u1. restart ipa_memcache. Ensure that the ipa session id changes"
 		kdestroy
+        local user="$u1"
 		KinitAsUser $u1 $u1pass
+        
 		rlRun "ipa user-find $u1 &> /dev/null" 0 "user-find this user to populate the keyring"
-		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
+		rlRun "keyctl list @s " 0 "ensure that the ipa session cookie was created"
 		# Get current current session ID
-		sessid=$(keyctl list @s | grep ipa_session_cookie | grep $u1 |cut -d\  -f1)
-		if [ -x $sessid	]; then
-			# sometimes the grep and cut do not work, do it again.
-			sleep 1
-			sessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
-		fi
-		rlLog "current session ID is $sessid"
-		#rlRun "/bin/systemctl restart ipa_memcached.service" 0 "Restart memcached to break current session keys"
-		rlRun "service ipa_memcached restart" 0 "Restart memcached to break current session keys"
+        sessid=`read_session_id $user`
+		rlLog "current session ID is [$sessid]"
+        rlLog "restart both ipa_memcached and httpd to break current session keys"
+		rlRun "service ipa_memcached restart"
+		rlRun "service httpd restart"
 		rlRun "ipa user-find $u1 &> /dev/null" 0 "rerun user find to generate new session ID"
-		newsessid=$(keyctl list @s | grep ipa_session_cookie | grep $u1 |cut -d\  -f1) # Get new session ID
-		if [ -x $newsessid	]; then
-			# sometimes the grep and cut do not work, do it again.
-			sleep 1
-			newsessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
-		fi
-		rlLog "new session ID is $newsessid"
-		rlRun "echo $newsessid | grep $sessid" 1 "make sure the old session is not the same as the current sessionid"
+        newsessid=`read_session_id $user`
+		rlLog "new session ID is [$newsessid]"
+        if [ "$sessid" = "$newsessid" ];then
+            rlFail "ipa_memcached and httpd restart does not trigger new session id being issued for user [$u1]"
+        else
+            rlPass "ipa_memcached and httpd restart creates a new session id for user [$u1]"
+        fi
+		#rlRun "echo $newsessid | grep $sessid" 1 "make sure the old session is not the same as the current sessionid"
 	rlPhaseEnd
 	
 	rlPhaseStartTest "Populate keyring for admin. restart ipa_memcache. Ensure that the ipa session id changes"
 		kdestroy
+        local user="admin"
 		KinitAsAdmin
+        
 		rlRun "ipa user-find $u1 &> /dev/null" 0 "user-find this user to populate the keyring"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
 		# Get current current session ID
-		sessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
-		if [ -x $sessid	]; then
-			# sometimes the grep and cut do not work, do it again.
-			sleep 3
-			sessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
-		fi
-		keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1
-		rlLog "current session ID is $sessid"
-		#rlRun "/bin/systemctl restart ipa_memcached.service" 0 "Restart memcached to break current session keys"
-		rlRun "service ipa_memcached restart" 0 "Restart memcached to break current session keys"
+        sessid=`read_session_id $user`
+		rlLog "current session ID is [$sessid]"
+        rlLog "restart both ipa_memcached and httpd to break current session keys"
+		rlRun "service ipa_memcached restart"
+		rlRun "service httpd restart"
 		rlRun "ipa user-find $u1 &> /dev/null" 0 "rerun user find to generate new session ID"
-		newsessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1) # Get new session ID
-		if [ -x $newsessid	]; then
-			# sometimes the grep and cut do not work, do it again.
-			sleep 3
-			newsessid=$(keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1)
-		fi
-		keyctl list @s | grep ipa_session_cookie | grep admin |cut -d\  -f1
-		rlLog "new session ID is $newsessid"
-		rlRun "echo $newsessid | grep $sessid" 1 "make sure the old session is not the same as the current sessionid"
+        newsessid=`read_session_id $user`
+		rlLog "new session ID is [$newsessid]"
+        if [ "$sessid" = "$newsessid" ];then
+            rlFail "ipa_memcached and httpd restart does not trigger new session id being issued for admin"
+        else
+            rlPass "ipa_memcached and httpd restart creates a new session id for admin"
+        fi
 	rlPhaseEnd
 	
 	rlPhaseStartTest "Create a valid keyring, then try issuing a command that will fallback to kerberos auth. Verify that the fallback happens"
-		rlLog "This test tends to fail on the following bug https://fedorahosted.org/freeipa/ticket/2331"
 		kdestroy
-		keyctl purge user # Purging keys to be certain that the user-find populates the keyring properly.
+		#keyctl purge user # Fedora only command: Purging keys to be certain that the user-find populates the keyring properly.
 		rlRun "keyctl clear @s" 0 "Clear local session keyring"
 		rlRun "keyctl clear @u" 0 "Clear local user keyring"
+
 		KinitAsUser $u1 $u1pass
 		outf="/dev/shm/outfileg.txt"
+        rlRun "service ipa_memcached restart"
 		ipa -vv user-find $u1 &> $outf # running ipa user-find to populate the keyring. 
-		ipa user-find admin &> /dev/null
-		sleep 5
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "verify u1's ipa session cookie was created"
 		rlRun "grep Authorization:\ negotiate $outf" 0 "This first user-find should complete a full kerberos auth."
 		outf="/dev/shm/outfileh.txt"
-		sleep 5
-		ipa -vv user-find $u1 &>/dev/shm/1
-        sleep 3
+        sleep 30 # after restart ipa_memcached, we need wait for 30 seconds till httpd re-establish the session via mem_cached
 		ipa -vv user-find $u1 &> $outf # This command should work off of the current session.
-		ipa -vv user-find $u1 &>/dev/shm/2
-		#ipa -vv user-find $u1 &>/dev/shm/3
-		#sleep 30
-		#ipa -vv user-find $u1 &>/dev/shm/4
-		#sleep 30
-		#ipa -vv user-find $u1 &>/dev/shm/5
+		rlRun "grep Authorization:\ negotiate $outf" 0 "Re-verify that a normal user-find does not do a full kerberos auth, after 30 seconds"
 
-		rlRun "grep Authorization:\ negotiate $outf" 1 "Re-verify that a normal user-find does not do a full kerberos auth"
-        rlLog "yi debug starts"
-        rlLog ";:::::::::::::::::: 1 :::::::::::::::::::::::"
-        cat /dev/shm/1
-        rlLog "::::::::::::::::::: outfile :::::::::::::::::"
-        cat $outf
-        rlLog "::::::::::::::::::: 2 :::::::::::::::::::::::"
-        cat /dev/shm/2
-        rlLog "yi debug end"
 		outf="/dev/shm/outfilei.txt"
 		ipa -vv --delegate user-find &> $outf # this command should force a full kerberos auth
 		rlRun "grep Authorization:\ negotiate $outf" 0 "ipa delegate should force a full kerberos auth. Verify that it happened."
 	rlPhaseEnd		
 
 	rlPhaseStartTest "If this test contains a slave, stop the server on the master."
-		if [ -x $BEAKERSLAVE ]; then 
+		if [ -z $BEAKERSLAVE ]; then 
 			rlLog "This test does not contain a slave. Not runnign multimaster tests."
 			rlPass "test passed"
 		else
@@ -291,12 +287,11 @@ certcli_basic()
 				# This host is a slave
 				rlRun "rhts-sync-block -s 'multicertcli.starttests' $BEAKERMASTER"
 			fi
-
 		fi
 	rlPhaseEnd
 
 	rlPhaseStartTest "get a key for u1 on the slave and make sure that it works."
-		if [ -x $BEAKERSLAVE ]; then 
+		if [ -z $BEAKERSLAVE ]; then 
 			rlLog "This test does not contain a slave. Not runnign multimaster tests."
 			rlPass "test passed"
 		else
@@ -327,7 +322,7 @@ certcli_basic()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Multi-host tests complete. Sync up and start master's IPA server again."
-		if [ -x $BEAKERSLAVE ]; then 
+		if [ -z $BEAKERSLAVE ]; then 
 			rlLog "This test does not contain a slave. Not runnign multimaster tests."
 			rlPass "test passed"
 		else
