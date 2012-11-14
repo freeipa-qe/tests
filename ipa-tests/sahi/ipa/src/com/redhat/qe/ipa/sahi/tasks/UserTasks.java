@@ -295,10 +295,33 @@ public class UserTasks {
 				Assert.assertEquals(true, false, "Not verified mail: " + mailInUI);
 			}
 			mailMatched = false;
-		}		
-		Assert.assertEquals(sahiTasks.textbox("telephonenumber-0").value(), phone1, "Verified phone for user " + uid + ": " + phone1);
-		Assert.assertEquals(sahiTasks.textbox("telephonenumber-1").value(), phone2, "Verified phone for user " + uid + ": " + phone2);
+		}	
 		
+		String cell0InUI = sahiTasks.textbox("telephonenumber-0").value();
+		String cell1InUI = sahiTasks.textbox("telephonenumber-1").value();
+		
+		
+		String cellsInUI[] = {cell0InUI, cell1InUI};
+		String cells[] = {phone1, phone2};
+		boolean cellMatched = false;
+		
+		for (String cellInUI : cellsInUI) {
+			for (String cell : cells) {
+				if (cellInUI.equals(cell)) {
+					cellMatched = true;
+				}
+				if (cellMatched) {
+					Assert.assertEquals(cellInUI, cell, "Verified phone for user " + uid + ": " + cell);
+					break;
+				}	
+			}
+			if (!cellMatched) {
+				Assert.assertEquals(true, false, "Not verified cell#: " + cellInUI);
+			}
+			cellMatched = false;
+		}
+		
+				
 		Assert.assertEquals(sahiTasks.textbox("pager-0").value(), pager1, "Verified pager for user " + uid + ": " + pager1);
 		Assert.assertEquals(sahiTasks.textbox("pager-1").value(), pager2, "Verified pager for user " + uid + ": " + pager2);
 	
