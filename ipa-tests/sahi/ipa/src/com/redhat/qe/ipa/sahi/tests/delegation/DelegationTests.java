@@ -41,7 +41,7 @@ public class DelegationTests extends IPAWebAutomation {
 	////////////////////////////////////////////////
 	
 	
-	@Test (groups={"add"}, dataProvider="addData",
+	@Test (groups={"add"}, dataProvider="addData",dependsOnGroups = "nonStandardUserDelegation",
 		description = "execute test cases in add queue")
 	public void test_add(String scenario, String testPage, String testDataFile) throws Exception { 
 		start = System.currentTimeMillis();
@@ -56,12 +56,12 @@ public class DelegationTests extends IPAWebAutomation {
 	}
 	
 	
-	@Test (groups={"search"}, dataProvider="searchData", dependsOnGroups = "add",
+	@Test (groups={"search"}, dataProvider="searchData", dependsOnGroups = {"add","modify"},
 			description = "execute test cases in search queue")
 		public void test_search(String scenario, String testPage, String testDataFile) throws Exception {
 			executeQueue(testPage, "search", testDataFile);
-	}
 	
+	}
 	@Test (groups={"delete"}, dataProvider="deleteData", dependsOnGroups = {"add","search"},
 		description = "execute test cases in delete queue")
 	public void test_delete(String scenario, String testPage, String testDataFile) throws Exception {
@@ -79,7 +79,9 @@ public class DelegationTests extends IPAWebAutomation {
 	 *****************************************************************************/
 	
 	// RHEL :: 
-	private String DelegationTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
+	private String DelegationTestDataFile = "/home/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
+	//f17
+	//private String DelegationTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
 	// WIN::
 	//private String DelegationTestDataFile = "C:\\delegation.propertiesdelegation.properties";
 	
