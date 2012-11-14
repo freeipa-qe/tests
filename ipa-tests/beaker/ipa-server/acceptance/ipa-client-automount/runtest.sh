@@ -57,10 +57,10 @@ map_hostname_with_role
 print_hostname_role_mapping
 
 # test host based on role settings
-ipaServerMaster="$MASTER"
-ipaServerReplica="$REPLICA"
-dnsServer="$MASTER"
-nfsServer="$NFS"
+ipaServerMaster="$MASTER_IP"
+ipaServerReplica="$REPLICA_IP"
+dnsServer="$MASTER_IP"
+nfsServer="$NFS_IP"
 
 currentLocation=$automountLocationA
 currentIPAServer=$ipaServerMaster
