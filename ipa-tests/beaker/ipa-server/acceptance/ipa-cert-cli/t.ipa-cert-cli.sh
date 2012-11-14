@@ -350,6 +350,7 @@ certcli_envcleanup()
 		cat /etc/ipa/default.conf | grep -v debug > /dev/shm/default.conf
 		rm -f /etc/ipa/default.conf
 		rlRun "cp -a /dev/shm/default.conf /etc/ipa/default.conf" 0 "Restoring default.conf"
+		rlRun "restorecon -Fvv /etc/ipa/default.conf" 0 "Restoring SELINUX content for default.conf"
 		rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to disable debug mode"
 		#environment cleanup ends   here
 	rlPhaseEnd
