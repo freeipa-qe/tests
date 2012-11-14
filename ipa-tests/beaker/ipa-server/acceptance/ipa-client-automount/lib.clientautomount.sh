@@ -426,6 +426,7 @@ parse_test_roles_from_beaker_job_xml_file()
     MASTER="$MASTER_env1"
     Master_hostname=`echo $MASTER | cut -d'.' -f1`
     MASTER_IP=$(dig +short $MASTER)
+    MASTER_IPA="${Master_hostname}.${DOMAIN}"
     if [ -z "$MASTER_IP" ]; then
 	    MASTER_IP=$(getent ahostsv4 $MASTER | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
     fi
@@ -433,6 +434,7 @@ parse_test_roles_from_beaker_job_xml_file()
     REPLICA="$REPLICA_env1"
     Replica_hostname=`echo $REPLICA | cut -d'.' -f1`
     REPLICA_IP=$(dig +short $REPLICA)
+    REPLICA_IPA="${Replica_hostname}.${DOMAIN}"
     if [ -z "$REPLICA_IP" ]; then
 	    REPLICA_IP=$(getent ahostsv4 $REPLICA | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
     fi
@@ -440,6 +442,7 @@ parse_test_roles_from_beaker_job_xml_file()
     NFS=`echo $CLIENT_env1 | cut -d' ' -f1`
     Nfs_hostname=`echo $NFS | cut -d'.' -f1`
     NFS_IP=$(dig +short $NFS)
+    NFS_IPA="${Nfs_hostname}.${DOMAIN}"
     if [ -z "$NFS_IP" ]; then
 	    NFS_IP=$(getent ahostsv4 $NFS | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
     fi
@@ -447,6 +450,7 @@ parse_test_roles_from_beaker_job_xml_file()
     CLIENT=`echo $CLIENT_env1 | cut -d' ' -f2`
     Client_hostname=`echo $CLIENT | cut -d'.' -f1`
     CLIENT_IP=$(dig +short $CLIENT)
+    CLIENT_IPA="${Client_hostname}.${DOMAIN}"
     if [ -z "$CLIENT_IP" ]; then
 	    CLIENT_IP=$(getent ahostsv4 $CLIENT | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
     fi

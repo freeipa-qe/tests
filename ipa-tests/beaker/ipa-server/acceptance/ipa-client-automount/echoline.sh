@@ -36,6 +36,13 @@ echoredOnWhite(){   echocolor $COLOR_redOnWhite "$@"; }
 echoredOnYellow(){   echocolor $COLOR_redOnYellow "$@"; }
 echogreenOnWhite(){ echocolor $COLOR_greenOnWhite "$@";}
 
+echopass(){ 
+    echogreen
+}
+echofail(){ 
+    echored
+}
+
 echoboldgreen(){ 
     echo -n -e "\033[1m"
     echo -n -e $COLOR_green
