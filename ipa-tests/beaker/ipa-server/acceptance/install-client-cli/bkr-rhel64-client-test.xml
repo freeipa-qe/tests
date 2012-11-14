@@ -16,7 +16,7 @@
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20121015.n.1"/>
+					<distro_version op="=" value="RedHatEnterpriseLinux6.4"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 				<distro_virt op="=" value=""/>
@@ -68,7 +68,7 @@
 			<distroRequires>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20121015.n.1"/>
+					<distro_version op="=" value="RedHatEnterpriseLinux6.4"/>
 					<distro_arch op="=" value="x86_64"/>
 			</distroRequires>
 			<hostRequires>
