@@ -802,8 +802,18 @@ ipaclientinstall_ntpservice()
         verify_ntpservice true
    rlPhaseEnd
 
+   rlPhaseStartTest "ipa-client-install-33-A [Negative] Verify that ntpdate was not called with the -d option"
+	# This is a tricky one to test for, as ntpdate called with the -d tag only produces one extra line in the sylog.
+	# Like this: Nov 13 16:36:15 epsilon ntpdate[4089]: ntpdate 4.2.6p4@1.2324-o Thu Oct  6 15:37:58 UTC 2011 (1
+	# This test will look for debug looking messages in /var/log/messages by looking for a line containing a combination of
+	#  "ntpdate" and the ntpdate version
 
-   rlPhaseStartTest "ipa-client-install-34- [Positive] Verify ntp service with client uninstall"
+	ntpdatever=$(ntpdate -v| grep ntpdate\  | cut -d\  -f 6)
+	rlLog "ntpdate version we are looking for is $ntpdatever"
+	rlRun "grep ntpdate /var/log/messages | grep '$ntpdatever'" 1 " checking messages for debug running of ntpdate"
+   rlPhaseEnd
+
+   rlPhaseStartTest "ipa-client-install-34- [Negative] Verify ntp service with client uninstall"
         uninstall_fornexttest
         verify_ntpservice false 
     rlPhaseEnd
