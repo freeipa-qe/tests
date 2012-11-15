@@ -148,14 +148,14 @@ check_nsswitch(){
 check_sysconfig_nfs(){
     local configuration_status=$1
     local conf="/etc/sysconfig/nfs"
-    local message="^SECURE_NFS=YES$"
+    local message="^SECURE_NFS=yes$"
     ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
 check_idmapd(){
     local configuration_status=$1
     local conf="/etc/idmapd.conf"
-    local message="^Domain=$domain$"
+    local message="^Domain=$DOMAIN$"
     ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 
