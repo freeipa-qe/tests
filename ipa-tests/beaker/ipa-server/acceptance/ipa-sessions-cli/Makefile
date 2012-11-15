@@ -1,7 +1,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/tests/Regression/ipa-cert-cli
-#   Description: IPA cert cli tests
+#   Makefile of /CoreOS/tests/Regression/ipa-sessions-cli
+#   Description: IPA sessions cli tests
 #   Author: Michael Gregg <mgregg@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,12 +24,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-cert-cli
-export TESTVERSION=1.0
+export TEST=/CoreOS/ipa-server/acceptance/ipa-sessions-cli
+export TESTVERSION=1.1
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-cert-cli.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipa-sessions-cli.sh
 
 .PHONY: all install download clean
 
@@ -50,7 +50,7 @@ $(METADATA): Makefile
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     IPA ipa-cert-cli acceptance tests" >> $(METADATA)
+	@echo "Description:     IPA CLI Sessions acceptance tests" >> $(METADATA)
 	@echo "Type:            Functional" >> $(METADATA)
 	@echo "TestTime:        15m" >> $(METADATA)
 	@echo "RunFor:          ipa-server" >> $(METADATA)

@@ -20,27 +20,25 @@ read_session_id()
 ######################
 # test suite		 #
 ######################
-ipa_cert_cli()
+ipa_sessions_cli()
 {
-	certcli_envsetup
-	certcli_basic
-	certcli_envcleanup
-} # certcli
+	sessionscli_envsetup
+	sessionscli_basic
+	sessionscli_envcleanup
+} 
 
 ######################
 # test cases		 #
 ######################
-certcli_envsetup()
+sessionscli_envsetup()
 {
-	rlPhaseStartSetup "certcli_envsetup"
+	rlPhaseStartSetup "sessions_envsetup"
 		#environment setup starts here
 		KinitAsAdmin	
 		create_ipauser $u1 user1 user1 $u1pass
 		create_ipauser $u2 user1 user1 $u2pass
-		#environment setup ends   here
-	rlPhaseEnd
 
-	rlPhaseStartTest "enable debug mode"
+		#set up debug
 		if [ -f /etc/ipa/server.conf ]; then
 			dc=$(date +%s)
 			mv /etc/ipa/server.conf /etc/ipa/server.conf-original-${dc}
@@ -55,9 +53,9 @@ certcli_envsetup()
 		rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to enable debug mode"
 	rlPhaseEnd
 		
-} #certcli_envsetup
+}
 
-certcli_basic()
+sessionscli_basic()
 {
 	rlPhaseStartTest "kinit as u1 and verify that the keyring gets created"
 		kdestroy
@@ -338,9 +336,9 @@ certcli_basic()
 
 }
 
-certcli_envcleanup()
+sessionscli_envcleanup()
 {
-	rlPhaseStartCleanup "certcli_envcleanup"
+	rlPhaseStartCleanup "sessionscli_envcleanup"
 		#environment cleanup starts here
 		KinitAsAdmin
 		delete_ipauser $u1
@@ -354,5 +352,5 @@ certcli_envcleanup()
 		rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to disable debug mode"
 		#environment cleanup ends   here
 	rlPhaseEnd
-} #certcli_envcleanup
+}
 
