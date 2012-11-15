@@ -28,6 +28,7 @@ ipaclientautomount()
 ######################
 clientautomount_script_install_and_uninstall()
 {
+    configure_autofs_direct $currentLocation $currentNFSServer $nfsDir $autofsDir 
     # simple install and uninstall case
     install_without_user_interruption   # such case will be covered by test set: clientautomount_script_install_option_combinations
     install_with_user_interruption      # negative test case

@@ -256,8 +256,10 @@ clean_up_automount_installation()
     ipa-client-automount --uninstall -U 2>&1 > $tmp
     if [ $? = "0" ];then
         echogreen "# clean up ipa-client-automount success"
+        rlPass    "# clean up ipa-client-automount success"
     else
         echored "# clean up ipa-client-automount error#"
+        rlFail  "# clean up ipa-client-automount error#"
         cat $tmp
     fi
     echo "#################################################"
@@ -268,13 +270,11 @@ show_file_content()
 {
     local file=$1
     if [ -f $file ];then
-        echo ""
-        echo "::::::::::::: [$file] :::::::::::::::"
+        rlLog "::::::::::::: [$file] :::::::::::::::"
         cat $file | grep -v "^\s*$" | grep -v "^#"
-        echo ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
-        echo ""
+        rlLog ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
     else
-        echoboldred ":::::::::::: [$file] does NOT exist :::::::::::::"
+        rlFail ":::::::::::: [$file] does NOT exist :::::::::::::"
     fi
 }
 

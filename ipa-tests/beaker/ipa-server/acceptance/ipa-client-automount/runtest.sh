@@ -87,6 +87,7 @@ rlJournalStart
     "MASTER" )
         rlPhaseStartTest "Setup Master [$MASTER] [$MASTER_IPA]"
             rlPass "Master setup [$MASTER], no action necessary"
+            rlLog "create automount locations for test use"
             rhts-sync-set -s 'master done'
             rlLog "master setup done"
         rlPhaseEnd 

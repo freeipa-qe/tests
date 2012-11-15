@@ -35,3 +35,4 @@ autofsDir="$autofsTopDir/$autofsSubDir"
 currentNFSMountOption=""
 currentNFSFileName="ipaserver.txt"
 currentNFSFileSecret="this_is_nfs_file_secret" 
+
