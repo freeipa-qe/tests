@@ -80,7 +80,7 @@ install_then_uninstall()
     rlPhaseStartTest "install then uninstall"
     clean_up_automount_installation
         # install
-        rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U" 
+        ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U
         check_autofs_sssd_configuration "configured"
         # uninstall
         rlRun "ipa-client-automount --uninstall -U"

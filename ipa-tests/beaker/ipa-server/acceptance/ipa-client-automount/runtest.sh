@@ -85,14 +85,14 @@ rlJournalStart
     # test_starts
     case "$MYROLE" in
     "MASTER" )
-        rlPhaseStartTest "Setup Master [$MASTER]"
+        rlPhaseStartTest "Setup Master [$MASTER] [$MASTER_IPA]"
             rlPass "Master setup [$MASTER], no action necessary"
             rhts-sync-set -s 'master done'
             rlLog "master setup done"
         rlPhaseEnd 
         ;;
     "REPLICA" ) 
-        rlPhaseStartTest "Setup Replica [$REPLICA]"
+        rlPhaseStartTest "Setup Replica [$REPLICA] [$REPLICA_IPA]"
             rlLog "waiting for master ..."
             rhts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
             rlLog "master is done, continue"
@@ -102,7 +102,7 @@ rlJournalStart
         rlPhaseEnd 
         ;;
     "NFS" )
-        rlPhaseStartTest "Setup NFS [$NFS]"
+        rlPhaseStartTest "Setup NFS [$NFS] [$NFS_IPA]"
             rlLog "waiting for masetr and replica ..."
             rhts-sync-block -s "master done" $MASTER
             rhts-sync-block -s "replica done" $REPLICA
@@ -114,14 +114,15 @@ rlJournalStart
         rlPhaseEnd
         ;;
     "CLIENT" )
-        rlPhaseStartTest "Setup CLIENT [$NFS]"
+        rlPhaseStartTest "Setup CLIENT [$CLIENT] [$CLIENT_IPA]"
             rlLog "Current host [$CURRENT_HOST], role [$MYROLE]"
             rlLog "waiting for master, replica and nfs server finishing their job"
             rhts-sync-block -s "master done" $MASTER
             rhts-sync-block -s "replica done" $REPLICA
             rhts-sync-block -s "nfs done" $NFS
             rlLog "master, replica and nfs are ready, continue testing"
-            rlLog "ipa host-find" 0 "print out all ipa host before test, this is just to show test environment"
+            KinitAsAdmin
+            rlRun "ipa host-find" 0 "print out all ipa host before test, this is just to show test environment"
         rlPhaseEnd
 
         ##############################################
