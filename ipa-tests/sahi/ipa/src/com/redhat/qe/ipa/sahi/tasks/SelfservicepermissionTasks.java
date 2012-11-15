@@ -97,5 +97,15 @@ public class SelfservicepermissionTasks {
 		
 		
 	}
+	
+	public static void pwdExpiration(SahiTasks browser,String userpassword,String newpassword) {
+		
+		browser.link("Reset your password.").click();
+		browser.password("current_password").setValue(userpassword);
+		browser.password("password1").setValue(newpassword);
+		browser.password("password2").setValue(newpassword);
+		browser.button("Reset Password").click();
+		
+	}
 
 }
