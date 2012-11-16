@@ -199,7 +199,8 @@ check_sysconfig_autofs_no_sssd(){
     local message="SEARCH_BASE=cn=${currentLocation},cn=automount,$suffix"
     ensure_configuration_status "$conf" "$message" "$configuration_status"
 
-    message="LDAP_URI=ldap://${currentIPAServer}"
+    #message="LDAP_URI=ldap://${currentIPAServer}"
+    message="LDAP_URI=ldap:///${suffix}"
     ensure_configuration_status "$conf" "$message" "$configuration_status"
 }
 

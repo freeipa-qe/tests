@@ -461,7 +461,7 @@ install_option__server_invalid__location_invalid__no_sssd()
 {
     rlPhaseStartTest "negative test: install option: --no-sssd + --server <invalid> --location <invalid>"
     clean_up_automount_installation
-        local invalidIPAServer="invalid.$RANCOM.ipa.server.com"
+        local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
         local invalidLocation="invalid_Automount_Location_$RANDOM"
         rlRun "ipa-client-automount --no-sssd --server=$invalidIPAServer --location=$invalidLocation -U" 1 "install should fail as invalid location used"
         check_autofs_no_sssd_configuration "not_configured"
