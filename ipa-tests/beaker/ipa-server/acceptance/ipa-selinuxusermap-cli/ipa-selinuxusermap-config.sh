@@ -48,7 +48,7 @@
 REALM=`os_getdomainname | tr "[a-z]" "[A-Z]"`
 DOMAIN=`os_getdomainname`
 default_selinuxuser="unconfined_u:s0-s0:c0.c1023"
-default_selinuxusermap_order_config="guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+default_selinuxusermap_order_config="guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
 
 
 
@@ -64,7 +64,7 @@ run_selinuxusermap_config_tests(){
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-001: Check ipa config for selinuxuser map order and default user"
 
-	expected_default_selinuxusermap_order_config="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+	expected_default_selinuxusermap_order_config="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
 
         rlRun "ipa config-show > $TmpDir/selinuxusermap_test1.out" 0 "Show ipa config"
 	rlRun "cat $TmpDir/selinuxusermap_test1.out"
@@ -73,23 +73,23 @@ run_selinuxusermap_config_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-002: Modify ipa config selinuxuser map order"
-        new_selinuxusermap_order_config="xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        new_selinuxusermap_order_config="xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
 
-        expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_default.out" 0 "Show ipa default config"
 	rlRun "cat  $TmpDir/selinuxusermap_default.out"
-        rlLog " Executing: ipa config-mod --ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-        ipa config-mod --ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+        rlLog " Executing: ipa config-mod --ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
         rlRun "ipa config-show > $TmpDir/selinuxusermap_neworder.out" 0 "Show ipa config"
 	rlRun "cat  $TmpDir/selinuxusermap_neworder.out"
         rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_neworder.out"
         rlLog "Cleanup: back on default ipa config selinuxuser map order"
-        ipa config-mod --ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+        ipa config-mod --ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-003: Modify ipa config default selinuxuser"
-        new_selinuxuser="user_u:s0-s0:c0.c1023"
-        expected_default_selinuxuser="Default SELinux user: user_u:s0-s0:c0.c1023"
+        new_selinuxuser="user_u:s0"
+        expected_default_selinuxuser="Default SELinux user: user_u:s0"
         rlRun "ipa config-mod --ipaselinuxusermapdefault=$new_selinuxuser" 0 "Modify ipa config default selinuxuser"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_new_default.out" 0 "Show ipa config"
         rlAssertGrep "$expected_default_selinuxuser" "$TmpDir/selinuxusermap_new_default.out"
@@ -98,14 +98,14 @@ run_selinuxusermap_config_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-004: Modify ipa config selinuxuser map order with non existing selinux user - selinux user order should get updated since there is no way to detect that contexts are available"
-        expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0"
-	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_order_unknown.out"
-	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_order_unknown.out
+        expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_order_unknown.out"
+	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_order_unknown.out
         rlRun "ipa config-show > $TmpDir/selinuxusermap_order_unkown.out" 0 "Show ipa config"
 	rlRun "cat  $TmpDir/selinuxusermap_order_unknown.out"
         rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_order_unkown.out"
-	rlLog "Cleanup: back on default ipa config selinuxuser map order: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+	rlLog "Cleanup: back on default ipa config selinuxuser map order: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+	ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-005: Modify ipa config default selinuxuser with non existing selinux user"
@@ -116,7 +116,7 @@ run_selinuxusermap_config_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-006: Modify ipa config selinuxuser map order with existing order"
-        command="ipa config-mod --ipaselinuxusermaporder=guest_u:s0\\\$xguest_u:s0\\\$user_u:s0-s0:c0.c1023\\\$staff_u:s0-s0:c0.c1023\\\$unconfined_u:s0-s0:c0.c1023"
+        command="ipa config-mod --ipaselinuxusermaporder=guest_u:s0\\\$xguest_u:s0\\\$user_u:s0\\\$staff_u:s0-s0:c0.c1023\\\$unconfined_u:s0-s0:c0.c1023"
         expmsg="ipa: ERROR: no modifications to be performed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for non existing selinux user"
     rlPhaseEnd
@@ -128,23 +128,23 @@ run_selinuxusermap_config_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-008: setattr ipa config selinuxuser map order"
-	new_selinuxusermap_order_config="xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+	new_selinuxusermap_order_config="xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
 
-        expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_default.out" 0 "Show ipa config"
         rlRun "cat  $TmpDir/selinuxusermap_default.out"
-        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-        ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
         rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_neworder.out" 0 "Show ipa setattr_neworder config"
         rlRun "cat  $TmpDir/selinuxusermap_setattr_neworder.out"
         rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder.out"
-        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+        rlLog "ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-009: setattr ipa config default selinuxuser with a selinux user"
-	new_selinuxuser="user_u:s0-s0:c0.c1023"
-        expected_default_selinuxuser="Default SELinux user: user_u:s0-s0:c0.c1023"
+	new_selinuxuser="user_u:s0"
+        expected_default_selinuxuser="Default SELinux user: user_u:s0"
         rlRun "ipa config-mod \"--setattr=ipaselinuxusermapdefault=$new_selinuxuser\"" 0 "Modify ipa config default selinuxuser: ipa config-mod --setattr=ipaselinuxusermapdefault=$new_selinuxuser"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_new_default.out" 0 "Show ipa config"
         rlAssertGrep "$expected_default_selinuxuser" "$TmpDir/selinuxusermap_setattr_new_default.out"
@@ -152,15 +152,15 @@ run_selinuxusermap_config_tests(){
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-010: setattr ipa config selinuxuser map order with non existing selinux user - selinux user order should get updated since there is no way to detect that contexts are available"
-        expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0"
-	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_setattr_unknown.out"
-        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_setattr_unknown.out
+        expected_selinuxusermap_order_config_entry="SELinux user map order: xguest_u:s0\$guest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0"
+	rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_setattr_unknown.out"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023\$unkown_u:s0 > $TmpDir/selinuxusermap_setattr_unknown.out
 	rlRun "cat $TmpDir/selinuxusermap_setattr_unknown.out"
 	rlRun "ipa config-show > $TmpDir/selinuxusermap_setattr_order_unknown.out" 0 "Show ipa config: ipa config-show"
         rlRun "cat $TmpDir/selinuxusermap_setattr_order_unknown.out"
         rlAssertGrep "$expected_selinuxusermap_setattr_order_config_entry" "$TmpDir/selinuxusermap_setattr_order_unknown.out"
-        rlLog "Cleanup: back on default ipa config selinuxuser map order: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+        rlLog "Cleanup: back on default ipa config selinuxuser map order: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-011: setattr ipa config default selinuxuser with non existing selinux user"
@@ -173,16 +173,16 @@ run_selinuxusermap_config_tests(){
     rlPhaseEnd
 	
     rlPhaseStartTest "ipa-selinuxusermap-config-cli-012: Remove selinux user from the order list when its default"
-        expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        expected_selinuxusermap_order_config_entry="SELinux user map order: guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
         rlRun "ipa config-show > $TmpDir/selinuxusermap_default.out" 0 "Show ipa config"
         rlRun "cat  $TmpDir/selinuxusermap_default.out"
         expmsg="ipa: ERROR: invalid 'ipaselinuxusermaporder': SELinux user map default user not in order list"
-        rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023"
-        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023
+        rlLog "Executing: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023
         if [ $? -eq 0 ] ; then
                 rlFail "ERROR: Command expected to fail."
         else
-                ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023 2> $TmpDir/selinuxusermap_no_defaultuser.out
+                ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023 2> $TmpDir/selinuxusermap_no_defaultuser.out
                 actual=`cat $TmpDir/selinuxusermap_no_defaultuser.out`
                 if [[ "$actual" = "$expmsg" ]] ; then
                         rlPass "Error message $expmsg is as expected"
@@ -375,8 +375,8 @@ run_selinuxusermap_config_tests(){
         rlAssertGrep "$expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_16.out"
         rlAssertNotGrep "$not_expected_selinuxusermap_order_config_entry" "$TmpDir/selinuxusermap_setattr_neworder_13_16.out"
 
-	rlLog "Clean up: back on original configuration: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+	rlLog "Clean up: back on original configuration: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
 	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2993"
     rlPhaseEnd
  

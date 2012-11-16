@@ -351,13 +351,13 @@ rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with inv
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-add-cli-033: Add a selinuxuser map with multiple selinuxusers"
-        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0-s0:c0.c1023\"  $selinuxusermap_multipleselinuxuser"
-        command="ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0-s0:c0.c1023\" $selinuxusermap_multipleselinuxuser"
+        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0\"  $selinuxusermap_multipleselinuxuser"
+        command="ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0\" $selinuxusermap_multipleselinuxuser"
         expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	
-	rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0\$user_u:s0-s0:c0.c1023\"  $selinuxusermap_multipleselinuxuser"
-        command="ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0-s0:c0.c1023\" $selinuxusermap_multipleselinuxuser"
+	rlLog "Executing: ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0\$user_u:s0\"  $selinuxusermap_multipleselinuxuser"
+        command="ipa selinuxusermap-add --selinuxuser=\"xguest_u:s0,user_u:s0\" $selinuxusermap_multipleselinuxuser"
         expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
@@ -367,9 +367,9 @@ rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with inv
 	rlRun "ipa hbacrule-disable testHbacRule" 0 "Disable hbac rule."
         # verify disabled
 	rlRun "verifyHBACStatus testHbacRule FALSE" 0 "Verify rule is now disabled"
-        rlLog "ipa selinuxusermap-add --selinuxuser=\"user_u:s0-s0:c0.c1023\" --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule"
-	rlRun "ipa selinuxusermap-add --selinuxuser=\"user_u:s0-s0:c0.c1023\" --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule" 0 "Add a selinuxusermap with disabled hbacrule "
-	rlRun "findSelinuxusermapByOption selinuxuser \"user_u:s0-s0:c0.c1023\" $selinuxusermap_disabledhbacrule" 0 "Verifying selinuxusermap was added with given selinuxuser"
+        rlLog "ipa selinuxusermap-add --selinuxuser=\"user_u:s0\" --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule"
+	rlRun "ipa selinuxusermap-add --selinuxuser=\"user_u:s0\" --hbacrule=testHbacRule $selinuxusermap_disabledhbacrule" 0 "Add a selinuxusermap with disabled hbacrule "
+	rlRun "findSelinuxusermapByOption selinuxuser \"user_u:s0\" $selinuxusermap_disabledhbacrule" 0 "Verifying selinuxusermap was added with given selinuxuser"
 	rlRun "findSelinuxusermapByOption hbacrule testHbacRule $selinuxusermap_disabledhbacrule" 0 "Verifying selinuxusermap was added with disabled hbacrule"
     rlPhaseEnd
 
@@ -450,8 +450,8 @@ rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with inv
         expmsg="ipa: ERROR: invalid 'selinuxuser': Invalid MCS value, must match c[0-1023].c[0-1023] and/or c[0-1023]-c[0-c0123]"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
 	
-	rlLog "Clean up: back on original configuration: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
-        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0-s0:c0.c1023\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
+	rlLog "Clean up: back on original configuration: ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023"
+        ipa config-mod --setattr=ipaselinuxusermaporder=guest_u:s0\$xguest_u:s0\$user_u:s0\$staff_u:s0-s0:c0.c1023\$unconfined_u:s0-s0:c0.c1023
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa-selinuxusermap-add-cli-cleanup: Destroying admin credentials."
