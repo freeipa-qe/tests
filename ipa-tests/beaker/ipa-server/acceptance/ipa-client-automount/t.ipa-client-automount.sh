@@ -435,7 +435,9 @@ install_option__server_valid__no_sssd()
     clean_up_automount_installation
         currentLocation="default"
         rlRun "ipa-client-automount --no-sssd --server=$currentIPAServer -U"
+        LDAP_URI="LDAP_URI=ldap://${currentIPAServer}"
         check_autofs_no_sssd_configuration "configured"
+        LDAP_URI="" #reset
     rlPhaseEnd
 }
 
@@ -444,7 +446,9 @@ install_option__location_valid__no_sssd()
     rlPhaseStartTest "install option: --no-sssd + --location <valid>"
     clean_up_automount_installation
         rlRun "ipa-client-automount --no-sssd --location=$currentLocation -U"
+        LDAP_URI="LDAP_URI=ldap:///${suffix}"
         check_autofs_no_sssd_configuration "configured"
+        LDAP_URI="" #reset
     rlPhaseEnd
 }
 
@@ -453,7 +457,9 @@ install_option__server_valid__location_valid__no_sssd()
     rlPhaseStartTest "install option: --no-sssd + --server <valid> --location <valid>"
     clean_up_automount_installation
         rlRun "ipa-client-automount --no-sssd --server=$currentIPAServer --location=$currentLocation -U"
+        LDAP_URI="LDAP_URI=ldap://${currentIPAServer}"
         check_autofs_no_sssd_configuration "configured"
+        LDAP_URI="" #reset
     rlPhaseEnd
 }
 

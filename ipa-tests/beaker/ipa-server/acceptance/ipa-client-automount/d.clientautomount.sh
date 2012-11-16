@@ -36,3 +36,15 @@ currentNFSMountOption=""
 currentNFSFileName="ipaserver.txt"
 currentNFSFileSecret="this_is_nfs_file_secret" 
 
+# special notes: yzhang@redhat.com Nov. 16, 2012
+# as one special case: the LDAP_URI in /etc/sysconfig/nfs would have different
+# value depends on whether ipa server and automount location is given when run
+# ipa-client-automount 
+LDAP_URI=""
+
+###################################################################################
+# 1. when only --location=< automount location> is given
+# expect: "LDAP_URI=ldap:///${suffix}"
+# 2. when -server=<ipa server> is given,  or --server=<ipa server> --location=<automount location> both given
+#expect: "LDAP_URI=ldap://${currentIPAServer}"
+###################################################################################

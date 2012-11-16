@@ -58,7 +58,10 @@ configure_autofs_direct(){
 
 verify_autofs_mounting(){
     local beforeDir=`pwd`
-    cd $autofsDir
+    rlLog "cd $autofsTopDir"
+    cd $autofsTopDir
+    rlLog "cd $autofsSubDir"
+    cd $autofsSubDir
     local currentDir=`pwd`
     echo "autofsDir=[$autofsDir] current directory `pwd`"
     if [ "$autofsDir" = "$currentDir" ]; then
@@ -199,9 +202,7 @@ check_sysconfig_autofs_no_sssd(){
     local message="SEARCH_BASE=cn=${currentLocation},cn=automount,$suffix"
     ensure_configuration_status "$conf" "$message" "$configuration_status"
 
-    #message="LDAP_URI=ldap://${currentIPAServer}"
-    message="LDAP_URI=ldap:///${suffix}"
-    ensure_configuration_status "$conf" "$message" "$configuration_status"
+    ensure_configuration_status "$conf" "$LDAP_URI" "$configuration_status"
 }
 
 check_nsswitch_no_sssd(){
