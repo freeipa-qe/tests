@@ -82,10 +82,10 @@ rlJournalStart
 			rhts-sync-block -s SECURESETUP $BEAKERMASTER
 			ipafunctionalservices_http
 			disable_httpservice
-			http_testcleanup
+			#http_testcleanup
                         ipafunctionalservices_ldap
 			revoke_ldapcert
-			ldap_testcleanup
+			#ldap_testcleanup
 			rhts-sync-set -s SECURE
                 fi
         else
@@ -99,6 +99,8 @@ rlJournalStart
 	rc=0
 	echo $MASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
+                mkdir /home/admin
+                chown admin:admins /home/admin
 		rhts-sync-block -s DEFAULT $BEAKERCLIENT
 		# set minsssf and anon access on master
 		/usr/bin/ldapmodify -x -D "cn=Directory Manager" -w "$ADMINPW" << EOF
