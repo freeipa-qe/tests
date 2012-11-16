@@ -78,6 +78,11 @@ verify_autofs_mounting(){
         fi
     else
         rlFail "can not get into autofs directory [$autofsDir]"
+        echo "================ debugging information ===================="
+        showmount -e $NFS_IPA
+        rpcinfo -p $NFS_IPA
+        tail -n 20 /var/log/messages
+        echo "==========================================================="
     fi
     cd $beforeDir
 }
