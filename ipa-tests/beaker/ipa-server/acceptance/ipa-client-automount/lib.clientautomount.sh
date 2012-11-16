@@ -317,15 +317,14 @@ restart_autofs()
     rlLog "restart autofs"
     service rpcgssd restart
     service autofs restart
-    if [ $? = "1" ];then
-        echo "autofs restart failed"
+    if service autofs stauts | grep "automount dead but subsys locked"
+    then
+        rlLog "autofs restart failed, found /var/lock/subsys/autofs, remove it and restart"
         if [ -f /var/lock/subsys/autofs ];then
-            echo "found /var/lock/subsys/autofs, remove it and restart"
             rm /var/lock/subsys/autofs
             service autofs restart
         fi
     fi
-    rlLog " autofs status "
     service autofs status
 }
 

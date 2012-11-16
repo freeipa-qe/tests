@@ -5,11 +5,11 @@ id=$RANDOM
 HOSTNAME=`hostname`
 
 #domain=`hostname -d`
-#realm="YZHANG.REDHAT.COM"
+#relm="YZHANG.REDHAT.COM"
 #suffix="dc=yzhang,dc=redhat,dc=com"
 
-hostPrinciple="host/${HOSTNAME}@${REALM}"
-nfsServicePrinciple="nfs/${HOSTNAME}@${REALM}"
+hostPrinciple="host/${HOSTNAME}@${RELM}"
+nfsServicePrinciple="nfs/${HOSTNAME}@${RELM}"
 suffix="$BASEDN"
 
 automountLocationA="Location__A"
