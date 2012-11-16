@@ -17,7 +17,7 @@ ipoc4=$(echo $ipaddr | cut -d\. -f4)
 newfakehostip=`route -n | grep ^0 | awk '{print $2'}`
 rlLog "IP is $ipoc1 . $ipoc2 . $ipoc3 . $ipoc4"
 
-ipaddr="$MASTER"
+ipaddr="$MASTER."
 zone="newzone"
 email="ipaqar.redhat.com"
 serial=2010010701
@@ -158,6 +158,7 @@ dnsreplicaprepare()
 dnszone()
 {
 	rlPhaseStartTest "ipa-dns-zone-01 create a new zone"
+		rlLog "Executing: ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
 	rlPhaseEnd
