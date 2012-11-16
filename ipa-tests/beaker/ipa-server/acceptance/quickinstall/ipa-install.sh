@@ -195,6 +195,11 @@ ipa_install_set_vars() {
 		IPADEBUG=1
 	fi
 		
+	# Copy ipa-install.sh to /dev/shm 
+	# Some tests like install-server-cli like to call the scipt as a library
+	rm -f /dev/shm/ipa-install.sh
+	cp -a ./ipa-install.sh /dev/shm/.
+ 
 	rlLog "===================== env|sort =========================="
 	rlRun "env|sort"
 	rlLog "===================== env.sh   =========================="
