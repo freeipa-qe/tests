@@ -592,6 +592,7 @@ bz767489()
 	rlRun "iptables -F"
 	rlRun "service iptables stop"
 	rlRun "mv -f /root/named.conf /etc/"
+        rlRun "chgrp named /etc/named.conf"
 	rlRun "service named restart"
 
     rlPhaseEnd
@@ -613,6 +614,7 @@ bz802375()
 	rlRun "service named status" 3 "Verifying that named is not running"
 
         rlRun "mv -f /root/named.conf /etc/"
+        rlRun "chgrp named /etc/named.conf"
         rlRun "service named restart"
 
     rlPhaseEnd
@@ -648,6 +650,7 @@ bz767496()
         rlRun "service named stop" 0 "stop named"
         rlRun "iptables-restore -c /tmp/iptables.backup" 0 "restore iptables" 
         rlRun "cp -f /root/named.conf /etc/"
+        rlRun "chgrp named /etc/named.conf"
         rlRun "service named restart"
 
     rlPhaseEnd
@@ -1042,6 +1045,7 @@ bz840383()
      zone840383="zone840383.testrelm.com"
      txt="\"bug test\""
      newtxt="\"Bug Test for 840383\""
+     ipaddr="$MASTER."
      rlPhaseStartTest "bz840383 - Implement SOA serial number increments for external changes"
        	rlLog "Executing: ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone840383" 
        	rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone840383" 0 "Add a new zone to test with"
