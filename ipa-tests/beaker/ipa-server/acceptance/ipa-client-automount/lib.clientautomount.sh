@@ -57,14 +57,17 @@ configure_autofs_direct(){
 }
 
 verify_autofs_mounting(){
+    local clientSideDir=$1
     local beforeDir=`pwd`
-    rlLog "cd $autofsTopDir"
-    cd $autofsTopDir
-    rlLog "cd $autofsSubDir"
-    cd $autofsSubDir
+    #rlLog "cd $autofsTopDir"
+    #cd $autofsTopDir
+    #rlLog "cd $autofsSubDir"
+    #cd $autofsSubDir
+    rlLog "cd $clientSideDir"
+    cd $clientSideDir
     local currentDir=`pwd`
-    echo "autofsDir=[$autofsDir] current directory `pwd`"
-    if [ "$autofsDir" = "$currentDir" ]; then
+    echo "clientSideDir=[$clientSideDir] current directory `pwd`"
+    if [ "$clientSideDir" = "$currentDir" ]; then
         ls -l
         show_file_content $currentNFSFileName
         echo "-----the secret should be ------"
@@ -74,13 +77,13 @@ verify_autofs_mounting(){
         if diff $TmpDir/secret.txt $currentNFSFileName 
         then
             rlPass "autofs mount success, file content matches"
-            echoboldgreen "file content matches"
         else
             rlFail "autofs mount failed, file content does NOT matches"
-            echoboldred "file content does NOT match"
         fi
     else
-        rlFail "can not get into autofs directory [$autofsDir]"
+        rlLog "cd $autofsTopDir"
+        cd $autofsTopDir
+        rlFail "can not get into autofs directory [$clientSideDir]"
         echo "================ debugging information ===================="
         showmount -e $NFS_IPA
         rpcinfo -p $NFS_IPA
@@ -201,8 +204,9 @@ check_sysconfig_autofs_no_sssd(){
 
     local message="SEARCH_BASE=cn=${currentLocation},cn=automount,$suffix"
     ensure_configuration_status "$conf" "$message" "$configuration_status"
-
-    ensure_configuration_status "$conf" "$LDAP_URI" "$configuration_status"
+    if [ "$LDAP_URI" != ""];then
+        ensure_configuration_status "$conf" "$LDAP_URI" "$configuration_status"
+    fi
 }
 
 check_nsswitch_no_sssd(){
