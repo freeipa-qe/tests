@@ -38,7 +38,8 @@
 # Include test case file
 . ./t.ipa-server-install.sh
 . ./lib.ipaserververify.sh
-. ../quickinstall/install-lib.sh
+#. ../quickinstall/install-lib.sh
+. /dev/shm/install-lib.sh
 
 
 PACKAGE="ipa-client"
