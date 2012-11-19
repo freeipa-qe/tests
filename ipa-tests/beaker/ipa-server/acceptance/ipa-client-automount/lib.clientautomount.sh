@@ -321,22 +321,34 @@ restart_sssd()
     service sssd restart
     service rpcgssd restart
     service sssd status
+    rlLog "restart sssd done"
 }
 
 restart_autofs()
 {
     rlLog "restart autofs"
     service rpcgssd restart
-    service autofs restart
-    if service autofs stauts | grep "automount dead but subsys locked"
-    then
-        rlLog "autofs restart failed, found /var/lock/subsys/autofs, remove it and restart"
-        if [ -f /var/lock/subsys/autofs ];then
-            rm /var/lock/subsys/autofs
-            service autofs restart
-        fi
+    #original code
+#    service autofs restart
+#    if service autofs stauts | grep "automount dead but subsys locked"
+#    then
+#        rlLog "autofs restart failed, found /var/lock/subsys/autofs, remove it and restart"
+#        if [ -f /var/lock/subsys/autofs ];then
+#            rm /var/lock/subsys/autofs
+#            service autofs restart
+#        fi
+#    fi
+    # modified code
+    service autofs stop
+    if [ -f /var/lock/subsys/autofs ];then
+        rlLog "remove autofs lock file: /var/lock/subsys/autofs"
+        rm -f /var/lock/subsys/autofs
     fi
+    service autofs start
+    echo "============ autofs status after restart ======================"
     service autofs status
+    echo "==============================================================="
+    rlLog "restart autofs done"
 }
 
 replace_line()
