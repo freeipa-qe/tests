@@ -252,7 +252,8 @@ public void testPreSharedPassword(String testName, String realmName,String passw
 		
 		ll.add(Arrays.asList(new Object[]{ "wrong_Account",	                addomain,      "administrators", "Secret123",  "Insufficient access: CIFS server ipaindia.ipaqe.com denied your credentials" ,"Add"   } ));
 		ll.add(Arrays.asList(new Object[]{ "Account_with_leadingspace",   	addomain,      " administrator", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"          		,"Add"   } ));
-		ll.add(Arrays.asList(new Object[]{ "Account_with_traillingspace",	addomain,     "administrator ", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"            	,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "Account_with_traillingspace",	addomain,      "administrator ", "Secret123",  "invalid 'realm': Leading and trailing spaces are not allowed"            	,"Add"   } ));
+		ll.add(Arrays.asList(new Object[]{ "non-admin account",	            addomain,      "varun",          "Password123", "Insufficient access: CIFS server ipaindia.ipaqe.com denied your credentials" ,"Add"   } ));
 		ll.add(Arrays.asList(new Object[]{ "Account_with_blankspace",	    addomain,      "",               "Secret123",  "Required field"                             							   		,"Add"   } ));
 		
 		ll.add(Arrays.asList(new Object[]{ "wrong_Password",	            addomain,      "administrator",  "Secret1234",  "Insufficient access: CIFS server ipaindia.ipaqe.com denied your credentials","Add"   } ));
