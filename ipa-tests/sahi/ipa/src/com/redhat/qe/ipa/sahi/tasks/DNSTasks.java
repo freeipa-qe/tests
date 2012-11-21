@@ -1468,6 +1468,7 @@ public class DNSTasks {
 	 */
 	
 	
+	
 	public static void addDNSGlobalForwarders(SahiTasks browser, String globalForwarders1,String globalForwarders2) 
 	{
 		
@@ -1492,6 +1493,7 @@ public class DNSTasks {
 		browser.span("Update").click();
 				
    }
+	
 	
 	/*
 	 * @param globalForwarders1 : IPv4 address
@@ -1521,7 +1523,6 @@ public class DNSTasks {
 		browser.span("Update").click();
 		Assert.assertFalse(browser.link("Delete").isVisible(),"Forwaredrs Deleted successfully");
 	}
-	
 	/*
 	 * Add invalid Global Forwarders
 	 */
