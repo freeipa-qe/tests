@@ -27,6 +27,8 @@ public class DNSTests extends SahiTestScript{
 	public static String zoneIP="10.65.222.0/24";
 	public static String reversezone= ""; 
 	public static String dummyHost="" ; 
+	public static String nameserver1="";
+	public static String nameserver2="";
 	public static String nameserver="";
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true, dependsOnGroups="setup")
@@ -38,7 +40,9 @@ public class DNSTests extends SahiTestScript{
 		 //reversezone= commonTasks.getReversezone();
 		reversezone="222.65.10.in-addr.arpa.";
 		dummyHost= "dummyhost." + CommonTasks.ipadomain;
-		nameserver=CommonTasks.getIpafqdn();
+		nameserver1=CommonTasks.getIpafqdn();
+		nameserver2=".";
+		nameserver=nameserver1.concat(nameserver2);
 			
 	}
 	
@@ -573,7 +577,7 @@ public class DNSTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
 	  ll.add(Arrays.asList(new Object[]{"dns settings test: soa name","SOA&class",DNSTests.dnszone,reversezone,
-			"idnssoamname","modified.dhcp-121.sjc.redhat.com"}));
+			"idnssoamname","margo.test.com."}));
 		
 		ll.add(Arrays.asList(new Object[]{"dns settings test: soa r name","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoarname","email.dhcp-121.sjc.redhat.com."}));
@@ -629,7 +633,7 @@ public class DNSTests extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
 	  ll.add(Arrays.asList(new Object[]{"dns settings test: soa name","SOA&class",DNSTests.dnszone,reversezone,
-			"idnssoamname","modified.dhcp-121.sjc.redhat.com"}));
+			"idnssoamname","margo.test.com."}));
 		
 		ll.add(Arrays.asList(new Object[]{"dns settings test: soa r name","SOA&class",DNSTests.dnszone,reversezone,
 				"idnssoarname","email.dhcp-121.sjc.redhat.com."}));
@@ -947,7 +951,7 @@ public class DNSTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{"dns record NAPTR and NS test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
 				"naptr_recordtest","E2U+sip","NAPTR","100","10","P","!^.*$!sip:customer-service@example.com!","test","","","","","","",
-				"ns_recordtest",nameserver+".","NS","","","","","","","","","","",""}));
+				"ns_recordtest",nameserver,"NS","","","","","","","","","","",""}));
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NSEC and PTR test", 
 				DNSTests.dnszone2,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
@@ -966,7 +970,7 @@ public class DNSTests extends SahiTestScript{
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NS and TXT test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
-				"ns_recordtest",nameserver+".","NS","","","","","","","","","","","",
+				"ns_recordtest",nameserver,"NS","","","","","","","","","","","",
 				"txt_recordtest","MOE     MB      A.ISI.EDU.","TXT","","","","","","","","","","",""}));
 		
 		return ll;	
@@ -1110,9 +1114,9 @@ public class DNSTests extends SahiTestScript{
 		
 		ll.add(Arrays.asList(new Object[]{"Zone_edit_NS ", "example.dns.test.zone",nameserver,"root." + DNSTests.dummyHost,				 
 				"aaaa_recordtest","fe80::216:36ff:fe23:9aa1","AAAA","","","","","","","","","","","",
-				"ns_recordtest","margo.idm.lab.bos.redhat.com.","NS","","","","","","","","","","","",
-				"ns_recordtest","ipaqa64vmb.idm.lab.bos.redhat.com.","NS","","","","","","","","","","","",
-				"ns_recordtest","zetaprime.lab.eng.pnq.redhat.com.","NS","","","","","","","","","","","","no modifications to be performed"}));
+				"ns_recordtest","margo.test.com.","NS","","","","","","","","","","","",
+				"ns_recordtest","ipaqa64vmb.test.com.","NS","","","","","","","","","","","",
+				"ns_recordtest","zetaprime.test.com.","NS","","","","","","","","","","","","no modifications to be performed"}));
 		
 		ll.add(Arrays.asList(new Object[]{"Zone_edit_NSEC", "demo.dns.test.zone",nameserver,"root." + DNSTests.dummyHost,				 
 				"a_recordtest","10.0.0.4","A","","","","","","","","","","","" ,
@@ -1313,7 +1317,7 @@ public class DNSTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{"dns record NAPTR and NS test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
 				"naptr_recordtest","E2U+sip","NAPTR","100","10","P","!^.*$!sip:customer-service@example.com!","test","","","","","","",
-				"ns_recordtest",nameserver+".","NS","","","","","","","","","","",""}));
+				"ns_recordtest",nameserver,"NS","","","","","","","","","","",""}));
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NSEC and PTR test", 
 				DNSTests.dnszone2,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
@@ -1332,7 +1336,7 @@ public class DNSTests extends SahiTestScript{
 		
 		ll.add(Arrays.asList(new Object[]{"dns record NS and TXT test", 
 				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
-				"ns_recordtest",nameserver+".","NS","","","","","","","","","","","",
+				"ns_recordtest",nameserver,"NS","","","","","","","","","","","",
 				"txt_recordtest","MOE     MB      A.ISI.EDU.","TXT","","","","","","","","","","",""}));
 		
 		return ll;	
