@@ -177,6 +177,7 @@ upgrade_test_master_bz_tests()
 		upgrade_slave
 		
 		# Now execute bug checks
+		upgrade_bz_819629
 		upgrade_bz_772359_finish
 		upgrade_bz_766096
 		upgrade_bz_746589
@@ -187,7 +188,6 @@ upgrade_test_master_bz_tests()
 		upgrade_bz_803930
 		upgrade_bz_812391
 		upgrade_bz_821176
-		upgrade_bz_819629
 		upgrade_bz_824074
 
 		# uninstall everything so we can start over
