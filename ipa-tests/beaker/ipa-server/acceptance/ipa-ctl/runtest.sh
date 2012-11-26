@@ -509,7 +509,10 @@ rlPhaseStartTest "ipa-ctl-25 restart services as non-root user"
 		outfile=/dev/shm/bz840381.txt
 		rlRun "ipactl start &> $outfile" 0 "Start ipa services, direct output to $outfile"
 		rlRun "grep 'Failed to start DNS Service' $outfile" 1 "Ensure that a DNS failure is not in the output file BZ 840381"
-		rlRun "grep named /var/log/messages | grep 'bind to LDAP server failed'" 1 "Make sure that there appears to be no bad messages from named in /var/log/messages BZ 840381"
+		# the check below is not valid. ipactl stop - will stop DS, and bind will try to reconnect periodically (default is 60 sec)
+                # everytime it reconnects, if ipactl is not restarted - there will be a message - bind to LDAP server failed: Can't contact LDAP server
+                # In which case - it is a valid message.
+                # rlRun "grep named /var/log/messages | grep 'bind to LDAP server failed'" 1 "Make sure that there appears to be no bad messages from named in /var/log/messages BZ 840381"
 		rlRun "grep named /var/log/messages | grep 'control process exited'" 1 "Make sure that bind has not crashed. BZ 840381"
 	rlPhaseEnd
 
