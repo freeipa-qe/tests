@@ -426,9 +426,9 @@ public class GroupTests extends SahiTestScript{
 				Assert.assertFalse(browser.link(groupName).exists(),"Group Type Posix deleted as expected");
 			}else if (testScenario == "External") {
 				Assert.assertTrue(browser.span("Add").exists(),"Verified external grouptype can add external members");
-				//add 4 external members in ad and get their SIDs
-				String aduser1 = "s-1-5-21-2048782538-2375889789-2933420090-1175";
-				String aduser2 = "s-1-5-21-2048782538-2375889789-2933420090-1176";
+				//add 4 external members in ad with name and SIDs 
+				String aduser1 = "IPAQE\\aduser1";
+				String aduser2 = "IPAQE\\aduser2";
 				String aduser3 = "s-1-5-21-2048782538-2375889789-2933420090-1177";
 				String aduser4 = "s-1-5-21-2048782538-2375889789-2933420090-1178";
 				//check Add button
@@ -449,8 +449,8 @@ public class GroupTests extends SahiTestScript{
 				browser.textbox("ipaexternalmember").setValue(aduser4);
 				browser.button("Cancel").click();
 				Assert.assertFalse(browser.div(aduser4).exists(),"External member aduser4 cancelled as expected");
-				//add duplicate external member TODO::bug869616
-				//add invalid external member  TODO::bug869616
+				//add duplicate external member TODO::bug874671
+				//add non-existent external member  TODO::bug874674
 				//check Delete button
 				String[] adusers = {aduser1,aduser2,aduser3};
 				for(String aduser:adusers){
