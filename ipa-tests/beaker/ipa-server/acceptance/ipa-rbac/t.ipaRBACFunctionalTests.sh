@@ -310,8 +310,8 @@ dnsSetup()
        # add two DNS Zones
        rlRun "kinitAs $ADMINID $ADMINPW"
        email="ipaqar.resdhat.com"
-       ipa dnszone-add --name-server=$ipaddr $zone1 --admin-email=$email
-       ipa dnszone-add --name-server=$ipaddr $zone2 --admin-email=$email
+       ipa dnszone-add --name-server=$ipaddr. $zone1 --admin-email=$email
+       ipa dnszone-add --name-server=$ipaddr. $zone2 --admin-email=$email
 
        # Add a new privilege to test
        ipa privilege-add $dnsPrivilege --desc=$dnsPrivilege
@@ -371,7 +371,7 @@ testPerDomainDNS()
 
       rlPhaseStartTest "ipa-rbac-1013 - Cannot add a new zone"
           testZone="testzone.testrelm.com"
-          command="ipa dnszone-add --name-server=$ipaddr $testZone --admin-email=$email"
+          command="ipa dnszone-add --name-server=$ipaddr. $testZone --admin-email=$email"
           expmsg="ipa: ERROR: Insufficient access: Insufficient 'add' privilege to add the entry 'idnsname=$testZone,cn=dns,dc=testrelm,dc=com'."
           rlRun "$command > $TmpDir/ipaDNSPermissionTest_add.log 2>&1" 1 "Verify error message when adding new zone" 
           rlAssertGrep "$expmsg" "$TmpDir/ipaDNSPermissionTest_add.log"
