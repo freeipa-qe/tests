@@ -91,7 +91,7 @@ ssh -i id_rsa_user1 user1@vm2
 
 tmpout=/tmp/errormsg.out
 
-ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=vm1.testrelm.com --admin-email=ipaqar.redhat.com
+ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=vm1.testrelm.com. --admin-email=ipaqar.redhat.com
 for i in 1 2 3 4 5; do
 	ssh-keygen -q -t rsa -f host${i}_rsa -C '' -N '' 
 	RSAKEY=$(awk '{print $2}' host${i}_rsa.pub)
