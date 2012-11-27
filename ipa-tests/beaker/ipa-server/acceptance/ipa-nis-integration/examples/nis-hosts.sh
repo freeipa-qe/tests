@@ -15,11 +15,11 @@ for line in $(cat /dev/shm/nis-map.hosts); do
 	fi 
 	zone=$(echo $hostname|cut -f2- -d.)
 	if [ $(ipa dnszone-show $zone 2>/dev/null | wc -l) -eq 0 ]; then
-		ipa dnszone-add --name-server=$master --admin-email=root.$master
+		ipa dnszone-add --name-server=$master. --admin-email=root.$master
 	fi
 	ptrzone=$(echo $ipaddress|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}') 
 	if [ $(ipa dnszone-show $ptrzone 2>/dev/null|wc -l) -eq 0 ]; then  
-		ipa dnszone-add  $ptrzone --name-server=$master --admin-email=root.$master
+		ipa dnszone-add  $ptrzone --name-server=$master. --admin-email=root.$master
 	fi
 	# Now create this entry 
 	ipa host-add $hostname --ip-address=$ipaddress

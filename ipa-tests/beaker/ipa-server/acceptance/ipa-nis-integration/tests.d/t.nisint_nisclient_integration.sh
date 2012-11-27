@@ -100,7 +100,7 @@ nisint_nisclient_integration_master_envsetup()
 		NISCLIENT=$NISCLIENT_S.$DOMAIN
 		ptrzone=$(echo $NISCLIENT_IP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		if [ $(ipa dnszone-show $ptrzone 2>/dev/null|wc -l) -eq 0 ]; then 
-			rlRun "ipa dnszone-add $ptrzone --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add $ptrzone --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 		fi
 		if [ $(ipa host-show $NISCLIENT 2>&1|grep -i "host not found"|wc -l) -gt 0 ]; then
 			rlRun "ipa host-add $NISCLIENT --ip-address=$NISCLIENT_IP"

@@ -179,7 +179,7 @@ nisint_ipamaster_integration_add_nis_data_hosts()
 			firsthostname=$(echo $hostnames|awk '{print $1}'|cut -f1 -d.|head -1)
 			ptrzonefound=$(ipa dnszone-show $ptrzone 2>/dev/null |wc -l)
 			if [ $ptrzonefound -eq 0 ]; then
-				rlRun "ipa dnszone-add $ptrzone --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+				rlRun "ipa dnszone-add $ptrzone --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 			fi
 			if [ $(ipa host-show x$MASTER 2>&1 | grep "x$MASTER: host not found" | wc -l) -gt 0 ]; then
 				rlRun "ipa host-add $firsthostname.$DOMAIN --ip-address=$ip" 
