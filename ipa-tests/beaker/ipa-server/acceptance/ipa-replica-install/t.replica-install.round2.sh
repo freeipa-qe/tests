@@ -105,16 +105,16 @@ installSlave_nr_0001()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
 		[ $(ipa dnszone-find|grep $SLAVEZONE|wc -l) -eq 0 ] && \
-			rlRun "ipa dnszone-add $SLAVEZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add $SLAVEZONE --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 		[ $(ipa dnszone-find|grep $ZONE1|wc -l) -eq 0 ] && \
-			rlRun "ipa dnszone-add $ZONE1 --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add $ZONE1 --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 		[ $(grep $(echo $SLAVE|cut -f1 -d.) /etc/hosts|wc -l) -eq 0 ] && \
 			rlRun "echo '$SLAVEIP $SLAVE $SLAVE_S' >> /etc/hosts"
 
 		rlRun "ipa-replica-prepare -p $ADMINPW $SLAVE"
 
 		[ $(ipa dnszone-find|grep $ZONE2|wc -l) -eq 0 ] && \
-			rlRun "ipa dnszone-add $ZONE2 --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add $ZONE2 --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $BEAKERSLAVE"

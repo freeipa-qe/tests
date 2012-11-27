@@ -113,12 +113,12 @@ createReplica1()
 			rlRun "ipa dnszone-find"
 			REVERSE_ZONE=$(echo $SLAVEIP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 			if [ $(ipa dnszone-show $REVERSE_ZONE 2>/dev/null | wc -l) -eq 0 ]; then
-				rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+				rlRun "ipa dnszone-add $REVERSE_ZONE --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 			fi
 			rlRun "ipa dnsrecord-add $DOMAIN $s_short --a-rec=$SLAVEIP --a-create-reverse"
 
 			if [ $(ipa dnszone-find|grep $ZONE1|wc -l) -eq 0 ]; then 
-				rlRun "ipa dnszone-add $ZONE1 --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+				rlRun "ipa dnszone-add $ZONE1 --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 			fi
 	
 			rlRun "service named restart" 0 "Restarting named as work around when adding new reverse zone"
@@ -128,7 +128,7 @@ createReplica1()
 			rlRun "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
 
 			if [ $(ipa dnszone-find|grep $ZONE2|wc -l) -eq 0 ]; then 
-				rlRun "ipa dnszone-add $ZONE2 --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+				rlRun "ipa dnszone-add $ZONE2 --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 			fi
 		done
 	rlPhaseEnd
