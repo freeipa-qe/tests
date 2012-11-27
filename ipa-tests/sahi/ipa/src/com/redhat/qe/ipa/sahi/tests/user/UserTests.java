@@ -709,6 +709,29 @@ public class UserTests extends SahiTestScript{
 		
 	}
 	
+	/*
+	 * bug verification 782981
+	 */	
+	@Test (groups={"bugVerfication782981"}, dataProvider="getbugverfication782981", dependsOnGroups="userAddTests")
+	public void bug782981(String testName, String uid,String givenname,String sn,String password,String newPassword) throws Exception {
+		//add a user
+		UserTasks.createUser(sahiTasks, uid, givenname, sn, password, password, "Add");
+		//login as new user to make sure form based auth page supports password changes.
+		CommonTasks.formauthNewUser(sahiTasks, uid, password, newPassword);
+		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		UserTasks.searchUser(sahiTasks, uid);
+		Assert.assertTrue(sahiTasks.link(uid).exists(), "Added new user " + uid + "  successfully");
+		UserTasks.clearSearch(sahiTasks);
+		//delete user
+		CommonTasks.formauth(sahiTasks, "admin", "Secret123");
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		UserTasks.searchUser(sahiTasks, uid);
+		UserTasks.deleteUser(sahiTasks, uid);
+		Assert.assertFalse(sahiTasks.link(uid).exists(), "Delete new user " + uid + "  successfully");
+		UserTasks.clearSearch(sahiTasks);
+		
+	}
+	
 	@AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
 	public void cleanup() throws CloneNotSupportedException {
 		sahiTasks.navigateTo(commonTasks.userPage, true);
@@ -1319,5 +1342,18 @@ public class UserTests extends SahiTestScript{
 		return ll;	
 	}
 	
+	@DataProvider(name="getbugverfication782981")
+	public Object[][] getbugverfication782981() {
+		return TestNGUtils.convertListOfListsTo2dArray(editBugverfication782981());
+	}
+	protected List<List<Object>> editBugverfication782981() {			
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testName          uid       givenname            sn              password           newPassword 			       		
+		ll.add(Arrays.asList(new Object[]{ "bug782981",	 "bug782981",	"bug782981",	"bug782981",		"bug782981",		"Secret123"		} ));
+		  
+		return ll;	
+	}
+
 
 }
