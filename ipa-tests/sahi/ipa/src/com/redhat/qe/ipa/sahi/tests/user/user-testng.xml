@@ -41,6 +41,7 @@
 			    <include name="userEditDeleteTests" />
 				<include name="userDeleteTests" />   
 		        <include name="userMultipleDeleteTests" />
+		        <include name="bugVerfication782981" />
 			</run>
 		</groups>
 		<classes>
