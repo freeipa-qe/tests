@@ -426,7 +426,7 @@ public class GroupTests extends SahiTestScript{
 				Assert.assertFalse(browser.link(groupName).exists(),"Group Type Posix deleted as expected");
 			}else if (testScenario == "External") {
 				Assert.assertTrue(browser.span("Add").exists(),"Verified external grouptype can add external members");
-				//add 4 external members in ad with name and SIDs 
+				//add 4 external members in ad with either name or SIDs,right now adding with name only shows its SID instead of name when added 
 				String aduser1 = "IPAQE\\aduser1";//S-1-5-21-2048782538-2375889789-2933420090-1237
 				String aduser2 = "IPAQE\\aduser2";//S-1-5-21-2048782538-2375889789-2933420090-1176
 				String aduser3 = "S-1-5-21-2048782538-2375889789-2933420090-1177";
