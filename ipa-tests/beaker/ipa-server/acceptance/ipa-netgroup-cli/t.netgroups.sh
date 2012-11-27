@@ -1522,7 +1522,7 @@ netgroup_find_positive_other()
 
 	rlPhaseStartTest "ipa_netgroup_find_positive_other_04: Positive in-netgroup find host test."
 		# add hosts for testing
-		ipa dnszone-add 2.2.4.in-addr.arpa. --name-server=$MASTER --admin-email=ipaqar.redhat.com
+		ipa dnszone-add 2.2.4.in-addr.arpa. --name-server=$MASTER. --admin-email=ipaqar.redhat.com
 		ipa host-add --force --ip-address=4.2.2.2 $hosta.$DOMAIN
 		ipa host-add --force --ip-address=4.2.2.3 $hostb.$DOMAIN
 		rlRun "ipa netgroup-add-member --hosts=$hosta.$DOMAIN,$hostb.$DOMAIN $ng" 0 "adding hosts to netgroup $ng"
