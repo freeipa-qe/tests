@@ -810,7 +810,7 @@ ipa_install_prep_disableFirewall()
 			rlPass "BZ 845301 not found -- service iptables stop succeeeded"
 		fi
 	else    
-		rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "service iptables stop"
 	fi
 
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
@@ -821,7 +821,7 @@ ipa_install_prep_disableFirewall()
 			rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
 		fi
 	else    
-		rlRun "service ip6tables stop" 0 "Stop the firewall on the client"
+		rlRun "service ip6tables stop"
 	fi
 }
 
@@ -949,6 +949,9 @@ ipa_install_master()
             rlRun "ipa dnsconfig-mod --forwarder=$DNSFORWARD"
             rlRun "service named restart"
         fi
+        rlLog "Starting SSSD in case it is not running"
+        rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
+        rlRun "service sssd start"
 
 		if [ $IPADEBUG ]; then
 			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
@@ -1002,6 +1005,9 @@ ipa_install_replica()
 		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
 		rlRun "ipa-replica-install $IPAOPTIONS -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlLog "Starting SSSD in case it is not running"
+        rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
+        rlRun "service sssd start"
 	rlPhaseEnd
 }
 
