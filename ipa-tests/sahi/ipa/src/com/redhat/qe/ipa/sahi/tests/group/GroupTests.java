@@ -427,22 +427,22 @@ public class GroupTests extends SahiTestScript{
 			}else if (testScenario == "External") {
 				Assert.assertTrue(browser.span("Add").exists(),"Verified external grouptype can add external members");
 				//add 4 external members in ad with name and SIDs 
-				String aduser1 = "IPAQE\\aduser1";
-				String aduser2 = "IPAQE\\aduser2";
-				String aduser3 = "s-1-5-21-2048782538-2375889789-2933420090-1177";
-				String aduser4 = "s-1-5-21-2048782538-2375889789-2933420090-1178";
+				String aduser1 = "IPAQE\\aduser1";//S-1-5-21-2048782538-2375889789-2933420090-1237
+				String aduser2 = "IPAQE\\aduser2";//S-1-5-21-2048782538-2375889789-2933420090-1176
+				String aduser3 = "S-1-5-21-2048782538-2375889789-2933420090-1177";
+				String aduser4 = "S-1-5-21-2048782538-2375889789-2933420090-1178";
 				//check Add button
 				browser.span("Add").click();
 				browser.textbox("ipaexternalmember").setValue(aduser1);
 				browser.button("Add").click();
-				Assert.assertTrue(browser.div(aduser1).exists(),"External member aduser1 added as expected");
+				Assert.assertTrue(browser.div("S-1-5-21-2048782538-2375889789-2933420090-1237").exists(),"External member aduser1 added as expected");
 				//check Add and Add Another button
 				browser.span("Add").click();
 				browser.textbox("ipaexternalmember").setValue(aduser2);
 				browser.button("Add and Add Another").click();
 				browser.textbox("ipaexternalmember").setValue(aduser3);
 				browser.button("Add").click();
-				Assert.assertTrue(browser.div(aduser2).exists(),"External member aduser2 added as expected");
+				Assert.assertTrue(browser.div("S-1-5-21-2048782538-2375889789-2933420090-1177").exists(),"External member aduser2 added as expected");
 				Assert.assertTrue(browser.div(aduser3).exists(),"External member aduser3 added as expected");
 				//check Cancel button
 				browser.span("Add").click();
@@ -452,7 +452,7 @@ public class GroupTests extends SahiTestScript{
 				//add duplicate external member TODO::bug874671
 				//add non-existent external member  TODO::bug874674
 				//check Delete button
-				String[] adusers = {aduser1,aduser2,aduser3};
+				String[] adusers = {"S-1-5-21-2048782538-2375889789-2933420090-1237","S-1-5-21-2048782538-2375889789-2933420090-1176",aduser3};
 				for(String aduser:adusers){
 					browser.checkbox(aduser).click();
 					browser.span("Delete").click();
