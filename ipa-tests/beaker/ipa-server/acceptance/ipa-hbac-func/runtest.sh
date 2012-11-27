@@ -657,7 +657,7 @@ rlJournalStart
 		# rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT_SH --a-rec=$BEAKERCLIENT_IP"
 		CLIENT_REVZONE=$(echo $BEAKERCLIENT_IP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		if [ $(ipa dnszone-show $CLIENT_REVZONE 2>/dev/null | wc -l) -eq 0 ]; then
-			rlRun "ipa dnszone-add $CLIENT_REVZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add $CLIENT_REVZONE --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 		fi
 		rlLog "Running: ipa dnsrecord-add $CLIENT_REVZONE $BEAKERCLIENT_PTR --ptr-rec=$CLIENT."
 		rlRun "ipa dnsrecord-add $CLIENT_REVZONE $BEAKERCLIENT_PTR --ptr-rec=$CLIENT."
@@ -668,7 +668,7 @@ rlJournalStart
 		# rlRun "ipa dnsrecord-add $DOMAIN $BEAKERCLIENT2_SH --a-rec=$BEAKERCLIENT2_IP"
 		CLIENT2_REVZONE=$(echo $BEAKERCLIENT2_IP|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		if [ $(ipa dnszone-show $CLIENT2_REVZONE 2>/dev/null | wc -l) -eq 0 ]; then
-			rlRun "ipa dnszone-add $CLIENT2_REVZONE --name-server=$MASTER --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add $CLIENT2_REVZONE --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
 		fi
 		rlLog "Running: ipa dnsrecord-add $CLIENT2_REVZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
 		rlRun "ipa dnsrecord-add $CLIENT2_REVZONE $BEAKERCLIENT2_PTR --ptr-rec=$CLIENT2."
