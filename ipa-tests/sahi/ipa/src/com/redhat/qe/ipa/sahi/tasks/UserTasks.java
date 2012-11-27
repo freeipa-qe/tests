@@ -826,5 +826,70 @@ public class UserTasks {
 		sahiTasks.span("Disable").click();
 		sahiTasks.button("OK").click();
 	}
-
+	
+	//------------------------------------------------------
+	//Prevent User and Group Administrators Tasks
+	//------------------------------------------------------
+	
+	/*
+	 * @param sahiTasks
+	 * @param uid - the uid of admin to be disable
+	 */
+	public static void disableUsersAdmin(SahiTasks sahiTasks, String uid)
+      {
+		if(sahiTasks.link(uid).exists())
+		{
+			sahiTasks.checkbox(uid).click();
+			sahiTasks.span("Disable").click();
+			sahiTasks.button("OK").click();
+		}
+      }
+	/*
+	 * @param sahiTasks
+	 * @param uid - the uid of admin to be disable
+	 * @param expectedMsg - the error thrown when trying to disable or delete admin
+	 */
+	
+	public static void preventAdmin(SahiTasks sahiTasks,String uid, String expectedMsg)
+    {
+		if(sahiTasks.span("Operations Error").exists())
+		{
+			sahiTasks.link("Show details").click();
+			Assert.assertTrue(sahiTasks.listItem(expectedMsg).exists(),"Expected message appeared :: "+expectedMsg);
+			sahiTasks.button("OK").click();
+			sahiTasks.checkbox(uid).click();
+		}
+    }
+	
+	/*
+	 * @param sahiTask
+	 * @param uid - the uid of admin
+	 * @param groupName - for admins
+	 * @params expectedMsg - the error thrown when trying to delete members or admin
+	 */
+	public static void deleteGroupAndMember(SahiTasks sahiTasks, String uid,String groupName, String expectedMsg,String expectedMsg2)
+    {
+	String [] users = {"testusers1","testusers2","testusers3"};
+	sahiTasks.link(groupName).click();
+	GroupTasks.modifyGroup_enroll_user_multiple(sahiTasks, groupName, users);
+	for (String user:users)
+		Assert.assertTrue(sahiTasks.link(user).exists(), 
+				"verify membership info: user:[" + user + "] should be member of group:" + groupName); 
+	
+	sahiTasks.checkbox("uid").click();
+	sahiTasks.span("Delete").click();
+	sahiTasks.button("Delete").click();
+	Assert.assertTrue(sahiTasks.div(expectedMsg2).exists(),"Expected message appeared :: "+expectedMsg);
+	sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
+	sahiTasks.checkbox("uid").click();
+	Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify group, " + uid + "  was not deleted");
+	
+	GroupTasks.modifyGroup_remove_user_multiple(sahiTasks, groupName, users);
+	for (String user:users)
+		Assert.assertFalse(sahiTasks.link(user).exists(), 
+				"verify membership info: user:[" + user + "] should NOT be member of group:" + groupName); 
+	sahiTasks.link("User Groups").in(sahiTasks.span("back-link")).click();
+    }
+	
+	
 }
