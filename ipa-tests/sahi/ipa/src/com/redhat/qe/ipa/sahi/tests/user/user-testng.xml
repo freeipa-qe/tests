@@ -1,5 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPAUserTestSuite">	
+
 	<test name="User Tests">
 		<packages>
 		     <package name="com.redhat.qe.ipa.sahi.*" />
@@ -48,6 +49,23 @@
 		    <class name="com.redhat.qe.ipa.sahi.tests.user.UserTests" />
 		</classes>
 	</test>
+	
+	
+	<test name="Prevent User and Group Administrators">
+		<groups>
+			<run>	
+					
+			<include name="setup" />
+	        <include name="preventUsersAdmin_Bz846309" />
+	        <include name="preventGroupAdmin_Bz805233" />
+	        
+	        </run>
+		</groups>
+		<classes>
+		    <class name="com.redhat.qe.ipa.sahi.tests.user.PreventUserAndGroupAdmins" />
+		</classes>
+	</test>
+	
 	
 	<listeners>        
   		<listener class-name="com.redhat.qe.auto.testng.TestNGListener" />	
