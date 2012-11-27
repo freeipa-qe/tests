@@ -152,11 +152,13 @@ public class CommonTasks {
             sahiTasks.password("password").setValue(password);
 
             sahiTasks.button("Login").click();
-            if(sahiTasks.password("new_password").exists()){
-                    sahiTasks.password("new_password").setValue(newpassword);
-                    sahiTasks.password("verify_password").setValue(newpassword);
-                    sahiTasks.button("Reset Password and Login").click();
-            }
+            //for a new user ,new_password should always exist,need to verificate for bug 782981
+            //if(sahiTasks.password("new_password").exists()){
+            Assert.assertTrue(sahiTasks.password("new_password").exists(),"reset password for first time login");
+            sahiTasks.password("new_password").setValue(newpassword);
+            sahiTasks.password("verify_password").setValue(newpassword);
+            sahiTasks.button("Reset Password and Login").click();
+            //}
             Assert.assertTrue(CommonTasks.kinitAsUser(userName, newpassword), "Logged in successfully as " + userName);			
 		}
 		catch (IOException e) {
