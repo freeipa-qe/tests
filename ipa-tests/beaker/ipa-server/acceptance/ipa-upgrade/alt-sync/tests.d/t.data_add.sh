@@ -75,8 +75,8 @@ data_add()
 
 		if [ "x$USEDNS" = "xyes" ]; then
 			# Add DNS Records (PTR)
-			rlRun "ipa dnszone-add ${dnsptr[1]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
-			rlRun "ipa dnszone-add ${dnsptr[2]} --name-server=${MASTER} --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add ${dnsptr[1]} --name-server=${MASTER}. --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add ${dnsptr[2]} --name-server=${MASTER}. --admin-email=ipaqar.redhat.com"
 		fi
 
 		# Add hosts
