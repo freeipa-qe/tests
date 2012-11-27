@@ -5,11 +5,11 @@
 ipapassword()
 {
     ipapassword_envsetup
-#    ipapassword_globalpolicy
+    ipapassword_globalpolicy
     ipapassword_grouppolicy
-#    ipapassword_nestedgroup
-#    ipapassword_attr
-#    ipapassword_bugzillas
+    ipapassword_nestedgroup
+    ipapassword_attr
+    ipapassword_bugzillas
     ipapassword_envcleanup
 } # ipapassword
 
@@ -47,26 +47,26 @@ ipapassword_globalpolicy()
 ipapassword_grouppolicy()
 {
     ipapassword_grouppolicy_envsetup
-#    ipapassword_grouppolicy_maxlifetime_default # this one always failed, i couldn't figure it out why
-#    ipapassword_grouppolicy_maxlifetime_lowerbound
-#    ipapassword_grouppolicy_maxlifetime_upperbound
-#    ipapassword_grouppolicy_maxlifetime_negative
-#    ipapassword_grouppolicy_minlifetime_default
-#    ipapassword_grouppolicy_minlifetime_lowerbound
-#    ipapassword_grouppolicy_minlifetime_upperbound
-#    ipapassword_grouppolicy_minlifetime_negative
+    ipapassword_grouppolicy_maxlifetime_default # this one always failed, i couldn't figure it out why
+    ipapassword_grouppolicy_maxlifetime_lowerbound
+    ipapassword_grouppolicy_maxlifetime_upperbound
+    ipapassword_grouppolicy_maxlifetime_negative
+    ipapassword_grouppolicy_minlifetime_default
+    ipapassword_grouppolicy_minlifetime_lowerbound
+    ipapassword_grouppolicy_minlifetime_upperbound
+    ipapassword_grouppolicy_minlifetime_negative
     ipapassword_grouppolicy_history_default
-#    ipapassword_grouppolicy_history_lowerbound
-#    ipapassword_grouppolicy_history_upperbound
-#    ipapassword_grouppolicy_history_negative
-#    ipapassword_grouppolicy_classes_default
-#    ipapassword_grouppolicy_classes_lowerbound
-#    ipapassword_grouppolicy_classes_upperbound
-#    ipapassword_grouppolicy_classes_negative
-#    ipapassword_grouppolicy_length_default
-#    ipapassword_grouppolicy_length_lowerbound
-#    ipapassword_grouppolicy_length_upperbound
-#    ipapassword_grouppolicy_length_negative
+    ipapassword_grouppolicy_history_lowerbound
+    ipapassword_grouppolicy_history_upperbound
+    ipapassword_grouppolicy_history_negative
+    ipapassword_grouppolicy_classes_default
+    ipapassword_grouppolicy_classes_lowerbound
+    ipapassword_grouppolicy_classes_upperbound
+    ipapassword_grouppolicy_classes_negative
+    ipapassword_grouppolicy_length_default
+    ipapassword_grouppolicy_length_lowerbound
+    ipapassword_grouppolicy_length_upperbound
+    ipapassword_grouppolicy_length_negative
     ipapassword_grouppolicy_envcleanup
 } #ipapassword_grouppolicy
 
