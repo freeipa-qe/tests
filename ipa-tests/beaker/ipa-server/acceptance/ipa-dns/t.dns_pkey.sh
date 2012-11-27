@@ -73,7 +73,7 @@ dnspkeysetup()
 
     rlPhaseStartTest "dns pkey setup"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	 rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Add test zone"
+	 rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Add test zone"
     rlPhaseEnd
 }
 

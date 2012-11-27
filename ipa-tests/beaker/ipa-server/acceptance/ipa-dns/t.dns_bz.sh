@@ -46,7 +46,7 @@ dnsbugs()
    bz798493
    bz809565
    bz798355
-  // bz767496
+   bz767496
    bz802375
    bz829353
    bz840383
@@ -65,7 +65,7 @@ dnsbugsetup()
     rlPhaseStartTest "dns bug setup"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	# add test zone
-	rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$email $zone" 0 "Add test zone: $zone"
+	rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$email $zone" 0 "Add test zone: $zone"
 	# Determine my IP address
     rlPhaseEnd
 }
@@ -167,9 +167,9 @@ bz766075()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=766075
 	rlPhaseStartTest "bz766075 DNS zone dynamic update is changed to false if --allow-dynupdate not specified"
-		rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=admin@example.com --allow-dynupdate | grep \"ipa: error: no such option: --allow-dynupdate\"" 1
+		rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=admin@example.com --allow-dynupdate | grep \"ipa: error: no such option: --allow-dynupdate\"" 1
 
-		rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=admin@example.com --dynamic-update"
+		rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=admin@example.com --dynamic-update"
 		rlRun "ipa dnszone-show example.com | grep \"Dynamic update: TRUE\"" 1
 		rlRun "ipa dnszone-show example.com --all | grep \"Dynamic update: TRUE\""
 		rlRun "ipa dnszone-mod example.com --retry=600 | grep \"Dynamic update: FALSE\"" 1
@@ -191,7 +191,7 @@ bz751776()
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=751776
 	rlPhaseStartTest "bz751776 Skip invalid record in a zone instead of refusing to load entire zone"
 
-		rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=admin@example.com"
+		rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=admin@example.com"
 		rlRun "ipa dnsrecord-add example.com foo --a-rec=10.0.0.1"
 		sleep 5
 		rlRun "dig +short -t A foo.example.com | grep 10.0.0.1"
@@ -222,7 +222,7 @@ bz797561()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=797561
 	rlPhaseStartTest "bz797561 Bool attributes used in setattr/addattr/delattr options are not encoded properly"
-		rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=admin@example.com"
+		rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=admin@example.com"
                 rlRun "ipa dnszone-show example.com --all --raw | grep -i \"idnsallowdynupdate: FALSE\""
 		
 		verifyErrorMsg "ipa dnszone-mod example.com --addattr=idnsAllowDynUpdate=true" "ipa: ERROR: idnsallowdynupdate: Only one value allowed."
@@ -248,7 +248,7 @@ bz750806()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=750806
         rlPhaseStartTest "bz750806 dnszone-mod and dnszone-add does not format administrator's email properly"
-                rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=admin@example.com"
+                rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=admin@example.com"
 		rlRun "ipa dnszone-mod example.com --admin-email=foo.bar@example.com"
 		rlRun "ipa dnszone-show example.com | grep \"Administrator e-mail address: foo\\\\\.bar.example.com.\""
 		rlRun "ipa dnszone-del example.com"
@@ -259,7 +259,7 @@ bz733371()
 {
 	rlPhaseStartTest "bz733371 DNS zones are not loaded when idnsAllowQuery/idnsAllowTransfer is filled"
 		MASTERIP=`dig +short $MASTER`
-		rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=admin@example.com"
+		rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=admin@example.com"
                 rlRun "ipa dnsrecord-add example.com foo --a-rec=10.0.1.1"
 		rlRun "ipa dnszone-mod example.com --allow-query=$MASTERIP"
 		rlRun "service named reload"
@@ -277,7 +277,7 @@ bz767492()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=767492
         rlPhaseStartTest "bz767492 The plugin doesn't delete zone when it is deleted in LDAP and zone_refresh is set"
-		rlRun "ipa dnszone-add unknownexample.com --name-server=$MASTER --admin-email=admin@unknownexample.com"
+		rlRun "ipa dnszone-add unknownexample.com --name-server=$MASTER. --admin-email=admin@unknownexample.com"
 		rlRun "ipa dnszone-mod unknownexample.com --refresh=30"
 		rlRun "ipa dnsrecord-add unknownexample.com foo --a-rec=10.0.2.2"
 		sleep 35
@@ -300,7 +300,7 @@ bz767494()
 
 		# for IPv4 +ve
 		# rlRun "ipa dnszone-add $DOMAIN --name-server=$HOSTNAME --admin-email=$email" # $DOMAIN zone already exists, hence commenting.
-		rlRun "ipa dnszone-add $a174rev --name-server=$MASTER --admin-email=$email"
+		rlRun "ipa dnszone-add $a174rev --name-server=$MASTER. --admin-email=$email"
 
 		rlRun "ipa dnsrecord-add $DOMAIN foo --a-rec=$a174 --a-create-reverse"
 		rlRun "ipa dnsrecord-show $a174rev 10 | grep \"PTR record: foo.$DOMAIN\""
@@ -315,7 +315,7 @@ bz767494()
 		rlRun "ipa dnsrecord-del $a174rev 10 --del-all"
 
 		# for IPv6 +ve
-		rlRun "ipa dnszone-add $aaaa174rev --name-server=$MASTER --admin-email=$email"
+		rlRun "ipa dnszone-add $aaaa174rev --name-server=$MASTER. --admin-email=$email"
 		rlRun "ipa dnsrecord-add $DOMAIN bar --aaaa-rec=$aaaa174 --aaaa-create-reverse"
 		rlRun "ipa dnsrecord-show $aaaa174rev 4.b.6.1.6.8.e.f.f.f.e.5.1.2.2.0 | grep \"PTR record: bar.$DOMAIN\""
 		sleep 5
@@ -382,12 +382,16 @@ bz805427()
 	rlPhaseStartTest "bz805427 idnssoaserial does not honour the recommended syntax in rfc1912."
 		myzone="bugzone"
 		FORMAT=`date +%Y%m%d`
+		FORMAT=`date +%s`
 		#trim any whitespace
 		FORMAT=`echo $FORMAT`
-		rlRun "ipa dnszone-show $DOMAIN | grep -i serial | cut -d : -f 2 | grep $FORMAT"
+		#rlRun "ipa dnszone-show $DOMAIN | grep -i serial | cut -d : -f 2 | grep $FORMAT"
 
-                rlRun "ipa dnszone-add $myzone --name-server=$MASTER --admin-email=$email"
-		rlRun "ipa dnszone-show $myzone | grep -i serial | cut -d : -f 2 | grep $FORMAT"
+                rlRun "ipa dnszone-add $myzone --name-server=$MASTER. --admin-email=$email"
+		zoneSerial=`ipa dnszone-show $myzone | grep -i serial | cut -d : -f 2`
+                #if [ $zoneSerial $FORMAT  ] ; then
+                #else
+                #fi
 
 		rlRun "ipa dnszone-del $myzone"
 
@@ -459,7 +463,7 @@ bz701677()
 		#MASTERIP6=`ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | sed -n '1p'`
 		MASTERIP6=`hostname -I | awk '{print $2}'`
 
-		rlRun "ipa dnszone-add example.com --name-server=$MASTER --admin-email=$email"
+		rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=$email"
 
 		# Tests allow query '--allow-query'
 		rlRun "echo \"ipa dnszone-mod example.com --allow-query='$MASTERIP;\!$MASTERIP6;'\" > /var/tmp/allow-query.sh"
@@ -531,8 +535,8 @@ bz772301()
         a174rev="1.1.10.in-addr.arpa."
 
         # add dns record - reverse zone does exist
-	rlLog "EXECUTING: ipa dnszone-add $a174rev --name-server=$MASTER --admin-email=$email"
-        rlRun "ipa dnszone-add $a174rev --name-server=$MASTER --admin-email=$email" 0 "Add ipv4 reverse zone"
+	rlLog "EXECUTING: ipa dnszone-add $a174rev --name-server=$MASTER. --admin-email=$email"
+        rlRun "ipa dnszone-add $a174rev --name-server=$MASTER. --admin-email=$email" 0 "Add ipv4 reverse zone"
 	rlLog "EXECUTING: ipa dnsrecord-add $DOMAIN --a-create-reverse --a-rec=$a174 myhost"
         rlRun "ipa dnsrecord-add $DOMAIN --a-create-reverse --a-rec=$a174 myhost" 0 "Add ipv4 dns record"
 	sleep 5
@@ -544,8 +548,8 @@ bz772301()
         sleep 5
 
         # add dns record - reverse zone does exist - ipv6
-	rlLog "EXECUTING: ipa dnszone-add $aaaa174rev --name-server=$MASTER --admin-email=$email"
-        rlRun "ipa dnszone-add $aaaa174rev --name-server=$MASTER --admin-email=$email" 0 "Add ipv6 reverse zone"
+	rlLog "EXECUTING: ipa dnszone-add $aaaa174rev --name-server=$MASTER. --admin-email=$email"
+        rlRun "ipa dnszone-add $aaaa174rev --name-server=$MASTER. --admin-email=$email" 0 "Add ipv6 reverse zone"
 	rlLog "EXECUTING: ipa dnsrecord-add testrelm.com --aaaa-ip-address=$aaaa174 --aaaa-create-reverse myhost"
         rlRun "ipa dnsrecord-add testrelm.com --aaaa-ip-address=$aaaa174 --aaaa-create-reverse myhost" 0 "Add ipv6 dns record"
 	sleep 5
@@ -666,9 +670,9 @@ bz805430()
 		kdestroy
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		outfile="/dev/shm/utmosr-zone-addtest.txt"
-		ipa dnszone-add --name-server=$MASTER --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone &> $outfile
+		ipa dnszone-add --name-server=$MASTER. --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone &> $outfile
 		ipa dnszone-del maxtzone
-		rlRun "ipa dnszone-add --name-server=$MASTER --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone" 0 "test to make sure the maxtzone dnszone-add returns 0"
+		rlRun "ipa dnszone-add --name-server=$MASTER. --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone" 0 "test to make sure the maxtzone dnszone-add returns 0"
 		rlRun "grep 'can be at most' $outfile" 1 "check output of dnszone-add for error message"
 		ipa dnszone-del maxtzone
 
@@ -860,7 +864,7 @@ bz813380()
 		tzone="llnewzone.com"
 
 		# Add a zone to test with
-		rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+		rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
 		# Create a host to add as a NS to the new zone
 		rlRun "ipa host-add nsnew.$tzone --ip-address=$ipoc1.$ipoc2.$ipoc3.$newoc4" 0 "Add a host to add as a ns server for the zone $tzone"
 		rlRun "ipa host-find nsnew.$tzone" 0 "make sure that the new host was created"
@@ -891,7 +895,7 @@ bz829340()
 		ipv6host=$ipa6address1
 
 		# Add a zone to test with
-		rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+		rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
 		rlRun "ipa dnszone-mod $tzone --addattr=idnsForwarders='$ipv6address'" 0 "add a IPv6 address to the idns Forwarders field of a zone."
 		rlRun "ipa dnszone-find $tzone | grep Zone\ forwarders | grep '$ipv6address'" 0 "Make sure that the IPv6 address appears to be part of the zone."
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
@@ -915,7 +919,7 @@ bz829340()
 				rlLog "setting ipv6 address on interface $inetinterface to $ipv6address1"
 				/sbin/ip -6 addr add $ipv6address1/64 dev $inetinterface
 				ipa dnszone-del $tzone
-				rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+				rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
 				rlRun "ipa dnszone-mod $tzone --addattr=idnsForwarders='$ipv6address2'" 0 "add a IPv6 address to the idns Forwarders field of a zone."
 	
 				rlRun "rhts-sync-block -s 'bz.dns.829340.b' $BEAKERSLAVE"
@@ -952,21 +956,21 @@ bz798493()
 		# Add a zone
 		forward='10.11.12.0/24'
 		reverse='12.11.10.in-addr.arpa.'
-		echo '' | ipa dnszone-add --name-server=`hostname` --admin-email="admin@testrelm.com" --name-from-ip=$forward
+		echo '' | ipa dnszone-add --name-server=`hostname`. --admin-email="admin@testrelm.com" --name-from-ip=$forward
 		rlRun "ipa dnszone-find '$reverse'" 0 "Make sure dnszone-find seems to find the reverse zone"
 		rlRun "ipa dnszone-find '$reverse' | grep 'Zone name: $reverse'" 0 "Make sure dnszone-find outputs teh correct zone name."
 		ipa dnszone-del $reverse
 		# Add a zone
 		forward='10.11.12.0/20'
 		reverse='11.10.in-addr.arpa.'
-		echo '' | ipa dnszone-add --name-server=`hostname` --admin-email="admin@testrelm.com" --name-from-ip=$forward
+		echo '' | ipa dnszone-add --name-server=`hostname`. --admin-email="admin@testrelm.com" --name-from-ip=$forward
 		rlRun "ipa dnszone-find '$reverse'" 0 "Make sure dnszone-find seems to find the reverse zone"
 		rlRun "ipa dnszone-find '$reverse' | grep 'Zone name: $reverse'" 0 "Make sure dnszone-find outputs teh correct zone name."
 		ipa dnszone-del $reverse
 		# Add a zone
 		forward='10.11.12.0/16'
 		reverse='11.10.in-addr.arpa.'
-		echo '' | ipa dnszone-add --name-server=`hostname` --admin-email="admin@testrelm.com" --name-from-ip=$forward
+		echo '' | ipa dnszone-add --name-server=`hostname`. --admin-email="admin@testrelm.com" --name-from-ip=$forward
 		rlRun "ipa dnszone-find '$reverse'" 0 "Make sure dnszone-find seems to find the reverse zone"
 		rlRun "ipa dnszone-find '$reverse' | grep 'Zone name: $reverse'" 0 "Make sure dnszone-find outputs teh correct zone name."
 		ipa dnszone-del $reverse
@@ -989,10 +993,14 @@ bz809565()
 		ipv6address='fe80::210:14ff:fe05:134'
 
 		# Add a zone to test with
-		rlRun "ipa dnszone-add --name-server=$MASTER --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+		rlLog "Executing: ipa dnszone-add --name-server=$MASTER. --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone"
+		rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
+		rlLog "Executing: ipa dnszone-mod $tzone --addattr=idnsName='Name1'"
 		ipa dnszone-mod $tzone --addattr=idnsName='Name1'
 		nameb='Name2'
+		rlLog "Executing: ipa dnszone-mod $tzone --addattr=idnsName='$nameb'"
 		rlRun "ipa dnszone-mod $tzone --addattr=idnsName='$nameb'" 0 "Try to modify the idns name without destroying it first."
+		rlLog "Executing: ipa dnszone-find $tzone | grep '$nameb'"
 		rlRun "ipa dnszone-find $tzone | grep '$nameb'" 0 "Make sure that the new name exists in the zone."
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 		
@@ -1028,8 +1036,8 @@ bz829388()
 bz829353()
 {
      rlPhaseStartTest "bz829353 - bind-dyndb-ldap crashes when NS is not resolvable"
-        rlLog "Executing: ipa dnszone-add --name-server=unused-4-107.brq.redhat.com --admin-email=$email e.test"
-        rlRun "ipa dnszone-add --name-server=unused-4-107.brq.redhat.com --admin-email=$email e.test" 0 "Add zone with non-resolvable name server"
+        rlLog "Executing: ipa dnszone-add --name-server=unused-4-107.brq.redhat.com. --admin-email=$email e.test"
+        rlRun "ipa dnszone-add --name-server=unused-4-107.brq.redhat.com. --admin-email=$email e.test" 0 "Add zone with non-resolvable name server"
         rlLog "Executing: ipa dnszone-del e.test"
         rlRun "ipa dnszone-del e.test" 0 "Delete this zone"
         rlLog "Executing: dig @$MASTERIP e.test | grep \"no servers could be reached\" "
