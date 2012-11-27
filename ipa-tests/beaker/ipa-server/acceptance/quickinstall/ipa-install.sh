@@ -1033,6 +1033,9 @@ ipa_install_client()
 		
 		rlLog "RUN ipa-client-install"
 		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
+        rlLog "Starting SSSD in case it is not running"
+        rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
+        rlRun "service sssd start"
 
 		#rlLog "Killing local ($HOSTNAME) tcpdump"
 		#TCPDPID=""
