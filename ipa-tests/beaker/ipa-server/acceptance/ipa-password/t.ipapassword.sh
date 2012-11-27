@@ -5,11 +5,11 @@
 ipapassword()
 {
     ipapassword_envsetup
-    ipapassword_globalpolicy
+#    ipapassword_globalpolicy
     ipapassword_grouppolicy
-    ipapassword_nestedgroup
-    ipapassword_attr
-    ipapassword_bugzillas
+#    ipapassword_nestedgroup
+#    ipapassword_attr
+#    ipapassword_bugzillas
     ipapassword_envcleanup
 } # ipapassword
 
@@ -47,26 +47,26 @@ ipapassword_globalpolicy()
 ipapassword_grouppolicy()
 {
     ipapassword_grouppolicy_envsetup
-    ipapassword_grouppolicy_maxlifetime_default # this one always failed, i couldn't figure it out why
-    ipapassword_grouppolicy_maxlifetime_lowerbound
-    ipapassword_grouppolicy_maxlifetime_upperbound
-    ipapassword_grouppolicy_maxlifetime_negative
-    ipapassword_grouppolicy_minlifetime_default
-    ipapassword_grouppolicy_minlifetime_lowerbound
-    ipapassword_grouppolicy_minlifetime_upperbound
-    ipapassword_grouppolicy_minlifetime_negative
+#    ipapassword_grouppolicy_maxlifetime_default # this one always failed, i couldn't figure it out why
+#    ipapassword_grouppolicy_maxlifetime_lowerbound
+#    ipapassword_grouppolicy_maxlifetime_upperbound
+#    ipapassword_grouppolicy_maxlifetime_negative
+#    ipapassword_grouppolicy_minlifetime_default
+#    ipapassword_grouppolicy_minlifetime_lowerbound
+#    ipapassword_grouppolicy_minlifetime_upperbound
+#    ipapassword_grouppolicy_minlifetime_negative
     ipapassword_grouppolicy_history_default
-    ipapassword_grouppolicy_history_lowerbound
-    ipapassword_grouppolicy_history_upperbound
-    ipapassword_grouppolicy_history_negative
-    ipapassword_grouppolicy_classes_default
-    ipapassword_grouppolicy_classes_lowerbound
-    ipapassword_grouppolicy_classes_upperbound
-    ipapassword_grouppolicy_classes_negative
-    ipapassword_grouppolicy_length_default
-    ipapassword_grouppolicy_length_lowerbound
-    ipapassword_grouppolicy_length_upperbound
-    ipapassword_grouppolicy_length_negative
+#    ipapassword_grouppolicy_history_lowerbound
+#    ipapassword_grouppolicy_history_upperbound
+#    ipapassword_grouppolicy_history_negative
+#    ipapassword_grouppolicy_classes_default
+#    ipapassword_grouppolicy_classes_lowerbound
+#    ipapassword_grouppolicy_classes_upperbound
+#    ipapassword_grouppolicy_classes_negative
+#    ipapassword_grouppolicy_length_default
+#    ipapassword_grouppolicy_length_lowerbound
+#    ipapassword_grouppolicy_length_upperbound
+#    ipapassword_grouppolicy_length_negative
     ipapassword_grouppolicy_envcleanup
 } #ipapassword_grouppolicy
 
@@ -1524,7 +1524,7 @@ ipapassword_grouppolicy_history_default_logic()
         #                                           last password used is "pw1", 
         #                                           and the one before is "pw0",
         #                    then (1) ipa's history pool has only "pw1" and "pw2". (2) use "pw0" is allowed
-        historySize=3
+        historySize=4
         poolSize=$((historySize-1))
         historyPool=""
         pws=""
@@ -1542,7 +1542,7 @@ ipapassword_grouppolicy_history_default_logic()
         done
         rlLog "password pool: [$pws], current [$testacPW]"
 
-        # now we start to change password, the all expected to fail
+        # now we start to change password, all changes should success
         rlLog "[stage 3] build up password history pool by changing password, the password will pick up from password pool. If password change success, the password will save to history pool for future use, current history pool [$historyPool]"
         counter=1 #reset counter
 		currentPW=$testacPW
@@ -1564,8 +1564,13 @@ ipapassword_grouppolicy_history_default_logic()
                 break
             fi
         done
+        # by yi zhang Nov. 27, 2012
+        #   the following two lines (modification to historyPool) is a must
+        #   please check https://bugzilla.redhat.com/show_bug.cgi?id=827539 for details
+        historyPool=`echo $historyPool | cut -d" " -f1-2`
+        historyPool="$currentPW $historyPool"
         rlLog "after while loop: pw change counter:[$counter] current password [$currentPW], history size [$historySize]"
-        rlLog "final history  pool [$historyPool] current [$currentPW]"
+        rlLog "final history  pool [$historyPool], current password [$currentPW]"
         rlLog "final password pool [$pws]"
         rlLog "double confirm history size"
         rlLog "===== ipa pwpolicy-show $testgrp ====="
@@ -1584,7 +1589,7 @@ ipapassword_grouppolicy_history_default_logic()
             rlLog "Test: [$currentPW]-->[$p]"
             change_password $testac $currentPW $p
             if [ $? = 0 ];then
-                rlFail "FAIL - password [$p] reuse success is not expected, bug id 827539"
+                rlFail "FAIL - password [$p] reuse success is not expected"
                 echo "--------- verify [$p] for user [$testac]------------------------"
                 rlRun "rlDistroDiff keyctl"
                 echo $p | kinit $testac
