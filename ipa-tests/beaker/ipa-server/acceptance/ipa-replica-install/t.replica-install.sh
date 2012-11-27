@@ -663,6 +663,7 @@ installSlave_ca()
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+            replicaBugCheck_bz867640
 
 		# Disabling the following since empty forwarders exist in named.conf
                 # rlAssertGrep "forwarders" "/etc/named.conf"

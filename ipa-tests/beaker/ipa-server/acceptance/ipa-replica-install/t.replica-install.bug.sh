@@ -154,6 +154,17 @@ replicaBugCheck_bz845405()
     rlPhaseEnd
 }
 
+replicaBugCheck_bz867640()
+{
+    rlPhaseStartTest "bz867640 - ipa-replica-install Configuration of CA failed"
+        if [ $(grep "CRITICAL failed to configure ca instance" /var/log/ipareplica-install.log|wc -l) -gt 0 ]; then
+            rlFail "BZ 867640 found...ipa-replica-install Configuration of CA failed"
+        else
+            rlPass "BZ 867640 not found"
+        fi
+    rlPhaseEnd
+}
+
 installBug_bz839004()
 {
 	rlPhaseStartTest "Try installing Slave to test bug 839004"
