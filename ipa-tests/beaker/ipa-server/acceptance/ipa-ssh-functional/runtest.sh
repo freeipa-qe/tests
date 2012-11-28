@@ -81,6 +81,8 @@ rlJournalStart
 	ipa_ssh_user_func_run
 	ipa_ssh_host_func_run
 
+	ipa_ssh_bug_run
+
     rlPhaseStartCleanup "ipa-test-template cleanup"
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
