@@ -8,7 +8,7 @@ sub trim{
 }
 
 sub findAllNickname{
-    my $cmdoutput = `$certutil -L -d $cert_dbdir`;
+    my $cmdoutput = `certutil -L -d $cert_dbdir`;
     my @lines = split(/\n/,$cmdoutput);
     foreach my $line (@lines){
         if ($line =~ /^(.*)\s+(\w*,\w*,\w*)$/){
@@ -118,7 +118,7 @@ sub parseCertDetails{
 
 
 sub parseCertutil{
-    my $cmdoutput = `$certutil -L -d $cert_dbdir -n "$cert_nickname"`;
+    my $cmdoutput = `certutil -L -d $cert_dbdir -n "$cert_nickname"`;
     my @lines = split(/\n/,$cmdoutput);
     my $flag=0;
     my $key=""; 
@@ -289,7 +289,7 @@ sub printCertToFile{
         if (! open OUT, ">$output"){
             return;
         }
-        foreach (sort keys $cert){
+        foreach (sort keys %$cert){
             my $key = $_;
             my $formatted_key = sprintf("%-16s",$key);
             print OUT $formatted_key."| ".$cert->{$_}."\n";
