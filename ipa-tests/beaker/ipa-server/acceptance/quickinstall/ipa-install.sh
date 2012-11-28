@@ -928,6 +928,23 @@ ipa_install_prep()
 	configAbrt
 }
 
+ipa_install_sssd_workarounds()
+{
+
+	# BZ 878420 Workaround
+	rlLog "Adding ldap_sasl_authid to sssd.conf"
+	rlLog "Working around BZ 878420"
+	M1="\[domain\/$DOMAIN\]"
+	M2="\[sssd\]"
+	A1="ldap_sasl_authid = host\/$(hostname)\@$RELM"
+	sed -i "/$M1/,/$M2/ s/^\(.*\[sssd\]\)/$A1\n\n\1/" /etc/sssd/sssd.conf
+
+	# BZ 878288 Workaround
+	rlLog "Starting SSSD in case it is not running"
+	rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
+	rlRun "service sssd start"
+}
+
 ipa_install_master()
 {
 	tmpout=/tmp/error_msg.out
@@ -949,9 +966,8 @@ ipa_install_master()
             rlRun "ipa dnsconfig-mod --forwarder=$DNSFORWARD"
             rlRun "service named restart"
         fi
-        rlLog "Starting SSSD in case it is not running"
-        rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
-        rlRun "service sssd start"
+
+		ipa_install_sssd_workarounds
 
 		if [ $IPADEBUG ]; then
 			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
@@ -1005,9 +1021,9 @@ ipa_install_replica()
 		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
 		rlRun "ipa-replica-install $IPAOPTIONS -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-        rlLog "Starting SSSD in case it is not running"
-        rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
-        rlRun "service sssd start"
+
+		ipa_install_sssd_workarounds
+
 	rlPhaseEnd
 }
 
@@ -1033,9 +1049,8 @@ ipa_install_client()
 		
 		rlLog "RUN ipa-client-install"
 		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
-        rlLog "Starting SSSD in case it is not running"
-        rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
-        rlRun "service sssd start"
+
+		ipa_install_sssd_workarounds
 
 		#rlLog "Killing local ($HOSTNAME) tcpdump"
 		#TCPDPID=""
