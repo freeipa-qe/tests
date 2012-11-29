@@ -19,15 +19,11 @@
                         </run>
                 </groups>
                 <classes>
-                    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
                     <class name="com.redhat.qe.ipa.sahi.tests.rbac.RBACFunctional" />
                 </classes>
         </test>
 
 	<test name="Permission Tests">
-                <packages>
-                     <package name="com.redhat.qe.ipa.sahi.*" />
-                </packages>
                 <groups>
                         <run>
                             <include name="setup" />
