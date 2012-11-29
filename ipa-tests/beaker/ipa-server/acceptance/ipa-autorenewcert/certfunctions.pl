@@ -313,8 +313,10 @@ sub setCertStatus{
     my $cert=shift;
     my $now = localtime;
     my $time_epoch_now = str2time($now);
-    my $notbefore=$cert->{"NotBefore_sec"}+0;
-    my $notafter=$cert->{"NotAfter_sec"}+0;
+    my $halfday=60*60*12; #set halfday as tolerance
+    my $notbefore=$cert->{"NotBefore_sec"} - $halfday;
+    my $notafter=$cert->{"NotAfter_sec"} + $halfday;
+    # set some tolerance here
     if ($time_epoch_now < $notbefore){
         $cert->{"status"} = "preValid";
     }elsif ($notbefore <= $time_epoch_now && $time_epoch_now <= $notafter){
