@@ -47,7 +47,7 @@ findAllNickname();
 if (defined $options{"n"} ){
     $cert_nickname= $options{"n"};
     if (! grep /$cert_nickname/, @cert_nicknamelist){
-        print "Nickname [$cert_nickname] not found\n";
+        #print "Nickname [$cert_nickname] not found\n";
         printAllCertNickname();
         exit 1;
     }else{
