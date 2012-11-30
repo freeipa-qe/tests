@@ -30,7 +30,17 @@ public class RBACFunctional extends SahiTestScript {
 		sahiTasks.setStrictVisibilityCheck(true);
 		sahiTasks.navigateTo(commonTasks.rolePage, true);
 		currentPage = sahiTasks.fetch("top.location.href");
-		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&privilege-facet=search" ;		
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&privilege-facet=search" ;	
+		
+		sahiTasks.navigateTo(commonTasks.dnsPage, true);
+		 sahiTasks.link(System.getProperty("ipa.server.domain")).click();
+		 sahiTasks.span("Add").click();
+		 sahiTasks.textbox("idnsname").setValue("servicehost1");
+		 sahiTasks.textbox("a_part_ip_address").setValue("10.16.96.199");
+		 sahiTasks.button("Add").click();
+		 sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+		 //sahiTasks.link("DNS Zones[1]").click();
+		
 	}
 	
 	@BeforeMethod (alwaysRun=true)
@@ -139,7 +149,7 @@ public class RBACFunctional extends SahiTestScript {
 	    
 	
 		//Verify bug
-		sahiTasks.navigateTo(commonTasks.dnsPage, true);
+		 sahiTasks.navigateTo(commonTasks.dnsPage, true);
 		 sahiTasks.link(System.getProperty("ipa.server.domain")).click();
          sahiTasks.link("servicehost1").click();
          sahiTasks.link("Edit").near(sahiTasks.link("10.16.96.199")).click();
@@ -179,7 +189,8 @@ public class RBACFunctional extends SahiTestScript {
 		PrivilegeTasks.verifyPrivilegeMembership(sahiTasks, privilegeName, "Permissions", permissions, true);*/
 		
 		String password="Secret123";
-		CommonTasks.formauthNewUser(sahiTasks, userName, password, password);
+//mvarun		CommonTasks.formauthNewUser(sahiTasks, userName, password, password);
+		commonTasks.formauth(sahiTasks, userName, password);
 		/*CommonTasks.kinitAsUser(userName, password);
 		sahiTasks.link("Logout").click();
 	    sahiTasks.link("Return to main page.").click();
@@ -357,7 +368,10 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.button("Add").click();
 			Assert.assertTrue(sahiTasks.link(uid).exists(), "User added successfully");
 			//add dns zone
-			String fqdn = System.getProperty("ipa.server.fqdn");
+			//String fqdn = System.getProperty("ipa.server.fqdn");
+			String fqdn1 = CommonTasks.getIpafqdn();
+			String fqdn2 =".";
+			String fqdn = fqdn1.concat(fqdn2);
 			sahiTasks.navigateTo(commonTasks.dnsPage, true);
 			DNSTasks.addDNSzone(sahiTasks,zonename,fqdn,"");
 			Assert.assertTrue(sahiTasks.link(zonename).exists(), "DNS zone added successfully");
@@ -439,7 +453,10 @@ public class RBACFunctional extends SahiTestScript {
 			//verify that can't list not managed by user.
 			Assert.assertFalse(sahiTasks.link(not_managed_zoneName).exists(),"can't list zone " + not_managed_zoneName + "not managed by user " + uid + " as expected");
 			//verify that can't add a new zone
-			String fqdn = System.getProperty("ipa.server.fqdn");
+			//String fqdn1 = System.getProperty("ipa.server.fqdn");
+			String fqdn1 = CommonTasks.getIpafqdn();
+			String fqdn2 =".";
+			String fqdn = fqdn1.concat(fqdn2);
 			sahiTasks.span("Add").click();
 			sahiTasks.textbox("idnsname").setValue(new_zoneName);
 			sahiTasks.textbox("idnssoamname").setValue(fqdn);
@@ -606,6 +623,8 @@ public class RBACFunctional extends SahiTestScript {
 	 */
 	 @AfterClass (groups={"cleanup"}, description="Delete objects created for this test suite", alwaysRun=true)
      public void cleanup() throws CloneNotSupportedException {
+	
+		 commonTasks.formauth(sahiTasks, "admin", System.getProperty("ipa.server.password"));
              sahiTasks.navigateTo(commonTasks.permissionPage, true);
              String[] permissionTestObjects = {"Manage DNSRecord1", "bug784621_permission", "bug811211_permission"     
              };
@@ -647,6 +666,15 @@ public class RBACFunctional extends SahiTestScript {
                      log.fine("Cleaning Role: " + groupTestObject);
                      GroupTasks.deleteGroup(sahiTasks, groupTestObject);
              }
+             
+             sahiTasks.navigateTo(commonTasks.dnsPage, true);
+    		 sahiTasks.link(System.getProperty("ipa.server.domain")).click();
+    		 sahiTasks.checkbox("servicehost1").click();
+    		 sahiTasks.span("Delete").click();
+    		 sahiTasks.button("Delete").click();
+    		 sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+    		 
+    		 
 
      }
                                                               
