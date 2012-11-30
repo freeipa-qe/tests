@@ -22,11 +22,11 @@ chop $host;
 our $connection;
 our $dn="cn=directory manager";
 our $password="Secret123";
+our $suffix="dc=yzhang,dc=redhat,dc=com";
 
 $ldap = Net::LDAP->new ($host) or die "$@";
 $connection = $ldap->bind ("$dn", password=>$password, version=>3);
-my $base="cn=ca_renewal,cn=ipa,cn=etc,dc=yzhang,dc=redhat,dc=com";
-#LDAPsearch ($ldap,$searchString,$attrs,$base) = @_;
+my $base="cn=ca_renewal,cn=ipa,cn=etc,$suffix";
 my @attrs=("cn","userCertificate");
 LDAPsearch ($ldap,"objectclass=*",\@attrs,$base);
 
@@ -36,6 +36,7 @@ if (defined $options{"n"} ){
     $cert_nickname= $options{"n"};
     $certRef = findCert($cert_nickname);
 }else{
+    usage();
     exit 1;
 }
 if (defined $options{"f"} ){
@@ -49,6 +50,10 @@ if (defined $options{"f"} ){
 ##########################################
 #           subroutine                   #
 ##########################################
+sub usage{
+    print "\nreadRenewalCertsInLDAP.pl -n <cert nick name> -f <out put file>\n";
+}
+
 sub LDAPsearch{
     my ($ldap,$searchString,$attrs,$base) = @_;
     if (!$attrs ) { 

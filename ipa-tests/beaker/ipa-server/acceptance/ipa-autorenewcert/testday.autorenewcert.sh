@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ./echoline.sh
+
 TmpDir="/tmp"
 ADMINID="admin"
 ADMINPW="Secret123"
@@ -362,9 +364,9 @@ calculate_autorenew_date(){
         && [ $autorenew -lt $certExpire ] \
         && [ $certExpire -lt $postExpire ]
     then
-        echo "Pass: got reasonable autorenew time"
+        echogreen "Pass: got reasonable autorenew time"
     else
-        echo "Fail: something wrong, date are not well ordered"
+        echored "Fail: something wrong, date are not well ordered"
     fi
     echo "$FUNCNAME finished"
 }
@@ -378,10 +380,10 @@ adjust_system_time(){
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     if [ "$?" = "0" ];then
         local after=`date`
-        echo "PASS, adjust ($label) [$before]=>[$after] done"
+        echogreen "PASS, adjust ($label) [$before]=>[$after] done"
     else
         local after=`date`
-        echo "Fail, change date failed, current data: [`date`]"
+        echored "Fail, change date failed, current data: [`date`]"
     fi
     echo "$FUNCNAME finished"
 }
@@ -392,9 +394,9 @@ stop_ipa_server(){
     sleep 5 # give system some time so ipa server can fully stopped
     if echo $out | grep "Aborting ipactl"
     then
-        echo "stop ipa server Failed"
+        echored "stop ipa server Failed"
     else
-        echo "stop ipa server Success"
+        echogreen "stop ipa server Success"
     fi
     echo "$FUNCNAME finished"
 }
@@ -405,9 +407,9 @@ start_ipa_server(){
     sleep 5 # give system some time so ipa server can fully stopped
     if echo $out | grep "Aborting ipactl"
     then
-        echo "start ipa server Failed"
+        echored "start ipa server Failed"
     else
-        echo "start ipa server Success"
+        echogreen "start ipa server Success"
     fi
     echo "$FUNCNAME finished"
 }
@@ -461,13 +463,13 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
     echo "[acutally being renewed  ]: [$justRenewedCerts]"
     echo ""
     if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
-        echo "PASS round [$testid] renewed certs: [$soonTobeRenewedCerts]"
-        echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
+        echogreen "PASS round [$testid] renewed certs: [$soonTobeRenewedCerts]"
+        echogreen "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
     else
         local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
-        echo "FAIL round [$testid] certs not renewed [ $difflist ]"
-        echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
-        echo "current system time :[`date`]"
+        echored "FAIL round [$testid] certs not renewed [ $difflist ]"
+        echored "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
+        echored "current system time :[`date`]"
         for cert in $difflist
         do
             print_cert_details "     " $cert expired
@@ -480,9 +482,9 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
 test_status_report(){
     if [ -f $testReport ];then
         echo ""
-        echo "#-------------- autorenewcert test status report round($testid) -------------------------------#"
+        echoyellow "#-------------- autorenewcert test status report round($testid) -------------------------------#"
         cat $testResult
-        echo "#----------------------------------------------------------------------------------------#"
+        echoyellow "#----------------------------------------------------------------------------------------#"
         echo ""
     fi
 }
@@ -878,14 +880,62 @@ create_cert_request_file()
    
 } #create_cert_request_file
  
+record_cert_expires_epoch_time()
+{
+    if [ ! -f $certdata_notafter ];then
+        touch $certdata_notafter
+    fi
+    echo "" > $certdata_notafter
+    for cert in $allcerts
+    do
+        local notafter_sec=`$cert NotAfter_sec valid`
+        local notafter=`$cert NotAfter valid`
+        echo "$cert $notafter_sec = $notafter"  >> $certdata_notafter
+    done
+    echo "#--------------- record remaining life of current certs -----------#"
+    cat $certdata_notafter
+    echo "#-------------------------------------------------------------------#"
+}
 
+compare_expires_epoch_time_of_certs()
+{
+    rlPhaseStartTest "autorenewcert round [$testid] - compare epoch time of certs expires date round [$testid]"
+    if [ ! -f $certdata_notafter ];then
+        rlFail "no epoch time of certs expires data file fouond, error!"
+    else
+        echo "#--------------- what have been recorded: expires date in eopch time of current certs -----------#"
+        cat $certdata_notafter
+        echo "#-------------------------------------------------------------------#"
+        for cert in $allcerts
+        do
+            local currentNotAfter=`$cert NotAfter_sec valid`
+            if [ "$currentNotAfter" = "no cert found" ];then
+                rlFail "No valid cert found for [$cert]"
+                echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert] has no valid cert" >> $testResult
+            else
+                local previousNotAfter=`grep "$cert" $certdata_notafter | cut -d" " -f2`
+                local previousNotAfterDate=`grep "$cert" $certdata_notafter | cut -d"=" -f2`
+                local currentNotAfterDate=`$cert NotAfter valid`
+                if [ $currentNotAfter -gt $previousNotAfter ];then
+                    justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
+                    rlPass "$cert gets renewed, not after previous: [$previousNotAfter] now: [$currentNotAfterDate]"
+                    echo "    [ PASS ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfterDate], previousNotAfter=[$previousNotAfterDate] " >> $testResult
+                elif [ $currentNotAfter -eq $previousNotAfter ];then
+                    rlLog "$cert haven't get renewed, previous not after [$previousNotAfterDate] now: [$currentNotAfterDate]"
+                else
+                    echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfter $currentNotAfterDate], previousNotAfter=[$previousNotAfter $previousNotAfterDate] " >> $testResult
+                fi
+            fi
+        done 
+    fi
+    rlPhaseEnd
+}
 
 # calculate dynamic variables
 host=`hostname`
 CAINSTANCE="pki-ca"
 DSINSTANCE="`find_dirsrv_instance ds`"
 CA_DSINSTANCE="`find_dirsrv_instance ca`"
-
 
 cert_sanity_check(){
     test_ipa_via_kinit_as_admin "$@"
@@ -904,6 +954,7 @@ autorenewcert()
         stop_ipa_server "Before autorenew"
         adjust_system_time $autorenew autorenew    
         start_ipa_server "After autorenew"
+        record_cert_expires_epoch_time
 
         go_to_sleep
 
@@ -912,6 +963,7 @@ autorenewcert()
         start_ipa_server "After postExpire"
 
         check_actually_renewed_certs $soonTobeRenewedCerts
+        compare_expires_epoch_time_of_certs
         compare_expected_renewal_certs_with_actual_renewed_certs "After postExpire"
 
         cert_sanity_check  "After auto renew triggered"

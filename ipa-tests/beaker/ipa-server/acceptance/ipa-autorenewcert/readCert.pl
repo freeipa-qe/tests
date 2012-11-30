@@ -99,7 +99,7 @@ sub findAllNickname{
     foreach my $line (@lines){
         if ($line =~ /^(.*)\s+(\w*,\w*,\w*)$/){
             my $nickname=trim($1);
-            #print "found nickname [$nickname]\n";
+            print "found nickname [$nickname]\n";
             push @cert_nicknamelist, $nickname;
         }
     }

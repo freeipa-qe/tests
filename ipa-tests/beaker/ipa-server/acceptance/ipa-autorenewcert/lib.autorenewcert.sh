@@ -65,7 +65,7 @@ caAuditLogCert(){
     fi
 }
 
-ipaRAagentCert(){
+ipaAgentCert(){
     local db="/etc/httpd/alias"
     local nickname="ipaCert"
     local state=$2
@@ -399,6 +399,9 @@ prepare_for_next_round(){
         local counter=`$countlist -s "$renewedCerts" -c "$cert"`
         local fp_certname=`perl -le "print sprintf (\"%+26s\",\"$cert\")"`
         echo "$header | $fp_certname : renewed [ $counter ] times         |"
+        if [ $counter -le $certRenewCounter ];then
+            certRenewCounter=$counter
+        fi
     done
     echo "$header +----------------------------------------------------------+"
 }
@@ -411,7 +414,7 @@ check_actually_renewed_certs(){
         local state=`$cert status valid`
         if [ "$state" = "valid" ];then
             rlPass "PASS: valid cert found for  [$cert]"
-            justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
+            #justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end: move this line to function: compare_expires_epoch_time_of_certs
         else
             rlFail "FAIL: NO valid cert found for [$cert]"
         fi
@@ -423,21 +426,33 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
     rlPhaseStartTest "autorenewcert round [$testid] - compare_expected_renewal_certs_with_actual_renewed_certs"
     echo "[soon to be renewed certs]: [$soonTobeRenewedCerts]"
     echo "[acutally being renewed  ]: [$justRenewedCerts]"
-    echo ""
-    if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
-        rlPass "PASS round [$testid] renewed certs: [$soonTobeRenewedCerts]"
-        echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
-    else
-        local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
-        rlFail "FAIL round [$testid] certs not renewed [ $difflist ]"
-        echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
-        rlLog "current system time :[`date`]"
-        for cert in $difflist
-        do
-            print_cert_details "     " $cert expired
-            print_cert_details "     " $cert preValid
-        done
-    fi
+
+    for soon in $soonTobeRenewedCerts
+    do
+        if echo $justRenewedCerts | grep $soon 2>&1 >/dev/null
+        then
+            rlPass "PASS round [$testid] renewed certs: [$soon] found in just renewed certs queue"
+            echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs: [$soon] did get renewed" >> $testResult
+        else
+            rlFail "FAIL round [$testid] renewed certs: [$soon] not found in just renewed certs queue"
+            echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs : [$soon] did not get renewed" >> $testResult
+        fi
+    done
+
+#    if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
+#        rlPass "PASS round [$testid] renewed certs: [$soonTobeRenewedCerts]"
+#        echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
+#    else
+#        local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
+#        rlFail "FAIL round [$testid] certs not renewed [ $difflist ]"
+#        echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
+#        rlLog "current system time :[`date`]"
+#        for cert in $difflist
+#        do
+#            print_cert_details "     " $cert expired
+#            print_cert_details "     " $cert preValid
+#        done
+#    fi
     rlPhaseEnd
 }
 
@@ -511,9 +526,19 @@ continue_test(){
         touch $testResult
         echo "yes" # when test gets into first round, there is no testResult file exist, just echo 'yes' to continue test
     else
+        # if all current test are passed
         if ! grep "FAIL" $testResult 2>&1 >/dev/null
         then
-            echo "yes"
+            if [ $certRenewCounter -gt $minRound ];then
+                #no need to continue 
+                #since all certs have been renewed minimum of [$minRound] round"
+                echo "no" 
+            else
+                # continue test, we want all certs gets renewed minimu [$minRound]
+                echo "yes"
+            fi
+        else
+            echo "no"
         fi
     fi
 }
@@ -647,7 +672,7 @@ test_ipa_via_kinit_as_admin(){
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
             rlFail "[test_ipa_via_kinit_as_admin] wrong $ADMINID password provided: [$pw]"
-            echo "  FAIL: test_ipa_via_kinit_as_admin ($@)" >> $testResult
+            echo "   [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
         else
             rlFail "[test_ipa_via_kinit_as_admin] unhandled error: Not because password expired; not because wrong password provided"
             echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
@@ -697,7 +722,56 @@ kinit_aftermaxlife()
     rm $exp
 } #kinit_aftermaxlife
 
+record_cert_expires_epoch_time()
+{
+    if [ ! -f $certdata_notafter ];then
+        touch $certdata_notafter
+    fi
+    echo "" > $certdata_notafter
+    for cert in $allcerts
+    do
+        local notafter_sec=`$cert NotAfter_sec valid`
+        local notafter=`$cert NotAfter valid`
+        echo "$cert $notafter_sec = $notafter"  >> $certdata_notafter
+    done
+    echo "#--------------- record remaining life of current certs -----------#"
+    cat $certdata_notafter
+    echo "#-------------------------------------------------------------------#"
+}
 
+compare_expires_epoch_time_of_certs()
+{
+    rlPhaseStartTest "autorenewcert round [$testid] - compare epoch time of certs expires date round [$testid]"
+    if [ ! -f $certdata_notafter ];then
+        rlFail "no epoch time of certs expires data file fouond, error!"
+    else
+        echo "#--------------- what have been recorded: expires date in eopch time of current certs -----------#"
+        cat $certdata_notafter
+        echo "#-------------------------------------------------------------------#"
+        for cert in $allcerts
+        do
+            local currentNotAfter=`$cert NotAfter_sec valid`
+            if [ "$currentNotAfter" = "no cert found" ];then
+                rlFail "No valid cert found for [$cert]"
+                echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert] has no valid cert" >> $testResult
+            else
+                local previousNotAfter=`grep "$cert" $certdata_notafter | cut -d" " -f2`
+                local previousNotAfterDate=`grep "$cert" $certdata_notafter | cut -d"=" -f2`
+                local currentNotAfterDate=`$cert NotAfter valid`
+                if [ $currentNotAfter -gt $previousNotAfter ];then
+                    justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
+                    rlPass "$cert gets renewed, not after previous: [$previousNotAfter] now: [$currentNotAfterDate]"
+                    echo "    [ PASS ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfterDate], previousNotAfter=[$previousNotAfterDate] " >> $testResult
+                elif [ $currentNotAfter -eq $previousNotAfter ];then
+                    rlLog "$cert haven't get renewed, previous not after [$previousNotAfterDate] now: [$currentNotAfterDate]"
+                else
+                    echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfter $currentNotAfterDate], previousNotAfter=[$previousNotAfter $previousNotAfterDate] " >> $testResult
+                fi
+            fi
+        done 
+    fi
+    rlPhaseEnd
+}
 
 test_dirsrv_via_ssl_based_ldapsearch(){
     rlPhaseStartTest "autorenewcert round [$testid] - test_dirsrv_via_ssl_based_ldapsearch ($@)"

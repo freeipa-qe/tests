@@ -40,6 +40,7 @@ autorenewcert()
         stop_ipa_server "Before autorenew"
         adjust_system_time $autorenew autorenew    
         start_ipa_server "After autorenew"
+        record_cert_expires_epoch_time
 
         go_to_sleep
 
@@ -48,6 +49,7 @@ autorenewcert()
         start_ipa_server "After postExpire"
 
         check_actually_renewed_certs $soonTobeRenewedCerts
+        compare_expires_epoch_time_of_certs
         compare_expected_renewal_certs_with_actual_renewed_certs "After postExpire"
 
         cert_sanity_check  "After auto renew triggered"

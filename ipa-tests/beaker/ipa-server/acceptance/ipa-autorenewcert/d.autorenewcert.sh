@@ -27,3 +27,9 @@ soonTobeRenewedCerts=""
 justRenewedCerts=""
 renewedCerts=""
 checkTestConditionRequired="true"
+
+#data storage used
+certdata_notafter="$TmpDir/cert.data.not.after.sec.txt"
+
+minRound=2
+certRenewCounter=99
