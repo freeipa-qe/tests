@@ -148,12 +148,12 @@ caJarSigningCert(){
 list_all_ipa_certs(){
     sort_certs
     echo ""
-    echo "+-------------------- all IPA certs [`date`]----------------------------------+"
-    echo "+-------------------- all IPA certs [`date`]----------------------------------+" > $certReport
-    echo "[preValid certs]:"
-    echo "[preValid certs]:" >> $certReport
-    list_certs "preValid" $allcerts
-    echo ""
+    echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+"
+    echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+" > $certReport
+    #echo "[preValid certs]:"
+    #echo "[preValid certs]:" >> $certReport
+    #list_certs "preValid" $allcerts
+    #echo ""
 
     echo "[valid certs]:"
     echo "[valid certs]:" >> $certReport
@@ -505,15 +505,17 @@ sort_certs(){
         if [ "$timeleft_sec" != "no cert found" ];then
             echo "$cert=$timeleft_sec" >> $tempdatafile
         else
-            timeleft_sec=`$cert LifeLeft_sec preValid`
+            #timeleft_sec=`$cert LifeLeft_sec preValid`
+            timeleft_sec=`$cert LifeLeft_sec expired`
             if [ "$timeleft_sec" != "no cert found" ];then
                 echo "$cert=$timeleft_sec" >> $tempdatafile 
-            else
-                timeleft_sec=`$cert LifeLeft_sec expired`
-                echo "$cert=$timeleft_sec" >> $tempdatafile
+            #else
+            #    timeleft_sec=`$cert LifeLeft_sec expired`
+            #    echo "$cert=$timeleft_sec" >> $tempdatafile
             fi
         fi
     done
+    # made some change here, but not sure why i need this at first place yi zhang debug
     if [ -f $tempdatafile ];then
         allcerts=`$sortlist $tempdatafile`
         echo " [$allcerts]"
@@ -586,8 +588,8 @@ final_cert_status_report(){
     local validCerts=`get_all_valid_certs`
     local notValid=`$difflist "$validCerts" "$allcerts"`
     echo ""
-    echo "#################################################################"
-    echo "#             Final IPA Cert Status Report [ `date`] #"
+    echo "############################################################################"
+    echo "#             Final IPA Cert Status Report [ `date`]  #"
     echo "[all certs  ] [$allcerts]"
     echo "[valid certs] [$validCerts]"
     echo "[not valid  ] [$notValid]"
@@ -604,18 +606,23 @@ final_cert_status_report(){
         echo "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]"
         echo "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]" >> $certReport
         $readCert -d $db -n "$nickname" -s expired >> $certReport
-        print_cert_details "     " $cert preValid
+        #print_cert_details "     " $cert preValid
         print_cert_details "     " $cert expired
     done
     test_status_report
-    echo "#-------------------------------------------------------------#"
+    echo "#---------------------------------------------------------------------------#"
     echo "            cert report for each round of test [`date`]"
-    echo "#-------------------------------------------------------------#"
+    echo "#---------------------------------------------------------------------------#"
     local reportCounter=1
     while [ $reportCounter -le $testroundCounter ]
     do
         local report="$TmpDir/cert.report.$reportCounter.txt"
-        cat $report
+        if [ -f $report ];then
+            echo "#------ cert file: [$report] ------#"
+            cat $report
+        else
+            echo "cert report: $report does not exist, this is not considerded as an error"
+        fi
         reportCounter=$((reportCounter + 1 ))
     done
 }
@@ -624,7 +631,7 @@ print_test_header(){
     echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
     echo "      #                                                         #"
     echo "      #                    test round [$testroundCounter]                       #"
-    echo "           (minRound=$minRound, counter=$certRenewCounter)      "
+    echo "      #           (minRound=$minRound, counter=$certRenewCounter)              #"
     echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
 }
 
@@ -793,7 +800,7 @@ compare_expires_epoch_time_of_certs()
                     rlPass "$cert gets renewed, not after previous: [$previousNotAfter] now: [$currentNotAfterDate]"
                     echo "    [ PASS ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfterDate], previousNotAfter=[$previousNotAfterDate] " >> $testResult
                 elif [ $currentNotAfter -eq $previousNotAfter ];then
-                    rlLog "$cert haven't get renewed, previous not after [$previousNotAfterDate] now: [$currentNotAfterDate]"
+                    rlLog "$cert haven't get renewed, previous not after [$previousNotAfterDate] is not changed now: [$currentNotAfterDate]"
                 else
                     echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfter $currentNotAfterDate], previousNotAfter=[$previousNotAfter $previousNotAfterDate] " >> $testResult
                 fi

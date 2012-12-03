@@ -32,4 +32,4 @@ checkTestConditionRequired="true"
 certdata_notafter="$TmpDir/cert.data.not.after.sec.txt"
 
 minRound=1
-certRenewCounter=99
+certRenewCounter=0
