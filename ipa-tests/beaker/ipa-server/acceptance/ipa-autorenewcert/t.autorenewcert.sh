@@ -37,16 +37,18 @@ autorenewcert()
 
         calculate_autorenew_date $soonTobeRenewedCerts
 
-        stop_ipa_server "Before autorenew"
+        stop_ipa_server "Before autorenew, stop ipa, adjust system to trigger automatic cert renew"
         adjust_system_time $autorenew autorenew    
-        start_ipa_server "After autorenew"
+        start_ipa_server "After autorenew, start ipa, expect automatic cert renew happening in background"
         record_cert_expires_epoch_time
-
+        
+        go_to_sleep
+        restart_ipa_server "After autorenew, restart ipa, give ipa serverr second chance to kick off automatic renew"
         go_to_sleep
 
-        stop_ipa_server "Before postExpire"
+        stop_ipa_server "Before postExpire, system time will change soon, to verify the renewed certs"
         adjust_system_time $postExpire postExpire
-        start_ipa_server "After postExpire"
+        start_ipa_server "After postExpire, system time has been changed, expect new certs are in use"
 
         check_actually_renewed_certs $soonTobeRenewedCerts
         compare_expires_epoch_time_of_certs
@@ -58,7 +60,7 @@ autorenewcert()
 
 ############## main test #################
 main_autorenewcert_test(){
-    testid=1
+    testroundCounter=1
     fix_prevalid_cert_problem #weird problem
     # conditions for test to continue (continue_test returns "yes")
     # 1. all ipa certs are valid
@@ -66,12 +68,13 @@ main_autorenewcert_test(){
 
     while [ "`continue_test`" = "yes" ]
     do
+        certReport="$TmpDir/cert.report.$testroundCounter.txt"
         echo "" > $testResult  # reset test result from last round
         list_all_ipa_certs
         find_soon_to_be_renewed_certs
         autorenewcert $round
         prepare_for_next_round
-        testid=$((testid + 1))
+        testroundCounter=$((testroundCounter + 1))
         #fix_prevalid_cert_problem #weird problem
     done
     final_cert_status_report 

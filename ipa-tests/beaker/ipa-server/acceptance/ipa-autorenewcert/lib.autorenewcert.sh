@@ -149,17 +149,22 @@ list_all_ipa_certs(){
     sort_certs
     echo ""
     echo "+-------------------- all IPA certs [`date`]----------------------------------+"
+    echo "+-------------------- all IPA certs [`date`]----------------------------------+" > $certReport
     echo "[preValid certs]:"
+    echo "[preValid certs]:" >> $certReport
     list_certs "preValid" $allcerts
     echo ""
 
     echo "[valid certs]:"
+    echo "[valid certs]:" >> $certReport
     list_certs "valid" $allcerts
     echo ""
 
     echo "[expired certs]:"
+    echo "[expired certs]:" >> $certReport
     list_certs "expired" $allcerts
     echo "+--------------------------------------------------------------------------------------------------+"
+    echo "+--------------------------------------------------------------------------------------------------+" >> $certReport
     echo ""
 }
 
@@ -195,9 +200,11 @@ print_cert_brief(){
             local fp_state=`perl -le "print sprintf (\"%-8s\",$passinState)"`
             local fp_timeleft=`perl -le "print sprintf(\"%-20s\",\"$timeleft\")"`
             echo "$fp_name #$fp_serial: [$notbefore_date]~~[$notafter_date] expires@($fp_timeleft) life [$life] "
+            echo "$fp_name #$fp_serial: [$notbefore_date]~~[$notafter_date] expires@($fp_timeleft) life [$life] " >> $certReport
         fi
     else
         echo "not supported status :[$passinState]"
+        echo "not supported status :[$passinState]" >> $certReport
     fi
 }
 
@@ -306,7 +313,7 @@ fix_prevalid_cert_problem(){
 }
 
 calculate_autorenew_date(){
-    rlPhaseStartTest "autorenewcert round [$testid] - calculate_autorenew_date"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - calculate_autorenew_date"
     local group=$@
     local after=`get_not_after_sec valid $group`
     local after_min=`min $after`
@@ -336,7 +343,7 @@ calculate_autorenew_date(){
 adjust_system_time(){
     local adjustTo=$1
     local label=$2
-    rlPhaseStartTest "autorenewcert round [$testid] - adjust_system_time $label"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - adjust_system_time $label"
     echo "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
     local before=`date`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
@@ -351,7 +358,7 @@ adjust_system_time(){
 }
 
 stop_ipa_server(){
-    rlPhaseStartTest "autorenewcert round [$testid] - stop_ipa_server ($@)"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - stop_ipa_server ($@)"
     local out=`ipactl stop 2>&1`
     sleep 5 # give system some time so ipa server can fully stopped
     if echo $out | grep "Aborting ipactl"
@@ -364,7 +371,7 @@ stop_ipa_server(){
 }
 
 start_ipa_server(){
-    rlPhaseStartTest "autorenewcert round [$testid] - start_ipa_server ($@)" 
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - start_ipa_server ($@)" 
     local out=`ipactl start 2>&1`
     sleep 5 # give system some time so ipa server can fully stopped
     if echo $out | grep "Aborting ipactl"
@@ -372,6 +379,19 @@ start_ipa_server(){
         rlFail "start ipa server Failed"
     else
         rlPass "start ipa server Success"
+    fi
+    rlPhaseEnd
+}
+
+restart_ipa_server(){
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - restart_ipa_server ($@)" 
+    local out=`ipactl restart 2>&1`
+    sleep 5 # give system some time so ipa server can fully stopped
+    if echo $out | grep "Aborting ipactl"
+    then
+        rlFail "restart ipa server Failed"
+    else
+        rlPass "restart ipa server Success"
     fi
     rlPhaseEnd
 }
@@ -393,7 +413,7 @@ prepare_for_next_round(){
     renewedCerts="$renewedCerts $justRenewedCerts"
     justRenewedCerts="" #reset so we can continue test
     local header="  "
-    echo "$header +------------------- Cert Renew report ($testid)-----------------+"
+    echo "$header +------------------- Cert Renew report ($testroundCounter)-----------------+"
     for cert in $allcerts
     do
         local counter=`$countlist -s "$renewedCerts" -c "$cert"`
@@ -407,7 +427,7 @@ prepare_for_next_round(){
 }
 
 check_actually_renewed_certs(){
-    rlPhaseStartTest "autorenewcert round [$testid] - check_actually_renewed_certs"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - check_actually_renewed_certs"
     local certsShouldBeRenewed=$@
     for cert in $certsShouldBeRenewed
     do
@@ -416,6 +436,7 @@ check_actually_renewed_certs(){
             rlPass "PASS: valid cert found for  [$cert]"
             #justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end: move this line to function: compare_expires_epoch_time_of_certs
         else
+            rlLog "[$cert status valid] returned [$state]"
             rlFail "FAIL: NO valid cert found for [$cert]"
         fi
     done
@@ -423,7 +444,7 @@ check_actually_renewed_certs(){
 }
 
 compare_expected_renewal_certs_with_actual_renewed_certs(){
-    rlPhaseStartTest "autorenewcert round [$testid] - compare_expected_renewal_certs_with_actual_renewed_certs"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - compare_expected_renewal_certs_with_actual_renewed_certs"
     echo "[soon to be renewed certs]: [$soonTobeRenewedCerts]"
     echo "[acutally being renewed  ]: [$justRenewedCerts]"
 
@@ -431,20 +452,20 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
     do
         if echo $justRenewedCerts | grep $soon 2>&1 >/dev/null
         then
-            rlPass "PASS round [$testid] renewed certs: [$soon] found in just renewed certs queue"
+            rlPass "PASS round [$testroundCounter] renewed certs: [$soon] found in just renewed certs queue"
             echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs: [$soon] did get renewed" >> $testResult
         else
-            rlFail "FAIL round [$testid] renewed certs: [$soon] not found in just renewed certs queue"
+            rlFail "FAIL round [$testroundCounter] renewed certs: [$soon] not found in just renewed certs queue"
             echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs : [$soon] did not get renewed" >> $testResult
         fi
     done
 
 #    if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
-#        rlPass "PASS round [$testid] renewed certs: [$soonTobeRenewedCerts]"
+#        rlPass "PASS round [$testroundCounter] renewed certs: [$soonTobeRenewedCerts]"
 #        echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
 #    else
 #        local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
-#        rlFail "FAIL round [$testid] certs not renewed [ $difflist ]"
+#        rlFail "FAIL round [$testroundCounter] certs not renewed [ $difflist ]"
 #        echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
 #        rlLog "current system time :[`date`]"
 #        for cert in $difflist
@@ -459,7 +480,7 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
 test_status_report(){
     if [ -f $testReport ];then
         echo ""
-        echo "#-------------- autorenewcert test status report round($testid) -------------------------------#"
+        echo "#-------------- autorenewcert test status report round($testroundCounter) -------------------------------#"
         cat $testResult
         echo "#----------------------------------------------------------------------------------------#"
         echo ""
@@ -501,7 +522,7 @@ sort_certs(){
 }
 
 find_soon_to_be_renewed_certs(){
-    rlPhaseStartTest "autorenewcert round [$testid] - find_soon_to_be_renewed_certs"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - find_soon_to_be_renewed_certs"
     rlLog "find_soon_to_be_renewed_certs"
     local tempdatafile="$TmpDir/cert.timeleft.$RANDOM.txt"
     for cert in $allcerts
@@ -529,7 +550,7 @@ continue_test(){
         # if all current test are passed
         if ! grep "FAIL" $testResult 2>&1 >/dev/null
         then
-            if [ $certRenewCounter -gt $minRound ];then
+            if [ $certRenewCounter -ge $minRound ];then
                 #no need to continue 
                 #since all certs have been renewed minimum of [$minRound] round"
                 echo "no" 
@@ -556,50 +577,59 @@ get_all_valid_certs(){
 }
 
 final_cert_status_report(){
-    # we stop test in the following 2 conditions
-    # 1. previous test result has to pass
-    # 2. there are some certs haven't get chance to be renewed
+    # we continue test in the following 2 conditions
+    # 1. all previous test results are 'pass'
+    # 2. there are some certs haven't get chance to be renewed for 'minround' times
    
     # check condition 1:
     notRenewedCerts=`$difflist "$renewedCerts" "$allcerts"`
     local validCerts=`get_all_valid_certs`
     local notValid=`$difflist "$validCerts" "$allcerts"`
     echo ""
-    echo "######################################################################################################################"
-    echo "#                                                                                                                    #"
-    echo "#                                        Final IPA Cert Status Report                                                #"
-    echo "#--------------------------------------------------------------------------------------------------------------------#"
+    echo "#################################################################"
+    echo "#             Final IPA Cert Status Report [ `date`] #"
     echo "[all certs  ] [$allcerts]"
     echo "[valid certs] [$validCerts]"
     echo "[not valid  ] [$notValid]"
     list_all_ipa_certs
     for cert in $notValid
     do
-        echo "   No valid certs found for [$cert]"
+        echo "   No valid certs found for [$cert], current date [`date`]"
+        echo "   No valid certs found for [$cert], current date [`date`]" >> $certReport
         local db=`$cert db`
         local nickname=`$cert nickname`
         echo "      debug [certutil -L -d $db -n \"$nickname\"] "
+        echo "      debug [certutil -L -d $db -n \"$nickname\"] " >> $certReport
+        certutil -L -d $db -n "$nickname" 2>&1 >> $certReport
         echo "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]"
+        echo "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]" >> $certReport
+        $readCert -d $db -n "$nickname" -s expired >> $certReport
         print_cert_details "     " $cert preValid
         print_cert_details "     " $cert expired
     done
     test_status_report
-    echo "######################################################################################################################"
-    echo ""
+    echo "#-------------------------------------------------------------#"
+    echo "            cert report for each round of test [`date`]"
+    echo "#-------------------------------------------------------------#"
+    local reportCounter=1
+    while [ $reportCounter -le $testroundCounter ]
+    do
+        local report="$TmpDir/cert.report.$reportCounter.txt"
+        cat $report
+        reportCounter=$((reportCounter + 1 ))
+    done
 }
 
 print_test_header(){
-    echo ""
-    echo "###########################################################"
-    echo "#                                                         #"
-    echo "#                    test round [$testid]                       #"
-    echo "#                                                         #"
-    echo "###########################################################"
-    echo ""
+    echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
+    echo "      #                                                         #"
+    echo "      #                    test round [$testroundCounter]                       #"
+    echo "           (minRound=$minRound, counter=$certRenewCounter)      "
+    echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
 }
 
 test_ipa_via_kinit_as_admin(){
-    rlPhaseStartTest "autorenewcert round [$testid] - test_ipa_via_kinit_as_admin ($@)"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - test_ipa_via_kinit_as_admin ($@)"
     local pw=$ADMINPW #use the password in env.sh file
     local out=$TmpDir/kinit.as.admin.$RANDOM.txt
     rlLog "[test_ipa_via_kinit_as_admin] test with password: [$pw]: echo $pw | kinit $ADMINID"
@@ -741,7 +771,7 @@ record_cert_expires_epoch_time()
 
 compare_expires_epoch_time_of_certs()
 {
-    rlPhaseStartTest "autorenewcert round [$testid] - compare epoch time of certs expires date round [$testid]"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - compare epoch time of certs expires date round [$testroundCounter]"
     if [ ! -f $certdata_notafter ];then
         rlFail "no epoch time of certs expires data file fouond, error!"
     else
@@ -774,7 +804,7 @@ compare_expires_epoch_time_of_certs()
 }
 
 test_dirsrv_via_ssl_based_ldapsearch(){
-    rlPhaseStartTest "autorenewcert round [$testid] - test_dirsrv_via_ssl_based_ldapsearch ($@)"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - test_dirsrv_via_ssl_based_ldapsearch ($@)"
     # doc: http://directory.fedoraproject.org/wiki/Howto:SSL#Use_ldapsearch_with_SSL
     local testCMD="$ldapsearch -H ldaps://$host -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -s base -b \"\" objectclass=* | grep \"vendorName:\" "
     rlLog "test command: $testCMD"
@@ -791,7 +821,7 @@ test_dirsrv_via_ssl_based_ldapsearch(){
 }
 
 test_dogtag_via_cert_show(){
-    rlPhaseStartTest "autorenewcert round [$testid] - test_dogtag_via_cert_show ($@)"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - test_dogtag_via_cert_show ($@)"
     local certid=1
     local testCMD="ipa cert-show $certid | grep 'Certificate:'"
     rlLog "test command : $testCMD"
@@ -830,7 +860,7 @@ find_dirsrv_instance(){
 }
 
 test_ipa_via_creating_new_cert(){
-    rlPhaseStartTest "autorenewcert round [$testid] - test_ipa_via_creating_new_cert ($@)"
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - test_ipa_via_creating_new_cert ($@)"
     local serviceName=testservice_$RANDOM
     local certRequestFile=$TmpDir/certreq.$RANDOM.csr
     local certPrivateKeyFile=$TmpDir/certprikey.$RANDOM.key

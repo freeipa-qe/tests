@@ -31,5 +31,5 @@ checkTestConditionRequired="true"
 #data storage used
 certdata_notafter="$TmpDir/cert.data.not.after.sec.txt"
 
-minRound=2
+minRound=1
 certRenewCounter=99
