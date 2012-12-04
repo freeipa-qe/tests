@@ -916,7 +916,7 @@ test_ipa_via_creating_new_cert(){
     then
         echo "[step 2/4 result] success, service [$principal] added"
         rlPass "service [$principal] added"
-    elif echo $serviceAddResult | grep "ipa: ERROR: Host does not have corresponding DNS A record"
+    elif echo $serviceAddResult | grep -i "Host does not have corresponding DNS A record"
     then
         echo "[step 2/4 result] failed:, it reports no DNS A record, weird, try same command again"
         ipa service-add $principal
