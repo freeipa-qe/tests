@@ -836,7 +836,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups={"bugverification","modifyGroupType_settings"})
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="firstUserGroupData", dependsOnGroups={"bugverification"})//add "modifyGroupType_settings" back for dependency after external member issue is fixed.  
 	public void deleteGroup_single(String testScenario, String groupName){
 		Assert.assertTrue(browser.link(groupName).exists(),"before 'Delete', group should exists");
 		GroupTasks.deleteGroup(browser, groupName);
@@ -844,7 +844,7 @@ public class GroupTests extends SahiTestScript{
 	}
 	
 	//@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups="modifyGroup_sudo_cleanup")
-	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups={"bugverification","modifyGroupType_settings"})
+	@Test (groups={"deleteGroup"}, description="delete group test", dataProvider="remainingUserGroupData", dependsOnGroups={"bugverification"})//add "modifyGroupType_settings" back for dependency after external member issue is fixed. 
 	public void deleteGroup_multiple(String testScenario, String groupNames){
 		String[] groups = groupNames.split(",");
 		for (String groupName:groups){
