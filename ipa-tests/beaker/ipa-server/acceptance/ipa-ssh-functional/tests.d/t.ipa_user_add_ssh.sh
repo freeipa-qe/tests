@@ -129,6 +129,36 @@ ipa_user_add_ssh_envsetup()
 	rlPhaseEnd
 }
 
+ipa_user_add_ssh_envcleanup()
+{
+	TESTCOUNT=$(( TESTCOUNT += 1 ))
+	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
+	rlPhaseStartTest "ipa_user_add_ssh_envcleanup - Clean up environment after IPA user-add sshpubkey Tests"
+		case "$MYROLE" in
+		MASTER*)
+			rlLog "Machine in recipe is MASTER ($MASTER)"
+			for u in $(ipa user-find --raw|grep uid:|awk '{print $2}'|egrep "^user[0-9]|^baduser[0-9]"); do
+				rlRun "ipa user-del $u"
+			done
+			rlRun "rm -f /tmp/ssh_user*"
+			rlRun "rm -f /tmp/ssh_basuser*"
+			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
+			;;
+		SLAVE*|REPLICA*)
+			rlLog "Machine in recipe is SLAVE ($SLAVE)"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
+			;;
+		CLIENT*)
+			rlLog "Machine in recipe is CLIENT ($CLIENT)"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
+			;;
+		*)
+			rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+			;;
+		esac
+	rlPhaseEnd
+}
+
 # Add user with empty key field
 ipa_user_add_ssh_positive_0001()
 {
