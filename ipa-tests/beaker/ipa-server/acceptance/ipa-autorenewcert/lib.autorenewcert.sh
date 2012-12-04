@@ -413,13 +413,16 @@ prepare_for_next_round(){
     renewedCerts="$renewedCerts $justRenewedCerts"
     justRenewedCerts="" #reset so we can continue test
     local header="  "
-    local lowest=0
+    local lowest=-1
     echo "$header +------------------- Cert Renew report ($testroundCounter)-----------------+"
     for cert in $allcerts
     do
         local counter=`$countlist -s "$renewedCerts" -c "$cert"`
         local fp_certname=`perl -le "print sprintf (\"%+26s\",\"$cert\")"`
         echo "$header | $fp_certname : renewed [ $counter ] times         |"
+        if [ $lowest -eq -1 ];then
+            lowest=$counter
+        fi
         if [ $counter -le $lowest ];then
             lowest=$counter
         fi
@@ -671,8 +674,9 @@ test_ipa_via_kinit_as_admin(){
     #local out=$TmpDir/kinit.as.admin.$RANDOM.txt
     #echo $pw | kinit $ADMINID 2>&1 > $out
     local out=`echo $pw | kinit $ADMINID 2>&1`
+    echo $pw | kinit $ADMINID
     if [ $? = 0 ];then
-        rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success"
+        rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success, output=[$out]"
         echo "    [ PASS ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
     elif [ $? = 1 ];then
         echo "[test_ipa_via_kinit_as_admin] first try of kinit as $ADMINID with [$pw] failed"
@@ -696,7 +700,7 @@ test_ipa_via_kinit_as_admin(){
             
         echo "[test_ipa_via_kinit_as_admin] password [$pw] failed, check whether it is because password expired"
         echo "#------------ output of [echo $pw | kinit $ADMINID] ----------#"
-        cat $out
+        echo $out
         echo "#----------------------------------------------------------------#"
         if echo $out | grep -i "Password expired" 2>&1 >/dev/null
         then
