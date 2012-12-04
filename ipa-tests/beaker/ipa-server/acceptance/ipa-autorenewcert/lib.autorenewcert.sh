@@ -667,9 +667,10 @@ print_test_header(){
 test_ipa_via_kinit_as_admin(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - test_ipa_via_kinit_as_admin ($@)"
     local pw=$ADMINPW #use the password in env.sh file
-    local out=$TmpDir/kinit.as.admin.$RANDOM.txt
     rlLog "[test_ipa_via_kinit_as_admin] test with password: [$pw]: echo $pw | kinit $ADMINID"
-    echo $pw | kinit $ADMINID 2>&1 > $out
+    #local out=$TmpDir/kinit.as.admin.$RANDOM.txt
+    #echo $pw | kinit $ADMINID 2>&1 > $out
+    local out=`echo $pw | kinit $ADMINID 2>&1`
     if [ $? = 0 ];then
         rlPass "[test_ipa_via_kinit_as_admin] kinit as $ADMINID with [$pw] success"
         echo "    [ PASS ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
@@ -677,7 +678,8 @@ test_ipa_via_kinit_as_admin(){
         echo "[test_ipa_via_kinit_as_admin] first try of kinit as $ADMINID with [$pw] failed"
         echo "[test_ipa_via_kinit_as_admin] check ipactl status"
         ipactl status
-        if echo $pw | kinit $ADMINID | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
+        #if echo $pw | kinit $ADMINID | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
+        if echo $out | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
         then
             echo "[test_ipa_via_kinit_as_admin] got kinit: Generic error, restart ipa and try same password again"
             ipactl restart
@@ -693,7 +695,7 @@ test_ipa_via_kinit_as_admin(){
         fi
             
         echo "[test_ipa_via_kinit_as_admin] password [$pw] failed, check whether it is because password expired"
-        echo "#------------ output of [echo $pw | kinit $ADMINID] ------------#"
+        echo "#------------ output of [echo $pw | kinit $ADMINID] ----------#"
         cat $out
         echo "#----------------------------------------------------------------#"
         if grep "Password expired" $out 2>&1 >/dev/null
@@ -735,12 +737,17 @@ test_ipa_via_kinit_as_admin(){
                 ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$minlife --history=$history --minclasses=$classes
                 echo "[test_ipa_via_kinit_as_admin] set $ADMINID password back to [$pw] success -- after set to temp"
             fi
-        elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
+        elif echo $out | grep -i "Password incorrect while getting initial credentials" 
         then
             rlFail "[test_ipa_via_kinit_as_admin] wrong $ADMINID password provided: [$pw]"
             echo "   [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
+        elif echo $out | grep -i "kinit: cannot contact any KDC for realm"
+        then
+            rlLog "catch cannot contact KDC error, restart ipa and try again"
+            ipactl restart
+            rlRun "echo $pw | kinit $ADMINID" 0 "try again pw=[$pw], adminid=[$ADMINID]"
         else
-            rlFail "[test_ipa_via_kinit_as_admin] unhandled error: Not because password expired; not because wrong password provided"
+            rlFail "[test_ipa_via_kinit_as_admin] unhandled error: Not because password expired; not because wrong password provided; also tried restart ipa but didnot work"
             echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
         fi
     else
@@ -909,7 +916,12 @@ test_ipa_via_creating_new_cert(){
 
     #requires : kinit as admin to success 
     echo "[step 1/4] create/add a host this should already done : use existing host $host"
-
+    if ipa host-find $host | grep -i "Host name: $host"
+    then
+        rlPass "found [$host] in ipa server"
+    else
+        rlFail "[$host] not found in ipa server"
+    fi
     echo "[step 2/4] add a test service add service: [$principal], sometimes there are some random failures for this"
     local serviceAddResult=`ipa service-add $principal`
     if echo $serviceAddResult | grep "Added service" 
