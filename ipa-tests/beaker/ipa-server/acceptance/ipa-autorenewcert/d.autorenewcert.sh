@@ -37,5 +37,6 @@ certRenewCounter=0
 log_httpd="/var/log/httpd/error_log"
 log_ldap="/var/log/dirsrv/slapd-*/errors"
 log_sys="/var/log/messages"
-logs="$log_sys $log_ldap $log_httpd"
+log_krb5="/var/log/krb5kdc.log"
+logs="$log_sys $log_ldap $log_httpd $log_krb5"
 
