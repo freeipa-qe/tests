@@ -698,7 +698,7 @@ test_ipa_via_kinit_as_admin(){
         echo "#------------ output of [echo $pw | kinit $ADMINID] ----------#"
         cat $out
         echo "#----------------------------------------------------------------#"
-        if grep "Password expired" $out 2>&1 >/dev/null
+        if echo $out | grep -i "Password expired" 2>&1 >/dev/null
         then
             echo "$ADMINID password exipred, do reset process"
             local exp=$TmpDir/reset.admin.password.$RANDOM.exp
@@ -754,7 +754,6 @@ test_ipa_via_kinit_as_admin(){
         rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
         echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
     fi
-    rm $out
     rlPhaseEnd
 }
 
