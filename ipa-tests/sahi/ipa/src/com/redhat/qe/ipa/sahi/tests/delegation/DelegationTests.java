@@ -83,7 +83,7 @@ public class DelegationTests extends IPAWebAutomation {
 	//f17
 	//private String DelegationTestDataFile = "/home/test/ipawebui/sahi/ipa/src/com/redhat/qe/ipa/sahi/tests/delegation/test.delegation.properties";
 	// WIN::
-	//private String DelegationTestDataFile = "C:\\delegation.propertiesdelegation.properties";
+	//private String DelegationTestDataFile = "C:\\delegation.properties";
 	
 	
 	private String[] IPAServerPageDelegation = {"Delegation Tests","IPAServerPageDelegation", DelegationTestDataFile};
