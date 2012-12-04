@@ -413,16 +413,18 @@ prepare_for_next_round(){
     renewedCerts="$renewedCerts $justRenewedCerts"
     justRenewedCerts="" #reset so we can continue test
     local header="  "
+    local lowest=0
     echo "$header +------------------- Cert Renew report ($testroundCounter)-----------------+"
     for cert in $allcerts
     do
         local counter=`$countlist -s "$renewedCerts" -c "$cert"`
         local fp_certname=`perl -le "print sprintf (\"%+26s\",\"$cert\")"`
         echo "$header | $fp_certname : renewed [ $counter ] times         |"
-        if [ $counter -le $certRenewCounter ];then
-            certRenewCounter=$counter
+        if [ $counter -le $lowest ];then
+            lowest=$counter
         fi
     done
+    certRenewCounter=$lowest
     echo "$header +----------------------------------------------------------+"
 }
 
@@ -812,6 +814,7 @@ compare_expires_epoch_time_of_certs()
         echo "#--------------- recorded: expires date in eopch time of current certs -----------#"
         cat $certdata_notafter
         echo "#---------------------------------------------------------------------------------#"
+        rlLog "before: justRenewedCerts=[$justRenewedCerts]"
         for cert in $allcerts
         do
             local currentNotAfter=`$cert NotAfter_sec valid`
@@ -833,6 +836,7 @@ compare_expires_epoch_time_of_certs()
                 fi
             fi
         done 
+        rlLog "after: justRenewedCerts=[$justRenewedCerts]"
     fi
     rlPhaseEnd
 }
