@@ -141,7 +141,7 @@ ipa_user_mod_ssh_envcleanup()
 				rlRun "ipa user-del $u"
 			done
 			rlRun "rm -f /tmp/ssh_user*"
-			rlRun "rm -f /tmp/ssh_basuser*"
+			rlRun "rm -f /tmp/ssh_baduser*"
 			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 			;;
 		SLAVE*|REPLICA*)
