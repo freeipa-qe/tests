@@ -55,7 +55,8 @@ satrtEpoch=`date "+%s"`
 rlJournalStart
     rlPhaseStartSetup "autorenewcert startup: Check for ipa-server package"
         #rlAssertRpm $PACKAGELIST
-        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory: [$TmpDir]"
+        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        rlLog "temp directory = [$TmpDir]"
         if [ "$TmpDir" = "" ];then
             TmpDir="/tmp"
         fi

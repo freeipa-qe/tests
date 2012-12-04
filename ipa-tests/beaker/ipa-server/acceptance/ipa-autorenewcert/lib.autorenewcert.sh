@@ -150,6 +150,8 @@ list_all_ipa_certs(){
     echo ""
     echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+"
     echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+" > $certReport
+    local summary="Summary: all certs are valid : [`all_certs_are_valid`] "
+    local summary="Summary: all certs are valid : [`all_certs_are_valid`] " >> $certReport
     #echo "[preValid certs]:"
     #echo "[preValid certs]:" >> $certReport
     #list_certs "preValid" $allcerts
@@ -429,6 +431,7 @@ prepare_for_next_round(){
     done
     certRenewCounter=$lowest
     echo "$header +----------------------------------------------------------+"
+    echo "$header ~~~ all certs are valid [`all_certs_are_valid`] ~~~~"
 }
 
 check_actually_renewed_certs(){
@@ -442,7 +445,11 @@ check_actually_renewed_certs(){
             #justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end: move this line to function: compare_expires_epoch_time_of_certs
         else
             rlLog "[$cert status valid] returned [$state]"
-            rlFail "FAIL: NO valid cert found for [$cert]"
+            rlFail "FAIL: NO valid cert found for [$cert], current date:[`date`]"
+            echo "Debug: check certutil output"
+            local db=`$cert db`
+            local nickname=`$cert nickname`
+            certutil -L -d $db -n "$nickname"
         fi
     done
     rlPhaseEnd
@@ -829,8 +836,11 @@ compare_expires_epoch_time_of_certs()
         do
             local currentNotAfter=`$cert NotAfter_sec valid`
             if [ "$currentNotAfter" = "no cert found" ];then
-                rlFail "No valid cert found for [$cert]"
+                rlFail "No valid cert found for [$cert], current date:[`date`]"
                 echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert] has no valid cert" >> $testResult
+                local db=`$cert db`
+                local nickname=`$cert nickname`
+                certutil -L -d $db -n "$nickname"
             else
                 local previousNotAfter=`grep "$cert" $certdata_notafter | cut -d" " -f2`
                 local previousNotAfterDate=`grep "$cert" $certdata_notafter | cut -d"=" -f2`
