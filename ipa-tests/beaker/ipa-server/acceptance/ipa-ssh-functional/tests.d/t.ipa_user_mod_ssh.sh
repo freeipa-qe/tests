@@ -463,7 +463,7 @@ ipa_user_mod_ssh_negative_0004()
 		else 
 			rlFail "IPA user has a key when it should not"
 		fi
-		rlRul "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
