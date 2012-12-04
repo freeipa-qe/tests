@@ -33,7 +33,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect ntpdate freeipa-server"/>
+					<param name="PKGARGNAME" value="expect ntpdate ipa-server"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
@@ -83,7 +83,7 @@
 			</task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect ntpdate freeipa-client"/>
+					<param name="PKGARGNAME" value="expect ntpdate ipa-client"/>
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
