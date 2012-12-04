@@ -33,3 +33,9 @@ certdata_notafter="$TmpDir/cert.data.not.after.sec.txt"
 
 minRound=1
 certRenewCounter=0
+
+log_httpd="/var/log/httpd/error_log"
+log_ldap="/var/log/dirsrv/slapd-*/errors"
+log_sys="/var/log/messages"
+logs="$log_sys $log_ldap $log_httpd"
+

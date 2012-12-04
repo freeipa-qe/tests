@@ -32,6 +32,7 @@ cert_sanity_check(){
 
 autorenewcert()
 {
+        record_cert_expires_epoch_time
         print_test_header
         cert_sanity_check "Before auto renew triggered"
 
@@ -40,7 +41,6 @@ autorenewcert()
         stop_ipa_server "Before autorenew, stop ipa, adjust system to trigger automatic cert renew"
         adjust_system_time $autorenew autorenew    
         start_ipa_server "After autorenew, start ipa, expect automatic cert renew happening in background"
-        record_cert_expires_epoch_time
         
         go_to_sleep
         restart_ipa_server "After autorenew, restart ipa, give ipa serverr second chance to kick off automatic renew"

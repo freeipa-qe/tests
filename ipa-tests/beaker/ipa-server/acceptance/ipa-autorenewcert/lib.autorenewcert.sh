@@ -597,6 +597,7 @@ final_cert_status_report(){
     for cert in $notValid
     do
         echo "   No valid certs found for [$cert], current date [`date`]"
+        echo "Debug:" >> $certReport
         echo "   No valid certs found for [$cert], current date [`date`]" >> $certReport
         local db=`$cert db`
         local nickname=`$cert nickname`
@@ -611,27 +612,53 @@ final_cert_status_report(){
     done
     test_status_report
     echo "#---------------------------------------------------------------------------#"
-    echo "            cert report for each round of test [`date`]"
+    echo "       cert report for each round of test [`date`]"
     echo "#---------------------------------------------------------------------------#"
     local reportCounter=1
     while [ $reportCounter -le $testroundCounter ]
     do
         local report="$TmpDir/cert.report.$reportCounter.txt"
         if [ -f $report ];then
-            echo "#------ cert file: [$report] ------#"
+            echo "[- Begining of Cert reort: [$report] ------]"
             cat $report
+            echo "[- END OF Cert report: [$report] ------]"
         else
             echo "cert report: $report does not exist, this is not considerded as an error"
         fi
         reportCounter=$((reportCounter + 1 ))
     done
+    if [ "`all_certs_are_valid`" = "no" ];then
+        for log in $logs
+        do
+            local nLines=150
+            echo ""
+            echo "============ last $nLines lines of $log ==================="
+            tail -n $nLines $log
+            echo ""
+        done
+    else
+        echo "No invalid certs found"
+    fi
+}
+
+all_certs_are_valid(){
+    local all_are_valid="yes"
+    for cert in $allcerts
+    do
+        if ! echo $validCerts | grep $cert 2>&1 >/dev/null
+        then
+            all_are_valid="no"
+        fi
+   done 
+    echo $all_are_valid
 }
 
 print_test_header(){
+    echo " "
     echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
     echo "      #                                                         #"
     echo "      #                    test round [$testroundCounter]                       #"
-    echo "      #           (minRound=$minRound, counter=$certRenewCounter)              #"
+    echo "      #                (minRound=$minRound, counter=$certRenewCounter)                  #"
     echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
 }
 
@@ -764,14 +791,14 @@ record_cert_expires_epoch_time()
     if [ ! -f $certdata_notafter ];then
         touch $certdata_notafter
     fi
-    echo "" > $certdata_notafter
+    echo "current date [`date`]" > $certdata_notafter
     for cert in $allcerts
     do
         local notafter_sec=`$cert NotAfter_sec valid`
         local notafter=`$cert NotAfter valid`
         echo "$cert $notafter_sec = $notafter"  >> $certdata_notafter
     done
-    echo "#--------------- record remaining life of current certs -----------#"
+    echo "#--------------- record NotAfter_sec of current certs --------------#"
     cat $certdata_notafter
     echo "#-------------------------------------------------------------------#"
 }
@@ -782,9 +809,9 @@ compare_expires_epoch_time_of_certs()
     if [ ! -f $certdata_notafter ];then
         rlFail "no epoch time of certs expires data file fouond, error!"
     else
-        echo "#--------------- what have been recorded: expires date in eopch time of current certs -----------#"
+        echo "#--------------- recorded: expires date in eopch time of current certs -----------#"
         cat $certdata_notafter
-        echo "#-------------------------------------------------------------------#"
+        echo "#---------------------------------------------------------------------------------#"
         for cert in $allcerts
         do
             local currentNotAfter=`$cert NotAfter_sec valid`
@@ -879,13 +906,31 @@ test_ipa_via_creating_new_cert(){
     #requires : kinit as admin to success 
     echo "[step 1/4] create/add a host this should already done : use existing host $host"
 
-    echo "[step 2/4] add a test service add service: [$principal]"
-    ipa service-add $principal
-
+    echo "[step 2/4] add a test service add service: [$principal], sometimes there are some random failures for this"
+    local serviceAddResult=`ipa service-add $principal`
+    if echo $serviceAddResult | grep "Added service" 
+    then
+        echo "[step 2/4 result] success, service [$principal] added"
+        rlPass "service [$principal] added"
+    elif echo $serviceAddResult | grep "ipa: ERROR: Host does not have corresponding DNS A record"
+    then
+        echo "[step 2/4 result] failed:, it reports no DNS A record, weird, try same command again"
+        ipa service-add $principal
+        if [ $? = 0 ];then
+            echo "[step 2/4 second try] success, gosh.."
+            rlPass "create service [$principal] success"
+        else
+            echo "[step 2/4 second try] still failed, report failure"
+            rlFail "create service [$principal] failed"
+        fi
+    else
+        rlFail "unknow error for step 2/4, add service, need more work here"
+    fi
+        
     echo "[step 3/4] create a cert request"
     create_cert_request_file $certRequestFile $certPrivateKeyFile
     if [ "$?" = "0" ];then
-        echo "cert file creation success, continue"
+        rlPass "cert file creation success, continue"
     else
         rlFail "cert file creation failed, return fail"
         echo "    [ FAIL ] test_ipa_via_creating_new_cert ($@)" >> $testResult
