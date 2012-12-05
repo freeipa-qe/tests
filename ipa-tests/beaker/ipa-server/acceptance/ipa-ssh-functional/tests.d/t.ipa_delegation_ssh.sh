@@ -186,8 +186,9 @@ ipa_delegation_ssh_0002()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-        rlRun "su - $TESTUSER1 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER2@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER2}\""
-        rlRun "su - $TESTUSER1 -c \"echo $TESTUSERPW|kinit $TESTUSER1; ipa user-mod $TESTUSER2 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER2}.pub)'\" > $tmpout 2>&1"
+		rlRun "rm -f /tmp/ssh_rsa_${TESTUSER2}*"
+		rlRun "su - $TESTUSER1 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER2@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER2}\""
+		rlRun "su - $TESTUSER1 -c \"echo $TESTUSERPW|kinit $TESTUSER1; ipa user-mod $TESTUSER2 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER2}.pub)'\" > $tmpout 2>&1"
 		KEYCHK=$(ipa user-show $TESTUSER2 --raw|grep "ipasshpubkey.*$(awk '{print $2}' /tmp/ssh_rsa_${TESTUSER2}.pub)"|wc -l)
 		if [ $KEYCHK -gt 0 ]; then
 			rlPass "Expected SSH Pub Key found for user delegation test"
@@ -222,8 +223,9 @@ ipa_delegation_ssh_0003()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-        rlRun "su - $TESTUSER2 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER1@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER1}\""
-        rlRun "su - $TESTUSER2 -c \"echo $TESTUSERPW|kinit $TESTUSER2; ipa user-mod $TESTUSER1 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER1}.pub)'\" > $tmpout 2>&1" 1
+		rlRun "rm -f /tmp/ssh_rsa_${TESTUSER1}*"
+		rlRun "su - $TESTUSER2 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER1@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER1}\""
+		rlRun "su - $TESTUSER2 -c \"echo $TESTUSERPW|kinit $TESTUSER2; ipa user-mod $TESTUSER1 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER1}.pub)'\" > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
 		rlAssertGrep "ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaSshPubKey' attribute" $tmpout
 		KEYCHK=$(ipa user-show $TESTUSER1 --raw|grep sshpubkeyfp|wc -l)
@@ -290,8 +292,9 @@ ipa_delegation_ssh_0005()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-        rlRun "su - $TESTUSER1 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER2@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER2}\""
-        rlRun "su - $TESTUSER1 -c \"echo $TESTUSERPW|kinit $TESTUSER1; ipa user-mod $TESTUSER2 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER2}.pub)'\" > $tmpout 2>&1"
+		rlRun "rm -f /tmp/ssh_rsa_${TESTUSER2}*"
+		rlRun "su - $TESTUSER1 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER2@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER2}\""
+		rlRun "su - $TESTUSER1 -c \"echo $TESTUSERPW|kinit $TESTUSER1; ipa user-mod $TESTUSER2 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER2}.pub)'\" > $tmpout 2>&1"
 		KEYCHK=$(ipa user-show $TESTUSER2 --raw|grep "ipasshpubkey.*$(awk '{print $2}' /tmp/ssh_rsa_${TESTUSER2}.pub)"|wc -l)
 		rlRun "cat $tmpout"
 		rlAssertGrep "ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaSshPubKey' attribute" $tmpout
