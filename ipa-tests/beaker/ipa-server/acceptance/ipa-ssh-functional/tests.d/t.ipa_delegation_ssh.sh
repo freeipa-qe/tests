@@ -66,8 +66,10 @@ ipa_delegation_ssh_run()
 ipa_delegation_ssh_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	TESTUSER1="selfservuser1"
-	TESTUSER2="selfservuser2"
+	TESTUSER1="delegatuser1"
+	TESTUSER2="delegatuser2"
+	TESTGROUP1="delegatgroup1"
+	TESTGROUP2="delegatgroup2"
 	TESTUSERPW="passw0rd1"
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_delegation_ssh_envsetup - Setup environment for IPA delegation sshpubkey tests"
