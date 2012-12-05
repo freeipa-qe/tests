@@ -49,7 +49,7 @@ autorenewcert()
         stop_ipa_server "Before postExpire, system time will change soon, to verify the renewed certs"
         adjust_system_time $postExpire postExpire
         start_ipa_server "After postExpire, system time has been changed, expect new certs are in use"
-
+        go_to_sleep # give ipa server some time to refresh everything
         check_actually_renewed_certs $soonTobeRenewedCerts
         compare_expires_epoch_time_of_certs
         compare_expected_renewal_certs_with_actual_renewed_certs "After postExpire"

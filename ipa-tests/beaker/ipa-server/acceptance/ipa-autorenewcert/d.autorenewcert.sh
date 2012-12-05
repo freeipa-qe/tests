@@ -12,6 +12,7 @@ difflist="$dir/difflist.pl"
 testResult="$TmpDir/test.result.$RANDOM.txt"
 
 # constance used for cert autorenew test
+threedays=259200
 sixdays=518400
 oneday=86400 
 halfday=43200
