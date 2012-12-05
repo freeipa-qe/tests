@@ -191,7 +191,7 @@ installBug_bz830338()
 			rlFail "bz830338 found...Change DS to purge ticket from krb cache in case of authentication error"
 			rlFail "dirsrv still using old Kerberos ticket...must be restarted"
 		fi
-	rlPhaseEndTest	
+	rlPhaseEnd
 }
 
 replicaBugTest_bz823657()
@@ -202,7 +202,7 @@ replicaBugTest_bz823657()
 		rlRun "ipa-replica-manage del $SLAVE" 0 "Disconnect the slave agreement"
 		rlRun "ipa-replica-manage connect $SLAVE $> $file" 0 "Reconnect the SLAVE."
 		rlRun "grep 'Unspecified GSS failure' $file" 1 "Ensure that a failure specified in BZ 823657 does not appear to be in the output file $file"
-	rlPhaseEndTest
+	rlPhaseEnd
 }
 
 replicaBugTest_bz824492()
@@ -215,7 +215,7 @@ replicaBugTest_bz824492()
 		rlRun "ipa-replica-manage connect $SLAVE $> $file" 0 "Reconnect the SLAVE."
 		rlRun "grep 'You cannot connect to a previously deleted master' $file" 1 "Ensure that a failure specified in BZ 824492 does not appear to be in the output file $file"
 		rlRun "grep 'list index out of range' $file" 1 "Ensure that a failure specified in BZ 824492 does not appear to be in the output file $file"
-	rlPhaseEndTest
+	rlPhaseEnd
 }
 
 replicaInstallBug748987()
@@ -228,6 +228,6 @@ replicaInstallBug748987()
 		rlLog "Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 		Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg &> $file
 		rlRun "grep 'A replication agreement for this host already exists. It needs to be removed' $file" 0 "Make sure that expected warning message appears in ipa-replica-install output"
-	rlPhaseEndTest
+	rlPhaseEnd
 }
 
