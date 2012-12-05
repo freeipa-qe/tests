@@ -30,6 +30,11 @@
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
 			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ipa-server bind bind-dyndb-ldap ipa-client"/>
+				</params>
+			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-install" role="MASTER">
 				<params/>
 			</task>
@@ -57,6 +62,11 @@
 			<partitions/>
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
+			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ipa-server bind bind-dyndb-ldap ipa-client"/>
+				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
 				<params/>
