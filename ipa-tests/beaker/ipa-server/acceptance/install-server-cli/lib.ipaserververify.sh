@@ -120,6 +120,8 @@ verify_sssd()
      ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider" "$testchpassprovider" "$1" 
      testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | xargs echo`
      ipacompare_forinstalluninstall "ipa_server " "$ipa_server" "$testipaserver" "$1" 
+
+     verify_bz878288 # Make sure sssd is running
 }
 
 verify_krb5()
@@ -681,3 +683,13 @@ verify_zonerefresh()
   fi
 
 }
+
+verify_bz878288()
+{
+	if [ $(ps -ef|grep "/usr/libexec/s[s]sd"|wc -l) -eq 0 ]; then
+		rlFail "BZ 878288 found...IPA users are not available after ipa-server-install because sssd not running"
+	else
+		rlPass "BZ 878288 not found"
+	fi
+}
+
