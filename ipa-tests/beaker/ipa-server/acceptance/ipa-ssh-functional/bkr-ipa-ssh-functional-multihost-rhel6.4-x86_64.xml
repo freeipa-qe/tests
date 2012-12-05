@@ -41,9 +41,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-ssh-functional" role="MASTER">
 				<params/>
 			</task>
-			<task name="/distribution/reservesys" role="STANDALONE">
-				<params/>
-			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="IPA REPLICA">
 			<autopick random="false"/>
@@ -83,9 +80,6 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-ssh-functional" role="REPLICA">
 				<params/>
 			</task>
-			<task name="/distribution/reservesys" role="STANDALONE">
-				<params/>
-			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="None" whiteboard="IPA CLIENT :: x86_64">
 			<autopick random="true"/>
@@ -123,9 +117,6 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-ssh-functional" role="CLIENT">
-				<params/>
-			</task>
-			<task name="/distribution/reservesys" role="STANDALONE">
 				<params/>
 			</task>
 		</recipe>
