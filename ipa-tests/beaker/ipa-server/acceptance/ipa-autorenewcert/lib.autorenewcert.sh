@@ -151,12 +151,8 @@ list_all_ipa_certs(){
     echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+"
     echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+" > $certReport
     local summary="Summary: all certs are valid : [`all_certs_are_valid`] "
-    local summary="Summary: all certs are valid : [`all_certs_are_valid`] " >> $certReport
-    #echo "[preValid certs]:"
-    #echo "[preValid certs]:" >> $certReport
-    #list_certs "preValid" $allcerts
-    #echo ""
-
+    echo $summary
+    echo $summary >> $certReport
     echo "[valid certs]:"
     echo "[valid certs]:" >> $certReport
     list_certs "valid" $allcerts
@@ -335,9 +331,9 @@ calculate_autorenew_date(){
         && [ $autorenew -lt $certExpire ] \
         && [ $certExpire -lt $postExpire ]
     then
-        rlPass "Pass: got reasonable autorenew time"
+        rlPass "got reasonable autorenew time"
     else
-        rlFail "Fail: something wrong, date are not well ordered"
+        rlFail "something wrong, date are not well ordered, the rest of test will fail"
     fi
     rlPhaseEnd
 }
@@ -351,10 +347,10 @@ adjust_system_time(){
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
     if [ "$?" = "0" ];then
         local after=`date`
-        rlPass "PASS, adjust ($label) [$before]=>[$after] done"
+        rlPass "adjust ($label) [$before]=>[$after] done"
     else
         local after=`date`
-        rlFail "Fail, change date failed, current data: [`date`]"
+        rlFail "change system date to ($label) failed, current data: [`date`]"
     fi
     rlPhaseEnd
 }
@@ -415,14 +411,14 @@ prepare_for_next_round(){
     renewedCerts="$renewedCerts $justRenewedCerts"
     justRenewedCerts="" #reset so we can continue test
     local header="  "
-    local lowest=-1
+    local lowest=""
     echo "$header +------------------- Cert Renew report ($testroundCounter)-----------------+"
     for cert in $allcerts
     do
         local counter=`$countlist -s "$renewedCerts" -c "$cert"`
         local fp_certname=`perl -le "print sprintf (\"%+26s\",\"$cert\")"`
         echo "$header | $fp_certname : renewed [ $counter ] times         |"
-        if [ $lowest -eq -1 ];then
+        if [ $lowest = "" ];then
             lowest=$counter
         fi
         if [ $counter -le $lowest ];then
@@ -437,19 +433,24 @@ prepare_for_next_round(){
 check_actually_renewed_certs(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - check_actually_renewed_certs"
     local certsShouldBeRenewed=$@
+    rlLog "check the queue certsShouldBeRenewed: [$certsShouldBeRenewed], all certs in this queue should be valid"
     for cert in $certsShouldBeRenewed
     do
         local state=`$cert status valid`
+        local db=`$cert db`
+        local nickname=`$cert nickname`
         if [ "$state" = "valid" ];then
-            rlPass "PASS: valid cert found for  [$cert]"
-            #justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end: move this line to function: compare_expires_epoch_time_of_certs
+            rlPass "Found valid cert for [$cert]"
+            echo "$cert Summary:"
+            $readCert -d $db -n "$nickname" -s "valid"
+            echo ""
         else
             rlLog "[$cert status valid] returned [$state]"
-            rlFail "FAIL: NO valid cert found for [$cert], current date:[`date`]"
-            echo "Debug: check certutil output"
-            local db=`$cert db`
-            local nickname=`$cert nickname`
+            rlFail "NO valid cert found for [$cert], current date:[`date`]"
+            echo "[$FUNC] Debug: check certutil output: certutil -L -d $db -n \"$nickname\""
             certutil -L -d $db -n "$nickname"
+            $readCert -d $db -n "$nickname" -s "valid"
+            echo "[End of debug of $FUNC]"
         fi
     done
     rlPhaseEnd
@@ -464,28 +465,13 @@ compare_expected_renewal_certs_with_actual_renewed_certs(){
     do
         if echo $justRenewedCerts | grep $soon 2>&1 >/dev/null
         then
-            rlPass "PASS round [$testroundCounter] renewed certs: [$soon] found in just renewed certs queue"
-            echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs: [$soon] did get renewed" >> $testResult
+            rlPass "Round [$testroundCounter] meet expactation: [$soon] found in just renewed certs queue"
+            echo "    [ PASS ] compare_expected_renewal_certs_with_actual_renewed_certs: [$soon] did get renewed" >> $testResult
         else
-            rlFail "FAIL round [$testroundCounter] renewed certs: [$soon] not found in just renewed certs queue"
-            echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs : [$soon] did not get renewed" >> $testResult
+            rlFail "Round [$testroundCounter] did NOT meet expactation: [$soon] not found in just renewed certs queue"
+            echo "    [ FAIL ] compare_expected_renewal_certs_with_actual_renewed_certs : [$soon] did not get renewed" >> $testResult
         fi
     done
-
-#    if [ "$soonTobeRenewedCerts " = "$justRenewedCerts " ];then # don't forget the extra spaces
-#        rlPass "PASS round [$testroundCounter] renewed certs: [$soonTobeRenewedCerts]"
-#        echo "    [ PASS ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
-#    else
-#        local difflist=`$difflist "$soonTobeRenewedCerts" "$justRenewedCerts"`
-#        rlFail "FAIL round [$testroundCounter] certs not renewed [ $difflist ]"
-#        echo "    [ FAIL ] -- compare_expected_renewal_certs_with_actual_renewed_certs ($@)" >> $testResult
-#        rlLog "current system time :[`date`]"
-#        for cert in $difflist
-#        do
-#            print_cert_details "     " $cert expired
-#            print_cert_details "     " $cert preValid
-#        done
-#    fi
     rlPhaseEnd
 }
 
@@ -517,13 +503,9 @@ sort_certs(){
         if [ "$timeleft_sec" != "no cert found" ];then
             echo "$cert=$timeleft_sec" >> $tempdatafile
         else
-            #timeleft_sec=`$cert LifeLeft_sec preValid`
             timeleft_sec=`$cert LifeLeft_sec expired`
             if [ "$timeleft_sec" != "no cert found" ];then
                 echo "$cert=$timeleft_sec" >> $tempdatafile 
-            #else
-            #    timeleft_sec=`$cert LifeLeft_sec expired`
-            #    echo "$cert=$timeleft_sec" >> $tempdatafile
             fi
         fi
     done
@@ -678,8 +660,6 @@ test_ipa_via_kinit_as_admin(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - test_ipa_via_kinit_as_admin ($@)"
     local pw=$ADMINPW #use the password in env.sh file
     rlLog "[test_ipa_via_kinit_as_admin] test with password: [$pw]: echo $pw | kinit $ADMINID"
-    #local out=$TmpDir/kinit.as.admin.$RANDOM.txt
-    #echo $pw | kinit $ADMINID 2>&1 > $out
     local out=`echo $pw | kinit $ADMINID 2>&1`
     echo $pw | kinit $ADMINID
     if [ $? = 0 ];then
@@ -689,7 +669,6 @@ test_ipa_via_kinit_as_admin(){
         echo "[test_ipa_via_kinit_as_admin] first try of kinit as $ADMINID with [$pw] failed"
         echo "[test_ipa_via_kinit_as_admin] check ipactl status"
         ipactl status
-        #if echo $pw | kinit $ADMINID | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
         if echo $out | grep -i "kinit: Generic error (see e-text) while getting initial credentials"
         then
             echo "[test_ipa_via_kinit_as_admin] got kinit: Generic error, restart ipa and try same password again"
@@ -837,7 +816,7 @@ compare_expires_epoch_time_of_certs()
             local currentNotAfter=`$cert NotAfter_sec valid`
             if [ "$currentNotAfter" = "no cert found" ];then
                 rlFail "No valid cert found for [$cert], current date:[`date`]"
-                echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert] has no valid cert" >> $testResult
+                echo "    [ FAIL ] compare_expires_epoch_time_of_certs: [$cert] has no valid cert" >> $testResult
                 local db=`$cert db`
                 local nickname=`$cert nickname`
                 certutil -L -d $db -n "$nickname"
@@ -847,12 +826,12 @@ compare_expires_epoch_time_of_certs()
                 local currentNotAfterDate=`$cert NotAfter valid`
                 if [ $currentNotAfter -gt $previousNotAfter ];then
                     justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
-                    rlPass "$cert gets renewed, not after previous: [$previousNotAfter] now: [$currentNotAfterDate]"
-                    echo "    [ PASS ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfterDate], previousNotAfter=[$previousNotAfterDate] " >> $testResult
+                    rlPass "$cert gets renewed, 'not after' values:  previous: [$previousNotAfter] now: [$currentNotAfterDate]"
+                    echo "    [ PASS ] compare_expires_epoch_time_of_certs: [$cert], currentNotAfter=[$currentNotAfterDate], previousNotAfter=[$previousNotAfterDate] " >> $testResult
                 elif [ $currentNotAfter -eq $previousNotAfter ];then
-                    rlLog "$cert haven't get renewed, previous not after [$previousNotAfterDate] is not changed now: [$currentNotAfterDate]"
+                    rlLog "$cert haven't get renewed, previous 'not after' values: previous [$previousNotAfterDate] is not changed now: [$currentNotAfterDate]"
                 else
-                    echo "    [ FAIL ] compare_expires_epoch_time_of_certs: cert:[$cert], currentNotAfter=[$currentNotAfter $currentNotAfterDate], previousNotAfter=[$previousNotAfter $previousNotAfterDate] " >> $testResult
+                    echo "    [ FAIL ] compare_expires_epoch_time_of_certs: [$cert], currentNotAfter=[$currentNotAfter $currentNotAfterDate], previousNotAfter=[$previousNotAfter $previousNotAfterDate] " >> $testResult
                 fi
             fi
         done 

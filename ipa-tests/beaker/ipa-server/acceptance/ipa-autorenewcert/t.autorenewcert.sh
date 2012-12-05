@@ -61,7 +61,6 @@ autorenewcert()
 ############## main test #################
 main_autorenewcert_test(){
     testroundCounter=1
-    #fix_prevalid_cert_problem #weird problem
     # conditions for test to continue (continue_test returns "yes")
     # 1. all ipa certs are valid
     # 2. if there are some certs haven't get chance to be renewed, test should be continue
@@ -75,7 +74,6 @@ main_autorenewcert_test(){
         autorenewcert $round
         prepare_for_next_round
         testroundCounter=$((testroundCounter + 1))
-        #fix_prevalid_cert_problem #weird problem
     done
     final_cert_status_report 
 }
