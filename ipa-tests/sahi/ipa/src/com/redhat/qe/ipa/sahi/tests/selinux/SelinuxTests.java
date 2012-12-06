@@ -45,8 +45,8 @@ public class SelinuxTests extends SahiTestScript {
 	
 	private String [] ugroups = {selinux_usergroup1, selinux_usergroup2, selinux_usergroup3};
 	private String selinuxUsersOld="";
-	
-	private String [] selinuxusers={"guest_u:s0", "xguest_u:s0", "user_u:s0-s0:c0.c1023", "staff_u:s0-s0:c0.c1023", "unconfined_u:s0-s0:c0.c1023"};
+	//not able to user_u:s0-s0:c0.c1023 (If I run 'semanage user -l' on RHEL 6.4 it looks like user_u cannot s0-s0:c0.c1023 only s0)
+	private String [] selinuxusers={"guest_u:s0", "xguest_u:s0", "user_u:s0", "staff_u:s0-s0:c0.c1023", "unconfined_u:s0-s0:c0.c1023"};
 	private String selinuxdefaultuser="";
 	
 	
@@ -730,7 +730,7 @@ public class SelinuxTests extends SahiTestScript {
 			// 									testName								 cn		 			section		type			name1							name2							button		action	
 			ll.add(Arrays.asList(new Object[]{ 	"add_user_selinuxusermap",				"selinux_rule2",	"User",		"Users",		"selinux-user1", 				"selinux-user2",				"Add",		"Add"		 } ));
 			ll.add(Arrays.asList(new Object[]{ 	"add_user_selinuxusermap_cancel",		"selinux_rule2",	"User",		"Users",		"selinux-user3",				"",								"Add",		"Cancel"	 } ));	
-			ll.add(Arrays.asList(new Object[]{ 	"add_user_selinuxusermap_all",			"selinux_rule2",	"User",		"Users",		"",								"",								"All", 		"Update"	 } ));
+        	ll.add(Arrays.asList(new Object[]{ 	"add_user_selinuxusermap_all",			"selinux_rule2",	"User",		"Users",		"",								"",								"All", 		"Update"	 } ));
 			ll.add(Arrays.asList(new Object[]{ 	"add_usergroup_selinuxusermap",			"selinux_rule2",	"User",		"User Groups",	"selinux-usergroup1", 			"selinux-usergroup2",			"Add",		"Add"		 } ));
 			ll.add(Arrays.asList(new Object[]{ 	"add_usergroup_selinuxusermap_cancel",	"selinux_rule2",	"User",		"User Groups",	"selinux-usergroup3",			"",								"Add",		"Cancel"	 } ));	
 			ll.add(Arrays.asList(new Object[]{ 	"add_usergroup_selinuxusermap_all",		"selinux_rule2",	"User",		"User Groups",	"",								"",								"All", 		"Update"	 } ));
