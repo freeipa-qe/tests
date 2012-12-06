@@ -124,8 +124,25 @@ ipa_host_mod_ssh_envsetup()
 			fi
 		done
 
-		rlRun "rm -f /tmp/ssh_host*"
-		rlRun "ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=$MYBM1. --admin-email=ipaqar.redhat.com"
+		case "$MYROLE" in
+		MASTER*)
+			rlLog "Machine in recipe is MASTER ($MASTER)"
+			rlRun "rm -f /tmp/ssh_host*"
+			rlRun "ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=$MYBM1. --admin-email=ipaqar.redhat.com"
+			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
+			;;
+		SLAVE*|REPLICA*)
+			rlLog "Machine in recipe is SLAVE ($SLAVE)"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
+			;;
+		CLIENT*)
+			rlLog "Machine in recipe is CLIENT ($CLIENT)"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
+			;;
+		*)
+			rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+			;;
+		esac
 
 		#rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME' "
 	rlPhaseEnd

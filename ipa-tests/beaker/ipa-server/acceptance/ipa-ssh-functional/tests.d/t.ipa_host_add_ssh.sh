@@ -124,7 +124,24 @@ ipa_host_add_ssh_envsetup()
 			fi
 		done
 
-		rlRun "ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=$MYBM1. --admin-email=ipaqar.redhat.com"
+		case "$MYROLE" in
+		MASTER*)
+			rlLog "Machine in recipe is MASTER ($MASTER)"
+			rlRun "ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=$MYBM1. --admin-email=ipaqar.redhat.com"
+			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
+			;;
+		SLAVE*|REPLICA*)
+			rlLog "Machine in recipe is SLAVE ($SLAVE)"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
+			;;
+		CLIENT*)
+			rlLog "Machine in recipe is CLIENT ($CLIENT)"
+			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
+			;;
+		*)
+			rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+			;;
+		esac
 
 		#rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME' "
 	rlPhaseEnd
@@ -630,7 +647,7 @@ ipa_host_add_ssh_envcleanup()
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	rlPhaseStartTest "ipa_host_add_ssh_envcleanup - clean up test environment"
 	case "$MYROLE" in
-	"MASTER")
+	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		for h in $(ipa host-find host --pkey-only --raw|grep fqdn:.*host|awk '{print $2}'); do
 			rlRun "ipa host-del $h --updatedns"
@@ -640,11 +657,11 @@ ipa_host_add_ssh_envcleanup()
 		rlRun "rm -f /tmp/ssh_host*"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
-	"SLAVE")
+	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
-	"CLIENT")
+	CLIENT*)
 		rlLog "Machine in recipe is CLIENT ($CLIENT)"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 		;;
