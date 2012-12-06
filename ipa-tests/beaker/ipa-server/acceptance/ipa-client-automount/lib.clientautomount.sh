@@ -123,21 +123,25 @@ debuginfo()
 
 clean_up_direct_map(){
     local name=$1
-    local autofsDir=$2
-    ipa automountkey-del $name auto.direct --key=$autofsDir
-    rlRun "umount $autofsDir" 0 "umount $autofsDir"
+    local autofs_dir=$2
+    rlPhaseStartTest "clean up indirect map location [$name], autofs dir=$autofs_dir"
+        ipa automountkey-del $name auto.direct --key=$autofs_dir
+        rlRun "umount $autofs_dir " 0 "umount $autofs_dir"
+    rlPhaseEnd
 }
 
 clean_up_indirect_map(){
     local name=$1
-    local autofsTopDir=$2
-    local autofsSubDir=$3
-    ipa automountkey-del $name auto.share --key=${autofsSubDir}
-    ipa automountkey-del $name auto.master --key=${autofsTopDir}
-    ipa automountmap-del $name auto.share
-    ipa automountlocation-del $name
-    rlRun "unmount $autofsDir" 0 "umount $autofsDir"
-    rlRun "umount $autofsTopDir" 0 "umount $autofsTopDir"
+    local topDir=$2
+    local dubDir=$3
+    rlPhaseStartTest "clean up indirect map location [$name], topdir=[$topDir] subdir=[$subDir]"
+        ipa automountkey-del $name auto.share --key=${subDir}
+        ipa automountkey-del $name auto.master --key=${topDir}
+        ipa automountmap-del $name auto.share
+        ipa automountlocation-del $name
+        rlRun "umount $topDir/$subDir" 0 "umount $topDir/$subDir"
+        rlRun "umount $topDir" 0 "umount $topDir"
+    rlPhaseEnd
 }
 
 how_to_check_autofs_mounting(){
@@ -296,19 +300,17 @@ ensure_message_not_appears_in_configuration_file()
 
 clean_up_automount_installation()
 {
-    local tmp=$TmpDir/ipa.client.automount.uninstall.$RAMDOM.txt
-    echo "#################################################"
-    ipa-client-automount --uninstall -U 2>&1 > $tmp
-    if [ $? = "0" ];then
-        echogreen "# clean up ipa-client-automount success"
-        rlPass    "# clean up ipa-client-automount success"
-    else
-        echored "# clean up ipa-client-automount error#"
-        rlFail  "# clean up ipa-client-automount error#"
-        cat $tmp
-    fi
-    echo "#################################################"
-    rm $tmp
+    rlPhaseStartTest "uninstall ipa-client-automount"
+        local tmp=$TmpDir/ipa.client.automount.uninstall.$RAMDOM.txt
+        ipa-client-automount --uninstall -U 2>&1 > $tmp
+        if [ "$?" = "0" ];then
+            rlPass    "clean up ipa-client-automount success"
+        else
+            rlFail  "clean up ipa-client-automount error#"
+            cat $tmp
+        fi
+        rm $tmp
+    rlPhaseEnd
 }
 
 show_file_content()
@@ -551,10 +553,12 @@ print_logs()
 {
     for log in $logs
     do
-        local nLines=150
-        echo ""
-        echo "============ last $nLines lines of $log ==================="
-        tail -n $nLines $log
-        echo ""
+        if [ -f $log ];then
+            local nLines=150
+            echo ""
+            echo "============ last $nLines lines of $log ==================="
+            tail -n $nLines $log
+            echo ""
+        fi
     done
 }
