@@ -124,6 +124,7 @@ ipa_host_mod_ssh_envsetup()
 			fi
 		done
 
+		rlRun "rm -f /tmp/ssh_host*"
 		rlRun "ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=$MYBM1. --admin-email=ipaqar.redhat.com"
 
 		#rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME' "

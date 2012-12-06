@@ -154,10 +154,10 @@ ipa_delegation_ssh_0001()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ipa delegation-add sshkey_test_delegation --group=$TESTGROUP1 --membergroup=$TESTGROUP2 --attrs=ipasshpubkey > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		rlAssertGrep "Delegation name: sshkey_test_delegation"
-		rlAssertGrep "Attributes: ipasshpubkey"
-		rlAssertGrep "Member user group: $TESTGROUP2"
-		rlAssertGrep "User group: $TESTGROUP1"
+		rlAssertGrep "Delegation name: sshkey_test_delegation" $tmpout
+		rlAssertGrep "Attributes: ipasshpubkey" $tmpout
+		rlAssertGrep "Member user group: $TESTGROUP2" $tmpout
+		rlAssertGrep "User group: $TESTGROUP1" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
@@ -189,7 +189,7 @@ ipa_delegation_ssh_0002()
 		rlRun "rm -f /tmp/ssh_rsa_${TESTUSER2}*"
 		rlRun "su - $TESTUSER1 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER2@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER2}\""
 		rlRun "su - $TESTUSER1 -c \"echo $TESTUSERPW|kinit $TESTUSER1; ipa user-mod $TESTUSER2 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER2}.pub)'\" > $tmpout 2>&1"
-		KEYCHK=$(ipa user-show $TESTUSER2 --raw|grep "ipasshpubkey.*$(awk '{print $2}' /tmp/ssh_rsa_${TESTUSER2}.pub)"|wc -l)
+		KEYCHK=$(ipa user-show $TESTUSER2 --raw --all|grep "ipasshpubkey.*$(awk '{print $2}' /tmp/ssh_rsa_${TESTUSER2}.pub)"|wc -l)
 		if [ $KEYCHK -gt 0 ]; then
 			rlPass "Expected SSH Pub Key found for user delegation test"
 		else

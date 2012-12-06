@@ -168,7 +168,7 @@ ipa_selfservice_ssh_0002()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ipa selfservice-del \"Users can manage their own SSH public keys\"" 
 		rlRun "su - $TESTUSER -c \"ssh-keygen -t rsa -N '' -C $TESTUSER@$DOMAIN -f /tmp/ssh_user_key_${TESTUSER}_rsa\""
-		rlRun "su - $TESTUSER -c \"echo $TESTUSERPW|kinit $TESTUSER; ipa user-mod $TESTUSER --sshpubkey='$(cat /tmp/sshtest1.pub)'\" > $tmpout 2>&1" 1
+		rlRun "su - $TESTUSER -c \"echo $TESTUSERPW|kinit $TESTUSER; ipa user-mod $TESTUSER --sshpubkey='$(cat /tmp/ssh_user_key_${TESTUSER}_rsa.pub)'\" > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
 		rlAssertGrep "ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaSshPubKey' attribute of entry" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"

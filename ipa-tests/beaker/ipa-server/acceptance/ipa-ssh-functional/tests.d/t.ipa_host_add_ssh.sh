@@ -635,7 +635,9 @@ ipa_host_add_ssh_envcleanup()
 		for h in $(ipa host-find host --pkey-only --raw|grep fqdn:.*host|awk '{print $2}'); do
 			rlRun "ipa host-del $h --updatedns"
 		done
-		rm -f /tmp/ssh_*host*
+		
+		rlRun "ipa dnszone-del 2.2.2.in-addr.arpa."
+		rlRun "rm -f /tmp/ssh_host*"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	"SLAVE")
