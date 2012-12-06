@@ -355,7 +355,7 @@ install_option__server_invalid()
     clean_up_automount_installation
     rlPhaseStartTest "negative test install option, --server <invalid ipa server>"
         currentLocation="default"
-        local invalidIPAServer="invalid.$RANCOM.ipa.server.com"
+        local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
         rlRun "ipa-client-automount --server=$invalidIPAServer -U" 1 "install should fail if invalid ipa server provided"
         check_autofs_sssd_configuration "not_configured"
     rlPhaseEnd
@@ -403,7 +403,7 @@ install_option__server_invalid__location_valid()
 {
     clean_up_automount_installation
     rlPhaseStartTest "negative test install option combined, --server <invalid> --location <valid>"
-        local invalidIPAServer="invalid.$RANCOM.ipa.server.com"
+        local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
         rlRun "ipa-client-automount --server=$invalidIPAServer --location=$currentLocation -U" 1 "install should fail as invalid ipa server used"
         check_autofs_sssd_configuration "not_configured"
     rlPhaseEnd
@@ -413,7 +413,7 @@ install_option__server_invalid__location_invalid()
 {
     clean_up_automount_installation
     rlPhaseStartTest "negative test install option combined, --server <invalid> --location <invalid>"
-        local invalidIPAServer="invalid.$RANCOM.ipa.server.com"
+        local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
         local invalidLocation="invalid_Automount_Location_$RANDOM"
         rlRun "ipa-client-automount --server=$invalidIPAServer --location=$invalidLocation -U" 1 "install should fail as invalid location and ipa server used"
         check_autofs_sssd_configuration "not_configured"
