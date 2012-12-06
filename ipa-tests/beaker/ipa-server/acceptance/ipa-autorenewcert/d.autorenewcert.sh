@@ -36,8 +36,11 @@ minRound=2
 certRenewCounter=0
 
 log_httpd="/var/log/httpd/error_log"
-log_ldap="/var/log/dirsrv/slapd-*/errors"
+log_ldap_error="/var/log/dirsrv/slapd-*/errors"
+log_ldap_access="/var/log/dirsrv/slapd-*/access"
 log_sys="/var/log/messages"
 log_krb5="/var/log/krb5kdc.log"
-logs="$log_sys $log_ldap $log_httpd $log_krb5"
+log_selinux="/var/log/audit/audit.log"
+log_pkica="/var/log/pki-ca/debug /var/log/pki-ca/selftests.log /var/log/pki-ca/catalina.out /var/log/pki-ca/system /var/log/pki-ca/transactions"
+logs="$log_sys $log_ldap_error $log_ldap_access $log_httpd $log_krb5 $log_selinux $log_pkica"
 

@@ -722,7 +722,7 @@ test_ipa_via_kinit_as_admin(){
             echo $pw | kinit $ADMINID
             if [ $? = 1 ];then
                 rlFail "[test_ipa_via_kinit_as_admin] reset password back to original [$pw] failed"
-                echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
+                echo "    [ FAIL ] * test_ipa_via_kinit_as_admin ($@)" >> $testResult
             else
                 rlPass "[test_ipa_via_kinit_as_admin] reset password success"
                 echo "    [ PASS ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
@@ -732,7 +732,7 @@ test_ipa_via_kinit_as_admin(){
         elif echo $out | grep -i "Password incorrect while getting initial credentials" 
         then
             rlFail "[test_ipa_via_kinit_as_admin] wrong $ADMINID password provided: [$pw]"
-            echo "   [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
+            echo "   [ FAIL ] * test_ipa_via_kinit_as_admin ($@)" >> $testResult
         elif echo $out | grep -i "kinit: cannot contact any KDC for realm"
         then
             rlLog "catch cannot contact KDC error, restart ipa and try again"
@@ -740,11 +740,11 @@ test_ipa_via_kinit_as_admin(){
             rlRun "echo $pw | kinit $ADMINID" 0 "try again pw=[$pw], adminid=[$ADMINID]"
         else
             rlFail "[test_ipa_via_kinit_as_admin] unhandled error: Not because password expired; not because wrong password provided; also tried restart ipa but didnot work"
-            echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
+            echo "    [ FAIL ] * test_ipa_via_kinit_as_admin ($@)" >> $testResult
         fi
     else
         rlFail "[test_ipa_via_kinit_as_admin] unknow error, return code [$?] not recoginzed"
-        echo "    [ FAIL ] test_ipa_via_kinit_as_admin ($@)" >> $testResult
+        echo "    [ FAIL ] * test_ipa_via_kinit_as_admin ($@)" >> $testResult
     fi
     rlPhaseEnd
 }
@@ -854,7 +854,7 @@ test_dirsrv_via_ssl_based_ldapsearch(){
         echo "    [ PASS ] test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
     else
         rlFail "[test_dirsrv_via_ssl_based_ldapsearch] Test Failed"
-        echo "    [ FAIL ] test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
+        echo "    [ FAIL ] * test_dirsrv_via_ssl_based_ldapsearch ($@)" >> $testResult
     fi
     echo ""
     rlPhaseEnd
@@ -871,7 +871,7 @@ test_dogtag_via_cert_show(){
         echo "    [ PASS ] test_dogtag_via_cert_show ($@)" >> $testResult
     else
         rlFail "[test_dogtag_via_cert_show] Test Failed"
-        echo "    [ FAIL ] test_dogtag_via_cert_show ($@)" >> $testResult
+        echo "    [ FAIL ] * test_dogtag_via_cert_show ($@)" >> $testResult
     fi
     echo ""
     rlPhaseEnd
@@ -944,7 +944,7 @@ test_ipa_via_creating_new_cert(){
         rlPass "cert file creation success, continue"
     else
         rlFail "cert file creation failed, return fail"
-        echo "    [ FAIL ] test_ipa_via_creating_new_cert ($@)" >> $testResult
+        echo "    [ FAIL ] * test_ipa_via_creating_new_cert ($@)" >> $testResult
         return
     fi
 
@@ -955,7 +955,7 @@ test_ipa_via_creating_new_cert(){
         echo "    [ PASS ] test_ipa_via_creating_new_cert ($@)" >> $testResult
     else
         rlFail "customer cert create failed, test failed"
-        echo "    [ FAIL ] test_ipa_via_creating_new_cert ($@)" >> $testResult
+        echo "    [ FAIL ] * test_ipa_via_creating_new_cert ($@)" >> $testResult
     fi
     rlPhaseEnd
 }
