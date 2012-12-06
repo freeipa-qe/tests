@@ -67,7 +67,8 @@ verify_autofs_mounting(){
     echo "clientSideDir=[$clientSideDir] current directory `pwd`"
     if [ "$clientSideDir" = "$currentDir" ]; then
         rlLog "get into clientSideDir [$clientSideDir], great, now check file content"
-        ls -l
+        pwd
+        ls -al
         show_file_content $currentNFSFileName
         echo "-----the secret should be ------"
         echo $currentNFSFileSecret
@@ -87,14 +88,16 @@ verify_autofs_mounting(){
             rlRun "cd $autofsSubDir" 0 "cd [$autofsSubDir]"
             if [ "`pwd`" = "$autofsTopDir/$autofsSubDir" ];then
                 rlLog "great, we are where we want to be, now do ls"
-                ls -l
+                pwd
+                ls -al
                 show_file_content $currentNFSFileName
                 echo $currentNFSFileSecret > $TmpDir/secret.txt
                 rlRun "diff $TmpDir/secret.txt $currentNFSFileName" 0 "diff our secret with desired secret, they should match"
             else
                 rlFail "we getinto top level dirs, but not the second level, current dir=[`pwd`]"
-                echo "---- 'ls -l' ----"
-                ls -l
+                echo "---- 'ls -al' ----"
+                pwd
+                ls -al
                 echo "-----------------"
                 debuginfo
             fi
@@ -122,8 +125,7 @@ clean_up_direct_map(){
     local name=$1
     local autofsDir=$2
     ipa automountkey-del $name auto.direct --key=$autofsDir
-    echo "umount $autofsDir"
-    umount $autofsDir
+    rlRun "umount $autofsDir" 0 "umount $autofsDir"
 }
 
 clean_up_indirect_map(){
@@ -134,8 +136,8 @@ clean_up_indirect_map(){
     ipa automountkey-del $name auto.master --key=${autofsTopDir}
     ipa automountmap-del $name auto.share
     ipa automountlocation-del $name
-    echo "umount $autofsDir"
-    umount $autofsDir
+    rlRun "unmount $autofsDir" 0 "umount $autofsDir"
+    rlRun "umount $autofsTopDir" 0 "umount $autofsTopDir"
 }
 
 how_to_check_autofs_mounting(){
@@ -155,8 +157,8 @@ show_autofs_configuration(){
     echo ""
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo "      autofs configuration for location [$locationName]"
-    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    ipa automountlocation-tofiles $name
+    echo "|-------------------------------------------------------------------------------|"
+    ipa automountlocation-tofiles $locationName
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo ""
 }

@@ -574,7 +574,7 @@ basic_autofs_functional_test()
 test_direct_map()
 {
     rlPhaseStartTest "autofs functional test direct map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
-        local automounLocation="Direct_sssd_${RANDOM}"
+        local automounLocation="Direct_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
         rlLog "config autofs direct mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
@@ -591,7 +591,7 @@ test_direct_map()
 test_indirect_map()
 {
     rlPhaseStartTest "autofs functional test indirect map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
-        local automounLocation="Indirect_sssd_${RANDOM}"
+        local automounLocation="Indirect_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
         rlLog "config autofs indirect mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
@@ -609,7 +609,7 @@ test_indirect_map()
 test_indirect_map_using_wildcard()
 {
     rlPhaseStartTest "autofs functional test add indirect map using wild card and with sssd[$current_serverEnv] + [$current_nfsConfiguration]"
-        local automounLocation="Indirect_sssd_${RANDOM}"
+        local automounLocation="Indirect_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
         local clientSideDir="${autofsTopDir}/${nfsExportSubDir}"
         rlLog "config autofs indirect mount use wildcard (*,&):"
@@ -627,7 +627,7 @@ test_indirect_map_using_wildcard()
 test_direct_map_use_no_sssd()
 {
     rlPhaseStartTest "autofs functional test direct map use no sssed [$current_serverEnv] + [$current_nfsConfiguration]"
-        local automounLocation="Direct_${RANDOM}"
+        local automounLocation="Direct_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
         rlLog "config autofs direct mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
@@ -643,7 +643,7 @@ test_direct_map_use_no_sssd()
 test_indirect_map_use_no_sssd()
 {
     rlPhaseStartTest "autofs functional test indirect map use no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
-        local automounLocation="Indirect_${RANDOM}"
+        local automounLocation="Indirect_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
         rlLog "config autofs indirect mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
@@ -660,7 +660,7 @@ test_indirect_map_use_no_sssd()
 test_indirect_map_using_wildcard_use_no_sssd()
 {
     rlPhaseStartTest "autofs functional test add indirect map using wild card and no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
-        local automounLocation="Indirect_${RANDOM}"
+        local automounLocation="Indirect_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
         local clientSideDir="${autofsTopDir}/${nfsExportSubDir}"
         rlLog "config autofs indirect mount use wildcard (*,&):"
