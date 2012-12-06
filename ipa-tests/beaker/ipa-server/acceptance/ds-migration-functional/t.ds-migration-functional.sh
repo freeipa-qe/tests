@@ -116,7 +116,7 @@ bz_tests()
         rlPhaseStartTest "ds-migration-functional-008 bz 822608 part 1 password test for migrated user $USER1"
 		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
 		KinitAsUser $USER1 $USER1PWD 
-		rlRun "klist | grep $USER1@RELM" 0 "Ensuring that kinit as $USER1 worked" 
+		rlRun "klist | grep $USER1" 0 "Ensuring that kinit as $USER1 worked" 
 		rlLog "Running kinit"
 		KinitAsUser $USER1 $USER1PWD 
         rlPhaseEnd
@@ -124,7 +124,7 @@ bz_tests()
         rlPhaseStartTest "ds-migration-functional-009 bz 822608 part 2 password test for migrated user $USER2"
 		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
 		KinitAsUser $USER2 $USER2PWD 
-		rlRun "klist | grep $USER2@RELM" 0 "Ensuring that kinit as $USER2 worked" 
+		rlRun "klist | grep $USER2" 0 "Ensuring that kinit as $USER2 worked" 
 		rlLog "Running kinit"
 		KinitAsUser $USER1 $USER1PWD 
         rlPhaseEnd
