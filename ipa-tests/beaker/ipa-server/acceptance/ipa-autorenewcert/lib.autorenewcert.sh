@@ -450,10 +450,14 @@ check_actually_renewed_certs(){
         else
             rlLog "[$cert status valid] returned [$state]"
             rlFail "NO valid cert found for [$cert], current date:[`date`]"
+            echo "certutil -L -d $db"
+            certutil -L -d $db
             echo "[`date`] Debug: check certutil output: certutil -L -d $db -n \"$nickname\""
             certutil -L -d $db -n "$nickname"
             $readCert -d $db -n "$nickname" -s "valid"
             echo "[`date`] [End of debug]"
+            echo "getcert list output"
+            getcert list
         fi
     done
     rlPhaseEnd
@@ -598,6 +602,9 @@ final_cert_status_report(){
         local db=`$cert db`
         local nickname=`$cert nickname`
         echo "      debug [certutil -L -d $db -n \"$nickname\"] "
+        echo "certutil -L -d $db"
+        certutil -L -d $db
+        certutil -L -d $db >> $certReport
         echo "      debug [certutil -L -d $db -n \"$nickname\"] " >> $certReport
         certutil -L -d $db -n "$nickname" 2>&1 >> $certReport
         echo "      OR    [$readCert -d $db -n \"$nickname\" -s (preValid/valid/expired)]"
@@ -635,6 +642,8 @@ final_cert_status_report(){
     else
         echo "No invalid certs found"
     fi
+    echo "getcert list output:"
+    getcert list
 }
 
 all_certs_are_valid(){
@@ -821,6 +830,9 @@ compare_expires_epoch_time_of_certs()
                 echo "    [ FAIL ] * compare_expires_epoch_time_of_certs: [$cert] has no valid cert" >> $testResult
                 local db=`$cert db`
                 local nickname=`$cert nickname`
+                echo "certutil -L -d $db"
+                certutil -L -d $db
+                echo "certutil -L -d $db -n \"$nickname\""
                 certutil -L -d $db -n "$nickname"
             else
                 local previousNotAfter=`grep "$cert" $certdata_notafter | cut -d" " -f2`
