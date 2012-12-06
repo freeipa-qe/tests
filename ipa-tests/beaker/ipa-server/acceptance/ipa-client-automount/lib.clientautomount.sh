@@ -57,7 +57,9 @@ configure_autofs_direct(){
 }
 
 verify_autofs_mounting(){
-    local clientSideDir=$1
+    local topDir=$1
+    local subDir=$2
+    local clientSideDir="$topDir/$subDir"
     local beforeDir=`pwd`
     rlLog "try get into client side autofs directory: cd $clientSideDir"
     cd $clientSideDir
@@ -81,29 +83,39 @@ verify_autofs_mounting(){
         rlLog "can not get into clientSideDir [$clientSideDir], now try one step at time"
         rlRun "cd $autofsTopDir" 0 "cd [$autofsTopDir], trying the top level dir"
         if [ "`pwd`" = "$autofsTopDir" ];then
-            rlLog "get into top autofs dir [$autofsTopDir], continue"
+            rlLog "get into top autofs dir [$autofsTopDir], continue, current dir=[`pwd`]"
             rlRun "cd $autofsSubDir" 0 "cd [$autofsSubDir]"
             if [ "`pwd`" = "$autofsTopDir/$autofsSubDir" ];then
                 rlLog "great, we are where we want to be, now do ls"
                 ls -l
                 show_file_content $currentNFSFileName
                 echo $currentNFSFileSecret > $TmpDir/secret.txt
-                    rlRun "diff $TmpDir/secret.txt $currentNFSFileName" 0 "diff our secret with desired secret, they should match"
+                rlRun "diff $TmpDir/secret.txt $currentNFSFileName" 0 "diff our secret with desired secret, they should match"
             else
-                rlFail "we getinto top level dirs, but not the second level"
+                rlFail "we getinto top level dirs, but not the second level, current dir=[`pwd`]"
+                echo "---- 'ls -l' ----"
+                ls -l
+                echo "-----------------"
+                debuginfo
             fi
         else
             rlFail "can not get into autofs directory at all, not even top level, client side dir=[$clientSideDir]"
-            echo "================ debugging information ===================="
-            echo "showmount -e $NFS_IPA"
-            showmount -e $NFS_IPA
-            echo "rpcinfo -p $NFS_IPA"
-            rpcinfo -p $NFS_IPA
-            print_logs
-            echo "==========================================================="
+            debuginfo
         fi
     fi
     cd $beforeDir
+}
+
+debuginfo()
+{
+    show_autofs_configuration $currentLocation
+    echo "================ debugging information ===================="
+    echo "showmount -e $NFS_IPA"
+    showmount -e $NFS_IPA
+    echo "rpcinfo -p $NFS_IPA"
+    rpcinfo -p $NFS_IPA
+    print_logs
+    echo "==========================================================="
 }
 
 clean_up_direct_map(){
