@@ -654,7 +654,7 @@ ipa_host_add_ssh_envcleanup()
 		done
 		
 		rlRun "ipa dnszone-del 2.2.2.in-addr.arpa."
-		rlRun "rm -f /tmp/ssh_host*"
+		rlRun "rm -f /tmp/ssh_*host*"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)

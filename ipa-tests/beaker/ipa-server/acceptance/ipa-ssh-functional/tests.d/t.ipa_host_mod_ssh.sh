@@ -427,6 +427,7 @@ ipa_host_mod_ssh_negative_0002()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rm -f /tmp/ssh_host${NUMBER}_rsa*"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
 		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"badkey\" > $tmpout 2>&1" 1
@@ -459,6 +460,7 @@ ipa_host_mod_ssh_negative_0003()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rm -f /tmp/ssh_badhost${NUMBER}_rsa*"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
 		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"badkey,$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
@@ -493,6 +495,7 @@ ipa_host_mod_ssh_negative_0004()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		KEYS="--sshpubkey=\"badkey\""
 		for i in $(seq 1 15); do
+			rm /tmp/ssh_badhost${NUMBER}_${i}_rsa*
 			ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_${i}_rsa
 			KEYS="$KEYS --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_${i}_rsa.pub)\""
 		done
@@ -527,6 +530,7 @@ ipa_host_mod_ssh_negative_0005()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rm -f /tmp/ssh_badhost${NUMBER}_rsa*"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
 		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey\" > $tmpout 2>&1" 1
@@ -559,7 +563,9 @@ ipa_host_mod_ssh_negative_0006()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rm -f /tmp/ssh_badhost${NUMBER}_rsa*"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
+		rlRun "rm -f /tmp/ssh_badhost${NUMBER}_dsa*"
 		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_dsa"
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
 		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey,$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub)\" > $tmpout 2>&1" 1
@@ -592,7 +598,9 @@ ipa_host_mod_ssh_negative_0007()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rm -f /tmp/ssh_badhost${NUMBER}_rsa*"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
+		rlRun "rm -f /tmp/ssh_badhost${NUMBER}_dsa*"
 		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_dsa"
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER}"
 		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub),badkey\" > $tmpout 2>&1" 1
@@ -625,6 +633,7 @@ ipa_host_mod_ssh_negative_0008()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
+		rlRun "rm -f /tmp/ssh_badhost${NUMBER}_rsa*"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\"" 0
 		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
@@ -658,7 +667,7 @@ test_envcleanup()
 		for h in $(ipa host-find host --pkey-only --raw|grep fqdn:.*host|awk '{print $2}'); do
 			rlRun "ipa host-del $h --updatedns"
 		done
-		rm -f /tmp/ssh_*host*
+		rlRun "rm -f /tmp/ssh_*host*"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	"SLAVE")
