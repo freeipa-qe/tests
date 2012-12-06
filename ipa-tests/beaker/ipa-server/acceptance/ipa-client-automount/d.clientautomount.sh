@@ -36,6 +36,13 @@ currentNFSMountOption=""
 currentNFSFileName="ipaserver.txt"
 currentNFSFileSecret="this_is_nfs_file_secret" 
 
+log_httpd="/var/log/httpd/error_log"
+log_ldap="/var/log/dirsrv/slapd-*/errors"
+log_sys="/var/log/messages"
+log_krb5="/var/log/krb5kdc.log"
+log_selinux="/var/log/audit/audit.log"
+logs="$log_sys $log_ldap $log_httpd $log_krb5 $log_selinux"
+
 # special notes: yzhang@redhat.com Nov. 16, 2012
 # as one special case: the LDAP_URI in /etc/sysconfig/nfs would have different
 # value depends on whether ipa server and automount location is given when run

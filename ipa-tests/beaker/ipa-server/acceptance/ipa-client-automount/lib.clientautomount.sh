@@ -59,15 +59,12 @@ configure_autofs_direct(){
 verify_autofs_mounting(){
     local clientSideDir=$1
     local beforeDir=`pwd`
-    #rlLog "cd $autofsTopDir"
-    #cd $autofsTopDir
-    #rlLog "cd $autofsSubDir"
-    #cd $autofsSubDir
-    rlLog "cd $clientSideDir"
+    rlLog "try get into client side autofs directory: cd $clientSideDir"
     cd $clientSideDir
     local currentDir=`pwd`
     echo "clientSideDir=[$clientSideDir] current directory `pwd`"
     if [ "$clientSideDir" = "$currentDir" ]; then
+        rlLog "get into clientSideDir [$clientSideDir], great, now check file content"
         ls -l
         show_file_content $currentNFSFileName
         echo "-----the secret should be ------"
@@ -81,14 +78,30 @@ verify_autofs_mounting(){
             rlFail "autofs mount failed, file content does NOT matches"
         fi
     else
-        rlLog "cd $autofsTopDir"
-        cd $autofsTopDir
-        rlFail "can not get into autofs directory [$clientSideDir]"
-        echo "================ debugging information ===================="
-        showmount -e $NFS_IPA
-        rpcinfo -p $NFS_IPA
-        tail -n 20 /var/log/messages
-        echo "==========================================================="
+        rlLog "can not get into clientSideDir [$clientSideDir], now try one step at time"
+        rlRun "cd $autofsTopDir" 0 "cd [$autofsTopDir], trying the top level dir"
+        if [ "`pwd`" = "$autofsTopDir" ];then
+            rlLog "get into top autofs dir [$autofsTopDir], continue"
+            rlRun "cd $autofsSubDir" 0 "cd [$autofsSubDir]"
+            if [ "`pwd`" = "$autofsTopDir/$autofsSubDir" ];then
+                rlLog "great, we are where we want to be, now do ls"
+                ls -l
+                show_file_content $currentNFSFileName
+                echo $currentNFSFileSecret > $TmpDir/secret.txt
+                    rlRun "diff $TmpDir/secret.txt $currentNFSFileName" 0 "diff our secret with desired secret, they should match"
+            else
+                rlFail "we getinto top level dirs, but not the second level"
+            fi
+        else
+            rlFail "can not get into autofs directory at all, not even top level, client side dir=[$clientSideDir]"
+            echo "================ debugging information ===================="
+            echo "showmount -e $NFS_IPA"
+            showmount -e $NFS_IPA
+            echo "rpcinfo -p $NFS_IPA"
+            rpcinfo -p $NFS_IPA
+            print_logs
+            echo "==========================================================="
+        fi
     fi
     cd $beforeDir
 }
@@ -520,3 +533,14 @@ print_hostname_role_mapping()
 }
 
 
+print_logs()
+{
+    for log in $logs
+    do
+        local nLines=150
+        echo ""
+        echo "============ last $nLines lines of $log ==================="
+        tail -n $nLines $log
+        echo ""
+    done
+}
