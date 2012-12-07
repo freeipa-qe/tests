@@ -60,8 +60,8 @@ verify_autofs_mounting(){
     local topDir=$1
     local subDir=$2
     local clientSideDir="$topDir/$subDir"
-    local beforeDir=`pwd`
-    rlLog "try get into client side autofs directory: cd $clientSideDir"
+    local startingDir=`pwd`
+    rlLog "Starting directory: [$startingDir]. try get into client side autofs directory: cd $clientSideDir"
     cd $clientSideDir
     local currentDir=`pwd`
     echo "clientSideDir=[$clientSideDir] current directory `pwd`"
@@ -82,11 +82,11 @@ verify_autofs_mounting(){
         fi
     else
         rlLog "can not get into clientSideDir [$clientSideDir], now try one step at time"
-        rlRun "cd $autofsTopDir" 0 "cd [$autofsTopDir], trying the top level dir"
-        if [ "`pwd`" = "$autofsTopDir" ];then
-            rlLog "get into top autofs dir [$autofsTopDir], continue, current dir=[`pwd`]"
-            rlRun "cd $autofsSubDir" 0 "cd [$autofsSubDir]"
-            if [ "`pwd`" = "$autofsTopDir/$autofsSubDir" ];then
+        rlRun "cd $topDir" 0 "cd [$topDir], trying the top level dir"
+        if [ "`pwd`" = "$topDir" ];then
+            rlLog "get into top dir [$topDir], continue, current dir=[`pwd`]"
+            rlRun "cd $subDir" 0 "now try sub directory: cd [$subDir]"
+            if [ "`pwd`" = "$topDir/$subDir" ];then
                 rlLog "great, we are where we want to be, now do ls"
                 pwd
                 ls -al
@@ -96,7 +96,7 @@ verify_autofs_mounting(){
             else
                 rlFail "we getinto top level dirs, but not the second level, current dir=[`pwd`]"
                 echo "---- 'ls -al' ----"
-                pwd
+                echo "current directory: [`pwd`]"
                 ls -al
                 echo "-----------------"
                 debuginfo
@@ -106,7 +106,7 @@ verify_autofs_mounting(){
             debuginfo
         fi
     fi
-    cd $beforeDir
+    rlRun "cd $startingDir" 0 "go back to starting directory: [$startingDir]"
 }
 
 debuginfo()
@@ -130,18 +130,46 @@ clean_up_direct_map(){
     rlPhaseEnd
 }
 
-clean_up_indirect_map(){
+umount_autofs_directory()
+{
+    local topDir=$1
+    local subDir=$2
+    local currentDir=`pwd`
+    rlLog "current directory = [$currentDir]"
+    echo "====== mount list before ======"
+    mount -l
+    echo "====== lsof | grep $topDir ===="
+    lsof | grep "$topDir"
+    echo "==============================="
+    if umount -fv $topDir/$subDir
+    then
+        rlPass "umount [$topDir/$subDir] success"
+    else
+        rlLog "umount [$topDir/$subDir] failed, try umount [$topDir]"
+        umount -fv $topDir
+        if [ "$?" = "1" ];then
+            rlLog "umount [$topDir] also failed, let's pray the rest test will magically work ;)"
+        else
+            rlPass "umount [$topDir] success"
+        fi
+    fi
+    sleep 5 # give system sometime to rest
+    echo "====== mount list after ======="
+    mount -l
+    echo "====== lsof | grep $topDir ===="
+    lsof | grep "$topDir"
+    echo "==============================="
+}
+
+clean_up_indirect_map_and_umount(){
     local name=$1
     local topDir=$2
-    local dubDir=$3
-    rlPhaseStartTest "clean up indirect map location [$name], topdir=[$topDir] subdir=[$subDir]"
-        ipa automountkey-del $name auto.share --key=${subDir}
-        ipa automountkey-del $name auto.master --key=${topDir}
-        ipa automountmap-del $name auto.share
-        ipa automountlocation-del $name
-        rlRun "umount -f $topDir/$subDir" 0 "umount -f $topDir/$subDir"
-        rlRun "umount -f $topDir" 0 "umount $topDir"
-    rlPhaseEnd
+    local subDir=$3
+    ipa automountkey-del $name auto.share --key=${subDir}
+    ipa automountkey-del $name auto.master --key=${topDir}
+    ipa automountmap-del $name auto.share
+    ipa automountlocation-del $name
+    umount_autofs_directory $topDir $subDir
 }
 
 how_to_check_autofs_mounting(){
@@ -235,7 +263,7 @@ check_sysconfig_autofs_no_sssd(){
 
     local message="SEARCH_BASE=cn=${currentLocation},cn=automount,$suffix"
     ensure_configuration_status "$conf" "$message" "$configuration_status"
-    if [ "$LDAP_URI" != ""];then
+    if [ "$LDAP_URI" != "" ];then
         ensure_configuration_status "$conf" "$LDAP_URI" "$configuration_status"
     fi
 }
@@ -300,17 +328,15 @@ ensure_message_not_appears_in_configuration_file()
 
 clean_up_automount_installation()
 {
-    rlPhaseStartTest "uninstall ipa-client-automount"
-        local tmp=$TmpDir/ipa.client.automount.uninstall.$RAMDOM.txt
-        ipa-client-automount --uninstall -U 2>&1 > $tmp
-        if [ "$?" = "0" ];then
-            rlPass    "clean up ipa-client-automount success"
-        else
-            rlFail  "clean up ipa-client-automount error#"
-            cat $tmp
-        fi
-        rm $tmp
-    rlPhaseEnd
+    local tmp=$TmpDir/ipa.client.automount.uninstall.$RAMDOM.txt
+    ipa-client-automount --uninstall -U 2>&1 > $tmp
+    if [ "$?" = "0" ];then
+        rlPass "clean up ipa-client-automount success"
+    else
+        rlLog "clean up ipa-client-automount failed, this is not considered as an error"
+        cat $tmp
+    fi
+    rm $tmp
 }
 
 show_file_content()
