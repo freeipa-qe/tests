@@ -576,6 +576,9 @@ test_direct_map()
     rlPhaseStartTest "autofs functional test direct map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Direct_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
+        autofsTopDir="/ipashare_${RANDOM}"
+        autofsSubDir="public_${RANDOM}"
+        autofsDir="$autofsTopDir/$autofsSubDir"
         rlLog "config autofs direct mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
         configure_autofs_direct $currentLocation $currentNFSServer $nfsDir $autofsDir 
@@ -593,6 +596,9 @@ test_indirect_map()
     rlPhaseStartTest "autofs functional test indirect map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
+        autofsTopDir="/ipashare_${RANDOM}"
+        autofsSubDir="public_${RANDOM}"
+        autofsDir="$autofsTopDir/$autofsSubDir"
         rlLog "config autofs indirect mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
         configure_autofs_indirect $currentLocation $currentNFSServer $nfsDir $autofsDir
@@ -611,7 +617,8 @@ test_indirect_map_using_wildcard()
     rlPhaseStartTest "autofs functional test add indirect map using wild card and with sssd[$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
-        local clientSideDir="${autofsTopDir}/${nfsExportSubDir}"
+        autofsTopDir="/ipashare_${RANDOM}"
+        autofsDir="$autofsTopDir/$nfsExportSubDir"
         rlLog "config autofs indirect mount use wildcard (*,&):"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsExportTopDir/&] [autofs local dir: $autofsTopDir/*]"
         configure_autofs_indirect_use_wildcard $currentLocation $currentNFSServer $nfsExportTopDir $autofsTopDir
@@ -619,7 +626,7 @@ test_indirect_map_using_wildcard()
         restart_sssd
         restart_autofs
         verify_autofs_mounting $autofsTopDir $nfsExportSubDir 
-        clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $autofsSubDir
+        clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $nfsExportSubDir
         clean_up_automount_installation
     rlPhaseEnd
 }
@@ -629,6 +636,9 @@ test_direct_map_use_no_sssd()
     rlPhaseStartTest "autofs functional test direct map use no sssed [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Direct_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
+        autofsTopDir="/ipashare_${RANDOM}"
+        autofsSubDir="public_${RANDOM}"
+        autofsDir="$autofsTopDir/$autofsSubDir"
         rlLog "config autofs direct mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
         configure_autofs_direct $currentLocation $currentNFSServer $nfsDir $autofsDir 
@@ -645,6 +655,9 @@ test_indirect_map_use_no_sssd()
     rlPhaseStartTest "autofs functional test indirect map use no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
+        autofsTopDir="/ipashare_${RANDOM}"
+        autofsSubDir="public_${RANDOM}"
+        autofsDir="$autofsTopDir/$autofsSubDir"
         rlLog "config autofs indirect mount:"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsDir] [autofs local dir: $autofsDir]"
         configure_autofs_indirect $currentLocation $currentNFSServer $nfsDir $autofsDir
@@ -662,14 +675,15 @@ test_indirect_map_using_wildcard_use_no_sssd()
     rlPhaseStartTest "autofs functional test add indirect map using wild card and no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
-        local clientSideDir="${autofsTopDir}/${nfsExportSubDir}"
+        autofsTopDir="/ipashare_${RANDOM}"
+        autofsDir="$autofsTopDir/${nfsExportSubDir}"
         rlLog "config autofs indirect mount use wildcard (*,&):"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsExportTopDir/&] [autofs local dir: $autofsTopDir/*]"
         configure_autofs_indirect_use_wildcard $currentLocation $currentNFSServer $nfsExportTopDir $autofsTopDir
-        rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation --no-sssd -U" 0 "setup ipa client automount"
+        rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation --no-sssd -U" 0 "setup ipa client automount: --server=$currentIPAServer --location=$currentLocation --no-sssd -U"
         restart_autofs
         verify_autofs_mounting $autofsTopDir $nfsExportSubDir 
-        clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $autofsSubDir
+        clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $nfsExportSubDir
         clean_up_automount_installation
     rlPhaseEnd
 }

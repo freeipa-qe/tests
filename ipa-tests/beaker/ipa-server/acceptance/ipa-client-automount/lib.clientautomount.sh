@@ -125,6 +125,7 @@ clean_up_direct_map(){
     local name=$1
     local autofs_dir=$2
     rlPhaseStartTest "clean up indirect map location [$name], autofs dir=$autofs_dir"
+        echo ipa automountkey-del $name auto.direct --key=$autofs_dir
         ipa automountkey-del $name auto.direct --key=$autofs_dir
         rlRun "umount -f $autofs_dir " 0 "umount -f $autofs_dir"
     rlPhaseEnd
@@ -165,9 +166,16 @@ clean_up_indirect_map_and_umount(){
     local name=$1
     local topDir=$2
     local subDir=$3
+    echo ipa automountkey-del $name auto.share --key=${subDir}
     ipa automountkey-del $name auto.share --key=${subDir}
+
+    echo ipa automountkey-del $name auto.master --key=${topDir}
     ipa automountkey-del $name auto.master --key=${topDir}
+
+    echo ipa automountmap-del $name auto.share
     ipa automountmap-del $name auto.share
+
+    echo ipa automountlocation-del $name
     ipa automountlocation-del $name
     umount_autofs_directory $topDir $subDir
 }
