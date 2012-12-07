@@ -415,7 +415,7 @@ ipa_host_mod_ssh_negative_0001()
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST" $tmpout
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
 		rlLog "Machine in recipe is SLAVE ($SLAVE)"
