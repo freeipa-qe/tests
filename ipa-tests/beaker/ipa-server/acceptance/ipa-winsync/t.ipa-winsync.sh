@@ -215,10 +215,7 @@ rlPhaseStartTest "0001 Creating winsync agreement"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd" 0 "Creating Winsync Agreement with valid cert"
 
 	# Restart PassSync after winsync agreement is established
-	net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
-	sleep 5
-	net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
-	rlRun "net rpc service start PassSync -I $ADip -U administrator%$ADpswd" 0 "Restarting PassSync Service"
+	rlRun "PassSync_Restart" 0 "Restarting PassSync Service"
 
 rlPhaseEnd
 }
@@ -599,10 +596,7 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 	sleep 15
 
 	 # Restart PassSync after winsync agreement is established
-        net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
-	sleep 5
-        net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
-        rlRun "net rpc service start PassSync -I $ADip -U administrator%$ADpswd" 0 "Restarting PassSync Service"
+	rlRun "PassSync_Restart" 0 "Restarting PassSync Service"
 	sleep 15
 
 	rlRun "ipa user-show $l1user | grep \"Account disabled: False\"" 0 "$l1user from OU $OU1 synced and enabled in IPA"
@@ -629,10 +623,7 @@ rlPhaseStartTest "0015 Winsync with --win-subtree"
 	sleep 15
 
 	 # Restart PassSync after winsync agreement is established
-        net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
-	sleep 5
-        net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
-        rlRun "net rpc service start PassSync -I $ADip -U administrator%$ADpswd" 0 "Restarting PassSync Service"
+	rlRun "PassSync_Restart" 0 "Restarting PassSync Service"
 	sleep 10
 
 	rlRun "syncinterval_ldif $sec add"

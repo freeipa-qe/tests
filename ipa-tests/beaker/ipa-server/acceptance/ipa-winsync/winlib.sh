@@ -36,6 +36,13 @@
 . ./Config
 
 # Commonly used routines
+PassSync_Restart() {
+net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
+sleep 5
+net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
+sleep 5
+net rpc service start PassSync -I $ADip -U administrator%$ADpswd
+}
 
 ADuser_ldif() {
 # $1 first name # $2 Surname # $3 Username # $4 changetype (add, modify, delete)
