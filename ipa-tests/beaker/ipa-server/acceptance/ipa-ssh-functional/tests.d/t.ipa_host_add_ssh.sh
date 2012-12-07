@@ -128,6 +128,7 @@ ipa_host_add_ssh_envsetup()
 		MASTER*)
 			rlLog "Machine in recipe is MASTER ($MASTER)"
 			rlRun "ipa dnszone-add 2.2.2.in-addr.arpa. --name-server=$MYBM1. --admin-email=ipaqar.redhat.com"
+			rlRun "ipa dnszone-add 4.2.2.in-addr.arpa. --name-server=$MYBM1. --admin-email=ipaqar.redhat.com"
 			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 			;;
 		SLAVE*|REPLICA*)
@@ -158,7 +159,8 @@ ipa_host_add_ssh_positive_0001()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey="
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${SMALLNUMBER} --sshpubkey="
 		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
 			rlPass "IPA user has no key, as expected"
 		else 
@@ -192,7 +194,8 @@ ipa_host_add_ssh_positive_0002()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=''"
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${SMALLNUMBER} --sshpubkey=''"
 		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
 			rlPass "IPA user has no key, as expected"
 		else 
@@ -227,7 +230,8 @@ ipa_host_add_ssh_positive_0003()
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
-		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
 		KEY="$(ssh-keygen -l -f /tmp/ssh_host${NUMBER}_rsa.pub|awk '{print $2}')"
 		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ]; then
 			rlPass "IPA host has expected ssh key fingerprint: $KEY"
@@ -264,7 +268,8 @@ ipa_host_add_ssh_positive_0004()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_rsa"
 		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_dsa"
-		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\" --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_dsa.pub)\""
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\" --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_dsa.pub)\""
 		KEY="$(ssh-keygen -l -f /tmp/ssh_host${NUMBER}_rsa.pub|awk '{print $2}')"
 		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|grep -i "$KEY"|wc -l) -gt 0 ]; then
 			rlPass "IPA host has expected ssh key fingerprint: $KEY"
@@ -310,7 +315,8 @@ ipa_host_add_ssh_positive_0005()
 			ssh-keygen -t rsa -N '' -C '' -f /tmp/ssh_host${NUMBER}_${i}_rsa
 			KEYS="$KEYS --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_${i}_rsa.pub)\""
 		done
-		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} $KEYS"
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${SMALLNUMBER} $KEYS"
 		rlRun "ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp > $tmpout 2>&1"
 		for i in $(seq 1 15); do
 			KEY="$(ssh-keygen -l -f /tmp/ssh_host${NUMBER}_${i}_rsa.pub | awk '{print $2}')"
@@ -348,7 +354,8 @@ ipa_host_add_ssh_positive_0006()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=' '"
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add host${NUMBER}.${DOMAIN} --ip-address=2.2.2.${SMALLNUMBER} --sshpubkey=' '"
 		if [ $(ipa host-show host${NUMBER}.${DOMAIN} --raw|grep sshpubkeyfp|wc -l) -eq 0 ]; then
 			rlPass "IPA user has no key, as expected"
 		else 
@@ -383,7 +390,8 @@ ipa_host_add_ssh_negative_0001()
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		BADKEY="AAAAB3NzaC1yc2EAAAABIwAAAQEA2Vq7ocM+3CIgE9EpR61Yli0ayiw+BdzF3eKq3F44+mFj3gKBBpIIQY9SI74HUpaeahgC6pTsdGdxvqFwCQ5UMnn79YIw+rnkgfzTrD5p4BPxq6IadayMJaKZkhJR4+GGY99Wqp2cfIwWDnfY9QPOTCgOt2SsCZh/SefqXUjy+5O21gtged+59H/qyXeFMrqEhC+dNR2V2Y0l/k8TkNJKdbyVq5LCk3S9wJ5IlCBW8/hF3Nkus7WyLadqfVPoNWdOwfy8BPF4L+iU0AWIWTmGyXtMdwg5cKjWF1fwoh3T5DewQzIX1/2aGiHRueFCvyZU2u+4jI+wDa5HJRwTf9L+Ww"
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$BADKEY\" > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$BADKEY\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
@@ -415,7 +423,8 @@ ipa_host_add_ssh_negative_0002()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"badkey\" > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"badkey\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
@@ -449,7 +458,8 @@ ipa_host_add_ssh_negative_0003()
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"badkey,$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"badkey,$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
@@ -486,7 +496,8 @@ ipa_host_add_ssh_negative_0004()
 			ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_${i}_rsa
 			KEYS="$KEYS --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_${i}_rsa.pub)\""
 		done
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} $KEYS > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} $KEYS > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
@@ -519,7 +530,8 @@ ipa_host_add_ssh_negative_0005()
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey\" > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
@@ -553,7 +565,8 @@ ipa_host_add_ssh_negative_0006()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
 		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_dsa"
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey,$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub)\" > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),badkey,$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub)\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
@@ -587,7 +600,8 @@ ipa_host_add_ssh_negative_0007()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
 		rlRun "ssh-keygen -q -t dsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_dsa"
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub),badkey\" > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub),$(cat /tmp/ssh_badhost${NUMBER}_dsa.pub),badkey\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
 		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
 		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
@@ -620,8 +634,9 @@ ipa_host_add_ssh_negative_0008()
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "ssh-keygen -q -t rsa -N '' -C '' -f /tmp/ssh_badhost${NUMBER}_rsa"
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\"" 0
-		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.2.${NUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
+		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\"" 0
+		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: host with name \"badhost${NUMBER}.${DOMAIN}\" already exists" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
