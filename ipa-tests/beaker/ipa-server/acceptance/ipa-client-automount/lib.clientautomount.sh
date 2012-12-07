@@ -435,27 +435,23 @@ replace_line()
 
 configurate_non_secure_NFS_Server()
 {
-    if [ "$MYROLE" = "NFS" ];then
-        rlRun "mkdir -p $nfsDir" 0 "prepare nfs export directory [$nfsDir]"
-        echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
-        echo "========= content of secret file content ======="
-        cat $nfsDir/$currentNFSFileName
-        echo "===== end of content of [$nfsDir/$currentNFSFileName] ====="
+    rlLog "MYHOSTNAME=[$MYHOSTNAME] configure [$MYROLE] as non-secure NFS server"
+    rlRun "mkdir -p $nfsDir" 0 "prepare nfs export directory [$nfsDir]"
+    echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
+    echo "========= content of secret file content ======="
+    cat $nfsDir/$currentNFSFileName
+    echo "===== end of content of [$nfsDir/$currentNFSFileName] ====="
 
-        echo "$nfsConfiguration_NonSecure" > $nfsConfigFile
-        echo "====== configuration [$nfsConfigFile ] ============"
-        cat $nfsConfigFile
-        echo "============================================="
+    echo "$nfsConfiguration_NonSecure" > $nfsConfigFile
+    echo "====== configuration [$nfsConfigFile ] ============"
+    cat $nfsConfigFile
+    echo "============================================="
 
-        rlRun "service nfs restart" 0 "start nfs service"
-        rlRun "service iptables stop" 0 "shutdown firewall"
-        echo "========  check rpcinfo [`hostname`] ======"
-        rpcinfo -p `hostname`
-        echo "=================================================="
-    else
-        rlLog "acutal role is [$MYROLE], I should be (non-secure) NFS server "
-        rlFail "role does not match, expect [NFS], actual [$MYROLE]"
-    fi
+    rlRun "service nfs restart" 0 "start nfs service"
+    rlRun "service iptables stop" 0 "shutdown firewall"
+    echo "========  check rpcinfo [$MYHOSTNAME] ======"
+    rpcinfo -p $MYHOSTNAME
+    echo "=================================================="
 }
 
 verify_nfs_service_keytabfile(){

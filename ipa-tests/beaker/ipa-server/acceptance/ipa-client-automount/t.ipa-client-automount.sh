@@ -517,7 +517,7 @@ setup_server()
         currentNFSServer=$nfsServer 
     elif [ "$serverEnv" = "all_combined" ];then
         currentIPAServer=$ipaServerMaster
-        currentDNSServer=$ipaServerMasterIP
+        currentDNSServer=$ipaServerMaster
         currentNFSServer=$ipaServerMaster
     fi
     echo "ipa server : [$currentIPAServer]"

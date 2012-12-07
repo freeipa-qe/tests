@@ -88,6 +88,9 @@ rlJournalStart
         rlPhaseStartTest "Setup Master [$MASTER] [$MASTER_IPA]"
             rlPass "Master setup [$MASTER], no action necessary"
             rlLog "create automount locations for test use"
+            MYHOSTNAME="$MASTER_IPA"
+            rlLog "MYHOSTNAME=[$MYHOSTNAME]"
+            configurate_non_secure_NFS_Server
             rhts-sync-set -s 'master done'
             rlLog "master setup done"
         rlPhaseEnd 
@@ -97,6 +100,8 @@ rlJournalStart
             rlLog "waiting for master ..."
             rhts-sync-block -s 'master done' $MASTER # wait for signal "set up master done"
             rlLog "master is done, continue"
+            MYHOSTNAME="$ipaServerReplica"
+            rlLog "MYHOSTNAME=[$MYHOSTNAME]"
             rlPass "Replica setup [$REPLICA], no action necessary"
             rhts-sync-set -s 'replica done'
             rlLog "replica setup done"
@@ -107,6 +112,8 @@ rlJournalStart
             rlLog "waiting for masetr and replica ..."
             rhts-sync-block -s "master done" $MASTER
             rhts-sync-block -s "replica done" $REPLICA
+            MYHOSTNAME="$nfsServer"
+            rlLog "MYHOSTNAME=[$MYHOSTNAME]"
             rlLog "master and replica are both done, continue for NFS setup"
             configurate_non_secure_NFS_Server
             #setup_secure_NFS_Server #next step #to make nfs kerberized, we need configurate non secure nfs first
@@ -122,6 +129,8 @@ rlJournalStart
             rhts-sync-block -s "replica done" $REPLICA
             rhts-sync-block -s "nfs done" $NFS
             rlLog "master, replica and nfs are ready, continue testing"
+            MYHOSTNAME="$CLIENT_IPA"
+            rlLog "MYHOSTNAME=[$MYHOSTNAME]"
             KinitAsAdmin
             rlRun "ipa host-find" 0 "print out all ipa host before test, this is just to show test environment"
         rlPhaseEnd
