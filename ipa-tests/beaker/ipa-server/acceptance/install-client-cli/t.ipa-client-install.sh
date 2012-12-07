@@ -802,11 +802,11 @@ ipaclientinstall_ntpservice()
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-client-install-33-A [Negative] Verify that ntpdate was not called with the -d option"
-	# This test assumes that the date was set back two years at the beginning of this test.
-        # the current year should be stored in $currentyear 
+	# This test assumes that the date was set back two hourss at the beginning of this test.
+        # the current hour should be stored in $currenthour 
 
-	rlLog "Current year is $currentyear, Machine time is $(date)"
-	rlRun "date | grep $currentyear" 0 "Make sure the machine time contains the current year."
+	rlLog "Current hour is $currenthour, Machine time is $(date)"
+	rlRun "date +%H | grep $currenthour" 0 "Make sure the machine time contains the current hour."
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-client-install-34- [Negative] Verify ntp service with client uninstall"
