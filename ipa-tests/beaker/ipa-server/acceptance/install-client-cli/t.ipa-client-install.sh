@@ -796,21 +796,17 @@ ipaclientinstall_ntpservice()
 {
    rlPhaseStartTest "ipa-client-install-33- [Positive] Verify ntp service with client install"
         uninstall_fornexttest
-	ntpdate $MASTER
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         verify_ntpservice true
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-client-install-33-A [Negative] Verify that ntpdate was not called with the -d option"
-	# This is a tricky one to test for, as ntpdate called with the -d tag only produces one extra line in the sylog.
-	# Like this: Nov 13 16:36:15 epsilon ntpdate[4089]: ntpdate 4.2.6p4@1.2324-o Thu Oct  6 15:37:58 UTC 2011 (1
-	# This test will look for debug looking messages in /var/log/messages by looking for a line containing a combination of
-	#  "ntpdate" and the ntpdate version
+	# This test assumes that the date was set back two years at the beginning of this test.
+        # the current year should be stored in $currentyear 
 
-	ntpdatever=$(ntpdate -v| grep ntpdate\  | cut -d\  -f 6)
-	rlLog "ntpdate version we are looking for is $ntpdatever"
-	rlRun "grep ntpdate /var/log/messages | grep '$ntpdatever'" 1 " checking messages for debug running of ntpdate"
+	rlLog "Current year is $currentyear, Machine time is $(date)"
+	rlRun "date | grep $currentyear" 0 "Make sure the machine time contains the current year."
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-client-install-34- [Negative] Verify ntp service with client uninstall"

@@ -67,6 +67,11 @@ rlJournalStart
 	if [ $? -eq 0 ]; then
            # This machine is a client
 	   rlLog "I am a client"
+	   rlLog "syncing date"
+           ntpdate $NTPSERVER
+           export currentyear=$(date +%Y) # Get the current year to be used in a later test
+           date --set='-2 years' # Set the date on this machine back two years for ipa-client-install to fix later
+           rlLog "Current date is $(date)"
           if [ $slave_count -eq 3 ];then
            rlLog "Executing test cases with 1 Master and 3 Replicas"
            ipaclientinstall
