@@ -1,0 +1,53 @@
+<job retention_tag="scratch">
+    <notify>
+        <cc>
+            yzhang@redhat.com
+        </cc>
+    </notify>
+    <whiteboard>
+        ipa-server - cert automatic renew x86_64 (rhel6.4 release)
+    </whiteboard>
+    <recipeSet priority="Normal">
+        <recipe kernel_options="" kernel_options_post="" ks_meta="" role="None" whiteboard="ipa server - cert automatic renew">
+            <autopick random="false"/>
+            <watchdog/>
+            <packages/>
+            <ks_appends/>
+            <repos/>
+            <distroRequires>
+                <and>
+                    <distro_variant op="=" value="Server"/>
+                    <distro_arch op="=" value="x86_64"/>
+                    <distro_family op="=" value="RedHatEnterpriseLinux6"/>
+                </and>
+                <distro_virt op="=" value=""/>
+            </distroRequires>
+            <hostRequires>
+                <system_type value="Machine"/>
+            </hostRequires>
+            <partitions/>
+            <task name="/distribution/install" role="STANDALONE">
+                <params/>
+            </task>
+            <task name="/distribution/pkginstall" role="STANDALONE">
+                <params>
+                    <param name="PKGARGNAME" value="expect"/>
+                    <param name="PKGARGNAME" value="perl-LDAP"/>
+                    <param name="PKGARGNAME" value="perl-TimeDate"/>
+                </params>
+            </task>
+            <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+                <params/>
+            </task>
+            <task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+                <params/>
+            </task>
+            <task name="/CoreOS/ipa-server/acceptance/ipa-autorenewcert" role="MASTER">
+                <params>
+                    <param name="KILLTIMEOVERRIDE" value="8789333"/>
+                </params>
+            </task>
+        </recipe>
+    </recipeSet>
+</job>
+
