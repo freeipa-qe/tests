@@ -578,7 +578,6 @@ print_hostname_role_mapping()
     rlLog "-----------------------------------------"
 }
 
-
 print_logs()
 {
     for log in $logs
@@ -592,3 +591,29 @@ print_logs()
         fi
     done
 }
+
+setup_secure_NFS_Server()
+{
+    rlPhaseStartTest "setup secure (Kerberized) NFS server"
+        rlLog "Host Info: NFS [$NFS] [$NFS_IPA]"       
+        rlLog "MYROLE [$MYROLE], MYHOSTNAME [$MYHOSTNAME], MASTER [$MASTER]"
+        echo "============ Before config $nfsConfigFile  ========"
+        cat $nfsConfigFile
+        echo "$nfsConfiguration_Kerberized" > $nfsConfigFile
+        echo "============ After config $nfsConfigFile =========="
+        cat $nfsConfigFile
+        KinitAsAdmin
+        rlRun "ipa service-add $nfsServicePrinciple" 0 "add nfs service: $nfsServicePrinciple"
+        rlRun "ipa-getkeytab -s $MASTER -p $nfsServicePrinciple -k $keytabFile" 0 "get keytab file from master [$MASTER], for $nfsServicePrinciple, save it as [$keytabFile]"
+        rlRun "kinit -kt $keytabFile" 0 "verify keytab file with kinit -kt $keytabFile"
+        echo "======= klist -ket $keytabFile ======"
+        klist -ket /etc/krb5.keytab
+        replace_line "$nfsSystemConf" "#SECURE_NFS=yes" "SECURE_NFS=yes"
+        modify_sysconfig_nfs
+        rlLog "restart nfs"
+        service nfs restart
+        service nfs status
+        debuginfo 
+    rlPhaseEnd
+}
+

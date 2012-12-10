@@ -484,8 +484,10 @@ clientautomount_autofs_functional_test()
 #    do
 #        for current_nfsConfiguration in nfs_v3_non_secure nfs_v4_non_secure nfs_v4_kerberized
 #        do
-            current_serverEnv="all_combined"
-            current_nfsConfiguration="nfs_v3_non_secure"
+            #current_serverEnv="all_combined"
+            #current_nfsConfiguration="nfs_v3_non_secure"
+            current_serverEnv="combined_ipa_dns_standalone_nfs"
+            current_nfsConfiguration="nfs_v4_kerberized"
             setup_testing_environment $current_serverEnv $current_nfsConfiguration
             basic_autofs_functional_test
 #        done
@@ -499,7 +501,7 @@ setup_testing_environment()
     rlPhaseStartTest "autofs functional test env setup, [$serverEnv] - [$nfsConfiguration]"
         echo "::::::: configuration: server [$serverEnv], nfs [$nfsConfiguration] :::::::"
         setup_server $serverEnv
-        #setup_nfs $nfsConfiguration
+        setup_nfs $nfsConfiguration
         echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
     rlPhaseEnd
 }
@@ -534,22 +536,22 @@ setup_nfs()
         echo "NFS v3"
         configuration=$nfsConfiguration_NonSecure
         currentNFSMountOption="$nfsMountType_nfs3"
-        configure_nfs_non_secure "$configuration"
-        echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
-        service nfs restart
+        #configure_nfs_non_secure "$configuration"
+        #echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
+        #service nfs restart
     elif [ "$nfsConfiguration" = "nfs_v4_non_secure" ];then
         echo "NFS v4" 
         configuration=$nfsConfiguration_NonSecure
         currentNFSMountOption="$nfsMountType_nfs4"
-        configure_nfs_non_secure "$configuration"
-        echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
-        service nfs restart
+        #configure_nfs_non_secure "$configuration"
+        #echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
+        #service nfs restart
     elif [ "$nfsConfiguration" = "nfs_v4_kerberized" ];then
         echo "NFS v4 + kerberos"
         configuration="$nfsConfiguration_Kerberized"
         currentNFSMountOption="$nfsMountType_kerberized"
-        echo "$configuration" > $nfsConf
-        echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
+        #echo "$configuration" > $nfsConf
+        #echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
     fi
 }
 
