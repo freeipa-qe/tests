@@ -62,17 +62,17 @@ ipa_ssh_host_func_run()
 	ipa_ssh_host_func_0001 # New client added and host keys uploaded automatically to DNS
 	ipa_ssh_host_func_0002 # User ssh to client and sees valid keys match from DNS.
         # ATM this will still prompt until DNSSEC support added???
-	#ipa_ssh_host_func_0003 # Admin revokes/removes host keys
-	#ipa_ssh_host_func_0004 # User does not see key match from DNS
-	#ipa_ssh_host_func_0005 # Admin re-adds keys
-	#ipa_ssh_host_func_0006 # Host replaces keys
-	#ipa_ssh_host_func_0007 # User gets error/warning about key mismatch?
-	#ipa_ssh_host_func_0008 # host-mod add keys after host-disable
-	#ipa_ssh_host_func_0009 # ssh to/from host after host-disable
-	#ipa_ssh_host_func_0010 # host-mod add keys after host-del?
-	#ipa_ssh_host_func_0011 # ssh to/from host after host-del?
+	ipa_ssh_host_func_0003 # Admin revokes/removes host keys
+	ipa_ssh_host_func_0004 # User does not see key match from DNS
+	ipa_ssh_host_func_0005 # Admin re-adds keys
+	ipa_ssh_host_func_0006 # Host replaces keys
+	ipa_ssh_host_func_0007 # User gets error/warning about key mismatch?
+	ipa_ssh_host_func_0008 # host-mod add keys after host-disable
+	ipa_ssh_host_func_0009 # ssh to/from host after host-disable
+	ipa_ssh_host_func_0010 # host-mod add keys after host-del?
+	ipa_ssh_host_func_0011 # ssh to/from host after host-del?
 
-	#ipa_ssh_host_func_envcleanup
+	ipa_ssh_host_func_envcleanup
 }
 
 ipa_ssh_host_func_envsetup()
