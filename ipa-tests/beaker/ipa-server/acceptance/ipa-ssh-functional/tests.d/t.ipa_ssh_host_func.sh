@@ -90,6 +90,8 @@ ipa_ssh_host_func_envsetup()
 			rlRun "create_ipauser sshuser ssh user Passw0rd1"
 			rlRun "create_ipauser sshuser2 ssh user2 Passw0rd1"
 
+			rlRun "authconfig --enablemkhomedir --updateall"
+
 			KEYFILE=~sshuser/.ssh/id_rsa
 			rlRun "su - sshuser -c \"ssh-keygen -q -t rsa -N '' -C 'sshuser.$DOMAIN' -f $KEYFILE\""
 			rlRun "su - sshuser -c \"echo Passw0rd1|kinit sshuser\""
@@ -100,7 +102,6 @@ ipa_ssh_host_func_envsetup()
 			rlRun "su - sshuser2 -c \"echo Passw0rd1|kinit sshuser2\""
 			rlRun "su - sshuser2 -c \"ipa user-mod sshuser2 --sshpubkey='$(cat ${KEYFILE2}.pub)'\""
 
-			rlRun "authconfig --enablemkhomedir --updateall"
 			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 			;;
 		REPLICA*)
