@@ -52,7 +52,7 @@
 			</task>
 		</recipe>
 
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA_env1" whiteboard="REPLICA1">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA_env1" whiteboard="REPLICA">
 			<autopick random="false"/>
 			<watchdog panic="None"/>
 			<packages/>

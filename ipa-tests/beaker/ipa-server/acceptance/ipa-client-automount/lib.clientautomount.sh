@@ -571,10 +571,10 @@ print_hostname_role_mapping()
 {
     rlLog "--------- test host used ----------------"
     rlLog " current host [$CURRENT_HOST], role [$MYROLE]"
-    rlLog " MASTER : [$MASTER] [$Master_hostname] [$MASTER_IP]"
-    rlLog " REPLICA: [$REPLICA] [$Replica_hostname] [$REPLICA_IP]"
-    rlLog " NFS    : [$NFS] [$Nfs_hostname] [$NFS_IP]"
-    rlLog " CLIENT : [$CLIENT] [$Client_hostname] [$CLIENT_IP]"
+    rlLog " MASTER : [$MASTER] [$Master_hostname] IPA: [$MASTER_IPA] IP: [$MASTER_IP]"
+    rlLog " REPLICA: [$REPLICA] [$Replica_hostname] IPA: [$REPLICA_IPA] IP: [$REPLICA_IP]"
+    rlLog " NFS    : [$NFS] [$Nfs_hostname] IPA: [$NFS_IPA] IP: [$NFS_IP]"
+    rlLog " CLIENT : [$CLIENT] [$Client_hostname] IPA: [$CLIENT_IPA] IP: [$CLIENT_IP]"
     rlLog "-----------------------------------------"
 }
 
@@ -596,7 +596,7 @@ setup_secure_NFS_Server()
 {
     rlPhaseStartTest "setup secure (Kerberized) NFS server"
         rlLog "Host Info: NFS [$NFS] [$NFS_IPA]"       
-        rlLog "MYROLE [$MYROLE], MYHOSTNAME [$MYHOSTNAME], MASTER [$MASTER]"
+        rlLog "MYROLE [$MYROLE], MYHOSTNAME [$MYHOSTNAME], MASTER [$MASTER_IPA]"
         echo "============ Before config $nfsConfigFile  ========"
         cat $nfsConfigFile
         echo "$nfsConfiguration_Kerberized" > $nfsConfigFile
@@ -604,7 +604,7 @@ setup_secure_NFS_Server()
         cat $nfsConfigFile
         KinitAsAdmin
         rlRun "ipa service-add $nfsServicePrinciple" 0 "add nfs service: $nfsServicePrinciple"
-        rlRun "ipa-getkeytab -s $MASTER -p $nfsServicePrinciple -k $keytabFile" 0 "get keytab file from master [$MASTER], for $nfsServicePrinciple, save it as [$keytabFile]"
+        rlRun "ipa-getkeytab -s $MASTER_IPA -p $nfsServicePrinciple -k $keytabFile" 0 "get keytab file from master [$MASTER_IPA], for $nfsServicePrinciple, save it as [$keytabFile]"
         rlRun "kinit -kt $keytabFile" 0 "verify keytab file with kinit -kt $keytabFile"
         echo "======= klist -ket $keytabFile ======"
         klist -ket /etc/krb5.keytab
