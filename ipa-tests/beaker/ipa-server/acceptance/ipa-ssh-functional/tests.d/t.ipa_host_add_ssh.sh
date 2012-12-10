@@ -637,7 +637,10 @@ ipa_host_add_ssh_negative_0008()
 		SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\"" 0
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_badhost${NUMBER}_rsa.pub)\" > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: host with name \"badhost${NUMBER}.${DOMAIN}\" already exists" $tmpout
+		rlRun "cat $tmpout"
+		rlLog "Make sure it doesn't report that it added again"
+		rlAssertNotGrep "Added host \"badhost1.testrelm.com\"" $tmpout
+		rlAssertGrep "ipa: ERROR: IP address 2.2.4.${SMALLNUMBER} is already assigned in domain testrelm.com." $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)

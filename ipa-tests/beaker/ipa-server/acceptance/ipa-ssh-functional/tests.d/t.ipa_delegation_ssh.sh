@@ -330,7 +330,7 @@ ipa_delegation_ssh_0006()
 		rlLog "Machine in recipe is MASTER ($MASTER)"
 		rlRun "rm -f /tmp/ssh_rsa_${TESTUSER2}*"
 		rlRun "su - $TESTUSER1 -c \"ssh-keygen -t rsa -N '' -C $TESTUSER2@$DOMAIN -f /tmp/ssh_rsa_${TESTUSER2}\""
-		rlRun "su - $TESTUSER1 -c \"echo $TESTUSERPW|kinit $TESTUSER1; ipa user-mod $TESTUSER2 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER2}.pub)'\" > $tmpout 2>&1"
+		rlRun "su - $TESTUSER1 -c \"echo $TESTUSERPW|kinit $TESTUSER1; ipa user-mod $TESTUSER2 --sshpubkey='$(cat /tmp/ssh_rsa_${TESTUSER2}.pub)'\" > $tmpout 2>&1" 1
 		KEYCHK=$(ipa user-show $TESTUSER2 --raw|grep "ipasshpubkey.*$(awk '{print $2}' /tmp/ssh_rsa_${TESTUSER2}.pub)"|wc -l)
 		rlRun "cat $tmpout"
 		rlAssertGrep "ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'ipaSshPubKey' attribute" $tmpout

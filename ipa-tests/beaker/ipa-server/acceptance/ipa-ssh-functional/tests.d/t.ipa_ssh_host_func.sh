@@ -89,6 +89,17 @@ ipa_ssh_host_func_envsetup()
 			rlRun "KinitAsAdmin"
 			rlRun "create_ipauser sshuser ssh user Passw0rd1"
 			rlRun "create_ipauser sshuser2 ssh user2 Passw0rd1"
+
+			KEYFILE=~sshuser/.ssh/id_rsa
+			rlRun "su - sshuser -c \"ssh-keygen -q -t rsa -N '' -C 'sshuser.$DOMAIN' -f $KEYFILE\""
+			rlRun "su - sshuser -c \"echo Passw0rd1|kinit sshuser\""
+			rlRun "su - sshuser -c \"ipa user-mod sshuser --sshpubkey='$(cat ${KEYFILE}.pub)'\""
+
+			KEYFILE2=~sshuser2/.ssh/id_rsa
+			rlRun "su - sshuser2 -c \"ssh-keygen -q -t rsa -N '' -C 'sshuser2.$DOMAIN' -f $KEYFILE2\""
+			rlRun "su - sshuser2 -c \"echo Passw0rd1|kinit sshuser2\""
+			rlRun "su - sshuser2 -c \"ipa user-mod sshuser2 --sshpubkey='$(cat ${KEYFILE2}.pub)'\""
+
 			rlRun "authconfig --enablemkhomedir --updateall"
 			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 			;;
@@ -174,7 +185,7 @@ ipa_ssh_host_func_0002()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
-		rlRun "su - sshuser -c \"ssh $CLIENT 'hostname'\"|grep $CLIENT"	
+		rlRun "su - sshuser -c \"kdestroy; ssh $CLIENT 'hostname'\"|grep $CLIENT"	
 		
 		expfile=/tmp/sshhosttest.exp
 		cat > $expfile <<-EOF

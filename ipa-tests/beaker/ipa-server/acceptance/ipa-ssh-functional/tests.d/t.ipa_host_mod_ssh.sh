@@ -413,8 +413,9 @@ ipa_host_mod_ssh_negative_0001()
 		rlRun "ipa host-add badhost${NUMBER}.${DOMAIN} --ip-address=2.2.4.${SMALLNUMBER} --sshpubkey=\"$(cat /tmp/ssh_host${NUMBER}_rsa.pub)\""
 		rlRun "ipa host-mod badhost${NUMBER}.${DOMAIN} --sshpubkey=\"$BADKEY\" > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: invalid 'sshpubkey': invalid SSH public key" $tmpout
-		rlRun "ipa host-show badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 2
-		rlAssertGrep "ipa: ERROR: badhost${NUMBER}.${DOMAIN}: host not found" $tmpout
+		rlRun "ipa host-show --all badhost${NUMBER}.${DOMAIN} > $tmpout 2>&1" 
+		rlLog "Make sure IPA still shows original key"
+		rlAssertGrep "$(awk '{print $2}' /tmp/ssh_host${NUMBER}_rsa.pub)" $tmpout
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
 	SLAVE*|REPLICA*)
