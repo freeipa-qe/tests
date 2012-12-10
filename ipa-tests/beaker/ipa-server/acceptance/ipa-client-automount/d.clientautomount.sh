@@ -28,6 +28,10 @@ nfsMountType_nfs3=" --type nfs "
 nfsMountType_nfs4=" --type nfs4 "
 nfsMountType_kerberized=" --type nfs4 -o sec=${nfs_RPCGSS_security_flavors} "
 
+automountKey_non_secure_options="-rw,soft,rsize=8192,wsize=8192 "
+automountKey_krb5_options="-rw,soft,fstype=nfs4,sec=${nfs_RPCGSS_security_flavors} "
+automountKey_mount_option="$automountKey_non_secure_options"
+
 autofsTopDir="/ipashare"
 autofsSubDir="public"
 autofsDir="$autofsTopDir/$autofsSubDir"

@@ -536,6 +536,7 @@ setup_nfs()
         echo "NFS v3"
         configuration=$nfsConfiguration_NonSecure
         currentNFSMountOption="$nfsMountType_nfs3"
+        automountKey_mount_option="$automountKey_non_secure_options"
         #configure_nfs_non_secure "$configuration"
         #echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
         #service nfs restart
@@ -543,6 +544,7 @@ setup_nfs()
         echo "NFS v4" 
         configuration=$nfsConfiguration_NonSecure
         currentNFSMountOption="$nfsMountType_nfs4"
+        automountKey_mount_option="$automountKey_non_secure_options"
         #configure_nfs_non_secure "$configuration"
         #echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
         #service nfs restart
@@ -550,6 +552,7 @@ setup_nfs()
         echo "NFS v4 + kerberos"
         configuration="$nfsConfiguration_Kerberized"
         currentNFSMountOption="$nfsMountType_kerberized"
+        automountKey_mount_option="$automountKey_krb5_options"
         #echo "$configuration" > $nfsConf
         #echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
     fi

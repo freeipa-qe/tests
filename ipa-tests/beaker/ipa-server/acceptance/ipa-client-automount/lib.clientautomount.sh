@@ -10,7 +10,7 @@ configure_autofs_indirect(){
     ipa automountlocation-add $name
     ipa automountmap-add $name auto.share
     ipa automountkey-add $name auto.master --key=${autofsTopDir} --info=auto.share
-    ipa automountkey-add $name auto.share --key=${autofsSubDir} --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsDir}"
+    ipa automountkey-add $name auto.share --key=${autofsSubDir} --info="$automountKey_mount_option ${nfsHost}:${nfsDir}"
     show_autofs_configuration $name
 #    how_to_check_autofs_mounting $name $nfsHost $nfsDir $autofsDir
 }
@@ -24,7 +24,7 @@ configure_autofs_indirect_use_wildcard(){
     ipa automountlocation-add $name
     ipa automountmap-add $name auto.share
     ipa automountkey-add $name auto.master --key=${autofsTopDir} --info=auto.share
-    ipa automountkey-add $name auto.share --key=* --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsTopDir}/&"
+    ipa automountkey-add $name auto.share --key=* --info="$automountKey_mount_option ${nfsHost}:${nfsTopDir}/&"
     show_autofs_configuration $name
 #    how_to_check_autofs_mounting $name $nfsHost $nfsDir $autofsDir
 }
@@ -37,7 +37,7 @@ configure_autofs_indirect2(){
     echo "location [$name] : nfs server [$nfsHost] : nfs dir [$nfsDir] : autofs local dir [$autofsDir] "
     ipa automountlocation-add $name
     ipa automountmap-add-indirect $name auto.share --mount=${autofsTopDir} --parentmap=auto.master
-    ipa automountkey-add $name auto.share --key=${autofsSubDir} --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsDir}"
+    ipa automountkey-add $name auto.share --key=${autofsSubDir} --info="$automountKey_mount_option ${nfsHost}:${nfsDir}"
     show_autofs_configuration $name
 #    how_to_check_autofs_mounting $name $nfsHost $nfsDir $autofsDir
 }
@@ -51,7 +51,7 @@ configure_autofs_direct(){
     echo "location [$name] : nfs server [$nfsHost] : nfs dir [$nfsDir] : autofs local dir [$autofsDir] "
     ipa automountlocation-add $name
     ipa automountmap-add $name auto.direct
-    ipa automountkey-add $name auto.direct --key=$autofsDir --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsDir}"
+    ipa automountkey-add $name auto.direct --key=$autofsDir --info="$automountKey_mount_option ${nfsHost}:${nfsDir}"
     show_autofs_configuration $name
 #    how_to_check_autofs_mounting $name $nfsHost $nfsDir $autofsDir
 }
@@ -483,8 +483,11 @@ replace_line(){
 
 modify_sysconfig_nfs()
 {
-    replace_line $nfsSystemConf "RPCGSSDARGS=\"\"" "RPCGSSDARGS=\"-vvv\""
-    replace_line $nfsSystemConf "RPCSVCGSSDARGS=\"\"" "RPCSVCGSSDARGS=\"-vvv\""
+    replace_line $nfsSystemConf "#RPCGSSDARGS=\"\"" "RPCGSSDARGS=\"-vvv\""
+    replace_line $nfsSystemConf "#RPCSVCGSSDARGS=\"\"" "RPCSVCGSSDARGS=\"-vvv\""
+    echo "========== content of $nfsSystemConf ==============="
+    grep -v "^#" $nfsSystemConf
+    echo "===================================================="
 }
 
 start_nfs_in_kereberized_mode(){

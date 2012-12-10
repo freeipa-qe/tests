@@ -12,8 +12,7 @@ hostPrinciple="host/${hostname}@${realm}"
 suffix="dc=yzhang,dc=redhat,dc=com"
 
 automountLocationA="yztest${id}"
-ipaServerMaster="apple.yzhang.redhat.com"
-ipaServerMasterIP="192.168.122.101"
+ipaServerMaster="banana.yzhang.redhat.com"
 dnsServer="192.168.122.101"
 nfsServer=$ipaServerMaster
 nfsExportTopDir="/share"
@@ -35,7 +34,7 @@ currentDNSServer=$dnsServer
 currentNFSServer=$nfsServer
 currentNFSMountOption=""
 currentNFSFileName="ipaserver.txt"
-currentNFSFileSecret="this is my id" 
+currentNFSFileSecret="this_is_nfs_file_secret" 
 
 echobold(){
     echo -n -e "\033[1m"
@@ -53,7 +52,8 @@ configure_autofs_indirect(){
     ipa automountlocation-add $name
     ipa automountmap-add $name auto.share
     ipa automountkey-add $name auto.master --key=${autofsTopDir} --info=auto.share
-    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
+    #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
+    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5  ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
     show_autofs_configuration $name
 }
 
@@ -157,8 +157,8 @@ add_indirect_map()
         service sssd status
         service autofs restart
         verify_autofs_mounting
-        clean_up_indirect_map $currentLocation $autofsTopDir $autofsSubDir
-        clean_up_automount_installation
+        #clean_up_indirect_map $currentLocation $autofsTopDir $autofsSubDir
+        #clean_up_automount_installation
 }
 
 install_ipa_client()
