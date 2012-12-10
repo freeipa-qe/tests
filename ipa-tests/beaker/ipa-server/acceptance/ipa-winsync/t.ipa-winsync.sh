@@ -57,6 +57,7 @@ firstname="ipauser1"
 surname="user"
 userpw="Secret123"
 userpw2="Dec3yp12"
+userpw3="Enc3ypt39"
 
 PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
@@ -439,7 +440,8 @@ rlPhaseStartTest "0009 Update Password"
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
 	sleep 30
-	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw2 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep -i \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
+	FirstKinitAs $login $userpw2 $userpw3
+	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw3 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep -i \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
 
 rlPhaseEnd
 }
@@ -551,7 +553,8 @@ rlPhaseStartTest "0014 Using options force-sync, re-initialize, disconnect and d
 	rlRun "ipa user-show $aduser2" 0 "$aduser2 added in AD, synced to IPA with reinitialize option"
 
 	# Test clean up
-	rlRun "ipa user-del $aduser $aduser2"
+	rlRun "ipa user-del $aduser $aduser2" 0 "Deleting users from IPA and AD"
+	sleep 10
 
 	rlRun "ipa-replica-manage disconnect $ADhost" 0 "Disconnecting replica agreement"
 	sleep 15
@@ -689,6 +692,7 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "rm -fr /tmp/krb5cc_*"
+	rlrun "ipa_quick_uninstall" 0 "Uninstalling IPA server and Cleanup"
 
 rlPhaseEnd
 }
