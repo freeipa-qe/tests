@@ -624,19 +624,24 @@ final_cert_status_report(){
         reportCounter=$((reportCounter + 1 ))
     done
     if [ "`all_certs_are_valid`" = "no" ];then
-        for log in $logs
-        do
-            local nLines=150
-            echo ""
-            echo "============ last $nLines lines of $log ==================="
-            tail -n $nLines $log
-            echo ""
-        done
+        debuginfo
     else
         echo "No invalid certs found"
     fi
     echo "getcert list output:"
     getcert list
+}
+
+debuginfo()
+{
+    for log in $logs
+    do
+        local nLines=150
+        echo ""
+        echo "============ last $nLines lines of $log ==================="
+        tail -n $nLines $log
+        echo ""
+    done
 }
 
 all_certs_are_valid(){
@@ -952,9 +957,11 @@ test_ipa_via_creating_new_cert(){
         else
             echo "[step 2/4 second try] still failed, report failure"
             rlFail "create service [$principal] failed"
+            debuginfo
         fi
     else
         rlFail "unknow error for step 2/4, add service, need more work here"
+        debuginfo
     fi
         
     echo "[step 3/4] create a cert request"
