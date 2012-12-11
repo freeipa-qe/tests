@@ -347,8 +347,8 @@ ipa_ssh_host_func_0005()
 		rlRun "sftp $CLIENT:/etc/ssh/ssh_host_dsa_key.pub /tmp/ssh_host_dsa_key.pub.$CLIENT"
 		rlRun "ipa host-mod $CLIENT --sshpubkey=\"$(cat /tmp/ssh_host_rsa_key.pub.$CLIENT), $(cat /tmp/ssh_host_dsa_key.pub.$CLIENT)\""
 		
-		RSAKEYFP=$(ssh-keygen -r $(hostname) -f /tmp/ssh_host_rsa_key.pub.$CLIENT|awk '{print $6}')
-		RSADNSFP=$(dig +short $(hostname) sshfp|grep "^1 1" |awk '{print $3}'|tr '[:upper:]' '[:lower:]')
+		RSAKEYFP=$(ssh-keygen -r $CLIENT -f /tmp/ssh_host_rsa_key.pub.$CLIENT|awk '{print $6}')
+		RSADNSFP=$(dig +short $CLIENT sshfp|grep "^1 1" |awk '{print $3}'|tr '[:upper:]' '[:lower:]')
 		if [ -z "$RSAKEYFP" -o -z "$RSADNSFP" ]; then
 			rlFail "RSA Key FP on host or in DNS is empty"
 		elif [ "$RSAKEYFP" = "$RSADNSFP" ]; then
@@ -357,8 +357,8 @@ ipa_ssh_host_func_0005()
 			rlFail "RSA Key FP on host does not match FP in DNS"
 		fi
 
-		DSAKEYFP=$(ssh-keygen -r $(hostname) -f /tmp/ssh_host_dsa_key.pub.$CLIENT|awk '{print $6}')
-		DSADNSFP=$(dig +short $(hostname) sshfp|grep "^2 1" |awk '{print $3}'|tr '[:upper:]' '[:lower:]')
+		DSAKEYFP=$(ssh-keygen -r $CLIENT -f /tmp/ssh_host_dsa_key.pub.$CLIENT|awk '{print $6}')
+		DSADNSFP=$(dig +short $CLIENT sshfp|grep "^2 1" |awk '{print $3}'|tr '[:upper:]' '[:lower:]')
 		if [ -z "$DSAKEYFP" -o -z "$DSADNSFP" ]; then
 			rlFail "DSA Key FP on host or in DNS is empty"
 		elif [ "$DSAKEYFP" = "$DSADNSFP" ]; then
@@ -452,6 +452,8 @@ ipa_ssh_host_func_0007()
 		rlAssertGrep "Offending RSA key in /var/lib/sss/pubconf/known_hosts" $tmpout
 		rlAssertGrep "RSA host key for $CLIENT has changed and you have requested strict checking." $tmpout
 		rlAssertGrep "Host key verification failed." $tmpout
+
+		rlRun "cat $tmpout"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
@@ -582,7 +584,7 @@ ipa_ssh_host_func_0010()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "KinitAsAdmin"
-		rlRun "ipa host-del $CLIENT"
+		rlRun "ipa host-del $CLIENT --updatedns"
 		rlRun "ssh-keygen -R $CLIENT -f /var/lib/sss/pubconf/known_hosts"
 
 		#rlRun "sftp -o StrictHostKeyChecking=no $CLIENT:/etc/ssh/ssh_host_rsa_key.pub /tmp/new_ssh_host_rsa_key.pub.$CLIENT"
