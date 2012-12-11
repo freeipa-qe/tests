@@ -553,6 +553,10 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
 	sleep 20
 	rlRun "$ipa user-show $aduser" 2 "$aduser is deleted from IPA server as well as expected"
 
+	# Test Cleanup
+	rlRun "addOU_ldif $OU1 delete"
+        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Delete OU $OU1"
+
 rlPhaseEnd
 }
 
