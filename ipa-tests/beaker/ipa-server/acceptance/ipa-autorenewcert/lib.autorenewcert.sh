@@ -641,13 +641,26 @@ final_cert_status_report(){
 
 all_certs_are_valid(){
     local all_are_valid="yes"
+    local current_valid_certs=""
     for cert in $allcerts
     do
         local state=`$cert status valid`
-        if [ "$state" != "valid" ];then
+        if [ "$state" = "valid" ];then
+            current_valid_certs="$current_valid_certs $cert " #collect current valid certs
+        fi
+        #local state=`$cert status valid`
+        #if [ "$state" != "valid" ];then
+        #    all_are_valid="no"
+        #fi
+    done 
+    # all certs should appear in this collected current valid cert string
+    for cert in $allcerts
+    do
+        if ! echo "$current_valid_certs" | grep "$cert" 2>&1 > /dev/null
+        then
             all_are_valid="no"
         fi
-    done 
+    done
     echo $all_are_valid
 }
 
