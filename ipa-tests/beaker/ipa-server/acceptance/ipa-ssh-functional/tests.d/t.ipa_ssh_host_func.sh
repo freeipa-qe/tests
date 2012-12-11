@@ -256,6 +256,7 @@ ipa_ssh_host_func_0003()
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
+		rlRun "KinitAsAdmin"
 		rlRun "ipa host-mod $CLIENT --sshpubkey="
 		#rlRun "service sssd stop"
 		#rlRun "rm -f /var/lib/sss/db/*"
