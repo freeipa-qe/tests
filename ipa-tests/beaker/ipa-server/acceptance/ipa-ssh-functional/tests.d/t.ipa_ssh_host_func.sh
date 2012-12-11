@@ -449,7 +449,7 @@ ipa_ssh_host_func_0007()
 		rm -f $expfile
 
 		rlAssertGrep "WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!" $tmpout
-		rlAssertGrep "Offending RSA key in /var/lib/sss/pubconf/known_hosts" $tmpout
+		rlAssertGrep "Offending key in /var/lib/sss/pubconf/known_hosts" $tmpout
 		rlAssertGrep "RSA host key for $CLIENT has changed and you have requested strict checking." $tmpout
 		rlAssertGrep "Host key verification failed." $tmpout
 
