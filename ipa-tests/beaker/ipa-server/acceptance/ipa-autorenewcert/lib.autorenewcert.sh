@@ -936,7 +936,7 @@ test_ipa_via_creating_new_cert(){
         rlFail "[$host] not found in ipa server"
     fi
     echo "[step 2/4] add a test service add service: [$principal], sometimes there are some random failures for this"
-    local serviceAddResult=`ipa service-add $principal`
+    local serviceAddResult=`ipa service-add $principal 2>&1`
     if echo $serviceAddResult | grep "Added service" 
     then
         echo "[step 2/4 result] success, service [$principal] added"
@@ -944,6 +944,7 @@ test_ipa_via_creating_new_cert(){
     elif echo $serviceAddResult | grep -i "Host does not have corresponding DNS A record"
     then
         echo "[step 2/4 result] failed:, it reports no DNS A record, weird, try same command again"
+        ipa dnsrecord-find $DOMAIN
         ipa service-add $principal
         if [ $? = 0 ];then
             echo "[step 2/4 second try] success, gosh.."
