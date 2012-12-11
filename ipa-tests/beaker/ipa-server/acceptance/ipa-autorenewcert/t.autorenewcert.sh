@@ -43,7 +43,9 @@ autorenewcert()
         start_ipa_server "After autorenew, start ipa, expect automatic cert renew happening in background"
         
         go_to_sleep
-        restart_ipa_server "After autorenew, restart ipa, give ipa serverr second chance to kick off automatic renew"
+        restart_ipa_server "After autorenew, 1st restart ipa, give ipa serverr second chance to kick off automatic renew"
+        go_to_sleep
+        restart_ipa_server "After autorenew, 2nd restart ipa, give ipa serverr third  chance to kick off automatic renew"
         go_to_sleep
 
         stop_ipa_server "Before postExpire, system time will change soon, to verify the renewed certs"
