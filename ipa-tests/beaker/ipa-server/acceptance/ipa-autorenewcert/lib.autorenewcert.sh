@@ -355,46 +355,39 @@ adjust_system_time(){
     rlPhaseEnd
 }
 
-stop_ipa_server(){
-    rlPhaseStartTest "autorenewcert round [$testroundCounter] - stop_ipa_server ($@)"
-    local out=`ipactl stop 2>&1`
-    sleep 5 # give system some time so ipa server can fully stopped
-    if echo $out | grep "Aborting ipactl"
-    then
-        rlFail "stop ipa server Failed"
-    else
-        rlPass "stop ipa server Success"
-    fi
-    sleep 5 # give system some time so ipa server can fully stopped
+stop_ipa_certmonger_server(){
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - stop_ipa_certmonger_server ($@)"
+        rlRun "service certmonger stop" 0 "stop certmonger service before ipa server fully stopped"
+        sleep 5 # give system some time so ipa server can fully stopped
+        local out=`ipactl stop 2>&1`
+        if echo $out | grep "Aborting ipactl"
+        then
+            rlFail "stop ipa server Failed"
+        else
+            rlPass "stop ipa server Success"
+        fi
+        sleep 5 # give system some time so ipa server can fully stopped
     rlPhaseEnd
 }
 
-start_ipa_server(){
-    rlPhaseStartTest "autorenewcert round [$testroundCounter] - start_ipa_server ($@)" 
-    local out=`ipactl start 2>&1`
-    sleep 5 # give system some time so ipa server can fully stopped
-    if echo $out | grep "Aborting ipactl"
-    then
-        rlFail "start ipa server Failed"
-    else
-        rlPass "start ipa server Success"
-    fi
-    sleep 5 # give system some time so ipa server can fully stopped
+start_ipa_certmonger_server(){
+    rlPhaseStartTest "autorenewcert round [$testroundCounter] - start_ipa_certmonger_server ($@)" 
+        local out=`ipactl start 2>&1`
+        sleep 5 # give system some time so ipa server can fully stopped
+        if echo $out | grep "Aborting ipactl"
+        then
+            rlFail "start ipa server Failed"
+        else
+            rlPass "start ipa server Success"
+            rlRun "service certmonger start" 0 "start certmonger service after ipa server started"
+            sleep 5 #give system some time
+        fi
     rlPhaseEnd
 }
 
-restart_ipa_server(){
-    rlPhaseStartTest "autorenewcert round [$testroundCounter] - restart_ipa_server ($@)" 
-    local out=`ipactl restart 2>&1`
-    sleep 5 # give system some time so ipa server can fully stopped
-    if echo $out | grep "Aborting ipactl"
-    then
-        rlFail "restart ipa server Failed"
-    else
-        rlPass "restart ipa server Success"
-    fi
-    sleep 5 # give system some time so ipa server can fully stopped
-    rlPhaseEnd
+restart_ipa_certmonger_server(){
+    stop_ipa_certmonger_server "$@"
+    start_ipa_certmonger_server "$@"
 }
 
 go_to_sleep(){
