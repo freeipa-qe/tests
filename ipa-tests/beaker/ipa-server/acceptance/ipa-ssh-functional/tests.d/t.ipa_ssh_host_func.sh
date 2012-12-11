@@ -585,6 +585,7 @@ ipa_ssh_host_func_0010()
 
 		rlRun "KinitAsAdmin"
 		rlRun "ipa host-del $CLIENT --updatedns"
+		rlRun "ipa dnsrecord-del $DOMAIN $(echo $CLIENT|cut -f1 -d.) --del-all"
 		rlRun "ssh-keygen -R $CLIENT -f /var/lib/sss/pubconf/known_hosts"
 
 		#rlRun "sftp -o StrictHostKeyChecking=no $CLIENT:/etc/ssh/ssh_host_rsa_key.pub /tmp/new_ssh_host_rsa_key.pub.$CLIENT"
