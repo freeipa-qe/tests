@@ -592,6 +592,8 @@ ipa_ssh_host_func_0010()
 		rlRun "ipa host-mod $CLIENT --updatedns --sshpubkey=\"$(cat /tmp/new_ssh_host_rsa_key.pub.$CLIENT), $(cat /tmp/new_ssh_host_dsa_key.pub.$CLIENT)\" > $tmpout 2>&1" 2
 		
 		rlAssertGrep "ipa: ERROR:.*DNS resource record not found" $tmpout
+		rlAssertGrep "ipa: ERROR: $(echo $CLIENT|cut -f1 -d.): DNS resource record not found" $tmpout
+		rlRun "cat $tmpout"
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
