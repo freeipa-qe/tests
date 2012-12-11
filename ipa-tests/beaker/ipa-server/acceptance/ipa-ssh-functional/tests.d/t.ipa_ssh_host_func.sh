@@ -640,6 +640,7 @@ ipa_ssh_host_func_0011()
 
 		rlAssertGrep "No RSA host key is known for $CLIENT" $tmpout
 		rlAssertGrep "Host key verification failed." $tmpout
+		rlRun "cat $tmpout"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 		;;
