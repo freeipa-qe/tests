@@ -343,8 +343,8 @@ ipa_ssh_host_func_0005()
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		rlRun "KinitAsAdmin"
-		rlRun "sftp $CLIENT:/etc/ssh/ssh_host_rsa_key.pub /tmp/ssh_host_rsa_key.pub.$CLIENT"
-		rlRun "sftp $CLIENT:/etc/ssh/ssh_host_dsa_key.pub /tmp/ssh_host_dsa_key.pub.$CLIENT"
+		rlRun "sftp -o StrictHostKeyChecking=no $CLIENT:/etc/ssh/ssh_host_rsa_key.pub /tmp/ssh_host_rsa_key.pub.$CLIENT"
+		rlRun "sftp -o StrictHostKeyChecking=no $CLIENT:/etc/ssh/ssh_host_dsa_key.pub /tmp/ssh_host_dsa_key.pub.$CLIENT"
 		rlRun "ipa host-mod $CLIENT --sshpubkey=\"$(cat /tmp/ssh_host_rsa_key.pub.$CLIENT), $(cat /tmp/ssh_host_dsa_key.pub.$CLIENT)\""
 		
 		RSAKEYFP=$(ssh-keygen -r $CLIENT -f /tmp/ssh_host_rsa_key.pub.$CLIENT|awk '{print $6}')
