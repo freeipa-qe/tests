@@ -186,8 +186,13 @@ EOF
 }
 
 deleteuser_ldif() {
+if [ -n $3 ]; then
+   dn="dn: CN=$1 $2,CN=$3,$ADdc"
+else
+   dn="dn: CN=$1 $2,CN=Users,$ADdc"
+fi
 cat > deleteuser.ldif << EOF
-dn: CN=$1 $2,CN=Users,$ADdc
+$dn
 changetype: delete
 EOF
 }
@@ -226,4 +231,14 @@ objectClass: organizationalUnit
 distinguishedName: OU=$1,OU=$2,$ADdc
 EOF
 fi
+}
+
+moveOU_ldif() {
+cat > moveOU.ldif << EOF
+dn: CN=$1 $2,CN=Users,$ADdc
+changetype: modrdn
+newrdn: CN=$1 $2
+deleteoldrdn: 1
+newsuperior: OU=$3,$ADdc
+EOF
 }

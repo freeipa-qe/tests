@@ -103,6 +103,7 @@ PACKAGE="ipa-server"
 		"winsync_test_0013"
 		"winsync_test_0014"
 		"winsync_test_0015"
+		"winsync_test_0016"
 	}
 
 
