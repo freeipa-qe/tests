@@ -316,14 +316,14 @@ rlPhaseStartTest "0005 Synchronization behaviour of account lock status"
 syncaccntdefault() {  
 	rlLog "Testing with Winsync account disable set to\"both\""
 	rlRun "acctdisable_ldif both" 0 "Creating ldif file to reset ipawinsyncacctdisable to \"both\""
-	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Resetting disabled account to sync to both servers"
+	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f acctdisable.ldif" 0 "Setting disabled account to sync to both servers"
         rlRun "$ipa user-show $aduser | grep \"Account disabled: False\"" 0 "$aduser is enabled on IPA"
 
 	# To disable account set userAccountControl to 514
-	rlRun "ADuser_cntrl_ldif $aduser ads 514"
+	rlRun "ADuser_cntrl_ldif $aduser ads 514" 0 "Creating ldif file for disabling $aduser"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Disable $aduser on AD"
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,CN=Users,$ADdc\" | grep \"userAccountControl: 514\"" 0 "$aduser disabled in AD"
-	rlRun "sleep 10" 0 "Waiting for sync"
+	rlRun "sleep 15" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "$ipa user-show $aduser | grep \"Account disabled: True\"" 0 "After sync $aduser disabled on IPA as well"
 	rlRun "$ipa user-enable $aduser"
@@ -441,9 +441,9 @@ rlPhaseStartTest "0009 Update Password"
 
 	rlLog "Update password in IPA"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
-	sleep 10
+	sleep $sec
 	FirstKinitAs $aduser2 $userpw2 $userpw3
-	sleep 10
+	sleep $sec
 	/usr/bin/kdestroy 2>&1 >/dev/null
 
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"CN=$aduser2 ads,CN=users,$ADdc\" -w $userpw3 -b \"CN=$aduser2 ads,CN=users,$ADdc\" | grep -i \"sAMAccountName: $aduser2\"" 0 "Verifying connection via TLS to AD server as user $aduser2" 0 "$aduser2 login with in AD with new password"
@@ -495,8 +495,8 @@ winsync_test_0012() {
 
 rlPhaseStartTest "0012 Delete User"
 	rlLog "Delete user from AD"
-	rlRun "ADuser_ldif $aduser ads $aduser delete"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Delete $aduser from AD"
+	rlRun "ADuserdel_ldif $aduser ads"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete $aduser from AD"
 	rlRun "sleep 25" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "$ipa user-show $aduser" 2 "User $aduser not found in IPA as expected"
@@ -511,8 +511,8 @@ rlPhaseStartTest "0012 Delete User"
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 0 "456 was in IPA and then added in AD after winsync, hence is not deleted from AD as expected"
 	sleep 5
 	# Making sure 456 is deleted from AD
-	rlRun "ADuser_ldif 456 ads 456 delete"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Manual deletion of user 456 from AD"
+	rlRun "ADuserdel_ldif 456 ads"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Manual deletion of user 456 from AD"
 rlPhaseEnd
 }
 
@@ -550,9 +550,10 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
 	rlRun "$ipa user-mod $aduser --phone=$phn_2" 0 "Modifying $aduser locally"
 	sleep 10
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,OU=$OU1,$ADdc\" telephoneNumber | grep $phn_4" 0 "Phone No. modification failed to sync on AD"
-	rlRun "ADuser_ldiff $aduser ads $aduser delete $OU1" 0 "Delete $aduser from the OU $OU1"
+	rlRun "ADuserdel_ldif $aduser ads $OU1" 0 "Create ldif file to delete $aduser"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete $aduser from the OU $OU1"
 	sleep 20
-	rlRun "$ipa user-show $aduser" 2 "$aduser is deleted from IPA server as well as expected"
+	rlRun "$ipa user-show $aduser" 2 "Deleting $aduser in OU $OU1 also deletes it from IPA server"
 
 	# Test Cleanup
 	rlRun "addOU_ldif $OU1 delete"
@@ -597,7 +598,7 @@ rlPhaseStartTest "0015 Using options force-sync, re-initialize, disconnect and d
 
 	# Test clean up
 	rlRun "$ipa user-del $aduser $aduser2" 0 "Deleting users from IPA and AD"
-	sleep 10
+	sleep 15
 
 	rlRun "ipa-replica-manage disconnect $ADhost" 0 "Disconnecting replica agreement"
 	sleep 15
@@ -657,7 +658,7 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 
 	# Test clean up
 	rlRun "$ipa user-del $l1user $sub1user"
-	sleep 10
+	sleep 15
 	rlRun "addsubOU_ldif $sub_OU1 $OU1 delete"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Delete sub OU $sub_OU1"
 	rlRun "addOU_ldif $OU1 delete"
@@ -706,7 +707,7 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 
 	# Test clean up
 	rlRun "$ipa user-del $l2user $sub2user"
-	sleep 10
+	sleep 15
         rlRun "addsubOU_ldif $sub_OU2 $OU2 delete"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Delete sub OU $sub_OU2"
         rlRun "addOU_ldif $OU2 delete"
@@ -737,7 +738,7 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "rm -fr /tmp/krb5cc_*"
-	rlrun "ipa_quick_uninstall" 0 "Uninstalling IPA server and Cleanup"
+	rlRun "ipa_quick_uninstall" 0 "Uninstalling IPA server and Cleanup"
 
 rlPhaseEnd
 }

@@ -45,7 +45,7 @@ net rpc service start PassSync -I $1 -U $2%$3
 }
 
 ADuser_ldif() {
-# $1 first name # $2 Surname # $3 Username # $4 changetype (add, modify, delete)
+# $1 first name # $2 Surname # $3 Username # $4 changetype (add/ modify)
 [ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,$ADdc"
 [ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,$ADdc"
 [ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,$ADdc"
@@ -67,9 +67,9 @@ EOF
 }
 
 ADuserdel_ldif() {
-[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,$ADdc"
-[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,$ADdc"
-[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,$ADdc"
+[ $# -eq 4 ] && DN="CN=$1 $2,OU=$4,OU=$3,$ADdc"
+[ $# -eq 3 ] && DN="CN=$1 $2,OU=$3,$ADdc"
+[ $# -eq 2 ] && DN="CN=$1 $2,CN=Users,$ADdc"
 cat > ADuserdel.ldif << EOF
 dn: $DN
 changetype: delete
@@ -87,6 +87,7 @@ EOF
 #unicodePwd::$PASSWD
 #EOF
 #}
+
 ADuser_passwd_ldif() {
 PASSWD=`echo -n \"$3\" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
 [ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,OU=$4,$ADdc"
@@ -184,18 +185,6 @@ add: uidNumber
 uidNumber: $3
 EOF
 }
-
-#deleteuser_ldif() {
-#if [ -n $3 ]; then
-#   dn="dn: CN=$1 $2,CN=$3,$ADdc"
-#else
-#   dn="dn: CN=$1 $2,CN=Users,$ADdc"
-#fi
-#cat > deleteuser.ldif << EOF
-#$dn
-#changetype: delete
-#EOF
-#}
 
 addOU_ldif() {
 if [ $2 = delete ]; then
