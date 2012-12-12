@@ -115,8 +115,8 @@ ipa_join_1004()
         local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
 	local short_host=`hostname -s`
 	local CLIENTIP=$(hostname -I | awk '{print $1}')
-	rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa dnsrecord-add $DOMAIN $short_host --a-ip-address=$CLIENTIP\""
-	rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\""
+	#rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa dnsrecord-add $DOMAIN $short_host --a-ip-address=$CLIENTIP\""
+	#rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\""
         rlRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$OTP" 0 "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
