@@ -37,11 +37,11 @@
 
 # Commonly used routines
 PassSync_Restart() {
-net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
+net rpc service stop PassSync -I $1 -U $2%$3
 sleep 5
-net rpc service stop PassSync -I $ADip -U administrator%$ADpswd
+net rpc service stop PassSync -I $1 -U $2%$3
 sleep 5
-net rpc service start PassSync -I $ADip -U administrator%$ADpswd
+net rpc service start PassSync -I $1 -U $2%$3
 }
 
 ADuser_ldif() {
@@ -185,17 +185,17 @@ uidNumber: $3
 EOF
 }
 
-deleteuser_ldif() {
-if [ -n $3 ]; then
-   dn="dn: CN=$1 $2,CN=$3,$ADdc"
-else
-   dn="dn: CN=$1 $2,CN=Users,$ADdc"
-fi
-cat > deleteuser.ldif << EOF
-$dn
-changetype: delete
-EOF
-}
+#deleteuser_ldif() {
+#if [ -n $3 ]; then
+#   dn="dn: CN=$1 $2,CN=$3,$ADdc"
+#else
+#   dn="dn: CN=$1 $2,CN=Users,$ADdc"
+#fi
+#cat > deleteuser.ldif << EOF
+#$dn
+#changetype: delete
+#EOF
+#}
 
 addOU_ldif() {
 if [ $2 = delete ]; then

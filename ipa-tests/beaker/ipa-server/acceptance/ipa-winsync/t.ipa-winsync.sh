@@ -217,7 +217,8 @@ rlPhaseStartTest "0001 Creating winsync agreement"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd" 0 "Creating Winsync Agreement with valid cert"
 
 	# Restart PassSync after winsync agreement is established
-	rlRun "PassSync_Restart" 0 "Restarting PassSync Service"
+	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
+	rlRun "PassSync_Restart $ADip administrator $ADpswd" 0 "Restarting PassSync Service"
 
 rlPhaseEnd
 }
@@ -431,7 +432,7 @@ winsync_test_0009() {
 
 rlPhaseStartTest "0009 Update Password"
 	rlLog "Update password in AD"
-	rlRun "ADuser_passwd_ldif $ADfn $ADsn $userpw2"
+	rlRun "ADuser_passwd_ldif $ADfn $ADsn $userpw2" 0 "Creating update passwd ldif file"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Reset $ADfn passwd from AD"
 	sleep $sec
 	sleep 30
@@ -494,8 +495,8 @@ winsync_test_0012() {
 
 rlPhaseStartTest "0012 Delete User"
 	rlLog "Delete user from AD"
-	rlRun "deleteuser_ldif $aduser ads"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Delete $aduser from AD"
+	rlRun "ADuser_ldif $aduser ads $aduser delete"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Delete $aduser from AD"
 	rlRun "sleep 25" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "$ipa user-show $aduser" 2 "User $aduser not found in IPA as expected"
@@ -510,7 +511,7 @@ rlPhaseStartTest "0012 Delete User"
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=456 ads,CN=Users,$ADdc\"" 0 "456 was in IPA and then added in AD after winsync, hence is not deleted from AD as expected"
 	sleep 5
 	# Making sure 456 is deleted from AD
-	rlRun "deleteuser_ldif 456 ads"
+	rlRun "ADuser_ldif 456 ads 456 delete"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f deleteuser.ldif" 0 "Manual deletion of user 456 from AD"
 rlPhaseEnd
 }
@@ -532,7 +533,7 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
 	rlRun "ADuser_ldif $aduser ads $aduser add" 0 "Generate ldif file to add user $aduser"
         rlRun "ADuser_passwd_ldif $aduser ads $userpw" 0 "Generate ldif file for setting passwd for $aduser"
         rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
-        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser in AD to test options"
+        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser in AD"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser passwd"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
 	sleep 40
@@ -549,7 +550,7 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
 	rlRun "$ipa user-mod $aduser --phone=$phn_2" 0 "Modifying $aduser locally"
 	sleep 10
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,OU=$OU1,$ADdc\" telephoneNumber | grep $phn_4" 0 "Phone No. modification failed to sync on AD"
-	rlRun "deleteuser_ldif $aduser ads $OU1" 0 "Delete $aduser from OU $OU1"
+	rlRun "ADuser_ldiff $aduser ads $aduser delete $OU1" 0 "Delete $aduser from the OU $OU1"
 	sleep 20
 	rlRun "$ipa user-show $aduser" 2 "$aduser is deleted from IPA server as well as expected"
 
@@ -641,7 +642,8 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 	sleep 15
 
 	 # Restart PassSync after winsync agreement is established
-	rlRun "PassSync_Restart" 0 "Restarting PassSync Service"
+	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
+	rlRun "PassSync_Restart $ADip administrator $ADpswd" 0 "Restarting PassSync Service"
 	sleep 15
 
 	rlRun "$ipa user-show $l1user | grep \"Account disabled: False\"" 0 "$l1user from OU $OU1 synced and enabled in IPA"
@@ -668,7 +670,8 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 	sleep 15
 
 	 # Restart PassSync after winsync agreement is established
-	rlRun "PassSync_Restart" 0 "Restarting PassSync Service"
+	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
+	rlRun "PassSync_Restart $ADip administrator $ADpswd" 0 "Restarting PassSync Service"
 	sleep 10
 
 	rlRun "syncinterval_ldif $sec add"
