@@ -585,7 +585,7 @@ ipa_ssh_host_func_0010()
 
 		rlRun "KinitAsAdmin"
 		rlRun "ipa host-del $CLIENT"
-		rlRun "ipa dnsrecord-del $DOMAIN $(echo $CLIENT|cut -f1 -d.) --del-all"
+		#rlRun "ipa dnsrecord-del $DOMAIN $(echo $CLIENT|cut -f1 -d.) --del-all"
 		rlLog "Clearing sssd cache of previous host info"
 		rlRun "service sssd stop"
 		rlRun "ssh-keygen -R $CLIENT -f /var/lib/sss/pubconf/known_hosts"
