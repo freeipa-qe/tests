@@ -69,8 +69,8 @@ ipa_ssh_host_func_run()
 	ipa_ssh_host_func_0007 # User gets error/warning about key mismatch?
 	ipa_ssh_host_func_0008 # host-mod add keys after host-disable
 	ipa_ssh_host_func_0009 # ssh to/from host after host-disable
-	ipa_ssh_host_func_0010 # host-mod add keys after host-del?
-	ipa_ssh_host_func_0011 # ssh to/from host after host-del?
+	#ipa_ssh_host_func_0010 # host-mod add keys after host-del?
+	#ipa_ssh_host_func_0011 # ssh to/from host after host-del?
 
 	ipa_ssh_host_func_envcleanup
 }
