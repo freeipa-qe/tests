@@ -584,16 +584,17 @@ ipa_ssh_host_func_0010()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "KinitAsAdmin"
-		rlRun "ipa host-del $CLIENT --updatedns"
+		rlRun "ipa host-del $CLIENT"
 		rlRun "ipa dnsrecord-del $DOMAIN $(echo $CLIENT|cut -f1 -d.) --del-all"
+		rlLog "Clearing sssd cache of previous host info"
+		rlRun "service sssd stop"
 		rlRun "ssh-keygen -R $CLIENT -f /var/lib/sss/pubconf/known_hosts"
+		rlRun "rm -f /var/lib/sss/{db,mc}/*"
+		rlRun "service sssd start"
 
-		#rlRun "sftp -o StrictHostKeyChecking=no $CLIENT:/etc/ssh/ssh_host_rsa_key.pub /tmp/new_ssh_host_rsa_key.pub.$CLIENT"
-		#rlRun "sftp -o StrictHostKeyChecking=no $CLIENT:/etc/ssh/ssh_host_dsa_key.pub /tmp/new_ssh_host_dsa_key.pub.$CLIENT"
 		rlRun "ipa host-mod $CLIENT --updatedns --sshpubkey=\"$(cat /tmp/new_ssh_host_rsa_key.pub.$CLIENT), $(cat /tmp/new_ssh_host_dsa_key.pub.$CLIENT)\" > $tmpout 2>&1" 2
 		
-		rlAssertGrep "ipa: ERROR:.*DNS resource record not found" $tmpout
-		rlAssertGrep "ipa: ERROR: $(echo $CLIENT|cut -f1 -d.): DNS resource record not found" $tmpout
+		rlAssertGrep "ipa: ERROR: no such entry" $tmpout
 		rlRun "cat $tmpout"
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
