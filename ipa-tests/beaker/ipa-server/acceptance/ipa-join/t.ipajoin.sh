@@ -45,7 +45,7 @@ ipa_join_envsetup()
     rlPhaseStartSetup "ipa_join_envsetup"
         #environment setup starts here
         #install_ipa_client #ipa client host configuration has been take care of by ipa install script
-        rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID\" " 0 "kinit at remote ipa server as admin"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID\" " 0 "kinit at remote ipa server as admin"
         #environment setup ends   here
     rlPhaseEnd
 } #envsetup
@@ -60,7 +60,7 @@ ipa_join_envcleanup()
             rm $testKeytabfile
         fi
         delete_clientHostEntry_FromIPAServer
-        rlRun "ssh root@$serverFQDN \"kdestroy\"" 0 "remove kerboros ticket in remote server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"kdestroy\"" 0 "remove kerboros ticket in remote server"
         #environment cleanup ends   here
     rlPhaseEnd
 } #envcleanup
@@ -96,7 +96,7 @@ ipa_join_1003()
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
         local expectedErrMsg="Incorrect password"
         local expectedErrCode=15
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "we have to un-join before test starts"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "we have to un-join before test starts"
         #remove the client host record
         ssh root@$serverFQDN "ipa host-add $clientFQDN --password=$OTP"
         qaRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
@@ -115,8 +115,8 @@ ipa_join_1004()
         local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
 	local short_host=`hostname -s`
 	local CLIENTIP=$(hostname -I | awk '{print $1}')
-	rlRun "ssh root@$serverFQDN \"ipa dnsrecord-add $DOMAIN $short_host --a-ip-address=$CLIENTIP\""
-	rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\""
+	rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa dnsrecord-add $DOMAIN $short_host --a-ip-address=$CLIENTIP\""
+	rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\""
         rlRun "ipa-join --hostname=$hostname_TestValue  --bindpw=$OTP" 0 "test options:  [hostname]=[$hostname_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -129,7 +129,7 @@ ipa_join_1005()
         local testID="ipa_join_1005"
         local tmpout=$TmpDir/ipa_join_1005.$RANDOM.out
         KinitAsAdmin
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         rlRun "ipa-join --hostname=$hostname_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [keytab]=[$keytab_TestValue]" 
@@ -145,8 +145,8 @@ ipa_join_1006()
         local tmpout=$TmpDir/ipa_join_1006.$RANDOM.out
         #KinitAsAdmin
 
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN\" --password=$OTP" 0 "add $clientFQDN and set OTP"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN\" --password=$OTP" 0 "add $clientFQDN and set OTP"
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
@@ -249,7 +249,7 @@ ipa_join_1012()
         KinitAsAdmin
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue="$serverFQDN" #server;positive;FQDN
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue]" 
         Kcleanup
         rm $tmpout
@@ -267,8 +267,8 @@ ipa_join_1013()
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
         local expectedErrMsg="Incorrect password"
         local expectedErrCode=15
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -284,8 +284,8 @@ ipa_join_1014()
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue="$serverFQDN" #server;positive;FQDN
         local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -301,8 +301,8 @@ ipa_join_1015()
         local hostname_TestValue="$clientFQDN" #hostname;positive;FQDN
         local server_TestValue="$serverFQDN" #server;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
@@ -321,8 +321,8 @@ ipa_join_1016()
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
         local expectedErrMsg="Incorrect password"
         local expectedErrCode=15
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -339,8 +339,8 @@ ipa_join_1017()
         local server_TestValue="$serverFQDN" #server;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --hostname=$hostname_TestValue  --server=$server_TestValue  --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [hostname]=[$hostname_TestValue] [server]=[$server_TestValue] [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -354,8 +354,8 @@ ipa_join_1018()
         local tmpout=$TmpDir/ipa_join_1018.$RANDOM.out
         KinitAsAdmin
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --keytab=$keytab_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
@@ -372,8 +372,8 @@ ipa_join_1019()
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
         local expectedErrMsg="Incorrect password"
         local expectedErrCode=15
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -388,8 +388,8 @@ ipa_join_1020()
         #KinitAsAdmin
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
         local bindpw_TestValue=$OTP #bindpw;positive;ValidPW
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --keytab=$keytab_TestValue  --bindpw=$bindpw_TestValue " 0 "test options:  [keytab]=[$keytab_TestValue] [bindpw]=[$bindpw_TestValue]" 
         #Kcleanup
         rm $tmpout
@@ -450,8 +450,8 @@ ipa_join_1024()
         local tmpout=$TmpDir/ipa_join_1024.$RANDOM.out
         KinitAsAdmin
         local server_TestValue="$serverFQDN" #server;positive;FQDN
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --server=$server_TestValue " 0 "test options:  [server]=[$server_TestValue]" 
         Kcleanup
         rm $tmpout
@@ -468,8 +468,8 @@ ipa_join_1025()
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
         local expectedErrMsg="Incorrect password"
         local expectedErrCode=15
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP\"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --server=$server_TestValue  --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [server]=[$server_TestValue] [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
@@ -498,8 +498,8 @@ ipa_join_1027()
         KinitAsAdmin
         local server_TestValue="$serverFQDN" #server;positive;FQDN
         local keytab_TestValue="$testKeytabfile" #keytab;positive;ValidKeytab
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN \"" 0 "add $clientFQDN from ipa server"
         rlRun "ipa-join --server=$server_TestValue  --keytab=$keytab_TestValue " 0 "test options:  [server]=[$server_TestValue] [keytab]=[$keytab_TestValue]" 
         Kcleanup
         rm $tmpout
@@ -514,8 +514,8 @@ ipa_join_1028()
         local bindpw_TestValue_Negative="WrongPassword" #bindpw;negative;InvalidPW
         local expectedErrMsg="Incorrect password"
         local expectedErrCode=15
-        rlRun "ssh root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
-        rlRun "ssh root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-del $clientFQDN\"" 0 "delete $clientFQDN from ipa server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"ipa host-add $clientFQDN --password=$OTP \"" 0 "add $clientFQDN from ipa server"
         qaRun "ipa-join --bindpw=$bindpw_TestValue_Negative " "$tmpout" $expectedErrCode "$expectedErrMsg" "test options:  [bindpw]=[$bindpw_TestValue_Negative]" 
         #Kcleanup
         rm $tmpout
