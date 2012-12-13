@@ -735,7 +735,7 @@ netgroup_mod_positive()
 		rlRun "ipa netgroup-show $ngroup1 --all | grep \"Member Group:\" | grep \"$user2\"" 1 "Verifying memberuser deleted from $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_018: Remove memberuser attributes with setattr on netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_018: Remove memberuser attributes with setattr on netgroup [BZ 887015]"
 		rlLog "Executing: ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1"
 		rlRun "ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1" 0 "removing memberuser attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
@@ -757,7 +757,7 @@ netgroup_mod_positive()
 		rlRun "ipa netgroup-show $ngroup1 --all | grep \"Member Group:\" | grep \"$group2\"" 1 "Verifying memberuser group deleted from $ngroup1"
 	rlPhaseEnd
 	
-	rlPhaseStartTest "netgroup_mod_positive_022: Remove memberuser attributes with setattr on netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_022: Remove memberuser attributes with setattr on netgroup [BZ 887015]"
 		rlLog "Exceuting: ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1"
 		rlRun "ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1" 0 "removing memberuser attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
@@ -787,7 +787,7 @@ netgroup_mod_positive()
 		rlRun "ipa netgroup-show $ngroup1 | grep \"Member Host\" | grep -v \"$host2\"" 0 "Verify memberhost was deleted"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_026: Remove memberhost attributes with setattr on netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_026: Remove memberhost attributes with setattr on netgroup [BZ 887015]"
 		rlLog "Executing: ipa netgroup-mod --setattr=memberhost=\"\" $ngroup1"
 		rlRun "ipa netgroup-mod --setattr=memberhost=\"\" $ngroup1" 0 "removing memberhost attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\"" 1 "Verifying setattr removed all member hosts on $ngroup1"
@@ -831,7 +831,7 @@ netgroup_mod_positive()
 		rlRun "ipa netgroup-show $ngroup1|grep \"Member Hostgroup:\" | grep -v $hgroup2" 0 "Verifying one hostgroup deleted from netgroup"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_034: Modify netgroup to clear member hostgroup"
+	rlPhaseStartTest "netgroup_mod_positive_034: Modify netgroup to clear member hostgroup [BZ 887015]"
 		rlLog "Executing: ipa netgroup-mod $ngroup1 --setattr=memberhost=\"\"" 
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=memberhost=\"\"" 0 "Set initial memberhost to hostgroup for $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1|grep -v \"Member Hostgroup:\"" 0 "Verify hostgroup set for initial member host"
@@ -856,7 +856,7 @@ netgroup_mod_positive()
 		rlRun "ipa netgroup-show $ngroup1 | grep \"Member netgroups:\" | grep -v \"$ngroup3\"" 0 "Verifying member netgroup deleted from netgroup"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_038: Modify netgroup to clear member netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_038: Modify netgroup to clear member netgroup [BZ 887015]"
 		rlLog "Executing: ipa netgroup-mod $ngroup1 --setattr=member=\"\"" 
 		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=\"\"" 0 "Modify netgroup to set initial member to netgroup"
 		rlRun "ipa netgroup-show $ngroup1|grep -v \"Member netgroups:\"" 0 "Verify netgroup set for initial member host"
