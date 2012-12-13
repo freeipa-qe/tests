@@ -316,7 +316,7 @@ netgroup_add_negative()
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_010: Verify fail on netgroup-add with invalid setattr value"
-		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=badvalue > $tmpout 2>&1" 1
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberhost=badvalue > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: memberhost: Invalid syntax." $tmpout
 	rlPhaseEnd
 	
@@ -326,8 +326,8 @@ netgroup_add_negative()
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_012: Verify fail on netgroup-add with invalid addattr value"
-		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=memberHost=badvalue > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --addattr=memberhost=badvalue > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberhost: Invalid syntax." $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_013: Verify fail on netgroup-add with invalid addattr attr"
@@ -351,18 +351,18 @@ netgroup_add_negative()
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_add_negative_016: Verify fail on netgroup-add with setattr invalid value, valid addattr and all"
-		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=badvalue --addattr=memberHost=fqdn=hostname.$DOMAIN --all > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberhost=badvalue --addattr=memberhost=fqdn=hostname.$DOMAIN --all > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberhost: Invalid syntax." $tmpout
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_add_negative_017: Verify fail on netgroup-add with valid setattr, invalid addattr value, and raw"
-		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=fqdn=hostname.$DOMAIN --addattr=memberHost=badvalue --raw > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberhost=fqdn=hostname.$DOMAIN --addattr=memberhost=badvalue --raw > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberhost: Invalid syntax." $tmpout
 	rlPhaseEnd
 
 	rlPhaseStartTest "netgroup_add_negative_018: Verify fail on netgroup-add with valid setattr, invalid addattr value, all and raw"
-		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=fqdn=hostname.$DOMAIN --addattr=memberHost=badvalue --all --raw > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
+		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberhost=fqdn=hostname.$DOMAIN --addattr=memberhost=badvalue --all --raw > $tmpout 2>&1" 1
+		rlAssertGrep "ipa: ERROR: memberhost: Invalid syntax." $tmpout
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
@@ -714,30 +714,30 @@ netgroup_mod_positive()
 	rlPhaseEnd
 
 #### memberuser attr users
-	rlPhaseStartTest "netgroup_mod_positive_015: Set memberUser attribute on netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_015: Set memberuser attribute on netgroup"
 		member1="uid=$user1,cn=users,cn=accounts,$BASEDN"
-		rlLog "Setting first memberUser attribute to \"$member1\""
-		rlRun "ipa netgroup-mod --setattr=memberUser=\"$member1\" $ngroup1" 0 "setting memberUser attribute on $ngroup1"
+		rlLog "Setting first memberuser attribute to \"$member1\""
+		rlRun "ipa netgroup-mod --setattr=memberuser=\"$member1\" $ngroup1" 0 "setting memberuser attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\" | grep $user1" 0 "Verifying the memberuser attribute changed on $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_016: Add additional memberUser attribute on netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_016: Add additional memberuser attribute on netgroup"
 		member2="uid=$user2,cn=users,cn=accounts,$BASEDN"
-		rlLog "Setting second memberUser attribute to \"$member2\""
-		rlRun "ipa netgroup-mod --addattr=memberUser=\"$member2\" $ngroup1" 0 "setting additional memberUser attribute on $ngroup1"
-		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\" | grep \"$user1, $user2\"" 0 "Verifying the additional memberUser was added on $ngroup1"
+		rlLog "Setting second memberuser attribute to \"$member2\""
+		rlRun "ipa netgroup-mod --addattr=memberuser=\"$member2\" $ngroup1" 0 "setting additional memberuser attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\" | grep \"$user1, $user2\"" 0 "Verifying the additional memberuser was added on $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_017: Delete one memberUser attribute from netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_017: Delete one memberuser attribute from netgroup"
 		member2="uid=$user2,cn=users,cn=accounts,$BASEDN"
-		rlLog "Deleting one memberUser attribute entry for $user2"
-		rlRun "ipa netgroup-mod $ngroup1 --delattr=memberUser=\"$member2\"" 0 "deleting one memberuser from $ngroup1"
+		rlLog "Deleting one memberuser attribute entry for $user2"
+		rlRun "ipa netgroup-mod $ngroup1 --delattr=memberuser=\"$member2\"" 0 "deleting one memberuser from $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1 --all | grep \"Member Group:\" | grep \"$user2\"" 1 "Verifying memberuser deleted from $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_018: Remove memberUser attributes with setattr on netgroup"
-		rlLog "Executing: ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1"
-		rlRun "ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1" 0 "removing memberUser attribute on $ngroup1"
+	rlPhaseStartTest "netgroup_mod_positive_018: Remove memberuser attributes with setattr on netgroup"
+		rlLog "Executing: ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1"
+		rlRun "ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1" 0 "removing memberuser attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
 	rlPhaseEnd
 
@@ -752,44 +752,44 @@ netgroup_mod_positive()
 		rlRun "ipa netgroup-show $ngroup1 --all|grep  \"Member Group: $group1, $group2\"" 0 "Verifying group added to $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_021: Delete one group from memberUser attribute for netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_021: Delete one group from memberuser attribute for netgroup"
 		rlRun "ipa netgroup-mod $ngroup1 --delattr=memberuser=cn=$group2,cn=groups,cn=accounts,$BASEDN" 0 "deleting one group from memberuser attribute for $ngroup1"
 		rlRun "ipa netgroup-show $ngroup1 --all | grep \"Member Group:\" | grep \"$group2\"" 1 "Verifying memberuser group deleted from $ngroup1"
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_mod_positive_022: Remove memberuser attributes with setattr on netgroup"
-		rlLog "Exceuting: ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1"
-		rlRun "ipa netgroup-mod --setattr=memberUser=\"\" $ngroup1" 0 "removing memberUser attribute on $ngroup1"
+		rlLog "Exceuting: ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1"
+		rlRun "ipa netgroup-mod --setattr=memberuser=\"\" $ngroup1" 0 "removing memberuser attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member User\"" 1 "Verifying setattr removed all member users on $ngroup1"
 	rlPhaseEnd
 
 #### memberhost attr
-	rlPhaseStartTest "netgroup_mod_positive_023: Set memberHost attribute on netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_023: Set memberhost attribute on netgroup"
 		host1="host1.$DOMAIN"
 		member1="fqdn=$host1,cn=computers,cn=accounts,$BASEDN"
-		rlLog "Setting first memberHost attribute to \"$member1\""
-		rlRun "ipa netgroup-mod --setattr=memberHost=\"$member1\" $ngroup1" 0 "setting memberHost attribute on $ngroup1"
+		rlLog "Setting first memberhost attribute to \"$member1\""
+		rlRun "ipa netgroup-mod --setattr=memberhost=\"$member1\" $ngroup1" 0 "setting memberhost attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\" | grep $host1" 0 "Verifying the membergroup attribute changed on $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_024: Add additional memberHost attribute on netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_024: Add additional memberhost attribute on netgroup"
 		host1="host1.$DOMAIN"
 		host2="host2.$DOMAIN"
 		member2="fqdn=$host2,cn=computers,cn=accounts,$BASEDN"
-		rlRun "ipa netgroup-mod --addattr=memberHost=\"$member2\" $ngroup1" 0 "setting additional memberHost attribute on $ngroup1"
-		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\" | grep \"$host1, $host2\"" 0 "Verifying the additional memberHost was added on $ngroup1"
+		rlRun "ipa netgroup-mod --addattr=memberhost=\"$member2\" $ngroup1" 0 "setting additional memberhost attribute on $ngroup1"
+		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\" | grep \"$host1, $host2\"" 0 "Verifying the additional memberhost was added on $ngroup1"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_025: Delete one memberHost from netgroup"
+	rlPhaseStartTest "netgroup_mod_positive_025: Delete one memberhost from netgroup"
 		host2="host2.$DOMAIN"
 		member2="fqdn=$host2,cn=computers,cn=accounts,$BASEDN"
-		rlRun "ipa netgroup-mod $ngroup1 --delattr=memberHost=\"$member2\"" 0 "deleting one memberhost from $ngroup1"
-		rlRun "ipa netgroup-show $ngroup1 | grep \"Member Host\" | grep -v \"$host2\"" 0 "Verify memberHost was deleted"
+		rlRun "ipa netgroup-mod $ngroup1 --delattr=memberhost=\"$member2\"" 0 "deleting one memberhost from $ngroup1"
+		rlRun "ipa netgroup-show $ngroup1 | grep \"Member Host\" | grep -v \"$host2\"" 0 "Verify memberhost was deleted"
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_mod_positive_026: Remove memberHost attributes with setattr on netgroup"
-		rlLog "Executing: ipa netgroup-mod --setattr=memberHost=\"\" $ngroup1"
-		rlRun "ipa netgroup-mod --setattr=memberHost=\"\" $ngroup1" 0 "removing memberHost attribute on $ngroup1"
+	rlPhaseStartTest "netgroup_mod_positive_026: Remove memberhost attributes with setattr on netgroup"
+		rlLog "Executing: ipa netgroup-mod --setattr=memberhost=\"\" $ngroup1"
+		rlRun "ipa netgroup-mod --setattr=memberhost=\"\" $ngroup1" 0 "removing memberhost attribute on $ngroup1"
 		rlRun "ipa netgroup-show --all $ngroup1 | grep \"Member Host\"" 1 "Verifying setattr removed all member hosts on $ngroup1"
 	rlPhaseEnd
 
@@ -971,14 +971,14 @@ netgroup_mod_negative()
 	rlPhaseEnd
 
 #### memberuser
-	rlPhaseStartTest "netgroup_mod_negative_013: setattr and addattr on memberUser - Invalid Syntax"
+	rlPhaseStartTest "netgroup_mod_negative_013: setattr and addattr on memberuser - Invalid Syntax"
 		#### test1
-		command="ipa netgroup-mod --setattr memberUser=$user1 $ngroup1"
-		expmsg="ipa: ERROR: memberUser: Invalid syntax."
+		command="ipa netgroup-mod --setattr memberuser=$user1 $ngroup1"
+		expmsg="ipa: ERROR: memberuser: Invalid syntax."
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		#### test2
-		command="ipa netgroup-mod --addattr memberUser=$user2 $ngroup1"
+		command="ipa netgroup-mod --addattr memberuser=$user2 $ngroup1"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	rlPhaseEnd
 
@@ -989,14 +989,14 @@ netgroup_mod_negative()
 	rlPhaseEnd
 
 #### membergroup
-	rlPhaseStartTest "netgroup_mod_negative_015: setattr and addattr on memberGroup - attribute not allowed"
+	rlPhaseStartTest "netgroup_mod_negative_015: setattr and addattr on membergroup - attribute not allowed"
 		#### test1
-		command="ipa netgroup-mod --setattr memberGroup=$group1 $ngroup1"
+		command="ipa netgroup-mod --setattr membergroup=$group1 $ngroup1"
 		expmsg="ipa: ERROR: attribute membergroup not allowed"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		#### test2
-		command="ipa netgroup-mod --addattr memberGroup=$group1 $ngroup1"
+		command="ipa netgroup-mod --addattr membergroup=$group1 $ngroup1"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	rlPhaseEnd
 
@@ -1007,15 +1007,15 @@ netgroup_mod_negative()
 	rlPhaseEnd
 
 #### memberhost
-	rlPhaseStartTest "netgroup_mod_negative_017: setattr and addattr on memberHost - Invalid Syntax"
+	rlPhaseStartTest "netgroup_mod_negative_017: setattr and addattr on memberhost - Invalid Syntax"
 		local HOSTNAME=`hostname`
 		#### test1 
-		command="ipa netgroup-mod --setattr memberHost=$HOSTNAME $ngroup1"
-		expmsg="ipa: ERROR: memberHost: Invalid syntax."
+		command="ipa netgroup-mod --setattr memberhost=$HOSTNAME $ngroup1"
+		expmsg="ipa: ERROR: memberhost: Invalid syntax."
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		#### test2
-		command="ipa netgroup-mod --addattr memberHost=$HOSTNAME $ngroup1"
+		command="ipa netgroup-mod --addattr memberhost=$HOSTNAME $ngroup1"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	rlPhaseEnd
 
@@ -1026,11 +1026,11 @@ netgroup_mod_negative()
 	rlPhaseEnd
 
 #### member hostgroup
-	rlPhaseStartTest "netgroup_mod_negative_019: setattr and addattr on memberHostgroup"
-		command="ipa netgroup-mod --setattr memberHostgroup=$hgroup1 $ngroup1"
+	rlPhaseStartTest "netgroup_mod_negative_019: setattr and addattr on memberhostgroup"
+		command="ipa netgroup-mod --setattr memberhostgroup=$hgroup1 $ngroup1"
 		expmsg="ipa: ERROR: attribute memberhostgroup not allowed"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-		command="ipa netgroup-mod --addattr memberHostgroup=$hgroup1 $ngroup1"
+		command="ipa netgroup-mod --addattr memberhostgroup=$hgroup1 $ngroup1"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	rlPhaseEnd
 
@@ -1041,14 +1041,14 @@ netgroup_mod_negative()
 	rlPhaseEnd
 
 #### member netgroup
-	rlPhaseStartTest "netgroup_mod_negative_021: setattr and addattr on memberNetgroup not allowed"
+	rlPhaseStartTest "netgroup_mod_negative_021: setattr and addattr on membernetgroup not allowed"
 		#### test1
-		command="ipa netgroup-mod $ngroup1 --setattr memberNetgroup=$ngroup1"
+		command="ipa netgroup-mod $ngroup1 --setattr membernetgroup=$ngroup1"
 		expmsg="ipa: ERROR: attribute membernetgroup not allowed"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 
 		#### test2
-		command="ipa netgroup-mod $ngroup1 --addattr memberNetgroup=$ngroup1"
+		command="ipa netgroup-mod $ngroup1 --addattr membernetgroup=$ngroup1"
 		rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
 	rlPhaseEnd
 
