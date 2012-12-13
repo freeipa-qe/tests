@@ -448,7 +448,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
                 done
                 getent_macaddr=$getent_macaddr${new_byte6,,}
                 rlAssertGrep "$getent_macaddr $myhost" "$tmpfile"
-                rlRun "ipa host-mod --delattr $attr=${host_macaddr} $myhost > $tmpfile 2>&1" 1 "Delete attribute $attr=$host_macaddr."
+                rlRun "ipa host-mod --delattr $attr=${getent_macaddr} $myhost > $tmpfile 2>&1" 1 "Delete attribute $attr=$getent_macaddr."
                 rlAssertGrep "ipa: ERROR: macaddress does not contain" "$tmpfile"
                 rlRun "verifyHostAttr $myhost \"MAC address\" $host_macaddr" 0 "Check if MAC address attribute was not deleted"
                 rlRun "/usr/bin/getent ethers $myhost > $tmpfile" 0 "Get the ether value associated with the host, should not be empty."
