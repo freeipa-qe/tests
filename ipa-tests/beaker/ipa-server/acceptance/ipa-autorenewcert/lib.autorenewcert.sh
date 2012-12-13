@@ -366,7 +366,7 @@ enable_ipa_debug_mode()
 
 stop_ipa_certmonger_server(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - stop_ipa_certmonger_server ($@)"
-        rlRun "service certmonger stop" 0 "stop certmonger service before ipa server fully stopped"
+        rlRun "service certmonger stop" 0 "stop certmonger service before stop ipa server"
         sleep 5 # give system some time so ipa server can fully stopped
         local out=`ipactl stop 2>&1`
         if echo $out | grep "Aborting ipactl"
@@ -446,9 +446,10 @@ check_actually_renewed_certs(){
         local nickname=`$cert nickname`
         if [ "$state" = "valid" ];then
             rlPass "Found valid cert for [$cert]"
-            echo "$cert Summary:"
-            $readCert -d $db -n "$nickname" -s "valid"
-            echo ""
+            # yidebug: enable the following 3 lines later
+            #echo "$cert Summary:"
+            #$readCert -d $db -n "$nickname" -s "valid"
+            #echo ""
         else
             rlLog "[$cert status valid] returned [$state]"
             rlFail "NO valid cert found for [$cert], current date:[`date`]"
@@ -564,7 +565,7 @@ preserve_syswide_configuration()
     local filename=""
     if [ -f $original ];then
         filename=`basename $original`
-        local preservFile="$TmpDir/filename"
+        local preservFile="$TmpDir/$filename"
         echo "save original file [$original] as [$preservFile]"
         if cp -f $original $preservFile
         then
@@ -911,7 +912,7 @@ compare_expires_epoch_time_of_certs()
         echo "#--------------- recorded: expires date in eopch time of current certs -----------#"
         cat $certdata_notafter
         echo "#---------------------------------------------------------------------------------#"
-        rlLog "before: justRenewedCerts=[$justRenewedCerts], should be empty"
+        #rlLog "before: justRenewedCerts=[$justRenewedCerts], should be empty"
         for cert in $allcerts
         do
             local currentNotAfter=`$cert NotAfter_sec valid`
@@ -940,7 +941,7 @@ compare_expires_epoch_time_of_certs()
                 fi
             fi
         done 
-        rlLog "after: justRenewedCerts=[$justRenewedCerts]"
+        #rlLog "after: justRenewedCerts=[$justRenewedCerts]"
     fi
     rlPhaseEnd
 }

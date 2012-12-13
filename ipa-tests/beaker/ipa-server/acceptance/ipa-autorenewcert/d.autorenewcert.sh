@@ -32,7 +32,7 @@ checkTestConditionRequired="true"
 #data storage used
 certdata_notafter="$TmpDir/cert.data.not.after.sec.txt"
 
-minRound=3
+minRound=10
 certRenewCounter=0
 
 log_httpd="/var/log/httpd/error_log"
