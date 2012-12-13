@@ -317,7 +317,7 @@ netgroup_add_negative()
 	
 	rlPhaseStartTest "netgroup_add_negative_010: Verify fail on netgroup-add with invalid setattr value"
 		rlRun "ipa netgroup-add testng-002 --desc=testng-002 --nisdomain=mynisdom --setattr=memberHost=badvalue > $tmpout 2>&1" 1
-		rlAssertGrep "ipa: ERROR: memberHost: Invalid syntax." $tmpout
+		rlAssertGrep "ipa: ERROR: memberhost: Invalid syntax." $tmpout
 	rlPhaseEnd
 	
 	rlPhaseStartTest "netgroup_add_negative_011: Verify fail on netgroup-add with invalid setattr attr"
