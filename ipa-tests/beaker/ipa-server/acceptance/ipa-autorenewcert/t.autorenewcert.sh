@@ -66,7 +66,7 @@ main_autorenewcert_test(){
     # conditions for test to continue (continue_test returns "yes")
     # 1. all ipa certs are valid
     # 2. if there are some certs haven't get chance to be renewed, test should be continue
-
+    enable_ipa_debug_mode
     while [ "`continue_test`" = "yes" ]
     do
         certReport="$TmpDir/cert.report.$testroundCounter.txt"

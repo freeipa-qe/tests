@@ -355,6 +355,15 @@ adjust_system_time(){
     rlPhaseEnd
 }
 
+enable_ipa_debug_mode()
+{
+    rlPhaseStartTest "set debug=True in ipa server's config file: /etc/ipa/default.conf"
+        rlRun "ipactl stop" 0 "stop ipa server"
+        rlRun "echo debug=Ture >> /etc/ipa/default.conf" 0 "echo debug=True into /etc/ipa/default.conf" 
+        rlRun "ipactl start" 0 "start ipa server in debug mode"
+    rlPhaseEnd
+}
+
 stop_ipa_certmonger_server(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - stop_ipa_certmonger_server ($@)"
         rlRun "service certmonger stop" 0 "stop certmonger service before ipa server fully stopped"
