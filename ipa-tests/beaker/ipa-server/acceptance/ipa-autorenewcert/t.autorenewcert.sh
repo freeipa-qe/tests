@@ -24,6 +24,7 @@ CA_DSINSTANCE="`find_dirsrv_instance ca`"
 
 
 cert_sanity_check(){
+    restore_syswide_configuration 
     test_ipa_via_kinit_as_admin "$@"
     test_dirsrv_via_ssl_based_ldapsearch "$@"
     test_dogtag_via_cert_show "$@"
@@ -67,6 +68,8 @@ main_autorenewcert_test(){
     # 1. all ipa certs are valid
     # 2. if there are some certs haven't get chance to be renewed, test should be continue
     enable_ipa_debug_mode
+    preserve_syswide_configuration "/etc/resolv.conf"
+    preserve_syswide_configuration "/etc/hosts"
     while [ "`continue_test`" = "yes" ]
     do
         certReport="$TmpDir/cert.report.$testroundCounter.txt"

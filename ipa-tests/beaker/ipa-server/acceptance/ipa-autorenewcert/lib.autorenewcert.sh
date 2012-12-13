@@ -546,6 +546,59 @@ find_soon_to_be_renewed_certs(){
     rlPhaseEnd
 }
 
+preserve_syswide_configuration()
+{
+    if [ ! -f $preservRecordFile ];then
+        if touch $preservRecordFile
+        then
+            echo "create new empty preserv record data file [$preservRecordFile]"
+        else
+            echo "can NOT create preserv record data file [$preservRecordFile]"
+            return
+        fi
+    else
+        return
+    fi
+
+    local original="$1"
+    local filename=""
+    if [ -f $original ];then
+        filename=`basename $original`
+        local preservFile="$TmpDir/filename"
+        echo "save original file [$original] as [$preservFile]"
+        if cp -f $original $preservFile
+        then
+            local record="${original}:${preservFile}"
+            if grep "^$original" $datafile 2>&1
+            then
+                echo "original line exist, replace it"
+                replace_line $preservRecordFile "$original"  "$record"
+            else
+                echo "save a new record [$original $preservFile] in data file [$preservRecordFile]"
+                echo $record >> $preservRecordFile
+            fi
+        else
+            echo "copy file failed, no record being saved"
+        fi
+    else
+        echo "no original file exit, please double check your data"
+    fi
+    echo "======== preserv records [$preservRecordFile] ============="
+    cat $preservRecordFile
+    echo "==========================================================="
+}
+
+restore_syswide_configuration()
+{
+    for record in `cat $preservRecordFile`
+    do
+        local original=`echo $record | cut -d":" -f1`
+        local preserved=`echo $record| cut -d":" -f2`
+        cp -f $preserved $original
+    done
+}
+
+
 continue_test(){
     if [ ! -f $testResult ];then
         touch $testResult
@@ -1082,3 +1135,22 @@ digDNSerror()
     done
 }
  
+replace_line()
+{
+    local file=$1
+    local old=$2
+    local new=$3
+    local changeTo="#$old\n$new"
+    local id=$RANDOM
+    local tmp="/tmp/replace.oneline.$id.txt"
+    local backup="/tmp/replace.oneline.$id.original.txt"
+    if sed -e "s/^$old$/$changeTo/" $file > $tmp
+    then
+        cp $file $backup
+        cp -r $tmp $file
+        echo "change one line success"
+    else
+        echo "something wrong, no change made"
+    fi
+}
+

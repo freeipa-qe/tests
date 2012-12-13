@@ -44,3 +44,4 @@ log_selinux="/var/log/audit/audit.log"
 log_pkica="/var/log/pki-ca/debug /var/log/pki-ca/selftests.log /var/log/pki-ca/catalina.out /var/log/pki-ca/system /var/log/pki-ca/transactions"
 logs="$log_sys $log_ldap_error $log_ldap_access $log_httpd $log_krb5 $log_selinux $log_pkica"
 
+preservRecordFile="$TmpDir/preserve.records.conf"
