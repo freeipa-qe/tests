@@ -1,6 +1,10 @@
 #!/bin/bash
 
 . ./echoline.sh
+. ./lib.autorenewcert.sh
+# Include rhts environment
+. /usr/bin/rhts-environment.sh
+. /usr/share/beakerlib/beakerlib.sh
 
 TmpDir="/tmp"
 ADMINID="admin"
@@ -899,7 +903,7 @@ record_cert_expires_epoch_time()
 
 compare_expires_epoch_time_of_certs()
 {
-    rlPhaseStartTest "autorenewcert round [$testid] - compare epoch time of certs expires date round [$testid]"
+    echo "autorenewcert round [$testid] - compare epoch time of certs expires date round [$testid]"
     if [ ! -f $certdata_notafter ];then
         rlFail "no epoch time of certs expires data file fouond, error!"
     else
@@ -928,7 +932,7 @@ compare_expires_epoch_time_of_certs()
             fi
         done 
     fi
-    rlPhaseEnd
+    
 }
 
 # calculate dynamic variables
@@ -938,6 +942,7 @@ DSINSTANCE="`find_dirsrv_instance ds`"
 CA_DSINSTANCE="`find_dirsrv_instance ca`"
 
 cert_sanity_check(){
+    restore_syswide_configuration 
     test_ipa_via_kinit_as_admin "$@"
     test_dirsrv_via_ssl_based_ldapsearch "$@"
     test_dogtag_via_cert_show "$@"
@@ -946,22 +951,26 @@ cert_sanity_check(){
 
 autorenewcert()
 {
+        record_cert_expires_epoch_time
         print_test_header
         cert_sanity_check "Before auto renew triggered"
 
         calculate_autorenew_date $soonTobeRenewedCerts
 
-        stop_ipa_server "Before autorenew"
+        stop_ipa_certmonger_server "Before autorenew, stop ipa, adjust system to trigger automatic cert renew"
         adjust_system_time $autorenew autorenew    
-        start_ipa_server "After autorenew"
-        record_cert_expires_epoch_time
+        start_ipa_certmonger_server "After autorenew, start ipa, expect automatic cert renew happening in background"
 
         go_to_sleep
+        restart_ipa_certmonger_server "After autorenew, 1st restart ipa, give ipa serverr second chance to kick off automatic renew"
+        go_to_sleep
+        #restart_ipa_certmonger_server "After autorenew, 2nd restart ipa, give ipa serverr third  chance to kick off automatic renew"
+        #go_to_sleep
 
-        stop_ipa_server "Before postExpire"
+        stop_ipa_certmonger_server "Before postExpire, system time will change soon, to verify the renewed certs"
         adjust_system_time $postExpire postExpire
-        start_ipa_server "After postExpire"
-
+        start_ipa_certmonger_server "After postExpire, system time has been changed, expect new certs are in use"
+        go_to_sleep # give ipa server some time to refresh everything
         check_actually_renewed_certs $soonTobeRenewedCerts
         compare_expires_epoch_time_of_certs
         compare_expected_renewal_certs_with_actual_renewed_certs "After postExpire"
@@ -970,28 +979,26 @@ autorenewcert()
         test_status_report 
 }
 
-#########################################
-#              main test                #
-#########################################
+############## main test #################
 main_autorenewcert_test(){
-    testid=1
-    fix_prevalid_cert_problem #weird problem
+    testroundCounter=1
     # conditions for test to continue (continue_test returns "yes")
     # 1. all ipa certs are valid
     # 2. if there are some certs haven't get chance to be renewed, test should be continue
-
+    enable_ipa_debug_mode
+    preserve_syswide_configuration "/etc/resolv.conf"
+    preserve_syswide_configuration "/etc/hosts"
     while [ "`continue_test`" = "yes" ]
     do
+        certReport="$TmpDir/cert.report.$testroundCounter.txt"
         echo "" > $testResult  # reset test result from last round
         list_all_ipa_certs
         find_soon_to_be_renewed_certs
         autorenewcert $round
         prepare_for_next_round
-        testid=$((testid + 1))
-        #fix_prevalid_cert_problem #weird problem
+        testroundCounter=$((testroundCounter + 1))
     done
     final_cert_status_report 
 }
-################ end of main ###########
 
 main_autorenewcert_test

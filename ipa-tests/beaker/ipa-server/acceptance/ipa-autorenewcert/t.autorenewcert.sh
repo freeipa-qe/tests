@@ -67,7 +67,7 @@ main_autorenewcert_test(){
     # conditions for test to continue (continue_test returns "yes")
     # 1. all ipa certs are valid
     # 2. if there are some certs haven't get chance to be renewed, test should be continue
-    enable_ipa_debug_mode
+    #enable_ipa_debug_mode
     preserve_syswide_configuration "/etc/resolv.conf"
     preserve_syswide_configuration "/etc/hosts"
     while [ "`continue_test`" = "yes" ]

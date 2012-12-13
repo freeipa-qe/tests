@@ -431,8 +431,8 @@ prepare_for_next_round(){
         fi
     done
     certRenewCounter=$lowest
-    echo "$header +----------------------------------------------------------+"
-    echo "$header ~~~ all certs are valid [`all_certs_are_valid`]  system date [`date`] ~~~~"
+    echo "$header +----------------------------------------------------------------------+"
+    echo "$header ~~~ check whether all certs are valid [`all_certs_are_valid`]  system date [`date`] ~~~~"
 }
 
 check_actually_renewed_certs(){
