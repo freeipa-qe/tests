@@ -950,6 +950,7 @@ test_ipa_via_creating_new_cert(){
         rlFail "[$host] not found in ipa server"
     fi
     echo "[step 2/4] add a test service add service: [$principal], sometimes there are some random failures for this"
+    digDNSerror "$host"
     local serviceAddResult=`ipa service-add $principal 2>&1`
     if echo $serviceAddResult | grep "Added service" 
     then
@@ -1043,4 +1044,24 @@ create_cert_request_file()
     local ret=$?
    
 } #create_cert_request_file
+
+digDNSerror()
+{
+    local dig_hostname=$1
+    echo "================= dig DNS error ==================="
+    echo "#---------- dig -t ANY testrelm.com ---------------"
+    dig -t ANY testrelm.com
+
+    echo "#---------- dig -t ANY [$dig_hostname] ---------------"
+    dig -t ANY $dig_hostname
+   
+    echo "------------------ log & conf file content --------"
+    for file in /etc/resolv.conf /etc/hosts  /etc/named.conf 
+    do
+        echo "#---------- file [$file] ---------------#"
+        cat $file 
+        echo "#---------------------------------------#"
+    echo "============== end of dig DNS error ==============="
+    done
+}
  
