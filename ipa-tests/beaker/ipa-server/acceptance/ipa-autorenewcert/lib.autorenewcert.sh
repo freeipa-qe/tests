@@ -366,12 +366,15 @@ enable_ipa_debug_mode()
 
 stop_ipa_certmonger_server(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - stop_ipa_certmonger_server ($@)"
+        local tempout=$TmpDir/stop.ipa.certmonger.server.$testid.$RANDOM.txt
         rlRun "service certmonger stop" 0 "stop certmonger service before stop ipa server"
         sleep 5 # give system some time so ipa server can fully stopped
-        local out=`ipactl stop 2>&1`
-        if echo $out | grep "Aborting ipactl"
+        ipactl stop 2>&1 > $tempout
+        sleep 5 # give system some time so ipa server can fully stopped
+        if grep -i "Aborting ipactl" $tempout 2>&1 > /dev/null
         then
             rlFail "stop ipa server Failed"
+            cat $tempout
         else
             rlPass "stop ipa server Success"
         fi
@@ -381,11 +384,13 @@ stop_ipa_certmonger_server(){
 
 start_ipa_certmonger_server(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - start_ipa_certmonger_server ($@)" 
-        local out=`ipactl start 2>&1`
+        local tempout=$TmpDir/start.ipa.certmonger.server.$testid.$RANDOM.txt
+        ipactl start 2>&1 > $tempout
         sleep 5 # give system some time so ipa server can fully stopped
-        if echo $out | grep "Aborting ipactl"
+        if grep -i "Aborting ipactl" $tempout 2>&1 > /dev/null
         then
             rlFail "start ipa server Failed"
+            cat $tempout
         else
             rlPass "start ipa server Success"
             rlRun "service certmonger start" 0 "start certmonger service after ipa server started"
@@ -557,8 +562,6 @@ preserve_syswide_configuration()
             echo "can NOT create preserv record data file [$preservRecordFile]"
             return
         fi
-    else
-        return
     fi
 
     local original="$1"
@@ -569,8 +572,9 @@ preserve_syswide_configuration()
         echo "save original file [$original] as [$preservFile]"
         if cp -f $original $preservFile
         then
+            echo "save file success !"
             local record="${original}:${preservFile}"
-            if grep "^$original" $datafile 2>&1
+            if grep "^$original" $preservRecordFile 2>&1
             then
                 echo "original line exist, replace it"
                 replace_line $preservRecordFile "$original"  "$record"
