@@ -509,7 +509,7 @@ netgroup_bz_794882()
 		rlRun "ipa host-add ipahost.testrelm.com --force"
 		rlRun "ipa netgroup-add netgroup_bz_794882 --desc=desc1"
 		rlRun "ipa netgroup-add-member netgroup_bz_794882 --hosts=externalhost.external.com"
-		rlRun "ipa netgroup-find --hosts=externalhost.external.com > $tmpout 2>&1"
+		rlRun "ipa netgroup-find --hosts=externalhost.external.com > $tmpout 2>&1" 1
 		if [ $(grep "^0 netgroups matched$" $tmpout|wc -l) -gt 0 ]; then
 			rlPass "BZ 794882  Works as expected: ipa netgroup-find --hosts=<hostname> ::  not found for external hosts"
 		else
