@@ -207,7 +207,7 @@ ipa_ssh_bug_bz870060()
 	tmpout=/tmp/tmpout.$FUNCNAME
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	MYREPLICA1=$(eval echo \$BEAKERREPLICA1_env${MYENV})
+	MYREPLICA1=$(echo $(eval echo \$BEAKERREPLICA1_env${MYENV})|cut -f1 -d.).$DOMAIN
 	rlPhaseStartTest "ipa_ssh_bug_bz870060 - SSH host keys are not being removed from the cache"
 		case "$MYROLE" in
 		MASTER*)
@@ -216,6 +216,7 @@ ipa_ssh_bug_bz870060()
 			
 			rlRun "ipa host-show $MYREPLICA1 --all --raw | grep ipasshpubkey:"
 
+			rlRun "kdestroy"
 			expect <<-EOF > $tmpout
 			set timeout 3
 			set force_conservative 0
@@ -226,6 +227,8 @@ ipa_ssh_bug_bz870060()
 			expect eof
 			EOF
 			rlAssertGrep "login successful" $tmpout
+			rlRun "KinitAsAdmin"
+
 
 			rlRun "yum -y install ldb-tools"
 
@@ -233,6 +236,7 @@ ipa_ssh_bug_bz870060()
 		
 			rlRun "ipa host-mod $MYREPLICA1 --sshpubkey=''"
 	
+			rlRun "kdestroy"
 			expect <<-EOF > $tmpout
 			set timeout 3
 			set force_conservative 0
@@ -243,6 +247,7 @@ ipa_ssh_bug_bz870060()
 			expect eof
 			EOF
 			rlAssertGrep "login successful" $tmpout
+			rlRun "KinitAsAdmin"
 			
 			if [ $(ldbsearch -H /var/lib/sss/db/cache_$DOMAIN.ldb -b name=$MYREPLICA1,cn=ssh_hosts,cn=custom,cn=$DOMAIN,cn=sysdb 2>/dev/null| grep -i sshPublicKey:|wc -l) -gt 0 ]; then
 				rlRun "ldbsearch -H /var/lib/sss/db/cache_$DOMAIN.ldb -b name=$MYREPLICA1,cn=ssh_hosts,cn=custom,cn=$DOMAIN,cn=sysdb 2>/dev/null"
@@ -251,6 +256,10 @@ ipa_ssh_bug_bz870060()
 				rlPass "BZ 870060 not found."
 			fi
 			
+			rlRun "sftp -o StrictHostKeyChecking=no $MYREPLICA1:/etc/ssh/ssh_host_rsa_key.pub /tmp/ssh_host_rsa_key.pub.$MYREPLICA1"
+			rlRun "sftp -o StrictHostKeyChecking=no $MYREPLICA1:/etc/ssh/ssh_host_dsa_key.pub /tmp/ssh_host_dsa_key.pub.$MYREPLICA1"
+			rlRun "ipa host-mod $MYREPLICA1 --sshpubkey=\"$(cat /tmp/ssh_host_rsa_key.pub.$MYREPLICA1), $(cat /tmp/ssh_host_dsa_key.pub.$MYREPLICA1)\""
+
 			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
 			;;
 		REPLICA*)
