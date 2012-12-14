@@ -46,12 +46,13 @@ net rpc service start PassSync -I $1 -U $2%$3
 
 ADuser_ldif() {
 # $1 first name # $2 Surname # $3 Username # $4 changetype (add/ modify)
-[ $# -eq 6 ] && DN="CN=$1 $2,OU=$6,OU=$5,$ADdc"
-[ $# -eq 5 ] && DN="CN=$1 $2,OU=$5,$ADdc"
-[ $# -eq 4 ] && DN="CN=$1 $2,CN=Users,$ADdc"
+PASSWD=`echo -n \"$4\" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
+[ $# -eq 8 ] && DN="CN=$1 $2,OU=$8,OU=$7,$ADdc"
+[ $# -eq 7 ] && DN="CN=$1 $2,OU=$7,$ADdc"
+[ $# -eq 6 ] && DN="CN=$1 $2,CN=Users,$ADdc"
 cat > ADuser.ldif << EOF
 dn: $DN
-changetype: $4
+changetype: $6
 objectClass: top
 objectClass: person
 objectClass: organizationalPerson
@@ -63,6 +64,8 @@ distinguishedName: $DN
 name: $1 $2
 sAMAccountName: $3
 displayName: $1 $2
+unicodePwd::$PASSWD
+userAccountControl: $5
 EOF
 }
 

@@ -204,12 +204,8 @@ rlPhaseStartTest "0001 Creating winsync agreement"
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"$AD_binddn\"" 0 "Verifying connection via TLS to ADS server"
 
 	# Adding a user before winsync agreement
-	rlRun "ADuser_ldif $ADfn $ADsn $ADln add" 0 "Generate ldif file to add $ADln"
-        rlRun "ADuser_cntrl_ldif $ADfn $ADsn 512" 0 "Generate ldif file to enable $ADln"
-        rlRun "ADuser_passwd_ldif $ADfn $ADsn $userpw" 0 "Generate ldif file for setting $ADln passwd"
+	rlRun "ADuser_ldif $ADfn $ADsn $ADln $userpw 512 add" 0 "Generate ldif file to add $ADln"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD before winsync $ADln"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $ADln"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $ADln passwd"
 	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_4"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $ADln"
 
@@ -265,21 +261,13 @@ winsync_test_0003() {
 rlPhaseStartTest "0003 Create users(numeric/alphanumeric) in AD and verify it is synced to IPA and overwrites existing IPA users"
 
 	# Creating user in AD
-	rlRun "ADuser_ldif $aduser ads $aduser add" 0 "Generate ldif file to add user $aduser"
-	rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
-	rlRun "ADuser_passwd_ldif $aduser ads $userpw" 0 "Generate ldif file for setting passwd for $aduser"
+	rlRun "ADuser_ldif $aduser ads $aduser $userpw 512 add" 0 "Generate ldif file to add user $aduser"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $aduser"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser passwd"
 	sleep 15
 
-	rlRun "ADuser_ldif 456 ads 456 add" 0 "Generate ldif file to add user 456"
-	rlRun "ADuser_cntrl_ldif 456 ads 512" 0 "Generate ldif file to enable user 456"
-	rlRun "ADuser_passwd_ldif 456 ads $userpw" 0 "Generate ldif file for setting passwd for 456"
+	rlRun "ADuser_ldif 456 ads 456 $userpw 512 add" 0 "Generate ldif file to add user 456"
 	rlRun "telephoneNumber_ldif 456 ads $phn_2" 0 "Generate ldif file to add phone number of user 456"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD "456""
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable user 456"
-	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting 456 passwd"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Add phone number of user 456"
 	rlRun "sleep $sec" 0 "Sleeping $sec sec for sync"
 	sleep 90
@@ -383,12 +371,8 @@ winsync_test_0006() {
 rlPhaseStartTest "0006 bz765986 - winsync doesn't sync the employeeType attribute"
 	rlRun "employeetype_ldif add" 0 "Set employeetype attribute"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f employeetype.ldif"
-	rlRun "ADuser_ldif $aduser2 ads $aduser2 add" 0 "Generate ldif file to add user $aduser2"
-        rlRun "ADuser_cntrl_ldif $aduser2 ads 512" 0 "Generate ldif file to enable user $aduser2"
-        rlRun "ADuser_passwd_ldif $aduser2 ads $userpw" 0 "Generate ldif file for setting passwd for $aduser2"
+	rlRun "ADuser_ldif $aduser2 ads $aduser2 $userpw 512 add" 0 "Generate ldif file to add user $aduser2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $aduser2"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser2"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser2 passwd"
 	sleep 60
 	rlRun "$ipa user-show $aduser2 | grep \"Account disabled: False\"" 0 "$aduser2 synced and enabled on IPA"
 	rlRun "$ipa user-show $aduser2 --all | grep -i \"employeeType: unknown\"" 0 "employeetype attribute set to unknown in IPA"
@@ -418,14 +402,14 @@ rlPhaseStartTest "0008 Modify user attributes after replication setup"
 	rlLog "Modify user attributes for user existing before winsync"
 	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_3"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
-	rlRun "sleep 25" 0 "Waiting for sync"
+	rlRun "sleep 30" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "$ipa user-show $ADln | grep \"Telephone Number: $phn_3\"" 0 "Attribute modify for user existing before winsync"
 
 	rlLog "Modify user attributes for user created after winsync"
 	rlRun "telephoneNumber_ldif $aduser ads $phn_4"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $aduser"
-	rlRun "sleep 25" 0 "Waiting for sync"
+	rlRun "sleep 30" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "$ipa user-show $aduser | grep \"Telephone Number: $phn_4\"" 0 "Attribute modify for user created after winsync"
 rlPhaseEnd
@@ -443,6 +427,7 @@ rlPhaseStartTest "0009 Update Password"
 	rlRun "ssh_auth_success $ADln $userpw2 $IPAhost"
 
 	rlLog "Update password in IPA"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "echo $userpw2 | ipa passwd $aduser2" 0 "Reset $aduser2 passwd from IPA"
 	sleep $sec
 	FirstKinitAs $aduser2 $userpw2 $userpw3
@@ -500,7 +485,7 @@ rlPhaseStartTest "0012 Delete User"
 	rlLog "Delete user from AD"
 	rlRun "ADuserdel_ldif $aduser ads"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete $aduser from AD"
-	rlRun "sleep 25" 0 "Waiting for sync"
+	rlRun "sleep 30" 0 "Waiting for sync"
 	sleep $sec
 	rlRun "$ipa user-show $aduser" 2 "User $aduser not found in IPA as expected"
 
@@ -533,12 +518,8 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
 	rlRun "addOU_ldif $OU1 add"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Adding OU $OU1"
 
-	rlRun "ADuser_ldif $aduser ads $aduser add" 0 "Generate ldif file to add user $aduser"
-        rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
-        rlRun "ADuser_passwd_ldif $aduser ads $userpw" 0 "Generate ldif file for setting passwd for $aduser"
+	rlRun "ADuser_ldif $aduser ads $aduser $userpw 512 add" 0 "Generate ldif file to add user $aduser"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser in AD"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser passwd"
 	sleep 60
 
 	rlRun "$ipa user-show $aduser" 0 "$aduser is synced to IPA"
@@ -575,24 +556,16 @@ rlPhaseStartTest "0015 Using options force-sync, re-initialize, disconnect and d
 	rlRun "rlDistroDiff dirsrv_svc_restart" 0 "Restarting to make winsync interval change effective"
 	sleep 10
 
-	rlRun "ADuser_ldif $aduser ads $aduser add" 0 "Generate ldif file to add user $aduser"
-        rlRun "ADuser_cntrl_ldif $aduser ads 512" 0 "Generate ldif file to enable user $aduser"
-        rlRun "ADuser_passwd_ldif $aduser ads $userpw" 0 "Generate ldif file for setting passwd for $aduser"
+	rlRun "ADuser_ldif $aduser ads $aduser $userpw 512 add" 0 "Generate ldif file to add user $aduser"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser in AD to test options"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser passwd"
 	sleep 10
 
 	rlRun "ipa-replica-manage force-sync --from $ADhost" 0 "Using force-sync option"
-	sleep 30
+	sleep 50
 	rlRun "$ipa user-show $aduser" 0 "$aduser added in AD, synced to IPA using force-sync option"
 
-	rlRun "ADuser_ldif $aduser2 ads $aduser2 add" 0 "Generate ldif file to add user $aduser2"
-        rlRun "ADuser_cntrl_ldif $aduser2 ads 512" 0 "Generate ldif file to enable user $aduser2"
-        rlRun "ADuser_passwd_ldif $aduser2 ads $userpw" 0 "Generate ldif file for setting passwd for $aduser2"
+	rlRun "ADuser_ldif $aduser2 ads $aduser2 $userpw 512 add" 0 "Generate ldif file to add user $aduser2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser2 in AD to test options"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $aduser2"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $aduser2 passwd"
 	sleep 20
 
 	rlRun "ipa-replica-manage re-initialize --from $ADhost" 0 "Using re-initialize option"
@@ -627,19 +600,11 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
         rlRun "addsubOU_ldif $sub_OU2 $OU2 add"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Adding sub OU $sub_OU2"
 
-	rlRun "ADuser_ldif $l1user ads $l1user add $OU1" 0 "Generate ldif file to add user $l1user"
-        rlRun "ADuser_cntrl_ldif $l1user ads 512 $OU1" 0 "Generate ldif file to enable user $l1user"
-        rlRun "ADuser_passwd_ldif $l1user ads $userpw $OU1" 0 "Generate ldif file for setting passwd for $l1user"
+	rlRun "ADuser_ldif $l1user ads $l1user $userpw 512 add $OU1" 0 "Generate ldif file to add user $l1user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l1user in OU $OU1"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $l1user"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $l1user passwd"
 
-	rlRun "ADuser_ldif $sub1user ads $sub1user add $OU1 $sub_OU1" 0 "Generate ldif file to add user $sub1user"
-        rlRun "ADuser_cntrl_ldif $sub1user ads 512 $OU1 $sub_OU1" 0 "Generate ldif file to enable user $sub1user"
-        rlRun "ADuser_passwd_ldif $sub1user ads $userpw $OU1 $sub_OU1" 0 "Generate ldif file for setting passwd for $sub1user"
+	rlRun "ADuser_ldif $sub1user ads $sub1user $userpw 512 add $OU1 $sub_OU1" 0 "Generate ldif file to add user $sub1user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub1user in OU $OU1"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $sub1user"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $sub1user passwd"
 
 	rlLog "Winsync OU with existing users"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd --win-subtree=\"OU=$OU1,$ADdc\"" 0 "Creating winsync agreement with OU $OU1 win-subtree"
@@ -684,19 +649,11 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
         rlRun "rlDistroDiff dirsrv_svc_restart" 0 "Restarting to make winsync interval change effective"
 	sleep 30
 
-	rlRun "ADuser_ldif $l2user ads $l2user add $OU2" 0 "Generate ldif file to add user $l2user"
-        rlRun "ADuser_cntrl_ldif $l2user ads 512 $OU2" 0 "Generate ldif file to enable user $l2user"
-        rlRun "ADuser_passwd_ldif $l2user ads $userpw $OU2" 0 "Generate ldif file for setting passwd for $l2user"
+	rlRun "ADuser_ldif $l2user ads $l2user $userpw 512 add $OU2" 0 "Generate ldif file to add user $l2user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l2user in OU $OU2"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $l2user"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $l2user passwd"
 
-        rlRun "ADuser_ldif $sub2user ads $sub2user add $OU2 $sub_OU2" 0 "Generate ldif file to add user $sub2user"
-        rlRun "ADuser_cntrl_ldif $sub2user ads 512 $OU2 $sub_OU2" 0 "Generate ldif file to enable user $sub2user"
-        rlRun "ADuser_passwd_ldif $sub2user ads $userpw $OU2 $sub_OU2" 0 "Generate ldif file for setting passwd for $sub2user"
+        rlRun "ADuser_ldif $sub2user ads $sub2user $userpw 512 add $OU2 $sub_OU2" 0 "Generate ldif file to add user $sub2user"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub2user in OU $OU2"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_cntrl.ldif" 0 "Enable $sub2user"
-        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Setting $sub2user passwd"
 	rlRun "sleep 30" 0 "Waiting for sync"
 	sleep $sec
 	
