@@ -519,7 +519,7 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Adding OU $OU1"
 
 	rlRun "ADuser_ldif $aduser ads $aduser $userpw 512 add" 0 "Generate ldif file to add user $aduser"
-        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser in AD"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $aduser"
 	sleep 60
 
 	rlRun "$ipa user-show $aduser" 0 "$aduser is synced to IPA"
@@ -557,7 +557,7 @@ rlPhaseStartTest "0015 Using options force-sync, re-initialize, disconnect and d
 	sleep 10
 
 	rlRun "ADuser_ldif $aduser ads $aduser $userpw 512 add" 0 "Generate ldif file to add user $aduser"
-        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $aduser in AD to test options"
+	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $aduser"
 	sleep 10
 
 	rlRun "ipa-replica-manage force-sync --from $ADhost" 0 "Using force-sync option"
@@ -601,10 +601,10 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addsubOU.ldif" 0 "Adding sub OU $sub_OU2"
 
 	rlRun "ADuser_ldif $l1user ads $l1user $userpw 512 add $OU1" 0 "Generate ldif file to add user $l1user"
-        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l1user in OU $OU1"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l1user in OU $OU1"
 
 	rlRun "ADuser_ldif $sub1user ads $sub1user $userpw 512 add $OU1 $sub_OU1" 0 "Generate ldif file to add user $sub1user"
-        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub1user in OU $OU1"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub1user in OU $OU1"
 
 	rlLog "Winsync OU with existing users"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd --win-subtree=\"OU=$OU1,$ADdc\"" 0 "Creating winsync agreement with OU $OU1 win-subtree"
@@ -650,10 +650,10 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 	sleep 30
 
 	rlRun "ADuser_ldif $l2user ads $l2user $userpw 512 add $OU2" 0 "Generate ldif file to add user $l2user"
-        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l2user in OU $OU2"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $l2user in OU $OU2"
 
         rlRun "ADuser_ldif $sub2user ads $sub2user $userpw 512 add $OU2 $sub_OU2" 0 "Generate ldif file to add user $sub2user"
-        rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub2user in OU $OU2"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub2user in OU $OU2"
 	rlRun "sleep 30" 0 "Waiting for sync"
 	sleep $sec
 	
