@@ -32,7 +32,7 @@ checkTestConditionRequired="true"
 #data storage used
 certdata_notafter="$TmpDir/cert.data.not.after.sec.txt"
 
-minRound=10
+minRound=9
 certRenewCounter=0
 
 log_httpd="/var/log/httpd/error_log"
@@ -43,5 +43,3 @@ log_krb5="/var/log/krb5kdc.log"
 log_selinux="/var/log/audit/audit.log"
 log_pkica="/var/log/pki-ca/debug /var/log/pki-ca/selftests.log /var/log/pki-ca/catalina.out /var/log/pki-ca/system /var/log/pki-ca/transactions"
 logs="$log_sys $log_ldap_error $log_ldap_access $log_httpd $log_krb5 $log_selinux $log_pkica"
-
-preservRecordFile="$TmpDir/preserve.records.conf"

@@ -150,7 +150,7 @@ list_all_ipa_certs(){
     echo ""
     echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+"
     echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+" > $certReport
-    local summary="Summary: all certs are valid : [`all_certs_are_valid`] system date [`date`] "
+    local summary="Summary: are all certs valid? [`all_certs_are_valid`] system date [`date`] "
     echo $summary
     echo $summary >> $certReport
     echo "[valid certs]:"
@@ -552,57 +552,66 @@ find_soon_to_be_renewed_certs(){
     rlPhaseEnd
 }
 
-preserve_syswide_configuration()
+prepare_preserv_dir()
 {
-    if [ ! -f $preservRecordFile ];then
-        if touch $preservRecordFile
-        then
-            echo "create new empty preserv record data file [$preservRecordFile]"
-        else
-            echo "can NOT create preserv record data file [$preservRecordFile]"
-            return
-        fi
+    preservDir="$TmpDir/preserve"
+    if [ ! -d $preservDir ];then
+        mkdir -p $preservDir
+        echo "create preserv dir: [$preservDir]"
     fi
+}
 
-    local original="$1"
-    local filename=""
-    if [ -f $original ];then
-        filename=`basename $original`
-        local preservFile="$TmpDir/$filename"
-        echo "save original file [$original] as [$preservFile]"
-        if cp -f $original $preservFile
-        then
-            echo "save file success !"
-            local record="${original}:${preservFile}"
-            if grep "^$original" $preservRecordFile 2>&1
-            then
-                echo "original line exist, replace it"
-                replace_line $preservRecordFile "$original"  "$record"
-            else
-                echo "save a new record [$original $preservFile] in data file [$preservRecordFile]"
-                echo $record >> $preservRecordFile
-            fi
-        else
-            echo "copy file failed, no record being saved"
-        fi
+preserve_hosts()
+{
+    local original="/etc/hosts"
+    local dest="$preservDir/hosts"
+    preserve $original $dest
+}
+
+preserve_resolv_conf()
+{
+    local original="/etc/resolv.conf"
+    local dest="$preservDir/resolv.conf"
+    preserve $original $dest
+}
+
+preserve()
+{
+    local original=$1
+    local dest=$2
+    if cp -fv $original $dest
+    then
+        echo "preserv [$original] at [$dest] success"
     else
-        echo "no original file exit, please double check your data"
+        echo "preserv [$original] failed"
     fi
-    echo "======== preserv records [$preservRecordFile] ============="
-    cat $preservRecordFile
-    echo "==========================================================="
 }
 
-restore_syswide_configuration()
+restore_hosts()
 {
-    for record in `cat $preservRecordFile`
-    do
-        local original=`echo $record | cut -d":" -f1`
-        local preserved=`echo $record| cut -d":" -f2`
-        cp -f $preserved $original
-    done
+    local original="/etc/hosts"
+    local dest="$preservDir/hosts"
+    restore $original $dest
 }
 
+restore_resolv_conf()
+{
+    local original="/etc/resolv.conf"
+    local dest="$preservDir/resolv.conf"
+    restore $original $dest
+}
+
+restore()
+{
+    local original=$1
+    local dest=$2
+    if cp -fv $dest $original
+    then
+        echo "restore [$dest] to [$original] success"
+    else
+        echo "restore [$original] failed"
+    fi
+}
 
 continue_test(){
     if [ ! -f $testResult ];then
@@ -756,7 +765,6 @@ all_certs_are_valid(){
 print_test_header(){
     echo " "
     echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
-    echo "      #                                                         #"
     echo "      #                    test round [$testroundCounter]                       #"
     echo "      #                (minRound=$minRound, counter=$certRenewCounter)                  #"
     echo "      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
@@ -935,13 +943,14 @@ compare_expires_epoch_time_of_certs()
                 local currentNotAfterDate=`$cert NotAfter valid`
                 if [ $currentNotAfter -gt $previousNotAfter ];then
                     justRenewedCerts="${justRenewedCerts}${cert} " #append spaces at end
-                    rlLog "add cert [$cert] into queue: justRenewedCerts [${justRenewedCerts}]"
+                    #rlLog "add cert [$cert] into queue: justRenewedCerts [${justRenewedCerts}]"
                     rlPass "$cert gets renewed, 'not after' values:  previous: [$previousNotAfter] now: [$currentNotAfterDate]"
                     echo "    [ PASS ] compare_expires_epoch_time_of_certs: [$cert], currentNotAfter=[$currentNotAfterDate], previousNotAfter=[$previousNotAfterDate] " >> $testResult
                 elif [ $currentNotAfter -eq $previousNotAfter ];then
                     rlLog "$cert haven't get renewed, previous 'not after' values: previous [$previousNotAfterDate] is not changed now: [$currentNotAfterDate]"
                 else
                     echo "    [ FAIL ] * compare_expires_epoch_time_of_certs: [$cert], currentNotAfter=[$currentNotAfter $currentNotAfterDate], previousNotAfter=[$previousNotAfter $previousNotAfterDate] " >> $testResult
+                    rlFail "compare_expires_epoch_time_of_certs: [$cert], currentNotAfter=[$currentNotAfter $currentNotAfterDate], previousNotAfter=[$previousNotAfter $previousNotAfterDate]"
                 fi
             fi
         done 
@@ -1139,23 +1148,3 @@ digDNSerror()
     echo "============== end of dig DNS error ==============="
     done
 }
- 
-replace_line()
-{
-    local file=$1
-    local old=$2
-    local new=$3
-    local changeTo="#$old\n$new"
-    local id=$RANDOM
-    local tmp="/tmp/replace.oneline.$id.txt"
-    local backup="/tmp/replace.oneline.$id.original.txt"
-    if sed -e "s/^$old$/$changeTo/" $file > $tmp
-    then
-        cp $file $backup
-        cp -r $tmp $file
-        echo "change one line success"
-    else
-        echo "something wrong, no change made"
-    fi
-}
-

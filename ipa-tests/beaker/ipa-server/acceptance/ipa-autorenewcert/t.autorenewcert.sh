@@ -24,18 +24,19 @@ CA_DSINSTANCE="`find_dirsrv_instance ca`"
 
 
 cert_sanity_check(){
-    restore_syswide_configuration 
+    restore_hosts
+    restore_resolv_conf
     test_ipa_via_kinit_as_admin "$@"
     test_dirsrv_via_ssl_based_ldapsearch "$@"
-    test_dogtag_via_cert_show "$@"
-    test_ipa_via_creating_new_cert "$@"
+    #test_dogtag_via_cert_show "$@"
+    #test_ipa_via_creating_new_cert "$@"
 }
 
 autorenewcert()
 {
         record_cert_expires_epoch_time
         print_test_header
-        #cert_sanity_check "Before auto renew triggered"
+        cert_sanity_check "Before auto renew triggered"
 
         calculate_autorenew_date $soonTobeRenewedCerts
 
@@ -44,7 +45,7 @@ autorenewcert()
         start_ipa_certmonger_server "After autorenew, start ipa, expect automatic cert renew happening in background"
 
         go_to_sleep
-        restart_ipa_certmonger_server "After autorenew, 1st restart ipa, give ipa serverr second chance to kick off automatic renew"
+        restart_ipa_certmonger_server "After autorenew, restart ipa, give ipa serverr second chance to kick off automatic renew"
         go_to_sleep
         #restart_ipa_certmonger_server "After autorenew, 2nd restart ipa, give ipa serverr third  chance to kick off automatic renew"
         #go_to_sleep
@@ -57,7 +58,7 @@ autorenewcert()
         compare_expires_epoch_time_of_certs
         compare_expected_renewal_certs_with_actual_renewed_certs "After postExpire"
 
-        #cert_sanity_check  "After auto renew triggered"
+        cert_sanity_check  "After auto renew triggered"
         test_status_report 
 }
 
@@ -68,8 +69,9 @@ main_autorenewcert_test(){
     # 1. all ipa certs are valid
     # 2. if there are some certs haven't get chance to be renewed, test should be continue
     #enable_ipa_debug_mode
-    preserve_syswide_configuration "/etc/resolv.conf"
-    preserve_syswide_configuration "/etc/hosts"
+    prepare_preserv_dir
+    preserve_resolv_conf
+    preserve_hosts
     while [ "`continue_test`" = "yes" ]
     do
         certReport="$TmpDir/cert.report.$testroundCounter.txt"

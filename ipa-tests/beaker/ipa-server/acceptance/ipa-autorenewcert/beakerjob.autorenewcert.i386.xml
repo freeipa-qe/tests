@@ -39,7 +39,7 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-autorenewcert" role="MASTER">
 				<params>
-					<param name="KILLTIMEOVERRIDE" value="8789333"/>
+					<param name="KILLTIMEOVERRIDE" value="88789333"/>
 				</params>
 			</task>
 

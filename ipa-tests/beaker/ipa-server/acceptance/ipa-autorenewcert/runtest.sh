@@ -41,8 +41,6 @@
 
 # Include test case file
 . ./t.autorenewcert.sh
-#. ./lib.autorenewcert.sh
-#. ./d.autorenewcert.sh
 
 PACKAGELIST="ipa-server perl-TimeDate perl-LDAP"
 
