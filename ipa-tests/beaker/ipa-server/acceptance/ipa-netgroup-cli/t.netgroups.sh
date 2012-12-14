@@ -1054,8 +1054,11 @@ netgroup_mod_negative()
 
 	rlPhaseStartTest "netgroup_mod_negative_022: addattr for member netgroup already in netgroup"
 		ngroup2id=$(ipa netgroup-show $ngroup2 --all --raw|grep ipauniqueid:|awk '{print $2}')
-		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=ipauniqueid=$ngroup2id,cn=ng,cn=alt,$BASEDN"
-		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=ipauniqueid=$ngroup2id,cn=ng,cn=alt,$BASEDN > $tmpout 2>&1" 1
+		NID="ipauniqueid=$ngroup2id,cn=ng,cn=alt,$BASEDN"
+		if [ $(ipa netgroup-show $ngroup1 --all --raw|grep member|grep $NID|wc -l) -eq 0 ]; then
+			rlRun "ipa netgroup-mod $ngroup1 --setattr=member=$NID"
+		fi
+		rlRun "ipa netgroup-mod $ngroup1 --setattr=member=$NID > $tmpout 2>&1" 1
 		rlAssertGrep "ipa: ERROR: no modifications to be performed" $tmpout
 	rlPhaseEnd
 
