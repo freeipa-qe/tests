@@ -91,6 +91,7 @@ ipa_ssh_host_func_envsetup()
 			rlRun "create_ipauser sshuser2 ssh user2 Passw0rd1"
 
 			rlRun "authconfig --enablemkhomedir --updateall"
+			rlRun "service sssd start"
 
 			KEYFILE=~sshuser/.ssh/id_rsa
 			rlRun "su - sshuser -c \"ssh-keygen -q -t rsa -N '' -C 'sshuser.$DOMAIN' -f $KEYFILE\""
@@ -107,11 +108,13 @@ ipa_ssh_host_func_envsetup()
 		REPLICA*)
 			rlLog "Machine in recipe is REPLICA ($(hostname))"
 			rlRun "authconfig --enablemkhomedir --updateall"
+			rlRun "service sssd start"
 			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		CLIENT*)
 			rlLog "Machine in recipe is CLIENT ($(hostname))"
 			rlRun "authconfig --enablemkhomedir --updateall"
+			rlRun "service sssd start"
 			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		*)

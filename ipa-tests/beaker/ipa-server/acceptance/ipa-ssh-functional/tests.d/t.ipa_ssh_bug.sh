@@ -112,6 +112,7 @@ ipa_ssh_bug_bz799928()
 			rlLog "Machine in recipe is MASTER ($(hostname))"
 			rlRun "KinitAsAdmin"
 			rlRun "authconfig --enablemkhomedir --updateall"
+			rlRun "service sssd start"
 
 			expect <<-EOF 
 			set timeout 3
@@ -139,11 +140,13 @@ ipa_ssh_bug_bz799928()
 		REPLICA*)
 			rlLog "Machine in recipe is REPLICA ($(hostname))"
 			rlRun "authconfig --enablemkhomedir --updateall"
+			rlRun "service sssd start"
 			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		CLIENT*)
 			rlLog "Machine in recipe is CLIENT ($(hostname))"
 			rlRun "authconfig --enablemkhomedir --updateall"
+			rlRun "service sssd start"
 			rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
 			;;
 		*)
