@@ -182,6 +182,7 @@ ipa_ssh_bug_bz801719()
 				rlFail "BZ 801719 Found...Error looking up public keys while ssh to replica using IP address"	
 			else
 				rlPass "BZ 801719 not found."
+				rlPass "Error message 'Error looking up public keys' not seen in output"
 			fi
 
 			rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
