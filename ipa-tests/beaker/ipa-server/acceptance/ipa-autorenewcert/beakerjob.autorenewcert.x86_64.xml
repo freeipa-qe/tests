@@ -26,8 +26,6 @@
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
 				    <param name="PKGARGNAME" value="expect"/>
-				    <param name="PKGARGNAME" value="perl-LDAP"/>
-				    <param name="PKGARGNAME" value="perl-TimeDate"/>
 				</params>
 			</task>
             <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
@@ -39,7 +37,7 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-autorenewcert" role="MASTER">
 				<params>
-					<param name="KILLTIMEOVERRIDE" value="8789333"/>
+					<param name="KILLTIMEOVERRIDE" value="789333"/>
 				</params>
 			</task>
 
