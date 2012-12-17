@@ -3,7 +3,7 @@ Name:            /CoreOS/ipa-server/acceptance/ipa-netgroup-cli
 TestVersion:     1.0
 Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-netgroup-cli
 Description:     IPA netgroup test
-Type:            Regression
+Type:            Functional
 TestTime:        60m
 RunFor:          ipa-server
 Requires:        ipa-admintools
