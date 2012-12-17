@@ -59,10 +59,6 @@ rlJournalStart
             TmpDir="/tmp"
         fi
 
-        if ! rlCheckRpm expect; then
-            yum install expect
-            rlAssertRpm expect
-        fi
         if ! rlCheckRpm perl-TimeDate; then
             yum install perl-TimeDate
             rlAssertRpm perl-TimeDate
