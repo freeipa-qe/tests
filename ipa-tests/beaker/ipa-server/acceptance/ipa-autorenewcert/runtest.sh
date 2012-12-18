@@ -59,15 +59,15 @@ rlJournalStart
             TmpDir="/tmp"
         fi
 
-        if ! rlCheckRpm perl-TimeDate; then
-            yum install perl-TimeDate
-            rlAssertRpm perl-TimeDate
-        fi
+#        if ! rlCheckRpm perl-TimeDate; then
+#            yum install perl-TimeDate
+#            rlAssertRpm perl-TimeDate
+#        fi
 
-        if ! rlCheckRpm perl-LDAP; then
-            yum install perl-LDAP
-            rlAssertRpm perl-LDAP
-        fi
+#        if ! rlCheckRpm perl-LDAP; then
+#            yum install perl-LDAP
+#            rlAssertRpm perl-LDAP
+#        fi
         #rlRun "pushd $TmpDir"
     rlPhaseEnd
 

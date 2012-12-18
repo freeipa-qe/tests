@@ -12,6 +12,7 @@
 				<and>
 				    <distro_variant op="=" value="Server"/>
                     <distro_arch op="=" value="x86_64"/>
+                    <distro_name op="=" value="RHEL6.4-20121212.1"/>
                     <distro_family op="=" value="RedHatEnterpriseLinux6"/>
 				</and>
 				<distro_virt op="=" value=""/>
@@ -26,6 +27,8 @@
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
 				    <param name="PKGARGNAME" value="expect"/>
+				    <param name="PKGARGNAME" value="perl-LDAP"/>
+				    <param name="PKGARGNAME" value="perl-TimeDate"/>
 				</params>
 			</task>
             <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
