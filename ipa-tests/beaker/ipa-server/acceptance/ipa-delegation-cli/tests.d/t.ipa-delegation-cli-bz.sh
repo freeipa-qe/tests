@@ -16,6 +16,7 @@
 #  BZ 783554 -- ipa delegation-mod --attrs= removes Attributes from delegation instead of failing
 #  BZ 784468 -- ipa help delegation example has group and membergroup backwards
 # BZ 782974 -- 783554 is a duplicate of this bug. -- Exception why removing all values in config plugin
+#  BZ 888524 - ipa delegation-find --group option returns internal error
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -287,3 +288,23 @@ delegation_bz_784468()
     rlPhaseEnd
 }
 
+######################################################################
+# BZ 888524 - ipa delegation-find --group option returns internal error
+######################################################################
+delegation_bz_888524()
+{
+	rlPhaseStartTest "delegation_bz_888524 - ipa delegation-find --group option returns internal error"
+		KinitAsAdmin
+        local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
+		rlRun "ipa group-add mg_${FUNCNAME} --desc=member_group_${FUNCNAME}"
+		rlRun "ipa group-add gr_${FUNCNAME} --desc=group_${FUNCNAME}"
+		rlRun "ipa delegation-add delegation_${FUNCNAME} --membergroup=mg1000 --group=gr1000 --attrs=mobile"
+		rlRun "ipa delegation-find --group=gr_${FUNCNAME} > $tmpout 2>&1"
+		
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 888524 found...ipa delegation-find --group option returns internal error"
+		else
+			rlPass "BZ 888524 not found"
+		fi
+	rlPhaseEnd
+}
