@@ -680,11 +680,11 @@ ipa_host_mod_ssh_negative_0008()
 }
 
 
-test_envcleanup()
+ipa_host_mod_ssh_envcleanup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "test_envcleanup - clean up test environment"
+	rlPhaseStartTest "ipa_host_mod_ssh_envcleanup - clean up test environment"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER ($MASTER)"

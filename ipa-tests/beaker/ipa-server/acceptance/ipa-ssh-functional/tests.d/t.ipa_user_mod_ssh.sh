@@ -706,32 +706,3 @@ ipa_user_mod_ssh_negative_0009()
 	rlPhaseEnd
 }
 
-test_envcleanup()
-{
-	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "test_envcleanup - clean up test environment"
-	case "$MYROLE" in
-	"MASTER")
-		rlLog "Machine in recipe is MASTER ($MASTER)"
-		for u in $(ipa user-find user --pkey-only --raw|grep uid:|awk '{print $2}'); do
-			rlRun "ipa user-del $u"
-		done
-		rlRun "rm -f /tmp/ssh_user${NUMBER}_*"
-		rlRun "rm -f /tmp/ssh_baduser${NUMBER}_*"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $BKRRUNHOST"
-		;;
-	"SLAVE")
-		rlLog "Machine in recipe is SLAVE ($SLAVE)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
-		;;
-	"CLIENT")
-		rlLog "Machine in recipe is CLIENT ($CLIENT)"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $BKRRUNHOST"
-		;;
-	*)
-		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
-		;;
-	esac
-	rlPhaseEnd
-}
