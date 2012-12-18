@@ -160,7 +160,7 @@ dnszone()
 	rlPhaseStartTest "ipa-dns-zone-01 create a new zone"
 		rlLog "Executing: ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone"
 		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
-		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
+		#rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
 	rlPhaseEnd
 
 # Neg zone add test cases
@@ -196,9 +196,10 @@ dnszone()
 		rlRun "ipa dnszone-find --all $zone | grep $email" 0 "checking to ensure that the new zone got created with the correct email"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-zone-10 checking to ensure that the new zone got created with the correct serial number"
-		rlRun "ipa dnszone-find --all $zone | grep $serial" 0 "checking to ensure that the new zone got created with the correct serial number"
-	rlPhaseEnd
+        # with changes for SOA Serial Autoincrement, this test is not valid anymore
+#	rlPhaseStartTest "ipa-dns-zone-10 checking to ensure that the new zone got created with the correct serial number"
+#		rlRun "ipa dnszone-find --all $zone | grep $serial" 0 "checking to ensure that the new zone got created with the correct serial number"
+#	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-zone-11 checking to ensure that the new zone got created with the correct refresh"
 		rlRun "ipa dnszone-find --all $zone | grep $refresh" 0 "checking to ensure that the new zone got created with the correct "
@@ -228,9 +229,10 @@ dnszone()
 		rlRun "dig $zone SOA | grep $email" 0 "checking with dig to ensure that the new zone got created with the correct email"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-zone-18 checking to with dig to ensure that the new zone got created with the correct serial number"
-		rlRun "dig $zone SOA | grep $serial" 0 "checking with dig to ensure that the new zone got created with the correct serial number"
-	rlPhaseEnd
+        # with changes for SOA Serial Autoincrement, this test is not valid anymore
+#	rlPhaseStartTest "ipa-dns-zone-18 checking to with dig to ensure that the new zone got created with the correct serial number"
+#		rlRun "dig $zone SOA | grep $serial" 0 "checking with dig to ensure that the new zone got created with the correct serial number"
+#	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-zone-19 checking to with dig to ensure that the new zone got created with the correct refresh"
 		rlRun "dig $zone SOA | grep $refresh" 0 "checking with dig to ensure that the new zone got created with the correct refresh"
@@ -541,9 +543,10 @@ dnsptrzone()
 		rlRun "ipa dnszone-find --all $ptrzone | grep $pemail" 0 "checking to ensure that the new PTR zone got created with the correct email"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-ptrzone-06 checking to ensure that the new PTR zone got created with the correct serial number"
-		rlRun "ipa dnszone-find --all $ptrzone | grep $pserial" 0 "checking to ensure that the new PTR zone got created with the correct serial number"
-	rlPhaseEnd
+        # with changes for SOA Serial Autoincrement, this test is not valid anymore
+#	rlPhaseStartTest "ipa-dns-ptrzone-06 checking to ensure that the new PTR zone got created with the correct serial number"
+#		rlRun "ipa dnszone-find --all $ptrzone | grep $pserial" 0 "checking to ensure that the new PTR zone got created with the correct serial number"
+#	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-ptrzone-07 checking to ensure that the new PTR zone got created with the correct refresh"
 		rlRun "ipa dnszone-find --all $ptrzone | grep $prefresh" 0 "checking to ensure that the new PTR zone got created with the correct "
@@ -573,9 +576,10 @@ dnsptrzone()
 		rlRun "dig $ptrzone SOA | grep $pemail" 0 "checking with dig to ensure that the new PTR zone got created with the correct email"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-ptrzone-14 checking to with dig to ensure that the new PTR zone got created with the correct serial number"
-		rlRun "dig $ptrzone SOA | grep $pserial" 0 "checking with dig to ensure that the new PTR zone got created with the correct serial number"
-	rlPhaseEnd
+        # with changes for SOA Serial Autoincrement, this test is not valid anymore
+#	rlPhaseStartTest "ipa-dns-ptrzone-14 checking to with dig to ensure that the new PTR zone got created with the correct serial number"
+#		rlRun "dig $ptrzone SOA | grep $pserial" 0 "checking with dig to ensure that the new PTR zone got created with the correct serial number"
+#	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-ptrzone-15 checking to with dig to ensure that the new PTR zone got created with the correct refresh"
 		rlRun "dig $ptrzone SOA | grep $prefresh" 0 "checking with dig to ensure that the new PTR zone got created with the correct refresh"

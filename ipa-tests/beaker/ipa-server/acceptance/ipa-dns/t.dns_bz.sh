@@ -45,7 +45,6 @@ dnsbugs()
    bz829340
    bz798493
    bz809565
-   bz798355
    bz767496
    bz802375
    bz829353
@@ -53,6 +52,10 @@ dnsbugs()
    bz829728
    bz829388
    bz767489
+
+# test to be rewritten - in backlog
+#   bz798355
+
    dnsbugcleanup
 }
 
@@ -732,7 +735,7 @@ bz828687()
 		texpire=1202
 		tminimum=33
 		tttl=55
-		tzone="llnewzone"
+		tzone="llnewzone."
 		thn=$(hostname)
 		tipaddr="$thn." # Add a . to the end of the address to test with
 
@@ -740,7 +743,6 @@ bz828687()
 		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Adding a new zone to test with"
 		# Add a host to test with
 		rlRun "ipa host-add --ip-address='$ipoc1.$ipoc2.$ipoc3.$newoc4' 'tt.$tzone'" 0 "Add a new host to test with"
-		rlRun "ipa host-find tt.$tzone" 0 "verifying that the host was created."
 		rlRun "ipa dnsrecord-find $ipoc3.$ipoc2.$ipoc1.in-addr.arpa. $newoc4 | grep $tzone" 0 "Make sure PTR record was added for the new host."
 		rlRun "ipa host-del tt.$tzone --updatedns" 0 "Try to delete the new host. This should pass"
 	
@@ -853,7 +855,9 @@ bz813380()
 		ipoc2=$(echo $ipaddr | cut -d\. -f2)
 		ipoc3=$(echo $ipaddr | cut -d\. -f3)
 		ipoc4=$(echo $ipaddr | cut -d\. -f4)
-		newoc4=251
+		#newoc4=251
+                # NK:
+		newoc4=252
 		temail="ipaqar.redhat.com"
 		tserial=2010010701
 		trefresh=303
@@ -869,8 +873,8 @@ bz813380()
 		rlRun "ipa host-add nsnew.$tzone --ip-address=$ipoc1.$ipoc2.$ipoc3.$newoc4" 0 "Add a host to add as a ns server for the zone $tzone"
 		rlRun "ipa host-find nsnew.$tzone" 0 "make sure that the new host was created"
 		rlRun "ipa dnsrecord-add $tzone @ --ns-rec=nsnew" 0 "Add a non-FQDN NS record to the new zone"
-		rlRun "ipa dnsrecord-show $tzone @ | grep nsnew.$tzone" 0 "Make sure that the FQDN ns record appears to be in the new zone"
-		ipa host-del nsnew.$tzone # Cleanup the host
+		rlRun "ipa dnsrecord-show $tzone @ | grep nsnew" 0 "Make sure that the ns record appears in the new zone"
+		ipa host-del nsnew.$tzone --updatedns # Cleanup the host
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 
 	rlPhaseEnd	
@@ -990,18 +994,29 @@ bz809565()
 		tminimum=33
 		tttl=55
 		tzone="idnszone.com"
-		ipv6address='fe80::210:14ff:fe05:134'
+                recordName="ARecord"
+                newRecordName="ARenameRecord"
+		ipaddr=$(hostname -i)
+		rlLog "Ip address is $ipaddr"
+		ipoc1=$(echo $ipaddr | cut -d\. -f1)
+		ipoc2=$(echo $ipaddr | cut -d\. -f2)
+		ipoc3=$(echo $ipaddr | cut -d\. -f3)
+		ipoc4=$(echo $ipaddr | cut -d\. -f4)
+		newoc4=251
 
 		# Add a zone to test with
 		rlLog "Executing: ipa dnszone-add --name-server=$MASTER. --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone"
 		rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "Add a new zone to test with"
-		rlLog "Executing: ipa dnszone-mod $tzone --addattr=idnsName='Name1'"
-		ipa dnszone-mod $tzone --addattr=idnsName='Name1'
-		nameb='Name2'
-		rlLog "Executing: ipa dnszone-mod $tzone --addattr=idnsName='$nameb'"
-		rlRun "ipa dnszone-mod $tzone --addattr=idnsName='$nameb'" 0 "Try to modify the idns name without destroying it first."
-		rlLog "Executing: ipa dnszone-find $tzone | grep '$nameb'"
-		rlRun "ipa dnszone-find $tzone | grep '$nameb'" 0 "Make sure that the new name exists in the zone."
+
+                # Add an A Record
+                rlRun "ipa dnsrecord-add $tzone $recordName --a-ip-address=$ipoc1.$ipoc2.$ipoc3.$newoc4" 0 "Add ARecord"
+                rlRun "ipa dnsrecord-find $tzone | grep $recordName" 0 "Verify dnsrecord $recordName is added"
+                # Rename this record
+                rlRun "ipa dnsrecord-mod $tzone $recordName --rename $newRecordName" 0 "Rename $recordName to be $newRecordName"
+                
+                rlRun "ipa dnsrecord-find $tzone | grep $recordName" 1 "Verify dnsrecord $recordName is not found"
+                rlRun "ipa dnsrecord-find $tzone | grep $newRecordName" 0 "Verify renamed dnsrecord $newRecordName is found"
+
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 		
 	rlPhaseEnd
@@ -1010,6 +1025,8 @@ bz809565()
 bz798355()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=798355
+        # https://engineering.redhat.com/trac/ipa-tests/ticket/553
+        # automation moved to backlog. test below should be updated based on steps to verify listed in bz.
 	rlPhaseStartTest "Bug 798355 -  Fill DNS update policy by default"
 		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=TRUE" 0 "Enable Dynamic update." 
 		rlRun "ipa dnszone-show --rights $DOMAIN --all | grep BIND\ update | grep 'grant $RELM krb5-self'" 0 "Make sure that the correct update string was added"
