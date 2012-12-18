@@ -555,7 +555,7 @@ find_soon_to_be_renewed_certs(){
 
 prepare_preserv_dir()
 {
-    preservDir="$TmpDir/preserve"
+    preservDir="/tmp/preserve"
     if [ ! -d $preservDir ];then
         mkdir -p $preservDir
         echo "create preserv dir: [$preservDir]"
