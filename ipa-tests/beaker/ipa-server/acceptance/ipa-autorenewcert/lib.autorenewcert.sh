@@ -148,9 +148,9 @@ caJarSigningCert(){
 list_all_ipa_certs(){
     sort_certs
     echo ""
-    echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+"
-    echo "+-------------------- all IPA certs (round $testroundCounter) [`date`]----------------------------------+" > $certReport
-    local summary="Summary: are all certs valid? [`all_certs_are_valid`] system date [`date`] "
+    echo "+-------------- all IPA certs (round $testroundCounter) Days left to the CA Cert life limit [`distanceToCAcertLimit`] ----------------------------+"
+    echo "+-------------- all IPA certs (round $testroundCounter) Days left to the CA Cert life limit [`distanceToCAcertLimit`] ----------------------------+" > $certReport
+    local summary="   ===== Summary: are all certs valid? [`all_certs_are_valid`] current system date [`date`],  === "
     echo $summary
     echo $summary >> $certReport
     echo "[valid certs]:"
@@ -282,7 +282,6 @@ convert_utc_date_to_epoch(){
 convert_date_to_epoch(){
     date -d "$@" "+%s"
 }
-    
 
 convert_epoch_to_date(){
     perl -e "print scalar localtime($1)"
@@ -371,7 +370,7 @@ stop_ipa_certmonger_server(){
         sleep 5 # give system some time so ipa server can fully stopped
         ipactl stop 2>&1 > $tempout
         sleep 5 # give system some time so ipa server can fully stopped
-        if grep -i "Aborting ipactl" $tempout 2>&1 > /dev/null
+        if grep -i "Aborting ipactl\|FAILED" $tempout
         then
             rlFail "stop ipa server Failed"
             cat $tempout
@@ -387,7 +386,7 @@ start_ipa_certmonger_server(){
         local tempout=$TmpDir/start.ipa.certmonger.server.$testid.$RANDOM.txt
         ipactl start 2>&1 > $tempout
         sleep 5 # give system some time so ipa server can fully stopped
-        if grep -i "Aborting ipactl" $tempout 2>&1 > /dev/null
+        if grep -i "Aborting ipactl\|FAILED" $tempout 
         then
             rlFail "start ipa server Failed"
             cat $tempout
@@ -437,7 +436,9 @@ prepare_for_next_round(){
     done
     certRenewCounter=$lowest
     echo "$header +----------------------------------------------------------------------+"
-    echo "$header ~~~ check whether all certs are valid [`all_certs_are_valid`]  system date [`date`] ~~~~"
+    echo "$header ~~~~~ check whether all certs are valid [`all_certs_are_valid`]  ~~~~~"
+    echo "$header ~~~~~ current system date [`date`] ~~~~~~"
+    echo "$header ~~~~~ distance to CA cert life limit [`distanceToCAcertLimit`] ~~~~~"
 }
 
 check_actually_renewed_certs(){
@@ -618,38 +619,21 @@ continue_test(){
         touch $testResult
         echo "yes" # when test gets into first round, there is no testResult file exist, just echo 'yes' to continue test
     else
-        if [ "`all_certs_are_valid`" = "yes" ];then
-            # continue test till all certs are being renewed minRound times
-            if [ $certRenewCounter -ge $minRound ];then
-                echo "no"
-            else
-                echo "yes"
-            fi
+        if [ "`distanceToCAcertLimit`" = "-1" ];then
+            echo "no"
         else
-            echo "no" # stop test if any invalid certs are found
+            if [ "`all_certs_are_valid`" = "yes" ];then
+            # continue test till all certs are being renewed minRound times
+                if [ $certRenewCounter -ge $minRound ];then
+                    echo "no"
+                else
+                    echo "yes"
+                fi
+            else
+                echo "no" # stop test if any invalid certs are found
+            fi
         fi
     fi
-
-    # test condition change: I have seen many failures around DNS A record test. And this failure stops test to continue even all certs are found being renewed and cause no other probolems. The change I make here will make test continue beyound this problem. This is just a temp change. I will eventually chagne it back : yi zhang 2012.12.13
-#    else
-#        echo "No invalid certs found"
-#    fi
-
-        # if all current test are passed
-#        if ! grep "FAIL" $testResult 2>&1 >/dev/null
-#        then
-#            if [ $certRenewCounter -ge $minRound ];then
-                #no need to continue 
-                #since all certs have been renewed minimum of [$minRound] round"
-#                echo "no" 
-#            else
-                # continue test, we want all certs gets renewed minimu [$minRound]
-#                echo "yes"
-#            fi
-#        else
-#            echo "no"
-#        fi
-#    fi
 }
 
 get_all_valid_certs(){
@@ -1148,3 +1132,12 @@ digDNSerror()
     echo "============== end of dig DNS error ==============="
     done
 }
+
+distanceToCAcertLimit()
+{
+    local now=`date "+%s"`
+    local distance=`echo "$caCertLimit - $now" | bc`
+    local distance_str=`$timeverter $distance`
+    echo $distance_str
+}
+

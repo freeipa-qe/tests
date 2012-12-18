@@ -9,6 +9,7 @@ sortlist="$dir/sortlist.pl"
 grouplist="$dir/grouplist.pl"
 countlist="$dir/countlist.pl"
 difflist="$dir/difflist.pl"
+timeverter="$dir/convertTime.pl"
 testResult="$TmpDir/test.result.$RANDOM.txt"
 
 # constance used for cert autorenew test
@@ -31,8 +32,9 @@ checkTestConditionRequired="true"
 
 #data storage used
 certdata_notafter="$TmpDir/cert.data.not.after.sec.txt"
-
-minRound=2
+epoch_now=`date "+%s"`
+caCertLimit=`echo "2922 * 24 * 60 * 60 + $epoch_now" | bc` #based on Nalin's feedback: CA cert itself has only 8 years life time
+minRound=9
 certRenewCounter=0
 
 log_httpd="/var/log/httpd/error_log"
