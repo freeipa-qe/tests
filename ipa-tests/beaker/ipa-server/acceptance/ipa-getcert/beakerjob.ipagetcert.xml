@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server ipa-getcert RHEL6.2 build RC x86_64
+		ipa-server ipa-getcert RHEL6.2 build RC x86_64 [#serial]
 	</whiteboard>
 	<recipeSet>
 		<recipe whiteboard="ipa-getcert RHEL 6.2 RC x86_64">
@@ -9,18 +9,16 @@
             <ks_appends/>
             <packages/>
             <repos>
-                <repo name="ipa_rc" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-RC-4.0/6.2/Server/x86_64/os/"/>
-                <repo name="ipa_noarch_rc" url="http://download.lab.bos.redhat.com/rel-eng/RHEL6.2-RC-4.0/6.2/Server/optional/x86_64/os/"/>
+                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
             </repos>
-			<distroRequires>
-				<and>
-					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
-					<distro_variant op="=" value="Server"/>
-					<distro_tag op="=" value="STABLE"/>
-					<distro_arch op="=" value="x86_64"/>
-				</and>
-				<distro_virt op="=" value=""/>
-			</distroRequires>
+            <distroRequires>
+                <and>
+                <distro_variant op="=" value="Server"/>
+                <distro_arch op="=" value="x86_64"/>
+                <distro_family op="=" value="RedHatEnterpriseLinux6"/>
+                </and>
+                <distro_virt op="=" value=""/>
+            </distroRequires>
 			<hostRequires/>
 			<!--
 			<hostRequires>
