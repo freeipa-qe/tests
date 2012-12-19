@@ -26,7 +26,7 @@ addusertests()
 
 addsetup()
 {
-    rlPhaseStartTest
+    rlPhaseStartTest "ipa-user-cli-add-setup basic setup before tests"
        rlRun "rlDistroDiff keyctl" 
        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as administrator"
     rlPhaseEnd
@@ -726,7 +726,7 @@ disableuser.ldif_EOF
 
 addcleanup()
 {
-    rlPhaseStartTest
+    rlPhaseStartTest "ipa-user-cli-add-cleanup basic cleanup after tests"
         rlRun "ipa config-mod --searchrecordslimit=100" 0 "set default search records limit back to default"
         rlRun "ipa user-del $superuser " 0 "delete $superuser account"
     rlPhaseEnd
