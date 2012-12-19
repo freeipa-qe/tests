@@ -39,8 +39,8 @@ minRound=9
 certRenewCounter=0
 
 log_httpd="/var/log/httpd/error_log"
-log_ldap_error="/var/log/dirsrv/slapd-*/errors"
-log_ldap_access="/var/log/dirsrv/slapd-*/access"
+log_ldap_error="/var/log/dirsrv/slapd-*/errors*"
+log_ldap_access="/var/log/dirsrv/slapd-*/access*"
 log_sys="/var/log/messages"
 log_krb5="/var/log/krb5kdc.log"
 log_selinux="/var/log/audit/audit.log"

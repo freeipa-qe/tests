@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		ipa-server - cert automatic renew x86_64 (rhel6.4 release)
+		ipa-server - cert automatic renew x86_64 (rhel6.4 release) [#serial]
 	</whiteboard>
 	<notify>
         <cc>yzhang@redhat.com</cc>

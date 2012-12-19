@@ -721,6 +721,9 @@ debuginfo()
         tail -n $nLines $log
         echo ""
     done
+    echo "================ specific for certmonger : grep certmonger from /var/log/message* =========="
+    tail -n $nLines /var/log/messages* | grep -i "certmonger"
+    echo "===================== END OF CERTMONGER messages in /var/log/message* ======================"
 }
 
 all_certs_are_valid(){
