@@ -214,7 +214,8 @@ rlPhaseStartTest "0001 Creating winsync agreement"
 
 	# Restart PassSync after winsync agreement is established
 	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
-	rlRun "PassSync_Restart $ADip administrator $ADpswd" 0 "Restarting PassSync Service"
+	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd" 0 "PassSync status on AD"
+	rlRun "PassSync_Restart $ADip $ADadmin $ADpswd" 0 "Restarting PassSync Service"
 
 rlPhaseEnd
 }
@@ -612,7 +613,8 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 
 	 # Restart PassSync after winsync agreement is established
 	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
-	rlRun "PassSync_Restart $ADip administrator $ADpswd" 0 "Restarting PassSync Service"
+	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd" 0 "PassSync status on AD"
+	rlRun "PassSync_Restart $ADip $ADadmin $ADpswd" 0 "Restarting PassSync Service"
 	sleep 15
 
 	rlRun "$ipa user-show $l1user | grep \"Account disabled: False\"" 0 "$l1user from OU $OU1 synced and enabled in IPA"
@@ -640,7 +642,8 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 
 	 # Restart PassSync after winsync agreement is established
 	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
-	rlRun "PassSync_Restart $ADip administrator $ADpswd" 0 "Restarting PassSync Service"
+	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd" 0 "PassSync status on AD"
+	rlRun "PassSync_Restart $ADip $ADadmin $ADpswd" 0 "Restarting PassSync Service"
 	sleep 10
 
 	rlRun "syncinterval_ldif $sec add"
