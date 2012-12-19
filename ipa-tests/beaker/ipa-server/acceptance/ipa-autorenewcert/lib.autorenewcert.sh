@@ -619,7 +619,9 @@ continue_test(){
         touch $testResult
         echo "yes" # when test gets into first round, there is no testResult file exist, just echo 'yes' to continue test
     else
-        if [ "`distanceToCAcertLimit`" = "-1" ];then
+        local now=`date "+%s"`
+        local distance=`echo "$caCertLimit - $now" | bc`
+        if [ $distance -le $twoyears ];then
             echo "no"
         else
             if [ "`all_certs_are_valid`" = "yes" ];then

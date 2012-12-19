@@ -13,6 +13,7 @@ timeverter="$dir/convertTime.pl"
 testResult="$TmpDir/test.result.$RANDOM.txt"
 
 # constance used for cert autorenew test
+twoyears=`echo "2 * 366 * 24 * 60 * 60" | bc`
 threedays=259200
 sixdays=518400
 oneday=86400 
