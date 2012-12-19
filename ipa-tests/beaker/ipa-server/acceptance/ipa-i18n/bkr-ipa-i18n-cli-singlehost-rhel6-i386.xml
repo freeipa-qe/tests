@@ -38,7 +38,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-i18n-cli" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-i18n" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
