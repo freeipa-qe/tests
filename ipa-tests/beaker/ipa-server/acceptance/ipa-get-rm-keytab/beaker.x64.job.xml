@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		IPA get-rm-keytab RHEL6.4 X86_64 [$serial]
+		IPA get-rm-keytab RHEL6.4 X86_64 [#serial]
 	</whiteboard>
 	    <recipeSet>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="ipa-get-rm-keytab Client">
