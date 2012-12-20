@@ -74,7 +74,8 @@ ipa_install_set_vars() {
 		M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
 		export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
 		export BEAKERMASTER_env${I}=$M
-		export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype)
+		echo "export BEAKERMASTER_env${I}=$M" >> /dev/shm/env.sh
+		export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
 		if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
 			export MYROLE=MASTER_env${I}
 			export MYENV=${I}
@@ -97,7 +98,8 @@ ipa_install_set_vars() {
 		for R in $(eval echo \$REPLICA_env${I}); do
 			export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
 			export BEAKERREPLICA${J}_env${I}=$R
-			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype)
+			echo "export BEAKERREPLICA${J}_env${I}=$R" >> /dev/shm/env.sh
+			export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype|tail -1)
 			if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
 				export MYROLE=REPLICA${J}_env${I}
 				export MYENV=${I}
@@ -125,7 +127,8 @@ ipa_install_set_vars() {
 		for C in $(eval echo \$CLIENT_env${I}); do
 			export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN
 			export BEAKERCLIENT${J}_env${I}=$C
-			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype)
+			echo "export BEAKERCLIENT${J}_env${I}=$C" >> /dev/shm/env.sh
+			export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype|tail -1)
 			if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
 				export MYROLE=CLIENT${J}_env${I}
 				export MYENV=${I}
@@ -192,6 +195,11 @@ ipa_install_set_vars() {
 		IPADEBUG=1
 	fi
 		
+	# Copy ipa-install.sh to /dev/shm 
+	# Some tests like install-server-cli like to call the scipt as a library
+	rm -f /dev/shm/ipa-install.sh
+	cp -a ./ipa-install.sh /dev/shm/.
+ 
 	rlLog "===================== env|sort =========================="
 	rlRun "env|sort"
 	rlLog "===================== env.sh   =========================="
@@ -256,6 +264,7 @@ ipa_install_topo_default()
 			fi
 		rlPhaseEnd
 	done
+
 }
 
 ######################################################################
@@ -659,14 +668,8 @@ ipa_install_topo()
 
 }
 
-ipa_install_prep() 
+ipa_install_prep_initVars()
 {
-	rlLog "$FUNCNAME"
-	if [ -z "$IPA_SERVER_PACKAGES" ]; then
-		rlFail "IPA_SERVER_PACKAGES variable not set.  Run ipa_install_set_vars first"
-		return 1
-	fi
-
 	tmpout=/tmp/error_msg.out
 	currenteth=$(route | grep ^default | awk '{print $8}')
 	ipaddr=$(ip -o -4 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
@@ -680,7 +683,10 @@ ipa_install_prep()
 		rrtype=""
 		netaddr="$ipaddr"
 	fi
+}
 
+ipa_install_prep_pkgInstalls()
+{
 	rlRun "yum clean all"
 	rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
 	if [ $(echo $MYROLE|grep CLIENT|wc -l) -gt 0 ]; then
@@ -689,56 +695,110 @@ ipa_install_prep()
 		rlRun "yum -y install $YUM_OPTIONS $IPA_SERVER_PACKAGES"
 	fi
 	rlRun "yum -y update"
+}
 
-	# Set time
+ipa_install_prep_setTime()
+{
 	rlLog "Stopping ntpd service"
 	rlRun "service ntpd stop"
 	rlLog "Synchronizing time to $NTPSERVER"
 	rlRun "ntpdate $NTPSERVER"
+}
 
-	# Fix /etc/hosts
+fixHostFile()
+{
+	ipa_install_prep_initVars
+
 	cp -af /etc/hosts /etc/hosts.ipabackup
 	rlRun "sed -i s/$hostname//g    /etc/hosts"
 	rlRun "sed -i s/$hostname_s//g  /etc/hosts"
-	rlRun "sed -i /$ipaddr/d    /etc/hosts"
-	if [ -n "$ipv6addr" ]; then 
-		for i6 in $(echo $ipv6addr); do
-			rlRun "sed -i '/$i6/d'  /etc/hosts"
-		done
-	fi
-	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
-	
-	# Other IPv6 fixes
-	if [ "$IPv6SETUP" = "TRUE" ] ; then
-		rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /dev/shm/env.sh"
-		. /dev/shm/env.sh
-		rlRun "/sbin/ip -4 addr del $ipaddr dev $currenteth"
-	fi
+	for i in $(echo $ipaddr); do
+		rlRun "sed -i /$i/d    /etc/hosts"
+	done
 
-	# Fix hostname
+	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+}
+
+fixHostFileIPv6()
+{
+	ipa_install_prep_initVars
+
+	cp -af /etc/hosts /etc/hosts.ipabackup
+	rlRun "sed -i s/$hostname//g    /etc/hosts"
+	rlRun "sed -i s/$hostname_s//g  /etc/hosts"
+	for i6 in $(echo $ipv6addr); do
+		rlRun "sed -i '/$i6/d'  /etc/hosts"
+	done
+	rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+}
+
+fixhostname()
+{
+	ipa_install_prep_initVars
+	
 	if [ ! -f /etc/sysconfig/network-ipabackup ]; then
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
 	fi
 	rlRun "hostname $hostname_s.$DOMAIN"
 	rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
 	. /etc/sysconfig/network
+}
+
+fixForwarderIPv6()
+{
+	ipa_install_prep_initVars
 	
-	# Fix /etc/resolv.conf
+	rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /dev/shm/env.sh"
+	. /dev/shm/env.sh
+}
+
+rmIPv4addr()
+{
+	ipa_install_prep_initVars
+	
+	rlRun "/sbin/ip -4 addr del $ipaddr dev $currenteth"
+}
+
+fixResolv()
+{
+	ipa_install_prep_initVars
+	
 	# we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
 	if [ ! -f /etc/resolv.conf.ipabackup ]; then
 		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
 	fi
 	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
 		for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
-			nsaddr=$(dig +short $ns $rrtype)
+			nsaddr=$(dig +short $ns $rrtype|tail -1)
 			rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
 		done
 		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
 		rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
 		rlRun "rm -f /etc/resolv.conf.new"
 	fi
-		
-	# Disable Firewall
+}
+
+fixResolvIPv6()
+{
+	ipa_install_prep_initVars
+	
+	# we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
+	if [ ! -f /etc/resolv.conf.ipabackup ]; then
+		rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
+	fi
+	if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
+		for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
+			nsaddr=$(dig +short $ns $rrtype|tail -1)
+			rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
+		done
+		rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+		rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
+		rlRun "rm -f /etc/resolv.conf.new"
+	fi
+}
+
+ipa_install_prep_disableFirewall()
+{
 	rlRun "chkconfig iptables off"
 	rlRun "chkconfig ip6tables off"
 
@@ -750,7 +810,7 @@ ipa_install_prep()
 			rlPass "BZ 845301 not found -- service iptables stop succeeeded"
 		fi
 	else    
-		rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "service iptables stop"
 	fi
 
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
@@ -761,15 +821,12 @@ ipa_install_prep()
 			rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
 		fi
 	else    
-		rlRun "service ip6tables stop" 0 "Stop the firewall on the client"
+		rlRun "service ip6tables stop"
 	fi
+}
 
-	#if [ $(rpm -qa | grep ipa-server | wc -l) -eq 0 ]; then
-	#	rlFail "No ipa-server packages found"
-	#fi
-
-	# setup SSH keys
-	## Adding code from SetUpAuthKeys
+SetUpAuthKeys()
+{
 	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
 	chmod 700 /root/.ssh
 	restorecon -R /root/.ssh
@@ -780,15 +837,29 @@ ipa_install_prep()
 		for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
 			for server in $(eval echo \$$var); do
 				sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
-				#AddToKnownHosts $server
-				if [ -f /root/.ssh/known_hosts ]; then
-					ssh-keygen -R $server
-				fi
-				ssh-keyscan $server >> /root/.ssh/known_hosts
 			done
 		done
 	fi
+}
 
+SetUpKnownHosts()
+{
+	[ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
+	chmod 700 /root/.ssh
+	restorecon -R /root/.ssh
+	for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
+		for server in $(eval echo \$$var); do
+			#AddToKnownHosts $server
+			if [ -f /root/.ssh/known_hosts ]; then
+				ssh-keygen -R $server
+			fi
+			ssh-keyscan $server >> /root/.ssh/known_hosts
+		done
+	done
+}
+
+configAbrt()
+{
 	# configure abrt
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]" |wc -l) -gt 0 ]; then
 		rlLog "configAbrt : Machine is a RHEL 5 machine - no abrt"
@@ -825,6 +896,55 @@ ipa_install_prep()
 	fi
 }
 
+ipa_install_prep() 
+{
+	rlLog "$FUNCNAME"
+	if [ -z "$IPA_SERVER_PACKAGES" ]; then
+		rlFail "IPA_SERVER_PACKAGES variable not set.  Run ipa_install_set_vars first"
+		return 1
+	fi
+
+	ipa_install_prep_pkgInstalls
+
+	ipa_install_prep_setTime
+
+	if [ "$IPv6SETUP" != "TRUE" ]; then
+		fixHostFile
+		fixhostname
+		fixResolv
+	else
+		fixHostFileIPv6
+		fixhostname
+		fixForwarderIPv6
+		rmIPv4addr
+		fixResolvIPv6
+	fi
+
+	ipa_install_prep_disableFirewall
+
+	SetUpAuthKeys
+	SetUpKnownHosts
+
+	configAbrt
+}
+
+ipa_install_sssd_workarounds()
+{
+
+	# BZ 878420 Workaround
+	rlLog "Adding ldap_sasl_authid to sssd.conf"
+	rlLog "Working around BZ 878420"
+	M1="\[domain\/$DOMAIN\]"
+	M2="\[sssd\]"
+	A1="ldap_sasl_authid = host\/$(hostname)\@$RELM"
+	sed -i "/$M1/,/$M2/ s/^\(.*\[sssd\]\)/$A1\n\n\1/" /etc/sssd/sssd.conf
+
+	# BZ 878288 Workaround
+	rlLog "Starting SSSD in case it is not running"
+	rlLog "Workaround for BZ 878288 due to BZ 874527 fix"
+	rlRun "service sssd start"
+}
+
 ipa_install_master()
 {
 	tmpout=/tmp/error_msg.out
@@ -838,6 +958,16 @@ ipa_install_master()
 		done
 		
 		rlRun "ipa-server-install $IPAOPTIONS --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        if [ $(dig +short download.devel.redhat.com|wc -l) -eq 0 ]; then 
+            KinitAsAdmin
+            rlLog "[FAIL]: BZ 872372 found...IPA server DNS forwarding broken with bind-dyndb-ldap-2.2-1.el6.x86_64"
+            rlLog "Adding workaround for BZ 872372 to fix broken forwarding"
+            rlRun "echo $ADMINPW|kinit admin"
+            rlRun "ipa dnsconfig-mod --forwarder=$DNSFORWARD"
+            rlRun "service named restart"
+        fi
+
+		ipa_install_sssd_workarounds
 
 		if [ $IPADEBUG ]; then
 			if [ -f /usr/share/ipa/bind.named.conf.template ]; then
@@ -891,6 +1021,9 @@ ipa_install_replica()
 		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
 		rlRun "ipa-replica-install $IPAOPTIONS -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+
+		ipa_install_sssd_workarounds
+
 	rlPhaseEnd
 }
 
@@ -917,6 +1050,8 @@ ipa_install_client()
 		rlLog "RUN ipa-client-install"
 		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
 
+		ipa_install_sssd_workarounds
+
 		#rlLog "Killing local ($HOSTNAME) tcpdump"
 		#TCPDPID=""
 		#TCPDPID=$(ps -ef|grep tcpdump.*i[p]a-client.pcap|awk '{print $2}')
@@ -931,13 +1066,16 @@ ipa_install_client()
 		#	ssh root@$MYMASTER "kill $TCPDPID"
 		#fi
 
-		CHK=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
-		if [ $CHK -gt 0 ]; then
-			#sftp root@$MYMASTER:/var/tmp/ipa-server.pcap /var/tmp
-			rlFail "BZ 845691 found...ipa-client-install Failed to obtain host TGT"
+		CHK1=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+		if [ $CHK1 -gt 0 ]; then
+			rlLog "[FAIL1] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
 			submit_log /var/log/ipaclient-install.log
-			#submit_log /var/tmp/ipa-server.pcap
-			#submit_log /var/tmp/ipa-client.pcap
+		fi
+
+		CHK2=$(grep "kinit: Client.*not found in Kerberos database while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+		if [ $CHK2 -gt 0 ]; then
+			rlLog "[FAIL2] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
+			submit_log /var/log/ipaclient-install.log
 		fi
 	rlPhaseEnd
 }
