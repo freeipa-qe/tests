@@ -122,6 +122,8 @@ verify_sssd()
      ipacompare_forinstalluninstall "ipa_server " "$ipa_server" "$testipaserver" "$1" 
 
      verify_bz878288 # Make sure sssd is running
+     verify_bz888124 # Make sure sssd is enabled to start on boot
+	
 }
 
 verify_krb5()
@@ -693,3 +695,12 @@ verify_bz878288()
 	fi
 }
 
+verify_bz888124()
+{
+	chkconfig sssd
+	if [ $? -eq 1 ]; then
+		rlFail "BZ 888124 found...ipa install does not enable sssd start on boot"
+	else
+		rlPass "BZ 888124 not found"
+	fi
+}
