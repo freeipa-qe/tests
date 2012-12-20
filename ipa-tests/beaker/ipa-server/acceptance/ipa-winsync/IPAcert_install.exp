@@ -90,7 +90,7 @@ expect "Re-enter password: ";
 send -- "$paswd\r";
 send -- "certutil -d . -A -i $ipapath\\$ipacrt -n \"IPA Cert\" -t CT,, -a\r";
 sleep 5
-send -- "shutdown /r /f\r";
+send -- "shutdown /r /t /f\r";
 send -- "exit\r";
 expect eof;
 

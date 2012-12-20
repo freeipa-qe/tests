@@ -148,7 +148,9 @@ popd
 	# Uploading the IPA certificate in AD and importing it for passync
 	rm -f $ipacrt
 	rlRun "cp $crt_file $ipacrt"
+	rlRun "ping -c 4 $ADhost" 0 "AD Server is reachable from IPA Server"
 	rlRun "./IPAcert_install.exp add $ADadmin $ADpswd $ADip $msifile $IPAhost $ipacrt $IPAhostIP > /dev/null 2>&1" 0 "Installing PassSync, forwarder and IPA cert in AD"
+	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"" 0 "PassSync Service installed successfully"
 	rlLog "AD server is being rebooted. Waiting 5 mins"
 	sleep 300
 	while true; do
@@ -526,7 +528,7 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
 	rlRun "$ipa user-show $aduser" 0 "$aduser is synced to IPA"
 	rlRun "telephoneNumber_ldif $aduser ads $phn_4"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Adding telephone number for $aduser"
-	sleep 10
+	sleep 40
 	rlRun "$ipa user-show $aduser | grep \"Telephone Number: $phn_4\"" 0 "Change in telephone details synced to IPA"
 	rlRun "$ipa user-mod $aduser --email=$aduser_mail" 0 "Adding email address for $aduser from IPA server"
 	rlRun "ldapsearch -x -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -b \"CN=$aduser ads,CN=users,$ADdc\" mail | grep $aduser_mail" 0 "Change in email ID synced to AD"
