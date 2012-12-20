@@ -45,7 +45,7 @@ dnsbugs()
    bz829340
    bz798493
    bz809565
-   bz767496
+#   bz767496
    bz802375
    bz829353
    bz840383
@@ -691,8 +691,6 @@ bz819635()
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep global\ forwarders" 1 "Ensure old string does not exist in help section"
 		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep per-zone\ forwarders" 0 "Ensure new string does not exist in help section"
-		rlRun "ipa dnsconfig-mod --help | grep 'forwarder=STR' | grep global\ forwarders" 1 "Ensure old string does not exist in help section"
-		rlRun "ipa dnsconfig-mod --help | grep 'forwarder=STR' | grep per-zone\ forwarders" 0 "Ensure new string does not exist in help section"
 
 	rlPhaseEnd
 }
