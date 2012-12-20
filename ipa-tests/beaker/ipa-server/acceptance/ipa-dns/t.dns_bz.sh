@@ -45,13 +45,14 @@ dnsbugs()
    bz829340
    bz798493
    bz809565
-#   bz767496
    bz802375
    bz829353
    bz840383
    bz829728
    bz829388
    bz767489
+   # Note: this test possibly creates an env that is not good for further tests. Not recovering correctly
+   # bz767496
 
 # test to be rewritten - in backlog
 #   bz798355
