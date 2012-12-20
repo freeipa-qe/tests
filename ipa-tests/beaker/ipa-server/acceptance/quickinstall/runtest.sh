@@ -58,6 +58,7 @@ rlJournalStart
         #rlAssertRpm $PACKAGE
 		rlRun "env|sort"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+        rlRun "cp ./ipa-install.sh $TmpDir"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
