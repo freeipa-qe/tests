@@ -107,7 +107,7 @@ rlJournalStart
 dn: cn=config
 changetype: modify
 replace: nsslapd-minssf
-nssldap-minssf: 56
+nsslapd-minssf: 56
 EOF
 
 		/usr/bin/ldapmodify -x -D "cn=Directory Manager" -w "$ADMINPW" << EOF

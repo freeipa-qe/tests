@@ -296,9 +296,10 @@ ldap_tests()
 {
 
         rlPhaseStartTest "Check master ldap configuration"
-                minssf=`ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ADMINPW -b "cn=config" | grep nsslapd-minssf:`
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+                minssf=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b "cn=config" | grep nsslapd-minssf:`
                 rlLog "Master minssf configuration: $minssf"
-                anonaccess=`ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ADMINPW -b "cn=config" | grep nsslapd-allow-anonymous-access:`
+                anonaccess=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b "cn=config" | grep nsslapd-allow-anonymous-access:`
                 rlLog "Master anonymous access configuration: $anonaccess"
         rlPhaseEnd
 

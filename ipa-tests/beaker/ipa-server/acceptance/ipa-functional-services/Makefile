@@ -25,7 +25,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/ipa-functional-services
-export TESTVERSION=3.0
+export TESTVERSION=3.3
 
 BUILT_FILES=
 

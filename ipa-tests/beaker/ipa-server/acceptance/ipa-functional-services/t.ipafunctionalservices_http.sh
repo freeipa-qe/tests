@@ -162,9 +162,10 @@ http_tests()
 {
 
 	rlPhaseStartTest "Check master ldap configuration"
-		minssf=`ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ADMINPW -b "cn=config" | grep nsslapd-minssf:`
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
+		minssf=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b "cn=config" | grep nsslapd-minssf:`
 		rlLog "Master minssf configuration: $minssf"
-		anonaccess=`ldapsearch -x -h $MASTER -p 389 -D "cn=Directory Manager" -w $ADMINPW -b "cn=config" | grep nsslapd-allow-anonymous-access:`
+		anonaccess=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b "cn=config" | grep nsslapd-allow-anonymous-access:`
 		rlLog "Master anonymous access configuration: $anonaccess"
 	rlPhaseEnd
 
@@ -219,7 +220,7 @@ disable_service()
 		sftp admin@$MASTER:/tmp/disable_service.out /tmp/disable_service.out
 		rlAssertGrep "Disabled service \"$HTTPPRINC@$RELM\"" "/tmp/disable_service.out"
 		# verify service is disabled and certificate removed
-		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTERipa service-show --all $HTTPPRINC > /tmp/disable_http.out"
+		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-show --all $HTTPPRINC > /tmp/disable_http.out"
 		sftp admin@MASTER:/tmp/disable_http.out /tmp/disable_http.out
 		rlAssertGrep "Keytab: False" "/tmp/disable_http.out"
 		rlAssertNotGrep "Certificate" "/tmp/disable_http.out"
