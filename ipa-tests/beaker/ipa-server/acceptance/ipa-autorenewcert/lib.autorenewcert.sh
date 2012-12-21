@@ -707,15 +707,15 @@ final_cert_status_report(){
     else
         echo "No invalid certs found"
     fi
-    echo "getcert list output:"
-    getcert list
+    #echo "getcert list output:"
+    #getcert list
 }
 
 debuginfo()
 {
+    local nLines=150
     for log in $logs
     do
-        local nLines=150
         echo ""
         echo "============ last $nLines lines of $log ==================="
         tail -n $nLines $log
@@ -1023,7 +1023,6 @@ test_ipa_via_creating_new_cert(){
         rlFail "[$host] not found in ipa server"
     fi
     echo "[step 2/4] add a test service add service: [$principal], sometimes there are some random failures for this"
-    digDNSerror "$host"
     local serviceAddResult=`ipa service-add $principal 2>&1`
     if echo $serviceAddResult | grep "Added service" 
     then
@@ -1032,6 +1031,7 @@ test_ipa_via_creating_new_cert(){
     elif echo $serviceAddResult | grep -i "Host does not have corresponding DNS A record"
     then
         echo "[step 2/4 result] failed:, it reports no DNS A record, weird, try same command again"
+    	digDNSerror "$host"
         ipa dnsrecord-find $DOMAIN
         ipa service-add $principal
         if [ $? = 0 ];then
