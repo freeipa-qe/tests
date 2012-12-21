@@ -12,7 +12,7 @@ hostPrinciple="host/${hostname}@${realm}"
 suffix="dc=yzhang,dc=redhat,dc=com"
 
 automountLocationA="yztest${id}"
-ipaServerMaster="banana.yzhang.redhat.com"
+ipaServerMaster="apple.yzhang.redhat.com"
 dnsServer="192.168.122.101"
 nfsServer=$ipaServerMaster
 nfsExportTopDir="/share"
@@ -53,7 +53,8 @@ configure_autofs_indirect(){
     ipa automountmap-add $name auto.share
     ipa automountkey-add $name auto.master --key=${autofsTopDir} --info=auto.share
     #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
-    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5  ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
+    #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
+    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:/share"
     show_autofs_configuration $name
 }
 
