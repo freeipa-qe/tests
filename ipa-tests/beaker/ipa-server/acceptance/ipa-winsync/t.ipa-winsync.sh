@@ -150,7 +150,6 @@ popd
 	rlRun "cp $crt_file $ipacrt"
 	rlRun "ping -c 4 $ADhost" 0 "AD Server is reachable from IPA Server"
 	rlRun "./IPAcert_install.exp add $ADadmin $ADpswd $ADip $msifile $IPAhost $ipacrt $IPAhostIP > /dev/null 2>&1" 0 "Installing PassSync, forwarder and IPA cert in AD"
-	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"" 0 "PassSync Service installed successfully"
 	rlLog "AD server is being rebooted. Waiting 5 mins"
 	sleep 300
 	while true; do
@@ -158,7 +157,8 @@ popd
 	  [ $? -eq 0 ] && break
 	done
 	ping -c 4 $ADhost && rlPass "AD server has rebooted"
-	sleep 120
+	sleep 180
+	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"" 0 "PassSync Service installed successfully"
 rlPhaseEnd
 }
 
