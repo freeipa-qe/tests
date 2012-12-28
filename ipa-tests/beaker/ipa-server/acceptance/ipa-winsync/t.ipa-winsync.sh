@@ -158,6 +158,7 @@ popd
 	done
 	ping -c 4 $ADhost && rlPass "AD server has rebooted"
 	sleep 180
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
 	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"" 0 "PassSync Service installed successfully"
 rlPhaseEnd
 }

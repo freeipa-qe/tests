@@ -39,7 +39,7 @@ set ipadomain "testrelm.com"
 set passsync_dir "c:\\Program Files\\Red Hat Directory Password Synchronization"
 set ipapath "c:\\IPA"
 
-set timeout 20
+set timeout 60
 
 if { [string compare $action add ] == 0 } {
 # Add forwarder for testrelm.com
@@ -74,8 +74,10 @@ spawn ssh $username@$adhostip;
 expect "*?assword:*";
 send -- "$password\r";
 expect "*>";
+sleep 2;
 send -- "cd $ipapath\r";
 expect "*IPA>";
+sleep 3;
 send -- "msiexec /i $msifile /qn /l logfile.txt hostname=\"$ipahost\" portnum=\"636\" user=\"uid=passsync,cn=sysaccounts,cn=etc,dc=testrelm,dc=com\" password=\"password\" certtoken=\"Secret123\" srchbase=\"cn=users,cn=accounts,dc=testrelm,dc=com\"\r";
 sleep 5;
 # Import the certificate in the certdb for Passsync
