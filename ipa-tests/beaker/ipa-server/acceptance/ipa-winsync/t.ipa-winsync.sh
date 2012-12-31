@@ -662,6 +662,7 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding $sub2user in OU $OU2"
 	rlRun "sleep 30" 0 "Waiting for sync"
 	sleep $sec
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	
 	rlRun "$ipa user-show $l2user | grep \"Account disabled: False\"" 0 "$l2user from OU $OU2 synced and enabled in IPA"
 	sleep 5
