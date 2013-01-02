@@ -83,6 +83,9 @@ public class DNSGlobalconfigTests extends SahiTestScript{
 	 */
 	@Test (groups={"forwardPolicy"},dataProvider="getForwardPolicy")	
 	public void forwardPolicyTest(String testName, String expectedMsg)throws Exception{
+		//make a relogin to reset the radio button No.
+		CommonTasks.formauth(sahiTasks, "admin", "Secret123");
+		sahiTasks.navigateTo(commonTasks.dnsConfigPage, true);
 		DNSTasks.forwardPolicy(sahiTasks,expectedMsg);
 	}
 	
