@@ -1,19 +1,22 @@
 <job>
 	<whiteboard>
-		ipa-server - Certificate CLI Tests [#serial]
+		ipa-server - Certificate CLI Tests i386 [#serial]
 	</whiteboard>
 	<notify>
         <cc>yzhang@redhat.com</cc>
     </notify>
 	<recipeSet>
 		<recipe whiteboard="ipa server - Certificate CLI Tests">
+		    <repos/>
+		    <!--
             <repos>
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
+                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/i386//"/>
             </repos>
+            -->
             <distroRequires>
                 <and>
                 <distro_variant op="=" value="Server"/>
-                <distro_arch op="=" value="x86_64"/>
+                <distro_arch op="=" value="i386"/>
                 <distro_family op="=" value="RedHatEnterpriseLinux6"/>
                 </and>
                 <distro_virt op="=" value=""/>
