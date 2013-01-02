@@ -1,32 +1,27 @@
 <job>
 	<whiteboard>
-		ipa-server ipa-getcert RHEL6.2 build RC x86_64 [#serial]
+		ipa-server ipa-getcert RHEL6.4 build RC i386 [#serial]
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa-getcert RHEL 6.2 RC x86_64">
+		<recipe whiteboard="ipa-getcert RHEL 6.4 RC i386">
 		    <autopick random="false"/>
             <watchdog panic="None" />
             <ks_appends/>
             <packages/>
+            <repos/>
+            <!--
             <repos>
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
+                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/i386//"/>
             </repos>
+            -->
             <distroRequires>
                 <and>
-                <distro_variant op="=" value="Server"/>
-                <distro_arch op="=" value="x86_64"/>
-                <distro_family op="=" value="RedHatEnterpriseLinux6"/>
+                    <distro_variant op="=" value="Server"/>
+                    <distro_arch op="=" value="i386"/>
+                    <distro_family op="=" value="RedHatEnterpriseLinux6"/>
                 </and>
-                <distro_virt op="=" value=""/>
             </distroRequires>
 			<hostRequires/>
-			<!--
-			<hostRequires>
-			    <and>
-                    <hostname op="=" value="mv32b-vm.idm.lab.bos.redhat.com" />
-                </and>
-			</hostRequires>
-            -->
 			<partitions/>
 
 			<task name="/distribution/install" role="STANDALONE">
@@ -42,11 +37,7 @@
            	<task name="/CoreOS/ipa-server/acceptance/ipa-getcert" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
-				<params/>
-			</task>
 		</recipe>
-
 	</recipeSet>
 </job>
 
