@@ -34,17 +34,12 @@
                 <params/>
             </task>
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
-				<params>
-					<param name="SNAPSHOT" value="TRUE"/>
-				</params>
+				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-cert" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/uninstall" role="STANDALONE">
-				<params/>
-			</task>
-
+		
 		</recipe>
 	</recipeSet>
 </job>
