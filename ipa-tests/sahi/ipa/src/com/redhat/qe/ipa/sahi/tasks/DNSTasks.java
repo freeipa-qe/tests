@@ -1572,7 +1572,7 @@ public class DNSTasks {
 	
 	public static void forwardPolicy(SahiTasks browser,String expectedMsg) 
 	{
-		if (!System.getProperty("os.name").startsWith("Windows")){
+	/*	if (!System.getProperty("os.name").startsWith("Windows")){
 		
 			browser.radio("idnsforwardpolicy-1-1").click();
 			browser.span("undo").click();
@@ -1619,7 +1619,29 @@ public class DNSTasks {
 			browser.radio("idnsforwardpolicy-47-0").click();
 			browser.span("Update").click();
 			Assert.assertTrue(browser.radio("idnsforwardpolicy-47-0").checked(), "Changes to Forward First are Updated....Update works successfully");
-		}
+		} */
+		browser.radio("idnsforwardpolicy-1-1").click();
+		browser.span("undo").click();
+		Assert.assertFalse(browser.radio("idnsforwardpolicy-1-1").checked(), "Changes to Forward only are Undo.....Undo works successfully");
+		browser.radio("idnsforwardpolicy-1-1").click();
+		browser.link("DNS Zones").click();
+		//without saving changes...
+		browser.div(expectedMsg).click();
+		log.info("IPA error dialog appears:: ExpectedMsg ::"+expectedMsg);
+		browser.button("Cancel").click();
+		browser.span("Reset").click();
+		Assert.assertFalse(browser.radio("idnsforwardpolicy-1-1").checked(), "Changes to Forward only are Reset.....Reset works successfully");
+		browser.radio("idnsforwardpolicy-1-1").click();
+		browser.link("DNS Zones").click();
+		//without saving changes...
+		browser.div(expectedMsg).click();
+		log.info("IPA error dialog appears:: ExpectedMsg ::"+expectedMsg);
+		browser.button("Update").click();
+		browser.link("DNS Global Configuration").click();
+		Assert.assertTrue(browser.radio("idnsforwardpolicy-1-1").checked(), "Dialogbox Update works successfully.....Changes to Forward only are Updated");
+		browser.radio("idnsforwardpolicy-1-0").click();
+		browser.span("Update").click();
+		Assert.assertTrue(browser.radio("idnsforwardpolicy-1-0").checked(), "Changes to Forward First are Updated....Update works successfully");
 	}
 	
 	public static void zoneRefreshNegativeTests(SahiTasks browser, String zoneRefreshInterval, String expectedError1, String expectedError2) 
