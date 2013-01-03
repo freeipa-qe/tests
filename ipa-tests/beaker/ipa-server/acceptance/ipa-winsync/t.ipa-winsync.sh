@@ -704,7 +704,6 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 	rlRun "sed -i \"/^TLS_CACERTDIR.*/d\" /etc/openldap/ldap.conf"
 	rlRun "ipa_quick_uninstall" 0 "Uninstalling IPA server and Cleanup"
 
-	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "rm -fr /tmp/krb5cc_*"
 
 rlPhaseEnd
