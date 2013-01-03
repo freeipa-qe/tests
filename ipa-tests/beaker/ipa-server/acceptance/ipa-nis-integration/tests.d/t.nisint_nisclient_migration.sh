@@ -101,7 +101,9 @@ nisint_nisclient_migration_envsetup()
 		rlRun "touch /etc/krb5.conf"
 		rlRun "restorecon -v /etc/krb5.conf"
 		rlRun "mv -f /etc/krb5.keytab /etc/krb5.keytab.nismig"
-		rlRun "mv -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.nismig"
+		if [ -f /etc/sssd/sssd.conf ]; then
+			rlRun "mv -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.nismig"
+		fi
 		rlRun "service ntpd stop"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.1' -m $NISCLIENT_IP"
