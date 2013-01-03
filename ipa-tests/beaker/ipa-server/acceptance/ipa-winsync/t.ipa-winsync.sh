@@ -159,6 +159,8 @@ popd
 	ping -c 4 $ADhost && rlPass "AD server has rebooted"
 	sleep 180
 	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
+	sleep 5
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
 	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"" 0 "PassSync Service installed successfully"
 rlPhaseEnd
 }
@@ -217,6 +219,9 @@ rlPhaseStartTest "0001 Creating winsync agreement"
 
 	# Restart PassSync after winsync agreement is established
 	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
+	sleep 5
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
 	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd" 0 "PassSync status on AD"
 	rlRun "PassSync_Restart $ADip $ADadmin $ADpswd" 0 "Restarting PassSync Service"
 
@@ -616,6 +621,9 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 
 	 # Restart PassSync after winsync agreement is established
 	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
+	sleep 5
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
 	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd" 0 "PassSync status on AD"
 	rlRun "PassSync_Restart $ADip $ADadmin $ADpswd" 0 "Restarting PassSync Service"
 	sleep 15
@@ -645,6 +653,9 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
 
 	 # Restart PassSync after winsync agreement is established
 	rlRun "ping -c 4 $ADip" 0 "AD server reachable"
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
+	sleep 5
+	net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd | grep \"passsync.exe\"
 	rlRun "net rpc service status PassSync -I $ADip -U $ADadmin%$ADpswd" 0 "PassSync status on AD"
 	rlRun "PassSync_Restart $ADip $ADadmin $ADpswd" 0 "Restarting PassSync Service"
 	sleep 10
