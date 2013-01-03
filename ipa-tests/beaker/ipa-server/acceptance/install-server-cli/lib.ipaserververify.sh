@@ -358,7 +358,7 @@ verify_forwarder()
   rlLog "Verify forwarder"
 
   out=$2
-  command="ping -c 1 -w 3 redhat.com"
+  command="ping -c 1 -w 3 engineering.redhat.com"
   if [ "$3" == "noforwarders" ]; then
       $command 2> $out
       ping_result=`cat $out`
