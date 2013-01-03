@@ -9,7 +9,7 @@
 			<packages/>
 			<ks_appends/>
 			<repos>
-				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/i386"/>
+				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
 			</repos>
 			<partitions/>
 			<distroRequires>
