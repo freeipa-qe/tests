@@ -8,7 +8,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+			<repos>
+				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/i386"/>
+			</repos>
 			<partitions/>
 			<distroRequires>
 				<and>

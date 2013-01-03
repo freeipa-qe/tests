@@ -670,6 +670,9 @@ verify_zonerefresh()
   grep $zoneRefreshLine $NAMED | cut -d " " -f3 
   grep $zoneRefreshLine $NAMED | cut -d " " -f3 | cut -d "\"" -f1
 
+  testpsearch=$(grep "psearch.*yes" $NAMED|wc -l)
+  grep "psearch.*yes" $NAMED
+
   if [ "$2" == "zonerefresh" ] ; then
       if [ "$testzonerefresh" == "$zone_refresh_value" ] ; then
          rlPass "Zone Refresh is set correctly to $zone_refresh_value in $NAMED"
@@ -677,8 +680,10 @@ verify_zonerefresh()
          rlFail "Zone Refresh is NOT set correctly in $NAMED, and is $testzonerefresh"
       fi
   else
-      if [ "$testzonerefresh" == "$zone_refresh_value_default" ] ; then
+      if [ "$testzonerefresh" == "$zone_refresh_value_default" -a $testpsearch -eq 0 ] ; then
          rlPass "Zone Refresh is set correctly to $testzonerefresh in $NAMED"
+      elif [ "$testzonerefresh" == "0" -a $testpsearch -eq 1 ]; then
+         rlPass "Zone Refresh is set correctly to 0 in $NAMED when psearch is set to yes"
       else
          rlFail "Zone Refresh is NOT set correctly in $NAMED, and is $testzonerefresh"
       fi
