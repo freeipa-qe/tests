@@ -495,7 +495,7 @@ kinit_aftermaxlife()
     rlRun "rlDistroDiff keyctl"
     echo "set timeout 10" > $exp
     echo "set force_conservative 0" >> $exp
-    echo "set send_slow {1 .01}" >> $exp
+    echo "set send_slow {2 .5}" >> $exp
     echo "spawn kinit -V $username" >> $exp
     echo 'match_max 100000' >> $exp
     echo 'expect "*: "' >> $exp
@@ -579,7 +579,7 @@ Local_KinitAsAdmin()
             # now set admin password back to original password
             echo "set timeout 10" > $exp
             echo "set force_conservative 0" >> $exp
-            echo "set send_slow {1 .01}" >> $exp
+            echo "set send_slow {2 .5}" >> $exp
             echo "spawn ipa passwd admin" >> $exp
             echo 'expect "Current Password: "' >> $exp
             echo "send -s -- $temppw\r" >> $exp
@@ -641,7 +641,7 @@ change_password()
     fi
     echo "set timeout 5" > $exp
     echo "set force_conservative 0" >> $exp
-    echo "set send_slow {1 .01}" >> $exp
+    echo "set send_slow {2 .5}" >> $exp
     echo "spawn ipa passwd $userlogin" >> $exp
     echo 'expect "Current Password: "' >> $exp
     echo "send -s -- $currentpw\r" >> $exp
@@ -1075,7 +1075,7 @@ Local_FirstKinitAs()
 	###### assign initial password #####
     local expfile=/tmp/kinit${RANDOM}.exp
     echo "set timeout 5" > $expfile
-    echo "set send_slow {1 .1}" >> $expfile
+    echo "set send_slow {2 .5}" >> $expfile
 	echo "spawn ipa passwd $username" >> $expfile
 	echo "expect \"New Password: \"" >> $expfile
 	echo "send -s -- $password\r">> $expfile
@@ -1093,7 +1093,7 @@ Local_FirstKinitAs()
 	###### kinit as user, use initial password, then change password to desired one
     expfile=/tmp/kinit${RANDOM}.exp
     echo "set timeout 10" > $expfile
-    echo "set send_slow {1 .1}" >> $expfile
+    echo "set send_slow {2 .5}" >> $expfile
     echo "spawn $KINITEXEC $username" >> $expfile
     echo "expect \"Password for *\"" >> $expfile
     echo "send -s -- $password\r" >> $expfile
@@ -1132,7 +1132,7 @@ Local_kinit()
     local ret=9
     local msg=""
     echo "set timeout 3" > $expfile
-    echo "set send_slow {1 .1}" >> $expfile
+    echo "set send_slow {2 .5}" >> $expfile
     echo "spawn $KINITEXEC $user" >> $expfile
     echo "expect \"Password for *\"" >> $expfile
     echo "send -s -- $password\r" >> $expfile
