@@ -505,7 +505,7 @@ verify_useradd()
    rlRun "ipa user-add --first=${testuser}$largeuid --last=${testuser}$largeuid ${testuser}$largeuid --uid=$uidBeyondRange" 0 " Added new user outside uid range"
 
    # verify the users were added with expected uids
-   for y in {3..9}
+   for y in {1..9}
    do 
     assigneduid=$((idstart+$((y))))
      rlLog "EXECUTING: ipa user-find --uid=$assigneduid"

@@ -380,7 +380,7 @@ ipaserverinstall_invalidsubject()
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_invalidzonemgr.out
         command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject=$invalid_cert_subject -U"
-        expmsg="ipa-server-install: error: Invalid subject base format: malformed RDN string = \"$invalid_cert_subject\""
+        expmsg="ipa-server-install: error: --subject=$invalid_cert_subject has invalid subject base format: malformed RDN string = \"$invalid_cert_subject\""
 
         qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message for IPA Install with invalid subject"  debug
     rlPhaseEnd
@@ -590,16 +590,17 @@ ipaserverinstall_selfsign()
 ####################################################################################
 # Test for Bug 811295 - Installation fails when CN is set in certificate subject base 
 # This test sets the --subject CN=test
+# Now a negative test as this is not allowed via 811295 fix
 ####################################################################################
 ipaserverinstall_set_cn()
 {
-    rlPhaseStartTest "ipa-server-install - 30 - [Positive] Install test incolving setting the CN subject value "
+    rlPhaseStartTest "ipa-server-install - 30 - [Negative] Install test involving setting the CN subject value [bz 811295]"
         uninstall_fornexttest
-        local tmpout=$TmpDir/ipaserverinstall_cnsubject.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U --subject CN=Test"
-        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U --subject CN=Test" 0 "Installing ipa server while setting --subject value" 
-        verify_selfsign_install tmpout
-        verify_install true tmpout selfsign 
+        local tmpout=$TmpDir/ipaserverinstall_cnsubject.out
+        local command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject CN=Test -U"
+		local expmsg="ipa-server-install: error: --subject=CN=Test has invalid attribute: \"CN\""
+        qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message for IPA Install with invalid subject using CN value"  debug
     rlPhaseEnd
 
 }

@@ -96,7 +96,7 @@ special_char_in_admin_email="TÃªko@redhat.com"
 
 
 #forwarder check
-good_ping="--- redhat.com ping statistics ---"
+good_ping="--- engineering.redhat.com ping statistics ---"
 bad_ping="ping: unknown host engineering.redhat.com"
 
 
