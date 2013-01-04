@@ -455,7 +455,10 @@ nisint_netgroup_test_1009()
 			rlRun "mount"
 			rlRun "cat /etc/mtab"
 			rlRun "cat /proc/mounts"
-			rlRun "mount -t nfsd nfsd /proc/fs/nfsd" 0
+			rlRun "mount -t nfsd nfsd /proc/fs/nfsd" 0,32
+			rlRun "mount"
+			rlRun "cat /etc/mtab"
+			rlRun "cat /proc/mounts"
 		fi
 		if [ -f /usr/lib/systemd/system/nfs-server.service ]; then
 			rlRun "systemctl restart nfs-server.service"
