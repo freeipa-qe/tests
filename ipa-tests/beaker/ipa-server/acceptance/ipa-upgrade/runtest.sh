@@ -51,8 +51,32 @@ done
 startDate=`date "+%F %r"`
 satrtEpoch=`date "+%s"`
 
+if [ -n "$MASTER" ]; then 
+	echo "export MASTER_IP=$(dig +short $MASTER)" >> /dev/shm/env.sh
+	echo "export MASTER_S=$(echo $MASTER|cut -f1 -d.)" >> /dev/shm/env.sh
+	echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
+fi
 
+if [ -n "$SLAVE" -o -n "$REPLICA" ]; then
+	echo "export SLAVE_IP=$(dig +short $SLAVE)" >> /dev/shm/env.sh
+	echo "export SLAVE_S=$(echo  $SLAVE |cut -f1 -d.)" >> /dev/shm/env.sh
+	echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
+fi
 
+if [ -n "$CLIENT" ]; then
+	echo "export CLIENT_IP=$(dig +short $CLIENT)" >> /dev/shm/env.sh
+	echo "export CLIENT_S=$(echo $CLIENT|cut -f1 -d.)" >> /dev/shm/env.sh
+	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
+fi
+
+. /dev/shm/env.sh
+
+case $(hostname) in
+"$MASTER")  MYROLE="MASTER"    ;;
+"$SLAVE")   MYROLE="SLAVE"     ;;
+"$CLIENT")  MYROLE="CLIENT"    ;;
+*)          MYROLE="UNKNOWN"   ;;
+esac
 ##########################################
 #   test main 
 ##########################################
@@ -61,29 +85,6 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
 		rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
 		rlRun "pushd $TmpDir"
-		ipa_install_set_vars
-		case "$MYROLE" in
-		MASTER*)
-			echo "export MASTER_IP=$(dig +short $MASTER)" >> /dev/shm/env.sh
-			echo "export MASTER_S=$(echo $MASTER|cut -f1 -d.)" >> /dev/shm/env.sh
-			echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
-			echo "export MYROLE=MASTER" >> /dev/shm/env.sh
-			;;
-		REPLICA*|SLAVE*)
-			echo "export SLAVE_IP=$(dig +short $SLAVE)" >> /dev/shm/env.sh
-			echo "export SLAVE_S=$(echo  $SLAVE |cut -f1 -d.)" >> /dev/shm/env.sh
-			echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
-			echo "export MYROLE=SLAVE" >> /dev/shm/env.sh
-			;;
-		CLIENT*)
-			echo "export CLIENT_IP=$(dig +short $CLIENT)" >> /dev/shm/env.sh
-			echo "export CLIENT_S=$(echo $CLIENT|cut -f1 -d.)" >> /dev/shm/env.sh
-			echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
-			echo "export MYROLE=CLIENT" >> /dev/shm/env.sh
-			;;
-		esac
-		cat /dev/shm/env.sh
-		. /dev/shm/env.sh
 	rlPhaseEnd
 	
 	# Main test functions in tests.d/t.tests.sh:
