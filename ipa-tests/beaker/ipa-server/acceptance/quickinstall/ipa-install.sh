@@ -646,6 +646,9 @@ ipa_install_envs()
 			fi
 			I=$(( I += 1 ))
 		done
+		# Backup /dev/shm/ to /root/dev-shm-backup
+		mkdir /root/dev-shm-backup
+		cp -a /dev/shm/* /root/dev-shm-backup/.
 	rlPhaseEnd
 }
 
