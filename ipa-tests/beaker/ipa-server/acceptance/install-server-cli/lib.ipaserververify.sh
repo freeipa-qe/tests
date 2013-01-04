@@ -565,6 +565,10 @@ verify_782920()
 		return
 	fi
 
+	if [ "$2" == "realm" ]; then
+		BASEDN=$basedn
+	fi
+
   	if [ "$2" == "nodns" ] ; then
 		rlLog "DNS not configured with this install"
 	else
@@ -572,6 +576,23 @@ verify_782920()
 		rlRun "ls /etc/openldap/ldap.conf" 0 "Make sure that ldap.conf was created"
 		rlRun "grep '$BASEDN' /etc/openldap/ldap.conf" 0 "Check to see if the Base DN seems to be in ldap.conf"
 		rlRun "grep '$MASTER' /etc/openldap/ldap.conf" 0 "Check to see the MASTER dns seems to be in ldap.conf"
+	fi
+}
+
+verify_bz891793()
+{
+	if [ ! -f "$1" ]; then
+		return
+	else
+		local tmpout="$1"
+	fi
+	
+	local errmsg="ipa-server-install: error: persistent search feature is required for DNS SOA serial autoincrement"
+
+	if [ $(grep "$errmsg" $tmpout|wc -l) -gt 0 ]; then
+		rlFail "BZ 891793 found...ipa-server-install --zone-refresh set to non-zero fails unless --no-serial-autoincrement is used"	
+	else
+		rlPass "BZ 891793 not found."
 	fi
 }
 

@@ -467,10 +467,11 @@ ipaserverinstall_nohostdns_nohostsentry()
 ####################################################################################
 ipaserverinstall_zonerefresh()
 {
-    rlPhaseStartTest "ipa-server-install - 24 - [Positive] Install with --zone-refresh" 
+    rlPhaseStartTest "ipa-server-install - 24 - [Positive] Install with --zone-refresh [bz 891793]" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_zonerefresh.out
-        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zone-refresh=90 -U" 0 "Install with zone-refresh"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zone-refresh=90 -U > $tmpout 2>&1" 0 "Install with zone-refresh"
+		verify_bz891793 $tmpout
         verify_install true tmpout zonerefresh 
     rlPhaseEnd
 }
