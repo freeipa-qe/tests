@@ -85,7 +85,12 @@ ipaserverinstall()
       ipaserverinstall_reversezone
 
 #   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+#   fails without --no-serial-autoincrement
       ipaserverinstall_zonerefresh
+
+#   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+#   works with --no-serial-autoincrement
+      ipaserverinstall_zonerefresh2
 
 #     Add test to verify: bug 681978 : Uninstalling client if the server is installed should be prevented
       ipaclient_uninstall
@@ -464,18 +469,33 @@ ipaserverinstall_nohostdns_nohostsentry()
 
 ####################################################################################
 #   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+#   This now fails without --no-serial-autoincrement also on command line.  
 ####################################################################################
 ipaserverinstall_zonerefresh()
 {
-    rlPhaseStartTest "ipa-server-install - 24 - [Positive] Install with --zone-refresh [bz 891793]" 
+    rlPhaseStartTest "ipa-server-install - 24.0 - [Negative] Install with --zone-refresh fails without --no-serial-autoincrement"
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_zonerefresh.out
-        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zone-refresh=90 -U > $tmpout 2>&1" 0 "Install with zone-refresh"
-		verify_bz891793 $tmpout
-        verify_install true tmpout zonerefresh 
+		local errmsg="ipa-server-install: error: persistent search feature is required for DNS SOA serial autoincrement"
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --zone-refresh=90 -U > $tmpout 2>&1" 2 "Install with zone-refresh fails without no-serial-autoincrement"
+		rlAssertGrep "$errmsg" $tmpout
     rlPhaseEnd
 }
 
+####################################################################################
+#   --zone-refresh=ZONE_REFRESH Number of seconds between regular checks for new DNS zones.
+#   This time with --no-serial-autoincrement
+####################################################################################
+ipaserverinstall_zonerefresh2()
+{
+    rlPhaseStartTest "ipa-server-install - 24.1 - [Positive] Install with --zone-refresh and --no-serial-autoincrement" 
+        uninstall_fornexttest
+        local tmpout=$TmpDir/ipaserverinstall_zonerefresh.out
+        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-serial-autoincrement --zone-refresh=90 -U > $tmpout 2>&1" 0 "Install with zone-refresh and no-serial-autoincrement"
+		rlRun "cat $tmpout"
+        verify_install true tmpout zonerefresh 
+    rlPhaseEnd
+}
 
 ####################################################################################
 #  --no-ui-redirect      Do not automatically redirect to the Web UI.

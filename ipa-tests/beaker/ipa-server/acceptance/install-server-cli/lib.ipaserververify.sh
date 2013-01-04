@@ -589,6 +589,7 @@ verify_782920()
 	fi
 }
 
+# BZ 891793 CLOSED NOTABUG...that is expected behavior
 verify_bz891793()
 {
 	if [ ! -f "$1" ]; then
