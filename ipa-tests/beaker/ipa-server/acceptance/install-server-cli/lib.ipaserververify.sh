@@ -491,6 +491,7 @@ verify_reverse()
 
 verify_useradd()
 {
+   KinitAsAdmin
 
    # add users without specifying uid....uids will be assigned within the range used when installed.
    for x in {1..9}
@@ -524,7 +525,11 @@ verify_useradd()
     command="ipa user-add --first=${testuser} --last=${testuser} ${testuser}" 
     expmsg="ipa: ERROR: Operations error: Allocation of a new value for range cn=posix ids,cn=distributed numeric assignment plugin,cn=plugins,cn=config failed! Unable to proceed."
     rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message when adding users after uid range is depleted" 
-
+	if [ $? -eq 1 ]; then
+		rlFail "BZ 891930 found...DNA plugin no longer reports additional info when range is depleted"
+	else
+		rlPass "BZ 891930 not found"
+	fi
 }
 
 

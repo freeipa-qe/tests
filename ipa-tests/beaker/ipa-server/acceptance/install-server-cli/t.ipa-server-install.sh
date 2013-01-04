@@ -394,7 +394,7 @@ ipaserverinstall_invalidsubject()
 ########################################################################################
 ipaserverinstall_id()
 {
-    rlPhaseStartTest "ipa-server-install - 19 - [Positive] Install with id start and id max specified" 
+    rlPhaseStartTest "ipa-server-install - 19 - [Positive] Install with id start and id max specified [BZ 891930]" 
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_id.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --idstart=$idstart --idmax=$idmax -U"
