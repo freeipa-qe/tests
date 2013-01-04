@@ -566,6 +566,7 @@ verify_782920()
 	fi
 
 	if [ "$2" == "realm" ]; then
+		ORIGBASEDN=$BASEDN
 		BASEDN=$basedn
 	fi
 
@@ -576,6 +577,10 @@ verify_782920()
 		rlRun "ls /etc/openldap/ldap.conf" 0 "Make sure that ldap.conf was created"
 		rlRun "grep '$BASEDN' /etc/openldap/ldap.conf" 0 "Check to see if the Base DN seems to be in ldap.conf"
 		rlRun "grep '$MASTER' /etc/openldap/ldap.conf" 0 "Check to see the MASTER dns seems to be in ldap.conf"
+	fi
+
+	if [ "$2" == "realm" ]; then
+		BASEDN=$ORIGBASEDN
 	fi
 }
 
