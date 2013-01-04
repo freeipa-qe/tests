@@ -513,7 +513,7 @@ ipaserverinstall_bz826152()
     rlPhaseStartTest "ipa-server-install - BZ 826152"
 	kdestroy
 	ipa-server-install --uninstall -U
-	ipa-server-install --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U
+	ipa-server-install -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U
 	testemail="testemail@$DOMAIN"
 	KinitAsAdmin
 	ipa-dns-install --zonemgr $testemail -U --forwarder=10.14.63.12
