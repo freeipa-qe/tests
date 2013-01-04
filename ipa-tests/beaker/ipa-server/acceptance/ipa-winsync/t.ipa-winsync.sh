@@ -106,7 +106,7 @@ ipa="/usr/bin/ipa"
 aduser_mail="$aduser@testrelm.com"
 
 setup() {
-rlPhaseStartTest "Setup for winsync sanity tests"
+rlPhaseStartSetup "ipa-winsync-startup - Check for admintools package, setup certificates."
 	# check for packages
 pushd .
 	for item in $PACKAGE1 $PACKAGE2 $PACKAGE3 $PACKAGE4; do
@@ -697,7 +697,7 @@ rlPhaseEnd
 
 cleanup() {
 
-rlPhaseStartTest "Clean up for winsync sanity tests"
+rlPhaseStartCleanup "Clean up for winsync sanity tests"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
 
@@ -707,13 +707,13 @@ rlPhaseStartTest "Clean up for winsync sanity tests"
 	rlServiceStop "named"
         rlServiceStart "named"
 
-#	rlRun "kill -15 `pidof rdesktop`"
 	rlRun "rm -f *.ldif"
 	rlRun "rm -f $ipacrt"
 	rlRun "rm -fr $TmpDir"
 
 	rlRun "sed -i \"/^TLS_CACERTDIR.*/d\" /etc/openldap/ldap.conf"
-	rlRun "ipa_quick_uninstall" 0 "Uninstalling IPA server and Cleanup"
+	rlRun "kdestroy" 0 "Destroy any credentials"
+#	rlRun "ipa_quick_uninstall" 0 "Uninstalling IPA server and Cleanup"
 
 	rlRun "rm -fr /tmp/krb5cc_*"
 

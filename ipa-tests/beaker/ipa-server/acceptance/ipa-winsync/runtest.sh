@@ -48,6 +48,7 @@ rpm5="glibc-common"
 rpm6="openssh-clients"
 
 rlJournalStart
+  rlPhaseStartSetup "Check for essential RPM packages"
 
    rlCheckRpm "$rpm1"
 	if [ $? -ne 0 ]; then
@@ -78,7 +79,7 @@ rlJournalStart
         if [ $? -ne 0 ]; then
            rlRun "yum install -y $rpm6"
         fi
-
+  rlPhaseEnd
 # Include test case file
 . ./t.ipa-winsync.sh
 
@@ -107,17 +108,18 @@ PACKAGE="ipa-server"
 	}
 
 
-    rlPhaseStartSetup "ipa-winsync-startup: Check for admintools package, setup certificates."
-		rlRun "setup"
-    rlPhaseEnd
+#    rlPhaseStartSetup "ipa-winsync-startup - Check for admintools package, setup certificates."
+# Begin Setup for Tests
+setup
+#    rlPhaseEnd
 
 	# tests start...
 winsync_connect
 	# tests end...
 
-    rlPhaseStartCleanup "ipa-winsync-cleanup: Destroying admin credentials & removing certificates."
-		rlRun "cleanup"
-    rlPhaseEnd
+#    rlPhaseStartCleanup "ipa-winsync-cleanup - Destroying admin credentials & removing certificates."
+cleanup
+#    rlPhaseEnd
 
 
 rlJournalPrintText
