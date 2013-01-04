@@ -450,8 +450,9 @@ nisint_netgroup_test_1009()
 			rlRun "service rpcbind restart"
 		fi
 		
-		if [ $(mount|grep /proc/fs/nfsd|wc -l) -eq 0 ]; then
-			rlRun "mount -t nfsd nfsd /proc/fs/nfsd"
+		#if [ $(mount|grep /proc/fs/nfsd|wc -l) -eq 0 ]; then
+		if [ $(grep /proc/fs/nfsd /etc/mtab|wc -l) -eq 0 ]; then
+			rlRun "mount -t nfsd nfsd /proc/fs/nfsd" 
 		fi
 		if [ -f /usr/lib/systemd/system/nfs-server.service ]; then
 			rlRun "systemctl restart nfs-server.service"
