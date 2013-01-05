@@ -491,6 +491,7 @@ verify_reverse()
 
 verify_useradd()
 {
+   local userlist=""
    KinitAsAdmin
 
    # add users without specifying uid....uids will be assigned within the range used when installed.
@@ -498,6 +499,8 @@ verify_useradd()
    do
      rlLog "EXECUTING: ipa user-add --first=${testuser}$x --last=${testuser}$x ${testuser}$x"
      rlRun "ipa user-add --first=${testuser}$x --last=${testuser}$x ${testuser}$x" 0 " Added new user within given uid range"
+     uid=$(ipa user-find ${testuser}$x --raw |grep uidnumber:|awk '{print $2}') 
+     userlist="$userlist $(echo ${testuser}$x,$uid)"
    done
  
    # test adding user with uid with manual override
@@ -506,11 +509,18 @@ verify_useradd()
    rlRun "ipa user-add --first=${testuser}$largeuid --last=${testuser}$largeuid ${testuser}$largeuid --uid=$uidBeyondRange" 0 " Added new user outside uid range"
 
    # verify the users were added with expected uids
-   for y in {1..9}
-   do 
-    assigneduid=$((idstart+$((y))))
-     rlLog "EXECUTING: ipa user-find --uid=$assigneduid"
-     rlRun "ipa user-find --uid=$assigneduid" 0 "Verifying user with expected uid"
+   #for y in {1..9}
+   #do 
+   # assigneduid=$((idstart+$((y))))
+   #  rlLog "EXECUTING: ipa user-find --uid=$assigneduid"
+   #  rlRun "ipa user-find --uid=$assigneduid" 0 "Verifying user with expected uid"
+   #done
+   for entry in $userlist
+   do
+      username=$(echo $entry|cut -f1 -d,)
+      uid=$(echo $entry|cut -f2 -d,) 
+      rlLog "EXECUTING: ipa user-find --uid=$uid"
+      rlRun "ipa user-find --uid=$uid"
    done
   
    # verify the gids were also assigned within the given range
