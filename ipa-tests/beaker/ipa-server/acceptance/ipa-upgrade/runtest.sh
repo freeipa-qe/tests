@@ -57,6 +57,10 @@ if [ -n "$MASTER" ]; then
 	echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
 fi
 
+if [ -z "$SLAVE" -a -n "$REPLICA" ]; then
+	SLAVE=$REPLICA
+fi
+
 if [ -n "$SLAVE" -o -n "$REPLICA" ]; then
 	echo "export SLAVE_IP=$(dig +short $SLAVE)" >> /dev/shm/env.sh
 	echo "export SLAVE_S=$(echo  $SLAVE |cut -f1 -d.)" >> /dev/shm/env.sh
