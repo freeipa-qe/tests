@@ -92,9 +92,9 @@
 INSTANCE=`echo $RELM | sed 's/\./-/g'`
 
 ########################################################################
-user1="user1"
-user2="user2"
-user3="user3"
+user1="funcuser1"
+user2="funcuser2"
+user3="funcuser3"
 userpw="Secret123"
 bindpw="bind123"
 
@@ -353,7 +353,7 @@ send -s "sudo -l \r"
 expect "$1: "
 send -s "$userpw\r"
 expect "*$ "
-send -s "sudo -u user2 /bin/date > $sudoout 2>&1 \r"
+send -s "sudo -u $user2 /bin/date > $sudoout 2>&1 \r"
 expect "$1: "
 send -s "$userpw\r"
 expect eof
@@ -442,14 +442,14 @@ rlPhaseStartTest "sudorule-add-allow-command_func001: Allowed commands available
 	rlRun "ipa sudocmdgroup-add-member sudogrp1 --sudocmds=/bin/date,/bin/touch,/bin/uname"
 	rlRun "ipa sudorule-add sudorule1"
 	rlRun "ipa sudorule-add-host  sudorule1 --hosts=$SUDOCLIENT"
-	rlRun "ipa sudorule-add-user sudorule1 --users=user1"
+	rlRun "ipa sudorule-add-user sudorule1 --users=$user1"
 
 	rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/mkdir sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
 	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
-	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -463,11 +463,11 @@ sudorule-add-allow-commandgrp_func001() {
 rlPhaseStartTest "sudorule-add-allow-commandgrp_func001: Add command groups available for sudo client"
 
 	rlRun "ipa sudorule-add-allow-command --sudocmdgroups=sudogrp1 sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
 	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
-	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -482,7 +482,7 @@ sudorule-remove-allow-command_func001() {
 rlPhaseStartTest "sudorule-remove-allow-command_func001: Remove commands available from sudo client"
 
 	rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/mkdir sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
 	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
@@ -500,7 +500,7 @@ sudorule-remove-allow-commandgrp_func001() {
 rlPhaseStartTest "sudorule-remove-allow-commandgrp_func001: Remove command groups available from sudo client"
 
 	rlRun "ipa sudorule-remove-allow-command --sudocmdgroups=sudogrp1 sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
 	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
@@ -520,11 +520,11 @@ rlPhaseStartTest "sudorule-add-deny-command_func001: Deny commands available for
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-add-deny-command --sudocmds=/bin/mkdir sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
 	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
-	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -540,7 +540,7 @@ rlPhaseStartTest "sudorule-remove-deny-command_func001: Deny commands removed fr
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-deny-command --sudocmds=/bin/mkdir sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
         rlAssertGrep "sudo: user_matches=1" "$sudoout"
         rlAssertGrep "sudo: host_matches=1" "$sudoout"
         rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
@@ -559,11 +559,11 @@ rlPhaseStartTest "sudorule-add-deny-commandgrp_func001: Deny command groups avai
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-add-deny-command --sudocmdgroups=sudogrp1 sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
 	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
-	rlAssertGrep "User user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/date, !/bin/touch, !/bin/uname" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -579,7 +579,7 @@ rlPhaseStartTest "sudorule-remove-deny-commandgrp_func001: Remove denied command
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-remove-deny-command --sudocmdgroups=sudogrp1 sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: user_matches=1" "$sudoout"
 	rlAssertGrep "sudo: host_matches=1" "$sudoout"
 	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
@@ -598,7 +598,7 @@ rlPhaseStartTest "sudorule-add-host_func001: Adding host and verifying from sudo
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-add-host sudorule1 --hosts=test.example.com"
-	rlRun "sudo_list user1"
+	rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: ldap sudoHost 'test.example.com' ... not" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -615,7 +615,7 @@ rlPhaseStartTest "sudorule-remove-host_func001: removing host and verifying from
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-remove-host sudorule1 --hosts=test.example.com"
-	rlRun "sudo_list user1"
+	rlRun "sudo_list $user1"
 	rlAssertNotGrep "sudo: ldap sudoHost 'test.example.com' ... not" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -646,7 +646,7 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 	# the related functional test "grep for +hostgrp1" passess. 
 	# rlRun "getent netgroup hostgrp1"
 
-	rlRun "sudo_list user1"
+	rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
 	
 	rlRun "rm -fr $sudoout"
@@ -665,9 +665,9 @@ rlPhaseStartTest "sudorule-remove-hostgrp_func001: Removing hostgroup and verify
 	rlRun "rm -fr /var/lib/sss/db/cache_*"
         rlRun "service sssd restart"
 	sleep 5
-	rlRun "getent -s sss passwd user1"
+	rlRun "getent -s sss passwd $user1"
 
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
         rlAssertNotGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
         
 	rlRun "ipa sudorule-add-host sudorule1 --hosts=$SUDOCLIENT"
@@ -685,7 +685,7 @@ rlPhaseStartTest "sudorule-add-option_func001: Adding sudo option /var/log/sudol
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-option sudorule1 --sudooption=logfile=/var/log/sudolog"
-	rlRun "sudo_list user1"
+	rlRun "sudo_list $user1"
 	rlAssertGrep "sudo: ldap sudoOption: 'logfile=/var/log/sudolog'" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -702,7 +702,7 @@ rlPhaseStartTest "sudorule-add-option_func002: Adding sudo option env_keep and v
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-option sudorule1 --sudooption=\"env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE\""
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
         rlAssertGrep "sudo: ldap sudoOption: 'env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE'" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -719,7 +719,7 @@ rlPhaseStartTest "sudorule-add-option_func003: Adding sudo option !authenticate 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-option sudorule1 --sudooption='!authenticate'"
-        rlRun "sudo_list_wo_passwd user1"
+        rlRun "sudo_list_wo_passwd $user1"
         rlAssertGrep "sudo: ldap sudoOption: '!authenticate'" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -735,7 +735,7 @@ rlPhaseStartTest "sudorule-remove-option_func001: Removing sudo option /var/log/
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-option sudorule1 --sudooption=logfile=/var/log/sudolog"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
         rlAssertNotGrep "sudo: ldap sudoOption: 'logfile=/var/log/sudolog'" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -752,7 +752,7 @@ rlPhaseStartTest "sudorule-remove-option_func002: Removing sudo option env_keep 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-option sudorule1 --sudooption=\"env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE\""
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
         rlAssertNotGrep "sudo: ldap sudoOption: 'env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE'" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -768,7 +768,7 @@ rlPhaseStartTest "sudorule-remove-option_func003: Removing sudo option !authenti
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-option sudorule1 --sudooption='!authenticate'"
-        rlRun "sudo_list_wo_passwd user1"
+        rlRun "sudo_list_wo_passwd $user1"
         rlAssertNotGrep "sudo: ldap sudoOption: '!authenticate'" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -785,8 +785,8 @@ rlPhaseStartTest "sudorule-add-runasuser_func001: Adding RunAs user and verifyin
         rlRun "ipa sudorule-add-allow-command --sudocmdgroups=sudogrp1 sudorule1"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --users=$user2"
-	rlRun "sudo_list user1"
-	rlAssertGrep "(user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+	rlRun "sudo_list $user1"
+	rlAssertGrep "($user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
 	rlRun "rm -fr $sudoout"
 
@@ -800,8 +800,8 @@ rlPhaseStartTest "sudorule-remove-runasuser_func001: Removing RunAs user and ver
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=$user2"
-        rlRun "sudo_list user1"
-        rlAssertNotGrep "(user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "sudo_list $user1"
+        rlAssertNotGrep "(%$user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -815,8 +815,8 @@ rlPhaseStartTest "sudorule-add-runasuser_func002: Adding RunAs group and verifyi
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --groups=$user2"
-        rlRun "sudo_list user1"
-        rlAssertGrep "(%user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "sudo_list $user1"
+        rlAssertGrep "(%$user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -830,8 +830,8 @@ rlPhaseStartTest "sudorule-remove-runasuser_func002: Removing RunAs group and ve
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --groups=$user2"
-        rlRun "sudo_list user1"
-        rlAssertNotGrep "(%user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "sudo_list $user1"
+        rlAssertNotGrep "(%$user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -845,8 +845,8 @@ rlPhaseStartTest "sudorule-add-runasuser_func003: Adding comma-separated list of
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --users=$user2,$user3"
-        rlRun "sudo_list user1"
-        rlAssertGrep "(user2, user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "sudo_list $user1"
+        rlAssertGrep "($user2, $user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -860,8 +860,8 @@ rlPhaseStartTest "sudorule-remove-runasuser_func003: Removing comma-separated li
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=$user2,$user3"
-        rlRun "sudo_list user1"
-        rlAssertNotGrep "(user2, user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "sudo_list $user1"
+        rlAssertNotGrep "($user2, $user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -875,8 +875,8 @@ rlPhaseStartTest "sudorule-add-runasuser_func004: Adding comma-separated list of
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --groups=$user2,$user3"
-        rlRun "sudo_list user1"
-        rlAssertGrep "(%user2, %user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "sudo_list $user1"
+        rlAssertGrep "(%$user2, %$user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -890,8 +890,8 @@ rlPhaseStartTest "sudorule-remove-runasuser_func004: Removing comma-separated li
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --groups=$user2,$user3"
-        rlRun "sudo_list user1"
-        rlAssertNotGrep "(%user2, %user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "sudo_list $user1"
+        rlAssertNotGrep "(%$user2, %$user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -910,7 +910,7 @@ rlPhaseStartTest "Bug 719009: sudorule-add-runasuser does not match valid users 
 	verifyErrorMsg "ipa sudorule-add-runasuser sudorule1 --users=ALL" "ipa: ERROR: invalid 'runas-user': RunAsUser does not accept 'ALL' as a user name"
 
 # The following comments are result of https://bugzilla.redhat.com/show_bug.cgi?id=782976
-#        rlRun "sudorun_withusr user1"
+#        rlRun "sudorun_withusr $user1"
 #        rlAssertGrep "sudo: ldap sudoRunAsUser 'all' ... MATCH" "$sudoout"
 #        rlAssertNotGrep "is not allowed to execute" "$sudoout"
 
@@ -931,7 +931,7 @@ rlPhaseStartTest "sudorule-remove-runasuser_func005: Removing the special value 
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=ALL"
 
-        rlRun "sudorun_withusr user1"
+        rlRun "sudorun_withusr $user1"
         rlAssertNotGrep "sudo: ldap sudoRunAsUser 'all' ... MATCH" "$sudoout"
         rlAssertGrep "sudo: host_matches=1" "$sudoout"
 
@@ -981,7 +981,7 @@ rlPhaseStartTest "sudorule-add-runasgroup_func001: Adding RunAs group and verify
 #cat $sudoout
 #}
 #
-#	rlRun "sudorun_withgrp user1"
+#	rlRun "sudorun_withgrp $user1"
 #        rlAssertGrep "sudo: ldap sudoRunAsGroup 'all' ... MATCH" "$sudoout"
 #	rlAssertNotGrep "is not allowed to execute" "$sudoout"
 #
@@ -1000,7 +1000,7 @@ rlPhaseStartTest "sudorule-remove-runasgroup_func001: Removing RunAs group and v
 	rlRun "ipa sudorule-add-runasgroup sudorule1 --groups=ALL"
 
         rlRun "ipa sudorule-remove-runasgroup sudorule1 --groups=ALL"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
         rlAssertNotGrep "sudo: ldap sudoRunAsGroup 'all'" "$sudoout"
 
         rlRun "rm -fr $sudoout"
@@ -1022,8 +1022,8 @@ rlPhaseStartTest "sudorule-disable_func001: Disabling sudorule and verifying fro
 	rlRun "ipa sudorule-find"
 	rlRun "ipa sudorule-show sudorule1"
         rlRun "ipa sudorule-disable sudorule1"
-        rlRun "sudo_list user1"
-	rlAssertGrep "User user1 may run the following commands on this host" "$sudoout"
+        rlRun "sudo_list $user1"
+	rlAssertGrep "User $user1 may run the following commands on this host" "$sudoout"
 	rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
         #rlAssertGrep "user1 is not in the sudoers file.  This incident will be reported." "$sudoout"
 
@@ -1039,7 +1039,7 @@ rlPhaseStartTest "sudorule-enable_func001: Enabling sudorule and verifying from 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-enable sudorule1"
-        rlRun "sudo_list user1"
+        rlRun "sudo_list $user1"
         rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
