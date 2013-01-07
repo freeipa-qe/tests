@@ -68,6 +68,8 @@ upgrade_master()
 		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
 		rlRun "ipactl status"
+		rlRun "service sssd status"
+		rlRun "service sssd restart"
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 		#submit_log /var/log/ipaupgrade.log
@@ -132,6 +134,8 @@ upgrade_slave()
 		#fi
 
 		rlRun "ipactl status"
+		rlRun "service sssd status"
+		rlRun "service sssd restart"
 
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
@@ -194,6 +198,8 @@ upgrade_client()
 		rlRun "yum -y update 'ipa*'"	
 		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q $PKG-client sssd"
+		rlRun "service sssd status"
+		rlRun "service sssd restart"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $CLIENT_IP"
 		;;
