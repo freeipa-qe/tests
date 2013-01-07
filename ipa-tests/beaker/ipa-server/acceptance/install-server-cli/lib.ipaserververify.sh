@@ -625,6 +625,9 @@ verify_819629()
 
   	if [ "$2" == "nodns" ] ; then
 		rlLog "DNS not configured with this install"
+	elif [ "$2" == "zonerefresh" ]; then
+		rlLog "zonerefresh option set to non-zero for this test."
+		rlLog "Skipping psearch install because psearch and zonerefresh are mutually exclusive"
 	else
 		rlLog "Test for BZ 819629 - Enable persistent search in bind-dyndb-ldap during IPA upgrade"
 		rlRun "grep psearch /etc/named.conf  | grep yes" 0 "Make sure a psearch enabled line exists in named.conf"
