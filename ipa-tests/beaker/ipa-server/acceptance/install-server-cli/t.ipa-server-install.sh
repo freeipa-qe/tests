@@ -535,9 +535,10 @@ ipaserverinstall_bz826152()
 	ipa-server-install --uninstall -U
 	ipa-server-install -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --no-ui-redirect -U
 	testemail="testemail@$DOMAIN"
+	dnstestemail="testemail.$DOMAIN"
 	KinitAsAdmin
-	ipa-dns-install --zonemgr $testemail -U --forwarder=10.14.63.12
-	rlRun "ipa dnszone-find | grep $testemail" 0 "Make sure that the test email seems to have been installed into the useful zone"
+	ipa-dns-install -p $ADMINPW --zonemgr $testemail -U --forwarder=$DNSFORWARD
+	rlRun "ipa dnszone-find | grep $dnstestemail" 0 "Make sure that the test email seems to have been installed into the useful zone"
 	ipa-server-install --uninstall -U
     rlPhaseEnd
 }
