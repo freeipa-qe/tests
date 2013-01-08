@@ -14,13 +14,15 @@ EOF
 setup_iparhts_sync()
 {
 	# Make sure apache is installed
-	yum -y install httpd
-	rm -Rf $IPARHTSDIR
-	mkdir $IPARHTSDIR
-	chmod 755 $IPARHTSDIR
+	rlRun "yum -y install httpd"
+	rlRun "rm -Rf $IPARHTSDIR"
+	rlRun "mkdir $IPARHTSDIR"
+	rlRun "chmod 755 $IPARHTSDIR"
 	#/etc/init.d/httpd restart
 	#systemctl restart httpd.service
-	/usr/sbin/httpd -f $IPARHTSCFG
+	rlRun "/usr/sbin/httpd -f $IPARHTSCFG"
+	rlRun "ps -ef|grep httpd"
+	rlRun "netstat -taupne|grep $IPARHTSPORT"
 }
 
 iparhts-sync-set()
