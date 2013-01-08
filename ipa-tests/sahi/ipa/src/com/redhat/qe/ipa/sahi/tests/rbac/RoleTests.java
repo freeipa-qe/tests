@@ -78,7 +78,11 @@ public class RoleTests extends SahiTestScript {
 		
 		sahiTasks.navigateTo(commonTasks.rolePage, true);
 		currentPage = sahiTasks.fetch("top.location.href");
-		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&role-facet=search" ;		
+		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&role-facet=search" ;
+		//previous tests cases in privileges has left roles page in IT Specialist,need to click backlink in Win
+		if (sahiTasks.link("Roles").in(sahiTasks.div("content")).exists())
+			sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		
 	}
 	
 	@BeforeMethod (alwaysRun=true)
@@ -96,7 +100,8 @@ public class RoleTests extends SahiTestScript {
 	 */		
 	@Test (groups={"roleAddTests"}, description="Add Role", 
 			dataProvider="roleAddTestObjects")	
-	public void testRoleAdd(String testName, String name, String description) throws Exception {		
+	public void testRoleAdd(String testName, String name, String description) throws Exception {
+		
 		//verify role doesn't exist
 		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify Role " + name + " doesn't already exist");
 		
