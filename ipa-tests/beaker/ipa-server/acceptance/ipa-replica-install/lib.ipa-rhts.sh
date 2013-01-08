@@ -22,7 +22,6 @@ iparhts-sync-set()
 
 iparhts-sync-block()
 {
-iparhts-sync-set -s READY_REPLICA1 $BEAKERMASTER
 	rlLog "Blocking waiting for $3 to post state $2"
 	done=0;
 	while [ $done -eq 0 ]; do
