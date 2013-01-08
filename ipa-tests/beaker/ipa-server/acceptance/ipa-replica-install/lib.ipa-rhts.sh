@@ -27,7 +27,7 @@ iparhts-sync-set -s READY_REPLICA1 $BEAKERMASTER
 	done=0;
 	while [ $done -eq 0 ]; do
 		rlLog "Attempting to get http://$3/iparhtsdir/$2"
-		wget http://$4/$3
+		rlRun "wget http://$3/iparhtsdir/$2"
 		if [ $? -eq 0 ]; then 
 			rlLog "Success! Got $2 from $3. Proceeding."
 			done=1;
