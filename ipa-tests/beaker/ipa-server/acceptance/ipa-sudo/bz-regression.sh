@@ -70,7 +70,7 @@ rlPhaseStartTest "bug769491: Unable to add certain sudo commands to groups."
 
 	rlRun "ipa sudocmdgroup-add sudogrp1 --desc=sudogrp1"
 	rlRun "ipa sudocmdgroup-add-member sudogrp1 --sudocmds=\"/bin/chown -R apache:developers /var/www/*/shared/log\" > $TmpDir/bug769491.txt 2>&1"
-	rlAssertGrep "Member Sudo commands: /bin/chown -r apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
+	rlAssertGrep "Member Sudo commands: /bin/chown -R apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
 	rlAssertGrep "Number of members added 1" "$TmpDir/bug769491.txt"
         rlRun "cat $TmpDir/bug769491.txt"
 
@@ -81,7 +81,7 @@ rlPhaseStartTest "bug769491: Unable to add certain sudo commands to groups."
 	
 	rlRun "ipa sudocmdgroup-remove-member sudogrp1 --sudocmds=\"/bin/chown -R apache:developers /var/www/*/shared/log\" > $TmpDir/bug769491.txt 2>&1"
 	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/bug769491.txt"
-        rlAssertNotGrep "Member Sudo commands: /bin/chown -r apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
+        rlAssertNotGrep "Member Sudo commands: /bin/chown -R apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
 	rlAssertGrep "Number of members removed 1" "$TmpDir/bug769491.txt"
         rlRun "cat $TmpDir/bug769491.txt"
 
@@ -148,14 +148,15 @@ rlPhaseStartTest "bug782976: SUDO: --users and --groups should detect values suc
 	rlRun "ipa sudorule-add bug782976"
 	rlRun "ipa sudorule-add-user bug782976 --users=user1"
 	rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1" 1
-	rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug782976.txt"
+	rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are allowed users" "$TmpDir/bug782976.txt"
+	rlRun "cat $TmpDir/bug782976.txt"
 
 	rlRun "ipa sudorule-del bug782976"
 
 	rlRun "ipa sudorule-add bug782976"
         rlRun "ipa sudorule-add-user bug782976 --groups=group1"
         rlRun "ipa sudorule-mod bug782976 --usercat=all > $TmpDir/bug782976.txt 2>&1" 1
-        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug782976.txt"
+        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are allowed users" "$TmpDir/bug782976.txt"
 
 	# clean up
 	rlRun "ipa group-del group1"
@@ -196,14 +197,14 @@ rlPhaseStartTest "bug783286: Setting HBAC/SUDO category to Anyone doesn't remove
         rlRun "ipa sudorule-add bug783286"
         rlRun "ipa sudorule-add-user bug783286 --users=shanks"
         rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1" 1
-        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug783286.txt"
+        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are allowed users" "$TmpDir/bug783286.txt"
 
         rlRun "ipa sudorule-del bug783286"
 
         rlRun "ipa sudorule-add bug783286"
         rlRun "ipa sudorule-add-user bug783286 --groups=group1"
         rlRun "ipa sudorule-mod bug783286 --usercat=all > $TmpDir/bug783286.txt 2>&1" 1
-        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are users" "$TmpDir/bug783286.txt"
+        rlAssertGrep "ipa: ERROR: user category cannot be set to 'all' while there are allowed users" "$TmpDir/bug783286.txt"
 
         # clean up
         rlRun "ipa group-del group1"
