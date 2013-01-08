@@ -151,34 +151,34 @@ rlJournalStart
 			mkdir -p /root/dev-shm-backup
 			cp -a /dev/shm/* /root/dev-shm-backup
 
-			iparhts-sync-set -s READY_REPLICA1 $BEAKERMASTER
-			iparhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
+			rhts-sync-set -s READY_REPLICA1 -m $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
 
 			createReplica3
 
-			iparhts-sync-set -s READY_REPLICA3 $BEAKERMASTER
-			iparhts-sync-block -s DONE_REPLICA3 $BEAKERSLAVE
+			rhts-sync-set -s READY_REPLICA3 -m $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA3 $BEAKERSLAVE
 
 			createReplica4
 
-			iparhts-sync-set -s READY_REPLICA4 $BEAKERMASTER
-			iparhts-sync-block -s DONE_REPLICA4 $BEAKERSLAVE
+			rhts-sync-set -s READY_REPLICA4 -m $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA4 $BEAKERSLAVE
 
 			createReplica2
 
-			iparhts-sync-set -s READY_REPLICA2 $BEAKERMASTER
-			iparhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
+			rhts-sync-set -s READY_REPLICA2 -m $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA2 $BEAKERSLAVE
 	
 			replicaBugCheck_bz769545
 
-			iparhts-sync-set -s READY_REPLICA5 $BEAKERMASTER
-			iparhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
+			rhts-sync-set -s READY_REPLICA5 -m $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
 	
 			replicaBugTest_bz823657
 			replicaBugTest_bz824492
 
-			iparhts-sync-set -s READY_REPLICA6 $BEAKERMASTER
-			iparhts-sync-block -s DONE_REPLICA6 $BEAKERSLAVE
+			rhts-sync-set -s READY_REPLICA6 -m $BEAKERMASTER
+			rhts-sync-block -s DONE_REPLICA6 $BEAKERSLAVE
 
 			# Delete dns entires for slave
 			slavename=$(echo $SLAVE | sed s/.$DOMAIN//g)
@@ -192,7 +192,7 @@ rlJournalStart
 			rlLog "Deleting reverse entry with ipa dnsrecord-del $ptrzone $awk4 --ptr-rec=\"$SLAVE.\""
 			ipa dnsrecord-del $ptrzone $awk4 --ptr-rec="$SLAVE."
 			
-			iparhts-sync-set -s CONTINUE_REPLICA6 $BEAKERSLAVE
+			rhts-sync-set -s CONTINUE_REPLICA6 -m $BEAKERSLAVE
 
 		rlPhaseEnd
 
@@ -233,7 +233,7 @@ rlJournalStart
 			SetUpAuthKeys
 			SetUpKnownHosts
 
-			iparhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
+			rhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
 			installSlave
 			installCA
 			replicaBugCheck_bz784696
@@ -256,25 +256,25 @@ rlJournalStart
 
 			installSlave_nr1
 			uninstall
-			iparhts-sync-set -s DONE_REPLICA1 $BEAKERSLAVE
+			rhts-sync-set -s DONE_REPLICA1 -m $BEAKERSLAVE
 
 
 			# Installing slave with --no-forwarders
-			iparhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
+			rhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
 			installSlave_nf
 			uninstall
-			iparhts-sync-set -s DONE_REPLICA3 $BEAKERSLAVE
+			rhts-sync-set -s DONE_REPLICA3 -m $BEAKERSLAVE
 			
-			iparhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
+			rhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
 			# Installing slave with --no-reverse
 			installSlave_nr2
 			uninstall
 
 			installSlave_nr3
 			uninstall
-			iparhts-sync-set -s DONE_REPLICA4 $BEAKERSLAVE
+			rhts-sync-set -s DONE_REPLICA4 -m $BEAKERSLAVE
 
-			iparhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
+			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
 			# Installing with --ssh-trust-dns
 			installSlave_sshtrustdns
 			uninstall
@@ -303,25 +303,25 @@ rlJournalStart
 				
 			# Test other bugs not covered directly in above tests
 
-			iparhts-sync-set -s DONE_REPLICA2 $BEAKERSLAVE
+			rhts-sync-set -s DONE_REPLICA2 -m $BEAKERSLAVE
 
-			iparhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
 
 			installSlave
 
-			iparhts-sync-set -s DONE_REPLICA5 $BEAKERSLAVE
+			rhts-sync-set -s DONE_REPLICA5 -m $BEAKERSLAVE
 
-			iparhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
 
 			uninstall
 
 			installSlave
 
-			iparhts-sync-set -s DONE_REPLICA6 $BEAKERSLAVE
+			rhts-sync-set -s DONE_REPLICA6 -m $BEAKERSLAVE
 
-			iparhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
+			rhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
 
-			iparhts-sync-block -s CONTINUE_REPLICA6 $BEAKERMASTER
+			rhts-sync-block -s CONTINUE_REPLICA6 $BEAKERMASTER
 
 			replicaInstallBug748987	
 
