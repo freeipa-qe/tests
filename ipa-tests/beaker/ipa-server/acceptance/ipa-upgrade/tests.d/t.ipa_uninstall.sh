@@ -66,7 +66,7 @@ ipa_uninstall_master()
 		#submit_logs
 
 		ipa_quick_uninstall
-
+		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl* krb5-libs"
 		[ -n $MASTER_IP ] && MASTER=$(dig +short -x $MASTER_IP|sed 's/\.$//g')
 
 		#submit_log /var/log/ipaserver-uninstall.log
@@ -123,6 +123,7 @@ ipa_uninstall_slave()
 		#submit_logs
 
 		ipa_quick_uninstall
+		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl* krb5-libs"
 		[ -n $SLAVE_IP ] && SLAVE=$(dig +short -x $SLAVE_IP|sed 's/\.$//g')
 
 		#submit_log /var/log/ipaserver-uninstall.log
