@@ -190,7 +190,7 @@ ipa_uninstall_client()
 
 		#submit_log /var/log/ipaclient-uninstall.log
 
-		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
+		rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl* krb5-libs"
 		rlRun "yum -y remove http*"
 
 		[ -n $CLIENT_IP ] && CLIENT=$(dig +short -x $CLIENT_IP|sed 's/\.$//g')
