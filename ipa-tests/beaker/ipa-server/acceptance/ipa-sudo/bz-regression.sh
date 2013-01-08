@@ -76,7 +76,7 @@ rlPhaseStartTest "bug769491: Unable to add certain sudo commands to groups."
 
 	rlRun "ipa sudocmdgroup-show sudogrp1 > $TmpDir/bug769491.txt 2>&1"
 	rlAssertGrep "Sudo Command Group: sudogrp1" "$TmpDir/bug769491.txt"
-	rlAssertGrep "Member Sudo commands: /bin/chown -r apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
+	rlAssertGrep "Member Sudo commands: /bin/chown -R apache:developers /var/www/\*/shared/log" "$TmpDir/bug769491.txt"
         rlRun "cat $TmpDir/bug769491.txt"
 	
 	rlRun "ipa sudocmdgroup-remove-member sudogrp1 --sudocmds=\"/bin/chown -R apache:developers /var/www/*/shared/log\" > $TmpDir/bug769491.txt 2>&1"
