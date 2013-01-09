@@ -57,16 +57,11 @@ configure_autofs_direct(){
 }
 
 verify_autofs_mounting(){
-    local topDir=$1
-    local subDir=$2
-    local clientSideDir="$topDir/$subDir"
     local startingDir=`pwd`
-    rlLog "Starting directory: [$startingDir]. try get into client side autofs directory: cd $clientSideDir"
-    cd $clientSideDir
-    local currentDir=`pwd`
-    echo "clientSideDir=[$clientSideDir] current directory `pwd`"
-    if [ "$clientSideDir" = "$currentDir" ]; then
-        rlLog "get into clientSideDir [$clientSideDir], great, now check file content"
+    rlLog "[verify_autofs_mounting] starts..."
+    rlLog "Starting point: [$startingDir]. try get into client side autofs directory: cd $autofsDir"
+    if cd $autofsDir; then
+        rlLog "get into autofs dir [$autofsDir], great, now check file content"
         pwd
         ls -al
         show_file_content $currentNFSFileName
@@ -81,12 +76,10 @@ verify_autofs_mounting(){
             rlFail "autofs mount failed, file content does NOT matches"
         fi
     else
-        rlLog "can not get into clientSideDir [$clientSideDir], now try one step at time"
-        rlRun "cd $topDir" 0 "cd [$topDir], trying the top level dir"
-        if [ "`pwd`" = "$topDir" ];then
-            rlLog "get into top dir [$topDir], continue, current dir=[`pwd`]"
-            rlRun "cd $subDir" 0 "now try sub directory: cd [$subDir], current dir=[`pwd`]"
-            if [ "`pwd`" = "$topDir/$subDir" ];then
+        rlLog "can not get into [$autofsDir], now try one step at time"
+        if cd $autofsTopDir ;then
+            rlLog "get into top dir [$autofsTopDir], continue"
+            if cd $autofsSubDir ;then
                 rlLog "great, we are where we want to be, now do ls"
                 pwd
                 ls -al
@@ -94,11 +87,11 @@ verify_autofs_mounting(){
                 echo $currentNFSFileSecret > $TmpDir/secret.txt
                 rlRun "diff $TmpDir/secret.txt $currentNFSFileName" 0 "diff our secret with desired secret, they should match"
             else
-                rlLog "it looks like we can not get into sub dir [$subDir], this is ok, let's try other ways to verify mount: mount -l"
+                rlLog "it looks like we can not get into sub dir [$autofsSubDir], this is ok, let's try other ways to verify mount: mount -l"
                 mount -l
-                if mount -l | grep "$topDir" 2>&1 >/dev/null
+                if mount -l | grep "$autofsSubDir" 2>&1 >/dev/null
                 then
-                    rlPass "although can not get into sub directory, this is temp issue, test still consider pass"
+                    rlPass "mount -l show mount location, test still consider pass"
                 else
                     rlFail "we get into top level dirs, but not the second level, current dir=[`pwd`], mount -l does not show either"
                 fi
@@ -107,11 +100,12 @@ verify_autofs_mounting(){
                 echo "---------------------------------------"
             fi
         else
-            rlFail "can not get into autofs directory at all, not even top level, client side dir=[$clientSideDir]"
+            rlFail "can not get into autofs directory at all, not even top level, client side dir=[$autofsDir]"
             debuginfo
         fi
     fi
-    rlRun "cd $startingDir" 0 "go back to starting directory: [$startingDir]"
+    rlRun "cd $startingDir" 0 "go back to starting point: [$startingDir]"
+    rlLog "[verify_autofs_mounting] finished"
 }
 
 debuginfo()

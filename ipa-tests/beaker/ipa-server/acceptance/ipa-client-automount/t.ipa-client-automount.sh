@@ -590,7 +590,7 @@ test_direct_map()
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U" 0 "setup ipa client automount"
         restart_sssd
         restart_autofs
-        verify_autofs_mounting $autofsTopDir $autofsSubDir
+        verify_autofs_mounting 
         clean_up_indirect_map_and_umount $currentLocation $autofsDir
         clean_up_automount_installation
     rlPhaseEnd
@@ -610,7 +610,7 @@ test_indirect_map()
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U" 0 "setup ipa client automount"
         restart_sssd
         restart_autofs
-        verify_autofs_mounting $autofsTopDir $autofsSubDir
+        verify_autofs_mounting 
         clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $autofsSubDir
         clean_up_automount_installation   
     rlPhaseEnd
@@ -630,7 +630,7 @@ test_indirect_map_using_wildcard()
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U" 0 "setup ipa client automount"
         restart_sssd
         restart_autofs
-        verify_autofs_mounting $autofsTopDir $nfsExportSubDir 
+        verify_autofs_mounting 
         clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $nfsExportSubDir
         clean_up_automount_installation
     rlPhaseEnd
@@ -649,7 +649,7 @@ test_direct_map_use_no_sssd()
         configure_autofs_direct $currentLocation $currentNFSServer $nfsDir $autofsDir 
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation --no-sssd -U" 0 "setup ipa client automount"
         restart_autofs
-        verify_autofs_mounting $autofsTopDir $autofsSubDir
+        verify_autofs_mounting
         clean_up_indirect_map_and_umount $currentLocation $autofsDir
         clean_up_automount_installation
     rlPhaseEnd
@@ -668,7 +668,7 @@ test_indirect_map_use_no_sssd()
         configure_autofs_indirect $currentLocation $currentNFSServer $nfsDir $autofsDir
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation --no-sssd -U" 0 "setup ipa client automount"
         restart_autofs
-        verify_autofs_mounting $autofsTopDir $autofsSubDir
+        verify_autofs_mounting 
         clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $autofsSubDir
         clean_up_automount_installation   
     rlPhaseEnd
@@ -681,13 +681,14 @@ test_indirect_map_using_wildcard_use_no_sssd()
         local automounLocation="Indirect_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
         autofsTopDir="/ipashare_${RANDOM}"
-        autofsDir="$autofsTopDir/${nfsExportSubDir}"
+        autofsSubDir="$nfsExportSubDir"
+        autofsDir="$autofsTopDir/$autofsSubDir"
         rlLog "config autofs indirect mount use wildcard (*,&):"
         rlLog "[automountLocation:$currentLocation] [NFS Server:$currentNFSServer:$nfsExportTopDir/&] [autofs local dir: $autofsTopDir/*]"
         configure_autofs_indirect_use_wildcard $currentLocation $currentNFSServer $nfsExportTopDir $autofsTopDir
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation --no-sssd -U" 0 "setup ipa client automount: --server=$currentIPAServer --location=$currentLocation --no-sssd -U"
         restart_autofs
-        verify_autofs_mounting $autofsTopDir $nfsExportSubDir 
+        verify_autofs_mounting 
         clean_up_indirect_map_and_umount $currentLocation $autofsTopDir $nfsExportSubDir
         clean_up_automount_installation
     rlPhaseEnd

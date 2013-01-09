@@ -22,11 +22,11 @@ autofsTopDir="/ipashare${id}"
 autofsSubDir="public${id}"
 autofsDir="$autofsTopDir/$autofsSubDir"
 nfsConfiguration_NonSecure="$nfsExportTopDir *(rw,async,fsid=0,no_subtree_check,no_root_squash)"
-nfs_RPCGSS_security_flavors="krb5"
-nfsConfiguration_Kerberized="$nfsExportTopDir gss/${nfs_RPCGSS_security_flavors}(rw,async,subtree_check,fsid=0)"
+nfs_RPCGSS_security_optioin="krb5"
+nfsConfiguration_Kerberized="$nfsExportTopDir gss/${nfs_RPCGSS_security_optioin}(rw,async,subtree_check,fsid=0)"
 nfsMountType_nfs3=" --type nfs "
 nfsMountType_nfs4=" --type nfs4 "
-nfsMountType_kerberized=" --type nfs4 -o sec=${nfs_RPCGSS_security_flavors} "
+nfsMountType_kerberized=" --type nfs4 -o sec=${nfs_RPCGSS_security_optioin} "
 
 currentLocation=$automountLocationA
 currentIPAServer=$ipaServerMaster
@@ -54,13 +54,15 @@ configure_autofs_indirect(){
     ipa automountkey-add $name auto.master --key=${autofsTopDir} --info=auto.share
     #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
     #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
-    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:/share"
+    #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:/share"
+    ipa automountkey-add $name auto.share --key=*  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:/share/&"
     show_autofs_configuration $name
 }
 
 verify_autofs_mounting(){
     local p=`pwd`
     cd $autofsTopDir
+    mount -l
     echo `pwd`
     ls -l
     show_file_content $currentNFSFileName
@@ -162,6 +164,19 @@ add_indirect_map()
         #clean_up_automount_installation
 }
 
+add_direct_map(){
+# ipa automountkey-add direct001 auto.direct --key=/ipashare001/ipapublic001 --info=f17apple.yzhang.redhat.com:/share/pub
+    local name=$1
+    local nfsHost=$2
+    local nfsDir=$3
+    local autofsDir=$4
+    echo "location [$name] : nfs server [$nfsHost] : nfs dir [$nfsDir] : autofs local dir [$autofsDir] "
+    ipa automountlocation-add $name
+    ipa automountmap-add $name auto.direct
+    ipa automountkey-add $name auto.direct --key=$autofsDir --info="$automountKey_mount_option ${nfsHost}:${nfsDir}"
+    show_autofs_configuration $name
+#    how_to_check_autofs_mounting $name $nfsHost $nfsDir $autofsDir
+}
 install_ipa_client()
 {
     ipa-client-install --domain=yzhang.redhat.com --server=apple.yzhang.redhat.com --unattended --principal=admin --password=Secret123 --hostname=banana.yzhang.redhat.com --mkhomedir 
@@ -174,6 +189,7 @@ uninstall_ipa_client()
 }
 
 ################### main ####################
+echo Secret123 | kinit admin
 c=0
 max=1
 while [ $c -lt $max ];do
