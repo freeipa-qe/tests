@@ -240,6 +240,8 @@ rlJournalStart
 			replicaBugCheck_bz845405
 			uninstall
 
+			sleep 600000
+
 			rlLog "Disabling IPv6 to test bz 839004 with"
 			diableIpv6
 			installBug_bz839004
