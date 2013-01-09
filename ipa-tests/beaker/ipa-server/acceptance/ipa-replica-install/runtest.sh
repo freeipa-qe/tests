@@ -118,7 +118,7 @@ rlJournalStart
 	fi
 
 	# Setting up iparhts sync server
-	setup_iparhts_sync
+	#setup_iparhts_sync
 
 	ipofm=`dig +short $BEAKERMASTER`
 	ipofs=`dig +short $BEAKERSLAVE`
