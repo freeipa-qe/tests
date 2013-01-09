@@ -119,25 +119,29 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacrule-cli-003: User Category - unknown"
         command="ipa hbacrule-add --usercat=bad test"
-        expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
+        #expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
+	expmsg="ipa: ERROR: invalid 'usercat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown user category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-004: Service Category - unknown"
         command="ipa hbacrule-add --servicecat=bad test"
-        expmsg="ipa: ERROR: invalid 'servicecat': must be one of (u'all',)"
+        #expmsg="ipa: ERROR: invalid 'servicecat': must be one of (u'all',)"
+	expmsg="ipa: ERROR: invalid 'servicecat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown service category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-005: Host Category - unknown"
         command="ipa hbacrule-add --hostcat=bad test"
-        expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
+        #expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
+	expmsg="ipa: ERROR: invalid 'hostcat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown host category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-006: Source Host Category - unknown"
         command="ipa hbacrule-add --srchostcat=bad test"
-        expmsg="ipa: ERROR: invalid 'srchostcat': must be one of (u'all',)"
+        #expmsg="ipa: ERROR: invalid 'srchostcat': must be one of (u'all',)"
+	expmsg="ipa: ERROR: invalid 'srchostcat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown source host category"
     rlPhaseEnd
 
