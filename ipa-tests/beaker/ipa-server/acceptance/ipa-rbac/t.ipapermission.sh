@@ -524,7 +524,7 @@ ipapermission_add_invalidtype()
 
    rlPhaseStartTest "ipa-permission-cli-1029 - add permission using invalid type" 
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget"
-     expmsg="ipa: ERROR: invalid 'type': must be one of (u'user', u'group', u'host', u'service', u'hostgroup', u'netgroup', u'dnsrecord')"
+     expmsg="ipa: ERROR: invalid 'type': must be one of 'user', 'group', 'host', 'service', 'hostgroup', 'netgroup', 'dnsrecord'"
      rlRun "$command > $TmpDir/ipapermission_invalidtype.log 2>&1" 1 "Verify error message for invalid type"
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidtype.log"
    rlPhaseEnd
@@ -562,7 +562,7 @@ ipapermission_add_invalidsubtree()
     permissionLocalTarget="--subtree=xyz"
     permissionName="TestPermission"
 
-   rlPhaseStartTest "ipa-permission-cli-1031 - add permission using invalid subtree"
+   rlPhaseStartTest "ipa-permission-cli-1031 - add permission using invalid subtree - bz 893108"
      command="addPermission $permissionName $permissionLocalRights $permissionLocalTarget"
      expmsg="ipa: ERROR: ACL Invalid Target Error"
      rlRun "$command > $TmpDir/ipapermission_invalidsubtree.log 2>&1" 1 "Verify error message for invalid subtree"
@@ -649,7 +649,7 @@ ipapermission_add_invalidsetattr()
 
    rlPhaseStartTest "ipa-permission-cli-1037 - add permission using invalid setattr"
      command="addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr"
-     expmsg="ipa: ERROR: owner: value #0 invalid per syntax: Invalid syntax."
+     expmsg="ipa: ERROR: owner: Invalid syntax."
      rlRun "$command > $TmpDir/ipapermission_invalidsetattr.log 2>&1" 1 "Verify error message for invalid setattr"
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidsetattr.log"
    rlPhaseEnd
@@ -990,7 +990,6 @@ ipapermission_mod_positive()
      attr="permissions"
      value="add,write"
      restOfRequiredCommand="--attrs="
-     rlRun "ipa permission-add \"Add Automount Keys\" --permissions=write --type=user --attr=description"
      rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
    rlPhaseEnd 
@@ -1076,7 +1075,7 @@ ipapermission_mod_negative()
      value="users"
      command="modifyPermission \"$permissionName\" $attr $value"
 #     command="ipa permission-mod --type=\"$value\" \"$permissionName\""
-     expMsg="ipa: ERROR: invalid 'type': must be one of (u'user', u'group', u'host', u'service', u'hostgroup', u'netgroup', u'dnsrecord')"
+     expmsg="ipa: ERROR: invalid 'type': must be one of 'user', 'group', 'host', 'service', 'hostgroup', 'netgroup', 'dnsrecord'"
      rlRun "$command > $TmpDir/ipapermission_invalidtype2.log 2>&1" 1 "Verify error message for invalid type"
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidtype2.log"
    rlPhaseEnd

@@ -39,7 +39,7 @@ cleanupPrivilegesTest()
 ipaprivilege_check()
 {
 
-   rlPhaseStartTest "ipa-privilege-cli-1001 - Check IPA provided Privileges have assigned Permissions (Bug 742327)" 
+   rlPhaseStartTest "ipa-privilege-cli-1001 - Check IPA provided Privileges have assigned Permissions (Bug 742327, 893186)" 
      ipa privilege-find | grep "Privilege name" | cut -d ":" -f2 > $TmpDir/ipaprivilege_check.log
      while read privilegeName 
      do
@@ -211,7 +211,7 @@ ipaprivilege_add_permission_positive()
 
   rlPhaseStartTest "ipa-privilege-cli-1013 - add multiple permissions to privilege" 
     privilegeName="Add User"
-    permissionList="add hbac rule, delete hbac rule, modify hbac rule"
+    permissionList="Delete HBAC rule, Modify HBAC rule, Add HBAC rule"
     rlRun "addPermissionToPrivilege \"$permissionList\" \"$privilegeName\"" 0 "Adding $permissionList to $privilegeName"
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Permissions\" \"$permissionList\" " 0 "Verify Permissions for a Privilege"
   rlPhaseEnd
@@ -219,7 +219,7 @@ ipaprivilege_add_permission_positive()
   rlPhaseStartTest "ipa-privilege-cli-1014 - add permission to IPA-provided privilege" 
     privilegeName="HBAC Administrator"
     permissionList="add groups"
-    expectedPermissionList="add groups, add hbac rule, delete hbac rule, modify hbac rule, manage hbac rule membership, add hbac services, delete hbac services, add hbac service groups, delete hbac service groups, manage hbac service group membership"
+    expectedPermissionList="Add Groups, Manage HBAC service group membership, Manage HBAC rule membership, Add HBAC services, Delete HBAC rule, Modify HBAC rule, Delete HBAC service groups, Delete HBAC services, Add HBAC rule, Add HBAC service groups"
     rlRun "addPermissionToPrivilege \"$permissionList\" \"$privilegeName\"" 0 "Adding $permissionList to $privilegeName"
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Permissions\" \"$expectedPermissionList\" " 0 "Verify Permissions for a Privilege"
   rlPhaseEnd
@@ -307,6 +307,7 @@ ipaprivilege_remove_permission_positive()
     privilegeName="HBAC Administrator"
     permissionList="add hbac rule"
     expectedPermissionListLeftForPrivilege="delete hbac rule, modify hbac rule, manage hbac rule membership, add hbac services, delete hbac services, add hbac service groups, delete hbac service groups, manage hbac service group membership"
+    expectedPermissionListLeftForPrivilege="Manage HBAC service group membership, Manage HBAC rule membership, Add HBAC services, Delete HBAC rule, Modify HBAC rule, Delete HBAC service groups, Delete HBAC services, Add HBAC service groups"
     rlRun "removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\"" 0 "Removing $permissionList from $privilegeName"
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Permissions\" \"$expectedPermissionListLeftForPrivilege\" " 0 "Verify Permissions for a Privilege"
   rlPhaseEnd
@@ -466,7 +467,7 @@ ipaprivilege_mod_negative()
     attr="addattr"
     addOwner="owner=xyz"
     command="modifyPrivilege $privilegeName $attr $addOwner"
-    expmsg="ipa: ERROR: owner: value #0 invalid per syntax: Invalid syntax."
+    expmsg="ipa: ERROR: owner: Invalid syntax."
     rlRun "$command > $TmpDir/ipaprivilege_invalidsyntax.log 2>&1" 1 "Verify error message for $privilegeName"
     rlAssertGrep "$expmsg" "$TmpDir/ipaprivilege_invalidsyntax.log"
   rlPhaseEnd
