@@ -242,12 +242,14 @@ rlJournalStart
 
 			sleep 600000
 
-			rlLog "Disabling IPv6 to test bz 839004 with"
-			diableIpv6
-			installBug_bz839004
-			uninstall
-			rlLog "Re-enabling IPv6"
-			enableIpv6
+			#rlLog "Disabling IPv6 to test bz 839004 with"
+			#diableIpv6
+			#rhts-reboot
+			#installBug_bz839004
+			#uninstall
+			#rlLog "Re-enabling IPv6"
+			#enableIpv6
+			#rhts-reboot
 
 			installSlave
 			RESTARTDS=0

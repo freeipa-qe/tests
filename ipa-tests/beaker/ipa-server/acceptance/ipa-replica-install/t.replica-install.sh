@@ -1198,13 +1198,26 @@ miscDNSCheckup_negative(){
 
 # Enable IPv6
 diableIpv6(){
-	/sbin/sysctl -a | grep ipv6  | grep disable | cut -d\  -f1 | while read var; do sysctl $var=1; done
+	/sbin/sysctl -a | grep ipv6  | grep disable | cut -d\  -f1 | \
+	while read var
+	do 
+		sysctl -w $var=1
+		sed -i "/$var = /d" /etc/sysctl.conf
+		echo "$var = 1" >> /etc/sysctl.conf
+	done
+	service ip6tables stop
 	rmmod ipv6
 }
 
 # Disable IPv6
 enableIpv6(){
-	/sbin/sysctl -a | grep ipv6  | grep disable | cut -d\  -f1 | while read var; do sysctl $var=0; done
+	/sbin/sysctl -a | grep ipv6  | grep disable | cut -d\  -f1 | \
+	while read var
+	do 
+		sysctl -w $var=0
+		sed -i "/$var = /d" /etc/sysctl.conf
+		echo "$var = 0" >> /etc/sysctl.conf
+	done
 	modprobe ipv6
 }
 
