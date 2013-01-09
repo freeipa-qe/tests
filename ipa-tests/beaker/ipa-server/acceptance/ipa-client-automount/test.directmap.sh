@@ -27,6 +27,8 @@ nfsConfiguration_Kerberized="$nfsExportTopDir gss/${nfs_RPCGSS_security_optioin}
 nfsMountType_nfs3=" --type nfs "
 nfsMountType_nfs4=" --type nfs4 "
 nfsMountType_kerberized=" --type nfs4 -o sec=${nfs_RPCGSS_security_optioin} "
+mount_non_secure_option="-fstype=nfs4,rw"
+mount_kerberized_option="-fstype=nfs4,rw,sec=krb5"
 
 currentLocation=$automountLocationA
 currentIPAServer=$ipaServerMaster
@@ -148,7 +150,7 @@ add_indirect_map()
 {
         local automounLocation="ipa_indirect_${RANDOM}"
         currentLocation=$automounLocation
-        configure_autofs_indirect $currentLocation $currentNFSServer $nfsDir $autofsDir
+        configure_autofs_indirect $automounLocation $currentNFSServer $nfsDir $autofsDir
         sleep 3
         ipa-client-automount --uninstall -U 2>&1 > $tmp
         echo "ipa-client-automount --server=$currentIPAServer --location=$currentLocation --no-sssd -U"
@@ -164,20 +166,41 @@ add_indirect_map()
         #clean_up_automount_installation
 }
 
-add_direct_map(){
+configure_autofs_direct(){
 # ipa automountkey-add direct001 auto.direct --key=/ipashare001/ipapublic001 --info=f17apple.yzhang.redhat.com:/share/pub
     local name=$1
     local nfsHost=$2
     local nfsDir=$3
     local autofsDir=$4
+    local info="$mount_kerberized_option ${nfsHost}:${nfsDir}"
     echo "location [$name] : nfs server [$nfsHost] : nfs dir [$nfsDir] : autofs local dir [$autofsDir] "
+    echo "info used: [$info]"
     ipa automountlocation-add $name
-    ipa automountmap-add $name auto.direct
-    ipa automountkey-add $name auto.direct --key=$autofsDir --info="$automountKey_mount_option ${nfsHost}:${nfsDir}"
+    ipa automountkey-add $name auto.direct --key=$autofsDir --info="$info"
     show_autofs_configuration $name
 #    how_to_check_autofs_mounting $name $nfsHost $nfsDir $autofsDir
 }
 
+add_direct_map(){
+    local automountLocation="ipa_direct_$RANDOM"
+        configure_autofs_direct $automountLocation $currentNFSServer $nfsDir $autofsDir
+        sleep 3
+        ipa-client-automount --uninstall -U 2>&1 
+        #echo "ipa-client-automount --server=$currentIPAServer --location=$automountLocation -U"
+        #ipa-client-automount --server=$currentIPAServer --location=$automountLocation -U
+
+        echo "ipa-client-automount --server=$currentIPAServer --location=$automountLocation --no-sssd -U"
+        ipa-client-automount --server=$currentIPAServer --location=$automountLocation --no-sssd -U
+        service sssd stop
+        sss_cache -A
+        #cat /etc/sssd/sssd.conf
+        service sssd start
+        service sssd status
+        service autofs restart
+        verify_autofs_mounting
+        #clean_up_indirect_map $currentLocation $autofsTopDir $autofsSubDir
+        #clean_up_automount_installation
+}
 install_ipa_client()
 {
     ipa-client-install --domain=yzhang.redhat.com --server=apple.yzhang.redhat.com --unattended --principal=admin --password=Secret123 --hostname=banana.yzhang.redhat.com --mkhomedir 
@@ -198,7 +221,7 @@ while [ $c -lt $max ];do
     echobold "                            test ($c) starts"
     echobold ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
     #install_ipa_client
-    add_indirect_map
+    add_direct_map
     #uninstall_ipa_client
     echobold "::::::::::::::::::::::::::::: test finished::::::::::::::::::::::::::::::::::"
     c=$((c+1))
