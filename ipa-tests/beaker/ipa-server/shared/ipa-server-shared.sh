@@ -1011,7 +1011,14 @@ ipa_quick_uninstall(){
 	fi
 	. /etc/sysconfig/network
 	rlRun "hostname $HOSTNAME"
-	rlRun "yum -y downgrade krb5-devel krb5-libs bind-libs bind-utils bind-license bind-libs-lite"
+	rlRun "yum -y downgrade krb5-devel krb5-libs bind-*"
+	rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
+
+	CERTCHK=$(certutil -L -d /etc/pki/nssdb 2>/dev/null |grep "IPA CA"|wc -l)
+	if [ $CERTCHK -gt 0 ]; then
+		rlLog "Found left over Certificate in NSS DB...removing"
+		rlRun "certutil -D -d /etc/pki/nssdb -n 'IPA CA'"
+	fi
 
 } #ipa_quick_uninstall 
 
