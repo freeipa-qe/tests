@@ -670,7 +670,7 @@ add_dns()
 {
     	KinitAsAdmin
 	rlPhaseStartTest "create a new zone $zone to be used in a replication dns test. It could contain the $zrec record"
-		rlRun "ipa dnszone-add --name-server=$ipaddr --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
+		rlRun "ipa dnszone-add --name-server=$ipaddr. --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Checking to ensure that ipa thinks that it can create a zone"
 		rlRun "/usr/sbin/ipactl restart" 0 "Restarting IPA server"
 		rlRun "ipa dnsrecord-add $zone $arec --a-rec $a" 0 "add record type a to $zone"
 	rlPhaseEnd
@@ -1234,9 +1234,8 @@ add_slave_pwpolicy()
 check_pwpolicy()
 {
 	rlPhaseStartTest "Searching for added pwpolicy"
-            maxlife=`echo "999 * 24 * 60 * 60 " | bc` 
-       	    rlRun "ipa pwpolicy-find $tg | grep $maxlife" 0 "Searching for added pwpolicy $tg with $maxlife"
-	    rlRun "ipa pwpolicy-find $ts | grep $maxlife" 0 "Searching for added pwpolicy $ts with $maxlife"
+       	    rlRun "ipa pwpolicy-find $tg | grep 999" 0 "Searching for added pwpolicy $tg with $maxlife"
+	    rlRun "ipa pwpolicy-find $ts | grep 999" 0 "Searching for added pwpolicy $ts with $maxlife"
 	rlPhaseEnd
 }
 modify_pwpolicy()
@@ -1252,15 +1251,13 @@ modify_slave_pwpolicy()
 check_modifiedpwpolicy()
 {
 	rlPhaseStartTest "Searching for modified pwpolicy in tg"
-            maxlife=`echo "384 * 24 * 60 * 60 " | bc` 
-	    rlRun "ipa pwpolicy-find $tg | grep $maxlife" 0 "Searching for modified pwpolicy in tg"
+	    rlRun "ipa pwpolicy-find $tg | grep 384" 0 "Searching for modified pwpolicy in tg"
 	rlPhaseEnd
 }
 check_slave_modifiedpwpolicy()
 {
 	rlPhaseStartTest "Searching for modified pwpolicy in the slave for user $ts"
-            maxlife=`echo "384 * 24 * 60 * 60 " | bc` 
-	    rlRun "ipa pwpolicy-find $ts | grep $maxlife" 0 "Searching for modified pwpolicy in ts"
+	    rlRun "ipa pwpolicy-find $ts | grep 384" 0 "Searching for modified pwpolicy in ts"
 	rlPhaseEnd
 }
 delete_pwpolicy()
