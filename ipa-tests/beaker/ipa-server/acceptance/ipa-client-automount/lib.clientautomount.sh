@@ -93,11 +93,23 @@ verify_autofs_mounting(){
                 then
                     rlPass "mount -l show mount location, test still consider pass"
                 else
-                    rlFail "we get into top level dirs, but not the second level, current dir=[`pwd`], mount -l does not show either"
+                    rlLog "mount -l shows no sign of mounted location, try ls -al"
+                    if ls -al | grep "$autofsSubDir" 
+                    then
+                        rlPass "ls -al shows the monted location, test pass"
+                        pwd
+                        ls -al
+                    else
+                        rlLog "try lsof | grep $autofsTopDir to verify whether autofs locked "
+                        lsof | grep "$autofsTopDir"
+                        if lsof | grep "autofsTopDir"
+                        then
+                            rlLog "autofs locked, try other solutions later"
+                        else
+                            rlFail "we get into top level dirs, but not the second level, current dir=[`pwd`], mount -l does not show either"
+                        fi
+                    fi
                 fi
-                echo "---- 'ls -al' current dir: [`pwd`] ----"
-                ls -al
-                echo "---------------------------------------"
             fi
         else
             rlFail "can not get into autofs directory at all, not even top level, client side dir=[$autofsDir]"
