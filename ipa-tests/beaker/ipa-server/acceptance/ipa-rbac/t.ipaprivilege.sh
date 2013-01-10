@@ -298,7 +298,7 @@ ipaprivilege_remove_permission_positive()
   rlPhaseStartTest "ipa-privilege-cli-1020 - remove permission from IPA-provided privilege (permission added by user)" 
     privilegeName="HBAC Administrator"
     permissionList="add groups"
-    expectedPermissionListLeftForPrivilege="Manage HBAC service group membership, Manage HBAC rule membership, Add HBAC services, Delete HBAC rule, Modify HBAC rule, Delete HBAC service groups, Delete HBAC services, Add HBAC rule, Add HBAC service groups'
+    expectedPermissionListLeftForPrivilege="Manage HBAC service group membership, Manage HBAC rule membership, Add HBAC services, Delete HBAC rule, Modify HBAC rule, Delete HBAC service groups, Delete HBAC services, Add HBAC rule, Add HBAC service groups"
     rlRun "removePermissionFromPrivilege \"$permissionList\" \"$privilegeName\"" 0 "Removing $permissionList from $privilegeName"
     rlRun "verifyPrivilegeAttr \"$privilegeName\" \"Permissions\" \"$expectedPermissionListLeftForPrivilege\" " 0 "Verify Permissions for a Privilege"
   rlPhaseEnd

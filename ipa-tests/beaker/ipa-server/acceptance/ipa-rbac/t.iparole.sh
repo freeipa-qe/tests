@@ -604,6 +604,7 @@ iparole_add_privilege_positive()
      expPriv="memberof_privilege: u,r stuff"
      rlRun "$command > $TmpDir/iparole_privilegewithcommaTorole.log 2>&1"  0 "Adding privilege to role"
      rlAssertGrep "$expPriv" "$TmpDir/iparole_privilegewithcommaTorole.log"
+     deletePrivilege "$privilegeName"
   rlPhaseEnd
 
 
@@ -677,8 +678,9 @@ iparole_remove_privilege()
      privilegeName="user administrators"
      command="removePrivilegeFromRole \"$privilegeName\" \"$roleName\" all"
      expMsg="Number of privileges removed 1"
-     expLeftPrivList="Privileges: Group Administrators, Modify Group membership, HBAC Administrator, Modify Users and Reset passwords"
+     expLeftPrivList="Privileges: Modify Group membership, Modify Users and Reset passwords"
      rlRun "$command > $TmpDir/iparole_removeprivilege.log 2>&1"  0 "Remove multiple privileges"
+     rlRun "cat $TmpDir/iparole_removeprivilege.log" 0 "NAMITA: cat contents"
      rlAssertGrep "$expMsg" "$TmpDir/iparole_removeprivilege.log"
      rlAssertGrep "$expLeftPrivList" "$TmpDir/iparole_removeprivilege.log"
    rlPhaseEnd
