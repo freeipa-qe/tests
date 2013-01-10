@@ -877,7 +877,7 @@ ipapermission_find_targetgroup()
     value="ipausers"
     permissions="\"Add user to default group\""
 
-    rlPhaseStartTest "ipa-permission-cli-1050 - find permission - --targetgroup"
+    rlPhaseStartTest "ipa-permission-cli-1050 - find permission - --targetgroup (bz 893827)"
       rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
@@ -985,7 +985,7 @@ ipapermission_mod_positive()
   rlRun "addPermission $permissionName $permissionRights $permissionTarget $permissionAttr" 0 "Adding $permissionName"
 
 
-   rlPhaseStartTest "ipa-permission-cli-1056 - modify permission --permissions"
+   rlPhaseStartTest "ipa-permission-cli-1056 - modify permission --permissions (bz 893850)"
      permissionName="Add Automount Keys"
      attr="permissions"
      value="add,write"
@@ -1077,7 +1077,7 @@ ipapermission_mod_negative()
 #     command="ipa permission-mod --type=\"$value\" \"$permissionName\""
      expmsg="ipa: ERROR: invalid 'type': must be one of 'user', 'group', 'host', 'service', 'hostgroup', 'netgroup', 'dnsrecord'"
      rlRun "$command > $TmpDir/ipapermission_invalidtype2.log 2>&1" 1 "Verify error message for invalid type"
-     rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidtype2.log"
+     rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidtype2.log"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1065 - modify permission --addattr - to add multivalue to single valued attr - (bug 782861)"

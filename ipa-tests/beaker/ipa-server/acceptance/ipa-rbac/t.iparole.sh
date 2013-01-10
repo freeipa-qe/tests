@@ -56,7 +56,7 @@ cleanupRolesTests()
 iparole_check()
 {
 
-   rlPhaseStartTest "ipa-role-cli-1001 - Check IPA provided Roles have assigned Privileges" 
+   rlPhaseStartTest "ipa-role-cli-1001 - Check IPA provided Roles have assigned Privileges (bz 893718)" 
      ipa role-find | grep "Role name" | cut -d ":" -f2 > $TmpDir/iparole_check.log
      while read roleName 
      do
