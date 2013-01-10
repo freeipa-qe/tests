@@ -76,7 +76,8 @@ migratecmd()
 		rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://ldap.example.com:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://ldap.example.com:389" 1 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="$GROUPCONTAINER" ldap://ldap.example.com:389 > /tmp/error.out 2>&1
-                rlAssertGrep "ipa: ERROR: Can't contact LDAP server:" "/tmp/error.out"
+                #rlAssertGrep "ipa: ERROR: Can't contact LDAP server:" "/tmp/error.out"
+		rlAssertGrep "ipa: ERROR: cannot connect to u'ldap://ldap.example.com:389': LDAP Server Down" "/tmp/error.out"
 	rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-002 Invalid User Container"
@@ -114,7 +115,7 @@ migratecmd()
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --schema=RFC9999 ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --schema=RFC9999 ldap://$CLIENT:389" 1 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="$GROUPCONTAINER" --schema=RFC9999 ldap://$CLIENT:389 > /tmp/error.out 2>&1
-                rlAssertGrep "ipa: ERROR: invalid 'schema': must be one of (u'RFC2307bis', u'RFC2307')" "/tmp/error.out"
+                rlAssertGrep "ipa: ERROR: invalid 'schema': must be one of 'RFC2307bis', 'RFC2307'" "/tmp/error.out"
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-007 Invalid bind password"
