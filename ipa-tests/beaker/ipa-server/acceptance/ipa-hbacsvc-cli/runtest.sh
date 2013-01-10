@@ -103,26 +103,27 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-005: Negative - Service - setattr and addattr on dn"
-        command="ipa hbacsvc-mod --setattr dn=newcn $service1"
-        expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
+        command="ipa hbacsvc-mod --setattr \"cn=newcn,cn=hbacservices,cn=hbac,$BASEDN\" $service1"
+        expmsg="ipa: ERROR: modifying primary key is not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
-        command="ipa hbacsvc-mod --addattr dn=newcn $service1"
+        command="ipa hbacsvc-mod --addattr \"cn=newcn,cn=hbacservices,cn=hbac,$BASEDN\" $service1"
+	expmsg="ipa: ERROR: cn: Only one value allowed."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-006: Negative - Service - setattr and addattr on ipaUniqueID"
-        command="ipa hbacsvc-mod --setattr ipaUniqueID=newid $service1"
+        command="ipa hbacsvc-mod --setattr \"ipaUniqueID=newid,cn=hbacservices,cn=hbac,$BASEDN\" $service1"
         expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
-        command="ipa hbacsvc-mod --addattr ipaUniqueID=newid $service1"
+        command="ipa hbacsvc-mod --addattr \"ipaUniqueID=newid,cn=hbacservices,cn=hbac,$BASEDN\" $service1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-007: Negative - Service - setattr and addattr on memberOf"
-        command="ipa hbacsvc-mod --setattr memberOf=SUDO $service1"
+        command="ipa hbacsvc-mod --setattr \"memberof=cn=sudo,cn=hbacservicegroups,cn=hbac,$BASEDN\" $service1"
 	expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'memberOf' attribute of entry 'cn=$service1,cn=hbacservices,cn=hbac,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
-        command="ipa hbacsvc-mod --addattr memberOf=SUDO $service1"
+        command="ipa hbacsvc-mod --addattr \"memberof=cn=sudo,cn=hbacservicegroups,cn=hbac,$BASEDN\" $service1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
     rlPhaseEnd
 
@@ -181,10 +182,10 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-015: Negative - Service Group - setattr and addattr on dn"
-        command="ipa hbacsvcgroup-mod --setattr dn=newcn $servicegroup1"
+        command="ipa hbacsvcgroup-mod --setattr \"dn=cn=newcn,cn=hbacservicegroup,cn=hbac,$BASEDN\" $servicegroup1"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
-        command="ipa hbacsvcgroup-mod --addattr dn=newcn $servicegroup1"
+        command="ipa hbacsvcgroup-mod --addattr \"dn=cn=newcn,cn=hbacservicegroup,cn=hbac,$BASEDN\" $servicegroup1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message"
     rlPhaseEnd
 
