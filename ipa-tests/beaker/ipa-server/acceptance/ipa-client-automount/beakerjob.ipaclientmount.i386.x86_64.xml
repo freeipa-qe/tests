@@ -1,6 +1,6 @@
 <job>
 	<whiteboard>
-		IPA client automount (use extended install :: RHEL 6.4 :: x86_64 :: 1 master , 1 replica , 2 clients) [#serial]
+		IPA client automount :: i386 + x86_64 :: [#serial]
 	</whiteboard>
 	<recipeSet priority="Normal">
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER_env1" whiteboard="MASTER">
@@ -8,18 +8,11 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-		    <repos>
-		        <!--
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
-                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch//"/>
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/20121029-170002/x86_64/"/>
-                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/20121029-170002/noarch/"/>
-                -->
-            </repos>
+		    <repos/>
             <distroRequires>
                 <and>
                 <distro_variant op="=" value="Server"/>
-                <distro_arch op="=" value="x86_64"/>
+                <distro_arch op="=" value="i386"/>
                 <distro_family op="=" value="RedHatEnterpriseLinux6"/>
                 </and>
                 <distro_virt op="=" value=""/>
@@ -59,14 +52,14 @@
 			<ks_appends/>
 		    <repos>
 		        <!--
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
-                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch//"/>
+                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/i386//"/>
+                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/noarch//"/>
                 -->
             </repos>
             <distroRequires>
                 <and>
                 <distro_variant op="=" value="Server"/>
-                <distro_arch op="=" value="x86_64"/>
+                <distro_arch op="=" value="i386"/>
                 <distro_family op="=" value="RedHatEnterpriseLinux6"/>
                 </and>
                 <distro_virt op="=" value=""/>
@@ -106,14 +99,14 @@
 			<ks_appends/>
 		    <repos>
 		        <!--
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
-                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch//"/>
+                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/i386//"/>
+                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/noarch//"/>
                 -->
             </repos>
             <distroRequires>
                 <and>
                 <distro_variant op="=" value="Server"/>
-                <distro_arch op="=" value="x86_64"/>
+                <distro_arch op="=" value="i386"/>
                 <distro_family op="=" value="RedHatEnterpriseLinux6"/>
                 </and>
                 <distro_virt op="=" value=""/>
@@ -151,8 +144,8 @@
 			<ks_appends/>
 		    <repos>
 		        <!--
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64//"/>
-                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/noarch//"/>
+                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/i386//"/>
+                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/noarch//"/>
                 -->
             </repos>
             <distroRequires>
