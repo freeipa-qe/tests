@@ -119,29 +119,25 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacrule-cli-003: User Category - unknown"
         command="ipa hbacrule-add --usercat=bad test"
-        #expmsg="ipa: ERROR: invalid 'usercat': must be one of (u'all',)"
-	expmsg="ipa: ERROR: invalid 'usercat': must be 'all'"
+        expmsg="ipa: ERROR: invalid 'usercat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown user category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-004: Service Category - unknown"
         command="ipa hbacrule-add --servicecat=bad test"
-        #expmsg="ipa: ERROR: invalid 'servicecat': must be one of (u'all',)"
-	expmsg="ipa: ERROR: invalid 'servicecat': must be 'all'"
+        expmsg="ipa: ERROR: invalid 'servicecat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown service category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-005: Host Category - unknown"
         command="ipa hbacrule-add --hostcat=bad test"
-        #expmsg="ipa: ERROR: invalid 'hostcat': must be one of (u'all',)"
-	expmsg="ipa: ERROR: invalid 'hostcat': must be 'all'"
+        expmsg="ipa: ERROR: invalid 'hostcat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown host category"
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-006: Source Host Category - unknown"
         command="ipa hbacrule-add --srchostcat=bad test"
-        #expmsg="ipa: ERROR: invalid 'srchostcat': must be one of (u'all',)"
-	expmsg="ipa: ERROR: invalid 'srchostcat': must be 'all'"
+        expmsg="ipa: ERROR: invalid 'srchostcat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown source host category"
     rlPhaseEnd
 
@@ -153,10 +149,10 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-008: Negative - setattr and addattr on dn"
-        command="ipa hbacrule-mod --setattr dn=mynewDN test"
-        expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
+        command="ipa hbacrule-mod --setattr \"ipaUniqueID=blah,cn=hbac,$BASEDN\" test"
+	expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
-        command="ipa hbacrule-mod --addattr dn=anothernewDN test"
+        command="ipa hbacrule-mod --addattr \"ipaUniqueID=blah,cn=hbac,$BASEDN\" test"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
@@ -204,7 +200,7 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacrule-cli-014: Negative - setattr and addattr accessRuleType"
         command="ipa hbacrule-mod --setattr accessruletype=bad test"
-        expmsg="ipa: ERROR: invalid 'accessruletype': must be one of (u'allow', u'deny')"
+	expmsg="ipa: ERROR: invalid 'accessruletype': must be one of 'allow', 'deny'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
 	expmsg="ipa: ERROR: accessruletype: Only one value allowed."
         command="ipa hbacrule-mod --addattr accessruletype=bad test"
