@@ -140,6 +140,7 @@ createReplica2()
 	rlPhaseStartTest "Create Replica Package(s) with --ip-address option"
 		for s in $SLAVE; do
 			if [ "$s" != "" ]; then
+				local tmpout=/tmp/ipa-replica-install.out.$s
 				# put the short form of the hostname for server $s into s_short
 				hostname_s=$(echo $s | cut -d. -f1)
 
@@ -167,7 +168,22 @@ createReplica2()
 				rlRun "service named restart"
 				rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
 				rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
-				rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN" 0 "Creating replica package"
+				rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN > $tmpout 2>&1" 0 "Creating replica package"
+				rlRun "cat $tmpout"
+				rlAssertNotGrep "preparation of replica failed:" $tmpout
+				rlAssertNotGrep "missing attribute.*idnsSOAserial" $tmpout
+				if [ $? -gt 0 ]; then
+					rlFail "BZ 894143 found...ipa-replica-prepare fails when reverse zone does not have SOA serial data"
+					rlLog "removing bad zone and re-adding"
+					rlRun "ipa dnszone-del $SLAVEZONE"
+					rlRun "ipa dnszone-add $SLAVEZONE --name-server=$MASTER. --admin-email=ipaqar.redhat.com"
+					rlLog "IP of server $s is resolving as $SLAVEIP, using short hostname of $hostname_s"
+					rlLog "Running: ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN"
+					rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $hostname_s.$DOMAIN > $tmpout 2>&1" 0 "Creating replica package"
+				else
+					rlPass "BZ 894143 not found"
+				fi
+				
 
 				# Checking DNS records added for Replica
 				rlRun "ipa dnsrecord-find $SLAVEZONE"
@@ -575,6 +591,7 @@ installSlave_nr3()
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz894131 $SLAVEZONE
 
 			rlLog "Checking that the SLAVEs zone is created locally"
 			rlRun "ipa dnszone-show $SLAVEZONE"

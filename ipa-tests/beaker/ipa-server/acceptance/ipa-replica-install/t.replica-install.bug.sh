@@ -231,3 +231,21 @@ replicaInstallBug748987()
 	rlPhaseEnd
 }
 
+replicaBugCheck_bz894131()
+{
+	MYREVZONE=$1
+	rlPhaseStartTest "Bug 894131 - ipa-replica-install fails to add idnssoaserial for a new zone"
+		KinitAsAdmin
+		rlRun "ipa dnszone-show $MYREVZONE --raw|grep -i idnssoaserial"
+		if [ $? -gt 0 ]; then
+			rlFail "BZ 894131 found...ipa-replica-install fails to add idnssoaserial for a new zone"
+		else
+			rlPass "BZ 894131 not found...ipa-replica-install added idnssoaserial for a new zone"
+		fi
+	rlPhaseEnd
+}
+
+replicaBugCheck_bz894143()
+{
+	
+}
