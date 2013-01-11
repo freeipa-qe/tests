@@ -618,14 +618,14 @@ upgrade_bz_893722()
 		rlLog "Machine in recipe is MASTER"
 
 		if [ -f /var/log/ipaupgrade.log ]; then 
-			rlAssertGrep "Cannot move CRL file to new directory" /var/log/ipaupgrade.log
-			if [ $? -eq 0 ]; then
+			rlAssertNotGrep "Cannot move CRL file to new directory" /var/log/ipaupgrade.log
+			if [ $? -gt 0 ]; then
 				rlFail "BZ 893722 found...ipa-server upgrade ERROR Cannot move CRL file to new directory"
 			else
 				rlPass "BZ 893722 not found"
 			fi
 		else
-			rlLog "No /var/log/ipaupgrade.log to check"
+			rlLog "No /var/log/ipaupgrade.log to check BZ 893722"
 		fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
