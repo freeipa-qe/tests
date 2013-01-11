@@ -487,7 +487,9 @@ clientautomount_autofs_functional_test()
             #current_serverEnv="all_combined"
             #current_nfsConfiguration="nfs_v3_non_secure"
             current_serverEnv="combined_ipa_dns_standalone_nfs"
-            current_nfsConfiguration="nfs_v4_kerberized"
+            #current_nfsConfiguration="nfs_v3_non_secure"
+            current_nfsConfiguration="nfs_v4_non_secure"
+            #current_nfsConfiguration="nfs_v4_kerberized"
             setup_testing_environment $current_serverEnv $current_nfsConfiguration
             basic_autofs_functional_test
 #        done

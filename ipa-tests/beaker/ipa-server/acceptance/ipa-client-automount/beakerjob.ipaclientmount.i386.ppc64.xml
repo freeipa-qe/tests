@@ -149,12 +149,7 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-		    <repos>
-		        <!--
-                <repo name="ipa" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/i386//"/>
-                <repo name="ipa_noarch" url="http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i386/noarch//"/>
-                -->
-            </repos>
+		    <repos/>
             <distroRequires>
                 <and>
                 <distro_variant op="=" value="Server"/>
@@ -185,7 +180,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="CLIENT_env1">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="8789333"/>
+				</params>
 			</task>
 		</recipe>
 	</recipeSet>

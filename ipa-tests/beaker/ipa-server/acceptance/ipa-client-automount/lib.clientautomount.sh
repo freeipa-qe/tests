@@ -444,36 +444,6 @@ replace_line()
     fi
 }
 
-configurate_non_secure_NFS_Server()
-{
-    rlLog "MYHOSTNAME=[$MYHOSTNAME] configure [$MYROLE] as non-secure NFS server"
-    rlRun "mkdir -p $nfsDir" 0 "prepare nfs export directory [$nfsDir]"
-    echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
-    echo "========= content of secret file content ======="
-    cat $nfsDir/$currentNFSFileName
-    echo "===== end of content of [$nfsDir/$currentNFSFileName] ====="
-
-    echo "$nfsConfiguration_NonSecure" > $nfsConfigFile
-    echo "====== configuration [$nfsConfigFile ] ============"
-    cat $nfsConfigFile
-    echo "============================================="
-
-    rlRun "service nfs restart" 0 "start nfs service"
-    rlRun "service iptables stop" 0 "shutdown firewall"
-    echo "========  check rpcinfo [$MYHOSTNAME] ======"
-    rpcinfo -p $MYHOSTNAME
-    echo "=================================================="
-}
-
-verify_nfs_service_keytabfile(){
-    if kvno -k $keytabFile $principle | grep "keytab entry valid" 
-    then
-        echo "keytab file [$keytabFile] is valid"
-    else
-        echo "keytab file [$keytabFile] is NOT valid"
-    fi
-}
-
 replace_line(){
     local file=$1
     local line="$2"
@@ -583,13 +553,13 @@ map_hostname_with_role()
 
 print_hostname_role_mapping()
 {
-    rlLog "--------- test host used ----------------"
-    rlLog " current host [$CURRENT_HOST], role [$MYROLE]"
-    rlLog " MASTER : [$MASTER] [$Master_hostname] IPA: [$MASTER_IPA] IP: [$MASTER_IP]"
-    rlLog " REPLICA: [$REPLICA] [$Replica_hostname] IPA: [$REPLICA_IPA] IP: [$REPLICA_IP]"
-    rlLog " NFS    : [$NFS] [$Nfs_hostname] IPA: [$NFS_IPA] IP: [$NFS_IP]"
-    rlLog " CLIENT : [$CLIENT] [$Client_hostname] IPA: [$CLIENT_IPA] IP: [$CLIENT_IP]"
-    rlLog "-----------------------------------------"
+    echo "------------------------- test host used ------------------------"
+    echo " current host [$CURRENT_HOST], role [$MYROLE]"
+    echo " MASTER : [$MASTER] [$Master_hostname] IPA: [$MASTER_IPA] IP: [$MASTER_IP]"
+    echo " REPLICA: [$REPLICA] [$Replica_hostname] IPA: [$REPLICA_IPA] IP: [$REPLICA_IP]"
+    echo " NFS    : [$NFS] [$Nfs_hostname] IPA: [$NFS_IPA] IP: [$NFS_IP]"
+    echo " CLIENT : [$CLIENT] [$Client_hostname] IPA: [$CLIENT_IPA] IP: [$CLIENT_IP]"
+    echo "-----------------------------------------------------------------"
 }
 
 print_logs()
@@ -606,7 +576,7 @@ print_logs()
     done
 }
 
-setup_secure_NFS_Server()
+configurate_kerberized_nfs_server()
 {
     rlPhaseStartTest "setup secure (Kerberized) NFS server"
         rlLog "Host Info: NFS [$NFS] [$NFS_IPA]"       
@@ -630,4 +600,35 @@ setup_secure_NFS_Server()
         debuginfo 
     rlPhaseEnd
 }
+
+configurate_non_secure_nfs_server()
+{
+    rlLog "MYHOSTNAME=[$MYHOSTNAME] configure [$MYROLE] as non-secure NFS server"
+    rlRun "mkdir -p $nfsDir" 0 "prepare nfs export directory [$nfsDir]"
+    echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
+    echo "========= content of secret file content ======="
+    cat $nfsDir/$currentNFSFileName
+    echo "===== end of content of [$nfsDir/$currentNFSFileName] ====="
+
+    echo "$nfsConfiguration_NonSecure" > $nfsConfigFile
+    echo "====== configuration [$nfsConfigFile ] ============"
+    cat $nfsConfigFile
+    echo "============================================="
+
+    rlRun "service nfs restart" 0 "start nfs service"
+    rlRun "service iptables stop" 0 "shutdown firewall"
+    echo "========  check rpcinfo [$MYHOSTNAME] ======"
+    rpcinfo -p $MYHOSTNAME
+    echo "=================================================="
+}
+
+verify_nfs_service_keytabfile(){
+    if kvno -k $keytabFile $principle | grep "keytab entry valid" 
+    then
+        echo "keytab file [$keytabFile] is valid"
+    else
+        echo "keytab file [$keytabFile] is NOT valid"
+    fi
+}
+
 
