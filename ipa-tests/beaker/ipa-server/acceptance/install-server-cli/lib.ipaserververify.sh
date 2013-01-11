@@ -754,3 +754,24 @@ verify_bz888124()
 		rlPass "BZ 888124 not found"
 	fi
 }
+
+verify_bz889583()
+{
+	IPAD=$(grep ^domain= /etc/ipa/default.conf |cut -f2 -d=|tr '[:upper:]' '[:lower:]')
+	IPAR=$(grep ^realm=  /etc/ipa/default.conf |cut -f2 -d=|tr '[:upper:]' '[:lower:]')
+	if [ -z "$IPAR" -o -z "$IPAR" ]; then
+		rlLog "Cannot find domain or realm name to check bz889583"
+		return 0
+	fi
+
+	if [ "$IPAR" != "$IPAD" ]; then
+		rlLog "IPA Realm and Domain differ...checking BZ 889583"
+		KinitAsAdmin
+		rlAssertNotGrep "Configuration of client side components failed" /var/log/ipaserver-install.log
+		if [ $? -eq 1 ]; then
+			rlFail "BZ 889583 found...ipa server install failing when realm differs from domain"
+		else
+			rlPass "BZ 889583 not found"
+		fi
+	fi
+}

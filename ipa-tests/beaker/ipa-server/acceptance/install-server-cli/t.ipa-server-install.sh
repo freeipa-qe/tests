@@ -248,6 +248,7 @@ ipaserverinstall_realm()
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $MYREALM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
         rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $MYREALM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0 "Installing ipa server with realm specified" 
         verify_install true tmpout realm 
+		verify_bz889583
     rlPhaseEnd
 }
 
