@@ -277,6 +277,11 @@ rlJournalStart
 			rhts-sync-set -s DONE_REPLICA4 -m $BEAKERSLAVE
 
 			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
+
+			# Installing with --no-sshd
+			installSlave_nosshd
+			uninstall
+
 			# Installing with --ssh-trust-dns
 			installSlave_sshtrustdns
 			uninstall

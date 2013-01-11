@@ -780,8 +780,13 @@ installSlave_configuresshd() {
 		else
 
 			rlRun "cat /etc/hosts"
+			CFGSSHD=$(ipa-replica-install --help|grep '\-\-configure-sshd'|awk '{print $1}')
+			if [ -z "${CFGSSHD}" ]; then
+				rlLog "no configure-sshd option supported in this version"
+				rlLog "skipping option but, will still test for proper settings"
+			fi
 
-			echo "ipa-replica-install -U --setup-dns --no-forwarders --configure-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+			echo "ipa-replica-install -U --setup-dns --no-forwarders $CFGSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
 			chmod 755 /dev/shm/replica-install.bash
 			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --configure-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
@@ -809,6 +814,47 @@ installSlave_configuresshd() {
 	rlPhaseEnd
 } #installSlave_configuresshd
 
+installSlave_nosshd() {
+
+	rlPhaseStartTest "Installing replica with --no-sshd option"
+		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		if [ $? -ne 0 ] ; then
+			rlFail "ERROR: Replica Package not found"
+		else
+
+			rlRun "cat /etc/hosts"
+			NOSSHD=$(ipa-replica-install --help|grep '\-\-no-sshd'|awk '{print $1}')
+			if [ -z "${NOSSHD}" ]; then
+				rlLog "no configure-sshd option supported in this version"
+				rlLog "skipping option but, will still test for proper settings"
+			fi
+
+			echo "ipa-replica-install -U --setup-dns --no-forwarders $NOSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+			chmod 755 /dev/shm/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+			replicaBugCheck_bz830314
+
+			rlRun "service ipa status"
+			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+			rlRun "grep -i \"#KerberosAuthentication no\" /etc/ssh/sshd_config" 0 "sshd_config should have #KerberosAuthentication no"
+			rlRun "grep -i \"GSSAPIAuthentication yes\" /etc/ssh/sshd_config" 0 "sshd_config should have GSSAPIAuthentication yes"
+			rlRun "grep -i \"#AuthorizedKeysCommand none\" /etc/ssh/sshd_config" 0 "sshd_config should have #AuthorizedKeysCommand none"
+			# Checking if sshfp record gets created by default
+			rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\""
+
+		fi
+
+		if [ -f /var/log/ipareplica-install.log ]; then
+			rhts-submit-log -l /var/log/ipareplica-install.log
+		fi
+
+		miscDNSCheckup_positive
+	rlPhaseEnd
+} #installSlave_configuresshd
 
 installSlave_nodnssshfp() {
 
