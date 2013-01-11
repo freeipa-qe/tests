@@ -745,9 +745,9 @@ installSlave_sshtrustdns() {
                 rlRun "cat /etc/hosts"
 				rlRun "cat /etc/resolv.conf"
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --configure-ssh --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
                 chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --configure-ssh --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
                 rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
