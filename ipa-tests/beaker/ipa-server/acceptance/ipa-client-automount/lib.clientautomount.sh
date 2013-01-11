@@ -106,7 +106,7 @@ verify_autofs_mounting(){
                         then
                             rlLog "autofs locked, try other solutions later"
                         else
-                            rlFail "we get into top level dirs, but not the second level, current dir=[`pwd`], mount -l does not show either"
+                            rlFail "we get into top level dirs, but not the sub level, current dir=[`pwd`], mount -l does not show either"
                         fi
                     fi
                 fi

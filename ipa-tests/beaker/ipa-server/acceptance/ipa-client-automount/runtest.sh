@@ -116,7 +116,7 @@ rlJournalStart
             rlLog "MYHOSTNAME=[$MYHOSTNAME]"
             rlLog "master and replica are both done, continue for NFS setup"
             configurate_non_secure_nfs_server
-            configurate_kerberized_nfs_server #next step #to make nfs kerberized, we need configurate non secure nfs first
+            #configurate_kerberized_nfs_server #next step #to make nfs kerberized, we need configurate non secure nfs first
             rhts-sync-set -s "nfs done"
             rlLog "nfs configuration done"
         rlPhaseEnd
