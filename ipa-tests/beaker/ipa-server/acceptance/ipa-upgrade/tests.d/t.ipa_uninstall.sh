@@ -103,9 +103,9 @@ ipa_uninstall_slave()
 		rlLog "Machine in recipe is MASTER"
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $MASTER_IP"
 		if [ "x$USEDNS" = "xyes" ]; then
-			rlRun "ipa-replica-manage del $SLAVE_S.$DOMAIN -f"
+			rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE_S.$DOMAIN -f"
 		else
-			rlRun "ipa-replica-manage del $SLAVE -f"
+			rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE -f"
 		fi
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.2' $SLAVE_IP"
 		;;
