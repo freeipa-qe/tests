@@ -56,6 +56,7 @@
 . /dev/shm/ipa-hbac-cli-lib.sh
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
+. ./t.hbac_cli_bz_tests.sh
 
 ########################################################################
 # Test Suite Globals
