@@ -78,7 +78,8 @@ verify_autofs_mounting(){
     else
         rlLog "can not get into [$autofsDir], now try one step at time"
         if cd $autofsTopDir ;then
-            rlLog "get into top dir [$autofsTopDir], continue"
+            rlLog "get into top dir [$autofsTopDir], continue, ls -al:"
+            ls -al
             if cd $autofsSubDir ;then
                 rlLog "great, we are where we want to be, now do ls"
                 pwd
@@ -91,12 +92,13 @@ verify_autofs_mounting(){
                 mount -l
                 if mount -l | grep "$autofsSubDir" 2>&1 >/dev/null
                 then
-                    rlPass "mount -l show mount location, test still consider pass"
+                    rlPass "mount -l showed mount location, test still consider pass"
                 else
                     rlLog "mount -l shows no sign of mounted location, try ls -al"
+                    ls -al
                     if ls -al | grep "$autofsSubDir" 
                     then
-                        rlPass "ls -al shows the monted location, test pass"
+                        rlPass "ls -al shows the mounted location, test pass"
                         pwd
                         ls -al
                     else
@@ -144,51 +146,44 @@ clean_up_direct_map(){
 
 umount_autofs_directory()
 {
-    local topDir=$1
-    local subDir=$2
     local currentDir=`pwd`
     rlLog "current directory = [$currentDir]"
     echo "====== mount list before ======"
     mount -l
-    echo "====== lsof | grep $topDir ===="
-    lsof | grep "$topDir"
-    echo "==============================="
-    if umount -fv $topDir/$subDir
+    echo "====== lsof | grep $autofsTopDir ===="
+    lsof | grep "$autofsTopDir"
+    echo "====================================="
+    if umount -fv $autofsDir
     then
-        rlPass "umount [$topDir/$subDir] success"
+        rlPass "umount [$autofsDir] success"
     else
-        rlLog "umount [$topDir/$subDir] failed, try umount [$topDir]"
-        umount -fv $topDir
+        rlLog "umount [$autofsDir] failed, try umount [$autofsTopDir]"
+        umount -fv $autofsTopDir
         if [ "$?" = "1" ];then
             rlLog "umount [$topDir] also failed, let's pray the rest test will magically work ;)"
+            lsof | grep "$autofsTopDir"
+            echo "last 15 lines of /var/log/message"
+            tail -n 15 /var/log/message
         else
-            rlPass "umount [$topDir] success"
+            rlPass "umount [$autofsTopDir] success"
         fi
     fi
-    sleep 5 # give system sometime to rest
-    echo "====== mount list after ======="
-    mount -l
-    echo "====== lsof | grep $topDir ===="
-    lsof | grep "$topDir"
-    echo "==============================="
 }
 
 clean_up_indirect_map_and_umount(){
     local name=$1
-    local topDir=$2
-    local subDir=$3
-    echo ipa automountkey-del $name auto.share --key=${subDir}
+    echo ipa automountkey-del $name auto.share --key=${autofsSubDir}
     ipa automountkey-del $name auto.share --key=${subDir}
 
-    echo ipa automountkey-del $name auto.master --key=${topDir}
-    ipa automountkey-del $name auto.master --key=${topDir}
+    echo ipa automountkey-del $name auto.master --key=${autofsTopDir}
+    ipa automountkey-del $name auto.master --key=${autofsTopDir}
 
     echo ipa automountmap-del $name auto.share
     ipa automountmap-del $name auto.share
 
     echo ipa automountlocation-del $name
     ipa automountlocation-del $name
-    umount_autofs_directory $topDir $subDir
+    umount_autofs_directory 
 }
 
 how_to_check_autofs_mounting(){
