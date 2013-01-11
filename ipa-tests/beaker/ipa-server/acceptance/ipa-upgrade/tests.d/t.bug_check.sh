@@ -607,3 +607,41 @@ upgrade_bz_824074()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
+upgrade_bz_893722()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	local failcount=0
+	rlPhaseStartTest "upgrade_bz_893722: ipa-server upgrade ERROR Cannot move CRL file to new directory"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+
+		if [ -f /var/log/ipaupgrade.log ]; then 
+			rlAssertGrep "Cannot move CRL file to new directory" /var/log/ipaupgrade.log
+			if [ $? -eq 0 ]; then
+				rlFail "BZ 893722 found...ipa-server upgrade ERROR Cannot move CRL file to new directory"
+			else
+				rlPass "BZ 893722 not found"
+			fi
+		else
+			rlLog "No /var/log/ipaupgrade.log to check"
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}

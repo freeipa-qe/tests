@@ -37,7 +37,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-upgrade" role="MASTER">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="IPA REPLICA">
@@ -74,7 +76,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-upgrade" role="REPLICA">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="IPA CLIENT">
@@ -111,7 +115,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-upgrade" role="CLIENT">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 	</recipeSet>
