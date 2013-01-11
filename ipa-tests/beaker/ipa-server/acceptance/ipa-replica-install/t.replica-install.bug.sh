@@ -244,8 +244,3 @@ replicaBugCheck_bz894131()
 		fi
 	rlPhaseEnd
 }
-
-replicaBugCheck_bz894143()
-{
-	
-}

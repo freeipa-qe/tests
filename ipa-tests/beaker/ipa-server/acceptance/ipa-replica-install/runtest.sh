@@ -240,7 +240,6 @@ rlJournalStart
 			replicaBugCheck_bz845405
 			uninstall
 
-
 			#rlLog "Disabling IPv6 to test bz 839004 with"
 			#diableIpv6
 			#rhts-reboot
@@ -256,8 +255,6 @@ rlJournalStart
 			installBug_bz830338
 			RESTARTDS=1
 			uninstall
-
-			sleep 600000
 
 			installSlave_nr1
 			uninstall
