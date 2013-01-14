@@ -370,7 +370,7 @@ ipaprivilege_show()
 {
    privilegeName="Host Group Administrators"
 
-    rlPhaseStartTest "ipa-privilege-cli-1026 - show privilege - raw"
+    rlPhaseStartTest "ipa-privilege-cli-1026 - show privilege - raw (bz 893718)"
      command="ipa privilege-show \"$privilegeName\" --all --raw"
      rlRun "$command > $TmpDir/ipaprivilege_showraw.log" 0 "Verify Privilege show with raw"
      memberindirectOccurences=`rlAssertGrep "memberindirect:" "$TmpDir/ipaprivilege_showraw.log" -c | cut -d ":" -f1`

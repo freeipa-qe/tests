@@ -914,8 +914,8 @@ ipapermission_find_multiplefilters()
     value4="3"
     rlPhaseStartTest "ipa-permission-cli-1052 - find permission - --attrs --permissions --type --sizelimit (bug 785257)"
       rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $option4 $value4" 0 "Verify permissions are found"
-      value4="2" # Lower the number of values to return to cause a failed find. 
-      rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $option4 $value4" 1 "Verify setting permissions to a lower number does not return all of the above values"
+      value4="2" # Lower the number of values 
+      rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $option4 $value4" 0 "Verify setting permissions to a lower number does not return all of the above values"
     rlPhaseEnd
 }
 
