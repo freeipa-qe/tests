@@ -311,9 +311,11 @@ run_selinuxusermap_mod_tests(){
  	#Question for rcrit for the behavior - shouldn't seealso accept user friendly names instead of DN
          rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --desc=\"some description\" $selinuxusermap9" 0 "Add a selinuxusermap"
  	#get hbacrule DN for hbacrule allow_all
- 	rlRun "ipa hbacrule-show --all allow_all > $TmpDir/selinuxusermap-mod_test18_4.out" 0 "hbacrule show for allow_all"
- 	hbacrule_dn_allow_all=`cat $TmpDir/selinuxusermap-mod_test18_4.out | grep dn:`
-	hbacrule_dn=`echo $hbacrule_dn_allow_all | cut -d " " -f 3`
+ 	#rlRun "ipa hbacrule-show --all allow_all > $TmpDir/selinuxusermap-mod_test18_4.out" 0 "hbacrule show for allow_all"
+ 	#hbacrule_dn_allow_all=`cat $TmpDir/selinuxusermap-mod_test18_4.out | grep dn:`
+	#hbacrule_dn=`echo $hbacrule_dn_allow_all | cut -d " " -f 3`
+	rlRun "ipa hbacrule-show --all allow_all" 0 "hbacrule show for allow_all"
+	hbacrule_dn=$(ipa hbacrule-find allow_all --all --raw|grep "dn:"|awk '{print $2}')
 	rlLog "hbacrule DN: $hbacrule_dn"
  	rlRun "ipa selinuxusermap-mod --setattr=seealso=$hbacrule_dn $selinuxusermap9 > $TmpDir/selinuxusermap-mod_test18_5.out" 0 "Modify selinuxuser map with --setattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test18_5.out"
@@ -362,10 +364,12 @@ run_selinuxusermap_mod_tests(){
 	#rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" --hbacrule=newHbacRule $selinuxusermap12" 0 "Add selinuxuser rule"
 	rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap12" 0 "Add selinuxuser rule"
 
-	#get hbacrule DN for hbacrule allow_all
-        rlRun "ipa hbacrule-show --all allow_all > $TmpDir/selinuxusermap-mod_test22_2.out" 0 "hbacrule show for allow_all"
-        hbacrule_dn_allow_all=`cat $TmpDir/selinuxusermap-mod_test22_2.out | grep dn:`
-        hbacrule_dn=`echo $hbacrule_dn_allow_all | cut -d " " -f 3`
+        #get hbacrule DN for hbacrule allow_all
+        #rlRun "ipa hbacrule-show --all allow_all > $TmpDir/selinuxusermap-mod_test22_2.out" 0 "hbacrule show for allow_all"
+        #hbacrule_dn_allow_all=`cat $TmpDir/selinuxusermap-mod_test22_2.out | grep dn:`
+        #hbacrule_dn=`echo $hbacrule_dn_allow_all | cut -d " " -f 3`
+        rlRun "ipa hbacrule-show --all allow_all" 0 "hbacrule show for allow_all"
+        hbacrule_dn=$(ipa hbacrule-find allow_all --all --raw|grep "dn:"|awk '{print $2}')
         rlLog "hbacrule DN: $hbacrule_dn"
 
         expmsg="ipa: ERROR: seealso: Only one value allowed."
@@ -415,9 +419,11 @@ run_selinuxusermap_mod_tests(){
          rlAssertNotGrep "Host category: all" "$TmpDir/selinuxusermap-mod_test26_3.out"
 
          #get hbacrule DN for hbacrule allow_all
-         rlRun "ipa hbacrule-show --all allow_all > $TmpDir/selinuxusermap-mod_test26_4.out" 0 "hbacrule show for allow_all"
-         hbacrule_dn_allow_all=`cat $TmpDir/selinuxusermap-mod_test26_4.out | grep dn:`
-         hbacrule_dn=`echo $hbacrule_dn_allow_all | cut -d " " -f 3`
+         #rlRun "ipa hbacrule-show --all allow_all > $TmpDir/selinuxusermap-mod_test26_4.out" 0 "hbacrule show for allow_all"
+         #hbacrule_dn_allow_all=`cat $TmpDir/selinuxusermap-mod_test26_4.out | grep dn:`
+         #hbacrule_dn=`echo $hbacrule_dn_allow_all | cut -d " " -f 3`
+         rlRun "ipa hbacrule-show --all allow_all" 0 "hbacrule show for allow_all"
+         hbacrule_dn=$(ipa hbacrule-find allow_all --all --raw|grep "dn:"|awk '{print $2}')
          rlRun "ipa selinuxusermap-mod --setattr=seealso=$hbacrule_dn $selinuxusermap12" 0 "Modify selinuxuser map with --setattr option"
          rlRun "ipa selinuxusermap-mod --delattr=seealso=$hbacrule_dn $selinuxusermap12 > $TmpDir/selinuxusermap-mod_test26_5.out" 0 "Modify selinuxuser map with --delattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test26_5.out"
