@@ -59,6 +59,7 @@ PACKAGE="ipa-admintools"
 
 rlJournalStart
     rlPhaseStartSetup "ipapassword startup: Check for ipa-server package"
+    service ntpd stop
 	rpm -qa | grep $PACKAGE
         if [ $? -eq 0 ] ; then
                 rlPass "ipa-admintools package is installed"
