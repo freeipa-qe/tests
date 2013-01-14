@@ -480,6 +480,7 @@ install_option__server_invalid__location_invalid__no_sssd()
 clientautomount_autofs_functional_test()
 {
     # there will be total 9 environment setup: 
+    change_autofs_debug_level
 #    for current_serverEnv in standalone_ipa_dns_nfs combined_ipa_dns_standalone_nfs all_combined
 #    do
 #        for current_nfsConfiguration in nfs_v3_non_secure nfs_v4_non_secure nfs_v4_kerberized
@@ -695,4 +696,5 @@ test_indirect_map_using_wildcard_use_no_sssd()
         clean_up_automount_installation
     rlPhaseEnd
 }
+
 

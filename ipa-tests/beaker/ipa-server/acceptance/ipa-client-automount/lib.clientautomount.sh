@@ -73,6 +73,7 @@ verify_autofs_mounting(){
         then
             rlPass "autofs mount success, file content matches"
         else
+            debuginfo
             rlFail "autofs mount failed, file content does NOT matches"
         fi
     else
@@ -108,6 +109,7 @@ verify_autofs_mounting(){
                         then
                             rlLog "autofs locked, try other solutions later"
                         else
+                            debuginfo
                             rlFail "we get into top level dirs, but not the sub level, current dir=[`pwd`], mount -l does not show either"
                         fi
                     fi
@@ -131,7 +133,8 @@ debuginfo()
     echo "rpcinfo -p $NFS_IPA"
     rpcinfo -p $NFS_IPA
     print_logs
-    echo "==========================================================="
+    echo "====================[ /var/log/sssd/sssd_autofs.log  ]======================================="
+    cat /var/log/sssd/sssd_autofs.log
 }
 
 clean_up_direct_map(){
@@ -626,4 +629,20 @@ verify_nfs_service_keytabfile(){
     fi
 }
 
+change_autofs_debug_level()
+{
+    local sssd_conf=/etc/sssd/sssd.conf
+    local sssd_conf_org=/etc/sssd/sssd.conf.org
+    local tmp_conf=/tmp/sssd.conf
+    if ! grep "debug=10" $sssd_conf
+        sed -e "s/^\[autofs\]/[autofs]\ndebug=10\n/" $sssd_conf > $tmp_conf
+        cp -f $sssd_conf $sssd_conf_org
+        cp -f $tmp_conf $sssd_conf
+        echo "[change_autofs_debug_level] original sssd conf file saved as [$sssd_conf_org]"
+        echo "[change_autofs_debug_level] new sssd conf file [$sssd_conf] has content"
+        cat $sssd_conf
+        service sssd restart
+        echo "[change_autofs_debug_level] done"
+    fi
+}
 
