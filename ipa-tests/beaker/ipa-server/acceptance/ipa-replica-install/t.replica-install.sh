@@ -788,7 +788,7 @@ installSlave_configuresshd() {
 
 			echo "ipa-replica-install -U --setup-dns --no-forwarders $CFGSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
 			chmod 755 /dev/shm/replica-install.bash
-			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --configure-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders $CFGSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
@@ -854,7 +854,7 @@ installSlave_nosshd() {
 
 		miscDNSCheckup_positive
 	rlPhaseEnd
-} #installSlave_configuresshd
+} #installSlave_nosshd
 
 installSlave_nodnssshfp() {
 

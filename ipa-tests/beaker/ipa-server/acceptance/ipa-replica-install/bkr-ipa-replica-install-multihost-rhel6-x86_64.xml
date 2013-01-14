@@ -17,7 +17,7 @@
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20121212.1"/>
+					<distro_name op="=" value="RHEL6.4-20130109.1"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -57,7 +57,7 @@
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20121212.1"/>
+					<distro_name op="=" value="RHEL6.4-20130109.1"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
