@@ -108,7 +108,10 @@ irm_run()
 	irm_del_negative_0003
 	irm_del_negative_0004
 
-	reconnect_slave2
+	# need to add bz824492 test here
+	# test is to connect after disconnect ...should work now (3.0.0-8)
+
+	reconnect_slave2 # may need to delete this 
 	irm_list_negative_0004 # must run after delete negative tests
 }
 
