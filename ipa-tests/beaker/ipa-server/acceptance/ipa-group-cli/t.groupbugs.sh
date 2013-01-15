@@ -38,6 +38,12 @@ grpbugzillas()
     rlPhaseStartTest "ipa-group-bugzillas-002 bz773488 - Make ipausers a non-posix group on new installs"
         rlRun "verifyGroupClasses ipausers ipa" 0 "Verify ipauser group objectclasses."
     rlPhaseEnd
+
+    rlPhaseStartTest "ipa-group-bugzillas-003 bz860683 group-mod should not be allowed to rename or modify admins account"
+        command="ipa group-mod --rename=Administrators admins"
+        expmsg="ipa: ERROR: group admins cannot be deleted/modified: Cannot be renamed"
+        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    rlPhaseEnd
 }
 
 grpbugcleanup()
