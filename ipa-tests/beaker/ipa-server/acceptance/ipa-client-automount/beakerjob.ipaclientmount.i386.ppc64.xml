@@ -50,6 +50,9 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="MASTER_env1">
 				<params/>
 			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+			    <params/>
+			</task>
 		</recipe>
 
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA_env1" whiteboard="REPLICA">
@@ -94,6 +97,9 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="REPLICA_env1">
 				<params/>
+			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+			    <params/>
 			</task>
 		</recipe>
 
@@ -142,6 +148,9 @@
 			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="CLIENT_env1">
 				<params/>
 			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+			    <params/>
+			</task>
 		</recipe>
 
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT_env1" whiteboard="CLIENT">
@@ -183,6 +192,9 @@
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="8789333"/>
 				</params>
+			</task>
+			<task name="/distribution/reservesys" role="STANDALONE">
+			    <params/>
 			</task>
 		</recipe>
 	</recipeSet>
