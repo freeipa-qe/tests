@@ -176,18 +176,20 @@ rlJournalStart
 
         rlPhaseStartTest "ipa-ctl-11A ensure that ipactl start started krb5kdc"
                 rlRun "ps xa | grep -v grep |grep krb5kdc" 0 "Checking to ensure that ipactl start started krb5kdc"
-                numberOfProcesses=`ps -e | grep krb5kdc | wc -l`
-                if [ $numberOfProcesses -eq 1 ] ; then
-                   newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
-                   rlLog "New krb5kdc pid is $newPID"
-                   oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
-                   rlLog "Old krb5kdc pid is $oldPID"
-                  if [ $newPID -eq $oldPID ] ; then
-                        rlFail "krb5kdc did not restart"
-                   else
-                        rlPass "krb5kdc was restarted"
-                   fi
+                newPID=`ps -e | grep krb5kdc | awk '{print $1}'`
+                rlLog "New krb5kdc pid is $newPID"
+                oldPID=`cat /tmp/krb5kdc.out | awk '{print $1}'`
+                rlLog "Old krb5kdc pid is $oldPID"
+                if [ "$newPID" = "$oldPID" ] ; then
+                    rlFail "krb5kdc did not restart"
                 else
+                    rlPass "krb5kdc was restarted"
+                fi
+                numberOfProcesses=`ps -e | grep krb5kdc | wc -l`
+                numberOfCPUs=`cat /proc/cpuinfo | grep processor | wc -l` 
+                rlLog "Number of krb5 process: $numberOfProcesses and number of CPUs: $numberOfCPUs"
+                numberOfCPUs=$((numberOfCPUs + 1))
+                if [ "$numberOfProcesses" -gt "$numberOfCPUs" ] ; then 
                    rlFail "Bug 871524 - orphaned krb5kdc processes restarting IPA services"
                 fi
         rlPhaseEnd
