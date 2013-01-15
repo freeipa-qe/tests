@@ -199,7 +199,7 @@ rlJournalStart
 			ipa dnsrecord-del $ptrzone $awk4 --ptr-rec="$SLAVE."
 			
 #### REPLICA6 Tests part2
-			rhts-sync-set -s CONTINUE_REPLICA6 -m $BEAKERSLAVE
+			rhts-sync-set -s CONTINUE_REPLICA6 -m $BEAKERMASTER
 
 		rlPhaseEnd
 
