@@ -144,6 +144,7 @@ rlJournalStart
 		rlPhaseEnd
 
 		rlPhaseStartTest "MASTER tests start"
+#### REPLICA1 Tests
 			installMaster
 			createReplica1
 
@@ -154,16 +155,19 @@ rlJournalStart
 			rhts-sync-set -s READY_REPLICA1 -m $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
 
+#### REPLICA3 Tests
 			createReplica3
 
 			rhts-sync-set -s READY_REPLICA3 -m $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA3 $BEAKERSLAVE
 
+#### REPLICA4 Tests
 			createReplica4
 
 			rhts-sync-set -s READY_REPLICA4 -m $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA4 $BEAKERSLAVE
 
+#### REPLICA2 Tests
 			createReplica2
 
 			rhts-sync-set -s READY_REPLICA2 -m $BEAKERMASTER
@@ -171,12 +175,14 @@ rlJournalStart
 	
 			replicaBugCheck_bz769545
 
-			rhts-sync-set -s READY_REPLICA5 -m $BEAKERMASTER
-			rhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
-	
-			replicaBugTest_bz823657
-			replicaBugTest_bz824492
+#### REPLICA5 Tests
+#			rhts-sync-set -s READY_REPLICA5 -m $BEAKERMASTER
+#			rhts-sync-block -s DONE_REPLICA5 $BEAKERSLAVE
+#	
+#			replicaBugTest_bz823657
+#			replicaBugTest_bz824492
 
+#### REPLICA6 Tests part1
 			rhts-sync-set -s READY_REPLICA6 -m $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA6 $BEAKERSLAVE
 
@@ -192,6 +198,7 @@ rlJournalStart
 			rlLog "Deleting reverse entry with ipa dnsrecord-del $ptrzone $awk4 --ptr-rec=\"$SLAVE.\""
 			ipa dnsrecord-del $ptrzone $awk4 --ptr-rec="$SLAVE."
 			
+#### REPLICA6 Tests part2
 			rhts-sync-set -s CONTINUE_REPLICA6 -m $BEAKERSLAVE
 
 		rlPhaseEnd
@@ -233,6 +240,7 @@ rlJournalStart
 			SetUpAuthKeys
 			SetUpKnownHosts
 
+#### REPLICA1 Tests
 			rhts-sync-block -s READY_REPLICA1 $BEAKERMASTER
 			installSlave
 			installCA
@@ -260,13 +268,14 @@ rlJournalStart
 			uninstall
 			rhts-sync-set -s DONE_REPLICA1 -m $BEAKERSLAVE
 
-
+#### REPLICA3 Tests
 			# Installing slave with --no-forwarders
 			rhts-sync-block -s READY_REPLICA3 $BEAKERMASTER
 			installSlave_nf
 			uninstall
 			rhts-sync-set -s DONE_REPLICA3 -m $BEAKERSLAVE
-			
+
+#### REPLICA4 Tests
 			rhts-sync-block -s READY_REPLICA4 $BEAKERMASTER
 			# Installing slave with --no-reverse
 			installSlave_nr2
@@ -276,6 +285,7 @@ rlJournalStart
 			uninstall
 			rhts-sync-set -s DONE_REPLICA4 -m $BEAKERSLAVE
 
+#### REPLICA2 Tests
 			rhts-sync-block -s READY_REPLICA2 $BEAKERMASTER
 
 			# Installing with --no-sshd
@@ -307,27 +317,24 @@ rlJournalStart
 
 			# Installing slave with --setup-ca
 			installSlave_ca
-				
-			# Test other bugs not covered directly in above tests
 
 			rhts-sync-set -s DONE_REPLICA2 -m $BEAKERSLAVE
 
-			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+			# Test other bugs not covered directly in above tests
 
-			installSlave
+#### REPLICA5 Tests
+#			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
+#			uninstall
+#			installSlave
+#			rhts-sync-set -s DONE_REPLICA5 -m $BEAKERSLAVE
 
-			rhts-sync-set -s DONE_REPLICA5 -m $BEAKERSLAVE
-
-			rhts-sync-block -s READY_REPLICA5 $BEAKERMASTER
-
+#### REPLICA6 Tests part1
+			rhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
 			uninstall
-
 			installSlave
-
 			rhts-sync-set -s DONE_REPLICA6 -m $BEAKERSLAVE
 
-			rhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
-
+#### REPLICA6 Tests part2
 			rhts-sync-block -s CONTINUE_REPLICA6 $BEAKERMASTER
 
 			replicaInstallBug748987	
