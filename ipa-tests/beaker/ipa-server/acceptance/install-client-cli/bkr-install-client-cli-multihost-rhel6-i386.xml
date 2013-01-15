@@ -42,7 +42,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>
@@ -85,7 +85,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>
