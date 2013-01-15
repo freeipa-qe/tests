@@ -226,7 +226,8 @@ replicaInstallBug748987()
 		# A pass will be seeing a error message  
 		file=/dev/shm/replica-install-output
 		rlLog "Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-		Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg &> $file
+		rlRun "ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg > $file 2>&1"
+		rlRun "cat $file"
 		rlRun "grep 'A replication agreement for this host already exists. It needs to be removed' $file" 0 "Make sure that expected warning message appears in ipa-replica-install output"
 	rlPhaseEnd
 }
