@@ -1098,7 +1098,7 @@ uninstall()
 		# issues with the remote executed yes hanging jobs if it irm doesn't prompt for confirmation
 		#rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
 		if [ "$CA2INSTALL" = "true" ]; then	
-			rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remove_exec.out 2>&1"
+			rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"
 		else
 			rlRun "remoteExec root $MASTERIP \"ipa-replica-manage del $SLAVE -f\""
 		fi
