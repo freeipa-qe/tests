@@ -317,7 +317,7 @@ run_selinuxusermap_mod_tests(){
 	rlRun "ipa hbacrule-show --all allow_all" 0 "hbacrule show for allow_all"
 	hbacrule_dn=$(ipa hbacrule-find allow_all --all --raw|grep "dn:"|awk '{print $2}')
 	rlLog "hbacrule DN: $hbacrule_dn"
- 	rlRun "ipa selinuxusermap-mod --setattr=seealso=$hbacrule_dn $selinuxusermap9 > $TmpDir/selinuxusermap-mod_test18_5.out" 0 "Modify selinuxuser map with --setattr option"
+ 	rlRun "ipa selinuxusermap-mod --setattr=seealso=$hbacrule_dn $selinuxusermap9 > $TmpDir/selinuxusermap-mod_test18_5.out 2>&1" 0 "Modify selinuxuser map with --setattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test18_5.out"
          rlAssertGrep "Rule name: $selinuxusermap9" "$TmpDir/selinuxusermap-mod_test18_5.out"
          rlAssertGrep "HBAC Rule: allow_all" "$TmpDir/selinuxusermap-mod_test18_5.out"

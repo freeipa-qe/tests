@@ -300,34 +300,39 @@ rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message
         rlRun "ipa selinuxusermap-add --selinuxuser=$default_selinuxuser --all $selinuxusermap_raw_noall" 0 "Add a selinuxusermap with --raw option without --all"
     rlPhaseEnd
 
-rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with invalid character - #"
-        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd#"
-        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd#"
-        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
-    rlPhaseEnd
+# Commenting out the following tests related to ticket 2985 after email discussion with Rob:
+# http://post-office.corp.redhat.com/archives/ipa-and-samba-team-list/2013-January/msg00369.html
+# > Right now we don't enforce a character set on rule names, so yeah, I'd
+# > comment out those tests.
 
-    rlPhaseStartTest "ipa-selinuxusermap-add-cli-028: Add a selinuxuser map with invalid character - @"
-        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd@"
-        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
-    rlPhaseEnd
+#    rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with invalid character - #"
+#        rlLog "Executing: ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd#"
+#        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd#"
+#        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+#        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+#	     rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
+#    rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-add-cli-029: Add a selinuxuser map with invalid character - *"
-        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd*"
-        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
-    rlPhaseEnd
+#    rlPhaseStartTest "ipa-selinuxusermap-add-cli-028: Add a selinuxuser map with invalid character - @"
+#        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd@"
+#        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+#        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+#	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
+#    rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-add-cli-030: Add a selinuxuser map with invalid character - ?"
-        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd?"
-        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
-    rlPhaseEnd
+#    rlPhaseStartTest "ipa-selinuxusermap-add-cli-029: Add a selinuxuser map with invalid character - *"
+#        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd*"
+#        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+#        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+#	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
+#    rlPhaseEnd
+
+#    rlPhaseStartTest "ipa-selinuxusermap-add-cli-030: Add a selinuxuser map with invalid character - ?"
+#        command="ipa selinuxusermap-add --selinuxuser=$default_selinuxuser abcd?"
+#        expmsg="ipa: ERROR: invalid 'selinuxusermap': may only include letters, numbers, _, -, . and $"
+#        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+#	rlLog "Failing due to Bug https://fedorahosted.org/freeipa/ticket/2985"
+#    rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-add-cli-031: Add a selinuxuser map with multiple hbacrule"
         rlRun "addHBACRule all all all all testHbacRuleM1" 0 "Adding HBAC rule."
@@ -456,14 +461,18 @@ rlPhaseStartTest "ipa-selinuxusermap-add-cli-027: Add a selinuxuser map with inv
 
     rlPhaseStartCleanup "ipa-selinuxusermap-add-cli-cleanup: Destroying admin credentials."
 	# delete selinux user 
-	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 $selinuxusermap6 $selinuxusermap7 $selinuxusermap8 $selinuxusermap9 $selinuxusermap10 $selinuxusermap11 $selinuxusermap_all $selinuxusermap_raw $selinuxusermap_raw_noall $selinuxusermap_multiplehbac $selinuxusermap_multipleselinuxuser $selinuxusermap_sytaxcheck1 $selinuxusermap_disabledhbacrule; do
+	for item in $selinuxusermap1 $selinuxusermap2 $selinuxusermap3 $selinuxusermap4 $selinuxusermap5 $selinuxusermap6 $selinuxusermap7 $selinuxusermap8 $selinuxusermap9 $selinuxusermap10 $selinuxusermap11 $selinuxusermap_all $selinuxusermap_raw $selinuxusermap_raw_noall $selinuxusermap_sytaxcheck1 $selinuxusermap_disabledhbacrule; do
 		rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
 	done
 
+	for item in $selinuxusermap_multiplehbac $selinuxusermap_multipleselinuxuser; do
+		rlRun "ipa selinuxusermap-del $item" 0,2 "CLEANUP: Attempting to delete user that should not have been created: $item"
+	done
+	
 	#This clean-up is required since selinuxusermap takes garbage input, ticket https://fedorahosted.org/freeipa/ticket/2985
-	for item in  abcd?  abcd* abcd@ abcd#; do
-                rlRun "ipa selinuxusermap-del $item" 0 "CLEANUP: Deleting selinuxuser $item"
-        done
+    for item in  abcd?  abcd* abcd@ abcd#; do
+        rlRun "ipa selinuxusermap-del $item" 0,2 "CLEANUP: Deleting selinuxuser $item"
+    done
 	rlRun "deleteGroup $usergroup1" 0 "Deleting User Group associated with rule."
 	rlRun "deleteHost $host1" 0 "Deleting Host associated with rule."
 	rlRun "deleteHostGroup $hostgroup1" 0 "Deleting Host Group associated with rule."
