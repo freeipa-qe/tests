@@ -219,6 +219,7 @@ ipa_install_slave_all(){
 		if [ -f /dev/shm/replica-info-$SLAVEFQDN.gpg ]; then
 			ipa_install_prep
 			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVEFQDN.gpg"
+			replicaBugCheck_bz830314
 		else
 			rlFail "ERROR: Replica Package not found"
 		fi
@@ -364,5 +365,23 @@ ipa_install_client(){
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
 		;;
 	esac
+	rlPhaseEnd
+}
+
+replicaBugCheck_bz830314()
+{
+	rlPhaseStartTest "replicaBugCheck_bz830314 - ipa-replica-install named failed to start"
+		if [ -f /var/log/ipareplica-install.log ]; then
+			if [ $(grep "Starting named:.*[FAILED]" /var/log/ipareplica-install.log |wc -l) -gt 0 ]; then
+				rlFail "BZ 830314 found...ipa-replica-install named failed to start"
+				rlRun "sed -n '/restarting named/,/7\/8/p' /var/log/ipareplica-install.log" 
+			else
+				rlPass "BZ 830314 not found...named did not seem to fail on ipa install"
+			fi
+		else
+			rlFail "Cannot find ipareplica-install.log to check BZ 830314"
+		fi
+		####### debugging here #################
+		#rlRun "grep named /var/log/ipareplica-install.log"
 	rlPhaseEnd
 }
