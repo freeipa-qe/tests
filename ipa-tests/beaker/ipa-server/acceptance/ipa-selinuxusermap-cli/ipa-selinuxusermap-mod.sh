@@ -288,7 +288,7 @@ run_selinuxusermap_mod_tests(){
          rlAssertGrep "Description: new description" "$TmpDir/selinuxusermap-mod_test17.out"
      rlPhaseEnd
  
-     rlPhaseStartTest "ipa-selinuxusermap-mod-018: Modify with  --setattr - on attribute that's in schema"
+     rlPhaseStartTest "ipa-selinuxusermap-mod-018: Modify with  --setattr - on attribute that's in schema [BZ 895256]"
          rlRun "ipa selinuxusermap-mod --setattr=description=newselinuxdescription $selinuxusermap8 > $TmpDir/selinuxusermap-mod_test18.out" 0 "Modify selinuxuser map with --setattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test18.out"
          rlAssertGrep "Rule name: $selinuxusermap8" "$TmpDir/selinuxusermap-mod_test18.out"
@@ -321,6 +321,14 @@ run_selinuxusermap_mod_tests(){
          rlRun "cat $TmpDir/selinuxusermap-mod_test18_5.out"
          rlAssertGrep "Rule name: $selinuxusermap9" "$TmpDir/selinuxusermap-mod_test18_5.out"
          rlAssertGrep "HBAC Rule: allow_all" "$TmpDir/selinuxusermap-mod_test18_5.out"
+
+		tmpout=$TmpDir/selinuxusermap-mod_test18_5.out
+		rlAssertNotGrep "ipa: ERROR: invalid 'seealso': must be Unicode text" $tmpout
+		if [ $? -eq 1 ]; then
+			rlFail "BZ 895256 found...ipa selinuxusermap-mod seealso must be unicode error"
+		else
+			rlPass "BZ 895256 not found"
+		fi
  
  	rlRun "ipa selinuxusermap-mod --setattr=ipaenabledflag=false $selinuxusermap8 > $TmpDir/selinuxusermap-mod_test18_6.out" 0 "Modify selinuxuser map with --setattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test18_6.out"
@@ -354,7 +362,7 @@ run_selinuxusermap_mod_tests(){
         rlAssertGrep "Description: newselinuxusermapdescription" "$TmpDir/selinuxusermap-mod_test21.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-selinuxusermap-mod-022: Modify with --setattr and --addattr on description"
+    rlPhaseStartTest "ipa-selinuxusermap-mod-022: Modify with --setattr and --addattr on description [BZ 895256]"
         rlRun "ipa selinuxusermap-add --selinuxuser=\"unconfined_u:s0-s0:c0.c1023\" $selinuxusermap11" 0 "Add selinuxuser rule"
  	rlRun "ipa selinuxusermap-mod --setattr=description=selinuxusermapdescription  $selinuxusermap11" 0 "Modify with --setattr"
         expmsg="ipa: ERROR: description: Only one value allowed."
@@ -375,6 +383,14 @@ run_selinuxusermap_mod_tests(){
         expmsg="ipa: ERROR: seealso: Only one value allowed."
         command="ipa selinuxusermap-mod --addattr=seealso=$hbacrule_dn $selinuxusermap12"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
+		tmpout=/tmp/errormsg.out
+		rlAssertNotGrep "ipa: ERROR: invalid 'seealso': must be Unicode text" $tmpout
+		if [ $? -eq 1 ]; then
+			rlFail "BZ 895256 found...ipa selinuxusermap-mod seealso must be unicode error"
+		else
+			rlPass "BZ 895256 not found"
+		fi
+		
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-selinuxusermap-mod-023: Negative: Modify with --addattr on attribute outside schema"
@@ -399,7 +415,7 @@ run_selinuxusermap_mod_tests(){
          rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for selinuxusermap with unknown Host Category"
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-selinuxusermap-mod-026: Modify with --delattr - on attribute that's in schema"
+     rlPhaseStartTest "ipa-selinuxusermap-mod-026: Modify with --delattr - on attribute that's in schema [BZ 895256]"
   	 rlRun "ipa selinuxusermap-mod --setattr=description=selinuxusermapdescription $selinuxusermap12" 0 "Modify selinuxuser map with --setattr option"
          rlRun "ipa selinuxusermap-mod --delattr=description=selinuxusermapdescription $selinuxusermap12 > $TmpDir/selinuxusermap-mod_test26.out" 0 "Modify selinuxuser map with --delattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test26.out"
@@ -424,11 +440,22 @@ run_selinuxusermap_mod_tests(){
          #hbacrule_dn=`echo $hbacrule_dn_allow_all | cut -d " " -f 3`
          rlRun "ipa hbacrule-show --all allow_all" 0 "hbacrule show for allow_all"
          hbacrule_dn=$(ipa hbacrule-find allow_all --all --raw|grep "dn:"|awk '{print $2}')
-         rlRun "ipa selinuxusermap-mod --setattr=seealso=$hbacrule_dn $selinuxusermap12" 0 "Modify selinuxuser map with --setattr option"
+         rlRun "ipa selinuxusermap-mod --setattr=seealso=$hbacrule_dn $selinuxusermap12 > $TmpDir/selinuxusermap-mod_test26_5.out 2>&1" 0 "Modify selinuxuser map with --setattr option"
+
+		tmpout=$TmpDir/selinuxusermap-mod_test26_5.out
+		rlAssertNotGrep "ipa: ERROR: invalid 'seealso': must be Unicode text" $tmpout
+		if [ $? -eq 1 ]; then
+			rlFail "BZ 895256 found...ipa selinuxusermap-mod seealso must be unicode error"
+		else
+			rlPass "BZ 895256 not found"
+		fi
+
+
          rlRun "ipa selinuxusermap-mod --delattr=seealso=$hbacrule_dn $selinuxusermap12 > $TmpDir/selinuxusermap-mod_test26_5.out" 0 "Modify selinuxuser map with --delattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test26_5.out"
          rlAssertGrep "Rule name: $selinuxusermap12" "$TmpDir/selinuxusermap-mod_test26_5.out"
          rlAssertNotGrep "HBAC Rule: allow_all" "$TmpDir/selinuxusermap-mod_test26_5.out"
+
 
          rlRun "ipa selinuxusermap-mod --delattr=ipaenabledflag=TRUE $selinuxusermap12 > $TmpDir/selinuxusermap-mod_test26_6.out" 0 "Modify selinuxuser map with --delattr option"
          rlRun "cat $TmpDir/selinuxusermap-mod_test26_6.out"
@@ -524,6 +551,25 @@ run_selinuxusermap_mod_tests(){
          expmsg="ipa: ERROR: donotexist: SELinux User Map rule not found"
          rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for selinuxusermap with unknown Host Category"
      rlPhaseEnd
+
+	rlPhaseStartTest "ipa-selinuxusermap-mod-036: Modify selinuxusermap --addattr and --setattr with attr value empty"
+		tmpout=/tmp/ipa-selinuxusermap-mod-036.out
+		rlRun "ipa selinuxusermap-mod $selinuxusermap14 --hbacrule=allow_all" 0,1
+		rlRun "ipa selinuxusermap-mod $selinuxusermap14 --addattr=seealso= > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 895247 found...ipa selinuxusermap-mod returns internal error when setting seealso empty"
+		else
+			rlPass "BZ 895247 not found"
+		fi
+
+		rlRun "ipa selinuxusermap-mod $selinuxusermap14 --hbacrule=allow_all" 0,1
+		rlRun "ipa selinuxusermap-mod $selinuxusermap14 --setattr=seealso= > $tmpout 2>&1"
+		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
+			rlFail "BZ 895247 found...ipa selinuxusermap-mod returns internal error when setting seealso empty"
+		else
+			rlPass "BZ 895247 not found"
+		fi
+	rlPhaseEnd
  
      rlPhaseStartCleanup "ipa-selinuxusermap-mod-cleanup: Destroying admin credentials."
  	# delete selinux user
