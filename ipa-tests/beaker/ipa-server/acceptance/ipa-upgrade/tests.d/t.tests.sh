@@ -200,6 +200,17 @@ upgrade_test_master_bz_tests()
 	rlPhaseEnd
 }
 
+upgrade_test_master_bz_866977()
+{
+	rlPhaseStartTest "upgrade_test_master_bz_866977: Inform user when ipa-upgradeconfig reports errors"
+		rlRun "env|sort"
+		ipa_install_master_all
+		upgade_bz_866977_setup
+		upgrade_master
+		upgrade_bz_866977_check
+		ipa_uninstall_master
+	rlPhaseEnd
+}
 
 upgrade_test_master_slave_client_all_final()
 {	
