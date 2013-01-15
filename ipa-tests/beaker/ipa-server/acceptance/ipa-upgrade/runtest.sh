@@ -96,6 +96,7 @@ rlJournalStart
 	upgrade_test_client_slave_master_all
 	upgrade_test_master_slave_client_nodns
 	upgrade_test_master_slave_client_dirsrv_off
+	upgrade_test_master_bz_866977
 	upgrade_test_master_bz_tests
 	upgrade_test_master_slave_client_all_final
 

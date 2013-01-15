@@ -206,7 +206,7 @@ upgrade_test_master_bz_866977()
 		rlRun "env|sort"
 		ipa_install_master_all
 		upgade_bz_866977_setup
-		upgrade_master
+		upgrade_master 2>&1 | tee /tmp/upgade_master_bz_866977.out
 		upgrade_bz_866977_check
 		ipa_uninstall_master
 	rlPhaseEnd

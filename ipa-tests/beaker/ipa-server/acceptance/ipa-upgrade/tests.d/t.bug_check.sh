@@ -741,16 +741,18 @@ upgade_bz_866977_setup()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 		# sed named.conf and change something...
-		# chattr +i /etc/named.conf
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		# sed -i '/dynamic-db \"ipa\"/,/^}/s/\(};\)/\targ "connections 1";\n\1/' /etc/named.conf
+		rlRun "sed -i '/dynamic-db \"ipa\"/,/\^}/ s/\\(};\\)/\\targ \"connections 1\";\\n\\1/' /etc/named.conf"
+		rlRun "chattr +i /etc/named.conf"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
@@ -765,20 +767,35 @@ upgade_bz_866977_check()
 	TESTORDER=$(( TESTORDER += 1 ))
 	local tmpout=/tmp/errormsg.out
 	local logfile=/var/log/ipaupgrade.log
+	local outfile=/tmp/upgade_master_bz_866977.out
 	local failcount=0
 	rlPhaseStartTest "upgade_bz_866977_check: Inform user when ipa-upgradeconfig reports errors"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		if [ -f $logfile ]; then
+			rlAssertGrep "ERROR Cannot update connections in /etc/named.conf:" $logfile
+		fi
+		if [ -f $outfile ]; then
+			rlAssertGrep "Cannot update connections in /etc/named.conf.*Permission denied" $outfile
+			if [ $? -ne 0 ]; then
+				rlFail "BZ 866977 found...Inform user when ipa-upgradeconfig reports errors"	
+			else
+				rlPass "BZ 866977 not found."
+			fi		
+		else
+			rlLog "Not output file to scan for bug info"
+		fi
+		rlRun "chattr -i /etc/named.conf"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
 		rlLog "Machine in recipe is SLAVE"
-		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	"CLIENT")
 		rlLog "Machine in recipe is CLIENT"
-		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
 		;;
 	*)
 		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
