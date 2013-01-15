@@ -334,7 +334,7 @@ rlPhaseStartTest "direct_mount_functionality_001: functionaly testing direct mou
 	rlAssertExists "/share/test"
 	rlAssertGrep " mounting root /share, mountpoint /share, what $MASTER:/usr/share/man, fstype nfs, options rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534" "/var/log/messages"
 	rlAssertGrep "mount(nfs): /share is local, attempt bind mount" "/var/log/messages"
-	rlAssertGrep "mount_mount: mount(bind): calling mount --bind  -o defaults /usr/share/man /share" "/var/log/messages"
+        rlAssertGrep "mount_mount: mount(bind): calling mount --bind -s  -o defaults /usr/share/man /share" "/var/log/messages"
 	rlAssertGrep "mount_mount: mount(bind): mounted /usr/share/man type bind on /share" "/var/log/messages"
 
 	rlRun "cat /var/log/messages"
@@ -390,7 +390,7 @@ cat $testout
 	#rlAssertGrep "mount(nfs): nfs options=\"rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534\", nosymlink=0, ro=0" "/var/log/messages"
 	rlAssertGrep "mount(nfs): nfs options=\"rw,fsid=0,insecure,no_root_squash,sync,anonuid=65534,anongid=65534\", nobind=0, nosymlink=0, ro=0" "/var/log/messages"
 	rlAssertGrep "mount(nfs): calling mkdir_path /ipashare/$user1" "/var/log/messages"
-	rlAssertGrep "mount(bind): calling mount --bind  -o defaults /tmp /ipashare/$user1" "/var/log/messages"
+	rlAssertGrep "mount(bind): calling mount --bind -s  -o defaults /tmp /ipashare/$user1" "/var/log/messages"
 	rlAssertGrep "mount(bind): mounted /tmp type bind on /ipashare/$user1" "/var/log/messages"
 	rlAssertGrep "mounted /ipashare/$user1" "/var/log/messages"
 
