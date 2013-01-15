@@ -54,8 +54,8 @@ configure_autofs_indirect(){
     ipa automountlocation-add $name
     ipa automountmap-add $name auto.share
     ipa automountkey-add $name auto.master --key=${autofsTopDir} --info=auto.share
-    #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
-    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
+    ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-rw,soft,rsize=8192,wsize=8192 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
+    #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:${nfsExportTopDir}/${nfsExportSubDir}"
     #ipa automountkey-add $name auto.share --key=${autofsSubDir}  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:/share"
     #ipa automountkey-add $name auto.share --key=*  --info="-fstype=nfs4,rw,sec=krb5 ${nfsHost}:/share/&"
     show_autofs_configuration $name
@@ -153,7 +153,7 @@ add_indirect_map()
         configure_autofs_indirect $automounLocation $currentNFSServer $nfsDir $autofsDir
         sleep 3
         ipa-client-automount --uninstall -U 2>&1 > $tmp
-        echo "ipa-client-automount --server=$currentIPAServer --location=$currentLocation --no-sssd -U"
+        echo "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U"
         ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U
         service sssd stop
         sss_cache -A
@@ -172,7 +172,8 @@ configure_autofs_direct(){
     local nfsHost=$2
     local nfsDir=$3
     local autofsDir=$4
-    local info="$mount_kerberized_option ${nfsHost}:${nfsDir}"
+    #local info="$mount_kerberized_option ${nfsHost}:${nfsDir}"
+    local info="$mount_non_secure_option ${nfsHost}:${nfsDir}"
     echo "location [$name] : nfs server [$nfsHost] : nfs dir [$nfsDir] : autofs local dir [$autofsDir] "
     echo "info used: [$info]"
     ipa automountlocation-add $name
@@ -189,8 +190,8 @@ add_direct_map(){
         #echo "ipa-client-automount --server=$currentIPAServer --location=$automountLocation -U"
         #ipa-client-automount --server=$currentIPAServer --location=$automountLocation -U
 
-        echo "ipa-client-automount --server=$currentIPAServer --location=$automountLocation --no-sssd -U"
-        ipa-client-automount --server=$currentIPAServer --location=$automountLocation --no-sssd -U
+        echo "ipa-client-automount --server=$currentIPAServer --location=$automountLocation -U"
+        ipa-client-automount --server=$currentIPAServer --location=$automountLocation -U
         service sssd stop
         sss_cache -A
         #cat /etc/sssd/sssd.conf

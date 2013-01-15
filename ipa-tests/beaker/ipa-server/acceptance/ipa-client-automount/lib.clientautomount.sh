@@ -636,7 +636,7 @@ change_autofs_debug_level()
     local tmp_conf=/tmp/sssd.conf
     if ! grep "debug=10" $sssd_conf
     then
-        sed -e "s/^\[autofs\]/[autofs]\ndebug=10\n/" $sssd_conf > $tmp_conf
+        sed -e "s/^\[autofs\]/[autofs]\ndebug_level=10\n/" $sssd_conf > $tmp_conf
         cp -f $sssd_conf $sssd_conf_org
         cp -f $tmp_conf $sssd_conf
         echo "[change_autofs_debug_level] original sssd conf file saved as [$sssd_conf_org]"
