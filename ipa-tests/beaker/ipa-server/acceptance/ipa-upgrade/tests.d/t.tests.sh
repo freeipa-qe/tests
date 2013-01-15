@@ -138,6 +138,7 @@ upgrade_test_master_slave_client_dirsrv_off()
 			rlRun "service dirsrv stop"
 		fi
 		upgrade_master
+		upgrade_bz_895298_check_master	
 		data_check $MASTER_IP
 		
 		# test slave upgrade with dirsrv down
@@ -146,6 +147,7 @@ upgrade_test_master_slave_client_dirsrv_off()
 			rlRun "service dirsrv stop"
 		fi
 		upgrade_slave
+		upgrade_bz_895298_check_slave
 		data_check $SLAVE_IP
 
 		# test client upgrade after master and slave upgrades with dirsrv down

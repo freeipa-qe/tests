@@ -645,3 +645,87 @@ upgrade_bz_893722()
 	rlPhaseEnd
 	[ -f $tmpout ] && rm -f $tmpout
 }
+
+upgrade_bz_895298_check_master()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	local logfile=/var/log/ipaupgrade.log
+	local failcount=0
+	rlPhaseStartTest "upgrade_bz_895298_check_master: IPA upgrade error restarting named when dirsrv off before upgrade"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+
+		if [ -f $logfile ]; then 
+			rlAssertNotGrep "The ipa-upgradeconfig command failed.*named restart" $logfile
+			if [ $? -gt 0 ]; then
+				rlFail "BZ 895298 found...IPA upgrade error restarting named when dirsrv off before upgrade"
+				rlLog "workaround: restarting everything"
+				rlRun "ipactl restart"
+			else
+				rlPass "BZ 893722 not found"
+			fi
+		else
+			rlLog "No /var/log/ipaupgrade.log to check BZ 895298"
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+upgrade_bz_895298_check_slave()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	local logfile=/var/log/ipaupgrade.log
+	local failcount=0
+	rlPhaseStartTest "upgrade_bz_895298_check_slave: IPA upgrade error restarting named when dirsrv off before upgrade"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+
+		if [ -f $logfile ]; then 
+			rlAssertNotGrep "The ipa-upgradeconfig command failed.*named restart" $logfile
+			if [ $? -gt 0 ]; then
+				rlFail "BZ 895298 found...IPA upgrade error restarting named when dirsrv off before upgrade"
+				rlLog "workaround: restarting everything"
+				rlRun "ipactl restart"
+			else
+				rlPass "BZ 893722 not found"
+			fi
+		else
+			rlLog "No /var/log/ipaupgrade.log to check BZ 895298"
+		fi
+
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $SLAVE_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
