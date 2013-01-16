@@ -113,7 +113,9 @@ ipaserverinstall()
 #     Add test to verify bug 817075 : ipa-server-install: s/calculated/determined/
       ipaserverinstall_bz817075
 
-
+#     Add test to verify bug 815849 :  ipa-server-install unhandled exception
+#     with unclear error messages (inside DNS check)
+      ipaserverinstall_bz815849
  
   --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
@@ -613,7 +615,8 @@ ipaserverinstall_bz817080()
 		rlRun "ipa-getcert start-tracking -d /tmp/certdb -n bz817080"
 		rlRun "certutil -f $pwfile -A -n bz817080 -d /etc/httpd/alias -t u,u,u -a < $dbdir/bz817080.crt"
 		rlRun "ipa-getcert start-tracking -d /etc/httpd/alias -n bz817080"
-		rlRun "ipa-server-install --uninstall -U 2>&1|tee $tmpout"
+		rlRun "ipa-server-install --uninstall -U > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertGrep "ipa.*ERROR.*Some certificates may still be tracked by certmonger." $tmpout
 		rlAssertGrep "This will cause re-installation to fail." $tmpout
 		rlAssertGrep "Start the certmonger service and list the certificates being tracked" $tmpout
@@ -631,13 +634,31 @@ ipaserverinstall_bz817075()
 	local tmpout=$TmpDir/ipaserverinstall_bz817075.out
 	rlPhaseStartTest "ipaserverinstall_bz817075 - ipa-server-install: s/calculated/determined/"
 		uninstall_fornexttest
-		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U 2>&1 | tee $tmpout"
+		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertGrep "The domain name has been determined based on the host name." $tmpout
 		rlAssertNotGrep "The domain name has been calculated based on the host name." $tmpout
 		if [ $? -ne 0 ]; then
 			rlFail "BZ 817075 found...ipa-server-install: s/calculated/determined/"
 		else
 			rlPass "BZ 817075 not found"
+		fi
+	rlPhaseEnd
+}
+
+ipaserverinstall_bz815849()
+{
+	local tmpout=$TmpDir/ipaserverinstall_bz815849.out
+	rlPhaseStartTest "ipaserverinstall_bz815849 - ipa-server-install unhandled exception with unclear error messages (inside DNS check)"
+		uninstall_fornexttest
+		rlRun "echo '1.2.3.4 foo.$DOMAIN' >> /etc/hosts"
+		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=foo.$DOMAIN -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
+		rlAssertGrep "Invalid IP Address 1.2.3.4 for foo.$DOMAIN:" $tmpout
+		if [ $? -ne 0 ]; then
+			rlFail "BZ 815849 found...ipa-server-install unhandled exception with unclear error messages (inside DNS check)"
+		else
+			rlPass "BZ 815849 not found"
 		fi
 	rlPhaseEnd
 }
