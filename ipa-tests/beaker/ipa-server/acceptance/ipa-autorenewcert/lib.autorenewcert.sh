@@ -343,7 +343,10 @@ adjust_system_time(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - adjust_system_time $label"
     echo "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
     local before=`date`
+    logger "************************ Before: `date` *************************"
+    logger "*****       time adjusted by adjust_system_time()             *****"
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
+    logger "************************ After : `date` *************************"
     if [ "$?" = "0" ];then
         local after=`date`
         rlPass "adjust ($label) [$before]=>[$after] done"

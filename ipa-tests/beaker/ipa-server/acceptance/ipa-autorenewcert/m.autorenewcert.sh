@@ -57,15 +57,22 @@ autorenewcert()
         adjust_system_time $autorenew autorenew    
         start_ipa_certmonger_server "After autorenew, start ipa, expect automatic cert renew happening in background"
 
-        go_to_sleep
-        restart_ipa_certmonger_server "After autorenew, restart ipa, give ipa serverr second chance to kick off automatic renew"
-        go_to_sleep
+
+        echo "wait a while, then answer yes, then try to restart pki-cad"
+        pause
+        # /sbin/service pki-cad restart
+        #echo "pki-cad restarted, we can not officially wait till all certs being renewed"
+        #pause
+#        go_to_sleep
+        #restart_ipa_certmonger_server "After autorenew, restart ipa, give ipa serverr second chance to kick off automatic renew"
+        #go_to_sleep
         #restart_ipa_certmonger_server "After autorenew, 2nd restart ipa, give ipa serverr third  chance to kick off automatic renew"
         #go_to_sleep
 
         stop_ipa_certmonger_server "Before postExpire, system time will change soon, to verify the renewed certs"
         adjust_system_time $postExpire postExpire
         start_ipa_certmonger_server "After postExpire, system time has been changed, expect new certs are in use"
+
         go_to_sleep # give ipa server some time to refresh everything
         check_actually_renewed_certs $soonTobeRenewedCerts
         compare_expires_epoch_time_of_certs
