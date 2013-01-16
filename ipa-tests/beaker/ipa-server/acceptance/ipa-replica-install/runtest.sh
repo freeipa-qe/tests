@@ -317,6 +317,7 @@ rlJournalStart
 
 			# Installing slave with --setup-ca
 			installSlave_ca
+			uninstall
 
 			rhts-sync-set -s DONE_REPLICA2 -m $BEAKERSLAVE
 
@@ -330,7 +331,6 @@ rlJournalStart
 
 #### REPLICA6 Tests part1
 			rhts-sync-block -s READY_REPLICA6 $BEAKERMASTER
-			uninstall
 			installSlave
 			rhts-sync-set -s DONE_REPLICA6 -m $BEAKERSLAVE
 
