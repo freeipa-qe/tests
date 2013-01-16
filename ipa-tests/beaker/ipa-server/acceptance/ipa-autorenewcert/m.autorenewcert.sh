@@ -92,16 +92,13 @@ main_autorenewcert_test(){
     preserve_resolv_conf
     preserve_hosts
 
-    #while [ "`continue_test`" = "yes" ]
-    #do
-        certReport="$TmpDir/cert.report.$testroundCounter.txt"
-        echo "" > $testResult  # reset test result from last round
-        list_all_ipa_certs
-        find_soon_to_be_renewed_certs
-        autorenewcert $round
-        prepare_for_next_round
-        testroundCounter=$((testroundCounter + 1))
-    #done
+    certReport="$TmpDir/cert.report.$testroundCounter.txt"
+    echo "" > $testResult  # reset test result from last round
+    list_all_ipa_certs
+    find_soon_to_be_renewed_certs
+    autorenewcert $round
+    prepare_for_next_round
+    testroundCounter=$((testroundCounter + 1))
     final_cert_status_report 
 }
 ################ end of main ###########
@@ -109,6 +106,11 @@ main_autorenewcert_test(){
 if [ -f $db ];then
 	echo "loading data from previous test: [$db]"
 	source $db
+fi
+
+if ! service ntpd status | grep "ntpd is stopped"
+then
+    service ntpd stop
 fi
 
 rlJournalStart

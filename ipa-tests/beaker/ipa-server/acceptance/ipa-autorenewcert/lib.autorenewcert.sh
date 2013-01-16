@@ -338,22 +338,22 @@ calculate_autorenew_date(){
 }
 
 adjust_system_time(){
-    local adjustTo=$1
-    local label=$2
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - adjust_system_time $label"
-    echo "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
-    local before=`date`
-    logger "************************ Before: `date` *************************"
-    logger "*****       time adjusted by adjust_system_time()             *****"
-    date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
-    logger "************************ After : `date` *************************"
-    if [ "$?" = "0" ];then
-        local after=`date`
-        rlPass "adjust ($label) [$before]=>[$after] done"
-    else
-        local after=`date`
-        rlFail "change system date to ($label) failed, current data: [`date`]"
-    fi
+        local adjustTo=$1
+        local label=$2
+        echo "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
+        local before=`date`
+        logger "************************ Before: `date` *************************"
+        logger "*****       time adjusted by adjust_system_time()             *****"
+        date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
+        logger "************************ After : `date` *************************"
+        if [ "$?" = "0" ];then
+            local after=`date`
+            rlPass "adjust ($label) [$before]=>[$after] done"
+        else
+            local after=`date`
+            rlFail "change system date to ($label) failed, current data: [`date`]"
+        fi
     rlPhaseEnd
 }
 
@@ -738,10 +738,6 @@ all_certs_are_valid(){
         if [ "$state" = "valid" ];then
             current_valid_certs="$current_valid_certs $cert " #collect current valid certs
         fi
-        #local state=`$cert status valid`
-        #if [ "$state" != "valid" ];then
-        #    all_are_valid="no"
-        #fi
     done 
     # all certs should appear in this collected current valid cert string
     for cert in $allcerts

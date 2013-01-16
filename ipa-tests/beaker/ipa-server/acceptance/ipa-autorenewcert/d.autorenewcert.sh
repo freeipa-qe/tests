@@ -21,6 +21,7 @@ halfday=43200
 sixhour=21600
 onehour=3600
 halfhour=1800
+#sleep 20 minutes is minimum. 
 wait4renew=60
 maxwait=`echo "$wait4renew * 20" | bc`
 continueTest="no"
