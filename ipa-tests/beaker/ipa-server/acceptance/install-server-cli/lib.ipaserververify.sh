@@ -38,6 +38,12 @@ uninstall_fornexttest()
        rlRun "ipa-server-install --uninstall -U " 0 "Uninstalling ipa server for next test"
        # Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
        rlRun "ls $SSSD" 2 "Making sure that $SSSD does not exist. BZ 819982"
+	
+		if [ -d /var/lib/pki-ca ]; then
+			rlLog "Looks like pki needs to be cleaned up..."
+			rlRun "pkiremove -pki_instance_root=/var/lib -pki_instance_name=pki-ca --force"
+			rlRun "yum -y reinstall pki-selinux"
+		fi
     fi
 
 }
@@ -775,3 +781,4 @@ verify_bz889583()
 		fi
 	fi
 }
+

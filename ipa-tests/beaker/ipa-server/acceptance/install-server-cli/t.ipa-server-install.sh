@@ -107,6 +107,12 @@ ipaserverinstall()
 #     Add test to verify: bug 742875 : named fails to start after installing ipa server when short hostname preceeds fqdn in /etc/hosts. 
       ipaserverinstall_shorthostname
 	
+#     Add test to verify bug 817080 : ipa-server-install --uninstall doesn't clear certmonger dirs, which leads to install failing
+      ipaserverinstall_bz817080
+
+#     Add test to verify bug 817075 : ipa-server-install: s/calculated/determined/
+      ipaserverinstall_bz817075
+
 
  
   --selfsign            Configure a self-signed CA instance rather than a dogtag CA
@@ -578,6 +584,63 @@ ipaserverinstall_shorthostname()
 
 }
 
+
+####################################################################################
+#    bug 817080 : ipa-server-install --uninstall doesn't clear certmonger dirs, 
+#                 which leads to install failing
+####################################################################################
+ipaserverinstall_bz817080()
+{
+	local tmpout=$TmpDir/ipaserverinstall_bz817080.out
+	rlPhaseStartTest "ipaserverinstall_bz817080 - ipa-server-install --uninstall doesn't clear certmonger dirs, which leads to install failing"
+
+		uninstall_fornexttest
+		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 
+
+		KinitAsAdmin
+		rlRun "ipa host-add bz817080.testrelm.com --force"
+		dbdir=/tmp/certdb
+		pwfile=$dbdir/passwd1
+		rlRun "mkdir $dbdir"
+		rlRun "echo "$ADMINPW" > $pwfile"
+		rlRun "certutil -f $pwfile -N -d $dbdir"
+		rlRun "certutil -f $pwfile -R -s 'cn=bz817080.testrelm.com,o=testrelm.com' -d $dbdir -z /etc/group -a > $dbdir/bz817080.csr"
+
+		rlRun "ipa cert-request --add --principal bz817080/bz817080.testrelm.com $dbdir/bz817080.csr > $dbdir/bz817080.crt"
+		sernum=$(grep "Serial number:" /tmp/certdb/bz817080.crt|awk '{print $3}')
+		rlRun "ipa cert-show --out=$dbdir/bz817080.crt $sernum"
+		rlRun "certutil -f $pwfile -A -n bz817080 -d $dbdir -t u,u,u -a < $dbdir/bz817080.crt"
+		rlRun "ipa-getcert start-tracking -d /tmp/certdb -n bz817080"
+		rlRun "certutil -f $pwfile -A -n bz817080 -d /etc/httpd/alias -t u,u,u -a < $dbdir/bz817080.crt"
+		rlRun "ipa-getcert start-tracking -d /etc/httpd/alias -n bz817080"
+		rlRun "ipa-server-install --uninstall -U 2>&1|tee $tmpout"
+		rlAssertGrep "ipa.*ERROR.*Some certificates may still be tracked by certmonger." $tmpout
+		rlAssertGrep "This will cause re-installation to fail." $tmpout
+		rlAssertGrep "Start the certmonger service and list the certificates being tracked" $tmpout
+		if [ $? -ne 0 ]; then
+			rlFail "BZ 817080 found...ipa-server-install --uninstall doesn't clear certmonger dirs, which leads to install failing"
+		else
+			rlPass "BZ 817080 not found"
+		fi
+
+	rlPhaseEnd
+}
+
+ipaserverinstall_bz817075()
+{
+	local tmpout=$TmpDir/ipaserverinstall_bz817075.out
+	rlPhaseStartTest "ipaserverinstall_bz817075 - ipa-server-install: s/calculated/determined/"
+		uninstall_fornexttest
+		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U 2>&1 | tee $tmpout"
+		rlAssertGrep "The domain name has been determined based on the host name." $tmpout
+		rlAssertNotGrep "The domain name has been calculated based on the host name." $tmpout
+		if [ $? -ne 0 ]; then
+			rlFail "BZ 817075 found...ipa-server-install: s/calculated/determined/"
+		else
+			rlPass "BZ 817075 not found"
+		fi
+	rlPhaseEnd
+}
 
 ####################################################################################
 #   --reverse-zone=REVERSE_ZONE  The reverse DNS zone to use
