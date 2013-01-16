@@ -762,14 +762,14 @@ upgade_bz_866977_setup()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
-upgade_bz_866977_check()
+upgrade_bz_866977_check()
 {
 	TESTORDER=$(( TESTORDER += 1 ))
 	local tmpout=/tmp/errormsg.out
 	local logfile=/var/log/ipaupgrade.log
-	local outfile=/tmp/upgade_master_bz_866977.out
+	local outfile=/tmp/upgrade_master_bz_866977.out
 	local failcount=0
-	rlPhaseStartTest "upgade_bz_866977_check: Inform user when ipa-upgradeconfig reports errors"
+	rlPhaseStartTest "upgrade_bz_866977_check: Inform user when ipa-upgradeconfig reports errors"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
