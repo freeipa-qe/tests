@@ -508,9 +508,12 @@ rlPhaseStartTest "ipa-ctl-25 restart services as non-root user"
 
 	rlPhaseStartTest "ipa-ctl bz840381 At times ipactl fails to start DNS service and a crash is detected."
 		rlRun "ipactl stop" 0 "Stop all ipa services"
-		outfile=/dev/shm/bz840381.txt
-		rlRun "ipactl start &> $outfile" 0 "Start ipa services, direct output to $outfile"
-		rlRun "grep 'Failed to start DNS Service' $outfile" 1 "Ensure that a DNS failure is not in the output file BZ 840381"
+		#outfile=/dev/shm/bz840381.txt
+                # check output of ipactl start and search for error instead of writing it out to a file.
+                # ipactl writing to /dev/shm causes avc errors, so not using that apprach. 
+                # Test ipa-ctl-20 tests that DNS service start correctly
+		rlRun "ipactl start | grep 'Failed to start DNS Service'" 1 "Start ipa services. Ensure that a DNS failure is not in the output - BZ 840381"
+		#rlRun "grep 'Failed to start DNS Service' $outfile" 1 "Ensure that a DNS failure is not in the output file BZ 840381"
 		# the check below is not valid. ipactl stop - will stop DS, and bind will try to reconnect periodically (default is 60 sec)
                 # everytime it reconnects, if ipactl is not restarted - there will be a message - bind to LDAP server failed: Can't contact LDAP server
                 # In which case - it is a valid message.
