@@ -1099,6 +1099,12 @@ uninstall()
 		#rlRun "replicaDel root $MASTERIP \"ipa-replica-manage del $SLAVE\" yes"
 		if [ "$CA2INSTALL" = "true" ]; then	
 			rlRun "ipa-replica-manage -H $MASTER del $SLAVE -p $ADMINPW -f > /tmp/remote_exec.out 2>&1"
+			rlRun "dig @$MASTER +short _kerberos-master._tcp.testrelm.com srv|grep $SLAVE" 1
+			if [ $? -ne 1 ]; then
+				rlFail "BZ 896699 found...ipa-replica-manage -H does not delete DNS SRV records"
+			else
+				rlPass "BZ 896699 not found"
+			fi
 		else
 			rlRun "remoteExec root $MASTERIP \"ipa-replica-manage del $SLAVE -f\""
 		fi
@@ -1257,6 +1263,16 @@ miscDNSCheckup_negative(){
 
 	rlLog "Checking for NO DNS SRV record _ntp._udp for $s"
 	rlRun "sed -n '/_ntp._udp/,/^[[:space:]]*$/p' /tmp/remote_exec.out|grep $s_short" 1
+
+	if [ "$CA2INSTALL" = "true" ]; then
+		rlRun "dig @$MASTER +short _kerberos-master._tcp.testrelm.com srv|grep $SLAVE" 1
+		if [ $? -ne 1 ]; then
+			rlFail "BZ 896699 found...ipa-replica-manage -H does not delete DNS SRV records"
+			rlFail "All above SRV checks will fail if this is the case"
+		else
+			rlPass "BZ 896699 not found"
+		fi
+	fi
 }
 
 # Enable IPv6
