@@ -709,8 +709,9 @@ upgrade_bz_895298_check_slave()
 				rlFail "BZ 895298 found...IPA upgrade error restarting named when dirsrv off before upgrade"
 				rlLog "workaround: restarting everything"
 				rlRun "ipactl restart"
+				submit_log $logfile
 			else
-				rlPass "BZ 893722 not found"
+				rlPass "BZ 895298 not found"
 			fi
 		else
 			rlLog "No /var/log/ipaupgrade.log to check BZ 895298"
