@@ -662,10 +662,14 @@ upgrade_bz_895298_check_master()
 			rlAssertNotGrep "The ipa-upgradeconfig command failed.*named restart" $logfile
 			if [ $? -gt 0 ]; then
 				rlFail "BZ 895298 found...IPA upgrade error restarting named when dirsrv off before upgrade"
-				rlLog "workaround: restarting everything"
-				rlRun "ipactl restart"
 			else
 				rlPass "BZ 895298 not found"
+			fi
+			rlAssertNotGrep "ERROR Failed to restart named" $logfile
+			if [ $? -gt 0 ]; then
+				rlLog "workaround: restarting everything"
+				rlRun "ipactl restart"
+				submit_log $logfile
 			fi
 		else
 			rlLog "No /var/log/ipaupgrade.log to check BZ 895298"
@@ -706,15 +710,17 @@ upgrade_bz_895298_check_slave()
 
 		if [ -f $logfile ]; then 
 			submit_log $logfile
-			#rlAssertNotGrep "The ipa-upgradeconfig command failed.*named restart" $logfile
-			rlAssertNotGrep "ERROR Failed to restart named" $logfile
+			rlAssertNotGrep "The ipa-upgradeconfig command failed.*named restart" $logfile
 			if [ $? -gt 0 ]; then
 				rlFail "BZ 895298 found...IPA upgrade error restarting named when dirsrv off before upgrade"
+			else
+				rlPass "BZ 895298 not found"
+			fi
+			rlAssertNotGrep "ERROR Failed to restart named" $logfile
+			if [ $? -gt 0 ]; then
 				rlLog "workaround: restarting everything"
 				rlRun "ipactl restart"
 				submit_log $logfile
-			else
-				rlPass "BZ 895298 not found"
 			fi
 		else
 			rlLog "No /var/log/ipaupgrade.log to check BZ 895298"
