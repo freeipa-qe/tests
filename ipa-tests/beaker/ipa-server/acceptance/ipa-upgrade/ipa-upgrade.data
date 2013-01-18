@@ -24,8 +24,8 @@ if [ "$OS" = "fedora" ]; then
 	myrepo[2]=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/$basearch/
 	myrepo[3]=http://download.fedoraproject.org/pub/fedora/linux/updates/\$releasever/\$basearch/
 else
-	myrepo[1]=http://download.devel.redhat.com/rel-eng/RHEL6.4-20121212.1/6.4/Server/\$basearch/os/
-	myrepo[2]=http://download.devel.redhat.com/rel-eng/RHEL6.4-20121212.1/6.4/Server/optional/\$basearch/os/
+	myrepo[1]=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130109.1/6.4/Server/\$basearch/os/
+	myrepo[2]=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130109.1/6.4/Server/optional/\$basearch/os/
 	myrepo[3]=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
 	myrepo[4]=http://10.65.201.171/pki/\$basearch
 	myrepo[5]=http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/\$basearch/os
