@@ -75,6 +75,8 @@ slfcrt="Self-Signed-CA Certificate"
 slfcer="slfcrt.cer"
 aduser="aduser1"
 aduser2="aduser2"
+ADUser3="First.Last"
+aduser3="first.last"
 l1user="l1user"
 l2user="l2user"
 sub1user="sub1user"
@@ -292,10 +294,31 @@ rlPhaseStartTest "0003 Create users(numeric/alphanumeric) in AD and verify it is
 rlPhaseEnd
 }
 
-
 winsync_test_0004() {
 
-rlPhaseStartTest "0004 User added in IPA is not replicated on AD"
+rlPhaseStartTest "0004 bz824490 - Modify password for winsync users with mix case"
+	# Creating user in AD with mix case
+        rlRun "ADuser_ldif First Last $ADUser3 $userpw 512 add" 0 "Generate ldif file to add user $ADUser3"
+        rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $ADUser3"
+        sleep $sec
+	# Verify Users have synced to IPA Server
+        rlRun "$ipa user-show $ADUser3" 0 "$ADUser3 is synced to IPA"
+	rlRun "$ipa user-show $ADUser3 | grep \"Password: True\"" 0 "Password in sync for $ADUser3"
+
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "echo $userpw2 | ipa passwd $ADUser3" 0 "Reset $ADUser3 passwd from IPA"
+        sleep $sec
+        FirstKinitAs $aduser3 $userpw2 $userpw3
+        sleep $sec
+        /usr/bin/kdestroy 2>&1 >/dev/null
+	rlRun "ssh_auth_success $aduser3 $userpw3 $IPAhost"
+	
+rlPhaseEnd
+}
+
+winsync_test_0005() {
+
+rlPhaseStartTest "0005 User added in IPA is not replicated on AD"
 	rlRun "create_ipauser $firstname $surname $firstname $userpw"
 	sleep 5
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -308,9 +331,9 @@ rlPhaseEnd
 }
 
 
-winsync_test_0005() {
+winsync_test_0006() {
 
-rlPhaseStartTest "0005 Synchronization behaviour of account lock status"
+rlPhaseStartTest "0006 Synchronization behaviour of account lock status"
 	
 syncaccntdefault() {  
 	rlLog "Testing with Winsync account disable set to\"both\""
@@ -375,9 +398,9 @@ syncaccntboth() {
 rlPhaseEnd
 }
 
-winsync_test_0006() {
+winsync_test_0007() {
 
-rlPhaseStartTest "0006 bz765986 - winsync doesn't sync the employeeType attribute"
+rlPhaseStartTest "0007 bz765986 - winsync doesn't sync the employeeType attribute"
 	rlRun "employeetype_ldif add" 0 "Set employeetype attribute"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f employeetype.ldif"
 	rlRun "ADuser_ldif $aduser2 ads $aduser2 $userpw 512 add" 0 "Generate ldif file to add user $aduser2"
@@ -397,17 +420,17 @@ rlPhaseStartTest "0006 bz765986 - winsync doesn't sync the employeeType attribut
 rlPhaseEnd
 }
 
-winsync_test_0007() {
+winsync_test_0008() {
 
-rlPhaseStartTest "0007 ipa-replica-manage list"
+rlPhaseStartTest "0008 ipa-replica-manage list"
 	rlRun "ipa-replica-manage list | grep winsync" 0 "Listing winsync in Replica agreement"
 	rlRun "ipa-replica-manage list | grep master" 0 "Listing master in Replica agreement"
 rlPhaseEnd
 }
 
-winsync_test_0008() {
+winsync_test_0009() {
 
-rlPhaseStartTest "0008 Modify user attributes after replication setup"
+rlPhaseStartTest "0009 Modify user attributes after replication setup"
 	rlLog "Modify user attributes for user existing before winsync"
 	rlRun "telephoneNumber_ldif $ADfn $ADsn $phn_3"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f telephoneNumber.ldif" 0 "Modifying telephone number for $ADln"
@@ -424,9 +447,9 @@ rlPhaseStartTest "0008 Modify user attributes after replication setup"
 rlPhaseEnd
 }
 
-winsync_test_0009() {
+winsync_test_0010() {
 
-rlPhaseStartTest "0009 Update Password"
+rlPhaseStartTest "0010 Update Password"
 	rlLog "Update password in AD"
 	rlRun "ADuser_passwd_ldif $ADfn $ADsn $userpw2" 0 "Creating update passwd ldif file"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser_passwd.ldif" 0 "Reset $ADfn passwd from AD"
@@ -448,9 +471,9 @@ rlPhaseStartTest "0009 Update Password"
 rlPhaseEnd
 }
 
-winsync_test_0010() {
+winsync_test_0011() {
 
-rlPhaseStartTest "0010 \"ipausers\" group is a non-posix group (without gid number)"
+rlPhaseStartTest "0011 \"ipausers\" group is a non-posix group (without gid number)"
 	rlLog "Synced users must have a GID which is that same as thier UID. This GID is a UPG GID"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	x=`$ipa user-show $aduser | grep UID | awk '{print $NF}'`
@@ -469,9 +492,9 @@ rlPhaseStartTest "0010 \"ipausers\" group is a non-posix group (without gid numb
 rlPhaseEnd
 }
 
-winsync_test_0011() {
+winsync_test_0012() {
 
-rlPhaseStartTest "0011 bz755436 - sync uidNumber from AD"
+rlPhaseStartTest "0012 bz755436 - sync uidNumber from AD"
 	rlLog "https://bugzilla.redhat.com/show_bug.cgi?id=755436"
 	rlRun "uidNumber_ldif $aduser ads $new_UID"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f uidNumber.ldif" 0 "Setting UID for $aduser"
@@ -488,9 +511,9 @@ rlPhaseStartTest "0011 bz755436 - sync uidNumber from AD"
 rlPhaseEnd
 }
 
-winsync_test_0012() {
+winsync_test_0013() {
 
-rlPhaseStartTest "0012 Delete User"
+rlPhaseStartTest "0013 Delete User"
 	rlLog "Delete user from AD"
 	rlRun "ADuserdel_ldif $aduser ads"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete $aduser from AD"
@@ -513,17 +536,17 @@ rlPhaseStartTest "0012 Delete User"
 rlPhaseEnd
 }
 
-winsync_test_0013() {
+winsync_test_0014() {
 
-rlPhaseStartTest "0013 Error adding the agreement over existing agreement"
+rlPhaseStartTest "0014 Error adding the agreement over existing agreement"
 	rlRun "ipa-replica-manage connect --winsync --passsync=password --cacert=$ADcrt $ADhost --binddn \"$AD_binddn\" --bindpw $ADpswd -v -p $DMpswd" 1 "Error on attempting to add agreement over existing agreement"
 
 rlPhaseEnd
 }
 
-winsync_test_0014() {
+winsync_test_0015() {
 
-rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of scope bz818762 resolved"
+rlPhaseStartTest "0015 winsync should not delete entry that appears to be out of scope bz818762 resolved"
 	rlRun "addOU_ldif $OU1 add"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Adding OU $OU1"
 
@@ -555,9 +578,9 @@ rlPhaseStartTest "0014 winsync should not delete entry that appears to be out of
 rlPhaseEnd
 }
 
-winsync_test_0015() {
+winsync_test_0016() {
 
-rlPhaseStartTest "0015 Using options force-sync, re-initialize, disconnect and del"
+rlPhaseStartTest "0016 Using options force-sync, re-initialize, disconnect and del"
 	
 	rlRun "syncinterval_ldif delete"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f syncinterval.ldif" 0 "Change winsync interval back to 5 mins"
@@ -596,9 +619,9 @@ rlPhaseStartTest "0015 Using options force-sync, re-initialize, disconnect and d
 rlPhaseEnd
 }
 
-winsync_test_0016() {
+winsync_test_0017() {
 
-rlPhaseStartTest "0016 Winsync with --win-subtree"
+rlPhaseStartTest "0017 Winsync with --win-subtree"
 	rlRun "addOU_ldif $OU1 add"
 	rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Adding OU $OU1"
 	rlRun "addsubOU_ldif $sub_OU1 $OU1 add"
@@ -692,6 +715,20 @@ rlPhaseStartTest "0016 Winsync with --win-subtree"
         rlRun "ldapmodify -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f addOU.ldif" 0 "Delete OU $OU2"
 	rlRun "ipa-replica-manage del $ADhost" 0 "Deleting agreement with OU $OU2"
 
+rlPhaseEnd
+}
+
+winsync_test_0018() {
+
+rlPhaseStartTest "0018 bz869656 - Improve information on passsync user in man page, command help"
+	rlRun "man ipa-replica-manage | col -b | grep -A3 \"\-\-passsync\" | head -4 > doc.txt" 0 "Picking Description of --passsync from man page"
+	echo >> doc.txt
+	rlRun "ipa-replica-manage -help | grep -A1 passsync >> doc.txt" 0 "Picking description of --passsync from help"
+	rlRun "diff -q doc.txt bz869656" 0 "Text in both man and help page is correct"
+
+	# Test cleanup
+	rlRun "rm -f doc.txt" 0 "Remove the doc file"
+	
 rlPhaseEnd
 }
 
