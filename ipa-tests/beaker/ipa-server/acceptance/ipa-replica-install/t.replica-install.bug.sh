@@ -234,14 +234,73 @@ replicaInstallBug748987()
 
 replicaBugCheck_bz894131()
 {
+	# change to remoteExec against MASTER to test properly
 	MYREVZONE=$1
+	local tmpout=/tmp/replicaBugCheck_bz894131.out
 	rlPhaseStartTest "Bug 894131 - ipa-replica-install fails to add idnssoaserial for a new zone"
 		KinitAsAdmin
+		rlLog "First check for idnssoaserial attr for new zone locally"
 		rlRun "ipa dnszone-show $MYREVZONE --raw|grep -i idnssoaserial"
+
+		rlLog "Then check for idnssoaserial attr for new zone remotely"
+		rlRun "ssh $MASTER \"echo $ADMINPW|kinit admin\""
+		rlRun "ssh $MASTER \"ipa dnszone-show $MYREVZONE --raw\" > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "idnssoaserial" $tmpout
 		if [ $? -gt 0 ]; then
 			rlFail "BZ 894131 found...ipa-replica-install fails to add idnssoaserial for a new zone"
 		else
 			rlPass "BZ 894131 not found...ipa-replica-install added idnssoaserial for a new zone"
+		fi
+	rlPhaseEnd
+}
+
+replicaBugCheck_bz894143()
+{
+	MYREVZONE=$1
+	local tmpout=/tmp/replicaBugCheck_bz894143.out
+	rlPhaseStartTest "Bug 894143 - ipa-replica-prepare fails when reverse zone does not have SOA serial data"
+		KinitAsAdmin
+
+		rlRun "sed -i 's/serial_autoincrement yes/serial_autoincrement no/' /etc/named.conf"
+		rlRun "service named restart"
+		rlRun "ssh $MASTER \"sed -i 's/serial_autoincrement yes/serial_autoincrement no/' /etc/named.conf\""
+		rlRun "ssh $MASTER \"service named restart\""
+
+		rlRun "ipa dnszone-add 3.3.3.in-addr.arpa. --name-server=${MASTER}. --admin-email=ipaqar.redhat.com"
+		rlRun "ssh $MASTER \"echo $ADMINPW|kinit admin\""
+		rlRun "ssh $MASTER \"ipa dnszone-show 3.3.3.in-addr.arpa.\" > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertNotGrep "SOA serial:" $tmpout
+		rlRun "ssh $MASTER \"ipa-replica-prepare -p $ADMINPW --ip-address=3.3.3.100 bz894143.$DOMAIN\" > $tmpout 2>&1" 1
+		rlAssertGrep "Could not create reverse DNS zone for the replica: missing attribute \"idnsSOAserial\"" $tmpout
+		if [ $? -ne 0 ]; then
+			rlFail "BZ 894143 found...ipa-replica-prepare fails when reverse zone does not have SOA serial data"
+		else
+			rlPass "BZ 894143 not found"
+		fi
+
+		rlRun "sed -i 's/serial_autoincrement no/serial_autoincrement yes/' /etc/named.conf"
+		rlRun "service named restart"
+		rlRun "ssh $MASTER \"sed -i 's/serial_autoincrement no/serial_autoincrement yes/' /etc/named.conf\""
+		rlRun "ssh $MASTER \"service named restart\""
+	rlPhaseEnd
+}
+
+replicaBugCheck_bz895083()
+{
+	local tmpout=/tmp/replicaBugCheck_bz895083.out
+	rlPhaseStartTest "Bug 895083 - IPA replicated zones can't be loaded because idnssoaserial is missing"
+		KinitAsAdmin
+		rlRun "ipa dnszone-add 4.4.4.in-addr.arpa. --name-server=${MASTER}. --admin-email=ipaqar.redhat.com"
+		rlRun "ssh $MASTER \"echo $ADMINPW|kinit admin\""
+		rlRun "ssh $MASTER \"ipa dnszone-show 4.4.4.in-addr.arpa.\" > $tmpout 2>&1"
+		rlRun "cat $tmpout"
+		rlAssertGrep "SOA serial:" $tmpout
+		if [ $? -ne 0 ]; then
+			rlFail "BZ 895083 found...IPA replicated zones can't be loaded because idnssoaserial is missing"
+		else
+			rlPass "BZ 895083 not found"
 		fi
 	rlPhaseEnd
 }

@@ -592,6 +592,8 @@ installSlave_nr3()
 
 			replicaBugCheck_bz830314
 			replicaBugCheck_bz894131 $SLAVEZONE
+			replicaBugCheck_bz894143 
+			replicaBugCheck_bz895083
 
 			rlLog "Checking that the SLAVEs zone is created locally"
 			rlRun "ipa dnszone-show $SLAVEZONE"
