@@ -32,6 +32,7 @@
 ##########################################################################
 ZONE1=4.2.2.in-addr.arpa.
 ZONE2=3.2.2.in-addr.arpa.
+CA2INSTALL=false
 
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
