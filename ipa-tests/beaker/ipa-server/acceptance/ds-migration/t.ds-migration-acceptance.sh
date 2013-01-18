@@ -325,6 +325,21 @@ migratecmd()
                 ipa group-del $GROUP1
                 ipa group-del $GROUP2
         rlPhaseEnd
+
+        rlPhaseStartTest "ds-migration-cmd-018 migration over ldaps"
+                rlLog "EXECUTING: ipa migrate-ds --with-compat --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldaps://$CLIENT:636"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldaps://$CLIENT:636" 0
+                rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
+                rlRun "ipa user-show $USER2" 0 "Verifying '$USER2' was migrated"
+                rlRun "ipa user-show $USER3" 0 "Verifying '$USER3' was migrated"
+                rlRun "ipa group-show $GROUP1" 0 "Verifying group '$GROUP1' was migrated"
+                rlRun "ipa group-show $GROUP2" 0 "Verifying group '$GROUP2' was migrated"
+
+                rlLog "Cleaning up migrated users"
+                ipa user-del $USER1 $USER2 $USER3
+                ipa group-del $GROUP1 $GROUP2 "HR Managers" "PD Managers" "QA Managers" "Accounting Managers"
+        rlPhaseEnd
+
 }
 
 bugzillas()

@@ -25,7 +25,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/ds-migration
-export TESTVERSION=2.0
+export TESTVERSION=2.1
 
 BUILT_FILES=
 
