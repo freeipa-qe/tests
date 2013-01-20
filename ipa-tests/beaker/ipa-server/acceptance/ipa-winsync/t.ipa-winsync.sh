@@ -300,7 +300,7 @@ rlPhaseStartTest "0004 bz824490 - Modify password for winsync users with mix cas
 	# Creating user in AD with mix case
         rlRun "ADuser_ldif First Last $ADUser3 $userpw 512 add" 0 "Generate ldif file to add user $ADUser3"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user in AD $ADUser3"
-        sleep $sec
+        sleep 90
 	# Verify Users have synced to IPA Server
         rlRun "$ipa user-show $ADUser3" 0 "$ADUser3 is synced to IPA"
 	rlRun "$ipa user-show $ADUser3 | grep \"Password: True\"" 0 "Password in sync for $ADUser3"
