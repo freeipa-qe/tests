@@ -312,6 +312,9 @@ rlPhaseStartTest "0004 bz824490 - Modify password for winsync users with mix cas
         sleep $sec
         /usr/bin/kdestroy 2>&1 >/dev/null
 	rlRun "ssh_auth_success $aduser3 $userpw3 $IPAhost"
+
+	# Test case cleanup
+        rlRun "$ipa user-del $aduser3" 0 "Deleting $ADUser3"
 	
 rlPhaseEnd
 }
