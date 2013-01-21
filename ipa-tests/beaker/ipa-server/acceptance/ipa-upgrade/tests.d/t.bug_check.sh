@@ -665,7 +665,7 @@ upgrade_bz_895298_check_master()
 			else
 				rlPass "BZ 895298 not found"
 			fi
-			rlAssertNotGrep "ERROR Failed to restart named" $logfile
+			rlRun "grep 'ERROR Failed to restart named' $logfile" 0,1
 			if [ $? -gt 0 ]; then
 				rlLog "workaround: restarting everything"
 				rlRun "ipactl restart"
@@ -716,7 +716,7 @@ upgrade_bz_895298_check_slave()
 			else
 				rlPass "BZ 895298 not found"
 			fi
-			rlAssertNotGrep "ERROR Failed to restart named" $logfile
+			rlRun "grep 'ERROR Failed to restart named' $logfile" 0,1
 			if [ $? -gt 0 ]; then
 				rlLog "workaround: restarting everything"
 				rlRun "ipactl restart"
@@ -797,6 +797,46 @@ upgrade_bz_866977_check()
 			rlLog "Not output file to scan for bug info"
 		fi
 		rlRun "chattr -i /etc/named.conf"
+		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
+		;;
+	"SLAVE")
+		rlLog "Machine in recipe is SLAVE"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	"CLIENT")
+		rlLog "Machine in recipe is CLIENT"
+		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $MASTER_IP"
+		;;
+	*)
+		rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+		;;
+	esac
+	rlPhaseEnd
+	[ -f $tmpout ] && rm -f $tmpout
+}
+
+upgrade_bz_902474()
+{
+	TESTORDER=$(( TESTORDER += 1 ))
+	local tmpout=/tmp/errormsg.out
+	local failcount=0
+	rlPhaseStartTest "upgrade_bz_902474: upgrading IPA from 2.2 to 3.0 sees certmonger errors"
+	case "$MYROLE" in
+	"MASTER")
+		rlLog "Machine in recipe is MASTER"
+
+		if [ -f /var/log/ipaupgrade.log ]; then 
+			rlAssertNotGrep "ERROR certmonger failed to start tracking certificate:.*dogtag-ipa-renew-agent" /var/log/ipaupgrade.log
+			if [ $? -gt 0 ]; then
+				rlFail "BZ 902474 found...upgrading IPA from 2.2 to 3.0 sees certmonger errors"
+				rlRun "grep -B 4 'ERROR certmonger failed to start tracking certificate:' /var/log/ipaupgrade.log"
+			else
+				rlPass "BZ 902474 not found"
+			fi
+		else
+			rlLog "No /var/log/ipaupgrade.log to check BZ 893722"
+		fi
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
