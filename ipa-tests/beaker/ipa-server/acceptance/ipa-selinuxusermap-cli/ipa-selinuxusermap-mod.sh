@@ -552,7 +552,7 @@ run_selinuxusermap_mod_tests(){
          rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for selinuxusermap with unknown Host Category"
      rlPhaseEnd
 
-	rlPhaseStartTest "ipa-selinuxusermap-mod-036: Modify selinuxusermap --addattr and --setattr with attr value empty"
+	rlPhaseStartTest "ipa-selinuxusermap-mod-036: Modify selinuxusermap --addattr and --setattr with attr value empty [BZ 895247]"
 		tmpout=/tmp/ipa-selinuxusermap-mod-036.out
 		rlRun "ipa selinuxusermap-mod $selinuxusermap14 --hbacrule=allow_all" 0,1
 		rlRun "ipa selinuxusermap-mod $selinuxusermap14 --addattr=seealso= > $tmpout 2>&1"
