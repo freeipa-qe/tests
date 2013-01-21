@@ -225,10 +225,21 @@ replicaInstallBug748987()
 		# This test attempts to install a replica. The install should fail because the a and ptr dns records on the master has been deleted
 		# A pass will be seeing a error message  
 		file=/dev/shm/replica-install-output
+		rlRun "ipa-server-install --uninstall -U"
+		rlRun "ssh $MASTERIP \"ipa-replica-manage -p $ADMINPW list $MASTER\""
+
 		rlLog "Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 		rlRun "ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg > $file 2>&1"
 		rlRun "cat $file"
-		rlRun "grep 'A replication agreement for this host already exists. It needs to be removed' $file" 0 "Make sure that expected warning message appears in ipa-replica-install output"
+		rlLog "Make sure that expected warning message appears in ipa-replica-install output"
+		rlAssertGrep "A replication agreement for this host already exists. It needs to be removed" $file 
+		if [ $? -ne 0 ]; then
+			rlFail "BZ 748987 found...If master has leftover replica agreement from a previous failed attempt, next replica install can fail"
+			rlFail "Did not see proper error messages. See above output"
+		else
+			rlPass "BZ 748987 not found"
+			rlPass "Did see proper error message.  See above output"
+		fi
 	rlPhaseEnd
 }
 

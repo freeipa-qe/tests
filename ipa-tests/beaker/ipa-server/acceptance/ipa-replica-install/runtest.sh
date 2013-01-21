@@ -190,14 +190,16 @@ rlJournalStart
 			# Delete dns entires for slave
 			slavename=$(echo $SLAVE | sed s/.$DOMAIN//g)
 			rlLog "Deleting a record of slave with ipa dnsrecord-del --a-rec=$SLAVEIP $DOMAIN $slavename"
-			ipa dnsrecord-del --a-rec=$SLAVEIP $DOMAIN $slavename			
+			rlRun "ipa dnsrecord-del --a-rec=$SLAVEIP $DOMAIN $slavename --del-all"
 			awk1=$(echo $SLAVEIP | cut -d\. -f1)		
 			awk2=$(echo $SLAVEIP | cut -d\. -f2)		
 			awk3=$(echo $SLAVEIP | cut -d\. -f3)		
 			awk4=$(echo $SLAVEIP | cut -d\. -f4)		
 			ptrzone="$awk3.$awk2.$awk1.in-addr.arpa."
 			rlLog "Deleting reverse entry with ipa dnsrecord-del $ptrzone $awk4 --ptr-rec=\"$SLAVE.\""
-			ipa dnsrecord-del $ptrzone $awk4 --ptr-rec="$SLAVE."
+			rlRun "ipa dnsrecord-del $ptrzone $awk4 --ptr-rec=$SLAVE."
+
+			rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
 			
 #### REPLICA6 Tests part2
 			rhts-sync-set -s CONTINUE_REPLICA6 -m $BEAKERMASTER
