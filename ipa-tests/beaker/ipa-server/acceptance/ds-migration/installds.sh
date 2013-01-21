@@ -141,8 +141,11 @@ sleep 3
 ##########################################################################
 
 cd /etc/dirsrv/$INSTANCE
+rlLog "EXECUTING: certutil -d . -L -n "CA certificate" -a > remoteds.crt"
 certutil -d . -L -n "CA certificate" -a > remoteds.crt
-scp remoteds.crt root@$MASTER:/ipa/crt/remoteds.crt
+ls /etc/dirsrv/$INSTANCE/remoteds.crt
+rlLog "EXECUTING: scp remoteds.crt root@$MASTER:/ipa/crt/remoteds.crt"
+scp remoteds.crt root@$MASTER:/etc/ipa/remoteds.crt
 
 ###########################################################################
 #  add a couple users and a couple of groups
