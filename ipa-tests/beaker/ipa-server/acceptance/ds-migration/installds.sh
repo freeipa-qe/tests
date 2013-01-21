@@ -136,6 +136,14 @@ fi
 
 sleep 3
 
+##########################################################################
+# Transfer CA certificate to the IPA Server for SSL migration test
+##########################################################################
+
+cd /etc/dirsrv/$INSTANCE
+certutil -d . -L -n "CA certificate" -a > remoteds.crt
+scp remoteds.crt root@$MASTER:/ipa/crt/remoteds.crt
+
 ###########################################################################
 #  add a couple users and a couple of groups
 ###########################################################################

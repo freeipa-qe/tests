@@ -37,6 +37,10 @@ setup()
 		rlLog "EXECUTING: echo $ADMINPW | ipa-compat-manage disable"
 		rlRun "echo $ADMINPW | ipa-compat-manage disable" 0
 		rlDistroDiff dirsrv_svc_restart
+
+		# For ldaps tests dependent on openldap and trust directory server CA certificate
+		rlLog "EXECUTING: restorecon /etc/ipa/remoteds.crt"
+		restorecon /etc/ipa/remoteds.crt
         rlPhaseEnd
 }
 
@@ -327,6 +331,10 @@ migratecmd()
         rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-018 migration over ldaps"
+		# setup /etc/openldap/ldap.conf/
+		sed -i 's/ca.crt/remoteds.crt/g' /etc/openldap/ldap.conf
+		service httpd restart
+
                 rlLog "EXECUTING: ipa migrate-ds --with-compat --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldaps://$CLIENT:636"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER,$MYBASEDN\" --group-container=\"$GROUPCONTAINER,$MYBASEDN\" ldaps://$CLIENT:636" 0
                 rlRun "ipa user-show $USER1" 0 "Verifying $USER1 was migrated"
@@ -338,6 +346,9 @@ migratecmd()
                 rlLog "Cleaning up migrated users"
                 ipa user-del $USER1 $USER2 $USER3
                 ipa group-del $GROUP1 $GROUP2 "HR Managers" "PD Managers" "QA Managers" "Accounting Managers"
+                sed -i 's/remoteds.crt/ca.crt/g' /etc/openldap/ldap.conf
+                service httpd restart
+
         rlPhaseEnd
 
 }
