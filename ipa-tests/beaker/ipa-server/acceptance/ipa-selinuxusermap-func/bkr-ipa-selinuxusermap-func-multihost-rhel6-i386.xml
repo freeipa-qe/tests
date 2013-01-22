@@ -42,7 +42,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-cli" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-func" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
@@ -85,7 +85,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-cli" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-func" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>
@@ -128,7 +128,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT2">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-cli" role="CLIENT2">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-func" role="CLIENT2">
 				<params/>
 			</task>
 		</recipe>
