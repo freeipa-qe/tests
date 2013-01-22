@@ -64,7 +64,9 @@ sessionscli_basic()
 		rlRun "keyctl clear @u" 0 "Clear local user keyring"
 		KinitAsUser $u1 $u1pass
 		rlRun "ipa user-find $u1" 0 "user-find this user to populate the keyring"
-		rlRun "keyctl list @s" 0 "DEBUG: ensure that the ipa session cookie was created"
+		rlRun "keyctl list @s" 0 "DEBUG: keyctl list @s"
+		rlRun "keyctl list -3" 0 "DEBUG:keyctl list -3"
+		rlRun "keyctl show" 0 "DEBUG:keyctl show"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
 	rlPhaseEnd
 
