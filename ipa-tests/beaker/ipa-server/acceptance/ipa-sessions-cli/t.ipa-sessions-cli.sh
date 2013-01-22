@@ -64,6 +64,7 @@ sessionscli_basic()
 		rlRun "keyctl clear @u" 0 "Clear local user keyring"
 		KinitAsUser $u1 $u1pass
 		rlRun "ipa user-find $u1" 0 "user-find this user to populate the keyring"
+		rlRun "keyctl list @s" 0 "DEBUG: ensure that the ipa session cookie was created"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
 	rlPhaseEnd
 
@@ -73,7 +74,7 @@ sessionscli_basic()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Ensure that ipa commands seem to not find valid session keys"
-		outf="/dev/shm/outfilea.txt"
+		outf="$TmpDir/outfilea.txt"
 		ipa user-find $u1 &> $outf
 		rlRun "grep 'keyctl_search: Required key not available' $outf" 0 "look for session key lookup failure in output"
 		rlRun "grep 'padd user' $outf" 0 "Ensure that keyctl seems to be populating local session key"
@@ -85,7 +86,7 @@ sessionscli_basic()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Ensure that ipa commands seem to find valid session keys now that the keyring should be populated"
-		outf="/dev/shm/outfileb.txt"
+		outf="$TmpDir/outfileb.txt"
 		ipa user-find $u1 &> $outf
 		rlRun "grep 'keyctl_search: Required key not available' $outf" 1 "look for session key lookup failure is not in output"
 		rlRun "grep 'padd user' $outf" 1 "Ensure that keyctl is not populating local session key, as it should be popluated already."
@@ -100,6 +101,7 @@ sessionscli_basic()
 		kdestroy
 		KinitAsUser $u2 $u2pass
 		rlRun "ipa user-find $u1" 0 "user-find this user to populate the keyring"
+		rlRun "keyctl list @s" 0 "DEBUG: ensure that the ipa session cookie was created"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
 	rlPhaseEnd
 
@@ -109,7 +111,7 @@ sessionscli_basic()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Ensure that ipa commands seem to not find valid session keys"
-		outf="/dev/shm/outfilec.txt"
+		outf="$TmpDir/outfilec.txt"
 		ipa user-find $u1 &> $outf
 		rlRun "grep 'keyctl_search: Required key not available' $outf" 0 "look for session key lookup failure in output"
 		rlRun "grep 'padd user' $outf" 0 "Ensure that keyctl seems to be populating local session key"
@@ -121,7 +123,7 @@ sessionscli_basic()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Ensure that ipa commands seem to find valid session keys now that the keyring should be populated"
-		outf="/dev/shm/outfiled.txt"
+		outf="$TmpDir/outfiled.txt"
 		ipa user-find $u1 &> $outf
 		rlRun "grep 'keyctl_search: Required key not available' $outf" 1 "look for session key lookup failure is not in output"
 		rlRun "grep 'padd user' $outf" 1 "Ensure that keyctl is not populating local session key, as it should be popluated already."
@@ -138,7 +140,7 @@ sessionscli_basic()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Ensure that ipa commands seem to not find valid session keys"
-		outf="/dev/shm/outfilee.txt"
+		outf="$TmpDir/outfilee.txt"
 		ipa host-find $MASTER &> $outf
 		rlRun "grep 'keyctl_search: Required key not available' $outf" 0 "look for session key lookup failure in output"
 		rlRun "grep 'padd user' $outf" 0 "Ensure that keyctl seems to be populating local session key"
@@ -150,7 +152,7 @@ sessionscli_basic()
 	rlPhaseEnd
 
 	rlPhaseStartTest "Ensure that ipa commands seem to find valid session keys now that the keyring should be populated"
-		outf="/dev/shm/outfilef.txt"
+		outf="$TmpDir/outfilef.txt"
 		ipa host-find $MASTER &> $outf
 		rlRun "grep 'keyctl_search: Required key not available' $outf" 1 "look for session key lookup failure is not in output"
 		rlRun "grep 'padd user' $outf" 1 "Ensure that keyctl is not populating local session key, as it should be popluated already."
@@ -167,6 +169,7 @@ sessionscli_basic()
 		kdestroy
 		KinitAsAdmin
 		ipa user-find $u1 &> /dev/null
+        rlRun "keyctl list @s" 0 "DEBUG: Make sure that a admin key seems around keyctl"
         rlRun "keyctl list @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
         
 	rlPhaseEnd
@@ -179,6 +182,7 @@ sessionscli_basic()
 
 	rlPhaseStartTest "Repopulate admin keyring"
 		ipa user-find admin &> /dev/null
+		rlRun "keyctl list @s" 0 "DEBUG: Make sure that a admin key seems around keyctl"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep admin" 0 "Make sure that a admin key seems around keyctl"
 	rlPhaseEnd
 	
@@ -193,6 +197,7 @@ sessionscli_basic()
 		ipa user-find $u1 &> /dev/null
 		KinitAsUser $u2 $u2pass
 		ipa user-find $u2 &> /dev/null
+		rlRun "keyctl list @s" 0 "DEBUG: Verify that u1 and u2 has a valid session key"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "Verify that u1 has a valid session key"
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u2" 0 "Verify that u2 has a valid session key"
 	rlPhaseEnd
@@ -251,17 +256,17 @@ sessionscli_basic()
 		rlRun "keyctl clear @u" 0 "Clear local user keyring"
 
 		KinitAsUser $u1 $u1pass
-		outf="/dev/shm/outfileg.txt"
+		outf="$TmpDir/outfileg.txt"
         rlRun "service ipa_memcached restart"
 		ipa -vv user-find $u1 &> $outf # running ipa user-find to populate the keyring. 
 		rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "verify u1's ipa session cookie was created"
 		rlRun "grep Authorization:\ negotiate $outf" 0 "This first user-find should complete a full kerberos auth."
-		outf="/dev/shm/outfileh.txt"
+		outf="$TmpDir/outfileh.txt"
         sleep 30 # after restart ipa_memcached, we need wait for 30 seconds till httpd re-establish the session via mem_cached
 		ipa -vv user-find $u1 &> $outf # This command should work off of the current session.
 		rlRun "grep Authorization:\ negotiate $outf" 0 "Re-verify that a normal user-find does not do a full kerberos auth, after 30 seconds"
 
-		outf="/dev/shm/outfilei.txt"
+		outf="$TmpDir/outfilei.txt"
 		ipa -vv --delegate user-find &> $outf # this command should force a full kerberos auth
 		rlRun "grep Authorization:\ negotiate $outf" 0 "ipa delegate should force a full kerberos auth. Verify that it happened."
 	rlPhaseEnd		
@@ -303,13 +308,13 @@ sessionscli_basic()
 				rlRun "keyctl list @s | grep ipa_session_cookie | grep $u1" 0 "ensure that the ipa session cookie was created"
 				rlRun "keyctl clear @s" 0 "Clear local session keyring"
 				rlRun "keyctl list @s | grep ipa_session_cookie" 1 "Make sure that session keyring appears clear"
-				outf="/dev/shm/outfilej.txt"
+				outf="$TmpDir/outfilej.txt"
 				ipa user-find $u1 &> $outf
 				rlRun "grep 'keyctl_search: Required key not available' $outf" 0 "look for session key lookup failure in output"
 				rlRun "grep 'padd user' $outf" 0 "Ensure that keyctl seems to be populating local session key"
 				rlRun "grep 'keyctl pipe' $outf" 1 "Ensure that keyctl pipe is not found"
 				rlRun "grep 'keyctl pupdate' $outf" 1 "Ensure that keyctl update is not found"
-				outf="/dev/shm/outfilek.txt"
+				outf="$TmpDir/outfilek.txt"
 				ipa user-find $u1 &> $outf
 				rlRun "grep 'keyctl_search: Required key not available' $outf" 1 "look for session key lookup failure is not in output"
 				rlRun "grep 'padd user' $outf" 1 "Ensure that keyctl is not populating local session key, as it should be popluated already."
@@ -345,9 +350,9 @@ sessionscli_envcleanup()
 		delete_ipauser $u2
 		rm -f /etc/ipa/server.conf-backup
 		rlRun "mv /etc/ipa/server.conf /etc/ipa/server.conf-backup" 0 "copying server.conf to a backup"
-		cat /etc/ipa/default.conf | grep -v debug > /dev/shm/default.conf
+		cat /etc/ipa/default.conf | grep -v debug > $TmpDir/default.conf
 		rm -f /etc/ipa/default.conf
-		rlRun "cp -a /dev/shm/default.conf /etc/ipa/default.conf" 0 "Restoring default.conf"
+		rlRun "cp -a $TmpDir/default.conf /etc/ipa/default.conf" 0 "Restoring default.conf"
 		rlRun "restorecon -Fvv /etc/ipa/default.conf" 0 "Restoring SELINUX content for default.conf"
 		rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to disable debug mode"
 		#environment cleanup ends   here

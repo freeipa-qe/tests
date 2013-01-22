@@ -70,7 +70,7 @@ rlJournalStart
 
     rlPhaseStartCleanup "Cleanup"
         rlRun "popd"
-        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+#        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
     makereport
