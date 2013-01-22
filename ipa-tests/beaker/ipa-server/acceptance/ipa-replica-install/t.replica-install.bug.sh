@@ -229,7 +229,7 @@ replicaInstallBug748987()
 		rlRun "ssh $MASTERIP \"ipa-replica-manage -p $ADMINPW list $MASTER\""
 
 		rlLog "Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-		rlRun "ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg > $file 2>&1"
+		rlRun "ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg > $file 2>&1" 3
 		rlRun "cat $file"
 		rlLog "Make sure that expected warning message appears in ipa-replica-install output"
 		rlAssertGrep "A replication agreement for this host already exists. It needs to be removed" $file 
