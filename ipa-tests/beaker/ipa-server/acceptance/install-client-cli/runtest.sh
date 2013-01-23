@@ -70,7 +70,7 @@ rlJournalStart
 	   rlLog "syncing date"
            ntpdate $NTPSERVER
            export currenthour=$(date +%H) # Get the current hours to be used in a later test
-           date --set='-2 hours' # Set the date on this machine back two hours for ipa-client-install to fix later
+           #date --set='-2 hours' # Set the date on this machine back two hours for ipa-client-install to fix later
            rlLog "Current date is $(date)"
           if [ $slave_count -eq 3 ];then
            rlLog "Executing test cases with 1 Master and 3 Replicas"
