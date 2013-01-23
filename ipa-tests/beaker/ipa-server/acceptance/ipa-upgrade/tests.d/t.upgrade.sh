@@ -65,19 +65,20 @@ upgrade_master()
 			EOF
 		done
 
+		if [ -f /var/log/ipaupgrade.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			mv /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
+		fi
+
 		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
+
 		rlRun "ipactl status"
 		rlRun "service sssd status"
 		rlRun "service sssd restart"
-		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
+		
 		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
-		#submit_log /var/log/ipaupgrade.log
-		#if [ -f /var/log/ipaupgrade.log ]; then
-		#	DATE=$(date +%Y%m%d-%H%M%S)
-		#	cp /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
-		#	rhts-submit -l /var/log/ipaupgrade.log.$DATE
-		#fi
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $MASTER_IP"
 		;;
 	"SLAVE")
@@ -123,6 +124,11 @@ upgrade_slave()
 			EOF
 		done
 
+		if [ -f /var/log/ipaupgrade.log ]; then
+			DATE=$(date +%Y%m%d-%H%M%S)
+			mv /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
+		fi
+
 		rlRun "yum clean all"
 		rlRun "yum -y update 'ipa*'"	
 
@@ -137,14 +143,8 @@ upgrade_slave()
 		rlRun "service sssd status"
 		rlRun "service sssd restart"
 
-		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
 		rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
-		#submit_log /var/log/ipaupgrade.log
-		#if [ -f /var/log/ipaupgrade.log ]; then
-		#	DATE=$(date +%Y%m%d-%H%M%S)
-		#	cp /var/log/ipaupgrade.log /var/log/ipaupgrade.log.$DATE
-		#	rhts-submit -l /var/log/ipaupgrade.log.$DATE
-		#fi
+
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $SLAVE_IP"
 		;;
 	"CLIENT")
@@ -193,10 +193,9 @@ upgrade_client()
 		done
 
 		rlRun "yum clean all"
-		#rlLog "upgrading selinux-policy and selinux-policy-targeted first"
-		#rlRun "yum -y update selinux-policy selinux-policy-targeted"
+		
 		rlRun "yum -y update 'ipa*'"	
-		#rlRun "ipactl restart" ### IS THIS REALLY NEEDED?  BZ 766687?
+
 		rlRun "rpm -q $PKG-client sssd"
 		rlRun "service sssd status"
 		rlRun "service sssd restart"
