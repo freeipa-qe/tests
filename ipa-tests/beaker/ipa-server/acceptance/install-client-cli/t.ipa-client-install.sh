@@ -412,7 +412,7 @@ ipaclientinstall_hostname()
        local tmpout=$TmpDir/ipaclientinstall_hostname.$RANDOM.out
        command="ipa-client-install --hostname=$CLIENT.nonexistent --server=$MASTER --domain=$DOMAIN -p $ADMINID -w $ADMINPW  -U"
        rlLog "EXECUTING: $command" 
-       expmsg1="Warning: Hostname ($CLIENT.nonexistent) not found in DNS"
+       expmsg1="Hostname ($CLIENT.nonexistent) not found in DNS"
        expmsg2="Could not update DNS SSHFP records."
 
 		if [ -f /etc/fedora-release ] ; then
