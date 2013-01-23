@@ -718,9 +718,10 @@ upgrade_bz_895298_check_slave()
 				rlPass "BZ 895298 not found"
 			fi
 			rlRun "grep 'ERROR Failed to restart named' $logfile" 0,1
-			if [ $? -gt 0 ]; then
+			if [ $? -eq 0 ]; then
 				rlLog "workaround: restarting everything"
 				rlRun "ipactl restart"
+				rlRun "service sssd restart"
 				submit_log $logfile
 			fi
 		else
