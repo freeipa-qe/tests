@@ -38,19 +38,19 @@ sessionscli_envsetup()
 		create_ipauser $u1 user1 user1 $u1pass
 		create_ipauser $u2 user1 user1 $u2pass
 
-		#set up debug
-		if [ -f /etc/ipa/server.conf ]; then
-			dc=$(date +%s)
-			mv /etc/ipa/server.conf /etc/ipa/server.conf-original-${dc}
-		fi
-		if [ -f /etc/ipa/default.conf-original-${dc} ]; then
-			rm -f /etc/ipa/default.conf-original-${dc}
-		fi		
-		mv /etc/ipa/server.conf /etc/ipa/default.conf-original-${dc}
-		echo '[global]' >> /etc/ipa/server.conf
-		echo 'debug=True' >> /etc/ipa/server.conf
-		echo 'debug=True' >> /etc/ipa/default.conf
-		rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to enable debug mode"
+#		#set up debug
+#		if [ -f /etc/ipa/server.conf ]; then
+#			dc=$(date +%s)
+#			mv /etc/ipa/server.conf /etc/ipa/server.conf-original-${dc}
+#		fi
+#		if [ -f /etc/ipa/default.conf-original-${dc} ]; then
+#			rm -f /etc/ipa/default.conf-original-${dc}
+#		fi		
+#		mv /etc/ipa/server.conf /etc/ipa/default.conf-original-${dc}
+#		echo '[global]' >> /etc/ipa/server.conf
+#		echo 'debug=True' >> /etc/ipa/server.conf
+#		echo 'debug=True' >> /etc/ipa/default.conf
+#		rlRun "/usr/sbin/ipactl restart" 0 "restarting IPA to enable debug mode"
 	rlPhaseEnd
 		
 }
