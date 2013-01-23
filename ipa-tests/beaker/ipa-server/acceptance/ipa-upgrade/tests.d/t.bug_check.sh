@@ -669,6 +669,7 @@ upgrade_bz_895298_check_master()
 			if [ $? -eq 0 ]; then
 				rlLog "workaround: restarting everything"
 				rlRun "ipactl restart"
+				rlRun "service sssd restart"
 				submit_log $logfile
 			fi
 		else
