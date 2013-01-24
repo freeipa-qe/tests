@@ -454,7 +454,7 @@ replace_line(){
     cp -f $file_modified $file
     rm $file_modified
     echo "original file backup at [$file_bk]"
-    echo "check new line in the [$file]"
+    echo "check new line [$new] in the [$file]"
     echo "-----------------------------------------"
     grep "$newline" $file
     echo "-----------------------------------------"
@@ -462,8 +462,8 @@ replace_line(){
 
 modify_sysconfig_nfs()
 {
-    replace_line $nfsSystemConf "#SECURE_NFS=" "SECURE_NFS=\"yes\""
-    replace_line $nfsSystemConf "#RPCGSSDARGS=\"\"" "RPCGSSDARGS=\"-vvv\""
+    replace_line $nfsSystemConf "#SECURE_NFS=\"yes\""  "SECURE_NFS=\"yes\""
+    replace_line $nfsSystemConf "#RPCGSSDARGS=\"\""    "RPCGSSDARGS=\"-vvv\""
     replace_line $nfsSystemConf "#RPCSVCGSSDARGS=\"\"" "RPCSVCGSSDARGS=\"-vvv\""
     echo "========== content of $nfsSystemConf ==============="
     grep -v "^#" $nfsSystemConf
