@@ -867,7 +867,7 @@ upgrade_bz_902474()
 	"MASTER")
 		rlLog "Machine in recipe is MASTER"
 
-		rlRun "ausearch -m avc > $tmpout 2>&1"
+		rlRun "ausearch -m avc > $tmpout 2>&1" 1
 		rlAssertNotGrep  "certmonger_t:.*pki_ca_var_lib_t" $tmpout
 		if [ $? -gt 0 ]; then
 			rlFail "BZ 902474 found...upgrading IPA from 2.2 to 3.0 sees certmonger errors"
