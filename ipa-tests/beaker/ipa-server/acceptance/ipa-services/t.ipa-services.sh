@@ -531,7 +531,13 @@ else
 	if [[ "$SLAVE" = "" ]] ; then
         	rlAssertGrep "Number of entries returned 4" "$TmpDir/service_find_004.out"
 	else
-		rlAssertGrep "Number of entries returned 8" "$TmpDir/service_find_004.out"
+                rlRun "cat $TmpDir/service_find_004.out"
+                grep -e "Principal: dogtagldap/$HOSTNAME@$RELM" $TmpDir/service_find_004.out
+                if [ $? -eq 0 ] ; then
+		  rlAssertGrep "Number of entries returned 8" "$TmpDir/service_find_004.out"
+                else
+		  rlAssertGrep "Number of entries returned 7" "$TmpDir/service_find_004.out"
+                fi
 	fi
 fi
 rlPhaseEnd
@@ -568,6 +574,7 @@ rlPhaseStartTest "service_find_007: ipa service-find with --timelimit option"
         # If timelimit comes in as 0 we set it to -1, unlimited, internally. 
         rlRun "ipa service-find --timelimit=0 > $TmpDir/service_find_007.out 2>&1"
         result=`cat $TmpDir/service_find_007.out | grep "Number of entries returned"`
+        rlRun "cat $TmpDir/service_find_007.out"
         number=`echo $result | cut -d " " -f 5`
 	if [[ "$SLAVE" = "" ]] ; then
 
@@ -584,12 +591,21 @@ rlPhaseStartTest "service_find_007: ipa service-find with --timelimit option"
                 		rlFail "Number of services returned is not as expected.  GOT: $number EXP: 5"
 	        	fi
 		fi
-	else
-                if [ $number -eq 9 ] ; then
-                        rlPass "Number of 9 services returned as expected with time limit of 0"
+	else 
+
+                rlRun "cat $TmpDir/service_find_007.out"
+                grep -e "Principal: dogtagldap/$HOSTNAME@$RELM" $TmpDir/service_find_004.out
+                if [ $? -eq 0 ] ; then
+                  rlAssertGrep "Number of entries returned $number" "$TmpDir/service_find_007.out"
                 else
-                        rlFail "Number of services returned is not as expected.  GOT: $number EXP: 9"
+                  rlAssertGrep "Number of entries returned $number" "$TmpDir/service_find_007.out"
                 fi
+            
+                #if [ $number -eq 9 ] ; then
+                #        rlPass "Number of 9 services returned as expected with time limit of 0"
+                #else
+                #        rlFail "Number of services returned is not as expected.  GOT: $number EXP: 9"
+                #fi
 	fi
 rlPhaseEnd
 }
