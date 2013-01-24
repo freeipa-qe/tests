@@ -193,6 +193,7 @@ ipaclientinstall_adminpwd()
     rlPhaseStartTest "ipa-client-install-01- [Positive] Install with admin & password - with -U"
         uninstall_fornexttest
 		rlLog "Changing time to make sure client install sets it and doesn't fail"
+        rlRun "service ntpd stop" 0 "Stopping the ntp server"
 		rlRun "date --set='-2 hours'"
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW -U "
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U " 0 "Installing ipa client and configuring - passing admin and password"
