@@ -483,17 +483,19 @@ clientautomount_autofs_functional_test()
     change_autofs_debug_level
 #    for current_serverEnv in standalone_ipa_dns_nfs combined_ipa_dns_standalone_nfs all_combined
 #    do
-#        for current_nfsConfiguration in nfs_v3_non_secure nfs_v4_non_secure nfs_v4_kerberized
-#        do
+        current_serverEnv="all_combined"
+        #for current_nfsConfiguration in nfs_v3_non_secure nfs_v4_non_secure nfs_v4_kerberized
+        for current_nfsConfiguration in nfs_v4_non_secure nfs_v4_kerberized
+        do
             #current_serverEnv="all_combined"
             #current_nfsConfiguration="nfs_v3_non_secure"
-            current_serverEnv="combined_ipa_dns_standalone_nfs"
+            #current_serverEnv="combined_ipa_dns_standalone_nfs"
             #current_nfsConfiguration="nfs_v3_non_secure"
-            current_nfsConfiguration="nfs_v4_non_secure"
+            #current_nfsConfiguration="nfs_v4_non_secure"
             #current_nfsConfiguration="nfs_v4_kerberized"
             setup_testing_environment $current_serverEnv $current_nfsConfiguration
             basic_autofs_functional_test
-#        done
+        done
 #    done
 }
 
@@ -515,7 +517,7 @@ setup_server()
     if [ "$serverEnv" = "standalone_ipa_dns_nfs" ];then
         currentIPAServer=$ipaServerMaster
         currentDNSServer=$dnsServer
-        currentNFSServer=$nfsServer 
+        currentNFSServer=$ipaServerReplica
     elif [ "$serverEnv" = "combined_ipa_dns_standalone_nfs" ];then
         currentIPAServer=$ipaServerMaster
         currentDNSServer=$ipaServerMaster
@@ -553,6 +555,7 @@ setup_nfs()
         #service nfs restart
     elif [ "$nfsConfiguration" = "nfs_v4_kerberized" ];then
         echo "NFS v4 + kerberos"
+        currentNFSServer=$ipaServerReplica
         configuration="$nfsConfiguration_Kerberized"
         currentNFSMountOption="$nfsMountType_kerberized"
         automountKey_mount_option="$automountKey_krb5_options"
