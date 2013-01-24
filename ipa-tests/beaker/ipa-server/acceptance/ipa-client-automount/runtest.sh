@@ -103,6 +103,7 @@ rlJournalStart
             MYHOSTNAME="$ipaServerReplica"
             rlLog "MYHOSTNAME=[$MYHOSTNAME]"
             rlPass "Replica setup [$REPLICA], no action necessary"
+            configurate_kerberized_nfs_server #next step #to make nfs kerberized, we need configurate non secure nfs first
             rhts-sync-set -s 'replica done'
             rlLog "replica setup done"
         rlPhaseEnd 

@@ -584,15 +584,20 @@ configurate_kerberized_nfs_server()
         echo "$nfsConfiguration_Kerberized" > $nfsConfigFile
         echo "============ After config $nfsConfigFile =========="
         cat $nfsConfigFile
+        echo "=========== Prepare for NFS directories ==========="
+        mkdir -p $nfsDir
+        echo "$currentNFSFileSecret" > $nfsDir/$currentNFSFileName
+        echo "=========== file content of: [$nfsDir/$currentNFSFileName] ============"
+        cat $nfsDir/$currentNFSFileName
         KinitAsAdmin
+        nfsServicePrinciple="nfs/$CURRENT_HOST@${RELM}"
         rlRun "ipa service-add $nfsServicePrinciple" 0 "add nfs service: $nfsServicePrinciple"
         rlRun "ipa-getkeytab -s $MASTER_IPA -p $nfsServicePrinciple -k $keytabFile" 0 "get keytab file from master [$MASTER_IPA], for $nfsServicePrinciple, save it as [$keytabFile]"
         rlRun "kinit -kt $keytabFile" 0 "verify keytab file with kinit -kt $keytabFile"
         echo "======= klist -ket $keytabFile ======"
         klist -ket /etc/krb5.keytab
-        replace_line "$nfsSystemConf" "#SECURE_NFS=yes" "SECURE_NFS=yes"
         modify_sysconfig_nfs
-        rlLog "restart nfs"
+        echo "====== restart nfs ======"
         service nfs restart
         service nfs status
         debuginfo 

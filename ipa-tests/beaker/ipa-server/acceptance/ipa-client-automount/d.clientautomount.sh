@@ -9,7 +9,7 @@ HOSTNAME=`hostname`
 #suffix="dc=yzhang,dc=redhat,dc=com"
 
 hostPrinciple="host/${HOSTNAME}@${RELM}"
-nfsServicePrinciple="nfs/${HOSTNAME}@${RELM}"
+#nfsServicePrinciple="nfs/${HOSTNAME}@${RELM}"
 suffix="$BASEDN"
 
 automountLocationA="Location__A"
@@ -23,7 +23,8 @@ nfsExportSubDir="pub"
 nfsDir="$nfsExportTopDir/$nfsExportSubDir"
 nfsConfiguration_NonSecure="$nfsExportTopDir *(rw,async,fsid=0,no_subtree_check,no_root_squash)"
 nfs_RPCGSS_security_flavors="krb5"
-nfsConfiguration_Kerberized="$nfsExportTopDir gss/${nfs_RPCGSS_security_flavors}(rw,async,subtree_check,fsid=0)"
+#nfsConfiguration_Kerberized="$nfsExportTopDir gss/${nfs_RPCGSS_security_flavors}(rw,async,subtree_check,fsid=0)" # this is old version
+nfsConfiguration_Kerberized="$nfsExportTopDir *(sec=${nfs_RPCGSS_security_flavors},rw,async,subtree_check)"
 nfsMountType_nfs3=" --type nfs "
 nfsMountType_nfs4=" --type nfs4 "
 nfsMountType_kerberized=" --type nfs4 -o sec=${nfs_RPCGSS_security_flavors} "
