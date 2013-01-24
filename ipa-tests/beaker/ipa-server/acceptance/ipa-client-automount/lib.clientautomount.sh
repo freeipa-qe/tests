@@ -462,7 +462,7 @@ replace_line(){
 
 modify_sysconfig_nfs()
 {
-    replace_line $nfsSystemConf "#SECURE_NFS=\"\"" "SECURE_NFS=\"yes\""
+    replace_line $nfsSystemConf "#SECURE_NFS=" "SECURE_NFS=\"yes\""
     replace_line $nfsSystemConf "#RPCGSSDARGS=\"\"" "RPCGSSDARGS=\"-vvv\""
     replace_line $nfsSystemConf "#RPCSVCGSSDARGS=\"\"" "RPCSVCGSSDARGS=\"-vvv\""
     echo "========== content of $nfsSystemConf ==============="
