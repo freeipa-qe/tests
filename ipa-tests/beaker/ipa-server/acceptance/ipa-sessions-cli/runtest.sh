@@ -65,6 +65,8 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
+    rlRun "set > $TmpDir/outfileset.txt" 0 "set"
+    rlRun "env > $TmpDir/outfileenv.txt" 0 "env"
     ipa_sessions_cli
     # r2d2_test_ends
 
