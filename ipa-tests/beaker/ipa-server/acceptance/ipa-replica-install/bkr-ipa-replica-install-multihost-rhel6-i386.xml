@@ -39,7 +39,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-install" role="MASTER">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA SLAVE">
@@ -77,7 +79,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-install" role="SLAVE">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 	</recipeSet>
