@@ -198,7 +198,6 @@ ipaclientinstall_adminpwd()
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW -U "
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U " 0 "Installing ipa client and configuring - passing admin and password"
 		rlLog "sleeping to debug"
-		rlRun "sleep 9999999"
         verify_install true nontpspecified 
     rlPhaseEnd
 }
