@@ -406,8 +406,9 @@ service_del_003() {
 rlPhaseStartTest "service_del_003: re-delete the same or unknown service."
         rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM > $TmpDir/service_del_003.out 2>&1" 2
         #rlAssertGrep "ipa: ERROR: no such entry" "$TmpDir/service_del_003.out"
-	rlAssertGrep "ipa: ERROR: vpn/qe-blade-11.testrelm.com@TESTRELM.COM: service not found" "$TmpDir/service_del_003.out"
         rlRun "cat $TmpDir/service_del_003.out"
+	#rlAssertGrep "ipa: ERROR: vpn/qe-blade-11.testrelm.com@TESTRELM.COM: service not found" "$TmpDir/service_del_003.out"
+	rlAssertGrep "ipa: ERROR: $SERVICE/$HOSTNAME@$RELM: service not found" "$TmpDir/service_del_003.out"
 rlPhaseEnd
 }
 
