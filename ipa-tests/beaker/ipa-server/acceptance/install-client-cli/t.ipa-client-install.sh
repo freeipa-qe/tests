@@ -368,7 +368,7 @@ ipaclientinstall_realm_casesensitive()
        fi
        rlLog "EXECUTING: ipa-client-install --realm=$relminlowercase"
        command="ipa-client-install --realm=$relminlowercase"
-       expmsg="ERROR: The provided realm name: [$relminlowercase] does not match with the discovered one: [$RELM]"
+       expmsg="The provided realm name [$relminlowercase] does not match with the discovered one [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_realm_casesensitive.out
 
 	if [ -f /etc/fedora-release ] ; then
@@ -387,7 +387,7 @@ ipaclientinstall_invalidrealm()
        uninstall_fornexttest
        rlLog "EXECUTING: ipa-client-install --realm=xxx"
        command="ipa-client-install --realm=xxx"
-       expmsg="ERROR: The provided realm name: [xxx] does not match with the discovered one: [$RELM]"
+       expmsg="The provided realm name [xxx] does not match with the discovered one [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_invalidrealm.out
 
 	if [ -f /etc/fedora-release ] ; then

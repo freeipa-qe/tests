@@ -142,7 +142,7 @@ verify_sssd()
 echo "verify_sssd"
     local installcheck="$1"
 
-    if [ "$2" == "nosssd" ] ; then
+    if [ "$2" == "nosssd" -a -f $SSSD ] ; then
        rlLog "Verify sssd.conf - with no sssd"
        testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "id_provider " "$id_provider_nosssd" "$testidprovider" "$1" 
@@ -154,6 +154,9 @@ echo "verify_sssd"
        ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider_nosssd" "$testchpassprovider" "$1" 
        testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
        ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm_nosssd" "$testkrb5realm" "$1" 
+	elif [ "$2" == "nosssd" -a ! -f $SSSD ] ; then
+       rlLog "nosssd verification selected but, no sssd.conf found."
+       rlLog "newer versions of IPA with nosssd move sssd.conf out of the way"
     else
        rlLog "Verify sssd.conf - with sssd"
        if [ "$2" == "force" ] ; then
