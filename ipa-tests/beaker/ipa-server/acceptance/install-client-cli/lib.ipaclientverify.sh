@@ -214,6 +214,9 @@ verify_krb5()
 {
     rlLog "Verify krb5.conf"
 
+	# INSTSRVOPT = 0 when --server is used in ipa-client-install
+	# INSTSRVOPT = 1 when --server is NOT used in ipa-client-install
+	INSTSRVOPT=$(grep "'server': None," /var/log/ipaclient-install.log |wc -l)
 	klist -ekt /etc/krb5.keytab | grep $HOSTNAME
 	if [ $? -ne 0 ] ; then
 		if [ -f /etc/fedora-release ] ; then
@@ -234,7 +237,7 @@ verify_krb5()
     ipacompare_forinstalluninstall "pkinit_anchors " "$pkinit_anchors" "$testpkinitanchors" "$1" 
     #testrenewlifetime=`grep "renew_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
     #ipacompare_forinstalluninstall "renew_lifetime " "$renew_lifetime" "$testrenewlifetime" "$1" 
-    if [ "$2" == "force" ] ; then
+    if [ "$2" == "force" -o $INSTSRVOPT -eq 0 ] ; then
        testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc_force" "$testdnslookupkdc" "$1" 
        testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
