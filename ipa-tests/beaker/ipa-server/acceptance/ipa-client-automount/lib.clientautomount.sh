@@ -592,8 +592,8 @@ configurate_kerberized_nfs_server()
         cat $nfsDir/$currentNFSFileName
         KinitAsAdmin
         nfsServicePrinciple="nfs/$CURRENT_HOST@${RELM}"
-        rlRun "ipa service-add $nfsServicePrinciple" 0 "add nfs service: $nfsServicePrinciple"
-        rlRun "ipa-getkeytab -s $MASTER_IPA -p $nfsServicePrinciple -k $keytabFile" 0 "get keytab file from master [$MASTER_IPA], for $nfsServicePrinciple, save it as [$keytabFile]"
+        rlRun "ipa service-add $nfsServicePrinciple" 0 "add nfs service: $nfsServicePrinciple" 
+        rlRun "ipa-getkeytab -s $REPLICA_IPA -p $nfsServicePrinciple -k $keytabFile" 0 "get keytab file from master [$MASTER_IPA], for $nfsServicePrinciple, save it as [$keytabFile]"
         rlRun "kinit -kt $keytabFile" 0 "verify keytab file with kinit -kt $keytabFile"
         echo "======= klist -ket $keytabFile ======"
         klist -ket /etc/krb5.keytab
