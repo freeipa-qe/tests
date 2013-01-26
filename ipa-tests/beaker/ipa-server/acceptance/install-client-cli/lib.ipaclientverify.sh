@@ -237,13 +237,24 @@ verify_krb5()
     ipacompare_forinstalluninstall "pkinit_anchors " "$pkinit_anchors" "$testpkinitanchors" "$1" 
     #testrenewlifetime=`grep "renew_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
     #ipacompare_forinstalluninstall "renew_lifetime " "$renew_lifetime" "$testrenewlifetime" "$1" 
-    if [ "$2" == "force" -o $INSTSRVOPT -eq 0 ] ; then
+    if [ "$2" == "force" ] ; then
        testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc_force" "$testdnslookupkdc" "$1" 
        testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_realm " "$dns_lookup_realm_force" "$testdnslookuprealm" "$1" 
        testdomain=`grep "$DOMAIN" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall_withmasterslave "domain_realm " "$domain_realm_force_master" "$domain_realm_force_slave" "$testdomain" "$1" 
+    elif [ $INSTSRVOPT -eq 0 ] ; then
+       testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc_force" "$testdnslookupkdc" "$1" 
+       testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
+       ipacompare_forinstalluninstall "dns_lookup_realm " "$dns_lookup_realm_force" "$testdnslookuprealm" "$1" 
+       testdomain=`grep "$DOMAIN = " $KRB5 | cut -d "=" -f2 | xargs echo`
+       if [ "$2" == "nonexistent" ] ; then
+          ipacompare_forinstalluninstall "domain_realm " "$domain_realm_nonexistent" "$testdomain" "$1"
+       else
+          ipacompare_forinstalluninstall "domain_realm " "$domain_realm" "$testdomain" "$1"
+       fi
     else
        testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc" "$testdnslookupkdc" "$1" 
