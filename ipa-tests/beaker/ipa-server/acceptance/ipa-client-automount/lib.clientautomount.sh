@@ -454,7 +454,7 @@ replace_line(){
     cp -f $file_modified $file
     rm $file_modified
     echo "original file backup at [$file_bk]"
-    echo "check new line [$new] in the [$file]"
+    echo "check new line [$newline] in [$file]"
     echo "-----------------------------------------"
     grep "$newline" $file
     echo "-----------------------------------------"

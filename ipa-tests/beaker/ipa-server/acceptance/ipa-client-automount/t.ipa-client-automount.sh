@@ -547,6 +547,7 @@ setup_nfs()
         #service nfs restart
     elif [ "$nfsConfiguration" = "nfs_v4_non_secure" ];then
         echo "NFS v4" 
+        currentNFSServer=$NFS_IPA
         configuration=$nfsConfiguration_NonSecure
         currentNFSMountOption="$nfsMountType_nfs4"
         automountKey_mount_option="$automountKey_non_secure_options"
