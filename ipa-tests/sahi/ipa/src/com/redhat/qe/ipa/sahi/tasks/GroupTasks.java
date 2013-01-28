@@ -178,6 +178,8 @@ public class GroupTasks {
 		browser.textarea("description").setValue(groupDescription); 
 		if (! gid.equals(""))
 			browser.textbox("gidnumber").setValue(gid);
+		if (groupType.equals("normal"))
+			browser.radio("normal").click();
 		if (groupType.equals("external"))
 			browser.radio("external").click();
 		if (groupType.equals("posix"))
