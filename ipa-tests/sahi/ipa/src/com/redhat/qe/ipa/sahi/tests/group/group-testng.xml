@@ -17,7 +17,7 @@
                 <include name="modifyGroup_enrollgroup" />
                 <include name="modifySettings" />
                 <include name="modifyGroup_settings" />
-                <include name="modifyGroup_settings_negative" /> -->
+                <include name="modifyGroup_settings_negative" /> 
                 <include name="modifyGroupType_settings" /> 
                  <include name="netgroup" />
 	           <include name="modifyGroup_netgroup_prepare" />
