@@ -322,3 +322,21 @@ replicaBugCheck_bz895083()
 		fi
 	rlPhaseEnd
 }
+
+replicaBugCheck_bz905064()
+{
+	local testlog=$1
+	rlPhaseStartTest "Bug 905064 - ipa install error Unable to find preop.pin"
+		if [ -z "$testlog" ]; then	
+			rlLog "$0 requires a log file to look for...skipping"
+			return 0
+		fi
+
+		rlAssertNotGrep "Unable to find preop.pin" $testlog
+		if [ $? -gt 0 ]; then
+			rlFail "BZ 905064 found...ipa install error Unable to find preop.pin"
+		else
+			rlPass "BZ 905064 not found"
+		fi
+	rlPhaseEnd
+}

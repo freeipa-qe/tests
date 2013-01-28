@@ -81,6 +81,7 @@ installMaster()
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
         verifyErrorMsg "ipa host-del $MASTER" "ipa: ERROR: invalid 'hostname': An IPA master host cannot be deleted or disabled"
 
+		replicaBugCheck_bz905064 /var/log/ipaserver-install.log
 
         if [ -f /var/log/ipaserver-install.log ]; then
                 rhts-submit-log -l /var/log/ipaserver-install.log
@@ -326,6 +327,7 @@ installSlave()
 			rlAssertGrep "$DNSFORWARD" "/etc/named.conf"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
 			rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 
@@ -397,6 +399,7 @@ installSlave_nf()
 				rlRun "cat /etc/resolv.conf"
 
 				replicaBugCheck_bz830314
+				replicaBugCheck_bz905064 /var/log/ipareplica-install.log
  
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 				rlRun "dig +short $MASTER"
@@ -453,6 +456,7 @@ installSlave_nr()
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
 			# Disabling the following since empty forwarders exist in named.conf
 			# rlAssertNotGrep "forwarders" "/etc/named.conf"
@@ -509,6 +513,7 @@ installSlave_nr1()
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
 			rlLog "Checking that the SLAVEs zone is created locally"
 			rlRun "ipa dnszone-show $SLAVEZONE"
@@ -547,6 +552,7 @@ installSlave_nr2()
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
 			rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757644"
 			rlLog "ipa-replica-install with --no-reverse should not create new reverse zone if it does not already exist"
@@ -591,6 +597,7 @@ installSlave_nr3()
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 			replicaBugCheck_bz894131 $SLAVEZONE
 			replicaBugCheck_bz894143 
 			replicaBugCheck_bz895083
@@ -638,6 +645,7 @@ installSlave_nhostdns()
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
 		# Disabling the following since empty forwarders exist in named.conf
                 # rlAssertNotGrep "forwarders" "/etc/named.conf"
@@ -682,6 +690,7 @@ installSlave_ca()
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
             replicaBugCheck_bz867640
 
 		# Disabling the following since empty forwarders exist in named.conf
@@ -754,6 +763,7 @@ installSlave_sshtrustdns() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
                 rlRun "service ipa status"
 				rlRun "service named restart"
@@ -795,6 +805,7 @@ installSlave_configuresshd() {
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
 			rlRun "service ipa status"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -838,6 +849,7 @@ installSlave_nosshd() {
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
+			replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
 			rlRun "service ipa status"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -884,6 +896,7 @@ installSlave_nodnssshfp() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 				replicaBugCheck_bz830314
+				replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
                 rlRun "service ipa status"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -919,6 +932,7 @@ installSlave_nouiredirect() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 				replicaBugCheck_bz830314
+				replicaBugCheck_bz905064 /var/log/ipareplica-install.log
 
                 rlRun "service ipa status"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
