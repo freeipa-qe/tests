@@ -31,6 +31,20 @@ ipacompare_forinstalluninstall()
     fi
 }
 
+ipacompare_simple()
+{
+	local label="$1"
+	local expected="$2"
+	local actual="$3"
+	
+	if [ "$actual" = "$expected" ]; then
+		rlPass "Value is set correctly for $label"
+	else
+		rlFail "[$label] does NOT match"
+		rlLog "expect [$expected], actual got [$actual]"
+	fi
+}
+
 ipacompare_forinstalluninstall_withmasterslave()
 {
     local label="$1"
@@ -246,9 +260,9 @@ verify_krb5()
        ipacompare_forinstalluninstall_withmasterslave "domain_realm " "$domain_realm_force_master" "$domain_realm_force_slave" "$testdomain" "$1" 
     elif [ $INSTSRVOPT -eq 0 ] ; then
        testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
-       ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc_force" "$testdnslookupkdc" "$1" 
+       ipacompare_simple "dns_lookup_kdc " "$dns_lookup_kdc_force" "$testdnslookupkdc"
        testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
-       ipacompare_forinstalluninstall "dns_lookup_realm " "$dns_lookup_realm_force" "$testdnslookuprealm" "$1" 
+       ipacompare_simple "dns_lookup_realm " "$dns_lookup_realm_force" "$testdnslookuprealm"
        testdomain=`grep "$DOMAIN = " $KRB5 | cut -d "=" -f2 | xargs echo`
        if [ "$2" == "nonexistent" ] ; then
           ipacompare_forinstalluninstall "domain_realm " "$domain_realm_nonexistent" "$testdomain" "$1"
