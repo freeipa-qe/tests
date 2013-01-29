@@ -48,9 +48,10 @@ replicaBugCheck_bz784696()
 		remoteExec root $MASTERIP "ipa user-add test1 --first=First --last=Last"
 		[ $(uname -i) = "i386" ] && rlRun "sleep 4"
 		rlRun "ipa user-show test1"
-		remoteExec root $MASTERIP "ipa user-add test2 --first=First --last=Last2"
+		rlRun "sleep 60"
+		remoteExec root $MASTERIP "ipa user-add newtest2 --first=First2 --last=Last2"
 		[ $(uname -i) = "i386" ] && rlRun "sleep 30"
-		rlRun "ipa user-show test2"
+		rlRun "ipa user-show newtest2"
 		submit_log /var/log/dirsrv/slapd-TESTRELM-COM/errors
 		remoteExec root $MASTERIP "ipa host-add test1.${DOMAIN} --force"
 		[ $(uname -i) = "i386" ] && rlRun "sleep 4"
