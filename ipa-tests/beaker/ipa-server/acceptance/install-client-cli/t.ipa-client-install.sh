@@ -879,20 +879,30 @@ ipaclientinstall_joinreplica()
 ##########################################
 ipaclientinstall_withmasterdown()
 {
-    rlPhaseStartTest "ipa-client-install-37- [Positive] Install with MASTER down, SLAVE up"
+	local ipalog=/var/log/ipaclient-install.log
+    rlPhaseStartTest "ipa-client-install-37- [Positive] Install with MASTER down, SLAVE up [BZ 905626]"
         uninstall_fornexttest
        
         # Stop the MASTER 
         rlRun "ssh -o StrictHostKeyChecking=no  root@$MASTER \"ipactl stop\"" 0 "Stop MASTER IPA server"
-
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended "
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
+		#rlRun "cp /etc/resolv.conf /etc/resolv.conf.withmasterdown"
+		#rlRun "echo 'nameserver $SLAVEIP' > /etc/resolv.conf"
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended " 0 \
+			"Installing ipa client and configuring - with all params"
+		rlAssertNotGrep "Can't contact LDAP server" $ipalog
+		rlAssertNotGrep "Failed to verify that $MASTER is an IPA Server" $ipalog
+		if [ $? -gt 0 ]; then
+			rlFail "BZ 905626 found...ipa-client-install failed to fall over to replica with master down"
+		else
+			rlPass "BZ 905626 not found"
+		fi
+			
+		submit_log /var/log/ipaclient-install.log
 
         # Start the MASTER back
         #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
         rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"ipactl start\"" 0 "Start MASTER IPA server"
-
-		submit_log /var/log/ipaclient-install.log
 
         verify_install true
     rlPhaseEnd
