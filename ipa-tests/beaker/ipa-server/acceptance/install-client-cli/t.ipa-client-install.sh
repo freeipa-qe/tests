@@ -798,22 +798,23 @@ ipaclientinstall_preservesssd()
 #######################################################
 ipaclientinstall_ntpservice()
 {
-   rlPhaseStartTest "ipa-client-install-33- [Positive] Verify ntp service with client install"
+    rlPhaseStartTest "ipa-client-install-33- [Positive] Verify ntp service with client install"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         verify_ntpservice true
-   rlPhaseEnd
+    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-client-install-33-A [Negative] Verify that ntpdate was not called with the -d option"
-	# This test assumes that the date was set back two hourss at the beginning of this test.
+    rlPhaseStartTest "ipa-client-install-33-A [Negative] Verify that ntpdate was not called with the -d option"
+        # This test assumes that the date was set back two hourss at the beginning of this test.
         # the current hour should be stored in $currenthour 
 
-	rlLog "Current hour is $currenthour, Machine time is $(date)"
-	rlRun "date +%H | grep $currenthour" 0 "Make sure the machine time contains the current hour."
-   rlPhaseEnd
+        currenthour=$(date +%H) # Get the current hours to be used in a later test
+	    rlLog "Current hour is $currenthour, Machine time is $(date)"
+	    rlRun "date +%H | grep $currenthour" 0 "Make sure the machine time contains the current hour."
+    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-client-install-34- [Negative] Verify ntp service with client uninstall"
+    rlPhaseStartTest "ipa-client-install-34- [Negative] Verify ntp service with client uninstall"
         uninstall_fornexttest
         verify_ntpservice false 
     rlPhaseEnd
