@@ -49,8 +49,9 @@ replicaBugCheck_bz784696()
 		[ $(uname -i) = "i386" ] && rlRun "sleep 4"
 		rlRun "ipa user-show test1"
 		remoteExec root $MASTERIP "ipa user-add test2 --first=First --last=Last2"
-		[ $(uname -i) = "i386" ] && rlRun "sleep 4"
+		[ $(uname -i) = "i386" ] && rlRun "sleep 30"
 		rlRun "ipa user-show test2"
+		submit_log /var/log/dirsrv/slapd-TESTRELM-COM/errors
 		remoteExec root $MASTERIP "ipa host-add test1.${DOMAIN} --force"
 		[ $(uname -i) = "i386" ] && rlRun "sleep 4"
 		rlRun "ipa host-show test1.${DOMAIN}"
@@ -60,6 +61,8 @@ replicaBugCheck_bz784696()
 		
 		rlLog "Running replica force-sync"
 		rlRun "ipa-replica-manage force-sync --from=$MASTER"
+
+		rlRun "ipa user-show test2"
 
 		rlLog "Quick checks confirming replication after force-sync.  Add on Master, Check on Replica"
 		remoteExec root $MASTERIP "ipa user-add test3 --first=First --last=Last3"
