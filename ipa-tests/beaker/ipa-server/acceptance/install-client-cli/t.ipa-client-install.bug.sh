@@ -46,6 +46,8 @@ ipaclientinstall_bugcheck_845691()
 ipaclientinstall_bugcheck_845691_fulltest()
 {
 	tmpout=/tmp/bz845691.testout
+	SLAVE_S=$(echo $SLAVE|cut -f1 -d.)
+	MASTER_S=$(echo $MASTER|cut -f1 -d.)
 	rlPhaseStartTest "ipaclientinstall_bugcheck_845691_fulltest - ipa-client-install Failed to obtain host TGT"	
 			
 		uninstall_fornexttest

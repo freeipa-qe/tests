@@ -332,9 +332,11 @@ ipaclientinstall_server_unreachableserver()
     rlPhaseStartTest "ipa-client-install-10- [Negative] Install with unreachable server"
        uninstall_fornexttest
        ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
-       #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
+       rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo 'service iptables stop' >> /tmp/at.1.sh\""
+       rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"at -f /tmp/at.1.sh now + 1 minute\""
+       rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"echo 'service iptables stop' >> /tmp/at.1.sh\""
+       rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"at -f /tmp/at.1.sh now + 1 minute\""
        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
-       #rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
        rlLog "EXECUTING: ipa-client-install -U"
        command="ipa-client-install -p $ADMINID -w $ADMINPW -U"
@@ -343,10 +345,8 @@ Installation failed. Rolling back changes.
 IPA client is not configured on this system."
        local tmpout=$TmpDir/ipaclientinstall_server_unreachableserver.out
        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server"
-
-       #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
+       rlRun "sleep 60"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
-       #rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVEIP \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
     rlPhaseEnd
 }
