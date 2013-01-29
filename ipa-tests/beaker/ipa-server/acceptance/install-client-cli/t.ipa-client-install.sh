@@ -892,6 +892,8 @@ ipaclientinstall_withmasterdown()
         #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
         rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"ipactl start\"" 0 "Start MASTER IPA server"
 
+		submit_log /var/log/ipaclient-install.log
+
         verify_install true
     rlPhaseEnd
 }

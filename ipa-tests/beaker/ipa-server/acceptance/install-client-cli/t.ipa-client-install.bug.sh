@@ -49,6 +49,7 @@ ipaclientinstall_bugcheck_845691_fulltest()
 	rlPhaseStartTest "ipaclientinstall_bugcheck_845691_fulltest - ipa-client-install Failed to obtain host TGT"	
 			
 		uninstall_fornexttest
+		rlRun "ssh $MASTER \"echo $ADMINPW|kinit admin\""
 		for REC in '_kerberos-master._tcp:88' '_kerberos-master._udp:88' '_kerberos._tcp:88' '_kerberos._udp:88' '_kpasswd._tcp:464' '_kpasswd._udp:464'; do
 			REC_NAME=$(echo $REC|cut -f1 -d:)
 			REC_PORT=$(echo $REC|cut -f2 -d:)
@@ -126,6 +127,7 @@ ipaclientinstall_dirty_keytab()
         # Now uninstall
         uninstall_fornexttest
         verify_install false 
+	rlLog "$command"
 	rlRun "$command" 0 "Uninstalling ipa client - after a force install"
 	rm -f $ktab
 	if [ ! -f $ktab ]; then

@@ -264,11 +264,7 @@ verify_krb5()
        testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_simple "dns_lookup_realm " "$dns_lookup_realm_force" "$testdnslookuprealm"
        testdomain=`grep "$DOMAIN = " $KRB5 | cut -d "=" -f2 | xargs echo`
-       if [ "$2" == "nonexistent" ] ; then
-          ipacompare_forinstalluninstall "domain_realm " "$domain_realm_nonexistent" "$testdomain" "$1"
-       else
-          ipacompare_forinstalluninstall "domain_realm " "$domain_realm" "$testdomain" "$1"
-       fi
+       ipacompare_simple "domain_realm " "$domain_realm" "$testdomain"
     else
        testdnslookupkdc=`grep "dns_lookup_kdc" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_forinstalluninstall "dns_lookup_kdc " "$dns_lookup_kdc" "$testdnslookupkdc" "$1" 
