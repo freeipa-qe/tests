@@ -85,7 +85,8 @@ uninstall_fornexttest()
 			fi
 		fi
 	# Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
-	if [ -f $SSSD ];then
+	PRESERVESSSDCHK=$(grep "'preserve_sssd': True," /var/log/ipaclient-install.log|wc -l)
+	if [ -f $SSSD -a $PRESERVESSSDCHK -eq 0 ];then
 		rlRun "grep $RELM $SSSD" 1 "Making sure that $SSSD does not contain the IPA relm. BZ 819982"
 		rlRun "grep $DOMAIN $SSSD" 1 "Making sure that $SSSD does not contain the IPA DOMAIN. BZ 819982"
 
@@ -93,8 +94,10 @@ uninstall_fornexttest()
 		if [ $? -eq 0 ];then
 			rlLog "BZ 819982 does not exists. This is preserve sssd scenario"
 		fi
-	else 
+	elif [ ! -f $SSSD ]; then 
 		rlLog "sssd.conf for testing BZ 819982 does not exists"
+	else
+		rlLog "preserve-sssd option used....skipping check"
 	fi
 
 	if [ -f $SSSD ] ; then
