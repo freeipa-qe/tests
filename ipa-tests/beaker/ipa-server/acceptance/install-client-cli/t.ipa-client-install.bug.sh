@@ -111,35 +111,23 @@ ipaclientinstall_bugcheck_845691_fulltest()
 ###############################################################################################
 ipaclientinstall_dirty_keytab()
 {
+	local tmpout=/tmp/ipaclientinstall_dirty_keytab.out
     rlPhaseStartTest "ipa_client_install-39 - Install with a dirty keytab"
         rlLog "Test for BZ 817869, install ipa-client with a dirty keytab"
         uninstall_fornexttest
-        #rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
-        #rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --ntp-server=$NTPSERVER -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
-        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER"
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
-        verify_install true
         # Backup keytab 
         bkup="/dev/shm/ipa-client-backup-keytab"
         ktab="/etc/krb5.keytab"
-        rm -f $bkup
+		rlRun "scp $MASTER:/etc/krb5.keytab /etc/krb5.keytab"
         cp -a $ktab $bkup
-        # Now uninstall
-        uninstall_fornexttest
-        verify_install false 
 
-        rlLog "$command"
-        rlRun "$command" 0 "Uninstalling ipa client - after a force install"
-        rm -f $ktab
-        if [ ! -f $ktab ]; then
-            cp -a $kbup $ktab
-        fi
+        rlRun "klist -kt /etc/krb5.keytab|grep 'host/$MASTER'"
 
-        klist -kt /etc/krb5.keytab
-        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 "Installing ipa client and configuring - with all params"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER" 0 \
+            "Installing ipa client and configuring - with all params"
         verify_install true
 
-        klist -kt /etc/krb5.keytab
+        rlRun "klist -kt /etc/krb5.keytab|grep 'host/$(hostname)' > $tmpout 2>&1"
         diff $bkup $ktab
         if [ $? -eq 0 ]; then 
             rlFail "FAIL - $bkup and $ktab match when they should not."
