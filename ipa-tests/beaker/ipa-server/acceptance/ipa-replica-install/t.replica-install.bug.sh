@@ -63,7 +63,7 @@ replicaBugCheck_bz784696()
 		rlLog "Running replica force-sync"
 		rlRun "ipa-replica-manage force-sync --from=$MASTER"
 
-		rlRun "ipa user-show test2"
+		rlRun "ipa user-show newtest2"
 
 		rlLog "Quick checks confirming replication after force-sync.  Add on Master, Check on Replica"
 		remoteExec root $MASTERIP "ipa user-add test3 --first=First --last=Last3"
