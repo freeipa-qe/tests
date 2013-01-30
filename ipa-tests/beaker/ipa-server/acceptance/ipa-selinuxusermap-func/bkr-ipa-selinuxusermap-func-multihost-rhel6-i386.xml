@@ -10,7 +10,7 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/i386"/>
-				<repo name="pki" url="http://10.65.201.171/pki/i386"/>
+				<repo name="pki" url="http://10.65.201.171/pki/9.0.3-30/i386/"/>
 				<repo name="r64" url="http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/i386/os"/>
 			</repos>
 			<distroRequires>
@@ -53,7 +53,7 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/i386"/>
-				<repo name="pki" url="http://10.65.201.171/pki/i386"/>
+				<repo name="pki" url="http://10.65.201.171/pki/9.0.3-30/i386/"/>
 				<repo name="r64" url="http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/i386/os"/>
 			</repos>
 			<distroRequires>
@@ -96,7 +96,7 @@
 			<ks_appends/>
 			<repos>
 				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/i386"/>
-				<repo name="pki" url="http://10.65.201.171/pki/i386"/>
+				<repo name="pki" url="http://10.65.201.171/pki/9.0.3-30/i386/"/>
 				<repo name="r64" url="http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/i386/os"/>
 			</repos>
 			<distroRequires>
