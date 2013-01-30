@@ -61,6 +61,7 @@ delegation_bz()
 	delegation_bz_783554
 	delegation_bz_782974
 	delegation_bz_784468
+	delegation_bz_888524
 }
 
 ######################################################################
