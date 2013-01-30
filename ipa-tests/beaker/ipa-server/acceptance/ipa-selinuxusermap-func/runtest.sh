@@ -190,7 +190,6 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_007_2 $BEAKERMASTER"
                 selinuxusermapsvc_client_007_2
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_007_2 -m $BEAKERCLIENT"
-        rlPhaseEnd
 
 	# selinuxusermapsvc_client_008
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_008 $BEAKERMASTER"
@@ -200,19 +199,16 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_008_2 $BEAKERMASTER"
                 selinuxusermapsvc_client_008_2
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_008_2 -m $BEAKERCLIENT"
-        rlPhaseEnd
 
 	# selinuxusermapsvc_client_009
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_009 $BEAKERMASTER"
                 selinuxusermapsvc_client_009
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_009 -m $BEAKERCLIENT"
-        rlPhaseEnd
 
         # selinuxusermapsvc_client_010
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_010 $BEAKERMASTER"
                 selinuxusermapsvc_client_010
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client_010 -m $BEAKERCLIENT"
-        rlPhaseEnd
 
         rlPhaseStartCleanup "ipa-selinuxusermap-func-cleanup: Destroying admin credentials."
                 rlRun "kdestroy" 0 "Destroying admin credentials."
@@ -307,7 +303,6 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_005_4 $BEAKERMASTER"
                 selinuxusermapsvc_client2_005_4
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_005_4 -m $BEAKERCLIENT2"
-	rlPhaseEnd
 
 	 # selinuxusermapsvc_client2_006
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_006 $BEAKERMASTER"
@@ -317,7 +312,6 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_006_2 $BEAKERMASTER"
                 selinuxusermapsvc_client2_006_2
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_006_2 -m $BEAKERCLIENT2"
-	rlPhaseEnd
 	
 	# selinuxusermapsvc_client2_007
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_007 $BEAKERMASTER"
@@ -327,7 +321,6 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_007_2 $BEAKERMASTER"
                 selinuxusermapsvc_client2_007_2
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_007_2 -m $BEAKERCLIENT2"
-        rlPhaseEnd
 
 	# selinuxusermapsvc_client2_008
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_008 $BEAKERMASTER"
@@ -337,19 +330,16 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_008_2 $BEAKERMASTER"
                 selinuxusermapsvc_client2_008_2
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_008_2 -m $BEAKERCLIENT2"
-        rlPhaseEnd
 
 	# selinuxusermapsvc_client2_009
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_009 $BEAKERMASTER"
                 selinuxusermapsvc_client2_009
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_009 -m $BEAKERCLIENT2"
-        rlPhaseEnd
 
         # selinuxusermapsvc_client2_010
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_master_010 -s DONE_selinuxusermapsvc_client_010 $BEAKERCLIENT $BEAKERMASTER"
                 selinuxusermapsvc_client2_010
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_client2_010 -m $BEAKERCLIENT2"
-        rlPhaseEnd
 
         rlPhaseStartCleanup "ipa-selinuxusermap-func-cleanup: Destroying admin credentials."
                 rlRun "kdestroy" 0 "Destroying admin credentials."
@@ -379,6 +369,8 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-selinuxusermapsvc-func: Setup of users"
 
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "yum install -y vsftpd"
+		rlRun "service vsftpd start" 0 "Start ftp service"
 		rlRun "authconfig --enablemkhomedir --updateall"
 		rlRun "service sssd restart"
         	rlRun "cat /dev/shm/env.sh"
@@ -479,7 +471,6 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_005_4 -s DONE_selinuxusermapsvc_client2_005_4 $BEAKERCLIENT $BEAKERCLIENT2"
 
                 selinuxusermapsvc_master_005_cleanup
-	rlPhaseEnd
 
 	# selinuxusermapsvc_master_006
                 selinuxusermapsvc_master_006
@@ -490,7 +481,6 @@ rlJournalStart
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_master_006_2 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_006_2 -s DONE_selinuxusermapsvc_client2_006_2 $BEAKERCLIENT $BEAKERCLIENT2"
 		selinuxusermapsvc_master_006_cleanup
-        rlPhaseEnd
 
 	# selinuxusermapsvc_master_007
                 selinuxusermapsvc_master_007
@@ -501,8 +491,6 @@ rlJournalStart
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_master_007_2 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_007_2 -s DONE_selinuxusermapsvc_client2_007_2 $BEAKERCLIENT $BEAKERCLIENT2"
                 selinuxusermapsvc_master_007_cleanup
-        rlPhaseEnd
-
 
 	# selinuxusermapsvc_master_008
                 selinuxusermapsvc_master_008
@@ -513,7 +501,6 @@ rlJournalStart
                 rlRun "rhts-sync-set -s DONE_selinuxusermapsvc_master_008_2 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_008_2 -s DONE_selinuxusermapsvc_client2_008_2 $BEAKERCLIENT $BEAKERCLIENT2"
                 selinuxusermapsvc_master_008_cleanup
-        rlPhaseEnd
 	
       # selinuxusermapsvc_master_009
                 selinuxusermapsvc_master_009
@@ -521,7 +508,6 @@ rlJournalStart
                 rlRun "rhts-sync-block -s DONE_selinuxusermapsvc_client_009 -s DONE_selinuxusermapsvc_client2_009 $BEAKERCLIENT $BEAKERCLIENT2"
 
                 selinuxusermapsvc_master_009_cleanup
-        rlPhaseEnd
 
       # selinuxusermapsvc_master_010
                 selinuxusermapsvc_master_010
