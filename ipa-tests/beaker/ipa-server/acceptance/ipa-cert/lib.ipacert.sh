@@ -5,6 +5,7 @@
 # test data used in ipa cert test
 hostname=`hostname | xargs echo`
 certList=$TmpDir/certlist.$RANDOM.txt
+reqList=$TmpDir/reqlist.$RANDOM.txt
 
 LKinitAsAdmin()
 {
@@ -36,12 +37,15 @@ create_cert()
         return 1
     fi
     # step 4: process cert request
+    rlRun "cat /dev/null > /var/log/pki-ca/debug" 0 "pki-ca debug log cleared again"
     ipa cert-request --principal=$principal $certRequestFile >$tmpout
     local ret=$?
     if [ "$ret" = "0" ];then
+        local reqid=`grep reqId /var/log/pki-ca/debug | cut -d"=" -f2 | xargs echo`
         local certid=`grep "Serial number" $tmpout | grep -v "hex" | cut -d":" -f2 | xargs echo` 
         echo "$principal=$certid" >> $certList
-        rlPass "create cert success, cert id :[$certid], principal [$principal]"
+        echo "$reqid" >> $reqList
+        rlPass "create cert success, req id :[$reqid], cert id :[$certid], principal [$principal]"
     else
         rlFail "create cert failed, principal [$principal]"
     fi
@@ -125,6 +129,7 @@ delete_cert()
 {
     rlRun "KinitAsAdmin" 0 "kinit as admin"
     cat $certList
+    cat $reqList
     for cert in `cat $certList`
     do
         echo "line:[$cert]"
@@ -136,6 +141,7 @@ delete_cert()
         fi
     done
     echo "" > $certList #clear up the cert list file
+    echo "" > $reqList #clear up the cert list file
     rlRun "Kcleanup" 0 "clear kerberos tkts"
 } #delete_cert
 

@@ -987,7 +987,7 @@ cert_revoke_1004()
 cert_revoke_1005()
 { #test_scenario (positive): without revocation-reason provided
     rlPhaseStartTest "cert_revoke_1005"
-        loca ltestID="cert_revoke_1005"
+        local testID="cert_revoke_1005"
         local tmpout=$TmpDir/certrevoke1005.$RANDOM.out
           create_cert
             local validCert=`tail -n1 $certList`
@@ -1339,27 +1339,27 @@ cert_status_1001()
         local testID="cert_status_1001"
         local tmpout=$TmpDir/cert_status_1001.$RANDOM.out
         KinitAsAdmin
-        for cert in `cat $certList`
+        for reqid in `cat $reqList`
         do
-            echo $cert
-            local word=service
-            echo "$cert" | grep -q "$word"
-            if [ $? -eq 0 ];then
-             local cert_principal=`echo $cert | cut -d"=" -f1`
-             local certid=`echo $cert | cut -d"=" -f2`
-             ipa cert-status $certid 2>&1 >$tmpout
-             if     grep -i "Request id: $certid" $tmpout \
+            echo $reqid
+            #local word=service
+            #echo "$cert" | grep -q "$word"
+            #if [ $? -eq 0 ];then
+             #local cert_principal=`echo $cert | cut -d"=" -f1`
+             #local certid=`echo $cert | cut -d"=" -f2`
+             ipa cert-status $reqid 2>&1 >$tmpout
+             if     grep -i "Request id: $reqid" $tmpout \
                 && grep -i "Request status: complete" $tmpout ;then
-                rlPass "status check pass for cert id [$certid]"
+                rlPass "status check pass for req id [$reqid]"
              else
-                rlFail "status check failed for cert id [$certid]"
+                rlFail "status check failed for req id [$reqid]"
                 echo "=========== output ================"
                 cat $tmpout
                 echo "==================================="
              fi
-            else
-               rlLog "hexadecimal number cannot be used for ipa cert-status"
-            fi
+            #else
+            #   rlLog "hexadecimal number cannot be used for ipa cert-status"
+           #fi
         done
         Kcleanup
         rm $tmpout
