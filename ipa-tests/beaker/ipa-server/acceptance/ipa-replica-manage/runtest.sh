@@ -78,6 +78,16 @@ echo "export SLAVE1_IP=$SLAVE1_IP" >> /dev/shm/env.sh
 echo "export SLAVE2=$SLAVE2" >> /dev/shm/env.sh
 echo "export SLAVE2_IP=$SLAVE2_IP" >> /dev/shm/env.sh
 
+echo "export BEAKERSLAVE1=${BEAKERSLAVE1_env1}" >> /dev/shm/env.sh
+echo "export BEAKERSLAVE2=${BEAKERSLAVE2_env1}" >> /dev/shm/env.sh
+
+if [ -z "$MYENV" ]; then
+	MYENV=1
+fi
+
+BEAKERSLAVE1=$(eval echo \$BEAKERSLAVE1_env${MYENV})
+BEAKERSLAVE2=$(eval echo \$BEAKERSLAVE2_env${MYENV})
+
 TESTORDER=0
 
 ##########################################
