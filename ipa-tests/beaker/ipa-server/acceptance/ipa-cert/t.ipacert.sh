@@ -1390,7 +1390,7 @@ cert_status_1002()
         done
 
         # scenario: give integer, but there are no such cert in ipa
-        for certid in 999 1999
+        for certid in 4999 51999
         do
             local errmsg="Request ID $certid was not found in the request queue"
             ipa cert-status $certid 2>$tmpout

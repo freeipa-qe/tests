@@ -37,14 +37,21 @@ create_cert()
         return 1
     fi
     # step 4: process cert request
-    rlRun "cat /dev/null > /var/log/pki-ca/debug" 0 "pki-ca debug log cleared again"
+    if [ -e /var/log/pki-ca/debug ];then
+     rlRun "cat /dev/null > /var/log/pki-ca/debug" 0 "pki-ca debug log cleared again"
+    fi
     ipa cert-request --principal=$principal $certRequestFile >$tmpout
     local ret=$?
     if [ "$ret" = "0" ];then
-        local reqid=`grep reqId /var/log/pki-ca/debug | cut -d"=" -f2 | xargs echo`
         local certid=`grep "Serial number" $tmpout | grep -v "hex" | cut -d":" -f2 | xargs echo` 
         echo "$principal=$certid" >> $certList
+       if [ -e /var/log/pki-ca/debug ];then
+        local reqid=`grep reqId /var/log/pki-ca/debug | cut -d"=" -f2 | xargs echo`
         echo "$reqid" >> $reqList
+       else 
+        reqid=$certid
+        echo "$reqid" >> $reqList
+       fi
         rlPass "create cert success, req id :[$reqid], cert id :[$certid], principal [$principal]"
     else
         rlFail "create cert failed, principal [$principal]"
