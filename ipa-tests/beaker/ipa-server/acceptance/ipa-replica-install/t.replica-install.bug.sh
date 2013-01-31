@@ -81,7 +81,7 @@ replicaBugCheck_bz784696()
 
 		rlLog "Cleanup test entries"
 		rlRun "ipa user-del test1"
-		rlRun "ipa user-del test2"
+		rlRun "ipa user-del newtest2"
 		rlRun "ipa user-del test3"
 		rlRun "ipa user-del test4"
 		rlRun "ipa host-del test1.${DOMAIN}"
