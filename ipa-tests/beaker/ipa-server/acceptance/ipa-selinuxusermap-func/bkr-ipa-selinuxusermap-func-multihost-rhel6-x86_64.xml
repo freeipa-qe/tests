@@ -8,16 +8,12 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos>
-				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
-				<repo name="pki" url="http://10.65.201.171/pki/9.0.3-30/x86_64/"/>
-				<repo name="r64" url="http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/x86_64/os"/>
-			</repos>
+			<repos/>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20130109.1"/>
+					<distro_name op="=" value="RHEL6.4-20130123.0"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -51,16 +47,12 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos>
-				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
-				<repo name="pki" url="http://10.65.201.171/pki/9.0.3-30/x86_64/"/>
-				<repo name="r64" url="http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/x86_64/os"/>
-			</repos>
+			<repos/>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20130109.1"/>
+					<distro_name op="=" value="RHEL6.4-20130123.0"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -94,16 +86,12 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos>
-				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
-				<repo name="pki" url="http://10.65.201.171/pki/9.0.3-30/x86_64/"/>
-				<repo name="r64" url="http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/x86_64/os"/>
-			</repos>
+			<repos/>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20130109.1"/>
+					<distro_name op="=" value="RHEL6.4-20130123.0"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
