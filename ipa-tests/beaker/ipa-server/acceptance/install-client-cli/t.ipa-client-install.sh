@@ -331,6 +331,8 @@ ipaclientinstall_server_unreachableserver()
 {
     rlPhaseStartTest "ipa-client-install-10- [Negative] Install with unreachable server"
        uninstall_fornexttest
+       rlRun "cat /etc/resolv.conf"
+       rlLog "M=$MASTERIP ; S=$SLAVEIP"
        ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo 'service iptables stop' >> /tmp/at.1.sh\""
        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"at -f /tmp/at.1.sh now + 1 minute\""
@@ -340,11 +342,19 @@ ipaclientinstall_server_unreachableserver()
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
        rlLog "EXECUTING: ipa-client-install -U"
        command="ipa-client-install -p $ADMINID -w $ADMINPW -U"
-       expmsg="Unable to discover domain, not provided on command line
-Installation failed. Rolling back changes.
-IPA client is not configured on this system."
+       expmsg1="Unable to discover domain, not provided on command line"
+       expmsg2="Failed to verify that.*redhat.com is an IPA Server"
        local tmpout=$TmpDir/ipaclientinstall_server_unreachableserver.out
-       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with unreachable server"
+       rlRun "$command > $tmpout 2>&1" 1
+       rlRun "cat $tmpout"
+       rlLog "Verify expected error message for IPA Install with unreachable server"
+       if [ $(grep "$expmsg1" $tmpout|wc -l) -gt 0 ]; then
+           rlPass "Expected error seen:  $expmsg1"
+       elif [ $(grep "$expmsg2" $tmpout|wc -l) -gt 0 ]; then
+           rlPass "Alternate expected error seen due to environment: $expmsg2"	
+       else
+           rlFail "Unexpected output seen"
+       fi
        rlRun "sleep 60"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
@@ -893,6 +903,7 @@ ipaclientinstall_withmasterdown()
 			"Installing ipa client and configuring - with all params"
 		rlAssertNotGrep "Can't contact LDAP server" $ipalog
 		rlAssertNotGrep "Failed to verify that $MASTER is an IPA Server" $ipalog
+		rlAssertNotGrep "Installation failed." $ipalog
 		if [ $? -gt 0 ]; then
 			rlFail "BZ 905626 found...ipa-client-install failed to fall over to replica with master down"
 		else
