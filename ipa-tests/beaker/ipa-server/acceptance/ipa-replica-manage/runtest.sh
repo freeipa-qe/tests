@@ -78,15 +78,15 @@ echo "export SLAVE1_IP=$SLAVE1_IP" >> /dev/shm/env.sh
 echo "export SLAVE2=$SLAVE2" >> /dev/shm/env.sh
 echo "export SLAVE2_IP=$SLAVE2_IP" >> /dev/shm/env.sh
 
-echo "export BEAKERSLAVE1=${BEAKERSLAVE1_env1}" >> /dev/shm/env.sh
-echo "export BEAKERSLAVE2=${BEAKERSLAVE2_env1}" >> /dev/shm/env.sh
+echo "export BEAKERSLAVE1=${BEAKERREPLICA1_env1}" >> /dev/shm/env.sh
+echo "export BEAKERSLAVE2=${BEAKERREPLICA2_env1}" >> /dev/shm/env.sh
 
 if [ -z "$MYENV" ]; then
 	MYENV=1
 fi
 
-BEAKERSLAVE1=$(eval echo \$BEAKERSLAVE1_env${MYENV})
-BEAKERSLAVE2=$(eval echo \$BEAKERSLAVE2_env${MYENV})
+BEAKERSLAVE1=$(eval echo \$BEAKERREPLICA1_env${MYENV})
+BEAKERSLAVE2=$(eval echo \$BEAKERREPLICA2_env${MYENV})
 
 TESTORDER=0
 
@@ -97,6 +97,7 @@ TESTORDER=0
 rlJournalStart
     rlPhaseStartSetup "ipa-replica-manage startup: Check for ipa-server package"
         rlAssertRpm $PACKAGE
+		rlRun "env|sort"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
     rlPhaseEnd
