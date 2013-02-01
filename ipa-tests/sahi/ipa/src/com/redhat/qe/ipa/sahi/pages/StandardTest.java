@@ -3,12 +3,12 @@ package com.redhat.qe.ipa.sahi.pages;
 public interface StandardTest {
 	
 	// whenever the test case name changes, the following string array should change accordingly 
-	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel", "addSpecial", "addLong", "addNegativeDuplicate", "addNegativeRequiredFields","addNegative"};
-	public static final String[] standardModTestCases = {"modify", "modifyNegative","modifyUpdateResetCancel"};
+	public static final String[] standardAddTestCases = {"addSingle", "addAndAddAnother", "addThenEdit", "addThenCancel","addNegativeDuplicate", "addNegativeRequiredFields"};//"addNegative" is cancelled for now since in globalization ,most of pages don't have "addNegative" test data
+	//public static final String[] standardModTestCases = {"modify", "modifyNegative","modifyUpdateResetCancel"};// we don't have the related test data in globalization.
 	public static final String[] standardSearchTestCases = {"searchPositive", "searchNegative"};
 	public static final String[] standardDelTestCases = {"deleteSingle", "deleteMultiple"};
-	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "deleteNonStandard"};
-	public static final String[] AutomemberTestCases = {"modifyConditionInclusiveAddSingle","modifyConditionInclusiveAddAndAddAnother","modifyConditionInclusiveAddThenCancel","modifyConditionInclusiveDeleteSingle","modifyConditionInclusiveDeleteMultiple","modifyConditionExclusiveAddSingle","modifyConditionExclusiveAddAndAddAnother","modifyConditionExclusiveAddThenCancel","modifyConditionExclusiveDeleteSingle","modifyConditionExclusiveDeleteMultiple","setDefaultGroup"};//xdong
+	public static final String[] EditUserDelegationTestCases = {"addUserGroup", "delegationNotAdded", "addUserDelegation", "addSpecial", "addLong","addNegative","modify", "modifyNegative","modifyUpdateResetCancel","deleteNonStandard"};
+	public static final String[] AutomemberTestCases = {"modify","modifyUpdateResetCancel","modifyConditionInclusiveAddSingle","modifyConditionInclusiveAddAndAddAnother","modifyConditionInclusiveAddThenCancel","modifyConditionInclusiveDeleteSingle","modifyConditionInclusiveDeleteMultiple","modifyConditionExclusiveAddSingle","modifyConditionExclusiveAddAndAddAnother","modifyConditionExclusiveAddThenCancel","modifyConditionExclusiveDeleteSingle","modifyConditionExclusiveDeleteMultiple","setDefaultGroup"};//xdong
 	
 	public IPAWebTestMonitor addSingle(IPAWebTestMonitor monitor);
 	public IPAWebTestMonitor addSpecial(IPAWebTestMonitor monitor);
