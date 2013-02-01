@@ -355,7 +355,7 @@ ipaclientinstall_server_unreachableserver()
        else
            rlFail "Unexpected output seen"
        fi
-       rlRun "sleep 60"
+       rlRun "sleep 100"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
     rlPhaseEnd
