@@ -87,7 +87,7 @@ public class IPAWebPage implements StandardTest{
 	protected void registerStandardTestCases()
 	{
 		this.registerTestCases("add", standardAddTestCases);
-		this.registerTestCases("modify", standardModTestCases);
+		//this.registerTestCases("modify", standardModTestCases);
 		this.registerTestCases("search", standardSearchTestCases);
 		this.registerTestCases("delete", standardDelTestCases);
 	}
@@ -123,12 +123,14 @@ public class IPAWebPage implements StandardTest{
 			return monitor;
 		try {
 			addSingleNewEntry(monitor, pageName);
+			commonTasks.search(browser,testAccounts.get(0) );
 			if(browser.link(testAccounts.get(0)).exists()){
 				monitor.pass("Added and Verified Successfully");
 			}
 			else{
 				monitor.fail("Add Failed");
 			}
+			commonTasks.clearSearch(browser);
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -144,13 +146,14 @@ public class IPAWebPage implements StandardTest{
 			return monitor;
 		try {
 			addSingleNewEntry(monitor, pageName);
+			commonTasks.search(browser,testAccounts.get(0) );
 			if(browser.link(testAccounts.get(0)).exists()){
 				monitor.pass("Added and Verified Successfully");
 			}
 			else{
 				monitor.fail("Add Failed");
 			}
-
+			commonTasks.clearSearch(browser);
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -166,12 +169,14 @@ public class IPAWebPage implements StandardTest{
 			return monitor;
 		try {
 			addSingleNewEntry(monitor, pageName);
+			commonTasks.search(browser,testAccounts.get(0) );
 			if(browser.link(testAccounts.get(0)).exists()){
 				monitor.pass("Added and Verified Successfully");
 			}
 			else{
 				monitor.fail("Add Failed");
 			}
+			commonTasks.clearSearch(browser);
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
 			monitor.fail(e);
@@ -189,12 +194,14 @@ public class IPAWebPage implements StandardTest{
 		try {
 			addMultipleNewEntries(monitor, pageName, numOfEntries);
 			for(int i=0;i<numOfEntries;i++){
+				commonTasks.search(browser,testAccounts.get(i) );
 				if(browser.link(testAccounts.get(i)).exists()){
 					monitor.pass("Added and Verified Successfully");
 				}
 				else{
 					monitor.fail("Add Failed");
 				}
+				commonTasks.clearSearch(browser);
 			}	
 
 		} catch (IPAWebAutomationException e) { 
@@ -230,12 +237,14 @@ public class IPAWebPage implements StandardTest{
 			return monitor;
 		try {
 			addNewEntryThenCancelOperation(monitor, pageName);
+			commonTasks.search(browser,testAccounts.get(0) );
 			if(browser.link(testAccounts.get(0)).exists()){
 				monitor.fail("Add and Cancel Failed");
 			}
 			else{
 				monitor.pass("Add and Cancel Passed");
 			}
+			commonTasks.clearSearch(browser);
 		} catch (IPAWebAutomationException e) {
 			e.printStackTrace();
 			monitor.fail(e);
@@ -619,6 +628,7 @@ public class IPAWebPage implements StandardTest{
 			else{
 				monitor.pass("Delete Passed");
 			}
+			//commonTasks.clearSearch(browser);
 
 		} catch (IPAWebAutomationException e) { 
 			e.printStackTrace();
@@ -638,12 +648,14 @@ public class IPAWebPage implements StandardTest{
 		try {
 			deleteMultipleEntry(monitor, pageName, numOfEntries);
 			for(int i=0;i<numOfEntries;i++){
+				commonTasks.search(browser,testAccounts.get(i) );
 				if(browser.link(testAccounts.get(i)).exists()){
 					monitor.fail("Delete Failed");
 				}
 				else{
 					monitor.pass("Delete Passed");
 				}
+				commonTasks.clearSearch(browser);
 			}
 
 		} catch (IPAWebAutomationException e) { 
@@ -996,6 +1008,8 @@ public class IPAWebPage implements StandardTest{
 			browser.span("Add").click();
 			fillDataIntoPage(monitor,pageName);
 			browser.button("Add").click();
+			if(browser.button("OK").exists())//for new prompt "The host was added but the DNS update failed with: DNS reverse zone for IP address xxx not found  "in addhost
+				browser.button("OK").click();
 	}
 	
 	protected void assignUserToGroup(IPAWebTestMonitor monitor, String pageName) throws IPAWebAutomationException
@@ -1080,6 +1094,8 @@ public class IPAWebPage implements StandardTest{
 		{ 
 			fillDataIntoPage(monitor,pageName);
 			browser.button("Add and Add Another").click();
+			if(browser.button("OK").exists())//for new prompt "The host was added but the DNS update failed with: DNS reverse zone for IP address xxx not found  "in addhost
+				browser.button("OK").click();
 		}
 		browser.button("Cancel").click();
 	}
@@ -1092,16 +1108,23 @@ public class IPAWebPage implements StandardTest{
 	
 	protected void deleteSingleEntry(IPAWebTestMonitor monitor,String pageName) throws IPAWebAutomationException
 	{
+		//commonTasks.search(browser,testAccounts.get(0));//for privilege and permission which has more than one page of entries that need to search out before deleting 
 		fillDataIntoPage(monitor,pageName);
 		browser.span("Delete").click(); 
+		if(browser.checkbox("updatedns").exists())//for clear entries from DNS ,otherwise there will be a error prompt says"ipa addr. xxx is already assigned" in adding host with a already used ip addr. in last run.
+			browser.checkbox("updatedns").click();
 		browser.button("Delete").click();
+		
 	}
 	
 	protected void deleteMultipleEntry(IPAWebTestMonitor monitor,String pageName, int numOfEntries) throws IPAWebAutomationException
 	{ 
+		//for privilege and permission which has more than one page of entries that need to search out before deleting,how to do that?????
 		for (int i=0;i< numOfEntries;i++)
 			fillDataIntoPage(monitor,pageName);
 		browser.span("Delete").click(); 
+		if(browser.checkbox("updatedns").exists())//for clear entries from DNS ,otherwise there will be a error prompt says"ipa addr. xxx is already assigned" in adding host with a already used ip addr. in last run.
+			browser.checkbox("updatedns").click();
 		browser.button("Delete").click();
 	}
 	
