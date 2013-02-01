@@ -30,19 +30,12 @@ public class PolicyPageAutomemberUserGroupRules extends IPAWebPage {
 	
 		
 		//registerStandardTestCases();
-		registerTestCases("add","addSingle");
-		registerTestCases("add","addAndAddAnother");
-		registerTestCases("add","addThenEdit");
-		registerTestCases("add","addThenCancel");
-		registerTestCases("add","addNegativeDuplicate");
-		registerTestCases("add","addNegativeRequiredFields");
+		registerTestCases("add",standardAddTestCases);
 		registerTestCases("nonStandardAutomember", AutomemberTestCases);
-		registerTestCases("modify","modify");
-		registerTestCases("modify","modifyUpdateResetCancel");
-		registerTestCases("search","searchPositive");
-		registerTestCases("search","searchNegative");
-		registerTestCases("delete","deleteSingle");
-		registerTestCases("delete","deleteMultiple");
+		//registerTestCases("modify",standardModTestCases);
+		registerTestCases("search",standardSearchTestCases);
+		registerTestCases("delete",standardDelTestCases);
+		
 
 		System.out.println("New instance of " + PolicyPageAutomemberUserGroupRules.class.getName() + " is ready");
 	}
