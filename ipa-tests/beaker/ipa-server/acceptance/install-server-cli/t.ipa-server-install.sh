@@ -117,7 +117,10 @@ ipaserverinstall()
 #     with unclear error messages (inside DNS check)
       ipaserverinstall_bz815849
  
-  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
+#     Add test to verify bug 886091 : Disallow root SSH public key authentication 
+      ipaserverinstall_bz886091
+
+#  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
 # This should be last test - then run IPA Functional tests against this server
 
@@ -662,6 +665,48 @@ ipaserverinstall_bz815849()
 			rlPass "BZ 815849 not found"
 		fi
 	rlPhaseEnd
+}
+
+ipaserverinstall_bz886091()
+{
+        local tmpout=$TmpDir/ipaserverinstall_bz886091.out
+        rlPhaseStartTest "ipaserverinstall_bz886091 - Disallow root SSH public key authentication"
+                uninstall_fornexttest
+
+                rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=`hostname` -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0
+                rlRun "rm -rf /root/.ssh/auth*"
+                rlRun "echo Secret123|kinit admin"
+                rlRun "ipa user-add root --first Fake --last Root --sshpubkey=\"`cat /root/.ssh/id_rsa.pub`\""
+
+                local certCmd="ssh root@localhost"
+                local exp=$TmpDir/createCertRequestFile.$RANDOM.exp # beaker test
+
+		echo "set timeout 5" > $exp
+		echo "set force_conservative 0" >> $exp
+		echo "set send_slow {1 .1}" >> $exp
+		echo "spawn $certCmd" >> $exp
+		echo 'match_max 100000' >> $exp
+
+		echo 'expect "root@localhost *"' >> $exp
+		echo "send -s -- \"\r\"" >> $exp
+
+		echo 'expect "root@localhost *"' >> $exp
+		echo "send -s -- \"\r\"" >> $exp
+		
+                echo 'expect "root@localhost *"' >> $exp
+		echo "send -s -- \"\r\"" >> $exp
+
+		echo 'expect eof ' >> $exp
+
+		/usr/bin/expect $exp
+		local ret=$?
+
+                if [ $? -eq 0 ]; then
+                        rlPass "BZ-886091 is not found : root SSH public key authentication is disallowed"
+                else
+                        rlFail "BZ-886091 is found : root SSH public key authentication is allowed"
+                fi
+        rlPhaseEnd
 }
 
 ####################################################################################
