@@ -49,6 +49,7 @@ public class IPAServerPageDelegation extends IPAWebPage{
 		loginUser="Login Username";
 		loginOldPassword="Login Old Password";
 		loginNewPassword="Login New Password";
+		
 		registerStandardTestCases();
 		registerTestCases("nonStandardUserDelegation", EditUserDelegationTestCases);
 		System.out.println("New instance of " + IPAServerPageDelegation.class.getName() + " is ready");
