@@ -479,7 +479,11 @@ ipaclientinstall_password()
        #expmsg="Joining realm failed: Incorrect password.
 #Installation failed. Rolling back changes."
        local tmpout=$TmpDir/ipaclientinstall_password.out
-       qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with password, but missing principal" 
+       qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with password, but missing principal" 
+       rlRun "cp /var/log/ipaclient-install.log /var/log/ipaclient-install_password.log"
+       rlRun "submit_log /var/log/ipaclient-install_password.log"
+       rlRun "sleep 1000000"
+       
     rlPhaseEnd
 }
 

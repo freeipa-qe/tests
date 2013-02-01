@@ -80,7 +80,7 @@ rlJournalStart
            rlLog "Executing test cases with 1 Master and 1 Replica"
            ipaclientinstall
           fi
-	   rhts-sync-set -s DONE
+	   rlRun "rhts-sync-set -s DONE"
 	else
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
 	fi
@@ -92,7 +92,7 @@ rlJournalStart
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
 				ipamastersetup
-                rhts-sync-block -s DONE $BEAKERCLIENT
+                rlRun "rhts-sync-block -s DONE $BEAKERCLIENT"
 				ipamastercleanup
                 rlPass
         else
@@ -106,7 +106,7 @@ rlJournalStart
         for R in $(eval echo $SLAVE); do
          echo $R | grep $HOSTNAME
           if [ $? -eq 0 ] ; then
-                rhts-sync-block -s DONE $BEAKERCLIENT
+                rlRun "rhts-sync-block -s DONE $BEAKERCLIENT"
                 rlPass
           else
                 rlLog "Machine in recipe in not a SLAVE"
