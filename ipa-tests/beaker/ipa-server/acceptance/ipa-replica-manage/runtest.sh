@@ -44,7 +44,7 @@ for file in $(ls tests.d/t.*.sh); do
 	. ./$file
 done
 
-IRMVERSION=2.1.90
+IRMVERSION=3.0.0
 
 PACKAGE="ipa-admintools"
 

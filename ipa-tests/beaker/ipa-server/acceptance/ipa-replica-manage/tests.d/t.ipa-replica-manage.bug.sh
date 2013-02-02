@@ -73,7 +73,7 @@ irm_bugcheck_831661()
 {
 	tmpout=$1
 	logserver=$2
-	TESTORDER=$(( TESTORDER += 1 ))
+	#TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_bug_831661 - ipa-replica-manage re-initialize update failed due to named ldap timeout"
 		OUTPUTCHK=$(grep "reports: Update failed! Status.*System error" $tmpout|wc -l)
 		
@@ -90,7 +90,7 @@ irm_bugcheck_831661()
 irm_bugcheck_839638()
 {
 	tmpout=$1
-	TESTORDER=$(( TESTORDER += 1 ))
+	#TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_bugcheck_839638 - ipa-replica-manage allows disconnect of last connection for a single replica"
 		OUTPUTCHK1=$(grep "Deleted replication agreement" $tmpout|wc -l)
 		OUTPUTCHK2=$(grep "Cannot remove the last replication link" $tmpout | wc -l)
@@ -105,7 +105,7 @@ irm_bugcheck_839638()
 irm_bugcheck_826677()
 {
 	tmpout=$1
-	TESTORDER=$(( TESTORDER += 1 ))
+	#TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_bugcheck_826677 - IPA cannot remove disconnected replica data to reconnect"
 		OUTPUTCHK1=$(grep "Deleting this server will orphan" $tmpout|wc -l)
 		OUTPUTCHK2=$(grep "You will need to reconfigure your replication topology to delete this server." $tmpout|wc -l)
@@ -121,7 +121,7 @@ irm_bugcheck_826677()
 irm_bugcheck_754539()
 {
 	tmpout=$1
-	TESTORDER=$(( TESTORDER += 1 ))
+	#TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_bugcheck_754539 - Connect after del using ipa-replica-manage fails"
 		OUTPUTCHK1=$(grep "You cannot connect to a previously deleted master" $tmpout|wc -l)
 		if [ $OUTPUTCHK1 -gt 0 ]; then
@@ -135,7 +135,7 @@ irm_bugcheck_754539()
 irm_bugcheck_823657()
 {
 	tmpout=$1
-	TESTORDER=$(( TESTORDER += 1 ))
+	#TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "irm_bugcheck_823657 - ipa-replica-manage connect fails with GSSAPI error after delete if using previous kerberos ticket"
 		OUTPUTCHK1=$(grep "SASL(-1): generic failure: GSSAPI Error: Unspecified GSS failure" $tmpout|wc -l)
 		OUTPUTCHK2=$(grep "You cannot connect to a previously deleted master" $tmpout|wc -l)
