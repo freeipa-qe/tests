@@ -84,7 +84,10 @@ ipaclientinstall_bugcheck_845691_fulltest()
 		fi
 
 		rlLog "Putting MASTER DNS and Firewall settings back"
-		SRVS="$MASTER_S $SLAVE_S"
+		for i in $SLAVE; do
+			SLAVE_S_ALL="$SLAVE_S_ALL $(echo $i|cut -f1 -d.)"
+		done	
+		SRVS="$MASTER_S $SLAVE_S_ALL"
 		for REC in '_kerberos-master._tcp:88' '_kerberos-master._udp:88' '_kerberos._tcp:88' '_kerberos._udp:88' '_kpasswd._tcp:464' '_kpasswd._udp:464'; do
 			REC_NAME=$(echo $REC|cut -f1 -d:)
 			REC_PORT=$(echo $REC|cut -f2 -d:)

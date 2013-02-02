@@ -135,10 +135,10 @@ install_setup()
          SLAVE3=`echo $SLAVE|cut -d " " -f3 | xargs echo`
          SLAVE_ACTIVE=$SLAVE1
          #Stoping ipa sevice on $SLAVE2 and $SLAVE3
-         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
-         rlRun "chmod +x $TmpDir/local.sh"
-         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"         
-         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA3 IPA server"         
+         #rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
+         #rlRun "chmod +x $TmpDir/local.sh"
+         #rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"         
+         #rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA3 IPA server"         
         else
          SLAVE_ACTIVE=`echo $SLAVE|cut -d " " -f1 | xargs echo`
         fi
