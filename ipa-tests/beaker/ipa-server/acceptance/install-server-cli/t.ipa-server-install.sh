@@ -678,7 +678,7 @@ ipaserverinstall_bz886091()
                 rlRun "echo Secret123|kinit admin"
                 rlRun "ipa user-add root --first Fake --last Root --sshpubkey=\"`cat /root/.ssh/id_rsa.pub`\""
 
-                local certCmd="ssh root@localhost"
+                local certCmd="ssh -o StrictHostKeyChecking=no root@localhost"
                 local exp=$TmpDir/createCertRequestFile.$RANDOM.exp # beaker test
 
 		echo "set timeout 5" > $exp
