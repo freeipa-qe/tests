@@ -95,13 +95,15 @@ irm_run()
 	irm_disconnect_negative_0001
 	irm_disconnect_negative_0002
 	irm_disconnect_negative_0003
-	irm_disconnect_negative_0004
-	irm_disconnect_negative_0005
+# Following 2 tests no longer valid since cannot disconnect last agreement
+# for a node.  Must delete.
+#	irm_disconnect_negative_0004 
+#	irm_disconnect_negative_0005
 
 	irm_del_negative_0000
 	
-	irm_forcesync_negative_0004 # must run after delete
-	irm_reinitialize_negative_0004 # must run after delete
+	irm_forcesync_negative_0004 # must run after master slave2 disconnect
+	irm_reinitialize_negative_0004 # must run after master slave2 disconnect
 
 	irm_del_negative_0001
 	irm_del_negative_0002
@@ -1469,23 +1471,23 @@ irm_reinitialize_negative_0004()
 
 
 # irm_disconnect_positive
-#     disconnect s1 s2
+#     disconnect m s2
 # 
 
 irm_disconnect_positive_0001()
 {
 	local tmpout=/tmp/errormsg.out
 	TESTORDER=$(( TESTORDER += 1 ))
-	rlPhaseStartTest "irm_disconnect_positive_0001 - Disconnect Replica1 to Replica2 agreement"
+	rlPhaseStartTest "irm_disconnect_positive_0001 - Disconnect Master to Replica2 agreement"
 	case "$MYROLE" in
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
-		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2 > $tmpout 2>&1"
+		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2 > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		rlAssertGrep "Deleted replication agreement from '$SLAVE1' to '$SLAVE2'" $tmpout
-		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE1 | grep -v $SLAVE2"
-		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE2 | grep -v $SLAVE1"
+		rlAssertGrep "Deleted replication agreement from '$MASTER' to '$SLAVE2'" $tmpout
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE2"
+		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE2 | grep -v $MASTER"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
@@ -1516,7 +1518,7 @@ irm_disconnect_negative_0000()
 
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE1 > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		rlAssertGrep "Cannot remove the last replication link of '$SLAVE1'" $tmpout
+		rlAssertGrep "Cannot remove the last replication link of '$MASTER'" $tmpout
 		rlAssertGrep "Please use the 'del' command to remove it from the domain" $tmpout
 		irm_bugcheck_839638 $tmpout
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE1"
@@ -1558,13 +1560,13 @@ irm_disconnect_negative_0001()
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
 
-		if [ $(ipa-replica-manage -p $ADMINPW list $SLAVE1|grep $SLAVE2|wc -l) -gt 0 ]; then
-			rlLog "found $SLAVE1 - $SLAVE2 replication agreement...disconnecting"
-			rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2"
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
+			rlLog "found $MASTER - $SLAVE2 replication agreement...disconnecting"
+			rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2"
 		fi
 	
-		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2 > $tmpout 2>&1" 
-		rlAssertGrep "'$SLAVE1' has no replication agreement for '$SLAVE2'" $tmpout
+		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2 > $tmpout 2>&1" 
+		rlAssertGrep "'$MASTER' has no replication agreement for '$SLAVE2'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
 		;;
@@ -1645,6 +1647,7 @@ irm_disconnect_negative_0003()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
+# No longer valid since cannot disconnect last agreement.  
 irm_disconnect_negative_0004()
 {
 	local tmpout=/tmp/errormsg.out
@@ -1685,6 +1688,7 @@ irm_disconnect_negative_0004()
 	[ -f $tmpout ] && rm -f $tmpout
 }
 
+# No longer valid since cannot disconnect last agreement.  
 irm_disconnect_negative_0005()
 {
 	local tmpout=/tmp/errormsg.out
@@ -1824,16 +1828,16 @@ irm_del_negative_0000()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 			
-		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 -f > $tmpout 2>&1" 1
+		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE1 -f > $tmpout 2>&1" 1
 		irm_bugcheck_826677 $tmpout
 		rlRun "sleep 10"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER > $tmpout 2>&1"
 		rlRun "cat $tmpout"
-		rlAssertGrep "$SLAVE2" $tmpout
-		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
-			rlPass "ipa-replica-manage not able to delete $SLAVE2 because $SLAVE1 would be orphaned"
+		rlAssertGrep "$SLAVE1" $tmpout
+		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE1|wc -l) -gt 0 ]; then
+			rlPass "ipa-replica-manage not able to delete $SLAVE1 because $SLAVE2 would be orphaned"
 		else
-			rlFail "ipa-replica-manage reporting that $SLAVE2 no longer a replica of $MASTER.  $SLAVE1 has been orphaned"
+			rlFail "ipa-replica-manage reporting that $SLAVE1 no longer a replica of $MASTER.  $SLAVE2 has been orphaned"
 		fi
 			
 		rlRun "ipa host-show $SLAVE2" 2

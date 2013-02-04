@@ -110,10 +110,11 @@ irm_bugcheck_826677()
 		OUTPUTCHK1=$(grep "Deleting this server will orphan" $tmpout|wc -l)
 		OUTPUTCHK2=$(grep "You will need to reconfigure your replication topology to delete this server." $tmpout|wc -l)
 		if [ $OUTPUTCHK1 -gt 0 -a $OUTPUTCHK2 -gt 0 ]; then
-			rlFail "BZ 826677 found...IPA cannot remove disconnected replica data to reconnect"
-			rlFail "IPA now prevents orphaning replicas"
+			rlPass "BZ 826677 not found"
+			rlPass "IPA now prevents orphaning replicas"
 		else
-			rlPass "BZ 826677 not found"	
+			rlFail "BZ 826677 found...IPA cannot remove disconnected replica data to reconnect"	
+			rlFail "IPA should no longer allow orphaning replicas"
 		fi
 	rlPhaseEnd
 }
