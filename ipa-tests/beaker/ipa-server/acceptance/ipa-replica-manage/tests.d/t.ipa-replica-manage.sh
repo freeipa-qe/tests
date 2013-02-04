@@ -1624,7 +1624,7 @@ irm_disconnect_negative_0003()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2 > $tmpout 2>&1"
-		rlAssertGrep "Cannot remove the last replication link of '$MASTER'" $tmpout
+		rlAssertGrep "Cannot remove the last replication link of '$SLAVE2'" $tmpout
 		rlAssertGrep "Please use the 'del' command to remove it from the domain" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
