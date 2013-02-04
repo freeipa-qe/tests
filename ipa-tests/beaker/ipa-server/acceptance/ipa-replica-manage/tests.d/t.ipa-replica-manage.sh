@@ -1356,6 +1356,7 @@ irm_reinitialize_negative_0001()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 	
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "re-initialize requires the option --from <host name>" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1386,6 +1387,7 @@ irm_reinitialize_negative_0002()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 	
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for '$MASTER'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1416,6 +1418,7 @@ irm_reinitialize_negative_0003()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 	
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=dne.$DOMAIN > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1451,6 +1454,7 @@ irm_reinitialize_negative_0004()
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$SLAVE2' has no replication agreement for '$MASTER'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE2"
@@ -1523,7 +1527,7 @@ irm_disconnect_negative_0000()
 		rlAssertGrep "Cannot remove the last replication link of '$MASTER'" $tmpout
 		rlAssertGrep "Please use the 'del' command to remove it from the domain" $tmpout
 		irm_bugcheck_839638 $tmpout
-		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep -v $SLAVE1"
+		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER | grep $SLAVE1"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
@@ -1568,6 +1572,7 @@ irm_disconnect_negative_0001()
 		fi
 	
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2 > $tmpout 2>&1" 
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for '$SLAVE2'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE1"
@@ -1598,6 +1603,7 @@ irm_disconnect_negative_0002()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER dne.$DOMAIN > $tmpout 2>&1" 
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 	
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1627,7 +1633,8 @@ irm_disconnect_negative_0003()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
-		rlRun "ipa-replica-manage -p $ADMINPW disconnect $MASTER $SLAVE2 > $tmpout 2>&1"
+		rlRun "ipa-replica-manage -p $ADMINPW disconnect $SLAVE1 $SLAVE2 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertGrep "Cannot remove the last replication link of '$SLAVE2'" $tmpout
 		rlAssertGrep "Please use the 'del' command to remove it from the domain" $tmpout
 
@@ -1702,6 +1709,7 @@ irm_disconnect_negative_0005()
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
 
 		rlRun "ipa host-show testhost2.$DOMAIN > $tmpout 2>&1" 2 
+		rlRun "cat $tmpout"
 		rlAssertGrep "ipa: ERROR: testhost2.$DOMAIN: host not found" $tmpout
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERMASTER"
@@ -1750,6 +1758,7 @@ irm_del_positive_0001()
 		rlRun "sleep 10"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertNotGrep "$SLAVE2" $tmpout
 		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
 			rlFail "ipa-replica-manage still listing deleted replica $MASTER to $SLAVE2"
@@ -1790,6 +1799,7 @@ irm_del_positive_0002()
 		rlRun "sleep 10"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertNotGrep "$SLAVE1" $tmpout
 		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE1|wc -l) -gt 0 ]; then
 			rlFail "ipa-replica-manage still listing deleted replica $MASTER to $SLAVE1"
@@ -1831,6 +1841,7 @@ irm_del_negative_0000()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 			
 		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE1 -f > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		irm_bugcheck_826677 $tmpout
 		rlRun "sleep 10"
 		rlRun "ipa-replica-manage -p $ADMINPW list $MASTER > $tmpout 2>&1"
@@ -1882,6 +1893,7 @@ irm_del_negative_0001()
 		fi
 	
 		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for '$SLAVE2'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1913,6 +1925,7 @@ irm_del_negative_0002()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW del dne.$DOMAIN > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
