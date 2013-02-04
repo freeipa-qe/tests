@@ -281,18 +281,21 @@ irm_envsetup()
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $BEAKERSLAVE1"
+		rlRun "KinitAsAdmin"
 		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	SLAVE2)
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $BEAKERSLAVE2"
+		rlRun "KinitAsAdmin"
 		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
 	SLAVE*)
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 		rlRun "rhts-sync-set -s '$FUNCNAME.0' -m $(hostname)"
+		rlRun "KinitAsAdmin"
 		rlLog "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER' $BEAKERMASTER"
 		;;
@@ -783,6 +786,7 @@ irm_connect_positive_0002()
 	SLAVE1)
 		rlLog "Machine in recipe is SLAVE1 ($(hostname))"
 		
+		rlRun "KinitAsAdmin"
 		rlRun "ipa group-add testgroup1 --desc=testgroup1"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.1' -m $BEAKERSLAVE1"
@@ -792,6 +796,7 @@ irm_connect_positive_0002()
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERSLAVE1"
 		sleep 10
+		rlRun "KinitAsAdmin"
 		rlRun "ipa group-show testgroup1|grep testgroup1" 
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
