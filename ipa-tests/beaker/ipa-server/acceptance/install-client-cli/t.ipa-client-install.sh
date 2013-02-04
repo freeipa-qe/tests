@@ -482,7 +482,7 @@ ipaclientinstall_password()
        qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with password, but missing principal" 
        rlRun "cp /var/log/ipaclient-install.log /var/log/ipaclient-install_password.log"
        rlRun "submit_log /var/log/ipaclient-install_password.log"
-       rlRun "sleep 1000000"
+       #rlRun "sleep 1000000"
        
     rlPhaseEnd
 }
