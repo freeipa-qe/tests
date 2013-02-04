@@ -72,6 +72,7 @@ public class IPAWebPage implements StandardTest{
 		if (!currentURL.equals(url)){ 
 			log.info("current url=(" + currentURL + "), is not a starting position, move to url=(" + url +")");
 			browser.navigateTo(url, true);
+			browser.setStrictVisibilityCheck(true);			
 		}
 	}
 	
