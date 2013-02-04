@@ -126,6 +126,7 @@ reconnect_slave1()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
+		rlRun "ipa-replica-manage del $SLAVE1 --force" 0,1
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE1_IP $SLAVE1"	
 		rlRun "service named restart"
 		rlRun "ipa dnsrecord-find $DOMAIN"
@@ -196,6 +197,7 @@ reconnect_slave2()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
+		rlRun "ipa-replica-manage del $SLAVE2 --force" 0,1
 		rlRun "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVE2_IP $SLAVE2"	
 		rlRun "service named restart"
 		rlRun "ipa dnsrecord-find $DOMAIN"
