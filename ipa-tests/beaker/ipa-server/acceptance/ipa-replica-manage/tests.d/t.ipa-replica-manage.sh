@@ -156,7 +156,7 @@ reconnect_slave1()
 
 		rlLog "Next re-install replica on $SLAVE1"
 		pushd /dev/shm
-		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "sftp root@$MASTER_IP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		popd
 		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE1_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 
@@ -226,7 +226,7 @@ reconnect_slave2()
 
 		rlLog "Next re-install replica on $SLAVE2"
 		pushd /dev/shm
-		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "sftp root@$MASTER_IP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		popd
 		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE2_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
 
