@@ -441,6 +441,7 @@ irm_list_positive_0003()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW list -v $MASTER > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertGrep "$SLAVE1" $tmpout
 		rlAssertGrep "$SLAVE2" $tmpout
 		rlAssertGrep "last init status" $tmpout
@@ -512,6 +513,7 @@ irm_list_negative_0001()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW list $SLAVE1 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertNotGrep "$SLAVE2" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -542,6 +544,7 @@ irm_list_negative_0002()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW list -H $SLAVE1 $SLAVE1 > $tmpout 2>&1"
+		rlRun "cat $tmpout"
 		rlAssertNotGrep "$SLAVE2" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -572,6 +575,7 @@ irm_list_negative_0003()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
 		rlRun "ipa-replica-manage -p $ADMINPW list dne.$DOMAIN > $tmpout 2>&1" 
+		rlRun "cat $tmpout"
 		rlAssertGrep "Cannot find dne.$DOMAIN in public server list" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -854,6 +858,7 @@ irm_connect_negative_0001()
 			rlRun "ipa-replica-manage -p $ADMINPW connect $SLAVE1 $SLAVE2"
 		fi
 		rlRun "ipa-replica-manage -p $ADMINPW connect $SLAVE1 $SLAVE2 > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "A replication agreement to $SLAVE2 already exists" $tmpout
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -884,6 +889,7 @@ irm_connect_negative_0002()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW connect $MASTER dne.$DOMAIN > $tmpout 2>&1" 
+		rlRun "cat $tmpout"
 		rlAssertGrep "Can't contact LDAP server" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -922,6 +928,7 @@ irm_connect_negative_0003()
 			rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE1"
 		fi
 		rlRun "ipa-replica-manage -p $ADMINPW connect $MASTER $SLAVE1 > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "You cannot connect to a previously deleted master" $tmpout
 		irm_bugcheck_754539 $tmpout
 		irm_bugcheck_823657 $tmpout
@@ -1056,6 +1063,7 @@ irm_forcesync_negative_0001()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "force-sync requires the option --from <host name>" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1087,6 +1095,7 @@ irm_forcesync_negative_0002()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for '$MASTER'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1118,6 +1127,7 @@ irm_forcesync_negative_0003()
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=dne.$DOMAIN > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$MASTER' has no replication agreement for 'dne.$DOMAIN'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
@@ -1154,6 +1164,7 @@ irm_forcesync_negative_0004()
 		rlLog "Machine in recipe is SLAVE2 ($(hostname))"
 
 		rlRun "ipa-replica-manage -p $ADMINPW force-sync --from=$MASTER > $tmpout 2>&1" 1
+		rlRun "cat $tmpout"
 		rlAssertGrep "'$SLAVE2' has no replication agreement for '$MASTER'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERSLAVE2"
