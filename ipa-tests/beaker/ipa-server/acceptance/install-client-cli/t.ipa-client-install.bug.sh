@@ -31,7 +31,7 @@ ipaclientinstall_bugcheck_905626()
 	ipalog=/var/log/ipaclient-install.log
 	rlAssertNotGrep "Installation failed." $ipalog
 	rlAssertNotGrep "Can't contact LDAP server" $ipalog
-	rlAssertNotGrep "Failed to verify that $MASTER is an IPA Server" $ipalog
+	rlAssertNotGrep "Failed to verify that.*is an IPA Server" $ipalog
 	if [ $? -gt 0 ]; then
 		rlFail "BZ 905626 found...ipa-client-install failed to fall over to replica with master down"
 	else
