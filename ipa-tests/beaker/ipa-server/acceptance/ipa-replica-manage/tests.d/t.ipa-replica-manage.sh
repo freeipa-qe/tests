@@ -897,9 +897,10 @@ irm_connect_negative_0002()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 
-		rlRun "ipa-replica-manage -p $ADMINPW connect $MASTER dne.$DOMAIN > $tmpout 2>&1" 
+		rlRun "ipa-replica-manage -p $ADMINPW connect $MASTER dne.$DOMAIN > $tmpout 2>&1" 1 
 		rlRun "cat $tmpout"
-		rlAssertGrep "Can't contact LDAP server" $tmpout
+		#rlAssertGrep "Can't contact LDAP server" $tmpout
+		rlAssertGrep "You cannot connect to a previously deleted master" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
