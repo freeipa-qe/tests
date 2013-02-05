@@ -595,6 +595,7 @@ host=$3
         	spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
                 expect {
                 	"*assword: " {
+                        sleep 5
                         send -- "$passwd\r"
                         	}
                        }
