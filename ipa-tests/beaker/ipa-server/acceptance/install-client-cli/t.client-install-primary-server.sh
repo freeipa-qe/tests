@@ -130,6 +130,7 @@ ipaclientinstall_fixed_primary_param_TC_6()
     rlPhaseStartTest "client-install-fixed-primary-server 06 [Positive] fixed primary with --server=SLAVE --server=MASTER"
         uninstall_fornexttest
         host_del
+		rlRun "sleep 60"
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$SLAVE3 --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$SLAVE3 --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlAssertGrep "ipa_server = $SLAVE3, $MASTER" "$SSSD"
@@ -595,5 +596,7 @@ host_del()
 {
         rlRun "echo \"echo Secret123|kinit admin;ipa host-del $CLIENT\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Deleting host from MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 
+		#0 "Deleting host from MASTER IPA server"
+		rlRun "sleep 10"
 }

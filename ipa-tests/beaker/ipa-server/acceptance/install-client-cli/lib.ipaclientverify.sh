@@ -83,6 +83,7 @@ uninstall_fornexttest()
 				rlLog "Unsuccessful uninstall"
 				rhts-submit-log -l /var/log/ipaclient-uninstall.log
 			fi
+
 		fi
 	# Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
 	PRESERVESSSDCHK=$(grep "'preserve_sssd': True," /var/log/ipaclient-install.log|wc -l)
@@ -108,6 +109,7 @@ uninstall_fornexttest()
 		rlLog "renaming last default.conf"
 		mv $DEFAULT $DEFAULT.old
 	fi
+	service ntpd stop
 }
 
 install_fornexttest()
