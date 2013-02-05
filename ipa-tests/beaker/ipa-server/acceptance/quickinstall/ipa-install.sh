@@ -153,6 +153,7 @@ ipa_install_set_vars() {
 	echo "export CLIENT=$CLIENT1_env1" >> /dev/shm/env.sh
 	echo "export CLIENT2=$CLIENT2_env1" >> /dev/shm/env.sh
 	echo "export BEAKERMASTER=$BEAKERMASTER_env1" >> /dev/shm/env.sh
+	echo "export BEAKERREPLICA_env1=\"$BEAKERREPLICA_env1\"" >> /dev/shm/env.sh
 	echo "export BEAKERSLAVE=\"$BEAKERREPLICA_env1\"" >> /dev/shm/env.sh
 	echo "export BEAKERCLIENT=$BEAKERCLIENT1_env1" >> /dev/shm/env.sh
 	echo "export BEAKERCLIENT2=$BEAKERCLIENT2_env1" >> /dev/shm/env.sh
