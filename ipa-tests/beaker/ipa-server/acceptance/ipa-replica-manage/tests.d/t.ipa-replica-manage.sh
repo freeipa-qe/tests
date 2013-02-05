@@ -1854,7 +1854,7 @@ irm_del_negative_0000()
 			rlFail "ipa-replica-manage reporting that $SLAVE1 no longer a replica of $MASTER.  $SLAVE2 has been orphaned"
 		fi
 			
-		rlRun "ipa host-show $SLAVE2" 2
+		rlRun "ipa host-show $SLAVE2" 
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		;;
