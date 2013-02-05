@@ -122,6 +122,7 @@ ipaclientinstall_fixed_primary_param_TC_5()
         rlAssertGrep "Added Server $SLAVE2" "$sssd_log_file"
         rlAssertGrep "Marking server '$MASTER' as 'working'" "$sssd_log_file"
         rlAssertNotGrep "Marking server '$SLAVE2' as 'working'" "$sssd_log_file"
+		debug_log
     rlPhaseEnd
 }
 
@@ -141,6 +142,7 @@ ipaclientinstall_fixed_primary_param_TC_6()
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
         rlAssertGrep "Marking server '$SLAVE3' as 'working'" "$sssd_log_file"
         rlAssertNotGrep "Marking server '$MASTER' as 'working'" "$sssd_log_file"
+		debug_log
     rlPhaseEnd
 }
 
@@ -173,6 +175,7 @@ ipaclientinstall_fixed_primary_param_TC_8()
         rlRun "ipa-client-install --fixed-primary -p $ADMINID -w $ADMINPW -U --no-sssd" 0 "Installing ipa client and configuring - with no SSSD configured"
         verify_install true nosssd
         rlAssertNotGrep "Option ipa_server has value $MASTER" "$sssd_log_file"
+		debug_log
     rlPhaseEnd
 }
 
@@ -242,6 +245,7 @@ ipaclientinstall_fixed_primary_param_TC_9()
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before uninstalling"
         #uninstall_fornexttest
+		debug_log
     rlPhaseEnd
 }
 
@@ -267,6 +271,7 @@ ipaclientinstall_fixed_primary_param_TC_10()
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
         rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+		debug_log
     rlPhaseEnd
 }
 
@@ -294,6 +299,7 @@ ipaclientinstall_fixed_primary_param_TC_11()
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
         rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+		debug_log
     rlPhaseEnd
 }
 
@@ -599,4 +605,10 @@ host_del()
         rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 
 		#0 "Deleting host from MASTER IPA server"
 		rlRun "sleep 10"
+}
+
+debug_log()
+{
+	cp /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$FUNC
+	submit_log /var/log/ipaclient-install.log.$FUNC
 }
