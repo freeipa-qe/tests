@@ -120,6 +120,9 @@ ipaserverinstall()
 #     Add test to verify bug 886091 : Disallow root SSH public key authentication 
       ipaserverinstall_bz886091
 
+#     Test for Bug 872707 - ipa-server dependency on krb5-server is not adequate
+      ipaserverinstall_krb5_dependency
+
 #  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
 # This should be last test - then run IPA Functional tests against this server
@@ -754,6 +757,18 @@ ipaserverinstall_set_cn()
         local command="ipa-server-install --setup-dns --forwarder=$DNSFORWARD  -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW --subject CN=Test -U"
 		local expmsg="ipa-server-install: error: --subject=CN=Test has invalid attribute: \"CN\""
         qaRun "$command" "$tmpout" 2 "$expmsg" "Verify expected error message for IPA Install with invalid subject using CN value"  debug
+    rlPhaseEnd
+
+}
+
+####################################################################################
+# Test for 872707 :: ipa-server dependency on krb5-server is not adequate
+####################################################################################
+ipaserverinstall_krb5_dependency()
+{
+    rlPhaseStartTest "ipa-server-install - 31 - [Positive] Ensure that ipa-server contains bot a >= entry and a < entry"
+	rlRun "rpm -q --requires ipa-server | grep krb5-server | grep '>='" 0 "Does the ipa-server package contain a greater than and equal to check on krb5-server"
+	rlRun "rpm -q --requires ipa-server | grep krb5-server | grep '<'" 0 "Does the ipa-server package contain a less than and equal to check on krb5-server"
     rlPhaseEnd
 
 }
