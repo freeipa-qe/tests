@@ -261,7 +261,7 @@ ipaclientinstall_fixed_primary_param_TC_10()
         # Stop the MASTER 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 1 "kinit failed"
         rlAssertGrep "Option ipa_server has value $MASTER" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -270,7 +270,7 @@ ipaclientinstall_fixed_primary_param_TC_10()
         # Start the MASTER 
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
 		debug_log
     rlPhaseEnd
 }
@@ -287,7 +287,7 @@ ipaclientinstall_fixed_primary_param_TC_11()
         # Stop the MASTER 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE2" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -298,7 +298,7 @@ ipaclientinstall_fixed_primary_param_TC_11()
         # Start the MASTER 
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
 		debug_log
     rlPhaseEnd
 }
@@ -315,8 +315,8 @@ ipaclientinstall_fixed_primary_param_TC_12()
         # Stop the MASTER and Replica
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 1 "kinit failed"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -326,8 +326,8 @@ ipaclientinstall_fixed_primary_param_TC_12()
         # Start the MASTER and Replica
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start SLAVE IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start SLAVE IPA server"
         
         uninstall_fornexttest
     rlPhaseEnd
@@ -345,8 +345,8 @@ ipaclientinstall_fixed_primary_param_TC_13()
         # Stop the MASTER and REPLICA1
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 1 "kinit failed"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -357,8 +357,8 @@ ipaclientinstall_fixed_primary_param_TC_13()
         # Start the MASTER and REPLICA1
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
         uninstall_fornexttest
     rlPhaseEnd
 }
@@ -375,8 +375,8 @@ ipaclientinstall_fixed_primary_param_TC_14()
         # Stop the MASTER and Replica1 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1, $SLAVE2" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -388,8 +388,8 @@ ipaclientinstall_fixed_primary_param_TC_14()
         # Start the MASTER and Replica1
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
     rlPhaseEnd
 }
 
@@ -405,9 +405,9 @@ ipaclientinstall_fixed_primary_param_TC_15()
         # Stop the MASTER, Replica1 and Replica2
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 1 "kinit failed"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1, $SLAVE2" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -420,9 +420,9 @@ ipaclientinstall_fixed_primary_param_TC_15()
         # Start the MASTER, Replica1 and Replica2
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
     rlPhaseEnd
 }
 
@@ -438,9 +438,9 @@ ipaclientinstall_fixed_primary_param_TC_16()
         # Stop the MASTER and Replica1 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -454,9 +454,9 @@ ipaclientinstall_fixed_primary_param_TC_16()
         # Start the MASTER and Replica1
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
     rlPhaseEnd
 }
 
@@ -472,10 +472,10 @@ ipaclientinstall_fixed_primary_param_TC_17()
         # Stop the MASTER and Replica1 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA3 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA3 IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 1 "kinit failed"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -489,10 +489,10 @@ ipaclientinstall_fixed_primary_param_TC_17()
         # Start the MASTER and Replica1
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA3 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA3 IPA server"
     rlPhaseEnd
 }
 
@@ -508,9 +508,9 @@ ipaclientinstall_fixed_primary_param_TC_18()
         # Stop the MASTER and Replica1, Replica2
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -521,11 +521,11 @@ ipaclientinstall_fixed_primary_param_TC_18()
         rlAssertGrep "server '$SLAVE1' as 'not working'" "$sssd_log_file"
         rlAssertGrep "server '$SLAVE2' as 'not working'" "$sssd_log_file"
         rlAssertGrep "server '$SLAVE3' as 'working'" "$sssd_log_file"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA3 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA3 IPA server"
         # Start the MASTER and Replica1
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
         rlRun "sss_cache -u admin"
         rlRun "cat /dev/null > $sssd_log_file;service sssd restart"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
@@ -536,9 +536,9 @@ ipaclientinstall_fixed_primary_param_TC_18()
         rlAssertGrep "Added Server $SLAVE3" "$sssd_log_file"
         rlAssertNotGrep "server '$SLAVE3' as 'working'" "$sssd_log_file"
         rlAssertGrep "server '$MASTER' as 'working'" "$sssd_log_file"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
         uninstall_fornexttest
     rlPhaseEnd
 }
@@ -555,9 +555,9 @@ ipaclientinstall_fixed_primary_param_TC_19()
         # Stop the MASTER and Replica1, Replica2
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Stop MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Stop REPLICA2 IPA server"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$sssd_log_file"
         rlAssertGrep "Added Server $MASTER" "$sssd_log_file"
@@ -571,7 +571,7 @@ ipaclientinstall_fixed_primary_param_TC_19()
         # Start the MASTER 
         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0 "Start MASTER IPA server"
         rlRun "sss_cache -u admin"
         rlRun "cat /dev/null > $sssd_log_file;service sssd restart"
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin" 0 "kinit successful"
@@ -582,9 +582,9 @@ ipaclientinstall_fixed_primary_param_TC_19()
         rlAssertGrep "Added Server $SLAVE3" "$sssd_log_file"
         rlAssertNotGrep "server '$SLAVE3' as 'working'" "$sssd_log_file"
         rlAssertGrep "server '$MASTER' as 'working'" "$sssd_log_file"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA3 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE1IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA1 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3IP 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA3 IPA server"
         uninstall_fornexttest
     rlPhaseEnd
 }
@@ -602,7 +602,7 @@ host_del()
 {
         rlRun "echo \"echo Secret123|kinit admin;ipa host-del $CLIENT\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 
 		#0 "Deleting host from MASTER IPA server"
 		rlRun "sleep 10"
 }
