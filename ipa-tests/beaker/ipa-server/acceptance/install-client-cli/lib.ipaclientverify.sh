@@ -110,7 +110,7 @@ uninstall_fornexttest()
 		mv $DEFAULT $DEFAULT.old
 	fi
 	rlRun "service ntpd stop"
-	rlRun "ssh root@$MASTERIP \"echo Secret123|kinit admin;ipa host-del $CLIENT\"" 0,1
+	rlRun "ssh root@$MASTERIP \"echo Secret123|kinit admin;ipa host-del $CLIENT\"" 0,1,2
 }
 
 install_fornexttest()
