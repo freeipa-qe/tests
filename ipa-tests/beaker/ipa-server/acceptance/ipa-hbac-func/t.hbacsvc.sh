@@ -52,9 +52,10 @@ hbacsvc_master_001() {
         done
 
 
-        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                kdestroy
 		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ssh_auth_success $user3 testpw123@ipa.com $MASTER"
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-add admin_allow_all --hostcat=all --srchostcat=all --servicecat=all"
 		rlRun "ipa hbacrule-add-user admin_allow_all --groups=admins"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -180,10 +181,12 @@ hbacsvc_client_002() {
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
+                kdestroy
 		# Source host validation has been depricated which caused the following test to fail, hence updating accordingly.
 		rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
 		rlRun "rm -fr /tmp/krb5cc_*_*"
+		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlPhaseEnd
 }
@@ -196,9 +199,11 @@ hbacsvc_client2_002() {
                 rlRun "getent -s sss passwd $user1"
                 rlRun "getent -s sss passwd $user2"
 		sleep 5
+               kdestroy
                 rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
 		rlRun "rm -fr /tmp/krb5cc_*_*"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlPhaseEnd
 
@@ -327,9 +332,11 @@ hbacsvc_client_003() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user3"
+                kdestroy
                 rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
                 rlRun "ftp_auth_success $user3 testpw123@ipa.com $MASTER"
                 rlRun "rm -fr /tmp/krb5cc_*_*"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 }
@@ -341,8 +348,10 @@ hbacsvc_client2_003() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user3"
 		sleep 5
+                kdestroy
                 rlRun "ftp_auth_success $user3 testpw123@ipa.com $MASTER"
                 rlRun "rm -fr /tmp/krb5cc_*_*"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 
@@ -2652,7 +2661,9 @@ hbacsvc_master_031() {
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-enable allow_all"
+                kdestroy
                 rlRun "ssh_auth_success $user31 testpw123@ipa.com $MASTER"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
                 rlRun "ipa hbacrule-add ÃŒ"
@@ -2829,7 +2840,9 @@ hbacsvc_client_bug736314() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user736314"
+                kdestroy
                 rlRun "ssh_auth_success user736314 testpw123@ipa.com $MASTER"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 }
@@ -2841,8 +2854,10 @@ hbacsvc_client2_bug736314() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user736314"
+                kdestroy
                 rlRun "ssh_auth_success user736314 testpw123@ipa.com $MASTER"
                 rlRun "ssh_auth_failure user2 testpw123@ipa.com $MASTER"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 
@@ -2970,7 +2985,9 @@ hbacsvc_client_bug766876() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
                 rlRun "getent -s sss passwd user766876"
+                kdestroy
                 rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 
@@ -2983,7 +3000,9 @@ hbacsvc_client2_bug766876() {
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
                 rlRun "getent -s sss passwd user766876"
+                kdestroy
                 rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 
