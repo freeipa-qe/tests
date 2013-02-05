@@ -109,7 +109,8 @@ uninstall_fornexttest()
 		rlLog "renaming last default.conf"
 		mv $DEFAULT $DEFAULT.old
 	fi
-	service ntpd stop
+	rlRun "service ntpd stop"
+	rlRun "ssh root@$MASTERIP \"echo Secret123|kinit admin;ipa host-del $CLIENT\"" 0,1
 }
 
 install_fornexttest()
