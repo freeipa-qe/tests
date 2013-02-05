@@ -1888,14 +1888,14 @@ irm_del_negative_0001()
 	MASTER)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
 		
-		if [ $(ipa-replica-manage -p $ADMINPW list $MASTER|grep $SLAVE2|wc -l) -gt 0 ]; then
-			rlLog "found $MASTER - $SLAVE2 replication agreement...deleting"
-			rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2"
+		if [ $(ipa-replica-manage -p $ADMINPW list $SLAVE1|grep $SLAVE2|wc -l) -gt 0 ]; then
+			rlLog "found $SLAVE1 - $SLAVE2 replication agreement...deleting"
+			rlRun "ipa-replica-manage -H $SLAVE1 -p $ADMINPW del $SLAVE2 --force"
 		fi
 	
-		rlRun "ipa-replica-manage -p $ADMINPW del $SLAVE2 > $tmpout 2>&1" 1
+		rlRun "ipa-replica-manage -H $SLAVE1 -p $ADMINPW del $SLAVE2 --force > $tmpout 2>&1" 1
 		rlRun "cat $tmpout"
-		rlAssertGrep "'$MASTER' has no replication agreement for '$SLAVE2'" $tmpout
+		rlAssertGrep "'$SLAVE1' has no replication agreement for '$SLAVE2'" $tmpout
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER' -m $BEAKERMASTER"
 		
