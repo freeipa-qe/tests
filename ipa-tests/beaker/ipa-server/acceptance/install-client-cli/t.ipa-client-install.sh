@@ -181,10 +181,14 @@ install_cleanup()
 {
          #Starting ipa sevice on $SLAVE2 and $SLAVE3
         if [ $slave_count -eq 3 ]; then
-         rlRun "echo \"ipactl start\" > $TmpDir/local.sh"
-         rlRun "chmod +x $TmpDir/local.sh"
-         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE2 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA2 IPA server"         
-         rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE3 'bash -s' < $TmpDir/local.sh" 0 "Start REPLICA3 IPA server"         
+         sshopts="-o StrictHostKeyChecking=no"
+         rlRun "ssh $sshopts root@$SLAVE2 \"ipactl start\"" 
+         rlRun "ssh $sshopts root@$SLAVE2 \"echo $ADMINPW|kinit admin\"" 
+         rlRun "ssh $sshopts root@$SLAVE2 \"ipa-replica-manage force-sync --from=$MASTER --force \"" 
+
+         rlRun "ssh $sshopts root@$SLAVE3 \"ipactl start\""
+         rlRun "ssh $sshopts root@$SLAVE3 \"echo $ADMINPW|kinit admin\"" 
+         rlRun "ssh $sshopts root@$SLAVE3 \"ipa-replica-manage force-sync --from=$MASTER --force \"" 
         fi
 }
 
@@ -200,7 +204,9 @@ ipaclientinstall_adminpwd()
 		rlRun "date --set='-2 hours'"
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW -U "
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U " 0 "Installing ipa client and configuring - passing admin and password"
-		rlLog "sleeping to debug"
+        if [ $slave_count -eq 3 ]; then
+            ipaclientinstall_bugcheck_905626
+        fi
         verify_install true nontpspecified 
     rlPhaseEnd
 }
@@ -485,6 +491,9 @@ ipaclientinstall_password()
        qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with password, but missing principal" 
        rlRun "cp /var/log/ipaclient-install.log /var/log/ipaclient-install_password.log"
        rlRun "submit_log /var/log/ipaclient-install_password.log"
+       if [ $slave_count -eq 3 ]; then
+           ipaclientinstall_bugcheck_905626
+       fi
        #rlRun "sleep 1000000"
        
     rlPhaseEnd
@@ -540,6 +549,9 @@ ipaclientinstall_nonadminprincipal()
         fi
 
        install_fornexttest
+       if [ $slave_count -eq 3 ]; then
+           ipaclientinstall_bugcheck_905626
+       fi
     rlPhaseEnd
 }
 
@@ -556,6 +568,9 @@ ipaclientinstall_principalwithinvalidpassword()
 		fi
 		tmpout=$TmpDir/ipaclientinstall_principalwithinvalidpassword.out
 		qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with principal with invalid password" 
+        if [ $slave_count -eq 3 ]; then
+            ipaclientinstall_bugcheck_905626
+        fi
 	rlPhaseEnd
 }
 
@@ -589,9 +604,16 @@ ipaclientinstall_mkhomedir()
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $ADMINPW -U --mkhomedir"
         rlRun "ipa-client-install  -p $ADMINID -w $ADMINPW -U --mkhomedir" 0 "Installing ipa client and configuring pam to create home dir if it does not exist"
+        if [ $slave_count -eq 3 ]; then
+            ipaclientinstall_bugcheck_905626
+        fi
         verify_install true mkhomedir
     rlPhaseEnd
+
     rlPhaseStartTest "ipa-client-install-21- [Positive] Uninstall and remove configuration for pam to create home dir"
+        if [ $slave_count -eq 3 ]; then
+            ipaclientinstall_bugcheck_905626
+        fi
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
         rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client and remove configuration for pam to create home dir"
         verify_install false mkhomedir
@@ -908,15 +930,8 @@ ipaclientinstall_withmasterdown()
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended " 0 \
 			"Installing ipa client and configuring - with all params"
-		rlAssertNotGrep "Can't contact LDAP server" $ipalog
-		rlAssertNotGrep "Failed to verify that $MASTER is an IPA Server" $ipalog
-		rlAssertNotGrep "Installation failed." $ipalog
-		if [ $? -gt 0 ]; then
-			rlFail "BZ 905626 found...ipa-client-install failed to fall over to replica with master down"
-		else
-			rlPass "BZ 905626 not found"
-		fi
 			
+		ipaclientinstall_bugcheck_905626
 		submit_log /var/log/ipaclient-install.log
 
         # Start the MASTER back
