@@ -591,16 +591,19 @@ ssh_auth_success()
 user=$1
 passwd=$2
 host=$3
-	expect -f - <<-EOF | grep -C 77 '^login successful'
-        	spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
-                expect {
-                	"*assword: " {
-                        sleep 5
-                        send -- "$passwd\r"
-                        	}
-                       }
-                expect eof
-EOF
+
+local expfile=/tmp/sshauthsuccess.exp
+   rm -rf $expfile
+   echo 'set timeout 30
+set force_conservative 0
+set send_slow {1 .1}' > $expfile
+   echo "spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'" >> $expfile
+   echo 'expect "*assword: "' >> $expfile
+   echo "send -s -- \"$passwd\"" >> $expfile
+   echo 'send -s -- "\r"' >> $expfile
+   echo 'expect eof ' >> $expfile
+
+   /usr/bin/expect $expfile
 
 if [ $? = 0 ]; then
 	rlPass "Authentication successful for $user, as expected"
@@ -621,16 +624,20 @@ ssh_auth_failure()
 user=$1
 passwd=$2
 host=$3
-        expect -f - <<-EOF | grep -C 77 '^login successful'
-                spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
-                expect {
- 	                "*assword: " {
-                        sleep 5
-                        send -- "$passwd\r"
-                                }
-                       }
-                expect eof
-EOF
+
+local expfile=/tmp/sshauthfailure.exp
+   rm -rf $expfile
+   echo 'set timeout 30
+set force_conservative 0
+set send_slow {1 .1}' > $expfile
+   echo "spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'" >> $expfile
+   echo 'expect "*assword: "' >> $expfile
+   echo "send -s -- \"$passwd\"" >> $expfile
+   echo 'send -s -- "\r"' >> $expfile
+   echo 'expect eof ' >> $expfile
+
+   /usr/bin/expect $expfile
+
 
 if [ $? = 0 ]; then
 	rlFail "ERROR: Authentication success for $user, expected failure."
