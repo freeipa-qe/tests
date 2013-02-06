@@ -12,7 +12,7 @@ SLAVE3=`echo $SLAVE|cut -d " " -f3 | xargs echo`
 
 clientinstall_primary_server()
 {
- setup ; touch /tmp/IPAQE_DEBUG_PAUSE
+ setup #; touch /tmp/IPAQE_DEBUG_PAUSE
  ipaclientinstall_fixed_primary_param_TC_1  ; debug_pause
  ipaclientinstall_fixed_primary_param_TC_2  ; debug_pause
  ipaclientinstall_fixed_primary_param_TC_3  ; debug_pause
@@ -42,6 +42,7 @@ setup()
        if [ $? -eq 1 ];then
          rlRun "yum install sssd-tools -y" 0 "Installing sssd-tools for clearing sssd cache"
        fi
+       sleep 60
 }
 
 ipaclientinstall_fixed_primary_param_TC_1()
