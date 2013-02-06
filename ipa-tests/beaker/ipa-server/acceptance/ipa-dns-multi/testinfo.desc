@@ -1,10 +1,10 @@
 Owner:           Michael Gregg <mgregg@redhat.com>
-Name:            /CoreOS/ipa-server/acceptance/ipa-dns
+Name:            /CoreOS/ipa-server/acceptance/ipa-dns-multi
 TestVersion:     1.0
-Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-dns
-Description:     Tests setup and exercise of nis integrated ipa tasks
+Path:            /mnt/tests/CoreOS/ipa-server/acceptance/ipa-dns-multi
+Description:     Tests setup and exercise multi host DNS tests
 Type:            Regression
-TestTime:        15m
+TestTime:        30m
 RunFor:          ipa-server
 Requires:        ipa-admintools
 Requires:        expect

@@ -67,7 +67,6 @@ rlJournalStart
 
   # run tests
   dnsacceptance  
-  dnspkey
   dnsbugs
 
   rlPhaseStartCleanup "DNS CLEANUP"
