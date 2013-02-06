@@ -547,6 +547,9 @@ ipaclientinstall_nonadminprincipal()
         else
        		qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with non-admin principal" "$expmsg"
         fi
+        if [ $slave_count -eq 3 ]; then
+            ipaclientinstall_bugcheck_905626
+        fi
 
        install_fornexttest
        if [ $slave_count -eq 3 ]; then
@@ -633,6 +636,9 @@ ipaclientinstall_enablednsupdates()
 	sleep 10
         rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $ADMINPW -U --enable-dns-updates"
         rlRun "ipa-client-install  -p $ADMINID -w $ADMINPW -U --enable-dns-updates" 0 "Installing ipa client and enable dynamic dns updates"
+        if [ $slave_count -eq 3 ]; then
+            ipaclientinstall_bugcheck_905626
+        fi
         verify_install true enablednsupdates
     rlPhaseEnd
     rlPhaseStartTest "ipa-client-install-23- [Positive] Uninstall and disable dynamic dns updates"
