@@ -1,0 +1,36 @@
+<job>
+	<whiteboard>
+		ipa-server dns tests fedora 17 x86_64
+	</whiteboard>
+	<recipeSet>
+		<recipe whiteboard="ipa dns tests - fedora x86_64" ks_meta="selinux=disabled partitions=yes">
+			<distroRequires>
+				<and>
+					<distro_family op="=" value="Fedora17"/>
+					<distro_virt op="=" value=""/>
+					<distro_variant op="=" value="Fedora"/>
+					<distro_name op="=" value="Fedora-17"/>
+					<distro_arch op="=" value="x86_64"/>
+				</and>
+			</distroRequires>
+			<hostRequires/>
+			<repos>
+				<repo name="ipa" url="http://jdennis.fedorapeople.org/ipa-devel/fedora/17/x86_64/os/"/>
+				<repo name="fc17-mv-updates" url="http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/x86_64/"/>
+			</repos>
+			<task name="/distribution/install" role="STANDALONE">
+				<params/>
+			</task>
+                        <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+                               <params/>
+                        </task>
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
+				<params/>
+			</task>
+		</recipe>
+	</recipeSet>
+</job>
+
