@@ -853,11 +853,16 @@ SetUpKnownHosts()
 	restorecon -R /root/.ssh
 	for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
 		for server in $(eval echo \$$var); do
+			ip=$(dig +short $server)
 			#AddToKnownHosts $server
-			if [ -f /root/.ssh/known_hosts ]; then
-				ssh-keygen -R $server
+			if [ ! -f /root/.ssh/known_hosts ]; then
+				touch /root/.ssh/known_hosts
 			fi
+			ssh-keygen -R $server 2>/dev/null
 			ssh-keyscan $server >> /root/.ssh/known_hosts
+
+			ssh-keygen -R $ip 2>/dev/null
+			ssh-keyscan $ip >> /root/.ssh/known_hosts
 		done
 	done
 }
