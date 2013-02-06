@@ -766,7 +766,7 @@ ipaserverinstall_set_cn()
 ####################################################################################
 ipaserverinstall_krb5_dependency()
 {
-    rlPhaseStartTest "ipa-server-install - 31 - [Positive] Ensure that ipa-server contains bot a >= entry and a < entry"
+    rlPhaseStartTest "ipa-server-install - 31 - [Positive] Ensure that ipa-server krb5-server depends contains both a >= entry and a < entry"
 	rlRun "rpm -q --requires ipa-server | grep krb5-server | grep '>='" 0 "Does the ipa-server package contain a greater than and equal to check on krb5-server"
 	rlRun "rpm -q --requires ipa-server | grep krb5-server | grep '<'" 0 "Does the ipa-server package contain a less than and equal to check on krb5-server"
     rlPhaseEnd
