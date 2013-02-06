@@ -12,28 +12,28 @@ SLAVE3=`echo $SLAVE|cut -d " " -f3 | xargs echo`
 
 clientinstall_primary_server()
 {
- setup
- ipaclientinstall_fixed_primary_param_TC_1
- ipaclientinstall_fixed_primary_param_TC_2
- ipaclientinstall_fixed_primary_param_TC_3
- ipaclientinstall_fixed_primary_param_TC_4
- ipaclientinstall_fixed_primary_param_TC_5
- ipaclientinstall_fixed_primary_param_TC_6
- ipaclientinstall_fixed_primary_param_TC_7
- ipaclientinstall_fixed_primary_param_TC_8
- ipaclientinstall_fixed_primary_param_TC_9
- ipaclientinstall_fixed_primary_param_TC_10
- ipaclientinstall_fixed_primary_param_TC_11
- ipaclientinstall_fixed_primary_param_TC_12
- ipaclientinstall_fixed_primary_param_TC_13
- ipaclientinstall_fixed_primary_param_TC_14
- ipaclientinstall_fixed_primary_param_TC_15
- ipaclientinstall_fixed_primary_param_TC_16
- ipaclientinstall_fixed_primary_param_TC_17
- ipaclientinstall_fixed_primary_param_TC_18
- ipaclientinstall_fixed_primary_param_TC_19
+ setup ; touch /tmp/IPAQE_DEBUG_PAUSE
+ ipaclientinstall_fixed_primary_param_TC_1  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_2  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_3  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_4  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_5  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_6  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_7  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_8  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_9  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_10  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_11  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_12  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_13  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_14  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_15  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_16  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_17  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_18  ; debug_pause
+ ipaclientinstall_fixed_primary_param_TC_19  ; debug_pause
  #Added following test cases from t.ipa-client-install.sh here because it enables iptables on IPA Servers
- ipaclientinstall_server_unreachableserver  
+ ipaclientinstall_server_unreachableserver    ; debug_pause
 }
 
 setup()

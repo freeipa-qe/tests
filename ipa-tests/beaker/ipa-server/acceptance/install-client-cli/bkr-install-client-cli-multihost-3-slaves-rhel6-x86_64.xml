@@ -41,7 +41,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="MASTER">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA SLAVE1">
@@ -82,7 +84,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="SLAVE">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA SLAVE2">
@@ -123,7 +127,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="SLAVE">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA SLAVE3">
@@ -164,7 +170,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="SLAVE">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="IPA CLIENT">
@@ -205,7 +213,9 @@
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/install-client-cli" role="CLIENT">
-				<params/>
+				<params>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
 			</task>
 		</recipe>
 	</recipeSet>
