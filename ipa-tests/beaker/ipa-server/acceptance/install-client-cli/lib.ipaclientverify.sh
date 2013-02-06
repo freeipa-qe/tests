@@ -626,4 +626,10 @@ writesssdconf()
 
 }
 
-
+debug_pause()
+{
+	while [ -f /tmp/IPAQE_DEBUG_PAUSE ]; do
+		rlLog "Paused for debugging...sleeping"
+		sleep 60
+	done
+}
