@@ -592,6 +592,70 @@ user=$1
 passwd=$2
 host=$3
 
+    expect -f - <<-EOF | grep -C 77 '^login successful'
+                        spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+                        expect {
+                                "*assword: " {
+                                sleep 5
+                                send -- "$passwd\r"
+                                        }
+                               }
+                        expect eof
+        EOF
+
+
+if [ $? = 0 ]; then
+	rlPass "Authentication successful for $user, as expected"
+	else   
+        rlFail "ERROR: Authentication failed for $user, expected success."
+fi
+        }
+   }
+
+
+####################################################################
+## ssh_auth_failure
+## Usage: ssh_auth_failure user password host
+
+ssh_auth_failure()
+   {
+        {
+user=$1
+passwd=$2
+host=$3
+
+    expect -f - <<-EOF | grep -C 77 '^login successful'
+                        spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+                        expect {
+                                "*assword: " {
+                                sleep 5
+                                send -- "$passwd\r"
+                                        }
+                               }
+                        expect eof
+        EOF
+
+
+if [ $? = 0 ]; then
+	rlFail "ERROR: Authentication success for $user, expected failure."
+        else
+        rlPass "Authentication failed for $user, as expected"
+fi
+        }
+   }
+
+
+####################################################################
+## ssh_auth_success
+## Usage: ssh_auth_success user password host
+
+ssh_master_auth_success()
+   {
+        {
+user=$1
+passwd=$2
+host=$3
+
 local expfile=/tmp/sshauthsuccess.exp
    rm -rf $expfile
    echo 'set timeout 30
@@ -618,14 +682,14 @@ fi
 ## ssh_auth_failure
 ## Usage: ssh_auth_failure user password host
 
-ssh_auth_failure()
+ssh_master_auth_failure()
    {
         {
 user=$1
 passwd=$2
 host=$3
 
-local expfile=/tmp/sshauthfailure.exp
+local expfile=/tmp/sshauthsuccess.exp
    rm -rf $expfile
    echo 'set timeout 30
 set force_conservative 0
@@ -637,7 +701,6 @@ set send_slow {1 .1}' > $expfile
    echo 'expect eof ' >> $expfile
 
    /usr/bin/expect $expfile
-
 
 if [ $? = 0 ]; then
 	rlFail "ERROR: Authentication success for $user, expected failure."

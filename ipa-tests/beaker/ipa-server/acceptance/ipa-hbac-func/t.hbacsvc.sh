@@ -53,8 +53,8 @@ hbacsvc_master_001() {
 
 
                 kdestroy
-		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
-		rlRun "ssh_auth_success $user3 testpw123@ipa.com $MASTER"
+		rlRun "ssh_master_auth_success $user1 testpw123@ipa.com $MASTER"
+		rlRun "ssh_master_auth_success $user3 testpw123@ipa.com $MASTER"
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-add admin_allow_all --hostcat=all --srchostcat=all --servicecat=all"
 		rlRun "ipa hbacrule-add-user admin_allow_all --groups=admins"
@@ -99,9 +99,13 @@ hbacsvc_client_001() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-001: $user1 accessing $CLIENT from $CLIENT using SSHD service."
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
 		sleep 5
+                 kinitAs $ADMINID $ADMINPW
+                ipa hbacrule-find
+		rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT --host=$CLIENT --service=sshd --rule=rule1 | grep -Ex '(Access granted: False|  notmatched: rule1)'"
+                kdestroy
                 rlRun "ssh_auth_success $user1 testpw123@ipa.com $CLIENT"
                 rlRun "ssh_auth_failure $user2 testpw123@ipa.com $CLIENT"
                 rlRun "rm -fr /tmp/krb5cc_*_*"
@@ -113,8 +117,9 @@ hbacsvc_client2_001() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-001: $user1 accessing $CLIENT from $CLIENT2 using SSHD service."
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
+                kdestroy
                 rlRun "ssh_auth_failure $user1 testpw123@ipa.com $CLIENT2"
                 rlRun "rm -fr /tmp/krb5cc_*_*"
 
@@ -179,14 +184,13 @@ hbacsvc_client_002() {
 
 	rlPhaseStartTest "ipa-hbacsvc-client1-002: $user1 accessing $MASTER from $CLIENT2 using FTP service"
 
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		#rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
                 kdestroy
 		# Source host validation has been depricated which caused the following test to fail, hence updating accordingly.
 		rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
 		rlRun "rm -fr /tmp/krb5cc_*_*"
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlPhaseEnd
 }
@@ -195,7 +199,7 @@ hbacsvc_client2_002() {
 
 	rlPhaseStartTest "ipa-hbacsvc-client2-002: $user1 accessing $MASTER from $CLIENT2 using FTP service"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user1"
                 rlRun "getent -s sss passwd $user2"
 		sleep 5
@@ -203,7 +207,7 @@ hbacsvc_client2_002() {
                 rlRun "ftp_auth_success $user1 testpw123@ipa.com $MASTER"
 		rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
 		rlRun "rm -fr /tmp/krb5cc_*_*"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlPhaseEnd
 
@@ -330,13 +334,12 @@ hbacsvc_client_003() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-003: $user3 accessing $MASTER from $CLIENT2 using default FTP service group"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user3"
                 kdestroy
                 rlRun "ftp_auth_failure $user2 testpw123@ipa.com $MASTER"
                 rlRun "ftp_auth_success $user3 testpw123@ipa.com $MASTER"
                 rlRun "rm -fr /tmp/krb5cc_*_*"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 }
@@ -345,13 +348,12 @@ hbacsvc_client2_003() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-003: $user3 accessing $MASTER from $CLIENT2 using default FTP service group"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd $user3"
 		sleep 5
                 kdestroy
                 rlRun "ftp_auth_success $user3 testpw123@ipa.com $MASTER"
                 rlRun "rm -fr /tmp/krb5cc_*_*"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 
@@ -409,9 +411,10 @@ hbacsvc_client_004() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-004: user4 accessing hostgroup from $CLIENT2"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user4"
+                kdestroy
                 rlRun "ssh_auth_success user4 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -421,8 +424,9 @@ hbacsvc_client2_004() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-004: user4 accessing hostgroup from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user4"
+                kdestroy
                 rlRun "ssh_auth_failure user2 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -481,9 +485,10 @@ hbacsvc_client_005() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-005: user5 accessing $CLIENT from hostgroup"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user5"
 		sleep 5
+                kdestroy
                 rlRun "ssh_auth_success user5 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -493,8 +498,9 @@ hbacsvc_client2_005() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-005: user5 accessing $CLIENT from hostgroup"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user5"
+                kdestroy
                 rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
@@ -530,8 +536,9 @@ hbacsvc_client_005_1() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-005_1: user5 is removed from rule5"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user5"
+                kdestroy
                 rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
@@ -541,8 +548,9 @@ hbacsvc_client2_005_1() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-005_1: user5 is removed from rule5"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user5"
+                kdestroy
                 rlRun "ssh_auth_failure user5 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
@@ -595,8 +603,9 @@ hbacsvc_client_006() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-006: user6 accessing hostgroup2 from hostgroup"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user6"
+                kdestroy
                 rlRun "ssh_auth_failure user6 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -606,9 +615,10 @@ hbacsvc_client2_006() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-006: user6 accessing hostgroup2 from hostgroup"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user6"
 		sleep 5
+                kdestroy
                 rlRun "ssh_auth_success user6 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
@@ -662,13 +672,14 @@ hbacsvc_client_007() {
 
 	rlPhaseStartTest "ipa-hbacsvc-client1-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		#rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd user7"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		# This if-statement accounts for lack of source host validation in RHEL6.3 and later.  
 		# RHEL5 though still appears to have source host validation and needs the failure check here.
 		# RHEL5.9 is getting source host validation disabled also so changing the test
 		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+                kdestroy
 		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
 		else
@@ -683,9 +694,10 @@ hbacsvc_client2_007() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-007: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp (BZ 830347)"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ssh root@$CLIENT 'getent -s sss passwd user7'"
 		sleep 5
+                kdestroy
                 rlRun "ssh_auth_success user7 testpw123@ipa.com $CLIENT"
 				rlRun "ssh root@$CLIENT 'tail -20 /var/log/secure'"
 				if [ $? -gt 0 ]; then
@@ -743,8 +755,9 @@ hbacsvc_client_007_1() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-007_1: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user7"
+                kdestroy
                 rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
@@ -754,8 +767,9 @@ hbacsvc_client2_007_1() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-007_1: user7 accessing hostgroup2 from hostgroup - hbacsvcgrp"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user7"
+                kdestroy
                 rlRun "ssh_auth_failure user7 testpw123@ipa.com $CLIENT"
 
         rlPhaseEnd
@@ -807,9 +821,10 @@ hbacsvc_client_008() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user8"
 		sleep 5
+                kdestroy
                 rlRun "ssh_auth_success user8 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -819,10 +834,11 @@ hbacsvc_client2_008() {
 
 	rlPhaseStartTest "ipa-hbacsvc-client2-008: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
-		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "getent -s sss passwd user8"
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
 		SRCHOSTENABLED=$(man sssd-ipa|cat|col -bx | grep "ipa_hbac_support_srchost.*(boolean)"|wc -l)
+                kdestroy
 		if [ $SRCHOSTENABLED -eq 0 ]; then
 			rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
 		else
@@ -865,8 +881,9 @@ hbacsvc_client_008_1() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-008_1: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user8"
+                kdestroy
                 rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -876,8 +893,9 @@ hbacsvc_client2_008_1() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-008_1: user8 from grp8 part of rule8 is allowed to access $CLIENT2 from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user8"
+                kdestroy
                 rlRun "ssh_auth_failure user8 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -931,9 +949,10 @@ hbacsvc_client_009() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-009: user9 from grp9 part of rule9 is allowed to access $CLIENT2 from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "getent -s sss passwd user9"
 		sleep 5
+                kdestroy
                 rlRun "ssh_auth_success user9 testpw123@ipa.com $CLIENT2"
 
         rlPhaseEnd
@@ -2733,9 +2752,10 @@ hbacsvc_master_032() {
 
         rlPhaseStartTest "ipa-hbacsvc-032: $user32 part of ÃŒÃŒ (UTF-8) is allowed to access $CLIENT from $CLIENT - SSHD Service"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "ssh_auth_success $user32 testpw123@ipa.com $MASTER"
+                kdestroy
+                rlRun "ssh_master_auth_success $user32 testpw123@ipa.com $MASTER"
 
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
 
                 rlRun "ipa hbacrule-add ÃŒÃŒ"
@@ -2837,12 +2857,11 @@ hbacsvc_client_bug736314() {
 
         rlPhaseStartTest "ipa-hbacsvc-client1-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user736314"
                 kdestroy
                 rlRun "ssh_auth_success user736314 testpw123@ipa.com $MASTER"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 }
@@ -2851,13 +2870,12 @@ hbacsvc_client2_bug736314() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		sleep 5
                 rlRun "getent -s sss passwd user736314"
                 kdestroy
                 rlRun "ssh_auth_success user736314 testpw123@ipa.com $MASTER"
                 rlRun "ssh_auth_failure user2 testpw123@ipa.com $MASTER"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 
@@ -2982,12 +3000,11 @@ hbacsvc_client_bug766876() {
 
         rlPhaseStartTest "ipa-hbacsvc-client-bug766876: ipa_hbac_support_srchost is set to false - Case 1"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
                 rlRun "getent -s sss passwd user766876"
                 kdestroy
                 rlRun "ssh_auth_success user766876 testpw123@ipa.com $MASTER"
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlPhaseEnd
 
@@ -2997,7 +3014,7 @@ hbacsvc_client2_bug766876() {
 
         rlPhaseStartTest "ipa-hbacsvc-client2-bug766876: ipa_hbac_support_srchost is set to false - Case 1"
 
-                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+#                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 sleep 5
                 rlRun "getent -s sss passwd user766876"
                 kdestroy
@@ -3123,7 +3140,9 @@ hbacsvc_master_bug771706() {
 		rlRun "ipa hbacsvcgroup-add svcgroup1 --desc=svcgroup1"
 		rlRun "ipa hbacrule-add-service rule771706 --hbacsvcgroups=svcgroup1"
 
-		rlRun "ssh_auth_failure user771706 $userpw $MASTER"
+                kdestroy
+		rlRun "ssh_master_auth_failure user771706 $userpw $MASTER"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 		rlRun "ipa hbacrule-del rule771706"
 
@@ -3135,10 +3154,13 @@ hbacsvc_master_bug771706() {
 		rlRun "ipa hbacrule-add-host rule771706 --hosts=$MASTER"
 		rlRun "ipa hbacrule-add-sourcehost rule771706 --hostgroups=testhostgroup1"
 
-		rlRun "ssh_auth_success user771706 $userpw $MASTER"
+                kdestroy
+		rlRun "ssh_master_auth_success user771706 $userpw $MASTER"
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hostgroup-del testhostgroup1"
 		rlRun "ipa hbacrule-add-sourcehost rule771706 --hosts=$MASTER"
-		rlRun "ssh_auth_success user771706 $userpw $MASTER"
+                kdestroy
+		rlRun "ssh_master_auth_success user771706 $userpw $MASTER"
 
         rlPhaseEnd
 }
