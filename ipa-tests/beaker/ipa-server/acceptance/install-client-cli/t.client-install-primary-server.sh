@@ -602,7 +602,7 @@ host_del()
 {
         rlRun "echo \"echo Secret123|kinit admin;ipa host-del $CLIENT\" > $TmpDir/local.sh"
         rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTERIP 'bash -s' < $TmpDir/local.sh" 0,1,2
 		#0 "Deleting host from MASTER IPA server"
 		rlRun "sleep 10"
 }
