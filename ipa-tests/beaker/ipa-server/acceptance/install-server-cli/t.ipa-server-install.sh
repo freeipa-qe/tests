@@ -117,15 +117,15 @@ ipaserverinstall()
 #     with unclear error messages (inside DNS check)
       ipaserverinstall_bz815849
  
-#     Add test to verify bug 886091 : Disallow root SSH public key authentication 
-      ipaserverinstall_bz886091
-
 #     Test for Bug 872707 - ipa-server dependency on krb5-server is not adequate
       ipaserverinstall_krb5_dependency
 
 #  --selfsign            Configure a self-signed CA instance rather than a dogtag CA
     ipaserverinstall_selfsign
 # This should be last test - then run IPA Functional tests against this server
+
+#     Add test to verify bug 886091 : Disallow root SSH public key authentication 
+      ipaserverinstall_bz886091
 
 }
 
