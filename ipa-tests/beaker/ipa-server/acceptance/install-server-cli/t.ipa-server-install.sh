@@ -631,8 +631,10 @@ ipaserverinstall_bz817080()
 		else
 			rlPass "BZ 817080 not found"
 		fi
+		rlRun "service certmonger start"
 		rlRun "getcert stop-tracking -d /tmp/certdb -n bz817080"
 		rlRun "rm -rf /tmp/certdb"
+		rlRun "service certmonger stop"
 	rlPhaseEnd
 }
 
