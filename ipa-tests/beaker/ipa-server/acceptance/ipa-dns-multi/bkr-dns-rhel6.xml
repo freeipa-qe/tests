@@ -1,12 +1,12 @@
 <job>
 	<whiteboard>
-		ipa-server dns tests rhel6 x86_64
+		ipa-server multi master dns tests rhel6 x86_64
 	</whiteboard>
 	<recipeSet>
-		<recipe whiteboard="ipa dns tests - rhel6 x86_64" role="MASTER" ks_meta="partitions=yes">
+		<recipe whiteboard="ipa dns tests - rhel6 x86_64" role="MASTER_env1" ks_meta="partitions=yes">
 			<distroRequires>
 				<and>
-i					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
@@ -23,17 +23,22 @@ i					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
                         <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
                                <params/>
                         </task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ipa-server ipa-client dig vim"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="MASTER_env1">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns-multi" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
-		<recipe whiteboard="ipa dns tests - rhel6 x86_64" role="SLAVE" ks_meta="partitions=yes">
+		<recipe whiteboard="ipa dns tests - rhel6 x86_64" role="MASTER_env2" ks_meta="partitions=yes">
 			<distroRequires>
 				<and>
-i					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_variant op="=" value="Server"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
@@ -50,10 +55,15 @@ i					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
                         <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
                                <params/>
                         </task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect ipa-server ipa-client dig vim"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="MASTER_env1">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns-multi" role="SLAVE">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
