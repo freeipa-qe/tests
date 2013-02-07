@@ -40,7 +40,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hbac-func" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-hbac-func" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
@@ -81,7 +81,7 @@
 			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hbac-func" role="CLIENT">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-hbac-func" role="SLAVE">
 				<params/>
 			</task>
 		</recipe>
