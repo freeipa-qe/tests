@@ -111,6 +111,7 @@ uninstall_fornexttest()
 	fi
 	rlRun "service ntpd stop"
 	rlRun "ssh root@$MASTERIP \"echo Secret123|kinit admin;ipa host-del $CLIENT\"" 0,1,2
+	rlRun "sleep 60"
 }
 
 install_fornexttest()
