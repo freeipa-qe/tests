@@ -344,9 +344,9 @@ ipaclientinstall_server_unreachableserver()
        rlLog "M=$MASTERIP ; S=$SLAVEIP"
        ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo 'service iptables stop' >> /tmp/at.1.sh\""
-       rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"at -f /tmp/at.1.sh now + 1 minute\""
+       rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"at -f /tmp/at.1.sh now + 2 minutes\""
        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"echo 'service iptables stop' >> /tmp/at.1.sh\""
-       rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"at -f /tmp/at.1.sh now + 1 minute\""
+       rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"at -f /tmp/at.1.sh now + 2 minutes\""
        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on MASTER IPA server"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"iptables -A INPUT -s $ipaddr -j REJECT\"" 0 "Start Firewall on SLAVE IPA server"
        rlLog "EXECUTING: ipa-client-install -U"
@@ -363,8 +363,9 @@ ipaclientinstall_server_unreachableserver()
            rlPass "Alternate expected error seen due to environment: $expmsg2"	
        else
            rlFail "Unexpected output seen"
+           submit_log /var/log/ipaclient-install.log
        fi
-       rlRun "sleep 100"
+       rlRun "sleep 150"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
     rlPhaseEnd

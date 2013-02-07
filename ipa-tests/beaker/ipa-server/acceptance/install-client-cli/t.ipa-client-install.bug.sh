@@ -46,12 +46,16 @@ ipaclientinstall_bugcheck_845691()
 		if [ $CHK1 -gt 0 ]; then
 			rlLog "[FAIL1] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
 			submit_log /var/log/ipaclient-install.log
+			rlRun "mail -s BZ845691 spoore@redhat.com </dev/null"
+			rlRun "sleep 86400"
 		fi
 
 		CHK2=$(grep "kinit: Client.*not found in Kerberos database while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
 		if [ $CHK2 -gt 0 ]; then
 			rlLog "[FAIL2] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
 			submit_log /var/log/ipaclient-install.log
+			rlRun "mail -s BZ845691 spoore@redhat.com </dev/null"
+			rlRun "sleep 86400"
 		fi
 	rlPhaseEnd
 }
