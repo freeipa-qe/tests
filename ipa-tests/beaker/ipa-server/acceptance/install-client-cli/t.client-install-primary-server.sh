@@ -232,11 +232,13 @@ ipaclientinstall_fixed_primary_param_TC_9()
        AVCCHKTS=$(date +%H:%M:%S)
        rlLog "EXECUTING: ipa-client-install --fixed-primary --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
        rlRun "ipa-client-install --fixed-primary --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
+       rlRun "cat /etc/sssd/sssd.conf"
        rlAssertGrep "ipa_server = $MASTER" "$SSSD"
        sssd_set_config_level
        rlRun "id admin;getent passwd admin;echo Secret123|kinit admin"
        rlAssertGrep "Option ipa_server has value $MASTER" "$sssd_log_file"
        rlAssertNotGrep "Marking server '$MASTER' as 'working'" "$sssd_log_file"
+       submit_log $sssd_log_file
        rlAssertGrep "Added Server $MASTER" "/var/log/sssd/sssd_LDAP-KRB5.log"
        rlAssertGrep "Marking server '$MASTER' as 'working'" "/var/log/sssd/sssd_LDAP-KRB5.log"
 
