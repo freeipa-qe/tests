@@ -601,7 +601,7 @@ host=$3
                                         }
                                }
                         expect eof
-        EOF
+EOF
 
 
 if [ $? = 0 ]; then
@@ -633,7 +633,7 @@ host=$3
                                         }
                                }
                         expect eof
-        EOF
+EOF
 
 
 if [ $? = 0 ]; then
