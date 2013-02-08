@@ -45,6 +45,8 @@ hbacsvc_master_001() {
 
                 # kinit as admin and creating users
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser $user1 $user1 $user1 Secret123"
+		rlRun "ssh_auth_success $user1 Secret123 $MASTER"
         for i in {1..3}; do
                 rlRun "create_ipauser user$i user$i user$i $userpw"
                 sleep 5
@@ -53,8 +55,8 @@ hbacsvc_master_001() {
 
 
                 kdestroy
-		rlRun "ssh_master_auth_success $user1 testpw123@ipa.com $MASTER"
-		rlRun "ssh_master_auth_success $user3 testpw123@ipa.com $MASTER"
+		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
+		rlRun "ssh_auth_success $user3 testpw123@ipa.com $MASTER"
         	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hbacrule-add admin_allow_all --hostcat=all --srchostcat=all --servicecat=all"
 		rlRun "ipa hbacrule-add-user admin_allow_all --groups=admins"
@@ -2753,7 +2755,7 @@ hbacsvc_master_032() {
         rlPhaseStartTest "ipa-hbacsvc-032: $user32 part of ÃŒÃŒ (UTF-8) is allowed to access $CLIENT from $CLIENT - SSHD Service"
 
                 kdestroy
-                rlRun "ssh_master_auth_success $user32 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_success $user32 testpw123@ipa.com $MASTER"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "ipa hbacrule-disable allow_all"
@@ -3141,7 +3143,7 @@ hbacsvc_master_bug771706() {
 		rlRun "ipa hbacrule-add-service rule771706 --hbacsvcgroups=svcgroup1"
 
                 kdestroy
-		rlRun "ssh_master_auth_failure user771706 $userpw $MASTER"
+		rlRun "ssh_auth_failure user771706 $userpw $MASTER"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 		rlRun "ipa hbacrule-del rule771706"
@@ -3155,12 +3157,12 @@ hbacsvc_master_bug771706() {
 		rlRun "ipa hbacrule-add-sourcehost rule771706 --hostgroups=testhostgroup1"
 
                 kdestroy
-		rlRun "ssh_master_auth_success user771706 $userpw $MASTER"
+		rlRun "ssh_auth_success user771706 $userpw $MASTER"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa hostgroup-del testhostgroup1"
 		rlRun "ipa hbacrule-add-sourcehost rule771706 --hosts=$MASTER"
                 kdestroy
-		rlRun "ssh_master_auth_success user771706 $userpw $MASTER"
+		rlRun "ssh_auth_success user771706 $userpw $MASTER"
 
         rlPhaseEnd
 }
