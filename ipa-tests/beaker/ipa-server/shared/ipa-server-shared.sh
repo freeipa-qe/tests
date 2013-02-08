@@ -593,14 +593,13 @@ passwd=$2
 host=$3
 
     expect -f - <<-EOF | grep -C 77 '^login successful'
-                        spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
-                        expect {
-                                "*assword: " {
-                                sleep 5
-                                send -- "$passwd\r"
-                                        }
-                               }
-                        expect eof
+            spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+            expect {
+                    "*assword: " {
+                    send -- "$passwd\r"
+                            }
+                   }
+            expect eof
 EOF
 
 
@@ -625,14 +624,13 @@ passwd=$2
 host=$3
 
     expect -f - <<-EOF | grep -C 77 '^login successful'
-                        spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
-                        expect {
-                                "*assword: " {
-                                sleep 5
-                                send -- "$passwd\r"
-                                        }
-                               }
-                        expect eof
+           spawn ssh -q -o StrictHostKeyChecking=no -l "$user" $host echo 'login successful'
+           expect {
+                  "*assword: " {
+                   send -- "$passwd\r"
+                           }
+                  }
+           expect eof
 EOF
 
 
