@@ -624,6 +624,7 @@ rlJournalStart
 
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
 		rlRun "authconfig --enablemkhomedir --updateall"
+        rlRun "service sssd restart"
         	rlRun "cat /dev/shm/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"
