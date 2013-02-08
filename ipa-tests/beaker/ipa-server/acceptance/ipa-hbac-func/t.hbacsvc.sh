@@ -45,8 +45,6 @@ hbacsvc_master_001() {
 
                 # kinit as admin and creating users
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-                rlRun "create_ipauser $user1 $user1 $user1 Secret123"
-		rlRun "ssh_auth_success $user1 Secret123 $MASTER"
         for i in {1..3}; do
                 rlRun "create_ipauser user$i user$i user$i $userpw"
                 sleep 5
