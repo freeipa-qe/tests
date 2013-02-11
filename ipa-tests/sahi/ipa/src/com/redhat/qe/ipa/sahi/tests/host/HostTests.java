@@ -577,19 +577,41 @@ public class HostTests extends SahiTestScript{
 	/*
 	 * host remove keytab tests
 	 */
-	@Test (groups={"hostRemoveKeytabTests"}, dataProvider="getHostRemoveKeytabTestObjects", dependsOnGroups="hostGetKeytabTests" )	
+	@Test (groups={"hostRemoveKeytabTests"}, dataProvider="getHostRemoveKeytabTestObjects", dependsOnGroups={"hostGetKeytabTests","hostRemoveKeytabCancelTests_Bug818665"} )	
 	public void testremoveHostKeytab(String testName ) throws Exception {
 		if (System.getProperty("os.name").startsWith("Windows")) {
     		log.info("Skipping test - not valid test for Windows");
     	} else {
     		String fqdn = testhost + "." + domain;
     		//  unprovision keytab
-    		HostTasks.deleteHostKeytab(sahiTasks, fqdn, "Unprovision");
+    		HostTasks.unprovisionHost(sahiTasks, fqdn, "Unprovision");
     		// verify service has a keytab
     		HostTasks.verifyHostKeytab(sahiTasks, fqdn, false);
     	}
 		
 	}
+	
+	
+	/*
+	 * host remove keytab cancel test (Bz818665)
+	 */
+	@Test (groups={"hostRemoveKeytabCancelTests_Bug818665"}, dataProvider="getHostRemoveKeytabCancelTestObjects", dependsOnGroups="hostGetKeytabTests" )	
+	public void cencelTestremoveHostKeytab(String testName ) throws Exception {
+		if (System.getProperty("os.name").startsWith("Windows")) {
+    		log.info("Skipping test - not valid test for Windows");
+    	} else {
+    		String fqdn = testhost + "." + domain;
+    		//  unprovision keytab
+    		HostTasks.unprovisionHost(sahiTasks, fqdn, "Cancel");
+    		
+    		// verify service has a keytab
+    		HostTasks.verifyHostKeytab(sahiTasks, fqdn, true);
+    		
+    		
+    	}
+		
+	}
+	
 	
 	/*
 	 * Bug835640 verification 
@@ -1038,6 +1060,22 @@ public class HostTests extends SahiTestScript{
 		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_reset_backlink",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa6",	"sshkey-status[5]",	"Reset" 	  } ));
 		ll.add(Arrays.asList(new Object[]{ "add_host_sshkey_update1_backlink",	"myhost1.testrelm.com",	"rsa",		"myhost1_rsa6",	"sshkey-status[5]",	"Update" 	  } ));       
 		return ll;		
+	}
+	
+	/*
+	 * Data to be used canceling deleting keytab
+	 */
+	@DataProvider(name="getHostRemoveKeytabCancelTestObjects")
+	public Object[][] getHostRemoveKeytabCancelTestObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createHostRemoveKeytabTestObjects());
+	}
+	protected List<List<Object>> createHostRemoveKeytabCancelTestObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //									testname					
+		ll.add(Arrays.asList(new Object[]{ 	"Cancel_unprovision_host_keytab_bz818665" } ));
+		
+		return ll;	
 	}
 	
 	/*
