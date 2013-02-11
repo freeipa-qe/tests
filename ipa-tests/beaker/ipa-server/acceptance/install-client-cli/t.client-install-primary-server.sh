@@ -115,6 +115,7 @@ ipaclientinstall_fixed_primary_param_TC_5()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
+		rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE2" "$SSSD"
         sssd_set_config_level
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin"
@@ -135,6 +136,7 @@ ipaclientinstall_fixed_primary_param_TC_6()
 		rlRun "sleep 60"
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$SLAVE3 --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$SLAVE3 --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
+		rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $SLAVE3, $MASTER" "$SSSD"
         sssd_set_config_level
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin"
@@ -233,6 +235,7 @@ ipaclientinstall_fixed_primary_param_TC_9()
        rlLog "EXECUTING: ipa-client-install --fixed-primary --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd"
        rlRun "ipa-client-install --fixed-primary --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --preserve-sssd" 0 "Installing ipa client with preserve-sssd"
        rlRun "cat /etc/sssd/sssd.conf"
+       rlRun "cat $SSSD"
        rlAssertGrep "ipa_server = $MASTER" "$SSSD"
        sssd_set_config_level
        rlRun "id admin;getent passwd admin;echo Secret123|kinit admin"
@@ -266,6 +269,7 @@ ipaclientinstall_fixed_primary_param_TC_10()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER 
@@ -292,6 +296,7 @@ ipaclientinstall_fixed_primary_param_TC_11()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE2" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER 
@@ -320,6 +325,7 @@ ipaclientinstall_fixed_primary_param_TC_12()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER and Replica
@@ -350,6 +356,7 @@ ipaclientinstall_fixed_primary_param_TC_13()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER and REPLICA1
@@ -380,6 +387,7 @@ ipaclientinstall_fixed_primary_param_TC_14()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER and Replica1 
@@ -410,6 +418,7 @@ ipaclientinstall_fixed_primary_param_TC_15()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER, Replica1 and Replica2
@@ -443,6 +452,7 @@ ipaclientinstall_fixed_primary_param_TC_16()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER and Replica1 
@@ -477,6 +487,7 @@ ipaclientinstall_fixed_primary_param_TC_17()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER and Replica1 
@@ -513,6 +524,7 @@ ipaclientinstall_fixed_primary_param_TC_18()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER and Replica1, Replica2
@@ -560,6 +572,7 @@ ipaclientinstall_fixed_primary_param_TC_19()
         host_del
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
+        rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
         sssd_set_config_level
         # Stop the MASTER and Replica1, Replica2
