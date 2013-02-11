@@ -627,7 +627,7 @@ public class HostTasks {
 	 * @param hostname - host name
 	 * @param button - Unprovision or cancel
 	 */
-	public static void deleteHostKeytab(SahiTasks sahiTasks, String hostname, String button ) {
+	public static void unprovisionHost(SahiTasks sahiTasks, String hostname, String button ) {
 		sahiTasks.link(hostname).click();
 		sahiTasks.span("Refresh").click();
 		sahiTasks.link("Unprovision").click();
