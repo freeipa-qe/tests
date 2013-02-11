@@ -45,6 +45,8 @@ hbacsvc_master_001() {
 
                 # kinit as admin and creating users
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+		rlRun "ssh_auth_success $user1 testpw123@ipa.com $MASTER"
         for i in {1..3}; do
                 rlRun "create_ipauser user$i user$i user$i $userpw"
                 sleep 5
@@ -154,14 +156,14 @@ hbacsvc_master_002() {
 
 	# ipa hbactest:
 
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -Ex '(Access granted: True|  matched: rule2)'"
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
                 # rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$CLIENT --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
 
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: True|  matched: rule2)'"
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule2 --nodetail | grep -i \"Access granted: True\""
