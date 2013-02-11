@@ -7,7 +7,7 @@
 		<groups>
 			<run>
 			    <include name="setup" />
-				<include name="addHostTests" />
+			    <include name="addHostTests" />
 				<include name="addHostBz751529Tests" />
 				<include name="deleteHostTests" />  
 				<include name="addAndAddAnotherHostTests" />
@@ -31,6 +31,7 @@
 			    <include name="hostEditUpdateResetCancelSSHPubKeyTests" />
 			    <include name="hostEditUndoSSHPubKeyTests" />
 			    <include name="hostDeleteSSHPubKeyTests" />
+			    <include name="hostRemoveKeytabCancelTests_Bug818665" />
 			    <include name="hostRemoveKeytabTests" /> 
 			    <include name="ManagedByHostMembershipAdded_Bug835640" />
 			</run>
