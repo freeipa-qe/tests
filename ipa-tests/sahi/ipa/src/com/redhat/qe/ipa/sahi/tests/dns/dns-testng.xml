@@ -12,20 +12,20 @@
             	    
             	        <include name="addDNSZoneTest" />
             	        <include name="zoneEnableDisableTest" />
-            	      <!--  <include name="addandanotherDNSZoneTest" />-->
+            	        <include name="addandanotherDNSZoneTest" />
             	        <include name="add_then_cancel_DNSZoneTest" />
             	        <!--<include name="addDNSZoneNegativeTest" />
             	        <include name="dnsZone_addandedit" />
-            	        <include name="recordType_NegativeTest" />-->
+            	        <include name="recordType_NegativeTest" />
             	        <include name="dnsZoneRecordsNegativeTest_add" />
-                     <!--   <include name="dnsZoneRecordsTest_add" />
+                        <include name="dnsZoneRecordsTest_add" />
                    	    <include name="dnsZoneRecordsTest_addandaddanother" />
                         <include name="dnsZoneRecordsTest_addandaddedit" />
                         <include name="dnsZoneRecordsTest_add_then_cancel" />
                         <include name="dnsZoneSettingsTest" />
-                        <include name="dnsZoneSettingsNagativeTest" /> -->
+                        <include name="dnsZoneSettingsNagativeTest" />
                         <include name="dnsZoneSettingsEnableDisableTest" />
-                   <!--     <include name="delDNSZoneTest" />
+                        <include name="delDNSZoneTest" />
                        
                         <include name="addReverseDNSZone" />
                         <include name="addandanother_ReverseDNSZone" />
@@ -36,7 +36,7 @@
                         <include name="reverseDNSZoneRecordsTest_add_then_cancel" />
                         <include name="dnsReverseZoneSettingsTest" />
                         <include name="deleteReverseDNSZone" />
-                        <include name="dnsReverseSettingsNagativeTest" />-->
+                        <include name="dnsReverseSettingsNagativeTest" />
             	        
             	        
             	        <!--  the following are premature, comment out 
