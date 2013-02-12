@@ -1,0 +1,43 @@
+Setup:
+
+3. To test Kerberize NFS reference this:
+
+https://access.redhat.com/knowledge/docs/en-US/Red_Hat_Enterprise_Linux/6/html/Identity_Management_Guide/kerb-nfs.html
+
+ON IPA MASTER:
+
+1. kinit admin
+2. ipa service-add nfs/ipamaster.ipa.example.com
+3. ipa-getkeytab -s ipamaster.ipa.example.com -k /etc/krb5.keytab -p nfs/ipamaster.ipa.example.com
+4. echo SECURE_NFS="yes" >> /etc/sysconfig/nfs
+5. sed -i 's/^.*Domain.*$/Domain = ipalab.qe/' /etc/idmapd.conf
+6. service rpcbind start
+7. service rpcgssd start
+8. service rpcidmapd start
+9. service nfs restart
+
+1.
+
+[root@rhel6-1 log]# kinit admin
+Password for admin@IPALAB.QE:
+
+2.
+
+[root@rhel6-1 ~]# ipa service-add nfs/rhel6-1.ipalab.qe
+-----------------------------------------------
+Added service "nfs/rhel6-1.ipalab.qe@IPALAB.QE"
+-----------------------------------------------
+  Principal: nfs/rhel6-1.ipalab.qe@IPALAB.QE
+  Managed by: rhel6-1.ipalab.qe
+
+3.
+
+[root@rhel6-1 ~]# ipa-getkeytab -s rhel6-1.ipalab.qe -p nfs/rhel6-1.ipalab.qe -k /etc/krb5.keytab
+Keytab successfully retrieved and stored in: /etc/krb5.keytab
+
+4.  write to config
+5. write to config
+6. start service if not running
+7. start service if not running
+8. start service if not running
+9. start service if not running

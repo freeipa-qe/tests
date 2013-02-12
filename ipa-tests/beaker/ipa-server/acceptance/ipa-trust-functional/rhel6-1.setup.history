@@ -1,0 +1,420 @@
+    1  setenforce 0
+    2  exit
+    3  yum -y install openssh-clients wget bind-utils net-tools
+    4  currenteth=$(route | grep ^default | awk '{print $8}')
+    5  ipaddr=$(hostname -i)
+    6  hostname=$(hostname)
+    7  hostname_s=$(hostname -s)
+    8  export MASTER=rhel6-1.example.com
+    9  export SLAVE=rhel6-2.example.com
+   10  export CLIENT=rhel6-3.example.com
+   11  export MASTER_S=$(echo $MASTER|cut -f1 -d.)
+   12  export SLAVE_S=$(echo $SLAVE|cut -f1 -d.)
+   13  export CLIENT_S=$(echo $CLIENT|cut -f1 -d.)
+   14  export MASTERIP=$(dig +short $MASTER)
+   15  export SLAVEIP=$(dig +short $SLAVE)
+   16  export CLIENTIP=$(dig +short $CLIENT)
+   17  export BEAKERMASTER=$MASTER
+   18  export BEAKERSLAVE=$SLAVE
+   19  export BEAKERCLIENT=$CLIENT
+   20  export ADMINID=admin
+   21  export ADMINPW=Secret123
+   22  export ROOTDN="cn=Directory Manager"
+   23  export ROOTDNPWD=Secret123
+   24  export DNSFORWARD=192.168.122.1
+   25  export RELM=TESTRELM.COM
+   26  export DOMAIN=testrelm.com
+   27  export BASEDN="dc=testrelm,dc=com"
+   28  export NISDOMAIN=ipatest
+   29  export NTPSERVER=clock.redhat.com
+   30  cp -af /etc/hosts /etc/hosts.ipabackup
+   31  sed -i "/^$ipaddr/d" /etc/hosts
+   32  sed -i s/$hostname//g /etc/hosts
+   33  sed -i s/$hostname_s//g /etc/hosts
+   34  echo "$ipaddr $hostname_s.$DOMAIN $hostname_s" >> /etc/hosts
+   35  cat /etc/hosts
+   36  cp /etc/sysconfig/network /etc/sysconfig/network.ipabackup
+   37  hostname $hostname_s.$DOMAIN
+   38  sed -i "/$hostname_s/d" /etc/sysconfig/network
+   39  echo "HOSTNAME=$hostname_s.$DOMAIN" >> /etc/sysconfig/network
+   40  cat /etc/sysconfig/network
+   41  yum -y install "*ipa-server" bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl
+   42  cat > /etc/yum.repos.d/rhel64.repo <<EOF
+   43  [rhel64]
+   44  name=rhel64
+   45  baseurl=http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/x86_64/os/
+   46  enabled=1
+   47  gpgcheck=0
+   48  skip_if_unavailable=1
+   49  EOF
+   50  cat > /etc/yum.repos.d/rhel64-optional.repo <<EOF
+   51  [rhel64-optional]
+   52  name=rhel64-optional
+   53  baseurl=http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/optional/x86_64/os/
+   54  enabled=1
+   55  gpgcheck=0
+   56  skip_if_unavailable=1
+   57  EOF
+   58  cat > /etc/yum.repos.d/ipa-devel.repo <<EOF
+   59  [ipa-devel]
+   60  name=ipa-devel
+   61  baseurl=http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_x86_64/x86_64
+   62  enabled=1
+   63  gpgcheck=0
+   64  skip_if_unavailable=1
+   65  EOF
+   66  cat > /etc/yum.repos.d/ipa-devel-noarch.repo <<EOF
+   67  [ipa-devel-noarch]
+   68  name=ipa-devel-noarch
+   69  baseurl=http://mickey.dsdev.sjc.redhat.com/repos/pki/ipa/devel/rhel6/devel_i686/noarch/
+   70  enabled=1
+   71  gpgcheck=0
+   72  skip_if_unavailable=1
+   73  EOF
+   74  yum clean all
+   75  yum -y install "*ipa-server" bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl
+   76  ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+   77  ausearch -m avc
+   78  less /var/log/ipaserver-install.log 
+   79  ipa-server-install --uninstall -U
+   80  cat /var/run/ipa/services.list
+   81  mkdir /var/run/ipa
+   82  touch /var/run/ipa/services.list
+   83  ipa-server-install --uninstall -U
+   84  ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U
+   85  chkconfig iptables off
+   86  service iptables stop
+   87  chkconfig ip6tables off
+   88  service ip6tables stop
+   89  ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP $SLAVE_S.$DOMAIN
+   90   yum list|grep ad-trust
+   91   yum list|grep trust-ad
+   92  yum -y install ipa-server-trust samba4
+   93  cat /etc/resolv.conf 
+   94  ipa help dnsconfig-mod
+   95  ipa dnsconfig-mod --forwarder=$DNSFORWARD
+   96  kinit admin
+   97  ipa dnsconfig-mod --forwarder=$DNSFORWARD
+   98  yum -y install ipa-server-trust samba4
+   99  nslookup download.devel.redhat.com
+  100  ps -ef|grep name
+  101  service named restart
+  102  ps -ef|grep name
+  103  nslookup download.devel.redhat.com
+  104  yum -y install ipa-server-trust samba4
+  105  yum -y install ipa-server-trust-ad samba4
+  106  ps -ef
+  107  ipa-adtrust-install
+  108  ldapsearch -H ldapi://%2fvar%2frun%2fslapd-TESTRELM-COM.socket objectclass=ipaNTDomainAttrs | grep -i ipaNTFlatName
+  109  ldapmodify -H ldapi://%2fvar%2frun%2fslapd-TESTRELM-DOM.socket << EOF
+  110  dn: cn=testrelm.com,cn=ad,cn=etc,dc=testrelm,dc=com
+  111  changetype: modify
+  112  replace: ipaNTFlatName
+  113  ipaNTFlatName: TESTRELM
+  114  EOF
+  115  ldapmodify -H ldapi://%2fvar%2frun%2fslapd-TESTRELM-COM.socket << EOF
+  116  dn: cn=testrelm.com,cn=ad,cn=etc,dc=testrelm,dc=com
+  117  changetype: modify
+  118  replace: ipaNTFlatName
+  119  ipaNTFlatName: TESTRELM
+  120  EOF
+  121  ldapsearch -H ldapi://%2fvar%2frun%2fslapd-TESTRELM-COM.socket objectclass=ipaNTDomainAttrs | grep -i ipaNTFlatName
+  122  ipa help trust-add
+  123  export ADDOMAIN=adtestdom.com
+  124  nslookup w2k8r2-1
+  125  ADSERVER=w2k8r2-1.adtestdom.com
+  126  ADSERVER="w2k8r2-1.adtestdom.com"
+  127  ADSERVERIP="192.168.122.21"
+  128  ADDOMAIN=$(echo $ADSERVER|cut -f2- -d.)
+  129  echo $ADMINPW|kinit admin
+  130  ipa dnszone-add $ADDOMAIN --name-server=$ADSERVER --admin-email="hostmaster@$ADDOMAIN" --force --forwarder=$ADSERVERIP --forward-policy=only
+  131  dig +nocomments +noquestion +nostats +nocmd SRV _ldap._tcp.$DOMAIN
+  132  dig +nocomments +noquestion +nostats +nocmd SRV _ldap._tcp.$ADDOMAIN
+  133  ipa trust-add adtestdom.com --admin Administrator --password
+  134  yum install samba4-client samba4-winbind-client
+  135  ipa trust-add adtestdom.com --admin Administrator --password
+  136  strace ipa trust-add adtestdom.com --admin Administrator --password
+  137  dig +nocomments +noquestion +nostats +nocmd SRV _ldap._tcp.$DOMAIN
+  138  reset
+  139  ls
+  140  clear
+  141  ipa trust-add adtestdom.com --admin Administrator --password
+  142  strace ipa trust-add adtestdom.com --admin Administrator --password
+  143  yum list "samba4*"
+  144  yum install samba4-winbind-clients
+  145   ipa trust-add adtestdom.com --admin Administrator --password
+  146  rpm -qa|grep ipa
+  147  yum list|grep samba
+  148  yum install samba4-winbind-clients
+  149  rpm -qa|grep samba
+  150  ipactl restart
+  151   ipa trust-add adtestdom.com --admin Administrator --password
+  152  strace -vtfo /tmp/trust-add.strace ipa trust-add adtestdom.com --admin Administrator --password
+  153  less /tmp/trust-add.strace 
+  154  iptables -L
+  155  wbinfo -n "ADTESTDOM\adtestuser1"
+  156  wbinfo --online-status
+  157  ipa dnszone-find
+  158  ipa trust-add adtestdom.com --admin Administrator --password
+  159  yum list|grep samba
+  160  yum install samba4-winbind-krb5-locator
+  161  less /tmp/trust-add.strace 
+  162  ipactl status
+  163  ps -ef|grep win
+  164  getenforce 
+  165  ausearch -m avc
+  166  date
+  167  setsebool samba_portmap=on
+  168  yum update selinux-policy
+  169  rpm -qa|grep selinux-policy
+  170  getsebool -a|grep samb
+  171  setsebool samba_portmapper=on
+  172  ipactl restart
+  173  date
+  174  ipa trust-add adtestdom.com --admin Administrator --password
+  175  klist
+  176  kdestory
+  177  kdestroy
+  178  kinit
+  179  kinit admin
+  180  klist
+  181  ipa trust-add adtestdom.com --admin Administrator --password
+  182  ipa trust-add adtestdom.com --type=ad --admin Administrator --password
+  183  wget https://mail.corp.redhat.com/service/home/~/0012-Revert-global-catalog-code-back-to-acutil.patch?auth=co&loc=en_US&id=85400&part=2
+  184  cd /usr/lib/python2.6/site-packages/ipaserver/
+  185  sftp spoore@192.168.0.190
+  186  ls
+  187  mv 0012-Revert-global-catalog-code-back-to-acutil.patch /tmp
+  188  less /tmp/0012-Revert-global-catalog-code-back-to-acutil.patch
+  189  cd ..
+  190  patch -p1 < /tmp/0012-Revert-global-catalog-code-back-to-acutil.patch 
+  191  pwd
+  192  ipa trust-add adtestdom.com --type=ad --admin Administrator --password
+  193  ipactl restart
+  194  ipa trust-add adtestdom.com --type=ad --admin Administrator --password
+  195  wbinfo -n "ADTESTDOM\adtestuser1"
+  196  ipa group-add ad_group_external
+  197  ipa group-del ad_group_external
+  198  ipa group-add ad_group_external --desc=1 --external
+  199  ipa group-add-member ad_group_external --external="ADTESTDOM\adtestgroup1"
+  200  wbinfo -n "ADTESTDOM\adtestgroup1"
+  201  ipa group-del ad_group_external
+  202  wbinfo -n "ADTESTDOM\adtestuser1"
+  203  wbinfo -n "ADTESTDOM\adtestgroup1"
+  204  ipa group-add ad_group_external --desc="ad.example.com group external" --external
+  205  ipa group-add-member ad_adgroup_external --external="ADTESTDOM\adtestgroup1"
+  206  ipa group-add-member ad_group_external --external="ADTESTDOM\adtestgroup1"
+  207  ipa group-show ad_group_external
+  208  vim /etc/nsswitch.conf 
+  209  sudo -v
+  210  cd
+  211  cd rpmbuild/RPMS/x86_64/
+  212  ll
+  213  yum install *.rpm
+  214  sudo -v
+  215  sudo -V
+  216  sudo -l
+  217  kinit admin
+  218  klist
+  219  ipa user-find
+  220  ipa sudorule-show testrule
+  221  ipa group-show adtestdom_adtestgroup1
+  222  ipa group-show adtestdom_adtestgroup1_external
+  223  wbinfo -s "S-1-5-21-1246088475-3077293710-2580964704-1135"
+  224  wbinfo -n "adtestuser1"
+  225  wbinfo -n "ADTESTDOM\adtestuser1"
+  226  man wbinfo
+  227  wbinfo -s "S-1-5-21-1246088475-3077293710-2580964704-1135"
+  228  wbinfo --group-info "ADTESTDOM\adtestgroup1"
+  229  wbinfo -s "S-1-5-21-1246088475-3077293710-2580964704-1135"
+  230  su adtestuser1@adtestdom
+  231  ll
+  232  ping fedorapeople.org
+  233  wget http://pbrezina.fedorapeople.org/scratch/sssd-1.9.90-0.fc17.4.src.rpm
+  234  ll
+  235  man rpmbuild
+  236  ll
+  237  man rpmbuild
+  238  man rpm
+  239  ll
+  240  rpm -i *.rpm
+  241  ll
+  242  cd rpmbuild/
+  243  ll
+  244  rpmbuild -bb SPECS/sssd.spec 
+  245  ll
+  246  cd RPMS/x86_64/
+  247  ll
+  248  yum install  *.rpm
+  249  yum reinstall  *.rpm
+  250  ll
+  251  rpm -qa | grep sss
+  252  yum remove libsss_idmap-1.9.90-0.20121106T0208zgita97f620.el6.x86_64 sssd-client-1.9.90-0.20121106T0208zgita97f620.el6.x86_64 slibsss_autofs-1.9.90-0.20121106T0208zgita97f620.el6.x86_64 sssd-1.9.90-0.20121106T0208zgita97f620.el6.x86_64
+  253  yum install *.rpm
+  254  yum update *.rpm
+  255  ll
+  256  yum install *.rpm
+  257  ll
+  258  cd
+  259  ll
+  260  cd rpmbuild/
+  261  ll
+  262  cd BUILD
+  263  ll
+  264  cd sssd-1.9.90/
+  265  ll
+  266  cd ..
+  267  cd .
+  268  cd
+  269  cd rpmbuild/RPMS/x86_64/
+  270  ll
+  271  yum downgrade *.rpm
+  272  ll
+  273  cd
+  274  cd /var/lib/sss/db
+  275  ll
+  276  rm -f *
+  277  vim /etc/sssd/sssd.conf 
+  278  sssd -i -d 0x0ff0
+  279  service sssd stop
+  280  ll
+  281  sssd -i -d 0x0ff0
+  282  ll
+  283  ldbsearch -H cache_testrelm.com.ldb -b cn=sysdb | less
+  284  ldbsearch -H cache_testrelm.com.ldb | less
+  285  yum install ldbtools
+  286  yum search ldb
+  287  yum install ldb-tools
+  288  ldbsearch -H cache_testrelm.com.ldb | less
+  289  rm -f *
+  290  sssd -i -d 0x0ff0
+  291  ll
+  292  ldbsearch -H cache_testrelm.com.ldb -b cn=sysdb | less
+  293  sssd -i -d 0x0ff0
+  294  ll
+  295  rm -f *
+  296  sssd -i -d 0x0ff0
+  297  ldbsearch -H cache_testrelm.com.ldb | less
+  298  sssd -i -d 0x0ff0
+  299  ldbsearch -H cache_testrelm.com.ldb | less
+  300  sssd -i -d 0x0ff0
+  301  ll
+  302  rm -f *
+  303  sssd -i -d 0x0ff0
+  304  ldbsearch -H cache_testrelm.com.ldb-b cn=sysdb  | less
+  305  ldbsearch -H cache_testrelm.com.ldb -b cn=sysdb  | less
+  306  man wbinfo
+  307  wbinfo -i "ADTESTDOM\adtestuser1"
+  308  wbinfo -i "adtestuser1"
+  309  ipa group-show adtestgroup1
+  310  ipa group-show adtestdom_adtestgroup1
+  311  ipa group-show adtestdom_adtestgroup1_external
+  312  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-1135
+  313  sssd -i -d 0x0ff0
+  314  ldbsearch -H cache_testrelm.com.ldb -b cn=sysdb  | less
+  315  sssd -i -d 0x0ff0
+  316  ldbsearch -H cache_testrelm.com.ldb -b cn=sysdb  | less
+  317  vim /etc/sssd/sssd.conf
+  318  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-1135
+  319  ipa group-show adtestdom_adtestgroup1
+  320  ipa group-show adtestdom_adtestgroup1_external
+  321  ldbsearch -H cache_testrelm.com.ldb -b cn=sysdb  | less
+  322  sssd -i -d 0x0ff0
+  323  ldbsearch -H cache_testrelm.com.ldb -b cn=sysdb  | less
+  324  kinit admin
+  325  ipa group-find
+  326  ipa group-show
+  327  ipa group-add-member ad_group_external --external "ADTESTDOM\adtestgroup1"
+  328  ipa group-add-member ad_group_external --external "ADTESTDOM\adtestuser1"
+  329  ipa group-add-member ad_group_external --external "adtestuser1@adtestdom.com"
+  330  ipa group-add-member ad_group_external --external S-1-5-21-1246088475-3077293710-2580964704-1135
+  331  ipa group-add-member ad_group_external --external S-1-5-21-1246088475-3077293710-2580964704-1136
+  332  ipa group-add-member ad_group_external --external S-1-5-21-1246088475-3077293710-2580964704-1700
+  333  rpm -q ipa-server
+  334  man wbinfo
+  335  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-1136
+  336  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-1700
+  337  ipa group-add-member ad_group_external --users=admin
+  338  rpm -q ipa-server
+  339  ipa group-add-member ad_group_external --external S-1-5-21-1246088475-3077293710-2580964704-1701
+  340  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-1701
+  341  ipa group-add-member ad_group_external --external ADTESTDOM\dne
+  342  pwd
+  343  w
+  344  ps -ef|grep yum
+  345  yum -y install rpm-build      autoconf     automake     libtool     popt-devel     libtalloc-devel     libtevent-devel     libtdb-devel     libldb-devel     libdhash-devel     libcollection-devel     libini_config-devel     dbus-devel     openldap-devel     pam-devel     nss-devel     nspr-devel     pcre-devel     docbook-style-xsl     krb5-devel     c-ares-devel     python-devel     check-devel     doxygen     libselinux-devel     libsemanage-devel     keyutils-libs-devel     libnl-devel     gettext-devel     glib2-devel     samba4-devel
+  346  rpm -qa|grep samba4
+  347  grep KRB5CCNAME /etc/init.d/*
+  348  rpm -q samba4
+  349  w
+  350  ipa-adtrust-install
+  351  kinit admin
+  352  klist
+  353  ipactl restart
+  354  klist
+  355   cdd
+  356  lls
+  357  ls
+  358  mkdir /root/yum.local.d
+  359  cd /root/yum.local.d
+  360  cat > /etc/yum.repos.d/mylocal.repo <<EOF
+  361  [mylocal]
+  362  name=mylocal
+  363  baseurl=file:///root/yum.local.d
+  364  enabled=1
+  365  gpgcheck=0
+  366  skip_if_unavailable=1
+  367  EOF
+  368  pwd
+  369  ls
+  370  ipa group-find
+  371  ipa group-add --desc='adtestdom.com adtestgroup1 external' adtestdom_adtestgroup1_external --external
+  372  ipa group-add --desc='adtestdom.com adtestgroup2 external' adtestdom_adtestgroup2_external --external
+  373  ipa group-add --desc='adtestdom.com adtestgroup1' adtestdom_adtestgroup1
+  374  ipa group-add --desc='adtestdom.com adtestgroup2' adtestdom_adtestgroup2
+  375  ipa group-add-member adtestdom_adtestgroup1 --groups=adtestdom_adtestgroup1_external
+  376  ipa group-add-member adtestdom_adtestgroup1_external --external "ADTESTDOM\adtestgroup1"
+  377  ssh -l adtestuser1@adtestdom.com rhel6-1
+  378  id
+  379  vi /etc/krb5.conf
+  380  vi /etc/sssd/sssd.conf
+  381  ls -ltra /etc/sssd/sssd.conf 
+  382  date
+  383  service krb5kdc restart
+  384  ssh -l adtestuser1@adtestdom.com rhel6-1
+  385  esrvice 
+  386  service sshd restart
+  387  ipa trust-find
+  388  kinit adtestuser1@ADTESTDOM.COM
+  389  ssh -K -l adtestuser1@adtestdom.com rhel6-1
+  390  klist
+  391  ps -ef|grep sss
+  392  service sssd start
+  393  ssh -K -l adtestuser1@adtestdom.com rhel6-1
+  394  service sssd stop
+  395  ipa sudorule-add testrule --hostcat all --cmdcat all --runasusercat all --runasgroupcat all
+  396  ipa sudorule-add-user testrule --groups=adtestdom_adtestgroup1
+  397  w
+  398  ps -ef
+  399  man wbinfo
+  400  wbinfo -g
+  401  wbinfo -g ADTESTDOM\adtestgroup1
+  402  wbinfo --group-info ADTESTDOM\adtestgroup1
+  403  man wbinfo
+  404  wbinfo --group-info "ADTESTDOM\adtestgroup1"
+  405  wbinfo --group-info 'ADTESTDOM\adtestgroup1'
+  406  wbinfo --group-info admin
+  407  wbinfo --group-info adtestdom_adtestgroup1 
+  408  wbinfo --group-info
+  409  wbinfo --group-info="ADTESTDOM\adtestgroup1"
+  410  wbinfo -r "ADTESTDOM\adtestuser1"
+  411  wbinfo -n "ADTESTDOM\adtestuser1"
+  412  wbinfo --user-sides=S-1-5-21-1246088475-3077293710-2580964704-1136
+  413  wbinfo --user-sids=S-1-5-21-1246088475-3077293710-2580964704-1136
+  414  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-1135
+  415  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-513
+  416  wbinfo -s S-1-5-21-1246088475-3077293710-2580964704-1136
+  417  pwd
+  418  cat /etc/sssd/sssd.conf
+  419  history|grep sudorule
+  420  history > rhel6-1.setup.history

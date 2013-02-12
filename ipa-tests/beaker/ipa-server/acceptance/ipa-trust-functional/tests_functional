@@ -1,0 +1,82 @@
+###############################################################################
+###### SSH
+###############################################################################
+### 1. Trusted AD user ssh using username without '@ad.domain' password/passwordless
+### 2. Trusted AD user ssh using username with 'aduser@ad.domain' passwordless
+### 3. Trusted AD user ssh to IPA machine with password without authenticating on AD
+### 4. Trusted AD user authenticated on AD ssh as different AD user to IPA machine
+### 5. Trusted AD user authenticated on AD ssh passwordless to IPA machine
+### 6. Trusted AD user ssh and executes linux cmds, create, modify files.
+### 7. New AD user ssh to IPA Server with password without authenticating on AD and execute linux cmds
+### 8. New AD user authenticated on AD ssh to IPA Server passwordless and executes linux cmds
+### 9. Note UID, GID, home dir then delete AD user on AD while logged in to IPA, AD user create, modify files.
+### 10. Re-create same AD user, re-login, check UID,GID, Old home directory/files access
+### 11. AD user/admin executes 'passwd' cmd
+### 12. AD user/admin executes 'su' to root
+### 13. AD user ssh between 2 IPA domain machines passwordless
+### 14. AD user ssh between 2 IPA domain machines with password
+### 15. AD user tries deleting trust from IPA server after ssh login
+### 16. AD administrator deleting trust from IPA server after ssh login
+
+###############################################################################
+###### NFS
+###############################################################################
+### 17. AD user NFS share access from windows client
+### 18. AD user NFS share access from IPA client after ssh login
+### 19. AD user unable to write to NFS share in ro mode, from windows client
+### 20. AD user unable to write to NFS share in ro mode, from IPA client
+### 21. AD user unable to write to NFS share with restricted file permissions, from windows client
+### 22. AD user unable to write to NFS share with restricted file permissions, from IPA client
+### 23. Using NFS all_squash option for share
+
+###############################################################################
+###### Console
+###############################################################################
+### 24. AD user login to IPA machine console
+### 25. AD user ssh to another IPA machine passwordless after console access
+### 26. AD user mounts NFS share after console access
+### 27. AD user login passwordless ssh as well as console, create and modify files.
+
+###############################################################################
+###### IPA Winsync
+###############################################################################
+### Establish Synchronization Agreements with the same AD server
+### 28. Getent passwd output for 'aduser@ad.domain' (adtrust) and aduser (winsync)
+### 29. Existing trusted AD user login passwordless ssh from windows client 
+    # and same AD synced user ssh login with password after password change
+### 30. Create new trusted AD user, login passwordless ssh from windows client 
+    # and same AD synced user ssh login with password
+
+###############################################################################
+###### HBAC
+###############################################################################
+### 31. Sshd HBAC allow rule for AD user, login as AD trusted user
+### 32. Sshd HBAC deny rule for AD user, login as AD trusted user
+### 33. Sshd HBAC allow rule for AD user group, trusted AD member user
+### 34. Sshd HBAC deny rule for AD user group, trusted AD member user
+### 35. Console HBAC allow rule for AD user, login as AD trusted user
+### 36. Console HBAC deny rule for AD user, login as AD trusted user
+### 37. Console HBAC allow rule for AD user group, login as AD trusted user
+### 38. Console HBAC deny rule for AD user group, login as AD trusted user
+
+###############################################################################
+###### SUDO
+###############################################################################
+### 39. Allow sudorule for AD user
+### 40. Deny sudorule for AD user
+### 41. Allow sudorule for AD user group
+### 42. Deny sudorule for AD user group
+
+###############################################################################
+###### CIFS
+###############################################################################
+### 43. AD user access CIFS writable share
+### 44. AD user access CIFS share with writeable no
+
+###############################################################################
+###### HTTP
+###############################################################################
+### 45. Open IPA UI from windows client using FireFox
+### 46. Open IPA UI from windows client using IE
+### 47. Open IPA UI from windows client using Chrome
+

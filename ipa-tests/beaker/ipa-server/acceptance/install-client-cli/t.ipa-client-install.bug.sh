@@ -161,3 +161,11 @@ ipaclientinstall_dirty_keytab()
     rlPhaseEnd
 }
 
+ipaclientinstall_bugcheck_910410()
+{
+    local tmpout=/tmp/ipaclientinstall_bugcheck_910410.out
+    rlPhaseStartTest "ipaclientinstall_bugcheck_910410 - ipa-client-install
+    fixed-primary server list out of order in sssd.conf on i386"
+        rlLog "Checking for Bug"
+    rlPhaseEnd
+}

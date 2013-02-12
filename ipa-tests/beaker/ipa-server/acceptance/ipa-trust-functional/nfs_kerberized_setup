@@ -1,0 +1,152 @@
+10.3.1. Setting up a Kerberized NFS Server
+
+    Obtain a Kerberos ticket before running IPA tools.
+
+    [jsmith@server ~]$ kinit admin
+
+    If the NFS host machine has not been added as a client to the IPA domain, then create the host entry. See Section 6.2, “Adding Host Entries”.
+
+    Create the NFS service entry in the IPA domain. For example:
+
+    [jsmith@server ~]$ ipa service-add nfs/nfs-server.example.com
+
+    For more information, see Section 6.5.1, “Adding and Editing Service Entries and Keytabs”.
+
+    Generate an NFS service keytab for the NFS server using the ipa-getkeytab command.
+
+    The NFS server may be on a Red Hat Enterprise Linux machine in the IPA domain or a different Unix machine. For a Red Hat Enterprise Linux machine, the ipa-getkeytab command can be run on the NFS server machine. Otherwise, the ipa-getkeytab command should be run on a Red Hat Enterprise Linux machine in the IPA domain and then copied over to the NFS server.
+
+    If ipa-getkeytab command is run on the NFS server, then save the keys directly to the host keytab. For example:
+
+    [jsmith@server ~]$ ipa-getkeytab -s server.example.com -p nfs/nfs-server.example.com -k /etc/krb5.keytab
+
+    For a Red Hat Enterprise Linux machine, that's all you need to do.
+    NOTE
+
+    Only DES keys are supported on Red Hat Enterprise Linux 5.
+
+    When generating keys to copy over to another system, then generate the key but do not save it in the host keytab. The key must be added separately to the keytab after it is copied to the NFS server:
+
+        Save the keytab to a temporary file. For example:
+
+        [jsmith@server ~]$ ipa-getkeytab -s server.example.com -p nfs/nfs-server.example.com -k /tmp/nfs.keytab
+
+        Copy the keytabs over to the NFS server.
+
+        Set the file permissions to 0700.
+
+        Add the service key to the keytab file.
+
+        [root@nfs-server ~]#  (  echo rkt /tmp/nfs.keytab; echo wkt /etc/krb5.keytab) |ktutil
+
+    TIP
+
+    Verify that the NFS service has been properly configured in IPA, with its keytab, by checking the service entry:
+
+    [jsmith@server ~]$ ipa service-show nfs/ipaclient2.example.com
+    Principal: NFS/ipaclient2.example.com@EXAMPLE.COM
+    Keytab: True
+
+    Install the NFS packages. For example:
+
+    [root@nfs-server ~]# yum install nfs-utils
+
+    Configure weak crypto support. This is required for every NFS client if any client (such as a Red Hat Enterprise Linux 5 client) in the domain will use older encryption options like DES.
+
+        Edit the krb5.conf file to allow weak crypto.
+
+        [root@nfs-server ~]# vim /etc/krb5.conf
+
+        allow_weak_crypto = true
+
+        Update the IPA server Kerberos configuration to support the DES encryption type.
+
+        [jsmith@ipaserver ~]$ ldapmodify -x -D "cn=directory manager" -w password -h ipaserver.example.com -p 389
+
+        dn: cn=EXAMPLEREALM,cn=kerberos,dc=example,dc=com
+        changetype: modify
+        add: krbSupportedEncSaltTypes
+        krbSupportedEncSaltTypes: des-cbc-crc:normal
+        -
+        add: krbSupportedEncSaltTypes
+        krbSupportedEncSaltTypes: des-cbc-crc:special
+        -
+        add: krbDefaultEncSaltTypes
+        krbDefaultEncSaltTypes: des-cbc-crc:special
+
+    Edit the NFS server configuration to use NFSv4 security by uncommenting the SECURE_NFS line.
+
+    [root@nfs-server ~]# vim /etc/sysconfig/nfs
+
+    SECURE_NFS="yes"
+
+    If the NFS server and client are in different DNS domains, then configure the NFS domain.
+
+    [root@nfs-server ~]# vim /etc/idmapd.conf
+
+    Domain = example.com
+
+    Edit the /etc/exports file and add the Kerberos information:
+
+    /export  *(rw,sec=sys:krb5:krb5i:krb5p)
+
+    Restart the NFS server.
+
+    [root@nfs-server ~]# service nfs restart
+
+    Configure the NFS server as an NFS client, following the directions in Section 10.3.2, “Setting up a Kerberized NFS Client”. 
+
+10.3.2. Setting up a Kerberized NFS Client
+
+    Obtain a Kerberos ticket before running IPA tools.
+
+    [jsmith@server ~]$ kinit admin
+
+    If the NFS client is not enrolled as a client in the IPA domain, then set up the required host entries, as described in Section 6.2, “Adding Host Entries”.
+
+    Generate an NFS service keytab for the NFS client using the ipa-getkeytab command.
+
+    The NFS client may be on a Red Hat Enterprise Linux machine in the IPA domain or a different Unix machine. For a Red Hat Enterprise Linux machine, the ipa-getkeytab command can be run on the NFS client machine. Otherwise, the ipa-getkeytab command should be run on a Red Hat Enterprise Linux machine in the IPA domain and then copied over to the NFS client.
+
+    If ipa-getkeytab command is run on the NFS client, then save the keys directly to the host keytab. For example:
+
+    [jsmith@server ~]$ ipa-getkeytab -k /etc/krb5.keytab -p host/nfs-client-server.example.com@EXAMPLE.COM
+
+    For a Red Hat Enterprise Linux machine, that's all you need to do.
+
+    When generating keys to copy over to another system, then generate the key but do not save it in the host keytab. The key must be added separately to the keytab after it is copied to the NFS server:
+
+        Save the keytab to a temporary file. For example:
+
+        [jsmith@server ~]$ ipa-getkeytab -p host/nfs-client-server.example.com@EXAMPLE.COM -k /tmp/nfs.keytab
+
+        Copy the keytabs over to the NFS client.
+
+        Set the file permissions to 0700.
+
+        Add the service key to the keytab file.
+
+        [root@nfs-client-server ~]# ( echo rkt /root/nfs-client.keytab; echo wkt /etc/krb5.keytab) |ktutil
+
+    Edit the NFS common configuration to enable client-side secure NFS, by uncommenting the SECURE_NFS line.
+
+    [root@nfs-client-server ~]# vim /etc/sysconfig/nfs
+
+    SECURE_NFS="yes"
+
+    If the NFS server and client are in different DNS domains, then configure the NFS domain. The idmapd.conf must be the same on the NFS client as it is on the NFS server.
+
+    [root@nfs-client-server ~]# vim /etc/idmapd.conf
+
+    Domain = example.com
+
+    Start the GSS daemon.
+
+    [root@nfs-client-server ~]# service rpcgssd start
+    [root@nfs-client-server ~]# service rpcbind start
+    [root@nfs-client-server ~]# service rpcidmapd start
+
+    Mount the directory.
+
+    [root@nfs-client-server ~]# echo "$NFSSERVER:/this /mnt/this nfs4 sec=krb5i,rw,proto=tcp,port=2049"  >>/etc/fstab
+    [root@nfs-client-server ~]# mount -av
