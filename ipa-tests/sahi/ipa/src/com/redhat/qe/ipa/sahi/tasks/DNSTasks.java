@@ -902,7 +902,48 @@ public class DNSTasks {
 		
 	}
 	
-	
+	/**/
+	 
+	/*
+	 * Modify DNS zone record: Add one record
+	 * @param browser 
+	 * @param record_name
+	 * @param record_data
+	 * @param record_type
+	 */
+	public static void zoneRecords_add_NegativeTest(SahiTasks browser, String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
+			String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11,String expected_msg){
+		// assume the page is already in the dns modification page
+		browser.span("Add").click();
+		browser.textbox("idnsname").setValue(record_name); 
+		browser.select("record_type").choose(record_type);
+		
+		DNSTasks.recordType(browser, record_data, record_type, other_data1, other_data2, other_data3, other_data4, other_data5, other_data6, other_data7, other_data8, other_data9, other_data10, other_data11);
+					
+		browser.button("Add").click(); 
+		if (browser.div("/IPA Error */").exists()){
+			log.info("IPA error dialog appears, usually this is data format error");
+			// there will be two cancel button here
+			browser.button("Cancel").click();
+			browser.button("Cancel").click();
+			//Assert.assertTrue(false, "ipa error ( dialog )occurs");
+		}else if (browser.span("Required field").exists()){
+			log.info ("Required field msg appears, usually this means missing data input");
+			log.info(expected_msg);
+			browser.button("Cancel").click();
+			//Assert.assertTrue(false, "missing required field");
+		}else{
+			// self-check to verify the newly added record
+			Assert.assertTrue(browser.link(record_name).exists(),"ensure new record name: (" + record_name + ") in the list");
+			// delete the newly created record
+			browser.checkbox(record_name).click();
+			browser.link("Delete").click();
+			browser.button("Delete").click();
+			Assert.assertFalse(browser.link(record_name).exists(),"delete newly created record: (" + record_name + ")"); 
+		} 
+	}//zoneRecords_add
+	 
+	 /**/
 	
 	
 	
