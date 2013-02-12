@@ -251,9 +251,32 @@ public class DNSTests extends SahiTestScript{
 	}
 	
 	/*
+	 * Negative Test for add dns zone record
+	 */
+	
+	@Test (groups={"dnsZoneRecordsNegativeTest_add"}, dataProvider="getNegativeDNSRecords", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
+	public void dnsZoneRecordsNegativeTest_add(String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
+									String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
+									String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11,String expected_msg) throws Exception {
+		//sahiTasks.navigateTo(url, true);
+		// get into DNS zone record modification page
+		sahiTasks.link(zoneName).click();
+		// performing the test
+		DNSTasks.zoneRecords_add_NegativeTest(sahiTasks,record_name,record_data,record_type,other_data1,other_data2,other_data3, other_data4, other_data5,
+									other_data6, other_data7, other_data8, other_data9, other_data10, other_data11,expected_msg); 
+		// go back to dns zone list, prepare for next test
+		sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+		
+	}
+	
+	
+	
+	/**/
+	
+	/*
 	 * Test for add one dns zone record
 	 */
-	@Test (groups={"dnsZoneRecordsTest_add"}, dataProvider="getDNSRecords", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest"})	
+	@Test (groups={"dnsZoneRecordsTest_add"}, dataProvider="getDNSRecords", dependsOnGroups={"addDNSZoneTest","zoneEnableDisableTest","dnsZoneRecordsNegativeTest_add"})	
 	public void dnsZoneRecordsTest_add(String testName, String zoneName,String reverseZoneName, String authoritativeNameserver, String rootEmail,
 									String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 									String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11) throws Exception {
@@ -771,6 +794,25 @@ public class DNSTests extends SahiTestScript{
 		
 		return ll;	
 	}
+	
+	
+	 
+	@DataProvider(name="getNegativeDNSRecords")
+	public Object[][] getNegativeDNSRecords() {
+		return TestNGUtils.convertListOfListsTo2dArray(createNegativeDNSRecords());
+	}
+	protected List<List<Object>> createNegativeDNSRecords() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+			
+		// testName,  zoneName, reverse_zone,authoritativeNameserver,rootEmail,recordName,recordData,recordType,otherData 1....otherData 11   
+				
+		ll.add(Arrays.asList(new Object[]{"dns record LOC negative test_Bug817878", 
+				DNSTests.dnszone,DNSTests.reversezone,nameserver,"root." + DNSTests.dummyHost, 
+				"loc_recordtest","42","LOC","21", "60777777777777", "N", "71", "06", "9999999999999", "W", "2000", "2", "4", "567","Maximum value is 59.999"}));
+		
+		return ll;	
+	}
+	 
 	
 	@DataProvider(name="getDNSRecords")
 	public Object[][] getDNSRecords() {
