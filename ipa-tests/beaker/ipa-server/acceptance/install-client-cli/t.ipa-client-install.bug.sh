@@ -163,9 +163,16 @@ ipaclientinstall_dirty_keytab()
 
 ipaclientinstall_bugcheck_910410()
 {
+    S1="$1" ; S2="$2" ; S3="$3" ; S4="$4"
     local tmpout=/tmp/ipaclientinstall_bugcheck_910410.out
     rlPhaseStartTest "ipaclientinstall_bugcheck_910410 - ipa-client-install
     fixed-primary server list out of order in sssd.conf on i386"
-        rlLog "Checking for Bug"
+        CHK1=$(grep "ipa_server.*$S1.*$S2.*$S3.*$S4" $SSSD|wc -l) 
+        CHK2=$(grep "ipa_server" $SSSD|grep "$S1"|grep "$S2"|grep "$S3"|grep "$S4"|wc -l)
+        if [ $CHK1 -eq $CHK2 ]; then
+            rlPass "BZ 910410 not found...ipa_server line in correct order"
+        else
+            rlFail "BZ 910410 found..ipa-client-install fixed-primary server list out of order in sssd.conf"
+        fi
     rlPhaseEnd
 }

@@ -117,6 +117,7 @@ ipaclientinstall_fixed_primary_param_TC_5()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
 		rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE2" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE2
         sssd_set_config_level
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin"
         rlAssertGrep "Option ipa_server has value $MASTER, $SLAVE2" "$sssd_log_file"
@@ -138,6 +139,7 @@ ipaclientinstall_fixed_primary_param_TC_6()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$SLAVE3 --server=$MASTER --domain=$DOMAIN --realm=$RELM -U"
 		rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $SLAVE3, $MASTER" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $SLAVE3 $MASTER
         sssd_set_config_level
         rlRun "id admin;getent passwd admin;echo Secret123|kinit admin"
         rlAssertGrep "Option ipa_server has value $SLAVE3, $MASTER" "$sssd_log_file"
@@ -298,6 +300,7 @@ ipaclientinstall_fixed_primary_param_TC_11()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE2" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE2
         sssd_set_config_level
         # Stop the MASTER 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -327,6 +330,7 @@ ipaclientinstall_fixed_primary_param_TC_12()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1
         sssd_set_config_level
         # Stop the MASTER and Replica
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -358,6 +362,7 @@ ipaclientinstall_fixed_primary_param_TC_13()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1
         sssd_set_config_level
         # Stop the MASTER and REPLICA1
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -389,6 +394,7 @@ ipaclientinstall_fixed_primary_param_TC_14()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1 $SLAVE2
         sssd_set_config_level
         # Stop the MASTER and Replica1 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -420,6 +426,7 @@ ipaclientinstall_fixed_primary_param_TC_15()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1 $SLAVE2
         sssd_set_config_level
         # Stop the MASTER, Replica1 and Replica2
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -454,6 +461,7 @@ ipaclientinstall_fixed_primary_param_TC_16()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1 $SLAVE2 $SLAVE3
         sssd_set_config_level
         # Stop the MASTER and Replica1 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -489,6 +497,7 @@ ipaclientinstall_fixed_primary_param_TC_17()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1 $SLAVE2 $SLAVE3
         sssd_set_config_level
         # Stop the MASTER and Replica1 
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -526,6 +535,7 @@ ipaclientinstall_fixed_primary_param_TC_18()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1 $SLAVE2 $SLAVE3
         sssd_set_config_level
         # Stop the MASTER and Replica1, Replica2
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
@@ -574,6 +584,7 @@ ipaclientinstall_fixed_primary_param_TC_19()
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=$SLAVE2 --server=$SLAVE3 --domain=$DOMAIN --realm=$RELM -U"
         rlRun "cat $SSSD"
         rlAssertGrep "ipa_server = $MASTER, $SLAVE1, $SLAVE2, $SLAVE3" "$SSSD"
+        ipaclientinstall_bugcheck_910410 $MASTER $SLAVE1 $SLAVE2 $SLAVE3
         sssd_set_config_level
         # Stop the MASTER and Replica1, Replica2
         rlRun "echo \"ipactl stop\" > $TmpDir/local.sh"
