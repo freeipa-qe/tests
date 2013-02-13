@@ -172,3 +172,65 @@ ipaclientinstall_bugcheck_910410()
         rlFail "BZ 910410 found..ipa-client-install fixed-primary server list out of order in sssd.conf"
     fi
 }
+
+
+ipaclientinstall_bugcheck_790105()
+{
+        #Installing client
+        uninstall_fornexttest
+
+        sssd_log_file="/var/log/sssd/sssd_testrelm.com.log"
+
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER --enable-dns-updates --mkhomedir"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER --enable-dns-updates --mkhomedir" 0 "Installing ipa client and configuring - with all params"
+
+        #Configuring sssd to pick lo interface for loopback addresses for dynamic dns update
+        rlRun "sed '/cache_credentials/ a debug_level = 0x200' $SSSD > /tmp/sssd.conf"
+        rlRun "cp /tmp/sssd.conf $SSSD"
+        rlRun "sed '/ipa_dyndns_update/ a ipa_dyndns_iface = lo' $SSSD > /tmp/sssd.conf"
+        rlRun "cp /tmp/sssd.conf $SSSD"
+        rlRun "cat $SSSD"
+        rlRun "service sssd restart"
+
+        exp=/tmp/expfile.out
+        local cmd="ssh admin@localhost"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "*assword: "' >> $exp
+        echo "send -s -- \"\r\"" >> $exp
+        echo 'expect "*assword: "' >> $exp
+        echo "send -s -- \"\r\"" >> $exp
+        echo 'expect "*assword: "' >> $exp
+        echo "send -s -- \"\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp
+        
+        rlAssertGrep "\[ok_for_dns\] (0x0200): Loopback IPv4 address" "$sssd_log_file"
+        rlAssertGrep "\[ok_for_dns\] (0x0200): Loopback IPv6 address" "$sssd_log_file"
+
+        #Configuring sssd to pick eth0 interface for link-local ipv6 address for dynamic dns update
+        rlRun "sed 's/ipa_dyndns_iface = lo/ipa_dyndns_iface = eth0/' $SSSD > /tmp/sssd.conf"
+        rlRun "cp /tmp/sssd.conf $SSSD"
+        rlRun "cat $SSSD"
+        rlRun "service sssd restart"
+
+        exp=/tmp/expfile.out
+        local cmd="ssh admin@localhost"
+        echo "set timeout 5" > $exp
+        echo "set force_conservative 0" >> $exp
+        echo "set send_slow {1 .1}" >> $exp
+        echo "spawn $cmd" >> $exp
+        echo 'expect "*assword: "' >> $exp
+        echo "send -s -- \"\r\"" >> $exp
+        echo 'expect "*assword: "' >> $exp
+        echo "send -s -- \"\r\"" >> $exp
+        echo 'expect "*assword: "' >> $exp
+        echo "send -s -- \"\r\"" >> $exp
+        echo 'expect eof ' >> $exp
+        /usr/bin/expect $exp
+ 
+        rlAssertGrep "\[ok_for_dns\] (0x0200): Link local IPv6 address" "$sssd_log_file"
+
+}

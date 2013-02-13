@@ -117,6 +117,9 @@ ipaclientinstall()
 # Bug 845691 - ipa-client-install Failed to obtain host TGT
 	ipaclientinstall_bugcheck_845691_fulltest
 
+# Bug 790105 - Filter inappropriate address for dns dynamic update
+       ipaclientinstall_bugcheck_790105
+
 # Moved it to be last test because it causes connection failure to IPA Servers, so thats why moved it to last test case even after fixed-primary server test cases
    if [ $slave_count -eq 1 ];then
    ipaclientinstall_server_unreachableserver
@@ -125,6 +128,7 @@ ipaclientinstall()
    install_cleanup
 
 }
+
 
 install_setup()
 {
