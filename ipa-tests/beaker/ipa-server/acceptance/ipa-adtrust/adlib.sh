@@ -109,7 +109,7 @@ NonRoot_Exp() {
         set send_slow {1 .1}' > $expfile
         echo "spawn ssh -o StrictHostKeychecking=no -l $user $IPAhost" >> $expfile
         echo 'expect "*password:*"' >> $expfile
-        echo 'sleep .5' >> $expfile
+        echo 'sleep 3' >> $expfile
         echo "send -s -- \"$userpw\\r\"" >> $expfile
         echo 'expect "*$ "' >> $expfile
         echo "send -s -- \"$trust_bin\\r\"" >> $expfile
@@ -180,7 +180,10 @@ Intractive_Exp() {
         echo 'set timeout 300
         set send_slow {1 .1}' > $expfile
         echo "spawn $trust_bin" >> $expfile
-        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
+        echo 'expect {
+	"IPA is not configured on this system." { exit 2 }
+	"Overwrite smb.conf?*: " {} 
+	}' >> $expfile
         echo 'sleep .5' >> $expfile
         echo 'send -s -- "y\r"' >> $expfile
         echo 'expect "*]: "' >> $expfile
@@ -299,12 +302,18 @@ NoAdminPriv_Exp() {
 	if [ $1 = A ]; then 
           echo 'expect "*assword: "' >> $expfile
           echo "send -s -- \"$adminpw\r\"" >> $expfile
-	fi
-        echo 'expect {
+	  echo 'expect {
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+        "Must have administrative privileges to setup AD trusts on server" { expect "*#" }
+} ' >> $expfile
+	else
+	  echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
         "error to automatically re-kinit your admin user ticket" { expect "*#" }
 } ' >> $expfile
+	fi
         echo 'send_user "\nWrong Kerberos credentials to setup AD trusts\n" ; exit 2' >> $expfile
 }
 

@@ -61,13 +61,19 @@ named_conf="/etc/named.conf"
 named_conf_bkp="/etc/named.conf.adtrust"
 krb5_conf="/etc/krb5.conf"
 krb5_conf_bkp="/etc/krb5.conf.bkp"
+IPAhost=`hostname`
 IPAhostIP=`ip addr | egrep 'inet ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 IPAhostIP6=`ip addr | egrep 'inet6 ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 IPAdomain="testrelm.com"
 IPARealm="TESTRELM.COM"
 NBname="TESTRELM"
 NBname2="TESTRELM2"
-dothypn=".TESTREM-"
+dotname1=".TESTRELM"
+dotname2="TESTRELM."
+dotname3="TEST.RELM"
+hypname1="-TESTRELM"
+hypname2="TESTRELM-"
+hypname3="TEST-RELM"
 lwnbnm="testrelm"
 spchnm='Te!5@relm'
 TID="10999"
@@ -75,6 +81,13 @@ STID="332233991"
 fakeIP="10.25.11.21"
 invalid_V6IP="3632:51:0:c41c:7054:ff:ae3c:c981"
 smbfile=`/bin/rpm -ql $PACKAGE4 | grep "smb.conf" | grep etc`
+group1="ipausers"
+group2="tgroup"
+ipacmd="which ipa"
+sidgen_ldif="/usr/share/ipa/ipa-sidgen-task-run.ldif"
+newsuffix='dc=testrelm,dc=com'
+DS_binddn="CN=Directory Manager"
+DMpswd="Secret123"
 
 setup() {
 rlPhaseStartTest "Setup for adtrust sanity tests"
@@ -92,7 +105,9 @@ rlPhaseStartTest "Setup for adtrust sanity tests"
 	done
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "create_ipauser $user test user $userpw"
 	rlRun "create_ipauser $user1 new user $userpw"
+	rlRun "$ipacmd group-add --desc \"Test Group\" $group2" 0 "Adding a test group"
 
 	# stopping firewall
 #	rlRun "service iptables stop"
@@ -128,9 +143,14 @@ rlPhaseEnd
 
 adtrust_test_0002() {
 
-rlPhaseStartTest "0002 Adtrust install with netbios name starting or ending with dot/hyphen"
+rlPhaseStartTest "0002 Adtrust install with netbios name cannot consist of dot/hyphen"
 	rlRun "NB_Exp" 0 "Creating expect script"
-        rlRun "$exp $expfile netbios-name $dothypn" 2 "Netbios name cannot start or end with dot/hyphen"
+        rlRun "$exp $expfile netbios-name $dotname1" 2 "Netbios name cannot have a dot"
+        rlRun "$exp $expfile netbios-name $dotname2" 2 "Netbios name cannot have a dot"
+        rlRun "$exp $expfile netbios-name $dotname3" 2 "Netbios name cannot have a dot"
+        rlRun "$exp $expfile netbios-name $hypname1" 2 "Netbios name cannot have a hyphen"
+        rlRun "$exp $expfile netbios-name $hypname2" 2 "Netbios name cannot have a hyphen"
+        rlRun "$exp $expfile netbios-name $hypname3" 2 "Netbios name cannot have a hyphen"
 
 rlPhaseEnd
 }
@@ -179,7 +199,7 @@ rlPhaseEnd
 
 adtrust_test_0007() {
 
-rlPhaseStartTest "0007 Adtrust install with invalid IPv6 address"
+rlPhaseStartTest "0007 Adtrust install with wrong IPv6 address"
 	rlRun "IP_Exp" 0 "Creating expect script"
 	rlRun "echo \"Server IPv6 address is $IPAhostIP6, but using an invalid IPv6 address to configure adtrust\""
 	rlRun "$exp $expfile ip-address \"$invalid_V6IP\"" 2 "Invalid IPv6 Address exited with an error"
@@ -201,7 +221,6 @@ adtrust_test_0009() {
 
 rlPhaseStartTest "0009 Adtrust install as a non-root user"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	rlRun "create_ipauser $user test user $userpw"
 	rlRun "NonRoot_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 2 "Failed as expected. Must be root to setup AD trusts on server"
 
@@ -220,7 +239,7 @@ rlPhaseEnd
 
 adtrust_test_0011() {
 
-rlPhaseStartTest "0011 Login as user, adtrust install with administrative privileges"
+rlPhaseStartTest "0011 Adtrust install by a user with administrative privileges"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "ipa group-add-member --users=$user admins" 0 "Adding tuser to the admins group"
 	rlRun "NonRoot_Exp" 0 "Creating expect script"
@@ -332,7 +351,7 @@ rlPhaseEnd
 
 adtrust_test_0021() {
 
-rlPhaseStartTest "0021 Adtrust install with valid IP Address"
+rlPhaseStartTest "0021 Install adtrust with valid IP Address"
 	rlRun "Valid_IP_Exp" 0 "Creating expect script"
 	rlRun "$exp $expfile ip-address $IPAhostIP" 0 "ADtrust installed with valid server IPv4 address"
 
@@ -359,13 +378,17 @@ rlPhaseEnd
 
 adtrust_test_0024() {
 
-rlPhaseStartTest "0024 Creating SIDs with adtrust install"
+rlPhaseStartTest "0024 Adtrust install with adding sids for existing IPA users and groups"
         rlRun "SID_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "ADtrust installed without populating SIDs"
-	rlRun "ipa user-show $user1 --all | grep ipantsecurityidentifier" 1 "SID not created for $user1 as expected"
+	rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 1 "SID not created for $user1 as expected"
+	rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 1 "SID not created for default $group1 group as expected"
+	rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 1 "SID not created for $group2 as expected"
         rlRun "SID_Exp add-sids" 0 "Creating expect script"
 	rlRun "$exp $expfile" 0 "ADtrust installed with populating SIDS for existing users"
-	rlRun "ipa user-show $user1 --all | grep ipantsecurityidentifier" 0 "SID created for $user1 as expected"
+	rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 0 "SID created for $user1 as expected"
+	rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 0 "SID created for default $group1 group as expected"
+	rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 0 "SID created for $group2 as expected"
 
 rlPhaseEnd
 }
@@ -374,6 +397,16 @@ adtrust_test_0025() {
 
 rlPhaseStartTest "0025 Adtrust install with start value of RID Base"
 	rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+	rlRun "Intractive_Exp" 0 "Creating expect script"
+        rlRun "$exp $expfile" 2 "Cannot configure adtrust without IPA server configured first"
+
+rlPhaseEnd
+}
+
+adtrust_test_0026() {
+
+rlPhaseStartTest "0026 Adtrust install with start value of RID Base"
+	# Install IPA and create users and groups
 	rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "Valid_RID_Exp" 0 "Creating expect script"
@@ -383,9 +416,9 @@ rlPhaseStartTest "0025 Adtrust install with start value of RID Base"
 rlPhaseEnd
 }
 
-adtrust_test_0026() {
+adtrust_test_0027() {
 
-rlPhaseStartTest "0026 Adtrust with start value of Secondary RID Base"
+rlPhaseStartTest "0027 Adtrust with start value of Secondary RID Base"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
@@ -396,9 +429,9 @@ rlPhaseStartTest "0026 Adtrust with start value of Secondary RID Base"
 rlPhaseEnd
 }
 
-adtrust_test_0027() {
+adtrust_test_0028() {
 
-rlPhaseStartTest "0027 Adtrust install with both base and secondary RIDs"
+rlPhaseStartTest "0028 Adtrust install with both base and secondary RIDs"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
@@ -410,11 +443,18 @@ rlPhaseStartTest "0027 Adtrust install with both base and secondary RIDs"
 rlPhaseEnd
 }
 
-adtrust_test_0028() {
+adtrust_test_0029() {
 
-rlPhaseStartTest "0028 Adtrust install with --no-msdcs on Non DNS integrated server"
+rlPhaseStartTest "0029 Adtrust install on IPA server without DNS with --no-msdcs"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
         rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install without DNS"
+
+	#Creating users and groups to check the creation of SIDs post adtrust-install
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user test user $userpw"
+        rlRun "create_ipauser $user1 new user $userpw"
+	rlRun "$ipacmd group-add --desc \"Test Group\" $group2" 0 "Adding a test group"
+
 	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "No_SRV_Exp no-msdcs" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created with --no-msdcs"
@@ -422,12 +462,38 @@ rlPhaseStartTest "0028 Adtrust install with --no-msdcs on Non DNS integrated ser
 rlPhaseEnd
 }
 
-adtrust_test_0029() {
+adtrust_test_0030() {
 
-rlPhaseStartTest "0029 Adtrust install on IPA server with DNS not integrated"
+rlPhaseStartTest "0030 Adtrust install on IPA server with no integrated DNS"
 	rlRun "No_SRV_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created without integrated DNS"
 
+rlPhaseEnd
+}
+
+adtrust_test_0031() {
+
+rlPhaseStartTest "0031 Add SIDs for exiting IPA users and groups after adtrust install"
+	rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 1 "SID not created for $user1 as expected"
+        rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 1 "SID not created for default $group1 group as expected"
+        rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 1 "SID not created for $group2 as expected"	
+	
+	rlRun "Tmpfile=\`mktemp\`" 0 "Creating tmp directory"
+	if [ -e $sidgen_ldif ]
+          rlRun "cp $sidgen_ldif $Tmpfile" 0 "Copying file for SID generation"
+	else
+	  rlFail "$sidgen_ldif file does not exist" 
+	  return 1
+	fi
+	rlRun "sed -i \'s/\:\ \$SUFFIX/\:\ $newsuffix/\' $Tmpfile" 0 "Modifying $Tmpfile"
+	rlRun "ldapmodify -x -h $IPAhost -D $DS_binddn -w $DMpswd -f $Tmpfile" 0 "Populating ipaNTSecurityIdentifier (SID) for existing users and groups"
+	rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 0 "SID created for $user1 as expected"
+        rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 0 "SID created for default $group1 group as expected"
+        rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 0 "SID created for $group2 as expected"
+
+	# Test Cleanup
+	rm -f $Tmpfile
+	
 rlPhaseEnd
 }
 
