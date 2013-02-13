@@ -33,7 +33,7 @@ clientinstall_primary_server()
  ipaclientinstall_fixed_primary_param_TC_18  ; debug_pause
  ipaclientinstall_fixed_primary_param_TC_19  ; debug_pause
  #Added following test cases from t.ipa-client-install.sh here because it enables iptables on IPA Servers
- ipaclientinstall_server_unreachableserver    ; debug_pause
+ #ipaclientinstall_server_unreachableserver    ; debug_pause
 }
 
 setup()

@@ -121,9 +121,11 @@ ipaclientinstall()
        ipaclientinstall_bugcheck_790105
 
 # Moved it to be last test because it causes connection failure to IPA Servers, so thats why moved it to last test case even after fixed-primary server test cases
-   if [ $slave_count -eq 1 ];then
+# Moving back here for everything after fixing hang issue with at job to
+# stop iptables
+   #if [ $slave_count -eq 1 ];then
    ipaclientinstall_server_unreachableserver
-   fi
+   #fi
 
    install_cleanup
 
