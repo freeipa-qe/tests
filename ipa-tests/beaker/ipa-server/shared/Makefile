@@ -77,8 +77,8 @@ run: $(FILES) build
 	rm -f /dev/shm/id_dsa*
 	cp ./id_dsa* /dev/shm/.
 	cp ./id_dsa* /root/.ssh/.
-	cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
-	cp /root/.ssh/id_dsa.pub /root/.ssh/authorized_keys2
+	cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+	cat /root/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys2
 	cp -f ./id_rsa_global.pub /dev/shm/.
 	cp -f ./id_rsa_global /dev/shm/.
 	cp -f ./known_hosts /dev/shm/.
