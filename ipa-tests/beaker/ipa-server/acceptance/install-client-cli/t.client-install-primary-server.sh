@@ -240,10 +240,9 @@ ipaclientinstall_fixed_primary_param_TC_9()
        rlRun "cat $SSSD"
        rlAssertGrep "ipa_server = $MASTER" "$SSSD"
        sssd_set_config_level
-       rlRun "id admin@LDAP-KRB5;getent passwd admin@LDAP-KRB5" 
-       # removing this from previous run: echo Secret123|kinit admin"
+       rlRun "id admin@LDAP-KRB5;getent passwd admin@LDAP-KRB5;echo Secret123|kinit admin"
        rlAssertGrep "Option ipa_server has value $MASTER" "$sssd_log_file"
-       rlAssertNotGrep "Marking server '$MASTER' as 'working'" "$sssd_log_file"
+       rlAssertGrep "Marking server '$MASTER' as 'working'" "$sssd_log_file"
        submit_log $sssd_log_file
        rlAssertGrep "Added Server $MASTER" "/var/log/sssd/sssd_LDAP-KRB5.log"
        rlAssertGrep "Marking server '$MASTER' as 'working'" "/var/log/sssd/sssd_LDAP-KRB5.log"
