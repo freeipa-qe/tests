@@ -129,6 +129,8 @@ rlJournalStart
 		"adtrust_test_0027"
 		"adtrust_test_0028"
 		"adtrust_test_0029"
+		"adtrust_test_0030"
+		"adtrust_test_0031"
 	}
 
 
