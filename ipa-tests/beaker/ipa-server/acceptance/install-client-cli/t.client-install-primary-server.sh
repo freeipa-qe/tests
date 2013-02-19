@@ -157,17 +157,16 @@ ipaclientinstall_fixed_primary_param_TC_7()
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=invalid --domain=$DOMAIN --realm=$RELM -U"
        command="ipa-client-install -p $ADMINID -w $ADMINPW --fixed-primary --server=$MASTER --server=$SLAVE1 --server=invalid --domain=$DOMAIN --realm=$RELM -U"
-       expmsg="invalid is not an IPA v2 Server."
-#Installation failed. Rolling back changes.
-#IPA client is not configured on this system."
+       expmsg="Client configuration complete"
        local tmpout=$TmpDir/ipaclientinstall_multiple_servers_one_invalidserver.out
-       qaRun "$command" "$tmpout" 1 "$expmsg" "Verify expected error message for IPA Install with invalid server"
+       qaRun "$command" "$tmpout" 0 "$expmsg" "Verify IPA Install with invalid server"
        rlAssertNotGrep "ipa_server.*invalid" /etc/sssd/sssd.conf
        if [ $? -gt 0 ]; then
            rlFail "BZ 905626 found...ipa-client-install failed to fall over to replica with master down"
            rlFail "BZ 905626 fix will prevent invalid servers from being included list"
        else
            rlPass "BZ 905626 not found"
+           rlPass "--server entry invalid not seen in sssd.conf"
        fi
     rlPhaseEnd
 }
