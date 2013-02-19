@@ -348,7 +348,8 @@ ipaclientinstall_server_unreachableserver()
        uninstall_fornexttest
        rlRun "cat /etc/resolv.conf"
        rlLog "M=$MASTERIP ; S=$SLAVEIP"
-       ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
+       #ipaddr=$(host -i $CLIENT | awk '{ field = $NF }; END{ print field }')
+       ipaddr=$(dig +short $CLIENT A)
        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo 'service iptables stop' >> /tmp/at.1.sh\""
        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"at -f /tmp/at.1.sh now + 2 minutes\""
        rlRun "ssh -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"echo 'service iptables stop' >> /tmp/at.1.sh\""

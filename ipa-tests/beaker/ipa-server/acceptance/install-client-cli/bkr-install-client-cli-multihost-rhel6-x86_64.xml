@@ -8,7 +8,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+            <repos>
+                <repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
+            </repos>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
@@ -49,7 +51,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+            <repos>
+                <repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
+            </repos>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
@@ -90,7 +94,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+            <repos>
+                <repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
+            </repos>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
@@ -131,7 +137,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+            <repos>
+                <repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
+            </repos>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
@@ -172,7 +180,9 @@
 			<watchdog panic="None"/>
 			<packages/>
 			<ks_appends/>
-			<repos/>
+            <repos>
+                <repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
+            </repos>
 			<distroRequires>
 				<and>
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
