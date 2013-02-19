@@ -127,10 +127,11 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartSetup "running reserve loop"
-		$currenttime=$(date +%s)
 		rescomplete=1
 		while [ $rescomplete ]; do
 			sleep 500
+			$currenttime=$(date +%s)
+			echo "current time is $currenttime starttime is $starttime"
 			let timediff=$currenttime-$starttime
 			if [ $timediff -lt 86400 ]; then # 86400 is 24 hours
 				rescomplete=0
