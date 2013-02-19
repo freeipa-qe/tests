@@ -47,6 +47,7 @@ This machine is now in a reservation state for $RESERVETIME seconds
 Reservation will end at $enddate. 
 
 Find information on this job at: Watch the progress at: https://beaker.engineering.redhat.com/jobs/$JOBID
+Or, if in mountain view: http://hammer1.dsdev.sjc.redhat.com/bkr/jobs/$JOBID
 
 A seperate email will be sent once the reservation time has elapsed.
 
@@ -121,7 +122,7 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartSetup "gathering start time"
-		$starttime=$(date +%s)
+		starttime=$(date +%s)
 		export starttime
 		rlRun "echo 'start time is $starttime'" 0 "echoing start time"
 	rlPhaseEnd
@@ -130,7 +131,7 @@ rlJournalStart
 		rescomplete=1
 		while [ $rescomplete ]; do
 			sleep 500
-			$currenttime=$(date +%s)
+			currenttime=$(date +%s)
 			echo "current time is $currenttime starttime is $starttime"
 			let timediff=$currenttime-$starttime
 			if [ $timediff -lt 86400 ]; then # 86400 is 24 hours
