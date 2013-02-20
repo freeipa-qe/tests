@@ -55,6 +55,7 @@ TmpDir=`mktemp -d`
 #########################################
 
 rlJournalStart
+    rlPhaseStartTest "Machine Check and execution"
         myhostname=`hostname`
         rlLog "hostname command: $myhostname"
         rlLog "HOSTNAME: $HOSTNAME"
@@ -71,41 +72,42 @@ rlJournalStart
         rc=0
         echo $CLIENT | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-                if [ $rc -eq 0 ] ; then
-			ipajoin
-			rhts-sync-set -s DONE
-                fi
+            if [ $rc -eq 0 ] ; then
+                ipajoin
+                rhts-sync-set -s DONE
+            fi
         else
-                rlLog "Machine in recipe in not a CLIENT"
+            rlLog "Machine in recipe in not a CLIENT"
         fi
 
 
-	#####################################################################
-	# 		IS THIS MACHINE A MASTER?                           #
-	#####################################################################
-	rc=0
-	echo $MASTER | grep $HOSTNAME
-	if [ $? -eq 0 ] ; then
-		rhts-sync-block -s DONE $CLIENT
-	else
-		rlLog "Machine in recipe in not a MASTER"
-	fi
+        #####################################################################
+        # 		IS THIS MACHINE A MASTER?                           #
+        #####################################################################
+        rc=0
+        echo $MASTER | grep $HOSTNAME
+        if [ $? -eq 0 ] ; then
+            rhts-sync-block -s DONE $CLIENT
+        else
+            rlLog "Machine in recipe in not a MASTER"
+        fi
 
-	#####################################################################
-	# 		IS THIS MACHINE A SLAVE?                            #
-	#####################################################################
-	rc=0
+        #####################################################################
+        # 		IS THIS MACHINE A SLAVE?                            #
+        #####################################################################
+        rc=0
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-		rhts-sync-block -s DONE $CLIENT
+            rhts-sync-block -s DONE $CLIENT
         else
-                rlLog "Machine in recipe in not a SLAVE"
+            rlLog "Machine in recipe in not a SLAVE"
         fi
+    rlPhaseEnd
 
-   rlJournalPrintText
-   report=/tmp/rhts.report.$RANDOM.txt
-   makereport $report
-   rhts-submit-log -l $report
+    rlJournalPrintText
+    report=/tmp/rhts.report.$RANDOM.txt
+    makereport $report
+    rhts-submit-log -l $report
 rlJournalEnd
 
 # manifest:
