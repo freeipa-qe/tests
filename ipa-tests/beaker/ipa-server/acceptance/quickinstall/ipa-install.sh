@@ -967,6 +967,10 @@ ipa_install_master()
 		done
 		
 		rlRun "ipa-server-install $IPAOPTIONS --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+        if [ $? -gt 0 ]; then
+            rlRun "submit_log /var/log/ipaserver-install.log"
+        fi
+
         if [ $(dig +short download.devel.redhat.com|wc -l) -eq 0 ]; then 
             KinitAsAdmin
             rlLog "[FAIL]: BZ 872372 found...IPA server DNS forwarding broken with bind-dyndb-ldap-2.2-1.el6.x86_64"
@@ -1030,6 +1034,9 @@ ipa_install_replica()
 		# Do we need DelayUntilMasterReady???
 		rlLog "RUN ipa-replica-install"
 		rlRun "ipa-replica-install $IPAOPTIONS -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+        if [ $? -gt 0 ]; then
+            rlRun "submit_log /var/log/ipareplica-install.log"
+        fi
 
 		ipa_install_sssd_workarounds
 
@@ -1058,6 +1065,9 @@ ipa_install_client()
 		
 		rlLog "RUN ipa-client-install"
 		rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
+        if [ $? -gt 0 ]; then
+            rlRun "submit_log /var/log/ipareplica-install.log"
+        fi
 
 		ipa_install_sssd_workarounds
 
