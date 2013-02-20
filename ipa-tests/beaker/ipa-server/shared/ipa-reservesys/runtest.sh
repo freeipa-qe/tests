@@ -107,7 +107,7 @@ rlJournalStart
 
 	send_start_notice
 	rlPhaseStartSetup "Make sure RESERVETIME was specified"
-		if [ -f /dev/shm/reservetime.txt ]; then
+		if [ ! -f /dev/shm/reservetime.txt ]; then
 			echo $RESERVETIME >> /dev/shm/reservetime.txt
 		else
 			rm -f /dev/shm/reservetime.txt
@@ -119,6 +119,17 @@ rlJournalStart
 		let maxseconds=1209600
 		if [ $RESERVETIME -gt $maxseconds ]; then
 			echo $RESERVETIME >> /dev/shm/toomanyseconds.txt
+			rlLog "ERROR - Reserve time is greater than 2 weeks.(1209600 seconds) Exiting"
+			echo "ERROR - Reserve time is greater than 2 weeks. Exiting"
+			rlFail "ERROR - reserve seconds was greater than 1209600"
+			rlPhaseEnd
+			send_end_notice
+			rlJournalPrintText
+			report=/tmp/rhts.report.$RANDOM.txt
+			makereport $report
+			rhts-submit-log -l $report
+			rlJournalEnd
+			exit
 		else
 			rm -f /dev/shm/toomanyseconds.txt
 		fi
@@ -133,13 +144,12 @@ rlJournalStart
 
 	rlPhaseStartSetup "running reserve loop"
 		rescomplete=1
-		while [ $rescomplete ]; do
+		while [ $rescomplete -eq 0 ]; do
 			sleep 500
 			currenttime=$(date +%s)
 			let timediff=$currenttime-$starttime
 			rlLog "current time is $currenttime starttime is $starttime"
 			rlLog "Seconds remaing in this reservation: $timediff"
-			echo "Seconds remaing in this reservation: $timediff"
 			if [ $timediff -lt 86400 ]; then # 86400 is 24 hours
 				rescomplete=0
 				export rescomplete
@@ -149,16 +159,16 @@ rlJournalStart
 		send_day_remaining_notice
 		let endseconds=$starttime+$RESERVETIME
 		enddate=$(date --date="$endseconds seconds")
-		echo "This machine is reserved until $enddate. Run extendreservation.sh to extend the reservation to a time farther in the future" >> /etc/motd
+		rlLog "This machine is reserved until $enddate. Run extendreservation.sh to extend the reservation to a time farther in the future" >> /etc/motd
 		rescomplete=1
-		while [ $rescomplete ]; do
+		while [ $rescomplete -eq 0 ]; do
 			sleep 500
 			if [ -f /tmp/ipa-reservation-extend-seconds.dat ]; then
 				moreseconds=$(cat /tmp/ipa-reservation-extend-seconds.dat)
 				oldstart=$starttime
 				let $starttime=$starttime+$moreseconds
-				echo "old start time is $oldstart"
-				echo "new start time is $starttime"
+				rlLog "old start time is $oldstart"
+				rlLog "new start time is $starttime"
 				echo "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				rlLog "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				export moreseconds
