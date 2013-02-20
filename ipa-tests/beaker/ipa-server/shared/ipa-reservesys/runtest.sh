@@ -107,7 +107,7 @@ rlJournalStart
 
 	send_start_notice
 	rlPhaseStartSetup "Make sure RESERVETIME was specified"
-		if [ -x $RESERVETIME ]; then
+		if [ -f /dev/shm/reservetime.txt ]; then
 			echo $RESERVETIME >> /dev/shm/reservetime.txt
 		else
 			rm -f /dev/shm/reservetime.txt
@@ -122,7 +122,7 @@ rlJournalStart
 		else
 			rm -f /dev/shm/toomanyseconds.txt
 		fi
-		rlRun "ls /dev/shm/toomanyseconds.txt" 1 "Making sure RESERVETIME is 1209600 (ie 20160 minuites, ie 14 days) or less"
+		rlRun "ls /dev/shm/toomanyseconds.txt" 2 "Making sure RESERVETIME is 1209600 (ie 20160 minuites, ie 14 days) or less"
 	rlPhaseEnd
 
 	rlPhaseStartSetup "gathering start time"
@@ -136,8 +136,10 @@ rlJournalStart
 		while [ $rescomplete ]; do
 			sleep 500
 			currenttime=$(date +%s)
-			echo "current time is $currenttime starttime is $starttime"
 			let timediff=$currenttime-$starttime
+			rlLog "current time is $currenttime starttime is $starttime"
+			rlLog "Seconds remaing in this reservation: $timediff"
+			echo "Seconds remaing in this reservation: $timediff"
 			if [ $timediff -lt 86400 ]; then # 86400 is 24 hours
 				rescomplete=0
 				export rescomplete
@@ -151,18 +153,26 @@ rlJournalStart
 		rescomplete=1
 		while [ $rescomplete ]; do
 			sleep 500
-			let timediff=$currenttime-$starttime
 			if [ -f /tmp/ipa-reservation-extend-seconds.dat ]; then
 				moreseconds=$(cat /tmp/ipa-reservation-extend-seconds.dat)
-				let $RESERVETIME=$RESERVETIME+$moreseconds
+				oldstart=$starttime
+				let $starttime=$starttime+$moreseconds
+				echo "old start time is $oldstart"
+				echo "new start time is $starttime"
 				echo "$moreseconds seconds added to this reservation under jobid of $JOBID."
+				rlLog "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				export moreseconds
 				send_extended_email
 				rm -f /tmp/ipa-reservation-extend-seconds.dat
 			fi
-			if [ $timediff -gt $RESERVETIME ]; then
+			let timediff=$currenttime-$starttime
+			rlLog "current time is $currenttime starttime now reported as $starttime"
+			rlLog "Seconds remaing in this reservation: $timediff"
+			echo "Seconds remaing in this reservation: $timediff"
+			if [ $timediff -lt 0 ]; then
 				rescomplete=0
 				export rescomplete
+				rlLog "Time expired. Exiting reserve loop."
 			fi
 		done
 
