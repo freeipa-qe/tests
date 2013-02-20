@@ -59,6 +59,38 @@ autorenewcert()
         test_status_report 
 }
 
+verify_root_ca_cert_lifetime(){
+	rlPhaseStartTest "verify the life time of root ca cert"
+        local cert="caSigningCert"
+        local state="valid"
+        local nickname=`$cert nickname $state`
+        local serial=`$cert serial $state`
+        local notbefore_sec=`$cert NotBefore_sec $state`
+        local notbefore_date=`$cert NotBefore $state`
+        local notafter_sec=`$cert NotAfter_sec $state`
+        local notafter_date=`$cert NotAfter $state`
+        local timeleft=`$cert LifeLeft $state`
+        local life=`$cert Life $state`
+        local life_sec=`$cert Life_sec $state`
+        local subject=`$cert subject $state`
+
+        local fp_serial=`perl -le "print sprintf (\"%-2d\",$serial)"`
+        local fp_state=`perl -le "print sprintf (\"%-8s\",$passinState)"`
+        local fp_timeleft=`perl -le "print sprintf(\"%-20s\",\"$timeleft\")"`
+        echo "root ca cert details:"
+        echo "$nickname #$fp_serial: [$notbefore_date]~~[$notafter_date] expires@($fp_timeleft) life [$life] "
+        echo ""
+        # based on bug#891985 , root cert life time should be > 15 years
+        local expected_life_time=`echo 86400*365*15 | bc` 
+        if [ "$life_sec" -gt "$expected_life_time" ];then
+            rlPass "life time of ca root cert is greater than expected (15 years)"
+        else
+            rlFail "life time of ca root cert is less than expected (15 years)"
+        fi
+	rlPhaseEnd
+}
+
+
 ############## main test #################
 main_autorenewcert_test(){
     testroundCounter=1

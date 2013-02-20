@@ -63,7 +63,8 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    main_autorenewcert_test
+    #main_autorenewcert_test
+    verify_root_ca_cert_lifetime
     # r2d2_test_ends
 
     rlPhaseStartCleanup "autorenewcert cleanup"

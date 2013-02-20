@@ -1,6 +1,22 @@
 #!/bin/bash
 . ./d.autorenewcert.sh
 
+caSigningCert(){
+    local db="/var/lib/$CAINSTANCE/alias"
+    local nickname="caSigningCert cert-$CAINSTANCE"
+    local state=$2
+    if [ "$state" = "" ];then
+        state="valid"
+    fi
+    if [ "$1" = "nickname" ];then
+        echo $nickname
+    elif [ "$1" = "db" ];then
+        echo $db
+    else
+        $readCert -d $db -n "$nickname" -p "$1" -s $state
+    fi
+}
+
 oscpSubsystemCert(){
     local db="/var/lib/$CAINSTANCE/alias"
     local nickname="ocspSigningCert cert-$CAINSTANCE"
