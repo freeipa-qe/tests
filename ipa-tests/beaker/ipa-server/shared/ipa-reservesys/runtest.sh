@@ -59,10 +59,14 @@ Good luck" > /dev/shm/setup-email.txt
 send_day_remaining_notice()
 {
 hostname=$(hostname)
+enddate=$(date --date="$endseconds seconds")
 echo "Subject: Reservation expirationnotice for $hostname with job $JOBID
-This is the machine at $hostname,
+This is the machine at $hostname.
 
 This machine's reservation will expire in less than 24 hours for now. 
+
+Currently, the reservation will expire at:
+$enddate
 
 If you would like to keep this reservation going, please login to $hostname 
 and extend the reservation with the extendreservation.sh script.
@@ -136,8 +140,8 @@ rlJournalStart
 			let timediff=$currenttime-$starttime
 			if [ $timediff -lt 86400 ]; then # 86400 is 24 hours
 				rescomplete=0
-				export $rescomplete
-				export $timediff
+				export rescomplete
+				export timediff
 			fi
 		done
 		send_day_remaining_notice
@@ -152,13 +156,13 @@ rlJournalStart
 				moreseconds=$(cat /tmp/ipa-reservation-extend-seconds.dat)
 				let $RESERVETIME=$RESERVETIME+$moreseconds
 				echo "$moreseconds seconds added to this reservation under jobid of $JOBID."
-				export $moreseconds
+				export moreseconds
 				send_extended_email
 				rm -f /tmp/ipa-reservation-extend-seconds.dat
 			fi
 			if [ $timediff -gt $RESERVETIME ]; then
 				rescomplete=0
-				export $rescomplete
+				export rescomplete
 			fi
 		done
 
