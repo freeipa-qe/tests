@@ -44,7 +44,7 @@ delete_clientHostEntry_FromIPAServer()
         host=$clientFQDN
     fi
     rlLog "log into ipa server [$serverFQDN] as root and delete [$host]"
-    rlRun "ssh root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID;ipa host-del $host\" " 0 "remotely remove client entry in ipa server"
+    rlRun "ssh -o StrictHostKeyChecking=no root@$serverFQDN \"echo $ADMINPW | kinit $ADMINID;ipa host-del $host\" " 0 "remotely remove client entry in ipa server"
 } #delete_clientHostEntry_FromIPAServer
 
 qaRun()
