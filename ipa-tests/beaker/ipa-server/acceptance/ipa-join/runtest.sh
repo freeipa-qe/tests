@@ -62,9 +62,12 @@ rlJournalStart
         rlLog "MASTER: $MASTER"
         rlLog "SLAVE: $SLAVE"
         rlLog "CLIENT: $CLIENT"
+        rlLog "BEAKERMASTER: $BEAKERMASTER"
+        rlLog "BEAKERSLAVE: $BEAKERSLAVE"
+        rlLog "BEAKERCLIENT: $BEAKERCLIENT"
    
-        echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
-        echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
+        #echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
+        #echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
 
         #####################################################################
         #               IS THIS MACHINE A CLIENT?                           #
@@ -87,7 +90,7 @@ rlJournalStart
         rc=0
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-            rhts-sync-block -s DONE $CLIENT
+            rhts-sync-block -s DONE $BEAKERCLIENT
         else
             rlLog "Machine in recipe in not a MASTER"
         fi
@@ -98,7 +101,7 @@ rlJournalStart
         rc=0
         echo $SLAVE | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-            rhts-sync-block -s DONE $CLIENT
+            rhts-sync-block -s DONE $BEAKERCLIENT
         else
             rlLog "Machine in recipe in not a SLAVE"
         fi
