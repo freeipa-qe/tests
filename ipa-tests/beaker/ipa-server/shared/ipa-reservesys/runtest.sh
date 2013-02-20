@@ -143,7 +143,7 @@ rlJournalStart
 	rlPhaseEnd
 
 	rlPhaseStartSetup "running reserve loop"
-		rescomplete=1
+		rescomplete=0
 		while [ $rescomplete -eq 0 ]; do
 			sleep 500
 			currenttime=$(date +%s)
@@ -151,16 +151,17 @@ rlJournalStart
 			rlLog "current time is $currenttime starttime is $starttime"
 			rlLog "Seconds remaing in this reservation: $timediff"
 			if [ $timediff -lt 86400 ]; then # 86400 is 24 hours
-				rescomplete=0
+				rescomplete=1
 				export rescomplete
 				export timediff
+				rlLog "Exiting Reserve loop"
 			fi
 		done
 		send_day_remaining_notice
 		let endseconds=$starttime+$RESERVETIME
 		enddate=$(date --date="$endseconds seconds")
 		rlLog "This machine is reserved until $enddate. Run extendreservation.sh to extend the reservation to a time farther in the future" >> /etc/motd
-		rescomplete=1
+		rescomplete=0
 		while [ $rescomplete -eq 0 ]; do
 			sleep 500
 			if [ -f /tmp/ipa-reservation-extend-seconds.dat ]; then
@@ -180,7 +181,7 @@ rlJournalStart
 			rlLog "Seconds remaing in this reservation: $timediff"
 			echo "Seconds remaing in this reservation: $timediff"
 			if [ $timediff -lt 0 ]; then
-				rescomplete=0
+				rescomplete=1
 				export rescomplete
 				rlLog "Time expired. Exiting reserve loop."
 			fi
