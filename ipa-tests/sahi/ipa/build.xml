@@ -53,7 +53,7 @@
 
 	<target name="run" description="run RHQ sahi java test" depends="compile">
 		<testng haltonfailure="false" classpathref="tests.cp" reporter="org.testng.reporters.JUnitXMLReporter" outputdir="${test.output.dir}" listeners="com.redhat.qe.auto.testng.TestNGListener">
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/delegation" includes="delegation-testng.xml"/>
+		<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/delegation" includes="delegation-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/rbac" includes="rbac-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/host" includes="host-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/service" includes="service-testng.xml"/>
@@ -69,10 +69,10 @@
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/kerberosticketpolicy" includes="kerberosticketpolicy-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selinux" includes="selinux-testng.xml"/>
 			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selfservicepermission" includes="selfservicepermission-testng.xml"/> 
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/configuration" includes="configuration-testng.xml"/>
+			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/configuration" includes="configuration-testng.xml"/>-->
 			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automember" includes="automember.xml"/>-->
 		<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/trusts" includes="trust-testng.xml"/> -->
-		<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/globalization" includes="globalization-testng.xml"/> -->
+		 <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/globalization" includes="globalization-testng.xml"/> 
 		</testng>
 	</target>
 
