@@ -154,7 +154,7 @@ rlJournalStart
 				rescomplete=1
 				export rescomplete
 				export timediff
-				rlLog "Exiting Reserve loop"
+				rlLog "Exiting first reserve loop"
 			fi
 		done
 		send_day_remaining_notice
@@ -164,6 +164,7 @@ rlJournalStart
 		rescomplete=0
 		while [ $rescomplete -eq 0 ]; do
 			sleep 500
+			currenttime=$(date +%s)
 			if [ -f /tmp/ipa-reservation-extend-seconds.dat ]; then
 				moreseconds=$(cat /tmp/ipa-reservation-extend-seconds.dat)
 				oldstart=$starttime
