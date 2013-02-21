@@ -60,7 +60,7 @@ send_day_remaining_notice()
 {
 hostname=$(hostname)
 enddate=$(date --date="$endseconds seconds")
-echo "Subject: Reservation expirationnotice for $hostname with job $JOBID
+echo "Subject: Reservation expiration notice for $hostname with job $JOBID
 This is the machine at $hostname.
 
 This machine's reservation will expire in less than 24 hours for now. 
@@ -70,6 +70,9 @@ $enddate
 
 If you would like to keep this reservation going, please login to $hostname 
 and extend the reservation with the extendreservation.sh script.
+
+Find information on this job at: Watch the progress at: https://beaker.engineering.redhat.com/jobs/$JOBID
+Or, if in mountain view: http://hammer1.dsdev.sjc.redhat.com/bkr/jobs/$JOBID
 
 Have a nice day." > /dev/shm/end-email.txt
         sendmail -fbeaker@redhat.com $SUBMITTER < /dev/shm/end-email.txt
@@ -171,17 +174,16 @@ rlJournalStart
 				let $starttime=$starttime+$moreseconds
 				rlLog "old start time is $oldstart"
 				rlLog "new start time is $starttime"
-				echo "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				rlLog "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				export moreseconds
 				send_extended_email
 				rm -f /tmp/ipa-reservation-extend-seconds.dat
 			fi
-			let timediff=$currenttime-$starttime
-			rlLog "current time is $currenttime starttime now reported as $starttime"
+			let endseconds=$starttime+$RESERVETIME
+			let timediff=$endseconds-$currenttime
+			rlLog "current time is $currenttime starttime now reported as $starttime, endseconds as $endseconds"
 			rlLog "Seconds remaing in this reservation: $timediff"
-			echo "Seconds remaing in this reservation: $timediff"
-			if [ $timediff -lt 0 ]; then
+			if [ $currenttime -gt $endseconds ]; then
 				rescomplete=1
 				export rescomplete
 				rlLog "Time expired. Exiting reserve loop."
