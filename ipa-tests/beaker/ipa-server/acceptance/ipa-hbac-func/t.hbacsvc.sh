@@ -2808,6 +2808,19 @@ hbacsvc_client2_032() {
 
 hbacsvc_master_033() {
 
+               # Cleanup
+        	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		for i in {6..19}; do
+			rlRun "ipa hbacrule-del rule$i"
+	        done
+		for i in {27..30}; do
+			rlRun "ipa hbacrule-del rule$i"
+	        done
+        	rlRun "ipa hbacrule-del rule21"
+        	rlRun "ipa hbacrule-del rule23"
+        	rlRun "ipa hbacrule-del rule25"
+        	rlRun "ipa hbacrule-del ÃŒ"
+
                 # kinit as admin and creating users
                 kinitAs $ADMINID $ADMINPW
                 create_ipauser user33 user33 user33 $userpw
