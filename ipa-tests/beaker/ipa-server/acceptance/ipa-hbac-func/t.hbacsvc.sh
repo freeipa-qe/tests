@@ -156,14 +156,13 @@ hbacsvc_master_002() {
 
 	# ipa hbactest:
 
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -Ex '(Access granted: True|  matched: rule2)'" 
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -Ex '(Access granted: True|  matched: rule2)'"
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
                 # rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$CLIENT --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
-
-                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: True|  matched: rule2)'" 
+                rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -Ex '(Access granted: True|  matched: rule2)'"
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --srchost=$CLIENT2 --host=$MASTER --service=vsftpd  --user=$user1 --rule=rule2 --nodetail | grep -i \"Access granted: True\""
@@ -226,14 +225,12 @@ hbacsvc_master_002_1() {
                 rlRun "ipa hbacrule-show rule2 --all"
 
         # ipa hbactest:
-
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
 		# Source host validation has been depricated which caused the following test to fail, hence commenting it out.
                 # rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$CLIENT --service=vsftpd | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
-
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule2 | grep -i \"Access granted: False\""
                 rlRun "ipa hbactest --user=$user1 --srchost=$CLIENT --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
                 rlRun "ipa hbactest --user=$user2 --srchost=$CLIENT2 --host=$MASTER --service=vsftpd --rule=rule1 | grep -i \"Non-existent or invalid rules: rule1\""
@@ -2809,6 +2806,309 @@ hbacsvc_client2_032() {
         rlPhaseEnd
 }
 
+hbacsvc_master_033() {
+
+                # kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser user33 user33 user33 $userpw
+                create_ipauser user34 user34 user34 $userpw
+                sleep 5
+                export user33=user33
+                export user34=user34
+
+        rlPhaseStartTest "ipa-hbacsvc-033: Offline client caching for enabled default HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa hbacrule-enable allow_all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user33 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user34 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user33 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user34 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user33 --srchost=$CLIENT --host=$MASTER --service=sshd | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user34 --srchost=$CLIENT --host=$MASTER --service=sshd | grep -i \"Access granted: True\""
+        rlPhaseEnd
+}
+
+hbacsvc_master_033_cleanup() {
+        # Cleanup
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        for i in {33..34}; do
+                rlRun "ipa user-del user$i"
+        done
+}
+
+hbacsvc_client_033() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-033: Offline client caching for enabled default HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user33"
+                rlRun "getent -s sss passwd user34"
+                sleep 5
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $MASTER"
+
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+                sleep 10
+
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $MASTER"
+
+                #Starting ipa sevice on $MASTER
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_033() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-033: Offline client caching for enabled default HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user33"
+                rlRun "getent -s sss passwd user34"
+                sleep 5
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $MASTER"
+
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+                sleep 10
+
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_success user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_success user34 testpw123@ipa.com $MASTER"
+
+                #Starting ipa sevice on $MASTER
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+
+        rlPhaseEnd
+}
+
+hbacsvc_master_034() {
+
+                # kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser user33 user33 user33 $userpw
+                create_ipauser user34 user34 user34 $userpw
+                sleep 5
+                export user33=user33
+                export user34=user34
+
+        rlPhaseStartTest "ipa-hbacsvc-034: Offline client caching for disabled default HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa hbacrule-disable allow_all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user33 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user34 --srchost=$CLIENT --host=$CLIENT --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user33 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user34 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user33 --srchost=$CLIENT --host=$MASTER --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user34 --srchost=$CLIENT --host=$MASTER --service=sshd | grep -i \"Access granted: False\""
+
+        rlPhaseEnd
+}
+
+hbacsvc_master_034_cleanup() {
+        # Cleanup
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        for i in {33..34}; do
+                rlRun "ipa user-del user$i"
+        done
+	rlRun "ipa hbacrule-enable allow_all"
+}
+
+hbacsvc_client_034() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-034: Offline client caching for disabled default HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user33"
+                rlRun "getent -s sss passwd user34"
+                sleep 5
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $MASTER"
+
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+                sleep 10
+
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $MASTER"
+
+                #Starting ipa sevice on $MASTER
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_034() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-034: Offline client caching for disabled default HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user33"
+                rlRun "getent -s sss passwd user34"
+                sleep 5
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $MASTER"
+
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+                sleep 10
+
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $CLIENT"
+                rlRun "ssh_auth_failure user33 testpw123@ipa.com $MASTER"
+                rlRun "ssh_auth_failure user34 testpw123@ipa.com $MASTER"
+
+                #Starting ipa sevice on $MASTER
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+
+        rlPhaseEnd
+}
+
+hbacsvc_master_035() {
+
+                # kinit as admin and creating users
+                kinitAs $ADMINID $ADMINPW
+                create_ipauser user35 user35 user35 $userpw
+                create_ipauser user36 user36 user36 $userpw
+                sleep 5
+                export user35=user35
+                export user36=user36
+
+        rlPhaseStartTest "ipa-hbacsvc-035: Offline client caching for custom HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+		rlRun "ipa hbacrule-disable allow_all"
+
+                rlRun "ipa hbacrule-add rule35"
+                rlRun "ipa hbacrule-add-user rule35 --users=$user35"
+                rlRun "ipa hbacrule-add-host rule35 --hosts=$CLIENT2"
+                rlRun "ipa hbacrule-add-service rule35 --hbacsvcs=sshd"
+                rlRun "ipa hbacrule-show rule35 --all"
+
+        # ipa hbactest:
+
+                rlRun "ipa hbactest --user=$user35 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: True\""
+                rlRun "ipa hbactest --user=$user36 --srchost=$CLIENT --host=$CLIENT2 --service=sshd | grep -i \"Access granted: False\""
+                rlRun "ipa hbactest --user=$user35 --srchost=$CLIENT --host=$CLIENT2 --service=vsftpd | grep -i \"Access granted: False\""
+        rlPhaseEnd
+}
+
+hbacsvc_master_035_cleanup() {
+        # Cleanup
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        for i in {35..36}; do
+                rlRun "ipa user-del user$i"
+        done
+
+        rlRun "ipa hbacrule-del rule35"
+	rlRun "ipa hbacrule-enable allow_all"
+}
+
+hbacsvc_client_035() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client1-035: Offline client caching for custom HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user35"
+                rlRun "getent -s sss passwd user36"
+                sleep 5
+                rlRun "ssh_auth_success user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user36 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_failure $user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user35 testpw123@ipa.com $MASTER"
+
+
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+                sleep 10
+
+                rlRun "ssh_auth_success user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user36 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_failure $user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user35 testpw123@ipa.com $MASTER"
+
+                #Starting ipa sevice on $MASTER
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+
+        rlPhaseEnd
+}
+
+hbacsvc_client2_035() {
+
+        rlPhaseStartTest "ipa-hbacsvc-client2-035: Offline client caching for custom HBAC rule"
+
+                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+                rlRun "getent -s sss passwd user35"
+                rlRun "getent -s sss passwd user36"
+                sleep 5
+
+                rlRun "ssh_auth_success user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user36 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_failure $user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user35 testpw123@ipa.com $MASTER"
+
+                #Stoping ipa sevice on $MASTER
+                rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+                sleep 10
+
+                rlRun "ssh_auth_success user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user36 testpw123@ipa.com $CLIENT2"
+                rlRun "ftp_auth_failure $user35 testpw123@ipa.com $CLIENT2"
+                rlRun "ssh_auth_failure user35 testpw123@ipa.com $MASTER"
+
+                #Starting ipa sevice on $MASTER
+                rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+                rlRun "chmod +x $TmpDir/local.sh"
+                rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+
+        rlPhaseEnd
+}
 
 hbacsvc_master_bug736314() {
 
