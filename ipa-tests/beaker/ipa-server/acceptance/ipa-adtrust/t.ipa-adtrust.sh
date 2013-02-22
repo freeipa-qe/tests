@@ -81,9 +81,9 @@ STID="332233991"
 fakeIP="10.25.11.21"
 invalid_V6IP="3632:51:0:c41c:7054:ff:ae3c:c981"
 smbfile=`/bin/rpm -ql $PACKAGE4 | grep "smb.conf" | grep etc`
-group1="ipausers"
+group1="editors"
 group2="tgroup"
-ipacmd="which ipa"
+ipacmd=`which ipa`
 sidgen_ldif="/usr/share/ipa/ipa-sidgen-task-run.ldif"
 newsuffix='dc=testrelm,dc=com'
 DS_binddn="CN=Directory Manager"
@@ -107,7 +107,8 @@ rlPhaseStartTest "Setup for adtrust sanity tests"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "create_ipauser $user test user $userpw"
 	rlRun "create_ipauser $user1 new user $userpw"
-	rlRun "$ipacmd group-add --desc \"Test Group\" $group2" 0 "Adding a test group"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "$ipacmd group-add --desc Test-Group $group2" 0 "Adding a test group"
 
 	# stopping firewall
 #	rlRun "service iptables stop"
@@ -145,12 +146,12 @@ adtrust_test_0002() {
 
 rlPhaseStartTest "0002 Adtrust install with netbios name cannot consist of dot/hyphen"
 	rlRun "NB_Exp" 0 "Creating expect script"
-        rlRun "$exp $expfile netbios-name $dotname1" 2 "Netbios name cannot have a dot"
-        rlRun "$exp $expfile netbios-name $dotname2" 2 "Netbios name cannot have a dot"
-        rlRun "$exp $expfile netbios-name $dotname3" 2 "Netbios name cannot have a dot"
-        rlRun "$exp $expfile netbios-name $hypname1" 2 "Netbios name cannot have a hyphen"
-        rlRun "$exp $expfile netbios-name $hypname2" 2 "Netbios name cannot have a hyphen"
-        rlRun "$exp $expfile netbios-name $hypname3" 2 "Netbios name cannot have a hyphen"
+        rlRun "$exp $expfile netbios-name $dotname1" 2 "Netbios name cannot have a dot \"$dotname1\""
+        rlRun "$exp $expfile netbios-name $dotname2" 2 "Netbios name cannot have a dot \"$dotname2\""
+        rlRun "$exp $expfile netbios-name $dotname3" 2 "Netbios name cannot have a dot \"$dotname3\""
+        rlRun "$exp $expfile netbios-name $hypname1" 2 "Netbios name cannot have a hyphen \"$hypname1\""
+        rlRun "$exp $expfile netbios-name $hypname2" 2 "Netbios name cannot have a hyphen \"$hypname2\""
+        rlRun "$exp $expfile netbios-name $hypname3" 2 "Netbios name cannot have a hyphen \"$hypname3\""
 
 rlPhaseEnd
 }
@@ -232,7 +233,7 @@ adtrust_test_0010() {
 rlPhaseStartTest "0010 Login as root, adtrust install by user without administrative privileges"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "NoAdminPriv_Exp A" 0 "Creating expect script"
-	rlRun "$exp $expfile A $user" 2 "Failed as expected. $user does not have admin priviliges"
+	rlRun "$exp $expfile A $user $userpw" 2 "Failed as expected. $user does not have admin priviliges"
 
 rlPhaseEnd
 }
@@ -283,9 +284,9 @@ rlPhaseStartTest "0015 Adtrust install without creating DNS Service records"
 	rlRun "No_SRV_Exp no-msdcs" 0 "Creating expect script"
         rlRun "$exp $expfile no-msdcs" 0 "Running $trust_bin with --no-msdcs option"
 
-#	for i in $rec1 $rec2 $rec3 $rec4 $rec5 $rec6; do
-#	rlRun "ipa dnsrecord-find $IPAdomain $i" 2 "$i SRV record not created as expected"
-#	done
+	  for i in $rec{1..6}; do
+	    rlRun "ipa dnsrecord-find $IPAdomain $i" 1 "$i SRV record not created as expected"
+	  done
 
 rlPhaseEnd
 }
@@ -293,9 +294,11 @@ rlPhaseEnd
 adtrust_test_0016() {
 
 rlPhaseStartTest "0016 Install adtrust without options on CLI. Check srv records"
-	rlRun "Intractive_Exp" 0 "Creating expect script"
+	rlRun "Interactive_Exp" 0 "Creating expect script"
 	rlRun "$exp $expfile" 0 "Running $trust_bin without cli options"
-	if [ $? -eq 0 ]; then
+	if [ "$?" -eq 0 ]; then
+	rlRun "kdestroy" 0 "Destroying admin credentials."
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	  for i in $rec{1..6}; do
             rlRun "ipa dnsrecord-find $IPAdomain $i" 0 "$i SRV record created"
 	  done
@@ -397,7 +400,7 @@ adtrust_test_0025() {
 
 rlPhaseStartTest "0025 Adtrust install with start value of RID Base"
 	rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
-	rlRun "Intractive_Exp" 0 "Creating expect script"
+	rlRun "Interactive_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 2 "Cannot configure adtrust without IPA server configured first"
 
 rlPhaseEnd
@@ -453,6 +456,7 @@ rlPhaseStartTest "0029 Adtrust install on IPA server without DNS with --no-msdcs
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
         rlRun "create_ipauser $user test user $userpw"
         rlRun "create_ipauser $user1 new user $userpw"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "$ipacmd group-add --desc \"Test Group\" $group2" 0 "Adding a test group"
 
 	[ -e $smbfile ] && rm -f $smbfile
@@ -465,6 +469,7 @@ rlPhaseEnd
 adtrust_test_0030() {
 
 rlPhaseStartTest "0030 Adtrust install on IPA server with no integrated DNS"
+	rlRun "[ -e $smbfile ] && rm -f $smbfile" 0 "Deleting $smbfile for convenience"
 	rlRun "No_SRV_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created without integrated DNS"
 
@@ -479,14 +484,24 @@ rlPhaseStartTest "0031 Add SIDs for exiting IPA users and groups after adtrust i
         rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 1 "SID not created for $group2 as expected"	
 	
 	rlRun "Tmpfile=\`mktemp\`" 0 "Creating tmp directory"
-	if [ -e $sidgen_ldif ]
+	if [ -e $sidgen_ldif ]; then
           rlRun "cp $sidgen_ldif $Tmpfile" 0 "Copying file for SID generation"
 	else
 	  rlFail "$sidgen_ldif file does not exist" 
 	  return 1
 	fi
-	rlRun "sed -i \'s/\:\ \$SUFFIX/\:\ $newsuffix/\' $Tmpfile" 0 "Modifying $Tmpfile"
-	rlRun "ldapmodify -x -h $IPAhost -D $DS_binddn -w $DMpswd -f $Tmpfile" 0 "Populating ipaNTSecurityIdentifier (SID) for existing users and groups"
+	sed -i "s/\:\ \$SUFFIX/\:\ $newsuffix/" $Tmpfile
+	if [ $? -eq 0 ]; then
+	  rlPass "Modifying $Tmpfile"
+	else
+	  rlFail "Modifying $Tmpfile"
+	fi
+	ldapmodify -H ldapi://%2fvar%2frun%2fslapd-TESTRELM-COM.socket -f $Tmpfile
+	if [ $? -eq 0 ]; then
+          rlPass "Populating ipaNTSecurityIdentifier (SID) for existing users and groups"
+        else
+          rlFail "Populating ipaNTSecurityIdentifier (SID) for existing users and groups"
+        fi
 	rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 0 "SID created for $user1 as expected"
         rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 0 "SID created for default $group1 group as expected"
         rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 0 "SID created for $group2 as expected"
@@ -500,12 +515,8 @@ rlPhaseEnd
 cleanup() {
 
 rlPhaseStartTest "Clean up for adtrust sanity tests"
-
-	rlRun "kinitAs $ADMINID $ADMINPW" 0
-#	rlRun "rm -f $named_conf && cp -p $named_conf_bkp $named_conf" 0 "Restoring $named_conf file from backup"
-#	rlServiceStop "named"
-#        rlServiceStart "named"
-
+	sleep 120
+	rlRun "check_coredump"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "rm -fr /tmp/krb5cc_*"
 

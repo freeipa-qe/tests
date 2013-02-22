@@ -40,12 +40,6 @@ rec3="_kerberos._tcp.Default-First-Site-Name._sites.dc._msdcs"
 rec4="_kerberos._tcp.dc._msdcs"
 rec5="_kerberos._udp.Default-First-Site-Name._sites.dc._msdcs"
 rec6="_kerberos._udp.dc._msdcs"
-#rec1re='\_ldap\.\_tcp\.Default\-First\-Site\-Name\.\_sites\.dc\.\_msdcs'
-#rec2re='\_ldap\.\_tcp\.dc\.\_msdcs'
-#rec3re='\_kerberos\.\_tcp\.Default\-First\-Site\-Name\.\_sites\.dc\.\_msdcs'
-#rec4re='\_kerberos\.\_tcp\.dc\.\_msdcs'
-#rec5re='\_kerberos\.\_udp\.Default\-\First\-\Site\-Name\.\_sites\.dc\.\_msdcs'
-#rec6re='\_kerberos\.\_udp\.dc\.\_msdcs'
 expfile="/tmp/adtrust_install.exp"
 exp=`which expect`
 user="tuser"
@@ -61,6 +55,8 @@ NB_Exp() {
         echo 'set timeout 10
         set send_slow {1 .1}' >> $expfile
         echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
+	echo 'expect "*assword: "' >> $expfile
+	echo "send -s -- \"$adminpw\r\"" >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
@@ -98,9 +94,11 @@ NBIP_Exp() {
   eof { send_user "\nSome issue\n"; exit 1 }
   "error:*option*--ip-address:*invalid*IP*address" {
      send_user "\n$var2 is not a valid ip address\n" ; exit 2 }
-  "Illegal*NetBIOS*name*\[$var4\]*ASCII*\." {
+  "*assword: " {
+     send -s -- \$adminpw\r
+     expect "Illegal*NetBIOS*name*\[$var4\]*ASCII*\." {
      send_user "\n Invalid Netbios name \"$var4\" fails as expected\n" ; exit 2 } 
-   }' >>  $expfile
+  } }' >>  $expfile
 }
 
 NonRoot_Exp() {
@@ -137,26 +135,32 @@ RID_Exp() {
 No_SRV_Exp() {
 	rm -rf $expfile
 	echo 'set timeout 300
-	set send_slow {1 .1}' > $expfile
+	spawn /bin/bash
+        expect "*# "' >> $expfile
 	if [ "$1" = "no-msdcs" ]; then
-	  echo "spawn $trust_bin --no-msdcs" >> $expfile
+	  echo "send -- \"$trust_bin --no-msdcs\r\"" >> $expfile
 	else
-	  echo "spawn $trust_bin" >> $expfile
-	  echo 'expect "*]: "' >> $expfile
-	  echo 'send -s -- "y\r"' >> $expfile
+	  echo "send -- \"$trust_bin\r\"" >> $expfile
 	fi
-	echo 'expect "*]: "' >> $expfile
-	echo 'send -s -- "\r"' >> $expfile
 	echo 'expect "*assword: "' >> $expfile
-	echo "send -s -- \"$adminpw\r\"" >> $expfile
-	echo 'expect {
+	echo "send -- \"$adminpw\r\"" >> $expfile
+	echo 'expect "*]: "' >> $expfile
+	echo 'send -- "\r"' >> $expfile
+	if [ "$1" = "no-msdcs" ]; then
+	 echo 'expect {
+	    timeout { send_user "\nExpected message not received\n"; exit 1 }
+	    eof { send_user "\nSome issue\n"; exit 1 }
+	"no-msdcs was given" {
+	send_user "\n------------------\n" }
+	}' >> $expfile
+	else
+	 echo 'expect {
 	    timeout { send_user "\nExpected message not received\n"; exit 1 }
 	    eof { send_user "\nSome issue\n"; exit 1 }
 	"DNS management was not enabled" {
 	send_user "\n------------------\n" }
-	"no-msdcs was given" {
-	send_user "\n------------------\n" }
 	}' >> $expfile
+	fi
 	echo "expect \"*$rec1\"" >> $expfile
 	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec2\"" >> $expfile
@@ -169,35 +173,34 @@ No_SRV_Exp() {
 	echo 'send_user "\n------------------\n"' >> $expfile
 	echo "expect \"*$rec6\"" >> $expfile
 	echo 'send_user "\n------------------\n"' >> $expfile
-	echo 'expect "Setup*complete" {
-	expect "*# " }
-	send_user "\nAdtrust installed successfully without service records\n"
-	exit' >> $expfile
+	echo 'expect {
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+        "Setup*complete" { sleep 30 ; send "exit\r" }
+}
+	send_user "\nAdtrust installed successfully without creating service records\n"' >> $expfile
 }
 
-Intractive_Exp() {
+Interactive_Exp() {
 	rm -rf $expfile
         echo 'set timeout 300
         set send_slow {1 .1}' > $expfile
-        echo "spawn $trust_bin" >> $expfile
+        echo 'spawn /bin/bash' >> $expfile
+	echo 'expect "# "' >> $expfile
+	echo "send -- \"$trust_bin\r\"" >> $expfile
         echo 'expect {
-	"IPA is not configured on this system." { exit 2 }
-	"Overwrite smb.conf?*: " {} 
+	"IPA is not configured on this system." { send_user "\nNeed IPA configured on the server before ipa-adtrust-install\n" ; exit 2 }
+	"Overwrite smb.conf?*: "
 	}' >> $expfile
-        echo 'sleep .5' >> $expfile
-        echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*]: "' >> $expfile
-        echo 'sleep .5' >> $expfile
-        echo 'send -s -- "\r"' >> $expfile
+	echo 'send -- "y\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
-        echo "send -s -- \"$adminpw\r\"" >> $expfile
+        echo "send -- \"$adminpw\r\"" >> $expfile
         echo 'expect {
-    timeout { send_user "\nExpected message not received\n"; exit 1 }
-    eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { expect "*#" }
- }
-  send_user "\nAdtrust installed successfully in interactive mode\n"
-  exit 0' >> $expfile
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+        "Setup*complete" { sleep 30 ; send -- "exit\r" }
+}
+	send_user "\nInteractive ADtrust install was successful.\n"' >> $expfile
 }
 
 Valid_NB_Exp() {
@@ -206,16 +209,20 @@ Valid_NB_Exp() {
         set var2 [lindex $argv 1]
         set timeout 300
         set send_slow {1 .1}' > $expfile
-        echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
+	echo 'spawn /bin/bash' >> $expfile
+        echo 'expect "# "' >> $expfile
+        echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
         echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'sleep .5' >> $expfile
         echo 'send -s -- "y\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { expect "*#" }
+	"*]: " { 
+	send -s -- "y\r" 
+	expect "Setup*complete" { sleep 30 ; send -- "exit\r" } }
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
 }' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -226,18 +233,19 @@ Valid_IP_Exp() {
         set var2 [lindex $argv 1]
         set timeout 300
         set send_slow {1 .1}' > $expfile
-        echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
+        echo 'spawn /bin/bash' >> $expfile
+        echo 'expect "# "' >> $expfile
+        echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
         echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'sleep .5' >> $expfile
         echo 'send -s -- "y\r"' >> $expfile
-	echo 'expect "*]: "' >> $expfile
-        echo 'send -s -- "\r"' >> $expfile
+#	echo 'expect "*]: "' >> $expfile
+#        echo 'send -s -- "\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { expect "*#" }
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
 }' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -250,16 +258,19 @@ Valid_NBIP_Exp() {
         set var4 [lindex $argv 3]
         set timeout 300
         set send_slow {1 .1}' > $expfile
-        echo "spawn $trust_bin --\$var1=\$var2 --\$var3=\$var4" >> $expfile
+	echo 'spawn /bin/bash' >> $expfile
+        echo 'expect "# "' >> $expfile
+        echo "send -- \"$trust_bin --\$var1=\$var2 --\$var3=\$var4\r\"" >> $expfile
         echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'sleep .5' >> $expfile
         echo 'send -s -- "y\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { expect "*#" }
+	"*]: " { 
+        send -s -- "y\r" 
+        expect "Setup*complete" { sleep 30 ; send -- "exit\r" } }
 }' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -272,21 +283,23 @@ Valid_RID_Exp() {
         set var4 [lindex $argv 3]
         set timeout 300
         set send_slow {1 .1}' > $expfile
-	if [ -n $1 -a $1 = both ]; then
-	  echo "spawn $trust_bin --\$var1=\$var2 --\$var3=\$var4" >> $expfile
+	echo 'spawn /bin/bash' >> $expfile
+        echo 'expect "# "' >> $expfile
+	if [ -n "$1" -a "$1" = both ]; then
+	  echo "send -- \"$trust_bin --\$var1=\$var2 --\$var3=\$var4\r\"" >> $expfile
 	else
-	  echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
+	  echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
 	fi
 #        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
 #        echo 'sleep .5' >> $expfile
 #        echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
+        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { expect "*#" }
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
 } ' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -295,26 +308,25 @@ NoAdminPriv_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
 	set var2 [lindex $argv 1]
+	set var3 [lindex $argv 2]
         set timeout 300
         set send_slow {1 .1}' > $expfile
         echo "spawn $trust_bin -\$var1 \$var2 " >> $expfile
-        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
-	if [ $1 = A ]; then 
+	if [ "$1" = "A" ]; then 
           echo 'expect "*assword: "' >> $expfile
-          echo "send -s -- \"$adminpw\r\"" >> $expfile
+          echo "send -s -- \"\$var3\r\"" >> $expfile
 	  echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Must have administrative privileges to setup AD trusts on server" { expect "*#" }
+        "Must have administrative privileges to setup AD trusts on server" { expect "*#" ; exit 2}
 } ' >> $expfile
 	else
 	  echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "error to automatically re-kinit your admin user ticket" { expect "*#" }
+        "error to automatically re-kinit your admin user ticket" { expect "*#" ; exit 2}
 } ' >> $expfile
 	fi
-        echo 'send_user "\nWrong Kerberos credentials to setup AD trusts\n" ; exit 2' >> $expfile
 }
 
 AdminPriv_Exp() {
@@ -323,19 +335,19 @@ AdminPriv_Exp() {
 	set var2 [lindex $argv 1]
         set timeout 300
         set send_slow {1 .1}' > $expfile
-        echo "spawn $trust_bin -\$var1 \$var2 " >> $expfile
+	echo 'spawn /bin/bash' >> $expfile
+        echo 'expect "# "' >> $expfile
+        echo "send -- \"$trust_bin -\$var1 \$var2\r\"" >> $expfile
 	echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'sleep .5' >> $expfile
         echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
-	if [ $1 = A ]; then 
+	if [ "$1" = "A" ]; then 
           echo 'expect "*assword: "' >> $expfile
-          echo "send -s -- \"$adminpw\r\"" >> $expfile
+          echo "send -s -- \"$userpw\r\"" >> $expfile
 	fi
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup complete" { expect "*#" }
+    "Setup*complete" { sleep 30 ; send -- "exit\r" }
 } ' >> $expfile
 	echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -345,21 +357,21 @@ SID_Exp() {
         echo 'set var1 [lindex $argv 0]
         set timeout 300
         set send_slow {1 .1}' > $expfile
-	if [ $1 = "add-sids" ]; then
-          echo "spawn $trust_bin --add-sids" >> $expfile
+	echo 'spawn /bin/bash' >> $expfile
+        echo 'expect "# "' >> $expfile
+	if [ "$1" = "add-sids" ]; then
+          echo "send -- \"$trust_bin --add-sids\r\"" >> $expfile
 	else
-	  echo "spawn $trust_bin" >> $expfile
+	  echo "send -- \"$trust_bin\r\"" >> $expfile
 	fi
         echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'sleep .5' >> $expfile
         echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup complete" { expect "*#" }
-} ' >> $expfile
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
+}' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
