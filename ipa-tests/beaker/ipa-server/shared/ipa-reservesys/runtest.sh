@@ -128,10 +128,8 @@ rlJournalStart
 			rlPhaseEnd
 			send_end_notice
 			rlJournalPrintText
-			report=/tmp/rhts.report.$RANDOM.txt
-			makereport $report
-			rhts-submit-log -l $report
 			rlJournalEnd
+			sleep 60
 			exit
 		else
 			rm -f /dev/shm/toomanyseconds.txt
@@ -196,7 +194,4 @@ rlJournalStart
 	send_end_notice
 
 rlJournalPrintText
-report=/tmp/rhts.report.$RANDOM.txt
-makereport $report
-rhts-submit-log -l $report
 rlJournalEnd
