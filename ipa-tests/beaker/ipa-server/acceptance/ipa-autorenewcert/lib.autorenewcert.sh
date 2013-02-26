@@ -357,6 +357,7 @@ adjust_system_time(){
     rlPhaseStartTest "autorenewcert round [$testroundCounter] - adjust_system_time $label"
         local adjustTo=$1
         local label=$2
+        echo "[adjust_system_time] ($label) : current [`date`]" 
         echo "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
         local before=`date`
         logger "************************ Before: `date` *************************"
@@ -366,6 +367,7 @@ adjust_system_time(){
         if [ "$?" = "0" ];then
             local after=`date`
             rlPass "adjust ($label) [$before]=>[$after] done"
+            echo "[adjust_system_time] finished: current [`date`]" 
         else
             local after=`date`
             rlFail "change system date to ($label) failed, current data: [`date`]"
@@ -424,7 +426,7 @@ restart_ipa_certmonger_server(){
 
 go_to_sleep(){
     local waittime=0
-    echo ""
+    echo "[go_to_sleep: before sleep, system time: [`date`]"
     echo -n "[go_to_sleep] $maxwait(s): "
     while [ $waittime -lt $maxwait ]
     do    
@@ -432,7 +434,7 @@ go_to_sleep(){
         echo -n " ...$waittime(s)"
         sleep $wait4renew
     done
-    echo ""
+    echo "[go_to_sleep: after sleep, system time: [`date`]"
 }
 
 prepare_for_next_round(){
