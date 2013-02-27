@@ -866,25 +866,3 @@ test_indirect_map_using_wildcard_offline()
     rlPhaseEnd
 }
 
-stop_ipa_master()
-{
-      rlPhaseStartTest "Stop IPA Master"
-        #Stoping ipa sevice on $MASTER
-        rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
-        rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
-        sleep 10
-      rlPhaseEnd
-}
-
-start_ipa_master()
-{
-      rlPhaseStartTest "Start IPA Master"
-        #Starting ipa sevice on $MASTER
-        rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
-        rlRun "chmod +x $TmpDir/local.sh"
-        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
-        sleep 10
-      rlPhaseEnd
-}
-
