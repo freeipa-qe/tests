@@ -426,7 +426,7 @@ restart_ipa_certmonger_server(){
 
 go_to_sleep(){
     local waittime=0
-    echo "[go_to_sleep: before sleep, system time: [`date`]"
+    echo "[go_to_sleep] before sleep, system time: [`date`]"
     echo -n "[go_to_sleep] $maxwait(s): "
     while [ $waittime -lt $maxwait ]
     do    
@@ -434,7 +434,8 @@ go_to_sleep(){
         echo -n " ...$waittime(s)"
         sleep $wait4renew
     done
-    echo "[go_to_sleep: after sleep, system time: [`date`]"
+    echo ""
+    echo "[go_to_sleep] after sleep, system time: [`date`]"
 }
 
 prepare_for_next_round(){
@@ -734,7 +735,7 @@ final_cert_status_report(){
 
 debuginfo()
 {
-    local nLines=150
+    local nLines=300
     for log in $logs
     do
         echo ""
