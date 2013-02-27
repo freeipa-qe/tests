@@ -524,7 +524,7 @@ parse_test_roles_from_beaker_job_xml_file()
     NFS_IP=$(dig +short $NFS)
     NFS_IPA="${Nfs_hostname}.${DOMAIN}"
     if [ -z "$NFS_IP" ]; then
-	    NFS_IP=$(getent ahostsv4 $NFS | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
+    	    NFS_IP=$(getent ahostsv4 $NFS | grep -e "^[0-9.]*[ ]*STREAM" | awk '{print $1}')
     fi
 
     CLIENT=`echo $CLIENT_env1 | cut -d' ' -f2`

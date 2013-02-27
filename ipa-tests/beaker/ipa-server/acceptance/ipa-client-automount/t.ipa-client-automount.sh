@@ -23,6 +23,7 @@ ipaclientautomount()
     clientautomount_script_install_and_uninstall #done script writing
     clientautomount_script_install_option_combinations # done script writing, need debug in official environment
     clientautomount_autofs_functional_test
+    clientautomount_autofs_functional_test_offline
 } #ipaclientautomount 
 
 ######################
@@ -701,4 +702,189 @@ test_indirect_map_using_wildcard_use_no_sssd()
     rlPhaseEnd
 }
 
+clientautomount_autofs_functional_test_offline()
+{
+    KinitAsAdmin
+    rlLog "clean up ipa-client-automount"
+    ipa-client-automount --uninstall -U
+
+    #Checking existence of ipa-admintools
+    rpm -q ipa-admintools
+    if [ $? -eq 0 ] ; then
+      rlLog "ipa-admintools is installed"
+    else
+      #rlRun "yum install ipa-admintools -y" 0 "Installing ipa-admintools"
+      rlRun "yum install ipa-admintools -y --nogpg" 0 "Installing ipa-admintools"
+    fi
+
+    rlRun "echo \"mkdir -p /ipashare/share/\" > $TmpDir/local.sh" 0
+    rlRun "echo \"echo mounted_file > /ipashare/share/mount.txt\" >> $TmpDir/local.sh" 0
+    rlRun "echo \"cp /etc/exports /etc/exports.old\" >> $TmpDir/local.sh" 0
+    text="/ipashare/share/\ *\(rw,async,fsid=0,no_subtree_check,no_root_squash\)"
+    rlRun "echo \"echo $text > /etc/exports\" >> $TmpDir/local.sh" 0
+    rlRun "echo \"service nfs restart\">> $TmpDir/local.sh" 0
+    rlRun "chmod +x $TmpDir/local.sh"
+    rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Creating shared directory and file on $MASTER"
+
+    test_direct_map_offline
+    test_indirect_map_offline
+    test_indirect_map_using_wildcard_offline
+
+    rlRun "echo \"rm -rf /ipashare/share/\" > $TmpDir/local.sh" 0
+    rlRun "echo \"cp /etc/exports.old /etc/exports\" >> $TmpDir/local.sh" 0
+    rlRun "echo \"service nfs restart\">> $TmpDir/local.sh" 0
+    rlRun "chmod +x $TmpDir/local.sh"
+    rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Removing shared directory and file on $MASTER"
+
+    rlLog "clean up ipa-client-automount"
+    ipa-client-automount --uninstall -U
+}
+
+test_direct_map_offline()
+{
+    rlPhaseStartTest "autofs functional test offline -- direct map"
+        local automounLocation="direct_map_${RANDOM}"
+        currentLocation=$automounLocation
+
+        #Adding direct automount map and installing ipa-client-automount 
+        rlRun "ipa automountlocation-add $currentLocation" 0 "Added automount localtion"
+        rlRun "ipa automountkey-add $currentLocation auto.direct --key=/$currentLocation/ --info=\"-rw,soft,rsize=8192,wsize=8192  $MASTER:/ipashare/share/\"" 0 "Added automountkey"
+        rlRun "ipa automountlocation-tofiles $currentLocation" 0 "automount direct map info"
+        rlRun "ipa-client-automount --server=$MASTER --location=$currentLocation -U" 0 "setup ipa client automount"
+        rlRun "service autofs restart" 0 "Restarting automount to fetch updated configuration"
+
+        #Mounting the localtion added by direct automount map
+
+        rlRun "cd /$currentLocation/;pwd" 0 "mounting the localtion specified in automount direct map"
+        rlRun "cat mount.txt |grep mounted_file" 0 "verifying the content of mounted file"
+        rlRun "cd; umount /$currentLocation/" 0 "unmount the location specified by automount direct map"
+
+	#Stoping ipa sevice on $MASTER
+        stop_ipa_master
+
+        sleep 10
+        rlRun "cd /$currentLocation/;pwd" 0 "mounting the localtion specified in automount direct map"
+        rlRun "cat mount.txt |grep mounted_file" 0 "verifying the content of mounted file"
+        rlRun "cd; umount /$currentLocation/" 0 "unmount the location specified by automount direct map"
+
+	#Starting ipa sevice on $MASTER
+        start_ipa_master
+
+        #clean-up
+        rlRun "ipa-client-automount --uninstall -U" 0 "uninstall ipa client automount"
+        rlRun "service autofs restart" 0 "Restarting automount to fetch updated configuration"
+        rlRun "ipa automountkey-del $currentLocation auto.direct --key=/$currentLocation/" 0 "Removed automount key"
+        rlRun "ipa automountlocation-del $currentLocation" 0 "Removed automount location"
+
+    rlPhaseEnd
+}
+
+test_indirect_map_offline()
+{
+    rlPhaseStartTest "autofs functional test offline -- indirect map"
+        local automounLocation="indirect_map_${RANDOM}"
+        currentLocation=$automounLocation
+     
+        #Adding indirect automount map and installing ipa-client-automount
+        rlRun "ipa automountlocation-add $currentLocation" 0 "Added automount localtion"
+        rlRun "ipa automountmap-add $currentLocation auto.share" 0 "Added automount map"
+        rlRun "ipa automountkey-add $currentLocation auto.master --key=/$currentLocation --info=auto.share" 0 "Added direct automountkey in auto.share"
+        rlRun "ipa automountkey-add $currentLocation auto.share --key=public --info=\"-rw,soft,rsize=8192,wsize=8192  $MASTER:/ipashare/share/\"" 0 "Added indirect automount key in auto.share"
+        rlRun "ipa automountlocation-tofiles $currentLocation" 0 "automount direct map info"
+        rlRun "ipa-client-automount --server=$MASTER --location=$currentLocation -U" 0 "setup ipa client automount"
+        rlRun "service autofs restart" 0 "Restarting automount to fetch updated configuration"
+
+        #sleep 60
+        #Mounting the localtion added by indirect automount map
+        rlRun "cd /$currentLocation;ls -al;cd public/;pwd" 0 "mounting the localtion specified in automount direct map"
+        rlRun "cat mount.txt |grep mounted_file" 0 "verifying the content of mounted file"
+        rlRun "cd; umount /$currentLocation/public/" 0 "unmount the location specified by automount direct map"
+
+	#Stoping ipa sevice on $MASTER
+        stop_ipa_master
+
+        #sleep 60
+        #Un-mounting the localtion added by indirect automount map
+        rlRun "cd /$currentLocation/public/;pwd" 0 "mounting the localtion specified in automount direct map"
+        rlRun "cat mount.txt |grep mounted_file" 0 "verifying the content of mounted file"
+        rlRun "cd; umount /$currentLocation/public/" 0 "unmount the location specified by automount direct map"
+
+	#Starting ipa sevice on $MASTER
+        start_ipa_master
+
+        #clean-up
+        rlRun "ipa-client-automount --uninstall -U" 0 "uninstall ipa client automount"
+        rlRun "service autofs restart" 0 "Restarting automount to fetch updated configuration"
+        rlRun "ipa automountkey-del $currentLocation auto.share --key=public" 0 "Removed automount key"
+        rlRun "ipa automountmap-del $currentLocation auto.share" 0 "Removed automount map"
+        rlRun "ipa automountlocation-del $currentLocation" 0 "Removed automount location"
+
+    rlPhaseEnd
+}
+
+
+test_indirect_map_using_wildcard_offline()
+{
+    rlPhaseStartTest "autofs functional test offline -- indirect map with wildcard"
+        local automounLocation="indirect_map_wildcard_${RANDOM}"
+        currentLocation=$automounLocation
+     
+        #Adding indirect automount map and installing ipa-client-automount
+        rlRun "ipa automountlocation-add $currentLocation" 0 "Added automount localtion"
+        rlRun "ipa automountmap-add $currentLocation auto.share" 0 "Added automount map"
+        rlRun "ipa automountkey-add $currentLocation auto.master --key=/$currentLocation --info=auto.share" 0 "Added direct automountkey in auto.share"
+        rlRun "ipa automountkey-add $currentLocation auto.share --key=* --info=\"-rw,soft,rsize=8192,wsize=8192  $MASTER:/ipashare/&\"" 0 "Added indirect automount key in auto.share"
+        rlRun "ipa automountlocation-tofiles $currentLocation" 0 "automount direct map info"
+        rlRun "ipa-client-automount --server=$MASTER --location=$currentLocation -U" 0 "setup ipa client automount"
+        rlRun "service autofs restart" 0 "Restarting automount to fetch updated configuration"
+
+        #sleep 60
+        #Mounting the localtion added by indirect automount map
+        rlRun "cd /$currentLocation;ls -la;cd share/;pwd" 0 "mounting the localtion specified in automount direct map"
+        rlRun "cat mount.txt |grep mounted_file" 0 "verifying the content of mounted file"
+        rlRun "cd; umount /$currentLocation/share/" 0 "unmount the location specified by automount direct map"
+
+	#Stoping ipa sevice on $MASTER
+        stop_ipa_master
+
+        #sleep 60
+        #Un-mounting the localtion added by indirect automount map
+        rlRun "cd /$currentLocation;ls;cd share/;pwd" 0 "mounting the localtion specified in automount direct map"
+        rlRun "cat mount.txt |grep mounted_file" 0 "verifying the content of mounted file"
+        rlRun "cd; umount /$currentLocation/share/" 0 "unmount the location specified by automount direct map"
+
+	#Starting ipa sevice on $MASTER
+        start_ipa_master
+
+        #clean-up
+        rlRun "ipa-client-automount --uninstall -U" 0 "uninstall ipa client automount"
+        rlRun "service autofs restart" 0 "Restarting automount to fetch updated configuration"
+        rlRun "ipa automountkey-del $currentLocation auto.share --key=*" 0 "Removed automount key"
+        rlRun "ipa automountmap-del $currentLocation auto.share" 0 "Removed automount map"
+        rlRun "ipa automountlocation-del $currentLocation" 0 "Removed automount location"
+
+    rlPhaseEnd
+}
+
+stop_ipa_master()
+{
+      rlPhaseStartTest "Stop IPA Master"
+        #Stoping ipa sevice on $MASTER
+        rlRun "echo \"ipactl stop\" > $TmpDir/local.sh" 0 "Stoping IPA service on $MASTER"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Stop IPA service on MASTER"
+        sleep 10
+      rlPhaseEnd
+}
+
+start_ipa_master()
+{
+      rlPhaseStartTest "Start IPA Master"
+        #Starting ipa sevice on $MASTER
+        rlRun "echo \"ipactl start\" > $TmpDir/local.sh" 0 "Starting IPA service on $MASTER"
+        rlRun "chmod +x $TmpDir/local.sh"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh" 0 "Start IPA service on MASTER"
+        sleep 10
+      rlPhaseEnd
+}
 
