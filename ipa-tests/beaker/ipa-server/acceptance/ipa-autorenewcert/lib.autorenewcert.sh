@@ -336,7 +336,7 @@ calculate_autorenew_date(){
     #preAutorenew=`echo "$certExpire - $sixdays - $sixdays" | bc` # this is not in use
     #autorenew=`echo "$certExpire - $threedays" | bc` # not sure if change from three days to one day would make any different
     #autorenew=`echo "$certExpire - $oneday" | bc`
-    autorenew=`echo "$certExpire - 3 * $onehour" | bc`
+    autorenew=`echo "$certExpire - 45 * 60 " | bc`
     postExpire=`echo "$certExpire + $oneday" | bc` #used to be halfhour, not sure change it to one day would make any different
     echo "     current date :" `date` "($current_epoch)"
     echo "     autorenew    :" `convert_epoch_to_date $autorenew` " ($autorenew)"  
