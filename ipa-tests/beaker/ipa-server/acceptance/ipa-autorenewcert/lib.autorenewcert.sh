@@ -436,6 +436,9 @@ go_to_sleep(){
     done
     echo ""
     echo "[go_to_sleep] after sleep, system time: [`date`]"
+    echo "============= beginning of tail -n 50 /var/log/messages ============="
+    tail -n 50 /var/log/messages
+    echo "============= end of tail -n 50 /var/log/messages ============="
 }
 
 prepare_for_next_round(){
@@ -577,7 +580,7 @@ find_soon_to_be_renewed_certs(){
 
 prepare_preserv_dir()
 {
-    preservDir="/tmp/preserve"
+    preservDir="/opt/preserve"
     if [ ! -d $preservDir ];then
         mkdir -p $preservDir
         echo "create preserv dir: [$preservDir]"
