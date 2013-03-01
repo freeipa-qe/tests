@@ -25,13 +25,13 @@
                         </task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect ipa-server ipa-client dig vim"/>
+					<param name="PKGARGNAME" value="expect ipa-server ipa-client vim-enhanced"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="MASTER_env1">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER_env1">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-dns-multi" role="MASTER_env1">
 				<params/>
 			</task>
 		</recipe>
@@ -57,13 +57,13 @@
                         </task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
 				<params>
-					<param name="PKGARGNAME" value="expect ipa-server ipa-client dig vim"/>
+					<param name="PKGARGNAME" value="expect ipa-server ipa-client vim-enhanced"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-test-install" role="MASTER_env1">
+			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER_env2">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns" role="MASTER">
+			<task name="/CoreOS/ipa-server/acceptance/ipa-dns-multi" role="MASTER_env2">
 				<params/>
 			</task>
 		</recipe>

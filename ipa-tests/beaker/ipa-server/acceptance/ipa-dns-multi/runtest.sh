@@ -2,22 +2,17 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-dns
-#   Description: IPA DNS acceptance tests
+#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-dns-multi
+#   Description: IPA DNS acceptance tests to be run on a instance with 
+#    multiple, independant masters.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa will be tested:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Michael Gregg <mgregg@redhat.com>
-#   Date  : Jan 21, 2011
+#   Date  : Feb 28, 2013
 #
-#   Author: Gowrishankar Rajaiyan <grajaiya@redhat.com>
-#   Date  : Feb 14, 2012
-#
-#   Author: Jenny Galipeau <jgalipea@redhat.com>
-#   Date:   April 25, 2012 
-#   Re-organization of tests
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
@@ -58,16 +53,40 @@
 
 rlJournalStart
 
-  rlPhaseStartSetup "DNS SETUP"
+  rlPhaseStartSetup "DNS MUlTI HOST SETUP"
         rlDistroDiff ipa_pkg_check
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 	yum -y install wget rpcbind
   rlPhaseEnd
 
+# If you change the style of setting MYROLE, remember
+# that $SLAVE could be a space delimited list of replicas
+env | grep "MASTER_env1"
+if [ $? -eq 0 ]; then
+	rlLog "Role is Master 1"
+	MYROLE=MASTER1
+else
+	rlLog "Role is Master 2"
+	MYROLE=MASTER2
+fi
+
+env | grep "MASTER_env1"
+if [ $? -eq 0 ]; then
+	rhts-sync-set -s READY_REPLICA1 -m $MASTER_env1
+	rlLog "ready_replica1 set"
+	rlLog "blocking master, waiting for slave"
+	rhts-sync-block -s DONE_REPLICA2 $MASTER_env2
+	rlLog "test complete"
+else
+	rlLog "blocking for master 1"
+	rhts-sync-block -s READY_REPLICA1 $MASTER_env1
+	rhts-sync-set -s DONE_REPLICA2 -m $MASTER_env1 
+	rlLog "test complete"
+fi
   # run tests
-  dnsacceptance  
-  dnsbugs
+#  dnsacceptance  
+#  dnsbugs
 
   rlPhaseStartCleanup "DNS CLEANUP"
         rlRun "popd"
