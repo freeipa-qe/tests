@@ -24,23 +24,66 @@ import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.NetgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 import com.redhat.qe.ipa.sahi.tasks.UserTasks;
+import com.redhat.qe.ipa.sahi.tests.automember.AutomemberUserGroupTests;
 import com.redhat.qe.ipa.sahi.tests.group.GroupTests;
 
 public class DelegationTests extends SahiTestScript {
 	private static Logger log = Logger.getLogger(GroupTests.class.getName());
+	String[] users = {"delegationuser1","delegationmemberuser1","delegationmemberuser2"};
+  	String[] groups = {"delegationgroup1","delegationmembergroup1","delegationmembergroup2"};
 	
 	@BeforeClass (groups={"init"}, description="Initialize app for this test suite run", alwaysRun=true)
 	public void initialize() throws CloneNotSupportedException {	
-		
-		//log.info("kinit as admin");
-		//Assert.assertTrue(CommonTasks.kinitAsAdmin(), "Logged in successfully as admin");
 		
 		log.info("Opening browser");
 		sahiTasks.open();
 		log.info("Accessing: IPA Server URL");
 		sahiTasks.setStrictVisibilityCheck(true);
       	CommonTasks.formauth(sahiTasks, "admin", "Secret123");
-				
+      	
+      	      	
+      	//add users for delegation
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		for (String username : users){
+			UserTasks.createUser(sahiTasks,username,username,username,username,username,"Add");
+		} 
+		
+		//add groups for delegation
+		sahiTasks.navigateTo(commonTasks.groupPage, true);
+		for (String groupname : groups){
+			String groupDescription = groupname + " description";
+			GroupTasks.addGroup(sahiTasks, groupname, groupDescription);
+		} 
+		
+		//add user to group 
+		sahiTasks.navigateTo(commonTasks.userPage, true);
+		for(int i=0;i<3;i++){
+			sahiTasks.link(users[i]).click();
+			sahiTasks.link("memberof_group").click();
+			sahiTasks.span("Add").click();
+			sahiTasks.checkbox(groups[i]).click();
+			sahiTasks.span(">>").click();
+			sahiTasks.button("Add").click();
+			sahiTasks.link("Users").in(sahiTasks.div("content")).click();;
+		}
+	}
+	
+	@AfterClass (groups={"cleanup"}, description="Delete objects added for the tests", alwaysRun=true)
+	public void cleanup() throws Exception {	
+
+		//delete users for delegation
+    	sahiTasks.navigateTo(commonTasks.userPage, true);
+    	for (String username : users) {
+    	 	UserTasks.deleteUser(sahiTasks, username);
+    		Assert.assertFalse(sahiTasks.link(username).exists(),"after 'Delete', user does NOT exists");
+    	}
+		
+		//delete groups for delegation
+    	sahiTasks.navigateTo(commonTasks.groupPage, true);
+    	for (String usergroup : groups) {
+    		GroupTasks.deleteGroup(sahiTasks, usergroup);
+    		Assert.assertFalse(sahiTasks.link(usergroup).exists(),"after 'Delete', usergroup does NOT exists");
+    	}
 	}
 	
 	////////////////////////////////////////////////
@@ -49,12 +92,12 @@ public class DelegationTests extends SahiTestScript {
 	
 	@Test (groups={"add"}, description="Delegation Add Single",
 			dataProvider="getDelegationAddSingleObjects")	
-	public void testDelegationAddSingle(String testName,String delegationName,String permissionType,String groupName,String memberGroup,String attribute) throws Exception {
+	public void testDelegationAddSingle(String testName,String delegationName,String groupName,String memberGroup,String attribute) throws Exception {
 		sahiTasks.navigateTo(commonTasks.delegationPage, true);
 		//verify delegation doesn't exist
 		Assert.assertFalse(sahiTasks.link(delegationName).exists(), "Verify delegation " + delegationName + " doesn't already exist");
 		//Add delegation : no permission checked,different group and member group,single attribute 
-		DelegationTasks.delegation_AddSingle(sahiTasks,delegationName,permissionType,groupName,memberGroup,attribute);		
+		DelegationTasks.delegation_AddSingle(sahiTasks,delegationName,groupName,memberGroup,attribute);		
 		//verify delegation was added successfully 
 		Assert.assertTrue(sahiTasks.link(delegationName).exists(), "Added delegation " + delegationName + "  successfully");
 	}
@@ -92,128 +135,103 @@ public class DelegationTests extends SahiTestScript {
 	
 	@Test (groups={"add"}, description="Delegation Add Then Cancel",
 			dataProvider="getDelegationAddThenCancelObjects")	
-	public void testDelegationAddThenCancel(String testName, String delegationName) throws Exception {
+	public void testDelegationAddThenCancel(String testName,String delegationName,String permissionType,String groupName,String memberGroup,String attribute) throws Exception {
 		sahiTasks.navigateTo(commonTasks.delegationPage, true);
 		//verify delegation doesn't exist
 		Assert.assertFalse(sahiTasks.link(delegationName).exists(), "Verify delegation " + delegationName + " doesn't already exist");
 		//Add delegation then cancel
-		DelegationTasks.delegation_AddThenCancel(sahiTasks, delegationName);		
+		DelegationTasks.delegation_AddThenCancel(sahiTasks, delegationName, permissionType, groupName, memberGroup, attribute);		
 		//verify delegation was canceled successfully 
 		Assert.assertFalse(sahiTasks.link(delegationName).exists(), "Verify delegation " + delegationName + " doesn't already exist");
 	}
 	
-	@Test (groups={"addNegative"}, description="delegation Add Negative Required Field",dependsOnGroups="add")	
+	@Test (groups={"addLong"}, description="Delegation Add Long", 
+			dataProvider="getDelegationAddLongObjects",dependsOnGroups="add")	
 	
-	public void testDelegationAddNegativeRequiredField() throws Exception {
+	public void testDelegationAddLong(String testName,String delegationName,String permissionType,String groupName,String memberGroup,String attribute) throws Exception {
+	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
+	    	Assert.assertFalse(sahiTasks.link(delegationName).exists(),"before 'Add', delegation does NOT exists");
+	    	DelegationTasks.delegation_AddLong(sahiTasks,delegationName,permissionType,groupName,memberGroup,attribute);
+	    	Assert.assertTrue(sahiTasks.link(delegationName).exists(),"after 'Add', delegation exists");	    
+	}
+	
+	@Test (groups={"addNegative"}, description="Delegation Add Negative Required Field",dataProvider="getDelegationAddNegativeObjects",dependsOnGroups="add")	
+	
+	public void testDelegationAddNegativeRequiredField(String testName) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
 	    	DelegationTasks.delegation_AddNegativeRequiredField(sahiTasks);
 	    	Assert.assertTrue(sahiTasks.span("Required field").exists(), "Verified Expected Error Message");
 	    	sahiTasks.button("Cancel").click();
 	}
 	
-	@Test (groups={"addDuplicate"}, description="delegation Add Duplicate Bug 818258 -Missing Specified Name In Error Msg", 
-			dataProvider="getDelegationAddDuplicateMissingSpecifiedNameBug818258TestObjects",dependsOnGroups="add")	
+	@Test (groups={"addNegative"}, description="Delegation Add Negative Name",dataProvider="getDelegationAddNegativeNameObjects",dependsOnGroups="add")	
 	
-	public void testDelegationAddDuplicateMissingSpecifiedName_Bug8182581(String testName,String delegationName) throws Exception {
+	public void testDelegationAddNegativeName(String testName,String permissionType,String groupName,String memberGroup,String attribute) throws Exception {
+	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
+	       	String[] delegationNames = {"a:;'<>.?/(ACL Syntax Error)", " " + "delegation007(invalid 'name': Leading and trailing spaces are not allowed)", "delegation007(invalid 'name': Leading and trailing spaces are not allowed)" + " "};
+	       	for(String delegationName : delegationNames){
+	       		DelegationTasks.delegation_AddNegativeName(sahiTasks,delegationName, permissionType, groupName, memberGroup, attribute);
+	       		Assert.assertTrue(sahiTasks.div("error_dialog").exists(), "Verified Expected Error Message");
+	       		sahiTasks.button("Cancel[1]").click();
+	       		sahiTasks.button("Cancel").click();
+	       	}
+	}
+	
+	@Test (groups={"addDuplicate"}, description="Delegation Add Duplicate", 
+			dataProvider="getDelegationAddDuplicateObjects",dependsOnGroups="add")	
+	
+	public void testDelegationAddDuplicate(String testName,String delegationName,String permissionType,String groupName,String memberGroup,String attribute) throws Exception {
 	       	//add and add another delegation user group rule and verify the bug
 	    	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	    	Assert.assertFalse(sahiTasks.link(delegationName).exists(),"before 'Add', usergroup role does NOT exists");
-	    	DelegationTasks.delegation_AddDuplicate(sahiTasks,delegationName);
-	    	Assert.assertTrue(sahiTasks.link(delegationName).exists(),"after 'Add', usergroup role exists");	    
+	    	Assert.assertFalse(sahiTasks.link(delegationName).exists(),"before 'Add', delegation does NOT exists");
+	    	DelegationTasks.delegation_AddDuplicate(sahiTasks,delegationName,permissionType,groupName,memberGroup,attribute);
+	    	Assert.assertTrue(sahiTasks.link(delegationName).exists(),"after 'Add', delegation exists");	    
 	}
 	
+	@Test (groups={"modify"}, description="Delegation Generic Edit",dataProvider="getDelegationGenericEditObjects",dependsOnGroups="add")	
 	
-	@Test (groups={"modify"}, description="delegation Condition Add Single",dataProvider="getDelegationConditionAddSingleObjects",dependsOnGroups="add")	
-	
-	public void testDelegationConditionAddSingle(String testName,String delegationName,String attribute,String expression) throws Exception {
+	public void testDelegationGenericEdit(String testName,String delegationName,String permissionType,String groupName,String memberGroup,String attribute) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
+	       	DelegationTasks.delegation_AddSingle(sahiTasks,delegationName,groupName,memberGroup,attribute);
 	       	sahiTasks.link(delegationName).click();
-	       	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Not Exist Before Add");
-	    	DelegationTasks.delegation_ConditionAddSingle(sahiTasks,testName,attribute,expression);
-	    	Assert.assertTrue(sahiTasks.div(attribute).exists(), "Verified Condition Added Successfully");
-	    	sahiTasks.link("User group rules").in(sahiTasks.div("content")).click();
+	       	DelegationTasks.delegation_GenericEdit(sahiTasks,delegationName,permissionType,groupName,memberGroup,attribute);
 	}
 	
-	@Test (groups={"modify"}, description="delegation Condition Add And Add Another",dataProvider="getDelegationConditionAddAndAddAnotherObjects",dependsOnGroups="add")	
+	@Test (groups={"modify with no delegation"}, description="Unable To Edit Userinfo With No Delegation",dataProvider="getUnableToEditUserinfoWithNoDelegationObjects",dependsOnGroups="add")	
+	
+	public void testEditUserinfoWithNoDelegation(String testName,String undelegatedUser,String userToBeEdited) throws Exception {
+			CommonTasks.formauthNewUser(sahiTasks, undelegatedUser, undelegatedUser,"Secret123");
+			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+			DelegationTasks.delegation_EditUserinfoWithNoDelegation(sahiTasks,userToBeEdited);
+			CommonTasks.formauth(sahiTasks, "admin", "Secret123");
+	}
 		
-	public void testDelegationConditionAddAndAddAnother(String testName,String delegationName,String attribute1,String attribute2,String expression1,String expression2) throws Exception {
+	@Test (groups={"modify with delegation"}, description="Edit Valid Userinfo With Delegation",dataProvider="getEditValidUserinfoWithDelegationObjects",dependsOnGroups={"add","modify with no delegation"})	
+	
+	public void testEditUserinfoWithDelegation(String testName,String delegationName,String permissionType, String groupName,String memberGroup,String attribute1,String attribute2,String delegatedUser,String userToBeEdited1,String userToBeEdited2,String displayNameToUpdate,String emailToUpdate) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	sahiTasks.link(delegationName).click();
-	       	Assert.assertFalse(sahiTasks.div(attribute1).exists(), "Verified Condition Not Exist Before Add");
-	       	Assert.assertFalse(sahiTasks.div(attribute2).exists(), "Verified Condition Not Exist Before Add");
-	       	DelegationTasks.delegation_ConditionAddAndAddAnother(sahiTasks,testName,attribute1,attribute2,expression1,expression2);
-	    	Assert.assertTrue(sahiTasks.div(attribute1).exists(), "Verified Condition Added Successfully");
-	    	Assert.assertTrue(sahiTasks.div(attribute2).exists(), "Verified Condition Added Successfully");
-	    	sahiTasks.link("User group rules").in(sahiTasks.div("content")).click();
+	       	DelegationTasks.delegation_EditUserinfoWithDelegation(sahiTasks,delegationName,permissionType,groupName,memberGroup,attribute1,attribute2,delegatedUser,userToBeEdited1,userToBeEdited2,displayNameToUpdate,emailToUpdate);
+	       	CommonTasks.formauth(sahiTasks, "admin", "Secret123");
 	}
 	
-	@Test (groups={"modify"}, description="delegation Condition Add Then Cancel",dataProvider="getDelegationConditionAddThenCancelObjects",dependsOnGroups="add")	
+	@Test (groups={"search"}, description="Delegation Search",dataProvider="getDelegationSearchObjects",dependsOnGroups={"add","modify with no delegation","modify with delegation"})	
 	
-	public void testDelegationConditionAddThenCancel(String testName,String delegationName,String attribute,String expression) throws Exception {
+	public void testDelegationSearch(String testName) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	sahiTasks.link(delegationName).click();
-	       	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Not Exist Before Add");
-	       	DelegationTasks.delegation_ConditionAddThenCancel(sahiTasks,testName,attribute,expression);
-	    	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Add Cancelled Successfully");
-	    	sahiTasks.link("User group rules").in(sahiTasks.div("content")).click();
+	       	//upper case insensitive
+	    	String delegationNames[]={"delegation001","DELEGATION002"};
+	    	for (String delegationName:delegationNames) {
+	       	   	CommonTasks.search(sahiTasks,delegationName);
+	       	   	Assert.assertTrue(sahiTasks.link(delegationName.toString().toLowerCase()).exists(),"search result found as expected");
+	       	   	CommonTasks.clearSearch(sahiTasks);
+	    	}
 	}
 	
-	@Test (groups={"modify"}, description="delegation Condition Delete Single",dataProvider="getDelegationConditionDeleteSingleObjects",dependsOnGroups="add")	
+	@Test (groups={"searchNegative"}, description="Delegation Search Negative",dataProvider="getDelegationSearchNegativeObjects",dependsOnGroups={"add","modify with no delegation","modify with delegation"})	
 	
-	public void testDelegationConditionDeleteSingle(String testName,String delegationName,String attribute,String expression) throws Exception {
+	public void testDelegationSearchNegative(String testName) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	sahiTasks.link(delegationName).click();
-	       	Assert.assertTrue(sahiTasks.div(attribute).exists(), "Verified Condition Exist Before Delete");
-	    	DelegationTasks.delegation_ConditionDeleteSingle(sahiTasks,testName,attribute,expression);
-	    	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Deleted Successfully");
-	    	sahiTasks.link("User group rules").in(sahiTasks.div("content")).click();
-	}
-	
-	@Test (groups={"modify"}, description="delegation Condition Delete Multiple",dataProvider="getDelegationConditionDeleteMultipleObjects",dependsOnGroups="add")	
-	
-	public void testDelegationConditionDeleteMultiple(String testName,String delegationName,String attribute1,String attribute2,String expression1,String expression2) throws Exception {
-	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	sahiTasks.link(delegationName).click();
-	       	Assert.assertTrue(sahiTasks.div(attribute1).exists(), "Verified Condition Exist Before Delete");
-	       	Assert.assertTrue(sahiTasks.div(attribute2).exists(), "Verified Condition Exist Before Delete");
-	    	DelegationTasks.delegation_ConditionDeleteMultiple(sahiTasks,testName,attribute1,attribute2,expression1,expression2);
-	    	Assert.assertFalse(sahiTasks.div(attribute1).exists(), "Verified Condition Deleted Successfully");
-	    	Assert.assertFalse(sahiTasks.div(attribute2).exists(), "Verified Condition Deleted Successfully");
-	    	sahiTasks.link("User group rules").in(sahiTasks.div("content")).click();
-	}
-	
-	@Test (groups={"modify"}, description="delegation Default User Group",dataProvider="getDelegationDefaultGroupObjects",dependsOnGroups="add")	
-	
-	public void testDelegationDefaultGroup(String testName,String delegationName) throws Exception {
-	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	Assert.assertEquals(sahiTasks.textbox("delegationdefaultgroup").getValue(),"");
-	       	DelegationTasks.delegation_DefaultGroup(sahiTasks,delegationName);
-	    	Assert.assertEquals(sahiTasks.textbox("delegationdefaultgroup").getValue(),"");
-
-	}
-	
-	@Test (groups={"modify"}, description="delegation Generic Edit",dataProvider="getDelegationGenericEditObjects",dependsOnGroups="add")	
-	
-	public void testDelegationGenericEdit(String testName,String delegationName) throws Exception {
-	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	sahiTasks.link(delegationName).click();
-	       	DelegationTasks.delegation_GenericEdit(sahiTasks,testName,delegationName);
-	}
-	
-	@Test (groups={"search"}, description="delegation Search",dataProvider="getDelegationSearchObjects",dependsOnGroups="add")	
-	
-	public void testDelegationSearch(String testName,String delegationName) throws Exception {
-	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	CommonTasks.search(sahiTasks,delegationName);
-	       	Assert.assertTrue(sahiTasks.link(delegationName).exists(),"search result found as expected");
-	       	CommonTasks.clearSearch(sahiTasks);
-	}
-	
-	@Test (groups={"searchNegative"}, description="delegation Search Negative",dataProvider="getDelegationSearchNegativeObjects",dependsOnGroups="add")	
-	
-	public void testDelegationSearchNegativeBug846754(String testName) throws Exception {
-	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	String delegationNames[]={"nonexistent", "n", "'<,>.?/", delegationUserGroupTests.usergroups[2] + " ", " " + delegationUserGroupTests.usergroups[2]};
+	       	String delegationNames[]={"nonexistent", "w", "'<,>.?/", "delegation001" + " ", " " + "delegation001"};
 	    	for (String delegationName:delegationNames) {
 	    		CommonTasks.search(sahiTasks,delegationName);
 	    		Assert.assertFalse(sahiTasks.link(delegationName).exists(),"search result not found as expected");
@@ -221,22 +239,22 @@ public class DelegationTests extends SahiTestScript {
 	    	}
 	}
 	
-	@Test (groups={"delete"}, description="delegation Delete Single",dataProvider="getDelegationDeleteSingleObjects",dependsOnGroups={"add","modify","addDuplicate","search","searchNegative"})	
+	@Test (groups={"delete"}, description="Delegation Delete Single",dataProvider="getDelegationDeleteSingleObjects",dependsOnGroups={"add","modify with no delegation","modify with delegation","addDuplicate","addLong","addNegative","search","searchNegative"})	
 	
 	public void testDelegationDeleteSingle(String testName,String delegationName) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
 	       	CommonTasks.search(sahiTasks,delegationName);
 	       	Assert.assertTrue(sahiTasks.link(delegationName).exists(),"delegation rule exists before delete");
 	       	DelegationTasks.delegation_DeleteSingle(sahiTasks,delegationName);
-	       	Assert.assertTrue(sahiTasks.link(delegationName).exists(),"delegation rule exists before delete");
+	       	Assert.assertFalse(sahiTasks.link(delegationName).exists(),"delegation rule not exist after delete");
 	       	CommonTasks.clearSearch(sahiTasks);
 	}
 	
-	@Test (groups={"delete"}, description="delegation Delete Multiple",dataProvider="getDelegationDeleteMulitpleObjects",dependsOnGroups={"add","modify","addDuplicate","search","searchNegative"})	
+	@Test (groups={"delete"}, description="Delegation Delete Multiple",dataProvider="getDelegationDeleteMultipleObjects",dependsOnGroups={"add","modify with no delegation","modify with delegation","addDuplicate","addLong","addNegative","search","searchNegative"})	
 	
 	public void testDelegationDeleteMultiple(String testName) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.delegationPage, true);
-	       	String delegationNames[]={delegationUserGroupTests.usergroups[0],delegationUserGroupTests.usergroups[1],delegationUserGroupTests.usergroups[2],delegationUserGroupTests.usergroups[3],delegationUserGroupTests.usergroups[5]};
+	       	String delegationNames[]={"delegation002","delegation003","delegation004","delegation006","veryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname","delegationduplicate001","group1_membergroup1"};
 	       	DelegationTasks.delegation_DeleteMultiple(sahiTasks,delegationNames);
 	       	for (String delegationName:delegationNames) {
 	       		Assert.assertFalse(sahiTasks.link(delegationName).exists(),"delegation rules don't exist after delete");
@@ -254,8 +272,8 @@ public class DelegationTests extends SahiTestScript {
 	protected List<List<Object>> createDelegationAddSingleObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									testName        delegationName     permissionType   groupName   memberGroup attribute			
-		ll.add(Arrays.asList(new Object[]{ "add single",   "delegation001",         "",        "editors",  "ipausers",  "audio" } ));
+        //									testName        delegationName      groupName       memberGroup    attribute			
+		ll.add(Arrays.asList(new Object[]{ "add single",   "delegation001",     "editors",      "ipausers",  "audio" } ));
 		return ll;	
 	}
 	
@@ -267,7 +285,7 @@ public class DelegationTests extends SahiTestScript {
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
         //									testName		 	  delegationName1 permissionType1 groupName1  memberGroup1     attribute1       delegationName2   permissionType2  groupName2  memberGroup2 attribute2
-		ll.add(Arrays.asList(new Object[]{ "add and add another", "delegation002",    "read",    "editors", "ipausers",   "businesscategory",  "delegation003",     "write",     "editors",  "ipausers", "carlicense"} ));
+		ll.add(Arrays.asList(new Object[]{ "add and add another", "delegation002",    "read",    "editors",    "ipausers",   "businesscategory",  "delegation003",     "write",     "editors",  "ipausers", "carlicense"} ));
 		return ll;	
 	}
 	
@@ -290,97 +308,56 @@ public class DelegationTests extends SahiTestScript {
 	protected List<List<Object>> createDelegationAddThenCancelObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									testName		 	   delegationName			
-		ll.add(Arrays.asList(new Object[]{ "add then cancel",   delegationUserGroupTests.usergroups[4]} ));
+        //									   testName       delegationName permissionType groupName memberGroup attribute			
+		ll.add(Arrays.asList(new Object[]{ "add then cancel", "delegation005",    "write",     "editors", "ipausers", "destinationindicator"} ));
 		return ll;	
 	}
 	
-	@DataProvider(name="getDelegationAddDuplicateMissingSpecifiedNameBug818258TestObjects")
-	public Object[][] getDelegationAddDuplicateMissingSpecifiedNameBug818258TestObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationAddDuplicateMissingSpecifiedNameBug818258TestObjects());
+	@DataProvider(name="getDelegationAddLongObjects")
+	public Object[][] getDelegationAddLongObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDelegationAddLongObjects());
 	}
-	protected List<List<Object>> createDelegationAddDuplicateMissingSpecifiedNameBug818258TestObjects() {		
+	protected List<List<Object>> createDelegationAddLongObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									testName		 	   delegationName			
-		ll.add(Arrays.asList(new Object[]{ "add duplicate",   delegationUserGroupTests.usergroups[5]} ));
+        //									   testName       delegationName permissionType groupName memberGroup attribute			
+		ll.add(Arrays.asList(new Object[]{    "add long", "veryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname",   "write", "editors", "ipausers", "audio"} ));
 		return ll;	
 	}
 	
-	@DataProvider(name="getDelegationConditionAddSingleObjects")
-	public Object[][] getDelegationConditionAddSingleObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationConditionAddSingleObjects());
+	@DataProvider(name="getDelegationAddNegativeObjects")
+	public Object[][] getDelegationAddNegativeObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDelegationAddNegativeObjects());
 	}
-	protected List<List<Object>> createDelegationConditionAddSingleObjects() {		
+	protected List<List<Object>> createDelegationAddNegativeObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									  testName          delegationName                           attribute     expression			
-		ll.add(Arrays.asList(new Object[]{ "Inclusive",   delegationUserGroupTests.usergroups[0],    "audio",       "audio"} ));
-		ll.add(Arrays.asList(new Object[]{ "Exclusive",   delegationUserGroupTests.usergroups[0],    "businesscategory",  "businesscategory"} ));
+        //									     testName			              
+		ll.add(Arrays.asList(new Object[]{ "add negative" } ));
 		return ll;	
 	}
 	
-	@DataProvider(name="getDelegationConditionAddAddAddAnotherObjects")
-	public Object[][] getDelegationConditionAddAndAddAnotherObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationConditionAddAndAddAnotherObjects());
+	@DataProvider(name="getDelegationAddNegativeNameObjects")
+	public Object[][] getDelegationAddNegativeNameObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDelegationAddNegativeNameObjects());
 	}
-	protected List<List<Object>> createDelegationConditionAddAndAddAnotherObjects() {		
+	protected List<List<Object>> createDelegationAddNegativeNameObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									  testName          delegationName                           attribute1       attribute2      expression1	expression2		
-		ll.add(Arrays.asList(new Object[]{ "Inclusive",   delegationUserGroupTests.usergroups[0],    "carlicense",       "cn",      "carlicense",      "cn"}));
-		ll.add(Arrays.asList(new Object[]{ "Exclusive",   delegationUserGroupTests.usergroups[0],   "departmentnumber", "description", "departmentnumber","description"} ));
+        //									   testName          permissionType groupName memberGroup  attribute			
+		ll.add(Arrays.asList(new Object[]{ "add negative name",    "write",     "editors", "ipausers", "audio"} ));
 		return ll;	
 	}
 	
-	@DataProvider(name="getDelegationConditionAddThenCancelObjects")
-	public Object[][] getDelegationConditionAddThenCancelObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationConditionAddThenCancelObjects());
+	@DataProvider(name="getDelegationAddDuplicateObjects")
+	public Object[][] getDelegationAddDuplicateObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createDelegationAddDuplicateObjects());
 	}
-	protected List<List<Object>> createDelegationConditionAddThenCancelObjects() {		
+	protected List<List<Object>> createDelegationAddDuplicateObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									  testName          delegationName                           attribute               expression			
-		ll.add(Arrays.asList(new Object[]{ "Inclusive",   delegationUserGroupTests.usergroups[0], "destinationindicator", "destinationindicator"} ));
-		ll.add(Arrays.asList(new Object[]{ "Exclusive",   delegationUserGroupTests.usergroups[0],   "displayname",        "displayname"} ));
-		return ll;	
-	}
-	
-	@DataProvider(name="getDelegationConditionDeleteSingleObjects")
-	public Object[][] getDelegationConditionDeleteSingleObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationConditionDeleteSingleObjects());
-	}
-	protected List<List<Object>> createDelegationConditionDeleteSingleObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //									  testName          delegationName                           attribute             expression			
-		ll.add(Arrays.asList(new Object[]{ "Inclusive",   delegationUserGroupTests.usergroups[0],    "audio" ,             "audio"} ));
-		ll.add(Arrays.asList(new Object[]{ "Exclusive",   delegationUserGroupTests.usergroups[0],   "businesscategory", "businesscategory"} ));
-		return ll;	
-	}
-	
-	@DataProvider(name="getDelegationConditionDeleteMultipleObjects")
-	public Object[][] getDelegationConditionDeleteMultipleObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationConditionDeleteMultipleObjects());
-	}
-	protected List<List<Object>> createDelegationConditionDeleteMultipleObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //									  testName          delegationName                           attribute1       attribute2      expression1	expression2			
-		ll.add(Arrays.asList(new Object[]{ "Inclusive",   delegationUserGroupTests.usergroups[0],    "carlicense",       "cn",      "carlicense",      "cn"} ));
-		ll.add(Arrays.asList(new Object[]{ "Exclusive",   delegationUserGroupTests.usergroups[0],   "departmentnumber", "description", "departmentnumber","description"} ));
-		return ll;	
-	}
-	
-	@DataProvider(name="getDelegationDefaultGroupObjects")
-	public Object[][] getDelegationDefaultGroupObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationDefaultGroupObjects());
-	}
-	protected List<List<Object>> createDelegationDefaultGroupObjects() {		
-		List<List<Object>> ll = new ArrayList<List<Object>>();
-		
-        //									     testName		 	             delegationName			
-		ll.add(Arrays.asList(new Object[]{ "modify default user group",   delegationUserGroupTests.usergroups[1]} ));
+        //									testName	       delegationName	         permissionType groupName memberGroup  attribute		
+		ll.add(Arrays.asList(new Object[]{ "add duplicate", "delegationduplicate001",      "write",          "editors", "ipausers",  "audio"} ));
 		return ll;	
 	}
 	
@@ -391,8 +368,32 @@ public class DelegationTests extends SahiTestScript {
 	protected List<List<Object>> createDelegationGenericEditObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									     testName		 	             delegationName			              
-		ll.add(Arrays.asList(new Object[]{ "User group rules",   delegationUserGroupTests.usergroups[2]} ));
+        //                            		 testName	       delegationName	 permissionType  groupName memberGroup  attribute		
+		ll.add(Arrays.asList(new Object[]{ "generic edit",    "delegation006",      "write",          "editors", "ipausers",  "audio"} ));
+		return ll;	
+	}
+	
+	@DataProvider(name="getUnableToEditUserinfoWithNoDelegationObjects")
+	public Object[][] getUnableToEditUserinfoWithNoDelegationbjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUnableToEditUserinfoWithNoDelegationObjects());
+	}
+	protected List<List<Object>> createUnableToEditUserinfoWithNoDelegationObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //                            		                testName                       undelegatedUser     userToBeEdited		
+		ll.add(Arrays.asList(new Object[]{ "unable to edit user info with no delegation", "delegationuser1", "delegationmemberuser1"} ));
+		return ll;	
+	}
+	
+	@DataProvider(name="getEditValidUserinfoWithDelegationObjects")
+	public Object[][] getEditValidUserinfoWithDelegationObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createEditValidUserinfoWithDelegationObjects());
+	}
+	protected List<List<Object>> createEditValidUserinfoWithDelegationObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		
+        //                            		       testName                         delegationName         permissionType      groupName              memberGroup       attribute1   attribute2  delegatedUser        userToBeEdited1         userToBeEdited2      displayNameToUpdate  emailToUpdate		
+		ll.add(Arrays.asList(new Object[]{ "edit valid userinfo with delegation", "group1_membergroup1",     "write",     "delegationgroup1", "delegationmembergroup1","displayname",  "mail",  "delegationuser1", "delegationmemberuser1","delegationmemberuser2","displayNameToUpdate","emailToUpdate@testrelm.com"} ));
 		return ll;	
 	}
 	
@@ -403,8 +404,8 @@ public class DelegationTests extends SahiTestScript {
 	protected List<List<Object>> createDelegationSearchObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									     testName		 	             delegationName			              
-		ll.add(Arrays.asList(new Object[]{ "search positive",   delegationUserGroupTests.usergroups[3]} ));
+        //									     testName					              
+		ll.add(Arrays.asList(new Object[]{ "search positive"} ));
 		return ll;	
 	}
 	
@@ -422,19 +423,19 @@ public class DelegationTests extends SahiTestScript {
 	
 	@DataProvider(name="getDelegationDeleteSingleObjects")
 	public Object[][] getDelegationDeleteSingleObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationGenericEditObjects());
+		return TestNGUtils.convertListOfListsTo2dArray(createDelegationDeleteSingleObjects());
 	}
 	protected List<List<Object>> createDelegationDeleteSingleObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		
-        //									     testName		 	             delegationName			              
-		ll.add(Arrays.asList(new Object[]{ "delete single",   delegationUserGroupTests.usergroups[0]} ));
+        //									     testName	   delegationName			              
+		ll.add(Arrays.asList(new Object[]{ "delete single",   "delegation001" } ));
 		return ll;	
 	}
 	
 	@DataProvider(name="getDelegationDeleteMultipleObjects")
 	public Object[][] getDelegationDeleteMultipleObjects() {
-		return TestNGUtils.convertListOfListsTo2dArray(createDelegationGenericEditObjects());
+		return TestNGUtils.convertListOfListsTo2dArray(createDelegationDeleteMultipleObjects());
 	}
 	protected List<List<Object>> createDelegationDeleteMultipleObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
