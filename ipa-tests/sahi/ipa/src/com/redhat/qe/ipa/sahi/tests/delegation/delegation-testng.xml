@@ -3,13 +3,18 @@
 	<test name="Delegation Tests">
 		<groups>
 			<run> 
-				<!--<include name="init" />-->
-				<include name="add" /> 
+				<include name="add" />
+				<include name="addLong" /> 
+				<include name="addNegative" />
+				<include name="addDuplicate" />
 				<include name="modify" />
+				<include name="modify with no delegation" />
+				<include name="modify with delegation" />
 				<include name="search" />
+				<include name="searchNegative" />
 				<include name="delete" />
-				<include name="nonStandardUserDelegation" />
-				<include name="report" />
+				
+				
 			</run>
 		</groups>
 		<classes>
