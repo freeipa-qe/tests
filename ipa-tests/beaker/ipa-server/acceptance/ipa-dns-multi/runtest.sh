@@ -62,7 +62,7 @@ rlJournalStart
 
 # If you change the style of setting MYROLE, remember
 # that $SLAVE could be a space delimited list of replicas
-env | grep "MASTER_env1"
+env | grep "MASTER_env1" | grep $(hostname -s )
 if [ $? -eq 0 ]; then
 	rlLog "Role is Master 1"
 	MYROLE=MASTER1
@@ -71,8 +71,7 @@ else
 	MYROLE=MASTER2
 fi
 
-env | grep "MASTER_env1"
-if [ $? -eq 0 ]; then
+if [ "$MYROLE" == "MASTER1" ]; then
 	rhts-sync-set -s READY_REPLICA1 -m $MASTER_env1
 	rlLog "ready_replica1 set"
 	rlLog "blocking master, waiting for slave"
@@ -86,7 +85,7 @@ else
 fi
   # run tests
 #  dnsacceptance  
-#  dnsbugs
+  dnsbugs
 
   rlPhaseStartCleanup "DNS CLEANUP"
         rlRun "popd"
