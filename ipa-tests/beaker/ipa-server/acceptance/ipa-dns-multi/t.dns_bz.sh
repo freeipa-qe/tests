@@ -33,6 +33,7 @@ dnsbugsetup()
 
 bz766233()
 {
+    rlPhaseStartTest "BZ 766233 - Test of zone transfers in IPA."
 	tzone="newtransferzone.com"
 	if [ "$MYROLE" == "MASTER1" ]; then
         	rhts-sync-set -s READY_REPLICA1 -m $MASTER_env1
@@ -67,6 +68,7 @@ bz766233()
 		rlRun "ipa dnszone-del $tzone" 0 "cleaning up test zone."
         	rlLog "test complete"
 	fi
+    rlPhaseEnd
 }
 
 dnsbugcleanup()
