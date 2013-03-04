@@ -39,7 +39,8 @@
 			</task>
 			<task name="/CoreOS/ipa-server/acceptance/ipa-autorenewcert" role="MASTER">
 				<params>
-					<param name="KILLTIMEOVERRIDE" value="88789333"/>
+                    <!-- CA cert usually last for 20 years -->
+					<param name="KILLTIMEOVERRIDE" value="632448000"/>
 				</params>
 			</task>
 
