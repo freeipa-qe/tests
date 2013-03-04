@@ -1005,6 +1005,10 @@ test_dogtag_via_cert_show(){
     else
         rlFail "[test_dogtag_via_cert_show] Test Failed"
         echo "    [ FAIL ] * test_dogtag_via_cert_show ($@)" >> $testResult
+        echo "=========== $log_httpd ========="
+        tail -n 50 $log_httpd
+        echo "=========== $log_sys ========="
+        tail -n 50 $log_sys
     fi
     echo ""
     rlPhaseEnd
