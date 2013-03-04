@@ -1009,6 +1009,9 @@ test_dogtag_via_cert_show(){
         tail -n 50 $log_httpd
         echo "=========== $log_sys ========="
         tail -n 50 $log_sys
+        echo "=========== $log_pkica ======="
+        tail -n 50 $log_pkica
+        echo "=============================="   
     fi
     echo ""
     rlPhaseEnd
