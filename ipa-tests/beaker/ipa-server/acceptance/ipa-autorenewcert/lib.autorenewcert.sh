@@ -435,8 +435,12 @@ go_to_sleep(){
         local signal=$((waittime%900))
         if [ "$signal" -eq "0" ];then
              echo "restart pki_ca and certmonger"
-             service pki_ca restart
+             service pki-cad restart
              service certmonger restart
+             echo "==== status of pki-cad and certmonger"
+             service pki-cad status
+             service certmonger status
+             echo "====================================="
         fi
         echo -n " ...$waittime(s)"
         sleep $wait4renew
