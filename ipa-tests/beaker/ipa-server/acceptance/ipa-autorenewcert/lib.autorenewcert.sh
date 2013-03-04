@@ -1187,3 +1187,11 @@ distanceToCAcertLimit()
     echo $distance_str
 }
 
+list_certutil_status()
+{
+    local label=$@
+    echo "============ ($label) ==============="   
+    echo " certutil -L -d /var/lib/$CAINSTANCE/alias "
+    certutil -L -d /var/lib/$CAINSTANCE/alias
+    echo "======= report date [`date`] ========="
+}

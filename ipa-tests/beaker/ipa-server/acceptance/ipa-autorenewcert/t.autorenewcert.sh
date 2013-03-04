@@ -39,18 +39,21 @@ autorenewcert()
         cert_sanity_check "Before auto renew triggered"
 
         calculate_autorenew_date $soonTobeRenewedCerts
-
+        list_certutil_status "before adjust system time to autorenew"
         stop_ipa_certmonger_server "Before autorenew, stop ipa, adjust system to trigger automatic cert renew"
         adjust_system_time $autorenew autorenew    
         start_ipa_certmonger_server "After autorenew, start ipa, expect automatic cert renew happening in background"
+        list_certutil_status "after adjust system time to autorenew"
 
         go_to_sleep
 
+        list_certutil_status "after adjust system time to autorenew, before postExpire"
         stop_ipa_certmonger_server "Before postExpire, system time will change soon, to verify the renewed certs"
         adjust_system_time $postExpire postExpire
         start_ipa_certmonger_server "After postExpire, system time has been changed, expect new certs are in use"
         echo "sleep 60 seconds..."
         sleep 60
+        list_certutil_status "after postExpire"
         check_actually_renewed_certs $soonTobeRenewedCerts
         compare_expires_epoch_time_of_certs
         compare_expected_renewal_certs_with_actual_renewed_certs "After postExpire"
