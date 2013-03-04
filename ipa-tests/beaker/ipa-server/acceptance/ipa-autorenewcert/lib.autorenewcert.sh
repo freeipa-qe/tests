@@ -1015,6 +1015,8 @@ test_dogtag_via_cert_show(){
         tail -n 50 $log_sys
         echo "=========== $log_pkica ======="
         tail -n 50 $log_pkica
+        echo " ========== certutil -L -d /var/lib/$CAINSTANCE/alias ============="
+        certutil -L -d /var/lib/$CAINSTANCE/alias
         echo "=============================="   
     fi
     echo ""
