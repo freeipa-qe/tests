@@ -1193,5 +1193,6 @@ list_certutil_status()
     echo "============ ($label) ==============="   
     echo " certutil -L -d /var/lib/$CAINSTANCE/alias "
     certutil -L -d /var/lib/$CAINSTANCE/alias
+    certutil -L -d  /var/lib/$CAINSTANCE/alias -n "auditSigningCert cert-pki-ca"
     echo "======= report date [`date`] ========="
 }
