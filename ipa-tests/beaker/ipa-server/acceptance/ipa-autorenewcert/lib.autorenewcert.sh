@@ -432,6 +432,12 @@ go_to_sleep(){
     while [ $waittime -lt $maxwait ]
     do    
         waittime=$((waittime + $wait4renew))
+        local signal=$((waittime%900))
+        if [ "$signal" -eq "0" ];then
+             echo "restart pki_ca and certmonger"
+             service pki_ca restart
+             service certmonger restart
+        fi
         echo -n " ...$waittime(s)"
         sleep $wait4renew
     done
