@@ -9,7 +9,7 @@ setup_iparhts_sync()
 	rm -Rf $IPARHTSDIR
 	mkdir -p $IPARHTSDIR
 	chmod 755 $IPARHTSDIR
-	/etc/init.d/httpd restart
+	cd /tmp;/etc/init.d/httpd restart
 	systemctl restart httpd.service
 }
 
