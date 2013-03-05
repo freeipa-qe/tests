@@ -46,6 +46,9 @@
 . ./t.dns_pkey.sh
 . ./t.dns.sh
 
+# Include alt sync lib
+. ./lib.ipa-rhts.sh
+
 ##########################################
 #   test main 
 #########################################
@@ -71,16 +74,19 @@ else
 	MYROLE=MASTER2
 fi
 
+# Setup RTHS sync section of Apache
+setup_iparhts_sync
+
 if [ "$MYROLE" == "MASTER1" ]; then
-	rhts-sync-set -s READY_REPLICA1 -m $MASTER_env1
+	iparhts-sync-set -s READY_REPLICA1 -m $MASTER_env1
 	rlLog "ready_replica1 set"
 	rlLog "blocking master, waiting for slave"
-	rhts-sync-block -s DONE_REPLICA2 $MASTER_env2
+	iparhts-sync-block -s DONE_REPLICA2 $MASTER_env2
 	rlLog "test complete"
 else
 	rlLog "blocking for master 1"
-	rhts-sync-block -s READY_REPLICA1 $MASTER_env1
-	rhts-sync-set -s DONE_REPLICA2 -m $MASTER_env1 
+	iparhts-sync-block -s READY_REPLICA1 $MASTER_env1
+	iparhts-sync-set -s DONE_REPLICA2 -m $MASTER_env1 
 	rlLog "test complete"
 fi
   # run tests

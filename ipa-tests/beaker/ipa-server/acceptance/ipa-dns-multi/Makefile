@@ -25,11 +25,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/ipa-dns-multi
-export TESTVERSION=0.3
+export TESTVERSION=0.4
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.dns_bz.sh t.dns.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.dns_bz.sh t.dns.sh lib.ipa-rhts.sh
 
 .PHONY: all install download clean
 
