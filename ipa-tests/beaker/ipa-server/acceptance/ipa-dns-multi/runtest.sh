@@ -74,6 +74,9 @@ else
 	MYROLE=MASTER2
 fi
 
+echo MASTER=$(hostname)
+echo MASTER_IP=$(hostname -i)
+
 # Setup RTHS sync section of Apache
 setup_iparhts_sync
 
