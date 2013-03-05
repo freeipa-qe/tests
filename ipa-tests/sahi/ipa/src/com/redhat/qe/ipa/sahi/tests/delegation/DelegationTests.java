@@ -234,6 +234,11 @@ public class DelegationTests extends SahiTestScript {
 	       	String delegationNames[]={"nonexistent", "w", "'<,>.?/", "delegation001" + " ", " " + "delegation001"};
 	    	for (String delegationName:delegationNames) {
 	    		CommonTasks.search(sahiTasks,delegationName);
+	    		if(sahiTasks.div("error_dialog").exists()){
+	    			String errormsg = sahiTasks.div("error_dialog").getText(); 
+	    			Assert.assertEquals("invalid 'criteria': Leading and trailing spaces are not allowed",errormsg); 
+	    			sahiTasks.button("Cancel").click();
+	    		}
 	    		Assert.assertFalse(sahiTasks.link(delegationName).exists(),"search result not found as expected");
 	    		CommonTasks.clearSearch(sahiTasks);
 	    	}
