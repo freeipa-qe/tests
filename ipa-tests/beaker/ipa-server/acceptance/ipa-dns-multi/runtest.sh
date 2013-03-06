@@ -81,15 +81,15 @@ echo MASTER_IP=$(hostname -i)
 setup_iparhts_sync
 
 if [ "$MYROLE" == "MASTER1" ]; then
-	iparhts-sync-set -s READY_REPLICA1 -m $MASTER_env1
+	iparhts-sync-set -s RUNTEST_READY_REPLICA1 -m $MASTER_env1
 	rlLog "ready_replica1 set"
 	rlLog "blocking master, waiting for slave"
-	iparhts-sync-block -s DONE_REPLICA2 $MASTER_env2
+	iparhts-sync-block -s RUNTEST_DONE_REPLICA2 $MASTER_env2
 	rlLog "test complete"
 else
 	rlLog "blocking for master 1"
-	iparhts-sync-block -s READY_REPLICA1 $MASTER_env1
-	iparhts-sync-set -s DONE_REPLICA2 -m $MASTER_env1 
+	iparhts-sync-block -s RUNTEST_READY_REPLICA1 $MASTER_env1
+	iparhts-sync-set -s RUNTEST_DONE_REPLICA2 -m $MASTER_env1 
 	rlLog "test complete"
 fi
   # run tests

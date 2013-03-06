@@ -87,7 +87,7 @@ bz869658()
         	rlLog "blocking master, waiting for slave"
 	        iparhts-sync-block -s BEGIN_REPLICA2 $MASTER_env2
         	rlLog "test start"
-		ipOfMaster1=$(host -4 $MASTER_env1 | cut -d\  -f 4)
+		ipOfMaster1=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 4)
 		rlRun "ipa dnszone-add $tzone --name-server=$hname. --admin-email=$hname" 0 "adding zone to test with"
 		rlRun "ipa dnsrecord-add sub.$tzone client --a-rec $ipOfMaster1" 0 "Adding host record to try resolving to from other master"
         	iparhts-sync-set -s STEP1_REPLICA1 -m $MASTER_env1
@@ -100,7 +100,7 @@ bz869658()
         	iparhts-sync-block -s READY_REPLICA1 $MASTER_env1
 	        iparhts-sync-set -s BEGIN_REPLICA2 -m $MASTER_env1
 		hname=$(hostname)
-		ipOfMaster1=$(host -4 $MASTER_env1 | cut -d\  -f 4)
+		ipOfMaster1=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 4)
 		rlRun "ipa dnszone-add $tzone --name-server=$hname. --admin-email=$hname" 0 "adding zone to test with"
 		rlRun "ipa dnsrecord-add $tzone ns.sub --a-rec=$ipOfMaster1" 0 "adding record to test with"
 		rlRun "ipa dnsrecord-add $tzone sub --ns-rec=ns.sub.$tzone." 0 "adding NS zerver to new zone"
