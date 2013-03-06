@@ -129,7 +129,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	@Test (groups={"addDuplicate"}, description="Automember Add Duplicate Bug 818258 -Missing Specified Name In Error Msg", 
 			dataProvider="getAutomemberAddDuplicateMissingSpecifiedNameBug818258TestObjects",dependsOnGroups="add")	
 	
-	public void testAutomemberAddDuplicateMissingSpecifiedName_Bug8182581(String testName,String groupName) throws Exception {
+	public void testAutomemberAddDuplicateMissingSpecifiedName_Bug818258(String testName,String groupName) throws Exception {
 	       	//add and add another automember host group rule and verify the bug
 	    	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
 	    	Assert.assertFalse(sahiTasks.link(groupName).exists(),"before 'Add', hostgroup role does NOT exists");
