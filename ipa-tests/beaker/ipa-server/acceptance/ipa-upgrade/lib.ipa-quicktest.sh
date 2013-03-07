@@ -459,5 +459,172 @@ function ipa_quicktest_automember_del()
 }
 
 ######################################################################
+# ssh
+######################################################################
+function ipa_quicktest_ssh_add()
+{
+    if [ "$(hostname -s)" != "$MASTER_S" ]; then
+        rlLog "$FUNCNAME must be run on MASTER ($MASTER)"
+        return 0
+    fi
+
+    KinitAsAdmin
+
+    grep "sss_ssh_knownhostsproxy" /etc/ssh/ssh_config >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        rlLog "Adding configs to ssh_config"
+        rlRun "cp /etc/ssh/ssh_config /etc/ssh/ssh_config.ipa_quicktest"
+        unindent > /etc/ssh/ssh_config <<<"\
+        GlobalKnownHostsFile /var/lib/sss/pubconf/known_hosts
+        PubkeyAuthentication yes
+        ProxyCommand /usr/bin/sss_ssh_knownhostsproxy -p %p %h"
+        rlRun "cat /etc/ssh/ssh_config"
+    fi
+
+    grep "sss_ssh_authorizedkeys" /etc/ssh/sshd_config >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        rlLog "Adding configs to sshd_config"
+        rlRun "cp /etc/ssh/sshd_config /etc/ssh/sshd_config.ipa_quicktest"
+        unindent > /etc/ssh/sshd_config <<<"\
+        AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys
+        KerberosAuthentication no
+        PubkeyAuthentication yes
+        UsePAM yes
+        GSSAPIAuthentication yes"
+        rlRun "cat /etc/ssh/sshd_config"
+    fi
+
+    grep services.*ssh /etc/sssd/sssd.conf >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        rlLog "Adding SSH service for sssd.conf"
+        rlRun "cp /etc/sssd/sssd.conf /etc/sssd/sssd.conf.ipa_quicktest"
+        rlRun "sed -i 's/\(services.*\)$/\1, ssh/' /etc/sssd/sssd.conf"
+        rlRun "echo '[ssh]' >> /etc/sssd/sssd.conf"
+    fi
+
+    rlLog "restarting ssh and sssd to make sure all configs are supported"
+    rlRun "service ssh restart"
+    rlRun "service sssd restart"
+
+    ipa user-show ${sshuser1} >/dev/null 2>&1
+    if [ $? -eq 2 ]; then
+        rlRun "create_ipauser ${sshuser1} f l ${sshpass1}"
+        KinitAsAdmin
+    else
+        rlLog "User ${sshuser1} already exists"
+    fi
+    
+    ipa user-show ${sshuser1} --raw|grep sshpubkeyfp >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        rlRun "ssh-keygen -q -t rsa -N '' -f /tmp/id_rsa_${sshuser1}"
+        rlRun "chown ${sshuser1}:${sshuser1} /tmp/id_rsa_${sshuser1}"
+        key1="$(cat /tmp/id_rsa_${sshuser1}.pub)"
+        rlRun "ipa user-mod ${sshuser1} --sshpubkey=\"${key1}\""
+    else
+        rlLog "User ${sshuser1} already has ssh public key"
+    fi
+
+    ipa host-show $(hostname) --raw --all|grep ipasshpubkey >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        key2="$(cat /etc/ssh/ssh_host_dsa_key.pub)"
+        key3="$(cat /etc/ssh/ssh_host_rsa_key.pub)"
+        rlRun "ipa host-mod $(hostname) --sshpubkey=\"${key2}, ${key3}\""
+    else
+        rlLog "Host $(hostname) already has ssh public keys"
+    fi
+}
+
+function ipa_quicktest_ssh_check()
+{
+    local runtype=${1:-new} 
+    local tmpout=$TmpDir/tmpout.$FUNCNAME.out
+
+    rlRun "rm -f /tmp/id_rsa_${sshuser1}*"
+    rlRun "sftp root@${MASTER}:/tmp/id_rsa_${sshuser1}* /tmp"
+
+    key1=$(awk '{print $2}' /tmp/id_rsa_${sshuser1}.pub)
+    key1fp=$(ssh-keygen -l -f /tmp/id_rsa_${sshuser1}.pub | 
+        awk '{print $2}' | tr '[:lower:]' '[:upper:]')
+    key2fp=$(ssh-keygen -l -f /etc/ssh/ssh_host_dsa_key.pub |
+        awk '{print $2}' | tr '[:lower:]' '[:upper:]')
+    key3fp=$(ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub |
+        awk '{print $2}' | tr '[:lower:]' '[:upper:]')
+    
+    if [ "$runtype" = "new" ]; then
+        rlLog "Checking for User SSH Public Key"
+        rlRun "ipa user-show ${sshuser1} | grep ${key1fp}"
+
+        rlLog "Checking for Host SSH Public DSA Key"
+        rlRun "ipa host-show $(hostname) | grep ${key2fp}"
+
+        rlLog "Checking for Host SSH Public RSA Key"
+        rlRun "ipa host-show $(hostname) | grep ${key3fp}"
+    else
+        rlLog "ipa sshpubkey limited support on older versions"
+
+        rlLog "Checking old version for some ssh key for ${sshuser1}"
+        rlRun "ipa user-show ${sshuser1} --raw --all|grep ipasshpubkey"
+        
+        rlLog "Checking old version for some ssh key for host ${MASTER}" 
+        rlRun "ipa host-show ${MASTER} --all --raw|grep ipasshpubkey"
+    fi
+
+    rlRun "ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa_${sshuser1} ${sshuser1}@${MASTER} hostname"
+}
+
+function ipa_quicktest_ssh_del()
+{
+    if [ "$(hostname -s)" != "$MASTER_S" ]; then
+        rlLog "$FUNCNAME must be run on MASTER ($MASTER)"
+        return 0
+    fi
+
+    KinitAsAdmin
+    rlRun "ipa user-del ${sshuser1}"
+    rlRun "ipa host-mod $(hostname) --sshpubkey=\"\""
+}
+
+######################################################################
+# SELinuxUserMap
+######################################################################
+
+function ipa_quicktest_selinuxusermap_add()
+{
+    KinitAsAdmin
+    rlRun "create_ipauser ${seuser1} f l passw0rd1"
+    KinitAsAdmin
+    key1="$(cat /root/.ssh/id_rsa.pub)"
+    rlRun "ipa user-mod ${seuser1} --sshpubkey=\"$key1\""
+
+    rlRun "ipa selinuxusermap-add --hostcat=all --selinuxuser=${secontext} ${serule}"
+    rlRun "ipa selinuxusermap-add-user --users=${seuser1} ${serule}"
+}
+
+function ipa_quicktest_selinuxusermap_check()
+{
+    local runtype=${1:-new}
+    local tmpout=$TmpDir/tmpout.$FUNCNAME.out
+
+    KinitAsAdmin
+    rlRun "ssh -o StrictHostKeyChecking=no ${seuser1}@${MASTER} \
+        'id -Z'|grep ${secontextid}"
+
+    if [ "$runtype" = "new" -o $OSVER -ge 63 ]; then
+        rlRun "ipa selinuxusermap-find ${serule}"
+        rlRun "ipa selinuxusermap-show ${serule}"
+    else
+        rlRun "ipa selinuxusermap-find ${serule} > $tmpout 2>&1" 1
+        rlRun "cat $tmpout"
+        rlAssertGrep "unknown command" $tmpout
+    fi
+}
+
+function ipa_quicktest_selinuxusermap_del()
+{
+    rlRun "ipa selinuxusermap-del ${serule}"
+    rlRun "ipa user-del ${seuser1}"
+}
+
+######################################################################
 # THE END.
 ######################################################################

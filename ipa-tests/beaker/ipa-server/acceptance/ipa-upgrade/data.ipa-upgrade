@@ -78,3 +78,13 @@ amuser2=tedd
 amhost1=bank.${DOMAIN}
 amhost2=postoffice.${DOMAIN}
 
+# SSH
+sshuser1=sshuser1
+sshpass1=passw0rd
+
+# SELinuxUserMap
+
+serule=serule1
+seuser1=jordan
+secontext="staff_u:s0-s0:c0.c1023"
+secontextid="staff_u:staff_r:staff_t:s0-s0:c0.c1023"
