@@ -89,7 +89,7 @@ bz869658()
 	        iparhts-sync-block -s 869658_BEGIN_REPLICA2 $MASTER_env2
         	rlLog "test start"
 		ipOfMaster1=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 4)
-		rlRun "ipa dnszone-add $tzone --name-server=$hname. --admin-email=$hname" 0 "adding zone to test with"
+		rlRun "ipa dnszone-add sub.$tzone --name-server=$hname. --admin-email=$hname" 0 "adding zone to test with"
 		rlRun "ipa dnsrecord-add sub.$tzone client --a-rec $ipOfMaster1" 0 "Adding host record to try resolving to from other master"
         	iparhts-sync-set -s 869658_STEP1_REPLICA1 -m $MASTER_env1
 	        iparhts-sync-block -s 869658_STEP1_REPLICA2 $MASTER_env2
