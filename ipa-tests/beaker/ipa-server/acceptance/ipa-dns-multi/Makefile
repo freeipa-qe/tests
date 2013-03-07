@@ -29,7 +29,7 @@ export TESTVERSION=0.6
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.dns_bz.sh t.dns.sh lib.ipa-rhts.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.dns_bz.sh t.dns.sh
 
 .PHONY: all install download clean
 

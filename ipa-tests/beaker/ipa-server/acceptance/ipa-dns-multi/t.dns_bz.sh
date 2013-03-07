@@ -95,7 +95,7 @@ bz869658()
 	        iparhts-sync-block -s 869658_STEP1_REPLICA2 $MASTER_env2
         	iparhts-sync-set -s 869658_COMPLETE_REPLICA1 -m $MASTER_env1
 	        iparhts-sync-block -s 869658_COMPLETE_REPLICA2 $MASTER_env2
-		rlRun "ipa dnszone-del $tzone" 0 "cleaning up test zone."
+		rlRun "ipa dnszone-del sub.$tzone" 0 "cleaning up test zone."
 	else
 	        rlLog "blocking for master 1"
         	iparhts-sync-block -s 869658_READY_REPLICA1 $MASTER_env1
