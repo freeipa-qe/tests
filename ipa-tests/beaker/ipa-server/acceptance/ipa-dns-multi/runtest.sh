@@ -47,7 +47,7 @@
 . ./t.dns.sh
 
 # Include alt sync lib
-. ./lib.ipa-rhts.sh
+. /dev/shm/lib.ipa-rhts.sh
 
 ##########################################
 #   test main 
