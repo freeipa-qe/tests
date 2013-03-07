@@ -1,0 +1,121 @@
+
+                     target
+   0   6.2  6.3  6.4  6.5  6.6  6.7  6.8  6.9
+c  6.2  0    1    1    1    1    1    1    1
+u  6.3  0    0    1    1    1    1    1    1 
+r  6.4  0    0    0    1    1    1    1    1
+r  6.5  0    0    0    0    1    1    1    1
+e  6.6  0    0    0    0    0    1    1    1
+n  6.7  0    0    0    0    0    0    1    1
+t  6.8  0    0    0    0    0    0    0    1
+   6.9  0    0    0    0    0    0    0    0
+
+
+**** EXAMPLE1:
+
+CURVER=62
+TGTVER=64
+
+repo62/*.repo
+repo63/*.repo
+repo64/*.repo
+
+**** EXAMPLE2:
+
+CURVER=65
+TGTVER=69
+
+myrepo1=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130116.3/6.4/Server/\$basearch/os/
+myrepo2=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130116.3/6.4/Server/optional/\$basearch/os/
+myrepo3=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
+myrepo4=http://10.65.201.171/pki/9.0.3-30/\$basearch
+myrepo5=http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/\$basearch/os
+
+
+myrhel63repo1
+myrhel63repo2
+
+myrhel64repo1
+myrhel64repo2
+
+...
+
+myrhel69repo1
+myrhel69repo2
+
+myf17repo1
+...
+myf18repo2
+
+OSNAME=rhel
+OSVER=65
+
+getrepo()
+{
+    case $1 in
+    63)
+        myrepo1=
+        myrepo2=
+        myrepo3=
+        ;;
+    64)
+        myrepo1=
+        myrepo2=
+        myrepo3=
+        ;;
+    65)
+        myrepo1=
+        myrepo2=
+        myrepo3=
+        ;;
+    66)
+        myrepo1=
+        myrepo2=
+        myrepo3=
+        ;;
+    67)
+        myrepo1=
+        myrepo2=
+        myrepo3=
+        ;;
+    68)
+        myrepo1=
+        myrepo2=
+        myrepo3=
+        ;;
+    69)
+        myrepo1=
+        myrepo2=
+        myrepo3=
+        ;;
+    *)
+        myrepo1=""
+        myrepo2=""
+        myrepo3=""
+        break
+        ;;
+    esac
+}
+
+upgrade 63
+upgrade 64
+upgrade 69
+
+OSVER=62
+UPVER=65
+
+CURVER=62
+UPVER=$(( CURVER += 1 ))
+TGTVER=69
+for (( i=$UPVER ; i<=TGTVER ; i++ )); do 
+    upgrade $i
+done
+
+upgrade()
+{
+    getrepo $1
+    setrepo
+    upgrade_master
+    upgrade_replica
+    upgrade_client
+}

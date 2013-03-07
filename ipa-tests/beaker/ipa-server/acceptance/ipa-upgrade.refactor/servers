@@ -1,0 +1,6 @@
+
+
+export MASTER=rhel6-1.example.com
+export REPLICA=rhel6-2.example.com
+export CLIENT=rhel6-3.example.com
+

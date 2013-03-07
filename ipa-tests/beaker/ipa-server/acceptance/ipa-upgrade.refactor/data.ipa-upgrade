@@ -1,0 +1,80 @@
+# Yum Repos
+echo $FAMILY | grep Fedora
+if [ $? -eq 0 ]; then
+	OS=fedora
+	VER=17
+        PKG="freeipa"
+fi
+
+echo $FAMILY | grep RedHatEnterpriseLinux
+if [ $? -eq 0 ]; then
+	OS=rhel
+	VER=6
+        PKG="ipa"
+fi
+
+export OS VER PKG
+
+# Adding support only for Fedora 17 and Rhel 6 at this time. Maybe a case statemet will be required for other OS's in the future.
+if [ "$OS" = "fedora" ]; then
+	# Disable fedora updates repo
+	sed -i s/^enabled=1/enabled=0/g /etc/yum.repos.d/fedora-updates.repo 
+	# Define some repos for Fedora 
+	myrepo1=http://jdennis.fedorapeople.org/ipa-devel/fedora/\$releasever/\$basearch/os/
+	myrepo2=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/$basearch/
+	myrepo3=http://download.fedoraproject.org/pub/fedora/linux/updates/\$releasever/\$basearch/
+else
+	myrepo1=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130116.3/6.4/Server/\$basearch/os/
+	myrepo2=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130116.3/6.4/Server/optional/\$basearch/os/
+	myrepo3=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
+	myrepo4=http://10.65.201.171/pki/9.0.3-30/\$basearch
+	myrepo5=http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/\$basearch/os
+fi
+
+# Users
+user1=jack
+user2=jill
+passwd1=passw0rd1
+passwd2=passw0rd2
+
+# Groups
+group1=managers
+group2=engineers
+
+# DNS
+dnsptr1=2.2.4.in-addr.arpa.
+dnsptr2=2.3.4.in-addr.arpa.
+
+# Hosts
+host1=web.$DOMAIN
+host2=ftp.$DOMAIN
+ipv41=4.2.2.100
+ipv42=4.3.2.101
+
+# Hostgroups
+hostgroup1=devhostgroup
+hostgroup2=enghostgroup
+
+# Netgroups
+netgroup1=devnetgroup
+netgroup2=engnetgroup
+
+# Automount
+automountmap1=auto.master
+automountmap2=auto.home
+automountmap3=auto.app
+automountkey1='/home auto.home'
+automountkey2='* $MASTER:/home/&'
+automountkey3='
+app1 $MASTER:/opt/app1
+app2 $MASTER:/opt/app2
+'
+
+# Automember
+amgroup1=finance
+amhostgroup1=calchostgroup
+amuser1=todd
+amuser2=tedd
+amhost1=bank.${DOMAIN}
+amhost2=postoffice.${DOMAIN}
+
