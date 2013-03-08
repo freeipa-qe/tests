@@ -396,7 +396,7 @@ function ipa_quicktest_automember_check()
     rlLog "data_check_automember: check automember data"
     KinitAsAdmin
 
-    if [ "$runtype" = "new" ]; then
+    if [ "$runtype" = "new" -o $OSVER -ge 63 ]; then
         rlLog "Find automember group rule"
         rlRun "ipa automember-find --type=group > $tmpout 2>&1" 
         rlRun "cat $tmpout"
@@ -409,7 +409,7 @@ function ipa_quicktest_automember_check()
         rlAssertGrep "unknown command" $tmpout
     fi
     
-    if [ "$runtype" = "new" ]; then
+    if [ "$runtype" = "new" -o $OSVER -ge 63 ]; then
         rlLog "Show automember hostgroup rule"
         rlRun "ipa automember-show --type=hostgroup ${amhostgroup1} > $tmpout 2>&1"
         rlRun "cat $tmpout"
@@ -539,8 +539,8 @@ function ipa_quicktest_ssh_check()
     local runtype=${1:-new} 
     local tmpout=$TmpDir/tmpout.$FUNCNAME.out
 
-    rlRun "rm -f /tmp/id_rsa_${sshuser1}*"
-    rlRun "sftp root@${MASTER}:/tmp/id_rsa_${sshuser1}* /tmp"
+    #rlRun "rm -f /tmp/id_rsa_${sshuser1}*"
+    rlRun "sftp -o StrictHostKeyChecking=no root@${MASTER}:/tmp/id_rsa_${sshuser1}* /tmp"
 
     key1=$(awk '{print $2}' /tmp/id_rsa_${sshuser1}.pub)
     key1fp=$(ssh-keygen -l -f /tmp/id_rsa_${sshuser1}.pub | 
