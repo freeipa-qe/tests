@@ -1,7 +1,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Makefile of /CoreOS/ipa-tests/acceptance/ipa-dns
-#   Description: Tests setup and exercise of nis integrated ipa tasks
+#   Description: Tests of multi a master DNS enviroment.
 #   Author: Michael Gregg <mgregg@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,7 +25,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/acceptance/ipa-dns-multi
-export TESTVERSION=0.7
+export TESTVERSION=0.8
 
 BUILT_FILES=
 
