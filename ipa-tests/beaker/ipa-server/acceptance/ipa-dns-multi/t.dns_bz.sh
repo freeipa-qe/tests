@@ -14,6 +14,7 @@ dnsbugs()
    dnsbugsetup
    bz766233
    bz869658
+   bz869324
 
    dnsbugcleanup
 }
@@ -117,6 +118,45 @@ bz869658()
         	rlLog "test complete"
 	fi
     rlPhaseEnd
+}
+
+bz869324()
+{
+	rlPhaseStartTest "BZ 869324 - Cache is not flushed after creating a new zone with conditional forwarder"
+
+	export MASTER_env1_short=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 1 | cut -d\. -f1)
+	export MASTER_env2_short=$(host -4 $MASTER_env2 |  grep -v IPv6 | cut -d\  -f 1 | cut -d\. -f1)
+	hname=$(hostname)
+	ipOfMaster1=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 4)
+	ipOfMaster2=$(host -4 $MASTER_env2 |  grep -v IPv6 | cut -d\  -f 4)
+
+	tzone="newtransferzoneb.com"
+	if [ "$MYROLE" == "MASTER1" ]; then
+        	iparhts-sync-set -s 869324_READY_REPLICA1 -m $MASTER_env1
+	        rlLog "ready_replica1 set"
+        	rlLog "blocking master, waiting for slave"
+	        iparhts-sync-block -s 869324_BEGIN_REPLICA2 $MASTER_env2
+        	rlLog "test start"
+		rlRun "dig @127.0.0.1 $MASTER_env2_short.$tzone | grep $ipOfMaster2" 1 "Make sure that the entry does not already exist"
+		rlRun "ipa dnszone-add $tzone --name-server=$hname. --admin-email=$hname --forward-policy=only --force --forwarder=$ipOfMaster2" 0 "adding forwarding zone to test with"
+	        iparhts-sync-block -s 869324_STEP1 $MASTER_env2
+		rlRun "dig @127.0.0.1 $MASTER_env2_short.$tzone | grep $ipOfMaster2" 0 "Make sure that the entry has been pulled from the forwarded cache."
+        	iparhts-sync-set -s 869324_COMPLETE_REPLICA1 -m $MASTER_env1
+		rlRun "ipa dnszone-del $tzone" 0 "cleaning up test zone."
+        	rlLog "test complete"
+	else
+	        rlLog "blocking for master 1"
+        	iparhts-sync-block -s 869324_READY_REPLICA1 $MASTER_env1
+	        iparhts-sync-set -s 869324_BEGIN_REPLICA2 -m $MASTER_env1
+		rlRun "ipa dnszone-add $tzone --name-server=$hname. --admin-email=$hname" 0 "adding zone to test with"
+		rlRun "ipa dnsrecord-add $tzone $MASTER_env2_short --a-rec=$ipOfMaster2" 0 "adding A record into zone to test with"
+		rlRun "dig @127.0.0.1 $MASTER_env2_short.$tzone | grep $ipOfMaster2" 0 "Make sure that the entry was created properly"
+	        iparhts-sync-set -s 869324_STEP1 -m $MASTER_env1
+		iparhts-sync-block -s 869324_COMPLETE_REPLICA1 $MASTER_env1
+		rlRun "ipa dnszone-del $tzone" 0 "cleaning up test zone."
+        	rlLog "test complete"
+	fi
+	rlPhaseEnd
 }
 
 dnsbugcleanup()
