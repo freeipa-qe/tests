@@ -29,6 +29,7 @@
 #   submit_log
 #   submit_logs
 #	rlDistroDiff
+#   unindent
 ######################################################################
 cat /etc/redhat-release | grep "5\.[0-9]"
 if [ $? -eq 0 ] ; then
@@ -1179,6 +1180,17 @@ rlDistroDiff() {
                 os_rhel
         fi
 
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# unindent function useful for here-strings (and/or here-docs)
+# unindent > /path/to/file <<<"\
+#     this will all be left 
+#     justified when it's read in"
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+function unindent()
+{ 
+    sed -e 's/^[[:space:]]*//'
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #

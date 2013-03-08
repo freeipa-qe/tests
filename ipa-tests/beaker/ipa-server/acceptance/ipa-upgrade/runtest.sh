@@ -33,8 +33,6 @@
 
 # Include rhts environment
 
-alias unindent="sed -e 's/^[[:space:]]*//'"
-
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . ./ipa-server-shared.sh
