@@ -79,8 +79,8 @@ ipa_upgrade_data_add()
     fi
 
     if [ $runver -ge 64 ]; then
-        ipa_quicktest_ssh_check $runtype
-        ipa_quicktest_selinuxusermap_check $runtype
+        ipa_quicktest_ssh_add $runtype
+        ipa_quicktest_selinuxusermap_add $runtype
     fi
     rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.1' -m $runhost"
 }
