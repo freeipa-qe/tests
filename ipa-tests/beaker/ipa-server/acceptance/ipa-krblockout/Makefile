@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-krblockout
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-krblockout
 export TESTVERSION=1.3
 
 BUILT_FILES=

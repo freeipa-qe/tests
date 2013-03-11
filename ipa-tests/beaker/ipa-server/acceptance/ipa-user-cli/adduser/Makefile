@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-user-cli/adduser
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-user-cli/adduser
 export TESTVERSION=1.0
 
 BUILT_FILES=

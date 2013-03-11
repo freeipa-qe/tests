@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/forms-cli
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/forms-cli
 export TESTVERSION=1.0
 
 BUILT_FILES=

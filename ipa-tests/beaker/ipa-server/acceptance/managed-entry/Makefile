@@ -25,7 +25,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/managed-entry
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/managed-entry
 export TESTVERSION=1.3
 
 BUILT_FILES=

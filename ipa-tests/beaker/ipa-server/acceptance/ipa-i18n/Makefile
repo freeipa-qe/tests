@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-i18n
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-i18n
 export TESTVERSION=1.0
 
 BUILT_FILES=

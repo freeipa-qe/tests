@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-ssh-functional
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-ssh-functional
 export TESTVERSION=1.0
 
 BUILT_FILES=

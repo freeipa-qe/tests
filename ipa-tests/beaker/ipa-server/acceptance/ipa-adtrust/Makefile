@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-adtrust
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-adtrust
 export TESTVERSION=1.0
 
 BUILT_FILES=

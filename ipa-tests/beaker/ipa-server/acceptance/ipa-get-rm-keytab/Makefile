@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-get-rm-keytab
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-get-rm-keytab
 export TESTVERSION=1.0
 
 BUILT_FILES=

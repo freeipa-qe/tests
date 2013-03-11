@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-selinuxusermap-func
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-selinuxusermap-func
 export TESTVERSION=1.0
 
 BUILT_FILES=

@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-winsync
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-winsync
 export TESTVERSION=1.0
 
 BUILT_FILES=

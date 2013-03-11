@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-netgroup-cli
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-netgroup-cli
 export TESTVERSION=1.0
 
 BUILT_FILES=

@@ -27,7 +27,7 @@
 # 11-17-2011 mgregg - changed all space groupings to tab stops. 
 # 11-18-2011 mgregg - changed all space groupings to tab stops. 
 
-export TEST=/CoreOS/ipa-server/acceptance/replication
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/replication
 export TESTVERSION=1.1
 
 BUILT_FILES=

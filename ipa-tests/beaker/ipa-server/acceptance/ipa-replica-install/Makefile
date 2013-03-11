@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-replica-install
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-install
 export TESTVERSION=1.0
 
 BUILT_FILES=

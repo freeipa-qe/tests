@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ds-migration-functional
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ds-migration-functional
 export TESTVERSION=1.0
 
 BUILT_FILES=

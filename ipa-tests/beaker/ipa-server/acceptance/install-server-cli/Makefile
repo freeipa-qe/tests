@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/install-server-cli
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/install-server-cli
 export TESTVERSION=1.1
 
 BUILT_FILES=

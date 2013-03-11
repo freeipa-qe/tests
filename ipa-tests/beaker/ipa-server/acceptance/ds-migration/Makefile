@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ds-migration
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ds-migration
 export TESTVERSION=2.3
 
 BUILT_FILES=

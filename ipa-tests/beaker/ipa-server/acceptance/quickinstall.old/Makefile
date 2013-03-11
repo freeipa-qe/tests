@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/quickinstall
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall
 export TESTVERSION=1.1
 
 BUILT_FILES=

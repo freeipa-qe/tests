@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-automount
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-automount
 export TESTVERSION=1.0
 
 BUILT_FILES=
