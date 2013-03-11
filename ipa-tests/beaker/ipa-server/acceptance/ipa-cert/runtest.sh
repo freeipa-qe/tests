@@ -41,6 +41,7 @@
 
 # Include test case file
 . ./t.ipacert.sh
+. ./d.ipacert.sh
 
 ########### temp fix ########
 bugfix()
@@ -77,6 +78,7 @@ rlJournalStart
 
     # r2d2_test_starts
     ipacert
+    bug_automation
     # r2d2_test_ends
 
     rlPhaseStartCleanup "ipacert cleanup"
