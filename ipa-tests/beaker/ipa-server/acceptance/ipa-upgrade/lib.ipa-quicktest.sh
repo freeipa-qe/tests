@@ -40,12 +40,32 @@
 ######################################################################
 # If needed override variables here:
 ######################################################################
+DLOGRUN=1
 
 ######################################################################
 # user 
 ######################################################################
+function dlog_start()
+{
+    rlLog
+    rlLog
+    rlLog "{{{{{{{{{{{{{{{{{{{ starting $1 }}}}}}}}}}}}}}}}}}}"
+    rlLog
+    rlLog
+}
+
+function dlog_end()
+{
+    rlLog
+    rlLog
+    rlLog "{{{{{{{{{{{{{{{{{{{ end $1 }}}}}}}}}}}}}}}}}}}"
+    rlLog
+    rlLog
+}
+
 function ipa_quicktest_user_add()
 {
+    dlog_start $FUNCNAME
     ipa user-show ${user1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "echo ${passwd2}|ipa user-add ${user1} --first=First --last=one --password"
@@ -63,21 +83,26 @@ function ipa_quicktest_user_add()
     else
         rlLog "User ${user2} already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_user_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa user-find"
     rlRun "ipa user-show ${user1}" 
     rlRun "ipa user-show ${user2}" 
     rlRun "id ${user1}"
     rlRun "id ${user2}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_user_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa user-del ${user1}" 
     rlRun "ipa user-del ${user2}" 
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -85,6 +110,7 @@ function ipa_quicktest_user_del()
 ######################################################################
 function ipa_quicktest_group_add()
 {
+    dlog_start $FUNCNAME
     ipa group-show ${group1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa group-add ${group1} --desc=GROUP_${group1}"
@@ -98,20 +124,25 @@ function ipa_quicktest_group_add()
     else
         rlLog "Group ${group2} already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_group_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa group-show ${group1}"
     rlRun "ipa group-show ${group2}"
     rlRun "getent group ${group1}"
     rlRun "getent group ${group2}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_group_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa group-del ${group1}"
     rlRun "ipa group-del ${group2}"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -119,6 +150,7 @@ function ipa_quicktest_group_del()
 ######################################################################
 function ipa_quicktest_dnszone_add()
 {
+    dlog_start $FUNCNAME
     ipa dnszone-show ${dnsptr1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa dnszone-add ${dnsptr1} --name-server=${MASTER}. --admin-email=ipaqar.redhat.com"
@@ -132,10 +164,12 @@ function ipa_quicktest_dnszone_add()
     else
         rlLog "DNS Zone ${dnsptr2} already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_dnszone_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa dnszone-show ${dnsptr1}"
     rlRun "ipa dnszone-show ${dnsptr2}"
     rlRun "dig +short ${dnsptr1} ns > $tmpout 2>&1"
@@ -144,12 +178,15 @@ function ipa_quicktest_dnszone_check()
     rlRun "dig +short ${dnsptr2} ns > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "$MASTER_S.$DOMAIN" $tmpout
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_dnszone_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa dnszone-del ${dnsptr1}"
     rlRun "ipa dnszone-del ${dnsptr2}"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -157,6 +194,7 @@ function ipa_quicktest_dnszone_del()
 ######################################################################
 function ipa_quicktest_host_add()
 {
+    dlog_start $FUNCNAME
     ipa host-show ${host1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa host-add ${host1} --ip-address=${ipv41}"
@@ -170,28 +208,35 @@ function ipa_quicktest_host_add()
     else
         rlLog "Host ${host2} already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_host_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa host-show ${host1}"
     rlRun "ipa host-show ${host2}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_host_dns_check()
 {
+    dlog_start $FUNCNAME
     rlRun "dig +short ${host1} a > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "${ipv41}" $tmpout
     rlRun "dig +short ${host2} a > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "${ipv42}" $tmpout
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_host_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa host-del ${host1} --updatedns"
     rlRun "ipa host-del ${host2} --updatedns"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -199,6 +244,7 @@ function ipa_quicktest_host_del()
 ######################################################################
 function ipa_quicktest_hostgroup_add()
 {
+    dlog_start $FUNCNAME
     ipa hostgroup-show ${hostgroup1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa hostgroup-add ${hostgroup1} --desc=hostgroupdesc"
@@ -214,20 +260,25 @@ function ipa_quicktest_hostgroup_add()
     else
         rlLog "Hostgroup ${hostgroup2} already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_hostgroup_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa hostgroup-show ${hostgroup1}"
     rlRun "ipa hostgroup-show ${hostgroup2}"
     rlRun "getent -s sss netgroup ${hostgroup1}"
     rlRun "getent -s sss netgroup ${hostgroup2}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_hostgroup_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa hostgroup-del ${hostgroup1}"
     rlRun "ipa hostgroup-del ${hostgroup2}"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -235,6 +286,7 @@ function ipa_quicktest_hostgroup_del()
 ######################################################################
 function ipa_quicktest_netgroup_add()
 {
+    dlog_start $FUNCNAME
     ipa netgroup-show ${netgroup1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa netgroup-add ${netgroup1} --desc=netgroupdesc"
@@ -250,20 +302,25 @@ function ipa_quicktest_netgroup_add()
     else
         rlLog "Netgroup ${netgroup2} already exists"
     fi
+    dlog_end $FUNCNAME
 }
     
 function ipa_quicktest_netgroup_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa netgroup-show ${netgroup1}"
     rlRun "ipa netgroup-show ${netgroup2}"
     rlRun "getent -s sss netgroup ${netgroup1}"
     rlRun "getent -s sss netgroup ${netgroup2}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_netgroup_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa netgroup-del ${netgroup1}"
     rlRun "ipa netgroup-del ${netgroup2}"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -272,6 +329,7 @@ function ipa_quicktest_netgroup_del()
 
 function ipa_quicktest_automount_add()
 {
+    dlog_start $FUNCNAME
     ipa automountlocation-show testloc > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa automountlocation-add testloc"
@@ -290,10 +348,12 @@ function ipa_quicktest_automount_add()
     else
         rlLog "Automount location testloc already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_automount_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa automountlocation-show testloc"
     rlRun "ipa automountmap-show testloc ${automountmap1}"
     rlRun "ipa automountmap-show testloc ${automountmap2}"
@@ -308,11 +368,14 @@ function ipa_quicktest_automount_check()
             rlRun "ipa automountkey-show testloc ${automountmap[$i]} --key=\"$key\""
         done
     done
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_automount_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa automountlocation-del testloc"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -320,6 +383,7 @@ function ipa_quicktest_automount_del()
 ######################################################################
 function ipa_quicktest_delegation_add()
 {
+    dlog_start $FUNCNAME
     ipa delegation-show delegation_open_gecos > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa delegation-add delegation_open_gecos --group=ipausers --membergroup=ipausers --attrs=gecos"
@@ -327,17 +391,22 @@ function ipa_quicktest_delegation_add()
     else
         rlLog "Delegation delegation_open_gecos already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_delegation_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa delegation-show delegation_open_gecos"
     rlRun "getent -s sss passwd ${user2}|grep ${user1}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_delegation_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa delegation-del delegation_open_gecos"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -345,6 +414,7 @@ function ipa_quicktest_delegation_del()
 ######################################################################
 function ipa_quicktest_selfservice_add()
 {
+    dlog_start $FUNCNAME
     ipa selfservice-show selfservice_update_gecos > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa selfservice-add selfservice_update_gecos --attrs=gecos"
@@ -352,17 +422,22 @@ function ipa_quicktest_selfservice_add()
     else
         rlLog "Selfservice selfservice_update_gecos already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_selfservice_check()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa selfservice-show selfservice_update_gecos"
     rlRun "getent -s sss passwd ${user1}|grep ${user1}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_selfservice_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa selfservice-del selfservice_update_gecos"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -371,6 +446,7 @@ function ipa_quicktest_selfservice_del()
 
 function ipa_quicktest_automember_add()
 {
+    dlog_start $FUNCNAME
     ipa automember-show ${amgroup1} --type=group > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa group-add ${amgroup1} --desc=desc"
@@ -387,10 +463,12 @@ function ipa_quicktest_automember_add()
     else
         rlLog "Automember ${amgroup1} already exists"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_automember_check()
 {
+    dlog_start $FUNCNAME
     local runtype=${1:-new} 
     local tmpout=$TmpDir/tmpout.$FUNCNAME.out
     rlLog "data_check_automember: check automember data"
@@ -444,10 +522,12 @@ function ipa_quicktest_automember_check()
     rlRun "ipa host-show ${host2} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertNotGrep "Member of host-groups.*${amhostgroup1}" $tmpout
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_automember_del()
 {
+    dlog_start $FUNCNAME
     KinitAsAdmin
     rlLog "data_del_automember: delete automember data"
     rlRun "ipa user-del ${amuser1}"
@@ -456,6 +536,7 @@ function ipa_quicktest_automember_del()
     rlRun "ipa hostgroup-del ${amhostgroup1}"
     rlRun "ipa host-del ${amhost1}"
     rlRun "ipa host-del ${amhost2}"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -463,6 +544,7 @@ function ipa_quicktest_automember_del()
 ######################################################################
 function ipa_quicktest_ssh_add()
 {
+    dlog_start $FUNCNAME
     if [ "$(hostname -s)" != "$MASTER_S" ]; then
         rlLog "$FUNCNAME must be run on MASTER ($MASTER)"
         return 0
@@ -532,10 +614,12 @@ function ipa_quicktest_ssh_add()
     else
         rlLog "Host $(hostname) already has ssh public keys"
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_ssh_check()
 {
+    dlog_start $FUNCNAME
     local runtype=${1:-new} 
     local tmpout=$TmpDir/tmpout.$FUNCNAME.out
 
@@ -572,10 +656,13 @@ function ipa_quicktest_ssh_check()
     fi
 
     rlRun "ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa_${sshuser1} ${sshuser1}@${MASTER} hostname"
+    dlog_end $FUNCNAME
 }
+
 
 function ipa_quicktest_ssh_del()
 {
+    dlog_start $FUNCNAME
     if [ "$(hostname -s)" != "$MASTER_S" ]; then
         rlLog "$FUNCNAME must be run on MASTER ($MASTER)"
         return 0
@@ -584,6 +671,7 @@ function ipa_quicktest_ssh_del()
     KinitAsAdmin
     rlRun "ipa user-del ${sshuser1}"
     rlRun "ipa host-mod $(hostname) --sshpubkey=\"\""
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
@@ -592,6 +680,7 @@ function ipa_quicktest_ssh_del()
 
 function ipa_quicktest_selinuxusermap_add()
 {
+    dlog_start $FUNCNAME
     KinitAsAdmin
     rlRun "create_ipauser ${seuser1} f l passw0rd1"
     KinitAsAdmin
@@ -600,10 +689,12 @@ function ipa_quicktest_selinuxusermap_add()
 
     rlRun "ipa selinuxusermap-add --hostcat=all --selinuxuser=${secontext} ${serule}"
     rlRun "ipa selinuxusermap-add-user --users=${seuser1} ${serule}"
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_selinuxusermap_check()
 {
+    dlog_start $FUNCNAME
     local runtype=${1:-new}
     local tmpout=$TmpDir/tmpout.$FUNCNAME.out
 
@@ -619,12 +710,15 @@ function ipa_quicktest_selinuxusermap_check()
         rlRun "cat $tmpout"
         rlAssertGrep "unknown command" $tmpout
     fi
+    dlog_end $FUNCNAME
 }
 
 function ipa_quicktest_selinuxusermap_del()
 {
+    dlog_start $FUNCNAME
     rlRun "ipa selinuxusermap-del ${serule}"
     rlRun "ipa user-del ${seuser1}"
+    dlog_end $FUNCNAME
 }
 
 ######################################################################
