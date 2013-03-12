@@ -540,7 +540,9 @@ function ipa_quicktest_ssh_check()
     local tmpout=$TmpDir/tmpout.$FUNCNAME.out
 
     #rlRun "rm -f /tmp/id_rsa_${sshuser1}*"
-    rlRun "sftp -o StrictHostKeyChecking=no root@${MASTER}:/tmp/id_rsa_${sshuser1}* /tmp"
+    if [ "$(hostname -s)" != "$MASTER_S" ]; then
+        rlRun "sftp -o StrictHostKeyChecking=no root@${MASTER}:/tmp/id_rsa_${sshuser1}* /tmp"
+    fi
 
     key1=$(awk '{print $2}' /tmp/id_rsa_${sshuser1}.pub)
     key1fp=$(ssh-keygen -l -f /tmp/id_rsa_${sshuser1}.pub | 
