@@ -503,7 +503,7 @@ function ipa_quicktest_ssh_add()
     fi
 
     rlLog "restarting ssh and sssd to make sure all configs are supported"
-    rlRun "service ssh restart"
+    rlRun "service sshd restart"
     rlRun "service sssd restart"
 
     ipa user-show ${sshuser1} >/dev/null 2>&1
