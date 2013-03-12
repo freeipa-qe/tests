@@ -626,6 +626,8 @@ function ipa_quicktest_ssh_check()
     #rlRun "rm -f /tmp/id_rsa_${sshuser1}*"
     if [ "$(hostname -s)" != "$MASTER_S" ]; then
         rlRun "sftp -o StrictHostKeyChecking=no root@${MASTER}:/tmp/id_rsa_${sshuser1}* /tmp"
+        rlLog "DEBUG: SLEEPING TO DEBUG THIS"
+        rlRun "sleep 10000000"
     fi
 
     key1=$(awk '{print $2}' /tmp/id_rsa_${sshuser1}.pub)
