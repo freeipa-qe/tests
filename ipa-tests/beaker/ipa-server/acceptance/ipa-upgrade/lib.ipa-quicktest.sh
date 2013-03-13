@@ -590,29 +590,34 @@ function ipa_quicktest_ssh_check()
     dlog_start $FUNCNAME
     local runtype=${1:-new} 
     local tmpout=$TmpDir/tmpout.$FUNCNAME.out
+    local key1file="/tmp/id_rsa_${sshuser1}.pub"
 
     #rlRun "rm -f /tmp/id_rsa_${sshuser1}*"
     if [ "$(hostname -s)" != "$MASTER_S" ]; then
         rlRun "sftp -o StrictHostKeyChecking=no root@${MASTER}:/tmp/id_rsa_${sshuser1}* /tmp"
     fi
+    key1fp=$(ssh-keygen -l -f ${key1file} | awk '{print $2}' |
+        tr '[:lower:]' '[:upper:]')
 
-    key1=$(awk '{print $2}' /tmp/id_rsa_${sshuser1}.pub)
-    key1fp=$(ssh-keygen -l -f /tmp/id_rsa_${sshuser1}.pub | 
-        awk '{print $2}' | tr '[:lower:]' '[:upper:]')
-    key2fp=$(ssh-keygen -l -f /etc/ssh/ssh_host_dsa_key.pub |
-        awk '{print $2}' | tr '[:lower:]' '[:upper:]')
-    key3fp=$(ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub |
-        awk '{print $2}' | tr '[:lower:]' '[:upper:]')
-    
+    key2file="/tmp/ssh_host_dsa_key_${MASTER}.pub"
+    rlRun "ssh-keyscan -t dsa ${MASTER} > ${key2file} 2>/dev/null"
+    key2fp=$(ssh-keygen -l -f ${key2file} | awk '{print $2}' |
+        tr '[:lower:]' '[:upper:]')
+
+    key3file="/tmp/ssh_host_rsa_key_${MASTER}.pub"
+    rlRun "ssh-keyscan -t rsa ${MASTER} > ${key3file} 2>/dev/null"
+    key3fp=$(ssh-keygen -l -f ${key3file} | awk '{print $2}' |
+        tr '[:lower:]' '[:upper:]')
+
     if [ "$runtype" = "new" ]; then
         rlLog "Checking for User SSH Public Key"
         rlRun "ipa user-show ${sshuser1} | grep ${key1fp}"
 
         rlLog "Checking for Host SSH Public DSA Key"
-        rlRun "ipa host-show $(hostname) | grep ${key2fp}"
+        rlRun "ipa host-show ${MASTER} | grep ${key2fp}"
 
         rlLog "Checking for Host SSH Public RSA Key"
-        rlRun "ipa host-show $(hostname) | grep ${key3fp}"
+        rlRun "ipa host-show ${MASTER} | grep ${key3fp}"
     else
         rlLog "ipa sshpubkey limited support on older versions"
 
