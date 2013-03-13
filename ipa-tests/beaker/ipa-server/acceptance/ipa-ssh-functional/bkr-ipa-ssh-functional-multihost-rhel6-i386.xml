@@ -32,13 +32,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-ssh-functional" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-ssh-functional" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
@@ -71,13 +71,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="REPLICA">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-ssh-functional" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-ssh-functional" role="REPLICA">
 				<params/>
 			</task>
 		</recipe>
@@ -110,13 +110,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-ssh-functional" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-ssh-functional" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>

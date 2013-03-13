@@ -32,15 +32,15 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-            <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+            <task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
                 <params/>
             </task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER_env1">
 			    <params>
 			        <param name="TOPO1" value="default"/>
 			    </params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="MASTER_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-client-automount" role="MASTER_env1">
 				<params/>
 			</task>
 		</recipe>
@@ -79,13 +79,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-            <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+            <task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
                 <params/>
             </task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="REPLICA_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="REPLICA_env1">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="REPLICA_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-client-automount" role="REPLICA_env1">
 				<params/>
 			</task>
 		</recipe>
@@ -126,13 +126,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-            <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+            <task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
                 <params/>
             </task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="CLIENT_env1">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="CLIENT_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-client-automount" role="CLIENT_env1">
 				<params/>
 			</task>
 		</recipe>
@@ -166,13 +166,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-            <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+            <task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
                 <params/>
             </task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="CLIENT_env1">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-client-automount" role="CLIENT_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-client-automount" role="CLIENT_env1">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="8789333"/>
 				</params>

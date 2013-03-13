@@ -30,13 +30,13 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-krblockout" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-krblockout" role="MASTER">
 				<params/>
 			</task>
 
@@ -68,13 +68,13 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-krblockout" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-krblockout" role="MASTER">
 				<params/>
 			</task>
 

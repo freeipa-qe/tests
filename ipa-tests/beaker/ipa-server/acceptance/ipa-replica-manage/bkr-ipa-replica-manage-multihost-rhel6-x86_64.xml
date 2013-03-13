@@ -34,54 +34,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-manage" role="CLIENT">
-				<params/>
-			</task>
-		</recipe>
-		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA SLAVE">
-			<autopick random="false"/>
-			<watchdog panic="None"/>
-			<packages/>
-			<ks_appends/>
-			<repos>
-				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
-			</repos>
-			<distroRequires>
-				<and>
-					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
-					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RHEL6.4-20130123.0"/>
-					<distro_arch op="=" value="x86_64"/>
-				</and>
-			</distroRequires>
-			<hostRequires>
-				<and>
-					<system_type value="Machine"/>
-					<memory op="&gt;=" value="1000"/>
-				</and>
-			</hostRequires>
-			<partitions/>
-			<task name="/distribution/install" role="STANDALONE">
-				<params/>
-			</task>
-			<task name="/distribution/pkginstall" role="STANDALONE">
-				<params>
-					<param name="PKGARGNAME" value="expect"/>
-				</params>
-			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
-				<params/>
-			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-manage" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>
@@ -116,13 +75,54 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-manage" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage" role="CLIENT">
+				<params/>
+			</task>
+		</recipe>
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="SLAVE" whiteboard="IPA SLAVE">
+			<autopick random="false"/>
+			<watchdog panic="None"/>
+			<packages/>
+			<ks_appends/>
+			<repos>
+				<repo name="ipa" url="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64"/>
+			</repos>
+			<distroRequires>
+				<and>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_variant op="=" value="Server"/>
+					<distro_name op="=" value="RHEL6.4-20130123.0"/>
+					<distro_arch op="=" value="x86_64"/>
+				</and>
+			</distroRequires>
+			<hostRequires>
+				<and>
+					<system_type value="Machine"/>
+					<memory op="&gt;=" value="1000"/>
+				</and>
+			</hostRequires>
+			<partitions/>
+			<task name="/distribution/install" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/distribution/pkginstall" role="STANDALONE">
+				<params>
+					<param name="PKGARGNAME" value="expect"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="SLAVE">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>

@@ -32,10 +32,10 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-install" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-install" role="MASTER">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
 				</params>
@@ -70,10 +70,10 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-install" role="SLAVE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-install" role="SLAVE">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
 				</params>

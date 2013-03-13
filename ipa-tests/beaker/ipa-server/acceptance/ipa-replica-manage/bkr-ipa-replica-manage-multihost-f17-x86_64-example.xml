@@ -36,7 +36,7 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/distribution/command" role="STANDALONE">
@@ -44,10 +44,10 @@
 					<param name="CMDS_TO_RUN" value="sleep 1"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-manage" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
@@ -81,7 +81,7 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/distribution/command" role="STANDALONE">
@@ -89,10 +89,10 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-manage" role="SLAVE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage" role="SLAVE">
 				<params/>
 			</task>
 		</recipe>
@@ -129,7 +129,7 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/distribution/command" role="STANDALONE">
@@ -137,10 +137,10 @@
 					<param name="CMDS_TO_RUN" value="sleep 600"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="SLAVE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="SLAVE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-replica-manage" role="SLAVE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage" role="SLAVE">
 				<params/>
 			</task>
 		</recipe>

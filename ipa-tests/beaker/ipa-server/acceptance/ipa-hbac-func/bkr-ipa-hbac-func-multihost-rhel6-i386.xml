@@ -34,13 +34,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hbac-func" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-hbac-func" role="MASTER">
 				<params/>
 			</task>
 		</recipe>
@@ -75,13 +75,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hbac-func" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-hbac-func" role="CLIENT">
 				<params/>
 			</task>
 		</recipe>
@@ -116,13 +116,13 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="CLIENT2">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="CLIENT2">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-hbac-func" role="CLIENT2">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-hbac-func" role="CLIENT2">
 				<params/>
 			</task>
 		</recipe>
