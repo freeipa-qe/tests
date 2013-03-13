@@ -145,7 +145,7 @@ rlPhaseStartTest "Setup for sudo functional tests"
         rlRun "service iptables stop"
 
         # enabling NIS
-	rlRun "nisdomainname `hostname -d`"
+#	rlRun "nisdomainname `hostname -d`"
 #        rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
 #        rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=707133"
 #        rlRun "ipa-nis-manage -y $TmpDir/passwd.txt enable"
@@ -163,60 +163,76 @@ rlPhaseStartTest "Setup for sudo functional tests"
 		rlRun "yum install nss-pam-ldapd -y"
 	fi
 
+############Commented by Kaleem as now using sssd instead of ldap for fetching sudo rules#################################
 
-SUDO_LDAP_CONF_PATH=`/usr/bin/sudo -V | grep 'ldap.conf path' | cut -d " " -f 3`
+#SUDO_LDAP_CONF_PATH=`/usr/bin/sudo -V | grep 'ldap.conf path' | cut -d " " -f 3`
 
-cat > $SUDO_LDAP_CONF_PATH << EOF
-bind_policy soft
-sudoers_base ou=SUDOers,$basedn
-binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
-bindpw $bindpw
-ssl no
+#cat > $SUDO_LDAP_CONF_PATH << EOF
+#bind_policy soft
+#sudoers_base ou=SUDOers,$basedn
+#binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
+#bindpw $bindpw
+#ssl no
 
-tls_cacertfile /etc/ipa/ca.crt
-tls_checkpeer yes
-bind_timelimit 5
-timelimit 15
-sudoers_debug 5
-BASE cn=ng,cn=alt,$basedn
-TLS_CACERTDIR /etc/ipa
-uri ldap://$MASTER
-EOF
+#tls_cacertfile /etc/ipa/ca.crt
+#tls_checkpeer yes
+#bind_timelimit 5
+#timelimit 15
+#sudoers_debug 5
+#BASE cn=ng,cn=alt,$basedn
+#TLS_CACERTDIR /etc/ipa
+#uri ldap://$MASTER
+#EOF
 
-	rlRun "cat $SUDO_LDAP_CONF_PATH"
-	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
-	rlRun "export LDAPTLS_CACERT"
+#	rlRun "cat $SUDO_LDAP_CONF_PATH"
+#	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
+#	rlRun "export LDAPTLS_CACERT"
 
-cat > $TmpDir/bindchpwd.exp << EOF
+#cat > $TmpDir/bindchpwd.exp << EOF
 #!/usr/bin/expect
 
-set timeout 30
-spawn /usr/bin/ldappasswd -S -W -h $MASTER -ZZ -D "$ROOTDN" uid=sudo,cn=sysaccounts,cn=etc,$basedn
-match_max 100000
-expect "*: "
-send -- "$bindpw\r"
-expect "*: "
-send -- "$bindpw\r"
-expect "*: "
-send -- "$ROOTDNPWD\r"
-send -- "\r"
-expect eof
-EOF
+#set timeout 30
+#spawn /usr/bin/ldappasswd -S -W -h $MASTER -ZZ -D "$ROOTDN" uid=sudo,cn=sysaccounts,cn=etc,$basedn
+#match_max 100000
+#expect "*: "
+#send -- "$bindpw\r"
+#expect "*: "
+#send -- "$bindpw\r"
+#expect "*: "
+#send -- "$ROOTDNPWD\r"
+#send -- "\r"
+#expect eof
+#EOF
 
-	rlFileBackup /var/log/dirsrv/slapd-$INSTANCE/errors
-	rlRun "> /var/log/dirsrv/slapd-$INSTANCE/errors"
+#	rlFileBackup /var/log/dirsrv/slapd-$INSTANCE/errors
+#	rlRun "> /var/log/dirsrv/slapd-$INSTANCE/errors"
 
-	rlRun "chmod 755 $TmpDir/bindchpwd.exp"
-	rlRun "$TmpDir/bindchpwd.exp" 0 "Setting sudo binddn password"
+#	rlRun "chmod 755 $TmpDir/bindchpwd.exp"
+#	rlRun "$TmpDir/bindchpwd.exp" 0 "Setting sudo binddn password"
 
-	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=712109"
-	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$basedn\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$INSTANCE/errors"
-	rlFileRestore /var/log/dirsrv/slapd-$INSTANCE/errors
+#	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=712109"
+#	rlAssertNotGrep "Entry \"uid=sudo,cn=sysaccounts,cn=etc,$basedn\" -- attribute \"krbExtraData\" not allowed" "/var/log/dirsrv/slapd-$INSTANCE/errors"
+#	rlFileRestore /var/log/dirsrv/slapd-$INSTANCE/errors
+
+SSSD=/etc/sssd/sssd.conf
+
+rlRun "sed '/cache_credentials/ a sudo_provider = ldap' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_uri = ldap://$MASTER' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_sudo_search_base = ou=sudoers,dc=testrelm,dc=com' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_sasl_mech = GSSAPI' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_sasl_realm = $RELM' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a krb5_server = $MASTER' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/services\ =\ nss,\ pam,\ ssh/d' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/\[sssd\]/ a services = nss, pam, ssh, sudo' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "service sssd restart"
+
+############Commented by Kaleem as now using sssd instead of ldap for fetching sudo rules#################################
 
 	rlAssertNotGrep "sudoers" "/etc/nsswitch.conf"
 		if [ $? = 0 ]; then
 			rlFileBackup /etc/nsswitch.conf
-			rlRun "echo \"sudoers:    ldap\" >> /etc/nsswitch.conf"
+			#rlRun "echo \"sudoers:    ldap\" >> /etc/nsswitch.conf"
+			rlRun "echo \"sudoers:    files sss\" >> /etc/nsswitch.conf"
 		fi
 
 	rlRun "grep ^[^#] /etc/nsswitch.conf"
@@ -245,12 +261,27 @@ rlPhaseStartTest "Setup for sudo functional tests on separate client"
 
         # kinit as admin and creating users
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
+        rlRun "create_ipauser $user1 $user1 $user1 $userpw"
+        sleep 5
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user2 $user2 $user2 $userpw"
+	sleep 5
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user3 $user3 $user3 $userpw"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 
 	# Add the machine with the hostname in $1 to the sshknown hosts file.
+	if [ -n "$CLIENT" ]; then
+		SUDOCLIENT=$CLIENT
+	else 
+		SUDOCLIENT=$MASTER
+	fi
+
+	# Add the machine with the hostname in $1 to the sshknown hosts file.
+        echo $SUDOCLIENT
+	AddToKnownHosts $SUDOCLIENT
 	AddToKnownHosts $MASTER
-	AddToKnownHosts $CLIENT	
 
 	# stopping firewall
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
@@ -265,44 +296,62 @@ rlPhaseStartTest "Setup for sudo functional tests on separate client"
 	fi
 
         # enabling NIS
-	rlRun "nisdomainname `hostname -d`"
+	#rlRun "nisdomainname `hostname -d`"
 
-	if [ "$distro_variant" = "Fedora" ] ; then
-		rlLog "Distro variant detected is $distro_variant"
-		rlRun "yum install nss_ldap -y"
-	else
-		rlLog "Distro variant detected is $distro_variant"
-		rlRun "yum install nss-pam-ldapd -y"
-	fi
+	#if [ "$distro_variant" = "Fedora" ] ; then
+	#	rlLog "Distro variant detected is $distro_variant"
+	#	rlRun "yum install nss_ldap -y"
+	#else
+	#	rlLog "Distro variant detected is $distro_variant"
+	#	rlRun "yum install nss-pam-ldapd -y"
+	#fi
 
-	SUDO_LDAP_CONF_PATH=`/usr/bin/sudo -V | grep 'ldap.conf path' | cut -d " " -f 3`
+############Commented by Kaleem as now using sssd instead of ldap for fetching sudo rules#################################
+	#SUDO_LDAP_CONF_PATH=`/usr/bin/sudo -V | grep 'ldap.conf path' | cut -d " " -f 3`
 
-	cat > $SUDO_LDAP_CONF_PATH <<-EOF
-	bind_policy soft
-	sudoers_base ou=SUDOers,$basedn
-	binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
-	bindpw $bindpw
-	ssl no
+	#cat > $SUDO_LDAP_CONF_PATH <<-EOF
+	#bind_policy soft
+	#sudoers_base ou=SUDOers,$basedn
+	#binddn uid=sudo,cn=sysaccounts,cn=etc,$basedn
+	#bindpw $bindpw
+	#ssl no
 
-	tls_cacertfile /etc/ipa/ca.crt
-	tls_checkpeer yes
-	bind_timelimit 5
-	timelimit 15
-	sudoers_debug 5
-	BASE cn=ng,cn=alt,$basedn
-	TLS_CACERTDIR /etc/ipa
-	uri ldap://$MASTER
-	EOF
+	#tls_cacertfile /etc/ipa/ca.crt
+	#tls_checkpeer yes
+	#bind_timelimit 5
+	#timelimit 15
+	#sudoers_debug 5
+	#BASE cn=ng,cn=alt,$basedn
+	#TLS_CACERTDIR /etc/ipa
+	#uri ldap://$MASTER
+	#EOF
 
-	rlRun "cat $SUDO_LDAP_CONF_PATH"
-	rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
-	rlRun "export LDAPTLS_CACERT"
+	#rlRun "cat $SUDO_LDAP_CONF_PATH"
+	#rlRun "LDAPTLS_CACERT=/etc/ipa/ca.crt"
+	#rlRun "export LDAPTLS_CACERT"
+
+SSSD=/etc/sssd/sssd.conf
+
+rlRun "sed '/cache_credentials/ a sudo_provider = ldap' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_uri = ldap://$MASTER' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_sudo_search_base = ou=sudoers,dc=testrelm,dc=com' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_sasl_mech = GSSAPI' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a ldap_sasl_realm = $RELM' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a krb5_server = $MASTER' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/cache_credentials/ a krb5_server = $MASTER' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/services\ =\ nss,\ pam,\ ssh/d' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "sed '/\[sssd\]/ a services = nss, pam, ssh, sudo' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+rlRun "service sssd restart"
+
+############Commented by Kaleem as now using sssd instead of ldap for fetching sudo rules#################################
+
 
 	rlRun "sed -i '/sudoers/d' /etc/nsswitch.conf"
 	rlAssertNotGrep "sudoers" "/etc/nsswitch.conf"
 	if [ $? = 0 ]; then
 		rlFileBackup /etc/nsswitch.conf
-		rlRun "echo \"sudoers:    ldap\" >> /etc/nsswitch.conf"
+		#rlRun "echo \"sudoers:    ldap\" >> /etc/nsswitch.conf"
+		rlRun "echo \"sudoers:    files sss\" >> /etc/nsswitch.conf"
 	fi
 
 	rlRun "grep ^[^#] /etc/nsswitch.conf"
@@ -368,6 +417,7 @@ cat $sudoout
 
 sudo_list() {
 
+sudoout_client=/tmp/sudo_list_client_$RANDOM.out
 sudoout=/tmp/sudo_list.out
 
 cat > $TmpDir/sudo_list.exp << EOF
@@ -381,7 +431,7 @@ spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
-send -s "sudo -l > $sudoout 2>&1 \r"
+send -s "sudo -l > $sudoout_client 2>&1 \r"
 expect "$1: "
 send -s "$userpw\r"
 expect eof
@@ -390,13 +440,15 @@ EOF
 chmod 755 $TmpDir/sudo_list.exp
 cat $TmpDir/sudo_list.exp
 $TmpDir/sudo_list.exp
-sftp $SUDOCLIENT:$sudoout $sudoout
-cat $sudoout
+echo $SUDOCLIENT
+sftp $SUDOCLIENT:$sudoout_client $sudoout
+#cat $sudoout
 }
 
 
-sudo_list_wo_passwd() {
+sudo_list_client() {
 
+sudoout_client=/tmp/sudo_list_client_$RANDOM.out
 sudoout=/tmp/sudo_list.out
 
 cat > $TmpDir/sudo_list.exp << EOF
@@ -410,17 +462,109 @@ spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
 expect "*: "
 send -s "$userpw\r"
 expect "*$ "
-send -s "sudo -l > $sudoout 2>&1 \r"
+send -s "sudo -l > $sudoout_client 2>&1 \r"
+expect "$1: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "sudo -u $2 $3 >> $sudoout_client 2>&1 \r"
 expect eof
 EOF
 
 chmod 755 $TmpDir/sudo_list.exp
 cat $TmpDir/sudo_list.exp
 $TmpDir/sudo_list.exp
-sftp $SUDOCLIENT:$sudoout $sudoout
-cat $sudoout
+echo $SUDOCLIENT
+sftp $SUDOCLIENT:$sudoout_client $sudoout
+#cat $sudoout
 }
 
+sudo_list_client_group() {
+
+sudoout_client=/tmp/sudo_list_client_$RANDOM.out
+sudoout=/tmp/sudo_list.out
+
+cat > $TmpDir/sudo_list.exp << EOF
+#!/usr/bin/expect -f
+
+set timeout 30
+set send_slow {1 .1}
+match_max 100000
+
+spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
+expect "*: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "sudo -l > $sudoout_client 2>&1 \r"
+expect "$1: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "sudo -g $2 $3 >> $sudoout_client 2>&1 \r"
+expect eof
+EOF
+
+chmod 755 $TmpDir/sudo_list.exp
+cat $TmpDir/sudo_list.exp
+$TmpDir/sudo_list.exp
+echo $SUDOCLIENT
+sftp $SUDOCLIENT:$sudoout_client $sudoout
+#cat $sudoout
+}
+
+sudo_list_wo_passwd() {
+
+sudoout_client=/tmp/sudo_list_client_$RANDOM.out
+sudoout=/tmp/sudo_list.out
+
+cat > $TmpDir/sudo_list.exp << EOF
+#!/usr/bin/expect -f
+
+set timeout 30
+set send_slow {1 .1}
+match_max 100000
+
+spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
+expect "*: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "sudo -l > $sudoout_client 2>&1 \r"
+expect eof
+EOF
+
+chmod 755 $TmpDir/sudo_list.exp
+cat $TmpDir/sudo_list.exp
+$TmpDir/sudo_list.exp
+sftp $SUDOCLIENT:$sudoout_client $sudoout
+#cat $sudoout
+}
+
+sudo_list_wo_passwd_client() {
+
+sudoout_client=/tmp/sudo_list_client_$RANDOM.out
+sudoout=/tmp/sudo_list.out
+
+cat > $TmpDir/sudo_list.exp << EOF
+#!/usr/bin/expect -f
+
+set timeout 30
+set send_slow {1 .1}
+match_max 100000
+
+spawn ssh -o StrictHostKeyChecking=no -l $1 $SUDOCLIENT
+expect "*: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "sudo -l > $sudoout_client 2>&1 \r"
+expect "*$ "
+send -s "sudo -u $2 $3 >> $sudoout_client 2>&1 \r"
+expect eof
+EOF
+
+chmod 755 $TmpDir/sudo_list.exp
+cat $TmpDir/sudo_list.exp
+$TmpDir/sudo_list.exp
+sftp $SUDOCLIENT:$sudoout_client $sudoout
+#cat $sudoout
+}
 
 sudorule-add-allow-command_func001() {
 
@@ -429,7 +573,7 @@ rlPhaseStartTest "sudorule-add-allow-command_func001: Allowed commands available
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-	rlRun "authconfig --enablemkhomedir --updateall"
+	#rlRun "authconfig --enablemkhomedir --updateall"
 	rlRun "ipa sudocmd-add /bin/mkdir"
 	rlRun "ipa sudocmd-add /bin/date"
 	rlRun "ipa sudocmd-add /bin/df"
@@ -445,13 +589,17 @@ rlPhaseStartTest "sudorule-add-allow-command_func001: Allowed commands available
 	rlRun "ipa sudorule-add-user sudorule1 --users=$user1"
 
 	rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/mkdir sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart"
+        rlRun "sssd_cache_cleanup"
+        #rlRun "getent -s sss passwd $user1"
         rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: user_matches=1" "$sudoout"
-	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+	#rlAssertGrep "sudo: user_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: host_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
+        #sleep 300
 
 	rlRun "rm -fr $sudoout"
 
@@ -463,12 +611,15 @@ sudorule-add-allow-commandgrp_func001() {
 rlPhaseStartTest "sudorule-add-allow-commandgrp_func001: Add command groups available for sudo client"
 
 	rlRun "ipa sudorule-add-allow-command --sudocmdgroups=sudogrp1 sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: user_matches=1" "$sudoout"
-	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+	#rlAssertGrep "sudo: user_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: host_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
-	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
+	#rlAssertGrep "(root) /bin/mkdir" "$sudoout"
+	rlAssertGrep "(root) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
 	rlRun "cat $sudoout"
 
 	rlRun "rm -fr $sudoout"
@@ -482,11 +633,14 @@ sudorule-remove-allow-command_func001() {
 rlPhaseStartTest "sudorule-remove-allow-command_func001: Remove commands available from sudo client"
 
 	rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/mkdir sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: user_matches=1" "$sudoout"
-	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+	#rlAssertGrep "sudo: user_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: host_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertNotGrep "/bin/mkdir" "$sudoout"
+	rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 	rlRun "cat $sudoout"
 
 	rlRun "rm -fr $sudoout"
@@ -500,11 +654,14 @@ sudorule-remove-allow-commandgrp_func001() {
 rlPhaseStartTest "sudorule-remove-allow-commandgrp_func001: Remove command groups available from sudo client"
 
 	rlRun "ipa sudorule-remove-allow-command --sudocmdgroups=sudogrp1 sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: user_matches=1" "$sudoout"
-	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+	#rlAssertGrep "sudo: user_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: host_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertNotGrep "/bin/mkdir" "$sudoout"
+	rlAssertGrep "User $user1 is not allowed to run sudo on" "$sudoout"
 	rlRun "cat $sudoout"
 
 	rlRun "rm -fr $sudoout"
@@ -520,10 +677,12 @@ rlPhaseStartTest "sudorule-add-deny-command_func001: Deny commands available for
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-add-deny-command --sudocmds=/bin/mkdir sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: user_matches=1" "$sudoout"
-	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+	#rlAssertGrep "sudo: user_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: host_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
@@ -540,10 +699,12 @@ rlPhaseStartTest "sudorule-remove-deny-command_func001: Deny commands removed fr
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-deny-command --sudocmds=/bin/mkdir sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertGrep "sudo: user_matches=1" "$sudoout"
-        rlAssertGrep "sudo: host_matches=1" "$sudoout"
-        rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+        #rlAssertGrep "sudo: user_matches=1" "$sudoout"
+        #rlAssertGrep "sudo: host_matches=1" "$sudoout"
+        #rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
         rlAssertNotGrep "(root) !/bin/mkdir" "$sudoout"
         rlRun "cat $sudoout"
 
@@ -559,10 +720,12 @@ rlPhaseStartTest "sudorule-add-deny-commandgrp_func001: Deny command groups avai
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-add-deny-command --sudocmdgroups=sudogrp1 sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: user_matches=1" "$sudoout"
-	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+	#rlAssertGrep "sudo: user_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: host_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "(root) !/bin/date, !/bin/touch, !/bin/uname" "$sudoout"
 	rlRun "cat $sudoout"
@@ -579,10 +742,12 @@ rlPhaseStartTest "sudorule-remove-deny-commandgrp_func001: Remove denied command
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
 	rlRun "ipa sudorule-remove-deny-command --sudocmdgroups=sudogrp1 sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: user_matches=1" "$sudoout"
-	rlAssertGrep "sudo: host_matches=1" "$sudoout"
-	rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
+	#rlAssertGrep "sudo: user_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: host_matches=1" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '$SUDOCLIENT' ... MATCH" "$sudoout"
 	rlAssertNotGrep "(root) !/bin/mkdir" "$sudoout"
 	rlRun "cat $sudoout"
 
@@ -630,13 +795,13 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-	domain=`hostname -d`
-	rlRun "domainname $domain"
-	rlRun "rm -fr /var/lib/sss/db/cache_*"
-	rlRun "service sssd restart"
-	sleep 5
+	#domain=`hostname -d`
+	#rlRun "domainname $domain"
+	#rlRun "rm -fr /var/lib/sss/db/cache_*"
+	#rlRun "service sssd restart"
 
 	rlRun "ipa hostgroup-add hostgrp1 --desc=test_hostgrp"
+	rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/mkdir sudorule1"
 	rlRun "ipa sudorule-remove-host sudorule1 --hosts=$SUDOCLIENT"
 	rlRun "ipa hostgroup-add-member hostgrp1 --hosts=$SUDOCLIENT"
 
@@ -645,9 +810,12 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 	# Commenting the following test as it is generating false failures and 
 	# the related functional test "grep for +hostgrp1" passess. 
 	# rlRun "getent netgroup hostgrp1"
-
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
 	rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
+	rlRun "cat $sudoout"
+	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
+	#rlAssertGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
 	
 	rlRun "rm -fr $sudoout"
 
@@ -662,13 +830,15 @@ rlPhaseStartTest "sudorule-remove-hostgrp_func001: Removing hostgroup and verify
 	rlRun "ipa sudorule-remove-host sudorule1 --hostgroup=hostgrp1"
         rlRun "ipa hostgroup-del hostgrp1"
 
-	rlRun "rm -fr /var/lib/sss/db/cache_*"
-        rlRun "service sssd restart"
-	sleep 5
+	#rlRun "rm -fr /var/lib/sss/db/cache_*"
+        #rlRun "service sssd restart"
+        sssd_cache_cleanup
 	rlRun "getent -s sss passwd $user1"
 
         rlRun "sudo_list $user1"
-        rlAssertNotGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
+	rlRun "cat $sudoout"
+        rlAssertGrep "User user1 is not allowed to run sudo on" "$sudoout"
+        #rlAssertNotGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
         
 	rlRun "ipa sudorule-add-host sudorule1 --hosts=$SUDOCLIENT"
         rlRun "rm -fr $sudoout"
@@ -685,8 +855,10 @@ rlPhaseStartTest "sudorule-add-option_func001: Adding sudo option /var/log/sudol
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-option sudorule1 --sudooption=logfile=/var/log/sudolog"
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
 	rlRun "sudo_list $user1"
-	rlAssertGrep "sudo: ldap sudoOption: 'logfile=/var/log/sudolog'" "$sudoout"
+        rlRun "sleep 180"
+	#rlAssertGrep "sudo: ldap sudoOption: 'logfile=/var/log/sudolog'" "$sudoout"
 	rlRun "cat $sudoout"
 
 	rlRun "rm -fr $sudoout"
@@ -702,8 +874,10 @@ rlPhaseStartTest "sudorule-add-option_func002: Adding sudo option env_keep and v
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-option sudorule1 --sudooption=\"env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE\""
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
         rlRun "sudo_list $user1"
-        rlAssertGrep "sudo: ldap sudoOption: 'env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE'" "$sudoout"
+        sleep 180
+        #rlAssertGrep "sudo: ldap sudoOption: 'env_keep = LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS XDG_SESSION_COOKIE'" "$sudoout"
         rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
@@ -719,8 +893,10 @@ rlPhaseStartTest "sudorule-add-option_func003: Adding sudo option !authenticate 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-option sudorule1 --sudooption='!authenticate'"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list_wo_passwd $user1"
-        rlAssertGrep "sudo: ldap sudoOption: '!authenticate'" "$sudoout"
+        rlAssertGrep "(root) NOPASSWD: /bin/mkdir" "$sudoout"
         rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
@@ -768,8 +944,10 @@ rlPhaseStartTest "sudorule-remove-option_func003: Removing sudo option !authenti
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-option sudorule1 --sudooption='!authenticate'"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list_wo_passwd $user1"
-        rlAssertNotGrep "sudo: ldap sudoOption: '!authenticate'" "$sudoout"
+        rlAssertNotGrep "(root) NOPASSWD: /bin/mkdir" "$sudoout"
         rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
@@ -785,8 +963,11 @@ rlPhaseStartTest "sudorule-add-runasuser_func001: Adding RunAs user and verifyin
         rlRun "ipa sudorule-add-allow-command --sudocmdgroups=sudogrp1 sudorule1"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --users=$user2"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
 	rlRun "sudo_list $user1"
-	rlAssertGrep "($user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+	rlAssertGrep "($user2) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
 	rlRun "rm -fr $sudoout"
 
@@ -800,8 +981,11 @@ rlPhaseStartTest "sudorule-remove-runasuser_func001: Removing RunAs user and ver
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=$user2"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertNotGrep "(%$user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+	rlAssertNotGrep "($user2) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -815,8 +999,11 @@ rlPhaseStartTest "sudorule-add-runasuser_func002: Adding RunAs group and verifyi
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --groups=$user2"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertGrep "(%$user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertGrep "(%$user2) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -830,8 +1017,11 @@ rlPhaseStartTest "sudorule-remove-runasuser_func002: Removing RunAs group and ve
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --groups=$user2"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertNotGrep "(%$user2) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertNotGrep "(%$user2) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -845,8 +1035,11 @@ rlPhaseStartTest "sudorule-add-runasuser_func003: Adding comma-separated list of
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --users=$user2,$user3"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertGrep "($user2, $user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertGrep "($user2, $user3) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -860,8 +1053,11 @@ rlPhaseStartTest "sudorule-remove-runasuser_func003: Removing comma-separated li
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --users=$user2,$user3"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertNotGrep "($user2, $user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertNotGrep "($user2, $user3) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -875,8 +1071,11 @@ rlPhaseStartTest "sudorule-add-runasuser_func004: Adding comma-separated list of
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-add-runasuser sudorule1 --groups=$user2,$user3"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertGrep "(%$user2, %$user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertGrep "(%$user2, %$user3) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -890,8 +1089,11 @@ rlPhaseStartTest "sudorule-remove-runasuser_func004: Removing comma-separated li
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-remove-runasuser sudorule1 --groups=$user2,$user3"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertNotGrep "(%$user2, %$user3) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlAssertNotGrep "(%$user2, %$user3) /bin/mkdir, /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
 
         rlRun "rm -fr $sudoout"
 
@@ -1015,16 +1217,23 @@ rlPhaseStartTest "sudorule-disable_func001: Disabling sudorule and verifying fro
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
-	rlRun "rm -fr /var/lib/sss/db/cache_*"
-        rlRun "service sssd restart"
-	sleep 5
+	#rlRun "rm -fr /var/lib/sss/db/cache_*"
+        #rlRun "service sssd restart"
+	#sleep 5
 
 	rlRun "ipa sudorule-find"
 	rlRun "ipa sudorule-show sudorule1"
         rlRun "ipa sudorule-disable sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-	rlAssertGrep "User $user1 may run the following commands on this host" "$sudoout"
-	rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
+	#rlAssertGrep "User $user1 may run the following commands on this host" "$sudoout"
+	#rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+	rlAssertNotGrep "(root) /bin/mkdir" "$sudoout"
+        if [ $? -eq 1 ]; then
+          rlLog "Failing because of https://bugzilla.redhat.com/show_bug.cgi?id=912673"
+        fi
         #rlAssertGrep "user1 is not in the sudoers file.  This incident will be reported." "$sudoout"
 
         rlRun "rm -fr $sudoout"
@@ -1039,16 +1248,315 @@ rlPhaseStartTest "sudorule-enable_func001: Enabling sudorule and verifying from 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
         rlRun "ipa sudorule-enable sudorule1"
+        #rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        sssd_cache_cleanup
         rlRun "sudo_list $user1"
-        rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
+        rlRun "cat $sudoout"
+	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
+        #rlAssertGrep "(root) /bin/date, /bin/touch, /bin/uname" "$sudoout"
 
         rlRun "rm -fr $sudoout"
 
 rlPhaseEnd
 }
 
+### Adding offline client caching functional test cases here.
 
+sudorule-offline-caching-allow-command() {
 
+rlPhaseStartTest "sudorule-offline-caching-allow-command"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+	rlRun "ipa sudocmd-add /bin/mkdir"
+	rlRun "ipa sudocmd-add /bin/date"
+	rlRun "ipa sudocmd-add /bin/df"
+	rlRun "ipa sudocmd-add /bin/touch"
+	rlRun "ipa sudocmd-add /bin/rm"
+	rlRun "ipa sudocmd-add /bin/uname"
+	rlRun "ipa sudocmd-add /bin/hostname"
+	rlRun "ipa sudocmd-add /bin/rmdir"
+	rlRun "ipa sudocmdgroup-add sudogrp1 --desc=sudogrp1"
+	rlRun "ipa sudocmdgroup-add-member sudogrp1 --sudocmds=/bin/date,/bin/touch,/bin/uname"
+	rlRun "ipa sudorule-add sudorule1"
+	rlRun "ipa sudorule-add-host  sudorule1 --hosts=$SUDOCLIENT"
+	rlRun "ipa sudorule-add-user sudorule1 --users=$user1"
+
+	rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 2"
+        rlRun "sudo_list_client $user1 root date"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "(root) /bin/date" "$sudoout"
+        dat=`date|cut -d " " -f1`
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_client $user1 root date"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "(root) /bin/date" "$sudoout"
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+        rlRun "start_ipa_master"
+	rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/date sudorule1"
+	rlRun "rm -fr $sudoout"
+
+rlPhaseEnd
+}
+
+sudorule-offline-caching-deny-command() {
+
+rlPhaseStartTest "sudorule-offline-caching-deny-command"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        rlRun "ipa sudorule-add-deny-command --sudocmds=/bin/uname sudorule1"
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        rlRun "sudo_list_client $user1 root uname"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "Sorry, user $user1 is not allowed to execute '/bin/uname' as root" "$sudoout"
+	rlAssertGrep "(root) !/bin/uname" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_client $user1 root uname"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "Sorry, user $user1 is not allowed to execute '/bin/uname' as root" "$sudoout"
+	rlAssertGrep "(root) !/bin/uname" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "start_ipa_master"
+
+        rlRun "ipa sudorule-remove-deny-command --sudocmds=/bin/uname sudorule1"
+	rlRun "rm -fr $sudoout"
+
+rlPhaseEnd
+}
+
+sudorule-offline-caching-runasuser-command() {
+
+rlPhaseStartTest "sudorule-offline-caching-runasuser-command"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-add-runasuser sudorule1 --users=$user2"
+
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        rlRun "sudo_list_client $user1 $user2 date "
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "($user2) /bin/date" "$sudoout"
+        dat=`date|cut -d " " -f1`
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_client $user1 $user2 date"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "($user2) /bin/date" "$sudoout"
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "start_ipa_master"
+
+        rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-remove-runasuser sudorule1 --users=$user2"
+	rlRun "rm -fr $sudoout"
+
+rlPhaseEnd
+}
+
+sudorule-offline-caching-runasgroup-command() {
+
+rlPhaseStartTest "sudorule-offline-caching-runasgroup-command"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa group-add --desc='testgroup' testgroup"
+        rlRun "ipa group-add-member testgroup --users=$user2"
+        rlRun "ipa sudorule-add-runasgroup sudorule1 --groups=testgroup"
+
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        rlRun "sudo_list_client_group $user1 testgroup date "
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "(root : testgroup) /bin/date" "$sudoout"
+        dat=`date|cut -d " " -f1`
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_client_group $user1 testgroup date "
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "(root : testgroup) /bin/date" "$sudoout"
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "start_ipa_master"
+
+        rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-remove-runasgroup sudorule1 --groups=testgroup"
+        rlRun "ipa group-remove-member testgroup --users=$user2"
+        rlRun "ipa group-del testgroup"
+	rlRun "rm -fr $sudoout"
+
+rlPhaseEnd
+}
+
+sudorule-offline-caching-hostgroup-command() {
+
+rlPhaseStartTest "sudorule-offline-caching-hostgroup-command"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-remove-host sudorule1 --hosts=$SUDOCLIENT"
+        rlRun "ipa hostgroup-add --desc='testhostgroup' testhostgroup"
+        rlRun "ipa hostgroup-add-member testhostgroup --hosts=$SUDOCLIENT"
+        rlRun "ipa sudorule-add-host sudorule1 --hostgroups=testhostgroup"
+
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        rlRun "sudo_list_client $user1 root date"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "($user2) /bin/date" "$sudoout"
+        dat=`date|cut -d " " -f1`
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_client $user1 root date"
+	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+	rlAssertGrep "($user2) /bin/date" "$sudoout"
+	rlAssertGrep "$dat" "$sudoout"
+	rlRun "cat $sudoout"
+
+        rlRun "start_ipa_master"
+
+        rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-remove-host sudorule1 --hostgroups=testhostgroup"
+        rlRun "ipa hostgroup-remove-member testhostgroup --hosts=$SUDOCLIENT"
+        rlRun "ipa hostgroup-del testhostgroup"
+        rlRun "ipa sudorule-add-host sudorule1 --hosts=$SUDOCLIENT"
+	rlRun "rm -fr $sudoout"
+
+rlPhaseEnd
+}
+
+sudorule-offline-caching-group() {
+
+rlPhaseStartTest "sudorule-offline-caching-group"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-remove-user sudorule1 --users=$user1"
+        rlRun "ipa group-add --desc='testgroup' testgroup"
+        rlRun "ipa group-add-member testgroup --users=$user1"
+        rlRun "ipa sudorule-add-user sudorule1 --groups=testgroup"
+
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        rlRun "sudo_list_client $user1 root date "
+        rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+        rlAssertGrep "(root) /bin/date" "$sudoout"
+        dat=`date|cut -d " " -f1`
+        rlAssertGrep "$dat" "$sudoout"
+        rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_client $user1 root date "
+        rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+        rlAssertGrep "(root) /bin/date" "$sudoout"
+        rlAssertGrep "$dat" "$sudoout"
+        rlRun "cat $sudoout"
+
+        rlRun "start_ipa_master"
+
+        rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-remove-user sudorule1 --groups=testgroup"
+        rlRun "ipa sudorule-add-user sudorule1 --users=$user1"
+        rlRun "ipa group-remove-member testgroup --users=$user1"
+        rlRun "ipa group-del testgroup"
+
+rlPhaseEnd
+}
+
+sudorule-offline-caching-option() {
+
+rlPhaseStartTest "sudorule-offline-caching-option"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-add-option sudorule1 --sudooption=!authenticate"
+
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        rlRun "sudo_list_wo_passwd_client $user1 root date "
+        rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+        rlAssertGrep "(root) NOPASSWD: /bin/date" "$sudoout"
+        dat=`date|cut -d " " -f1`
+        rlAssertGrep "$dat" "$sudoout"
+        rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_wo_passwd_client $user1 root date "
+        rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
+        rlAssertGrep "(root) NOPASSWD: /bin/date" "$sudoout"
+        rlAssertGrep "$dat" "$sudoout"
+        rlRun "cat $sudoout"
+
+        rlRun "start_ipa_master"
+
+        rlRun "ipa sudorule-remove-option sudorule1 --sudooption=!authenticate"
+        rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/date sudorule1"
+
+rlPhaseEnd
+}
+
+disable-sudorule-offline-caching() {
+
+rlPhaseStartTest "disable-sudorule-offline-caching"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        rlRun "ipa sudorule-add-allow-command --sudocmds=/bin/date sudorule1"
+        rlRun "ipa sudorule-disable sudorule1"
+
+        rlRun "rm -rf /var/lib/sss/db/*;service sssd restart;sleep 3"
+        rlRun "sudo_list_client $user1 root date "
+        rlAssertNotGrep "User $user1 may run the following commands on this host:" "$sudoout"
+        rlAssertNotGrep "(root) /bin/date" "$sudoout"
+        if [ $? -eq 1 ]; then
+          rlLog "Failing because of https://bugzilla.redhat.com/show_bug.cgi?id=912673"
+        fi
+        dat=`date|cut -d " " -f1`
+        rlAssertNotGrep "$dat" "$sudoout"
+        rlRun "cat $sudoout"
+
+        rlRun "stop_ipa_master"
+
+        rlRun "sudo_list_client $user1 root date "
+        rlAssertNotGrep "User $user1 may run the following commands on this host:" "$sudoout"
+        rlAssertNotGrep "(root) /bin/date" "$sudoout"
+        if [ $? -eq 1 ]; then
+          rlLog "Failing because of https://bugzilla.redhat.com/show_bug.cgi?id=912673"
+        fi
+        rlAssertNotGrep "$dat" "$sudoout"
+        rlRun "cat $sudoout"
+
+        rlRun "start_ipa_master"
+
+        rlRun "ipa sudorule-enable sudorule1"
+        rlRun "ipa sudorule-remove-allow-command --sudocmds=/bin/date sudorule1"
+
+rlPhaseEnd
+}
 
 cleanup-func() {
 
@@ -1065,11 +1573,10 @@ rlPhaseStartTest "sudo func cleanup"
         rlRun "ipa sudocmdgroup-del  sudogrp1"
 	rlRun "ipa sudorule-del sudorule1"
 
-rm -fr /var/lib/sss/db/cache_lab.eng.pnq.redhat.com.ldb 
+rm -fr /var/lib/sss/db/*
 rm -fr /tmp/krb5cc_1*
 rm -fr /tmp/sudo_list.out 
 service sssd restart
-
 
 rlPhaseEnd
 }
@@ -1172,15 +1679,48 @@ rlPhaseStartTest "Clean up for sudo functional tests"
         rlRun "kdestroy" 0 "Destroying admin credentials."
 
         # disabling NIS
-        rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
-        rlRun "ipa-nis-manage -y $TmpDir/passwd.txt disable"
-        rlRun "ipactl restart"
+        #rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
+        #rlRun "ipa-nis-manage -y $TmpDir/passwd.txt disable"
+        #rlRun "ipactl restart"
 
         rlRun "popd"
         rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
 
-	rlRun "rm -f $SUDO_LDAP_CONF_PATH"
-	rlFileRestore /etc/nsswitch.conf
+	#rlRun "rm -f $SUDO_LDAP_CONF_PATH"
+	#rlFileRestore /etc/nsswitch.conf
 rlPhaseEnd
 }
 
+stop_ipa_master()
+{
+       #Stoping ipa sevice on $MASTER
+        echo "service ipa stop" > $TmpDir/local.sh
+        chmod +x $TmpDir/local.sh
+        ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh
+        sleep 2
+}
+
+start_ipa_master()
+{
+      #Starting ipa sevice on $MASTER
+        echo "service ipa start" > $TmpDir/local.sh
+        chmod +x $TmpDir/local.sh
+        ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh
+        sleep 2
+}
+
+sssd_cache_cleanup()
+{
+       #Clean up sssd cache on $CLIENT
+        echo "rm -rf /var/lib/sss/db/*" > $TmpDir/local.sh
+        echo "service sssd restart" >> $TmpDir/local.sh
+        echo "sleep 3" >> $TmpDir/local.sh
+        chmod +x $TmpDir/local.sh
+        if [ -n $CLIENT ] ; then
+         ssh -o StrictHostKeyChecking=no root@$CLIENT 'bash -s' < $TmpDir/local.sh
+        else
+        sleep 2
+         ssh -o StrictHostKeyChecking=no root@$MASTER 'bash -s' < $TmpDir/local.sh
+        fi
+        sleep 2
+}

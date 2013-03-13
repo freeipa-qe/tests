@@ -116,10 +116,10 @@ rlPhaseStartTest "Setup for sudo sanity tests"
 	rlRun "service iptables stop"
 
 	# enabling NIS
-	rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
-	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=707133"
-	rlRun "ipa-nis-manage -y $TmpDir/passwd.txt enable"
-	rlRun "ipactl restart"
+	#rlRun "echo -n Secret123 > $TmpDir/passwd.txt"
+	#rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=707133"
+	#rlRun "ipa-nis-manage -y $TmpDir/passwd.txt enable"
+	#rlRun "ipactl restart"
 
 rlPhaseEnd
 }

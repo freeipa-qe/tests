@@ -220,15 +220,15 @@ functional() {
 	"sudorule-remove-deny-command_func001"
 	"sudorule-add-deny-commandgrp_func001"
 	"sudorule-remove-deny-commandgrp_func001"
-	"sudorule-add-host_func001"
-	"sudorule-remove-host_func001"
+	##"sudorule-add-host_func001"
+	##"sudorule-remove-host_func001"
 	"sudorule-add-hostgrp_func001"
 	"sudorule-remove-hostgrp_func001"
-	"sudorule-add-option_func001"
-	"sudorule-add-option_func002"
+	##"sudorule-add-option_func001"
+	##"sudorule-add-option_func002"
 	"sudorule-add-option_func003"
-	"sudorule-remove-option_func001"
-	"sudorule-remove-option_func002"
+	##"sudorule-remove-option_func001"
+	##"sudorule-remove-option_func002"
 	"sudorule-remove-option_func003"
 	"sudorule-add-runasuser_func001"
 	"sudorule-remove-runasuser_func001"
@@ -247,6 +247,18 @@ functional() {
 	"cleanup-func"
 }
 
+functional_client_offline() {
+	"sudorule-offline-caching-allow-command"
+	"sudorule-offline-caching-deny-command"
+	"sudorule-offline-caching-runasuser-command"
+	"sudorule-offline-caching-runasgroup-command"
+	"sudorule-offline-caching-hostgroup-command"
+	"sudorule-offline-caching-group"
+	"sudorule-offline-caching-option"
+	"disable-sudorule-offline-caching"
+	"cleanup-func"
+}
+
 TESTORDER=0
 
 rlJournalStart
@@ -256,8 +268,13 @@ rlJournalStart
 		rlLog "============================================"
 		cat /dev/shm/env.sh
 		rlLog "******* HOSTNAME = $HOSTNAME"
+                rpm -q libsss_sudo
+                if [ $? -eq 1 ];then
+                 rlRun "yum install libsss_sudo -y" 0 "Installing libsss_sudo for communication between SUDO and SSSD"
+                fi
 	rlPhaseEnd
 
+       
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa-sudo-cli-sanity-tests - cli regression and sanity tests for ipa sudo functionality"
 		if [ $(hostname) = "$CLIENT" ]; then
@@ -276,25 +293,27 @@ rlJournalStart
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartCleanup "ipa-sudo-cli-sanity-tests-cleanup"
-		rlLog
-	rlPhaseEnd
+	#rlPhaseStartCleanup "ipa-sudo-cli-sanity-tests-cleanup"
+	#	rlLog
+	#rlPhaseEnd
 
 	############## sudo cli functional tests #############
-	rlPhaseStartTest "ipa-sudo-func-tests - functional tests for ipa sudo"
-		rlLog
-	rlPhaseEnd
+	#rlPhaseStartTest "ipa-sudo-func-tests - functional tests for ipa sudo"
+	#	rlLog
+	#rlPhaseEnd
 
 	TESTORDER=$(( TESTORDER += 1 ))
 	rlPhaseStartTest "ipa-sudo-func-tests - functional and bugzilla tests for ipa sudo"
 		if [ $(hostname) = "$CLIENT" ]; then
 			func_setup_sudoclient
-
+                        functional_client_offline
+			func_cleanup
 			rlLog "rhts-sync-set -s '$TESTORDER.ipa_sudo_func.0' -m $BEAKERCLIENT"
 			rlRun "rhts-sync-set -s '$TESTORDER.ipa_sudo_func.0' -m $BEAKERCLIENT"
 
 			rlLog "rhts-sync-block -s '$TESTORDER.ipa_sudo_func.1' $BEAKERMASTER"
 			rlRun "rhts-sync-block -s '$TESTORDER.ipa_sudo_func.1' $BEAKERMASTER"
+
 		else
 			# On MASTER wait for func_setup_sudoclient to complete on client first
 			rlLog "rhts-sync-block -s '$TESTORDER.ipa_sudo_func.0' $BEAKERCLIENT"
@@ -321,9 +340,9 @@ rlJournalStart
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
-		rlLog
-	rlPhaseEnd
+	#rlPhaseStartCleanup "ipa-sudo-func-cleanup: Destroying admin credentials & and disabling nis."
+	#	rlLog
+	#rlPhaseEnd
 
 	rlJournalPrintText
 	report=/tmp/rhts.report.$RANDOM.txt
@@ -331,3 +350,4 @@ rlJournalStart
 	rhts-submit-log -l $report
 
 rlJournalEnd
+
