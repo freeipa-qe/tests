@@ -25,15 +25,15 @@ installMaster()
 	if [[ "$SKIPINSTALL" != "TRUE" ]] ; then
 
 	  if [[ "$IPv6SETUP" != "TRUE" ]] ; then
-		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /opt/rhqa_ipa/installipa.bash
 		rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 	  else
-		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+		echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /opt/rhqa_ipa/installipa.bash
                 rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 	  fi
         	setenforce 1
-		chmod 755 /dev/shm/installipa.bash
-        	rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+		chmod 755 /opt/rhqa_ipa/installipa.bash
+        	rlRun "/bin/bash /opt/rhqa_ipa/installipa.bash" 0 "Installing IPA Server"
 		# test kinit
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	fi
@@ -99,11 +99,11 @@ installSlave()
 	service ip6tables stop
         rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
 	rlRun "configAbrt"
-        cd /dev/shm/
+        cd /opt/rhqa_ipa/
         hostname_s=$(hostname -s)
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
         rlLog "Checking for existance of replica gpg file"
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
@@ -122,10 +122,10 @@ installSlave()
 
                 	rlRun "fixhostname" 0 "Fix hostname"
 			DelayUntilMasterReady
-			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                	chmod 755 /dev/shm/replica-install.bash
-                	rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-			rlRun "bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                	chmod 755 /opt/rhqa_ipa/replica-install.bash
+                	rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			if [[ "$IPv6SETUP" != "TRUE" ]] ; then

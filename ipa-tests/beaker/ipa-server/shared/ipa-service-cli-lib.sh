@@ -1,5 +1,5 @@
 #!/bin/sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/env.sh
 
 # Note - this file might not be used by any test.
 

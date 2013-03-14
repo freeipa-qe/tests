@@ -41,10 +41,10 @@
 # Include rhts and ipa environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/env.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/lib.user-cli.sh
-. /dev/shm/ipa-group-cli-lib.sh
+. /opt/rhqa_ipa/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/lib.user-cli.sh
+. /opt/rhqa_ipa/ipa-group-cli-lib.sh
 
 GROUPRDN="cn=groups,cn=accounts,"
 GROUPDN="$GROUPRDN$BASEDN"

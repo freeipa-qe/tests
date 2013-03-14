@@ -36,8 +36,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 # Include test case file
 . ./t.ipa-sudo.sh
@@ -266,7 +266,7 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-sudo-cli-sanity-tests-setup"
 		env|sort
 		rlLog "============================================"
-		cat /dev/shm/env.sh
+		cat /opt/rhqa_ipa/env.sh
 		rlLog "******* HOSTNAME = $HOSTNAME"
                 rpm -q libsss_sudo
                 if [ $? -eq 1 ];then

@@ -158,10 +158,10 @@ reconnect_slave1()
 		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf"
 
 		rlLog "Next re-install replica on $SLAVE1"
-		pushd /dev/shm
+		pushd /opt/rhqa_ipa
 		rlRun "sftp root@$MASTER_IP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		popd
-		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE1_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE1_IP -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 
 		rlRun "KinitAsAdmin"
 
@@ -229,10 +229,10 @@ reconnect_slave2()
 		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf"
 
 		rlLog "Next re-install replica on $SLAVE2"
-		pushd /dev/shm
+		pushd /opt/rhqa_ipa
 		rlRun "sftp root@$MASTER_IP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		popd
-		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE2_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE2_IP -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 
 		rlRun "KinitAsAdmin"
 
@@ -653,10 +653,10 @@ irm_list_negative_0004_full()
 		rlRun "echo \"nameserver $MASTER_IP\" > /etc/resolv.conf"
 
 		rlLog "Next re-install replica on $SLAVE2"
-		pushd /dev/shm
+		pushd /opt/rhqa_ipa
 		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		popd
-		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE2_IP -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --ip-address=$SLAVE2_IP -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE2"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.3' $BEAKERMASTER"

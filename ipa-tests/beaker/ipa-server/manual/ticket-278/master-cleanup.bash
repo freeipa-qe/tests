@@ -4,8 +4,8 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=783606
 # Run the master-setup.bash script on the master, then run the run-on-slave.bash script on the replica 
 # Run the master-cleanup.bash script to clean up the enviroment after complete
-. /dev/shm/env.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 
 NEWPORT=29719
 # number of users to add to server for replication

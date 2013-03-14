@@ -101,7 +101,7 @@ ipa_install_prep(){
 ipa_install_master_all(){
     USEDNS="yes"
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    DOMAIN=$(grep ^DOMAIN= /dev/shm/env.sh|cut -f2- -d=)
+    DOMAIN=$(grep ^DOMAIN= /opt/rhqa_ipa/env.sh|cut -f2- -d=)
     rlLog "ipa_install_master_all: Install and configure IPA Master with all services"
     case "$MYROLE" in
     "MASTER")
@@ -158,7 +158,7 @@ ipa_install_master_nodns(){
 ipa_install_slave_all(){
     USEDNS="yes"
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    DOMAIN=$(grep ^DOMAIN= /dev/shm/env.sh|cut -f2- -d=)
+    DOMAIN=$(grep ^DOMAIN= /opt/rhqa_ipa/env.sh|cut -f2- -d=)
     rlLog "ipa_install_slave_all: Install and configure IPA Replica/Slave"
     case "$MYROLE" in
     "MASTER")
@@ -179,17 +179,17 @@ ipa_install_slave_all(){
             rlRun "sed -i /$MYBEAKERMASTER/d ~/.ssh/known_hosts"
         fi
         rlRun "AddToKnownHosts $MASTER"
-        rlLog "pushd /dev/shm"
-        pushd /dev/shm
+        rlLog "pushd /opt/rhqa_ipa"
+        pushd /opt/rhqa_ipa
         if [ "x$USEDNS" = "xyes" ]; then
             REPLICAFQDN=$REPLICA_S.$DOMAIN
         else
             REPLICAFQDN=$REPLICA
         fi
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$REPLICAFQDN.gpg"
-        if [ -f /dev/shm/replica-info-$REPLICAFQDN.gpg ]; then
+        if [ -f /opt/rhqa_ipa/replica-info-$REPLICAFQDN.gpg ]; then
             ipa_install_prep
-            rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$REPLICAFQDN.gpg"
+            rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICAFQDN.gpg"
             replicaBugCheck_bz830314
         else
             rlFail "ERROR: Replica Package not found"
@@ -237,8 +237,8 @@ ipa_install_slave_nodns()
             rlRun "sed -i /$MYBEAKERMASTER/d ~/.ssh/known_hosts"
         fi
         rlRun "AddToKnownHosts $MASTER"
-        rlLog "pushd /dev/shm"
-        pushd /dev/shm
+        rlLog "pushd /opt/rhqa_ipa"
+        pushd /opt/rhqa_ipa
         if [ "x$USEDNS" = "xyes" ]; then
             REPLICAFQDN=$REPLICA_S.$DOMAIN
         else
@@ -246,9 +246,9 @@ ipa_install_slave_nodns()
         fi
         rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$REPLICAFQDN.gpg"
         rlLog "Checking for existance of replica gpg file"
-        if [ -f /dev/shm/replica-info-$REPLICAFQDN.gpg ]; then
+        if [ -f /opt/rhqa_ipa/replica-info-$REPLICAFQDN.gpg ]; then
             ipa_install_prep
-            rlRun "ipa-replica-install -U -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$REPLICAFQDN.gpg"
+            rlRun "ipa-replica-install -U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICAFQDN.gpg"
         else
             rlFail "ERROR: Replica Package not found"
         fi
@@ -283,7 +283,7 @@ ipa_install_client(){
     "CLIENT")
         rlLog "Machine in recipe is CLIENT"
         if [ "x$USEDNS" = "xyes" ]; then
-            DOMAIN=$(grep ^DOMAIN= /dev/shm/env.sh|cut -f2- -d=)
+            DOMAIN=$(grep ^DOMAIN= /opt/rhqa_ipa/env.sh|cut -f2- -d=)
         else
             DOMAIN=$(dnsdomainname)
         fi

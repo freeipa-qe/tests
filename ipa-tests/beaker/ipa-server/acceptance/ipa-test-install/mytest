@@ -17,10 +17,10 @@ export REPLICA_env2="beast.idm.lab.bos.redhat.com celeno.idm.lab.bos.redhat.com 
 
 cd ~/beaker/ipa-server/shared/
 make run
-sed -i 's/10.14.63.12/192.168.122.1/g' /dev/shm/env.sh
+sed -i 's/10.14.63.12/192.168.122.1/g' /opt/rhqa_ipa/env.sh
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 . ./ipa-install.sh
 
 rlJournalStart
@@ -28,4 +28,4 @@ rlJournalStart
 
 ipa_install_set_vars 
 
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/env.sh

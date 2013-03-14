@@ -51,8 +51,8 @@ Or, if in mountain view: http://hammer1.dsdev.sjc.redhat.com/bkr/jobs/$JOBID
 
 A seperate email will be sent once the reservation time has elapsed.
 
-Good luck" > /dev/shm/setup-email.txt
-        sendmail -fbeaker@redhat.com $SUBMITTER < /dev/shm/setup-email.txt
+Good luck" > /opt/rhqa_ipa/setup-email.txt
+        sendmail -fbeaker@redhat.com $SUBMITTER < /opt/rhqa_ipa/setup-email.txt
 }
 
 
@@ -74,8 +74,8 @@ and extend the reservation with the extendreservation.sh script.
 Find information on this job at: Watch the progress at: https://beaker.engineering.redhat.com/jobs/$JOBID
 Or, if in mountain view: http://hammer1.dsdev.sjc.redhat.com/bkr/jobs/$JOBID
 
-Have a nice day." > /dev/shm/end-email.txt
-        sendmail -fbeaker@redhat.com $SUBMITTER < /dev/shm/end-email.txt
+Have a nice day." > /opt/rhqa_ipa/end-email.txt
+        sendmail -fbeaker@redhat.com $SUBMITTER < /opt/rhqa_ipa/end-email.txt
 }
 
 send_end_notice()
@@ -86,8 +86,8 @@ This is the machine at $hostname,
 
 This machine is now being returned to the pool since $RESERVETIME seconds has elapsed
 
-Have a nice day." > /dev/shm/end-email.txt
-        sendmail -fbeaker@redhat.com $SUBMITTER < /dev/shm/end-email.txt
+Have a nice day." > /opt/rhqa_ipa/end-email.txt
+        sendmail -fbeaker@redhat.com $SUBMITTER < /opt/rhqa_ipa/end-email.txt
 }
 
 send_extended_email()
@@ -102,26 +102,26 @@ This machines reservation has been extended by $moreseconds seconds.
 
 This reservation should expire at $enddate
 
-Have a nice day." > /dev/shm/end-email.txt
-        sendmail -fbeaker@redhat.com $SUBMITTER < /dev/shm/end-email.txt
+Have a nice day." > /opt/rhqa_ipa/end-email.txt
+        sendmail -fbeaker@redhat.com $SUBMITTER < /opt/rhqa_ipa/end-email.txt
 }
 
 rlJournalStart
 
 	send_start_notice
 	rlPhaseStartSetup "Make sure RESERVETIME was specified"
-		if [ ! -f /dev/shm/reservetime.txt ]; then
-			echo $RESERVETIME >> /dev/shm/reservetime.txt
+		if [ ! -f /opt/rhqa_ipa/reservetime.txt ]; then
+			echo $RESERVETIME >> /opt/rhqa_ipa/reservetime.txt
 		else
-			rm -f /dev/shm/reservetime.txt
+			rm -f /opt/rhqa_ipa/reservetime.txt
 		fi
-		rlRun "ls /dev/shm/reservetime.txt" 0 "Making sure RESERVETIME was defined in this job"
+		rlRun "ls /opt/rhqa_ipa/reservetime.txt" 0 "Making sure RESERVETIME was defined in this job"
 	rlPhaseEnd
 
 	rlPhaseStartSetup "Make sure RESERVETIME is less than 20160 min"
 		let maxseconds=1209600
 		if [ $RESERVETIME -gt $maxseconds ]; then
-			echo $RESERVETIME >> /dev/shm/toomanyseconds.txt
+			echo $RESERVETIME >> /opt/rhqa_ipa/toomanyseconds.txt
 			rlLog "ERROR - Reserve time is greater than 2 weeks.(1209600 seconds) Exiting"
 			echo "ERROR - Reserve time is greater than 2 weeks. Exiting"
 			rlFail "ERROR - reserve seconds was greater than 1209600"
@@ -132,9 +132,9 @@ rlJournalStart
 			sleep 60
 			exit
 		else
-			rm -f /dev/shm/toomanyseconds.txt
+			rm -f /opt/rhqa_ipa/toomanyseconds.txt
 		fi
-		rlRun "ls /dev/shm/toomanyseconds.txt" 2 "Making sure RESERVETIME is 1209600 (ie 20160 minuites, ie 14 days) or less"
+		rlRun "ls /opt/rhqa_ipa/toomanyseconds.txt" 2 "Making sure RESERVETIME is 1209600 (ie 20160 minuites, ie 14 days) or less"
 	rlPhaseEnd
 
 	rlPhaseStartSetup "gathering start time"

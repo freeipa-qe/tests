@@ -35,7 +35,7 @@ setup-nis-server()
 	# Install RPMs
 	yum -y install $NIS_SERVER_PACKAGES
 
-	# Exit if NISDOMAIN variable not set.  Should come from /dev/shm/env.sh
+	# Exit if NISDOMAIN variable not set.  Should come from /opt/rhqa_ipa/env.sh
 	if [ -z "$NISDOMAIN" ]; then
 		echo "NISDOMAIN env var not set"
 		return 1

@@ -37,8 +37,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 # Init master var
 export master=0;
@@ -93,13 +93,13 @@ rlJournalStart
 	ipaddressa="33.44.55.66"
 	ipaddressb="99.88.77.66"
 	badipaddressa="333.111.222.444"
-	jsonfile=/dev/shm/forms-cli-json.script
-	jsonfilegrp=/dev/shm/forms-cli-json-grp.script
-	jsonfilegrpdel=/dev/shm/forms-cli-json-grp-del.script
-	jsondnsadda=/dev/shm/forms-cli-add-dnsa.script
-	jsondnsaddb=/dev/shm/forms-cli-add-dnsb.script
-	badjsondnsadda=/dev/shm/forms-cli-add-badjsondnsadda.script
-	jsondnsdela=/dev/shm/forms-cli-del-dnsa.script
+	jsonfile=/opt/rhqa_ipa/forms-cli-json.script
+	jsonfilegrp=/opt/rhqa_ipa/forms-cli-json-grp.script
+	jsonfilegrpdel=/opt/rhqa_ipa/forms-cli-json-grp-del.script
+	jsondnsadda=/opt/rhqa_ipa/forms-cli-add-dnsa.script
+	jsondnsaddb=/opt/rhqa_ipa/forms-cli-add-dnsb.script
+	badjsondnsadda=/opt/rhqa_ipa/forms-cli-add-badjsondnsadda.script
+	jsondnsdela=/opt/rhqa_ipa/forms-cli-del-dnsa.script
 
 echo "{
     \"method\":\"user_add\",
@@ -167,7 +167,7 @@ set_systime()
 
 
 	rlPhaseStartTest "forms-cli-02: Ensure that json script does not work without a valid session ID"
-		outputf=/dev/shm/forms-tmp-out.txt
+		outputf=/opt/rhqa_ipa/forms-tmp-out.txt
 		curl -v -H "Content-Type:application/json" -H "Referer: https://$MASTER/ipa/xml" -H "Accept:application/json"  -H "Accept-Language:en" --cacert /etc/ipa/ca.crt -d  @$jsonfile -X POST -b "ipa_session=0e1fb49d6d46c237e9f3584c96467e1; httponly; Path=/ipa; secure" https://$MASTER/ipa/session/json &> $outputf 
 		rlRun "grep 401\ Unauthorized $outputf" 0 "Make sure that the output of the curl request seems to have failed"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -175,8 +175,8 @@ set_systime()
 		rlRun "kdestroy" 0 "destroy any credentials that may already exist"
 	rlPhaseEnd
 
-	loginfile=/dev/shm/loginfile.txt
-	responsefile=/dev/shm/loginresponsefile.txt
+	loginfile=/opt/rhqa_ipa/loginfile.txt
+	responsefile=/opt/rhqa_ipa/loginresponsefile.txt
 	rlPhaseStartTest "forms-cli-03: ensure that you cannot get a valid session id with bad credentials."
 		echo "user=admin&password=Badpw168" > $loginfile
 		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' "https://$MASTER/ipa/session/login_password" -X POST -d @$loginfile
@@ -281,7 +281,7 @@ ipa dnsrecord-find $DOMAIN $dnsrecname
 		ipa user-add --first=u1 --last=u1 uu
 		echo passwd | ipa passwd uu
 
-		responsefile=/dev/shm/r1
+		responsefile=/opt/rhqa_ipa/r1
 		echo "user=uu&password=passwd" > $loginfile
 		echo "curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile"
 		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile
@@ -292,7 +292,7 @@ ipa dnsrecord-find $DOMAIN $dnsrecname
 date
 		set_systime 89000
 date		
-		responsefile=/dev/shm/r2
+		responsefile=/opt/rhqa_ipa/r2
 		echo "curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile"
 		curl -v --dump-header $responsefile -k -H 'Content-Type: application/x-www-form-urlencoded' https://$MASTER/ipa/session/login_password -X POST -d @$loginfile
 		rlRun "grep password-expired $responsefile" 0 "Make sure that the response header message that password has been expired" #Added correct error message to be verified as per bug.

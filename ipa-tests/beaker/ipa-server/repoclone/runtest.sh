@@ -58,8 +58,8 @@ if [ -x $iparepo ]; then
 	export iparepo="http://jdennis.fedorapeople.org/ipa-devel/ipa-devel-fedora.repo"
 fi
 
-	rlPhaseStartSetup "list files in /dev/shm"
-		rlRun "ls /dev/shm"
+	rlPhaseStartSetup "list files in /opt/rhqa_ipa"
+		rlRun "ls /opt/rhqa_ipa"
 	rlPhaseEnd
 
 	rlPhaseStartTest "run the repobackup now"
@@ -108,9 +108,9 @@ fi
 /etc/init.d/yum-updatesd stop
 
 # Cleaning up beaker repo files 
-rm -rf /dev/shm/beakerrepo
-mkdir -p /dev/shm/beakerrepo
-mv /etc/yum.repos.d/beaker* /dev/shm/beakerrepo/.
+rm -rf /opt/rhqa_ipa/beakerrepo
+mkdir -p /opt/rhqa_ipa/beakerrepo
+mv /etc/yum.repos.d/beaker* /opt/rhqa_ipa/beakerrepo/.
 
 yum clean all
 yum -y erase fedora-ds-base fedora-ds-base-devel 
@@ -157,7 +157,7 @@ fi
 if [ "$VARIANT" = "rhel" ]; then
 	VER=$(cat /etc/redhat-release | cut -d\  -f7)
 	rm -f /etc/yum.repos.d/rhel-gold.repo
-	cp /dev/shm/rhel-gold.repo /etc/yum.repos.d/.
+	cp /opt/rhqa_ipa/rhel-gold.repo /etc/yum.repos.d/.
 fi
 
 tempdir="/root/dist/$VARIANT/$VER/$ARCH"
@@ -204,7 +204,7 @@ cd /root/dist;rsync -av * /mnt/nfslocation/archives/ipa/$datecode/.
 chmod -Rf 755 /mnt/nfslocation/archives/ipa/$datecode/*
 
 rlRun "umount /mnt/nfslocation" 0 "Unmounting nfs share"
-cp -a /dev/shm/beakerrepo/*.repo /etc/yum.repos.d/.
+cp -a /opt/rhqa_ipa/beakerrepo/*.repo /etc/yum.repos.d/.
 
 	rlPhaseEnd
 

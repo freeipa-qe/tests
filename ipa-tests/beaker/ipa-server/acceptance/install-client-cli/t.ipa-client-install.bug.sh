@@ -138,7 +138,7 @@ ipaclientinstall_dirty_keytab()
         rlLog "Test for BZ 817869, install ipa-client with a dirty keytab"
         uninstall_fornexttest
         # Backup keytab 
-        bkup="/dev/shm/ipa-client-backup-keytab"
+        bkup="/opt/rhqa_ipa/ipa-client-backup-keytab"
         ktab="/etc/krb5.keytab"
 		rlRun "scp $MASTER:/etc/krb5.keytab /etc/krb5.keytab"
         cp -a $ktab $bkup

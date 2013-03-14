@@ -29,8 +29,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 # Include the data file to verify tests
 . ./data.ipaserverinstall.acceptance
@@ -39,7 +39,7 @@
 . ./t.ipa-server-install.sh
 . ./lib.ipaserververify.sh
 #. ../quickinstall/install-lib.sh
-. /dev/shm/install-lib.sh
+. /opt/rhqa_ipa/install-lib.sh
 
 
 PACKAGE="ipa-client"

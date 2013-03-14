@@ -1,10 +1,10 @@
 #!/bin/sh
 # 1 is the nis domain, 2 is the nis master server
 
-ypcat -d $1 -h $2 hosts | egrep -v "localhost|127.0.0.1" > /dev/shm/nis-map.hosts 2>&1
+ypcat -d $1 -h $2 hosts | egrep -v "localhost|127.0.0.1" > /opt/rhqa_ipa/nis-map.hosts 2>&1
 
 IFS=$'\n'
-for line in $(cat /dev/shm/nis-map.hosts); do 
+for line in $(cat /opt/rhqa_ipa/nis-map.hosts); do 
 	IFS=' '
 	ipaddress=$(echo $line|awk '{print $1}')
 	hostname=$(echo $line|awk '{print $2}')

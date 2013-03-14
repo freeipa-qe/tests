@@ -38,7 +38,7 @@
 . ./ipa-server-shared.sh
 . ./ipa-install.sh
 . ./lib.ipa-quicktest.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/env.sh
 
 # Include test case files
 for file in $(ls tests.d/t.*.sh); do

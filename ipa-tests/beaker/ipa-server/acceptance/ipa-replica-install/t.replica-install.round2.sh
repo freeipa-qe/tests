@@ -36,7 +36,7 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 . ./install-lib.sh
 . ./t.replica-install.bug.sh
 . ./t.replica-install.sh
@@ -73,8 +73,8 @@ uninstallSlave()
 		if [ -f /var/lib/sss/pubconf/kdcinfo.$RELM ]; then
 			rlRun "rm -f /var/lib/sss/pubconf/kdcinfo.$RELM"
 		fi
-		if [ -f /dev/shm/replica-info-$SLAVE.gpg ]; then
-			rlRun "rm -f /dev/shm/replica-info-$SLAVE.gpg"
+		if [ -f /opt/rhqa_ipa/replica-info-$SLAVE.gpg ]; then
+			rlRun "rm -f /opt/rhqa_ipa/replica-info-$SLAVE.gpg"
 		fi
 
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE"
@@ -126,8 +126,8 @@ installSlave_nr_0001()
 		[ $(grep $(echo $SLAVE|cut -f1 -d.) /etc/hosts|wc -l) -eq 0 ] && \
 			rlRun "echo '$SLAVEIP $SLAVE $SLAVE_S' >> /etc/hosts"
 		
-		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE.gpg /dev/shm"
-		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg"
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE.gpg /opt/rhqa_ipa"
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg"
 
 		rlRun "ipa dnszone-show $SLAVEZONE" 
 		rlRun "ipa dnszone-show $ZONE1"
@@ -177,8 +177,8 @@ installSlave_nr_0001_cleanup()
 		rlLog "Machine in recipe is SLAVE ($(hostname))"
 		rlRun "rhts-sync-block -s '$FUNCNAME.$TESTORDER.1' $BEAKERMASTER"
 
-		[ -f /dev/shm/replica-info-$SLAVE.gpg ] && \
-			rlRun "rm -f /dev/shm/replica-info-$SLAVE.gpg"
+		[ -f /opt/rhqa_ipa/replica-info-$SLAVE.gpg ] && \
+			rlRun "rm -f /opt/rhqa_ipa/replica-info-$SLAVE.gpg"
 		
 		rlRun "rhts-sync-set -s '$FUNCNAME.$TESTORDER.2' -m $BEAKERSLAVE"
 		;;
@@ -225,8 +225,8 @@ installSlave_nr_0002()
 		[ $(grep $(echo $MASTER|cut -f1 -d.) /etc/hosts|wc -l) -eq 0 ] && \
 			rlRun "echo '$MASTERIP $MASTER $MASTER_S' >> /etc/hosts"
 		
-		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE.gpg /dev/shm"
-		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg"
+		rlRun "sftp root@$MASTER:/var/lib/ipa/replica-info-$SLAVE.gpg /opt/rhqa_ipa"
+		rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg"
 
 		rlRun "ipa dnszone-show $SLAVEZONE" 
 		

@@ -731,7 +731,7 @@ dnslocrecord()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-locrecord-03 make sure that dig can find the record type loc"
-		file="/dev/shm/dig-loc-result.txt"
+		file="/opt/rhqa_ipa/dig-loc-result.txt"
 		dig $zone LOC > $file
 		cat $file
 		rlRun "grep '$loclong' $file" 0 "make sure dig can find the loc record looking for long"

@@ -3,7 +3,7 @@
 ipa automountlocation-add $1
 
 # 2 is the nis domain, 3 is the nis master server, 4 is the map name
-ypcat -k -d $2 -h $3 $4 > /dev/shm/nis-map.$4 2>&1
+ypcat -k -d $2 -h $3 $4 > /opt/rhqa_ipa/nis-map.$4 2>&1
 
 ipa automountmap-add $1 $4
 
@@ -21,7 +21,7 @@ EOF
 ldapadd -x -h $3 -D "cn=directory manager" -w secret -f /tmp/amap.ldif
 
 IFS=$'\n'
-for line in $(cat /dev/shm/nis-map.$4); do 
+for line in $(cat /opt/rhqa_ipa/nis-map.$4); do 
 	IFS=" "
 	key=$(echo "$line" | awk '{print $1}')
 	info=$(echo "$line" | sed -e "s#^$key[ \t]*##")

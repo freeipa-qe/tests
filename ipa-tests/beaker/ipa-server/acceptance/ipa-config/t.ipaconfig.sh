@@ -761,8 +761,8 @@ ipaconfig_ticket_2159()
 {
 	# Testcase covering https://fedorahosted.org/freeipa/ticket/2159
 	rlPhaseStartTest "Testcase covering ticket 2159"
-		ipa config-mod --groupsearch= &> /dev/shm/2159out.txt
-		rlRun "grep Traceback  /dev/shm/2159out.txt" 1 "Making sure that running a empty groupsearch did not return a exception"
+		ipa config-mod --groupsearch= &> /opt/rhqa_ipa/2159out.txt
+		rlRun "grep Traceback  /opt/rhqa_ipa/2159out.txt" 1 "Making sure that running a empty groupsearch did not return a exception"
 	rlPhaseEnd
 }
 

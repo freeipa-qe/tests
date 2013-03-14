@@ -17,13 +17,13 @@ fixHostFile()
     # Now, fix the hosts file to work with IPA.
     hostname=$(hostname)
     hostname_s=$(hostname -s)
-    cat /etc/hosts | grep -v ^$ipaddr > /dev/shm/hosts
+    cat /etc/hosts | grep -v ^$ipaddr > /opt/rhqa_ipa/hosts
  
     # Remove any existing hostname entries from the hosts file
-    sed -i s/$hostname//g /dev/shm/hosts
-    sed -i s/$hostname_s//g /dev/shm/hosts
-    echo "$ipaddr $hostname_s.$DOMAIN $hostname_s" >> /dev/shm/hosts
-    cat /dev/shm/hosts > /etc/hosts
+    sed -i s/$hostname//g /opt/rhqa_ipa/hosts
+    sed -i s/$hostname_s//g /opt/rhqa_ipa/hosts
+    echo "$ipaddr $hostname_s.$DOMAIN $hostname_s" >> /opt/rhqa_ipa/hosts
+    cat /opt/rhqa_ipa/hosts > /etc/hosts
     rlLog "Hosts file contains:"
     output=`cat /etc/hosts`
     rlLog "$output"
@@ -50,13 +50,13 @@ fixHostFileIPv6()
     # Now, fix the hosts file to work with IPA.
     hostname=$(hostname)
     hostname_s=$(hostname -s)
-    #cat /etc/hosts | grep -v ^$ipv6addr > /dev/shm/hosts
+    #cat /etc/hosts | grep -v ^$ipv6addr > /opt/rhqa_ipa/hosts
 
     # Remove any existing hostname entries from the hosts file
-    # sed -i s/$hostname//g /dev/shm/hosts
-    # sed -i s/$hostname_s//g /dev/shm/hosts
-    echo "$ipv6addr $hostname_s.$DOMAIN $hostname_s" >> /dev/shm/hosts
-    cat /dev/shm/hosts > /etc/hosts
+    # sed -i s/$hostname//g /opt/rhqa_ipa/hosts
+    # sed -i s/$hostname_s//g /opt/rhqa_ipa/hosts
+    echo "$ipv6addr $hostname_s.$DOMAIN $hostname_s" >> /opt/rhqa_ipa/hosts
+    cat /opt/rhqa_ipa/hosts > /etc/hosts
     rlLog "Hosts file contains:"
     output=`cat /etc/hosts`
     rlLog "$output"
@@ -75,10 +75,10 @@ fixhostname()
     # Fix hostname
     rlRun "hostname $hostname_s.$DOMAIN"
     hostname $hostname_s.$DOMAIN
-    cat /etc/sysconfig/network | grep -v $hostname_s > /dev/shm/network
-    echo "HOSTNAME=$hostname_s.$DOMAIN" >> /dev/shm/network
+    cat /etc/sysconfig/network | grep -v $hostname_s > /opt/rhqa_ipa/network
+    echo "HOSTNAME=$hostname_s.$DOMAIN" >> /opt/rhqa_ipa/network
     mv /etc/sysconfig/network /etc/sysconfig/network-ipabackup
-    cat /dev/shm/network > /etc/sysconfig/network
+    cat /opt/rhqa_ipa/network > /etc/sysconfig/network
     rlLog "/etc/sysconfig/network contains:"
     output=`cat /etc/sysconfig/network`
     rlLog "$output"
@@ -153,30 +153,30 @@ appendEnv()
   # Adding MASTER and SLAVE bits to env.sh
   master_short=`echo $MASTER | cut -d "." -f1`
   MASTER=$master_short.$DOMAIN
-  echo "export MASTER=$MASTER" >> /dev/shm/env.sh
-  echo "export MASTERIP=$ipaddr" >> /dev/shm/env.sh
+  echo "export MASTER=$MASTER" >> /opt/rhqa_ipa/env.sh
+  echo "export MASTERIP=$ipaddr" >> /opt/rhqa_ipa/env.sh
   if [ "$SLAVE" != "" ]; then
 	slave_short=`echo $SLAVE | cut -d "." -f1`
   	SLAVE=$slave_short.$DOMAIN
         slaveipaddr=$(dig +noquestion $SLAVE  | grep A | grep $SLAVE | grep IN | awk '{print $5}')
-	echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
-        echo "export SLAVEIP=$slaveipaddr" >> /dev/shm/env.sh
+	echo "export SLAVE=$SLAVE" >> /opt/rhqa_ipa/env.sh
+        echo "export SLAVEIP=$slaveipaddr" >> /opt/rhqa_ipa/env.sh
   fi
   if [ "$CLIENT" != "" ]; then
 	client_short=`echo $CLIENT | cut -d "." -f1`
 	CLIENT=$client_short.$DOMAIN
-	echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
+	echo "export CLIENT=$CLIENT" >> /opt/rhqa_ipa/env.sh
   fi
 
   if [ "$CLIENT2" != "" ]; then
         client2_short=`echo $CLIENT2 | cut -d "." -f1`
         CLIENT2=$client2_short.$DOMAIN
-        echo "export CLIENT2=$CLIENT2" >> /dev/shm/env.sh
+        echo "export CLIENT2=$CLIENT2" >> /opt/rhqa_ipa/env.sh
   fi
 
 
   rlLog "Contents of env.sh are"
-  output=`cat /dev/shm/env.sh`
+  output=`cat /opt/rhqa_ipa/env.sh`
   rlLog "$output"
 }
 
@@ -189,29 +189,29 @@ appendEnvIPv6()
   # Adding MASTER and SLAVE bits to env.sh
   master_short=`echo $MASTER | cut -d "." -f1`
   MASTER=$master_short.$DOMAIN
-  echo "export MASTER=$MASTER" >> /dev/shm/env.sh
-  echo "export MASTERIP=$ipv6addr" >> /dev/shm/env.sh
+  echo "export MASTER=$MASTER" >> /opt/rhqa_ipa/env.sh
+  echo "export MASTERIP=$ipv6addr" >> /opt/rhqa_ipa/env.sh
   if [ "$SLAVE" != "" ]; then
         slave_short=`echo $SLAVE | cut -d "." -f1`
         SLAVE=$slave_short.$DOMAIN
         slaveipv6addr=$(nslookup -type=AAAA $SLAVE | grep "has AAAA" | awk '{print $5}')
-        echo "export SLAVE=$SLAVE" >> /dev/shm/env.sh
-        echo "export SLAVEIP=$slaveipv6addr" >> /dev/shm/env.sh
+        echo "export SLAVE=$SLAVE" >> /opt/rhqa_ipa/env.sh
+        echo "export SLAVEIP=$slaveipv6addr" >> /opt/rhqa_ipa/env.sh
   fi
   if [ "$CLIENT" != "" ]; then
         client_short=`echo $CLIENT | cut -d "." -f1`
         CLIENT=$client_short.$DOMAIN
-        echo "export CLIENT=$CLIENT" >> /dev/shm/env.sh
+        echo "export CLIENT=$CLIENT" >> /opt/rhqa_ipa/env.sh
   fi
 
   if [ "$CLIENT2" != "" ]; then
         client2_short=`echo $CLIENT2 | cut -d "." -f1`
         CLIENT2=$client2_short.$DOMAIN
-        echo "export CLIENT2=$CLIENT2" >> /dev/shm/env.sh
+        echo "export CLIENT2=$CLIENT2" >> /opt/rhqa_ipa/env.sh
   fi
 
   rlLog "Contents of env.sh are"
-  output=`cat /dev/shm/env.sh`
+  output=`cat /opt/rhqa_ipa/env.sh`
   rlLog "$output"
 }
 
@@ -221,9 +221,9 @@ appendEnvIPv6()
 fixForwarderIPv6()
 {
   ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | head -1)
-  sed -i "s/10.14.63.12/$ipv6addr/g" /dev/shm/env.sh
-  . /dev/shm/env.sh
-  rlRun "cat /dev/shm/env.sh"
+  sed -i "s/10.14.63.12/$ipv6addr/g" /opt/rhqa_ipa/env.sh
+  . /opt/rhqa_ipa/env.sh
+  rlRun "cat /opt/rhqa_ipa/env.sh"
   rlLog "fixing DNSFORWARD in env.sh"
 }
 
@@ -244,8 +244,8 @@ rmIPv4addr()
 #################################################################
 SetUpAuthKeys()
 {
-   PUBKEY=/dev/shm/id_rsa_global.pub
-   PRIVATEKEY=/dev/shm/id_rsa_global
+   PUBKEY=/opt/rhqa_ipa/id_rsa_global.pub
+   PRIVATEKEY=/opt/rhqa_ipa/id_rsa_global
    SSHROOT=/root/.ssh/
    PUBKEYFILE=$SSHR0OT/id_rsa
    AUTHKEYFILE=$SSHROOT/authorized_keys

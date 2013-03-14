@@ -1,13 +1,13 @@
 #!/bin/bash
 
-. /dev/shm/ipa-automember-cli-lib.sh
+. /opt/rhqa_ipa/ipa-automember-cli-lib.sh
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-group-cli-lib.sh
-. /dev/shm/ipa-hostgroup-cli-lib.sh
-. /dev/shm/ipa-host-cli-lib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-group-cli-lib.sh
+. /opt/rhqa_ipa/ipa-hostgroup-cli-lib.sh
+. /opt/rhqa_ipa/ipa-host-cli-lib.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 kinitAs $ADMINID $ADMINPW
 ipa hostgroup-add --desc=hg1 hg1

@@ -77,8 +77,8 @@ irm_bugcheck_831661()
 	rlPhaseStartTest "irm_bug_831661 - ipa-replica-manage re-initialize update failed due to named ldap timeout"
 		OUTPUTCHK=$(grep "reports: Update failed! Status.*System error" $tmpout|wc -l)
 		
-		sftp root@$logserver:/var/log/messages /dev/shm/messages.$logserver
-		SYSLOGCHK=$(grep "named.*LDAP query timed out. Try to adjust.*timeout" /dev/shm/messages.$logserver|wc -l)
+		sftp root@$logserver:/var/log/messages /opt/rhqa_ipa/messages.$logserver
+		SYSLOGCHK=$(grep "named.*LDAP query timed out. Try to adjust.*timeout" /opt/rhqa_ipa/messages.$logserver|wc -l)
 		if [ $OUTPUTCHK -gt 0 -a $SYSLOGCHK -gt 0 ]; then
 			rlFail "BZ 831661 found...ipa-replica-manage re-initialize update failed due to named ldap timeout"
 		else

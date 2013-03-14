@@ -7,15 +7,15 @@
         123: NTP 
 
 tmpout=/tmp/error_msg.out
-rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$SLAVE.gpg /dev/shm"
+rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$SLAVE.gpg /opt/rhqa_ipa"
 
 rlRun "ipa-replica-conncheck --master $MASTER --auto-master-check --realm $RELM --principal admin --hostname $SLAVE --password $ADMINPW > $tmpout 2>&1" 1
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg"
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg"
 
 ########### HTTP ###############
 rlLog "Testing HTTP TCP and UDP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 80  -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "HTTP Server: Unsecure port (80): FAILED" $tmpout
 rlAssertGrep "Port check failed! Inaccessible port(s): 80 (TCP)" $tmpout
 rlRun "cat $tmpout"
@@ -24,7 +24,7 @@ rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 80  -j REJECT
 ########### HTTPS ##############
 rlLog "Testing HTTPS TCP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 443 -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "HTTP Server: Secure port (443): FAILED" $tmpout
 rlAssertGrep "Port check failed! Inaccessible port(s): 443 (TCP)" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 443 -j REJECT --reject-with icmp-host-prohibited'"
@@ -32,7 +32,7 @@ rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 443 -j REJECT
 ########### LDAP ##############
 rlLog "Testing LDAP TCP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 389 -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "Directory Service: Unsecure port (389): FAILED" $tmpout
 rlAssertGrep "Port check failed! Inaccessible port(s): 389 (TCP)" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 389 -j REJECT --reject-with icmp-host-prohibited'"
@@ -40,7 +40,7 @@ rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 389 -j REJECT
 ########### LDAPS ##############
 rlLog "Testing LDAPS TCP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 636 -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "Directory Service: Secure port (636): FAILED" $tmpout
 rlAssertGrep "Port check failed! Inaccessible port(s): 636 (TCP)" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 636 -j REJECT --reject-with icmp-host-prohibited'"
@@ -48,7 +48,7 @@ rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 636 -j REJECT
 ########### Kerberos KDC TCP ##############
 rlLog "Testing Kerberos KDC TCP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 88  -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "Kerberos KDC: TCP (88): FAILED" $tmpout
 rlAssertGrep "Port check failed! Inaccessible port(s): 88 (TCP)" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 88  -j REJECT --reject-with icmp-host-prohibited'"
@@ -56,7 +56,7 @@ rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 88  -j REJECT
 ########### Kerberos Kpasswd TCP ##############
 rlLog "Testing Kerberos Kpasswd TCP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "Kerberos Kpasswd: TCP (464): FAILED" $tmpout
 rlAssertGrep "Port check failed! Inaccessible port(s): 464 (TCP)" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"
@@ -66,7 +66,7 @@ rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 464 -j REJECT
 ########### Kerberos KDC UDP  ##############
 rlLog "Testing Kerberos KDC UDP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m udp -p udp --dport 88 -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "REPLACMENOW" $tmpout
 rlAssertGrep "REPLACEMENOW" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m udp -p udp --dport 88 -j REJECT --reject-with icmp-host-prohibited'"
@@ -83,7 +83,7 @@ rlRun "rm -f /var/lib/sss/pubconf/kdcinfo.$RELM"
 ########### Kerberos Kpasswd UDP ##############
 rlLog "Testing Kerberos Kpasswd UDP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m udp -p udp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "REPLACMENOW" $tmpout
 rlAssertGrep "REPLACEMENOW" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m udp -p udp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"
@@ -96,7 +96,7 @@ rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m udp -p udp --dport 464 -j REJECT
 ########### NTP UDP ##############
 rlLog "Testing NTP UDP port access"
 rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m udp -p udp --dport 123 -j REJECT --reject-with icmp-host-prohibited'"
-rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 rlAssertGrep "REPLACMENOW" $tmpout
 rlAssertGrep "REPLACEMENOW" $tmpout
 rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m udp -p udp --dport 123 -j REJECT --reject-with icmp-host-prohibited'"

@@ -53,7 +53,7 @@ installMaster
 	* fixes the hostname
 	* installs ipa server with dns and dogtag
 	* tests kinit as admin
-	* appends to /dev/shm/env.sh machine information of all
+	* appends to /opt/rhqa_ipa/env.sh machine information of all
 	  machines in the job xml recipe set
 
    TEST 2:
@@ -68,13 +68,13 @@ installReplica
 	* sftp to master to get replica package
 	* installs replica
 	* test kinit as admin
-	* appends to /dev/shm/env.sh machine information of all
+	* appends to /opt/rhqa_ipa/env.sh machine information of all
           machines in the job xml recipe set
 
 installClient
    TEST 1:
 	* syncs to corporate ntp server
-	* appends to /dev/shm/env.sh machine information of all
+	* appends to /opt/rhqa_ipa/env.sh machine information of all
           machines in the job xml recipe set
 	* fixes the hosts file
         * fixes the hostname

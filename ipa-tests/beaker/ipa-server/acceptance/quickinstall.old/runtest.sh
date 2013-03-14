@@ -29,8 +29,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 . ./install-lib.sh
 
 # include tests
@@ -57,16 +57,16 @@ rlJournalStart
         rlLog "CLIENT: $CLIENT"
         rlLog "CLIENT2: $CLIENT2"
    
-        echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
-        echo "export BEAKERSLAVE=\"$SLAVE\"" >> /dev/shm/env.sh
-	echo "export BEAKERCLIENT=$CLIENT" >> /dev/shm/env.sh
-	echo "export BEAKERCLIENT2=$CLIENT2" >> /dev/shm/env.sh
+        echo "export BEAKERMASTER=$MASTER" >> /opt/rhqa_ipa/env.sh
+        echo "export BEAKERSLAVE=\"$SLAVE\"" >> /opt/rhqa_ipa/env.sh
+	echo "export BEAKERCLIENT=$CLIENT" >> /opt/rhqa_ipa/env.sh
+	echo "export BEAKERCLIENT2=$CLIENT2" >> /opt/rhqa_ipa/env.sh
 
 	I=0
 	for S in $SLAVE; do
 		I=$(( I += 1 ))
-		echo "export BEAKERSLAVE${I}=$S" >> /dev/shm/env.sh
-		echo "export BEAKERSLAVE${I}IP=$(dig +noquestion +short $S)" >> /dev/shm/env.sh
+		echo "export BEAKERSLAVE${I}=$S" >> /opt/rhqa_ipa/env.sh
+		echo "export BEAKERSLAVE${I}IP=$(dig +noquestion +short $S)" >> /opt/rhqa_ipa/env.sh
 	done
 
 	cat /etc/redhat-release | grep "Fedora"
@@ -291,11 +291,11 @@ rlJournalStart
                 rlLog "Machine in recipe in not a CLIENT2"
         fi
 
-	# Back up /dev/shm for use after rebooting on the host machine
-	rlLog "Backing up /dev/shm to /root/dev-shm-backup"
+	# Back up /opt/rhqa_ipa for use after rebooting on the host machine
+	rlLog "Backing up /opt/rhqa_ipa to /root/dev-shm-backup"
 	mkdir -p  /root/dev-shm-backup
-	rsync -av /dev/shm/* /root/dev-shm-backup/.	
-	rlLog "/dev/shm backup complete"
+	rsync -av /opt/rhqa_ipa/* /root/dev-shm-backup/.	
+	rlLog "/opt/rhqa_ipa backup complete"
 
    rlJournalPrintText
    report=/tmp/rhts.report.$RANDOM.txt

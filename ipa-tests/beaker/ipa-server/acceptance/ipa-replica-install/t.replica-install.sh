@@ -36,7 +36,7 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 . ./install-lib.sh
 . ./t.replica-install.bug.sh
 
@@ -69,13 +69,13 @@ installMaster()
 	fi
 
 	# Including --idstart=3000 --idmax=50000 to verify bug 782979.
-	echo "ipa-server-install --idstart=3000 --ip-address $ipaddr --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+	echo "ipa-server-install --idstart=3000 --ip-address $ipaddr --idmax=50000 --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /opt/rhqa_ipa/installipa.bash
 
-	rlLog "EXECUTING: $(cat /dev/shm/installipa.bash)"
+	rlLog "EXECUTING: $(cat /opt/rhqa_ipa/installipa.bash)"
 
         rlRun "setenforce 1" 0 "Making sure selinux is enforced"
-        rlRun "chmod 755 /dev/shm/installipa.bash" 0 "Making ipa install script executable"
-        rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+        rlRun "chmod 755 /opt/rhqa_ipa/installipa.bash" 0 "Making ipa install script executable"
+        rlRun "/bin/bash /opt/rhqa_ipa/installipa.bash" 0 "Installing IPA Server"
 
         rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=797563"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
@@ -299,13 +299,13 @@ installSlave()
 		rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
 		rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
 
-		cd /dev/shm/
+		cd /opt/rhqa_ipa/
 		hostname_s=$(hostname -s)
 		AddToKnownHosts $MASTERIP
 		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		rlLog "Checking for existance of replica gpg file"
-		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -317,10 +317,10 @@ installSlave()
 			rlRun "fixHostFile" 0 "Set up /etc/hosts"
 
 			rlRun "fixhostname" 0 "Fix hostname"
-			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-			chmod 755 /dev/shm/replica-install.bash
-			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+			chmod 755 /opt/rhqa_ipa/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 			# Disabling the following since empty forwarders exist in named.conf
 			# rlAssertGrep "forwarders" "/etc/named.conf"
@@ -371,14 +371,14 @@ installSlave_nf()
 
    rlPhaseStartTest "Installing replica with --no-forwarders option"
 
-        cd /dev/shm/
+        cd /opt/rhqa_ipa/
         hostname_s=$(hostname -s)
 		AddToKnownHosts $MASTERIP
-	rlRun "rm -fr /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+	rlRun "rm -fr /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
@@ -387,10 +387,10 @@ installSlave_nf()
 		#rlRun "> /var/lib/sss/pubconf/kdcinfo.$RELM"
                 rlRun "cat /etc/resolv.conf"
 		sleep 10
-                echo "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                echo "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                chmod 755 /opt/rhqa_ipa/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 				# Disabling the following since empty forwarders exist in named.conf
                 # rlAssertNotGrep "forwarders" "/etc/named.conf"
@@ -434,12 +434,12 @@ installSlave_nf()
 installSlave_nr()
 {
 	rlPhaseStartTest "installSlave_nr - Installing replica with --no-reverse option"
-		cd /dev/shm/
+		cd /opt/rhqa_ipa/
 		[ -z "$hostname_s" ] && hostname_s=$(echo $SLAVE|cut -f1 -d.)
-		rlRun "rm -f /dev/shm/replica-info-*"
+		rlRun "rm -f /opt/rhqa_ipa/replica-info-*"
 		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
-		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -449,10 +449,10 @@ installSlave_nr()
 			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
 			rlRun "cat /etc/hosts"
 
-			echo "ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-			chmod 755 /dev/shm/replica-install.bash
-			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			echo "ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+			chmod 755 /opt/rhqa_ipa/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-reverse -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -495,10 +495,10 @@ installSlave_nr1()
 	rlPhaseStartTest "installSlave_nr1 - Installing replica with --no-reverse WITH reverse zones"
 		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
-		cd /dev/shm/
-		rlRun "rm -f /dev/shm/replica-info-*"
-		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /dev/shm"
-		ls /dev/shm/replica-info-$s_short.$DOMAIN.gpg
+		cd /opt/rhqa_ipa/
+		rlRun "rm -f /opt/rhqa_ipa/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /opt/rhqa_ipa"
+		ls /opt/rhqa_ipa/replica-info-$s_short.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -508,7 +508,7 @@ installSlave_nr1()
 			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
 			rlRun "cat /etc/hosts"
 
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg" 
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$s_short.$DOMAIN.gpg" 
 
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
@@ -535,10 +535,10 @@ installSlave_nr2()
 		MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
-		cd /dev/shm/
-		rlRun "rm -f /dev/shm/replica-info-*"
-		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /dev/shm"
-		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		cd /opt/rhqa_ipa/
+		rlRun "rm -f /opt/rhqa_ipa/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /opt/rhqa_ipa"
+		ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -548,7 +548,7 @@ installSlave_nr2()
 			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
 			rlRun "cat /etc/hosts"
 
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg"
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --no-reverse -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$s_short.$DOMAIN.gpg"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -580,10 +580,10 @@ installSlave_nr3()
 		MASTERZONE=$(echo $MASTERIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		SLAVEZONE=$(echo $SLAVEIP|awk -F . '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
 		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
-		cd /dev/shm/
-		rlRun "rm -f /dev/shm/replica-info-*"
-		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /dev/shm"
-		ls /dev/shm/replica-info-$s_short.$DOMAIN.gpg
+		cd /opt/rhqa_ipa/
+		rlRun "rm -f /opt/rhqa_ipa/replica-info-*"
+		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$s_short.$DOMAIN.gpg /opt/rhqa_ipa"
+		ls /opt/rhqa_ipa/replica-info-$s_short.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -593,7 +593,7 @@ installSlave_nr3()
 			rlRun "echo \"$MASTERIP $MASTER\" >> /etc/hosts"
 			rlRun "cat /etc/hosts"
 
-			rlRun "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$s_short.$DOMAIN.gpg"
+			rlRun "ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$s_short.$DOMAIN.gpg"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -623,7 +623,7 @@ installSlave_nhostdns()
 
                 rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=757681"
 
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
@@ -638,10 +638,10 @@ installSlave_nhostdns()
 		rlRun "cat /etc/hosts"
 
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                chmod 755 /opt/rhqa_ipa/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-host-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -676,17 +676,17 @@ installSlave_ca()
 
    rlPhaseStartTest "Installing replica with --setup-ca option"
 
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
 
                 rlRun "cat /etc/resolv.conf"
 
-                echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                chmod 755 /opt/rhqa_ipa/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD --setup-ca -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -743,12 +743,12 @@ installSlave_ca()
 installSlave_sshtrustdns() {
 
    rlPhaseStartTest "Installing replica with --ssh-trust-dns option"
-		cd /dev/shm/
+		cd /opt/rhqa_ipa/
 		[ -z "$hostname_s" ] && hostname_s=$(echo $SLAVE|cut -f1 -d.)
-		rlRun "rm -f /dev/shm/replica-info-*"
+		rlRun "rm -f /opt/rhqa_ipa/replica-info-*"
 		rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 		rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
@@ -756,10 +756,10 @@ installSlave_sshtrustdns() {
                 rlRun "cat /etc/hosts"
 				rlRun "cat /etc/resolv.conf"
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                chmod 755 /opt/rhqa_ipa/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --ssh-trust-dns --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -786,7 +786,7 @@ installSlave_sshtrustdns() {
 installSlave_configuresshd() {
 
 	rlPhaseStartTest "Installing replica with --configure-sshd option"
-		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -798,10 +798,10 @@ installSlave_configuresshd() {
 				rlLog "skipping option but, will still test for proper settings"
 			fi
 
-			echo "ipa-replica-install -U --setup-dns --no-forwarders $CFGSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-			chmod 755 /dev/shm/replica-install.bash
-			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders $CFGSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			echo "ipa-replica-install -U --setup-dns --no-forwarders $CFGSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+			chmod 755 /opt/rhqa_ipa/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders $CFGSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -830,7 +830,7 @@ installSlave_configuresshd() {
 installSlave_nosshd() {
 
 	rlPhaseStartTest "Installing replica with --no-sshd option"
-		ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+		ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -842,10 +842,10 @@ installSlave_nosshd() {
 				rlLog "skipping option but, will still test for proper settings"
 			fi
 
-			echo "ipa-replica-install -U --setup-dns --no-forwarders $NOSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-			chmod 755 /dev/shm/replica-install.bash
-			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-			rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+			echo "ipa-replica-install -U --setup-dns --no-forwarders $NOSSHD --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+			chmod 755 /opt/rhqa_ipa/replica-install.bash
+			rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-sshd --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+			rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
 			rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 			replicaBugCheck_bz830314
@@ -874,7 +874,7 @@ installSlave_nodnssshfp() {
 
    rlPhaseStartTest "Installing replica with --no-dns-sshfp option"
 
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
@@ -889,10 +889,10 @@ installSlave_nodnssshfp() {
 				done
 
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-dns-sshfp --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-dns-sshfp --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-dns-sshfp --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                chmod 755 /opt/rhqa_ipa/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-dns-sshfp --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 				replicaBugCheck_bz830314
@@ -918,17 +918,17 @@ installSlave_nouiredirect() {
 
    rlPhaseStartTest "Installing replica with --no-ui-redirect"
 
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else   
 
                 rlRun "cat /etc/hosts"
 
-                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-ui-redirect --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-ui-redirect --skip-conncheck -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                echo "ipa-replica-install -U --setup-dns --no-forwarders --no-ui-redirect --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                chmod 755 /opt/rhqa_ipa/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --no-forwarders --no-ui-redirect --skip-conncheck -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
 				replicaBugCheck_bz830314
@@ -961,11 +961,11 @@ installCA()
 
    rlPhaseStartTest "Installing CA Replica"
 
-	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
-	chmod 755 /dev/shm/replica-ca-install.bash
+	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
+	chmod 755 /opt/rhqa_ipa/replica-ca-install.bash
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-	rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation"
+	rlRun "/bin/bash /opt/rhqa_ipa/replica-ca-install.bash" 0 "CA Replica installation"
 
 	if [ -f /var/log/ipareplica-ca-install.log ]; then
 		rhts-submit-log -l /var/log/ipareplica-ca-install.log
@@ -978,7 +978,7 @@ installSlave_negative1()
 	local tmpout=/tmp/error_msg.out
 	rlPhaseStartTest "installSlave_negative1 - Installing replica fails during conncheck if ports not accessible"
 		[ -z "$s_short" ] && s_short=$(echo $SLAVE|cut -f1 -d.)
-		ls /dev/shm/replica-info-$s_short.$DOMAIN.gpg
+		ls /opt/rhqa_ipa/replica-info-$s_short.$DOMAIN.gpg
 		if [ $? -ne 0 ] ; then
 			rlFail "ERROR: Replica Package not found"
 		else
@@ -992,7 +992,7 @@ installSlave_negative1()
 			########### HTTP ###############
 			rlLog "Testing HTTP TCP and UDP port access"
 			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 80  -j REJECT --reject-with icmp-host-prohibited'"
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 			rlAssertGrep "HTTP Server: Unsecure port (80): FAILED" $tmpout
 			rlAssertGrep "Port check failed! Inaccessible port(s): 80 (TCP)" $tmpout
 			rlRun "cat $tmpout"
@@ -1001,7 +1001,7 @@ installSlave_negative1()
 			########### HTTPS ##############
 			rlLog "Testing HTTPS TCP port access"
 			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 443 -j REJECT --reject-with icmp-host-prohibited'"
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 			rlAssertGrep "HTTP Server: Secure port (443): FAILED" $tmpout
 			rlAssertGrep "Port check failed! Inaccessible port(s): 443 (TCP)" $tmpout
 			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 443 -j REJECT --reject-with icmp-host-prohibited'"
@@ -1009,7 +1009,7 @@ installSlave_negative1()
 			########### LDAP ##############
 			rlLog "Testing LDAP TCP port access"
 			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 389 -j REJECT --reject-with icmp-host-prohibited'"
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 			rlAssertGrep "Directory Service: Unsecure port (389): FAILED" $tmpout
 			rlAssertGrep "Port check failed! Inaccessible port(s): 389 (TCP)" $tmpout
 			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 389 -j REJECT --reject-with icmp-host-prohibited'"
@@ -1017,7 +1017,7 @@ installSlave_negative1()
 			########### LDAPS ##############
 			rlLog "Testing LDAPS TCP port access"
 			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 636 -j REJECT --reject-with icmp-host-prohibited'"
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 			rlAssertGrep "Directory Service: Secure port (636): FAILED" $tmpout
 			rlAssertGrep "Port check failed! Inaccessible port(s): 636 (TCP)" $tmpout
 			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 636 -j REJECT --reject-with icmp-host-prohibited'"
@@ -1025,7 +1025,7 @@ installSlave_negative1()
 			########### Kerberos KDC TCP ##############
 			rlLog "Testing Kerberos KDC TCP port access"
 			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 88  -j REJECT --reject-with icmp-host-prohibited'"
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 			rlAssertGrep "Kerberos KDC: TCP (88): FAILED" $tmpout
 			rlAssertGrep "Port check failed! Inaccessible port(s): 88 (TCP)" $tmpout
 			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 88  -j REJECT --reject-with icmp-host-prohibited'"
@@ -1033,7 +1033,7 @@ installSlave_negative1()
 			########### Kerberos Kpasswd TCP ##############
 			rlLog "Testing Kerberos Kpasswd TCP port access"
 			rlRun "ssh root@$MASTERIP 'iptables -A INPUT -m tcp -p tcp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"
-			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
+			rlRun "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE.gpg > $tmpout 2>&1" 1
 			rlAssertGrep "Kerberos Kpasswd: TCP (464): FAILED" $tmpout
 			rlAssertGrep "Port check failed! Inaccessible port(s): 464 (TCP)" $tmpout
 			rlRun "ssh root@$MASTERIP 'iptables -D INPUT -m tcp -p tcp --dport 464 -j REJECT --reject-with icmp-host-prohibited'"

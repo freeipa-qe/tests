@@ -40,14 +40,14 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/ipa-group-cli-lib.sh
-. /dev/shm/env.sh
-. /dev/shm/ipa-rbac-cli-lib.sh
-. /dev/shm/lib.user-cli.sh
-. /dev/shm/ipa-group-cli-lib.sh
-. /dev/shm/ipa-host-cli-lib.sh
-. /dev/shm/ipa-hostgroup-cli-lib.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-group-cli-lib.sh
+. /opt/rhqa_ipa/env.sh
+. /opt/rhqa_ipa/ipa-rbac-cli-lib.sh
+. /opt/rhqa_ipa/lib.user-cli.sh
+. /opt/rhqa_ipa/ipa-group-cli-lib.sh
+. /opt/rhqa_ipa/ipa-host-cli-lib.sh
+. /opt/rhqa_ipa/ipa-hostgroup-cli-lib.sh
 
 # Include test case file
 . ./lib.iparbac.sh

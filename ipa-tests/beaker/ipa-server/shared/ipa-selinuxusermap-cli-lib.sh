@@ -1,5 +1,5 @@
 #!/bin/sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/env.sh
 
 ########################################################################
 #  selinuxusermap CLI SHARED LIBRARY

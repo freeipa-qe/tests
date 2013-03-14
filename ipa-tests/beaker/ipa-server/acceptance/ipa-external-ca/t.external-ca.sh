@@ -36,7 +36,7 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 . ./install-lib.sh
 
 
@@ -50,18 +50,18 @@ installMasterExtCA()
 	rlRun "fixhostname" 0 "Fix hostname"
 	rlRun "appendEnv" 0 "Appending env with new hostname"
 
-	. ./dev/shm/env.sh
-	rlRun "cat /dev/shm/env.sh"
+	. ./opt/rhqa_ipa/env.sh
+	rlRun "cat /opt/rhqa_ipa/env.sh"
 
 	rlRun "yum install -y ipa-server bind-dyndb-ldap bind"
-	echo "ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+	echo "ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /opt/rhqa_ipa/installipa.bash
 
 	rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=750828"
 	rlLog "EXECUTING: ipa-server-install --external-ca --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
         rlRun "setenforce 1" 0 "Making sure selinux is enforced"
-        rlRun "chmod 755 /dev/shm/installipa.bash" 0 "Making ipa install script executable"
-        rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+        rlRun "chmod 755 /opt/rhqa_ipa/installipa.bash" 0 "Making ipa install script executable"
+        rlRun "/bin/bash /opt/rhqa_ipa/installipa.bash" 0 "Installing IPA Server"
 
         if [ -f /var/log/ipaserver-install.log ]; then
                 rhts-submit-log -l /var/log/ipaserver-install.log

@@ -36,8 +36,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/ipa-selinuxusermap-cli-lib.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-selinuxusermap-cli-lib.sh
 
 # Test Suite Globals
 ipa_default_selinuxuser="unconfined_u:s0-s0:c0.c1023"

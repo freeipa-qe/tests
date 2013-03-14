@@ -3,17 +3,17 @@
 # https://engineering.redhat.com/trac/ipa-tests/ticket/278, aka:
 # https://bugzilla.redhat.com/show_bug.cgi?id=783606
 # Run the master-setup.bash script on the master, then run the run-on-slave.bash script on the replica 
-. /dev/shm/env.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 
-INFFILE=/dev/shm/ticket-278.inf
+INFFILE=/opt/rhqa_ipa/ticket-278.inf
 LDIFIN=./10.entries.example.dc.com.ldif
-LDIFOUT=/dev/shm/import-278.ldif
+LDIFOUT=/opt/rhqa_ipa/import-278.ldif
 NEWPORT=29719
 # number of users to add to server for replication
 maxusers=100
 
-if [ ! -f /dev/shm/env.sh ]; then
+if [ ! -f /opt/rhqa_ipa/env.sh ]; then
 	echo 'ERROR - Sorry, this script needs to be run on a IPA provisioned master from beaker'
 	exit
 fi

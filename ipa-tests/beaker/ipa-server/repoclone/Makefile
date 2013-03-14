@@ -38,7 +38,7 @@ run: $(FILES) build
 	#expect ./set-root-pw.exp
 	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
 	chmod 755 ./rhel-gold.repo
-	cp ./rhel-gold.repo /dev/shm/.
+	cp ./rhel-gold.repo /opt/rhqa_ipa/.
 	./runtest.sh
 
 build: $(BUILT_FILES)

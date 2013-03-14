@@ -107,11 +107,11 @@ nisint_ipamaster_integration_add_nis_data_passwd()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd > /dev/shm/nis-map.passwd 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd > /opt/rhqa_ipa/nis-map.passwd 2>&1"
 		ORIGIFS="$IFS"
 		IFS="
 "
-		for line in $(cat /dev/shm/nis-map.passwd); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.passwd); do
 			IFS="$ORIGIFS"
 			username=$(echo $line|cut -f1 -d:)
 			# Not collecting encrypted password because we need cleartext password to create kerberos key	
@@ -138,11 +138,11 @@ nisint_ipamaster_integration_add_nis_data_group()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group > /dev/shm/nis-map.group 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group > /opt/rhqa_ipa/nis-map.group 2>&1"
 		ORIGIFS="$IFS"
 		IFS="
 "
-		for line in $(cat /dev/shm/nis-map.group); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.group); do
 			IFS="$ORIGIFS"
 			groupname=$(echo $line|cut -f1 -d:)
 			# not collecting Group password 
@@ -167,11 +167,11 @@ nisint_ipamaster_integration_add_nis_data_hosts()
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts |sort -u|egrep -v 'localhost|$MASTER|$NISMASTER|$NISCLIENT'  > /dev/shm/nis-map.hosts 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts |sort -u|egrep -v 'localhost|$MASTER|$NISMASTER|$NISCLIENT'  > /opt/rhqa_ipa/nis-map.hosts 2>&1"
 		ORIGIFS="$IFS"
 		IFS="
 "
-		for line in $(cat /dev/shm/nis-map.hosts); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.hosts); do
 			IFS="$ORIGIFS"
 			ip=$(echo $line|awk '{print $1}')
 			ptrzone=$(echo $ip|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
@@ -198,11 +198,11 @@ nisint_ipamaster_integration_add_nis_data_netgroup()
 	rlPhaseStartTest "nisint_ipamaster_integration_add_nis_data_netgroup: Import NIS netgroup map"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup  > /dev/shm/nis-map.netgroup 2>&1"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup  > /opt/rhqa_ipa/nis-map.netgroup 2>&1"
 		ORIGIFS="$IFS"
 		IFS="
 "
-		for line in $(cat /dev/shm/nis-map.netgroup); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.netgroup); do
 			IFS="$ORIGIFS"
 			hostcat=""
 			usercat=""
@@ -266,12 +266,12 @@ nisint_ipamaster_integration_add_nis_data_automount()
 		rlRun "ipa automountlocation-add nis"
 		rlRun "ipa automountmap-del nis auto.direct"
 		rlRun "ipa automountmap-del nis auto.master"
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER auto.master > /dev/shm/nis-map.auto.master 2>&1"
-		MAPS=$(echo auto.master ; awk '{print $2}' /dev/shm/nis-map.auto.master)
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER auto.master > /opt/rhqa_ipa/nis-map.auto.master 2>&1"
+		MAPS=$(echo auto.master ; awk '{print $2}' /opt/rhqa_ipa/nis-map.auto.master)
 	
 		ORIGIFS="$IFS"
 		for MAP in $MAPS; do
-			rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER $MAP > /dev/shm/nis-map.$MAP 2>&1"				
+			rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER $MAP > /opt/rhqa_ipa/nis-map.$MAP 2>&1"				
 			rlRun "ipa automountmap-add nis $MAP"
 
 			cat <<-EOF > /tmp/amap.ldif
@@ -287,7 +287,7 @@ nisint_ipamaster_integration_add_nis_data_automount()
 
 			IFS="
 "
-			for line in $(cat /dev/shm/nis-map.$MAP); do
+			for line in $(cat /opt/rhqa_ipa/nis-map.$MAP); do
 				IFS="$ORIGIFS"
 				echo "$line"
 				key=$(echo "$line" | awk '{print $1}')
@@ -308,9 +308,9 @@ nisint_ipamaster_integration_add_nis_data_ethers()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 	
 		ORIGIFS="$IFS"
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers > /opt/rhqa_ipa/nis-map.ethers 2>&1"
 		IFS=$'\n'
-		for line in $(cat /dev/shm/nis-map.ethers); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.ethers); do
 			IFS="$ORIGIFS"
 			echo "$line"
 			mac=$(echo "$line" | awk '{print $1}')
@@ -337,8 +337,8 @@ nisint_ipamaster_integration_del_nis_data()
 nisint_ipamaster_integration_del_nis_data_passwd()
 {
 	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_passwd: Delete users from passwd map"
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd  > /dev/shm/nis-map.passwd 2>&1"
-		for user in $(cut -f1 -d: /dev/shm/nis-map.passwd); do
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd  > /opt/rhqa_ipa/nis-map.passwd 2>&1"
+		for user in $(cut -f1 -d: /opt/rhqa_ipa/nis-map.passwd); do
 			if [ $(ipa user-show $user 2>/dev/null | wc -l) -gt 0 ]; then
 				rlRun "ipa user-del $user"
 			else
@@ -351,8 +351,8 @@ nisint_ipamaster_integration_del_nis_data_passwd()
 nisint_ipamaster_integration_del_nis_data_group()
 {
 	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_group: Delete groups grom group map"
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group  > /dev/shm/nis-map.group 2>&1"
-		for group in $(cut -f1 -d: /dev/shm/nis-map.group); do
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group  > /opt/rhqa_ipa/nis-map.group 2>&1"
+		for group in $(cut -f1 -d: /opt/rhqa_ipa/nis-map.group); do
 			if [ $(ipa group-show $group 2>/dev/null | wc -l) -gt 0 ]; then
 				rlRun "ipa group-del $group"
 			else
@@ -368,8 +368,8 @@ nisint_ipamaster_integration_del_nis_data_hosts()
 	NISMASTER_S=$(echo $NISMASTER|cut -f1 -d.)
 	NISCLIENT_S=$(echo $NISMASTER|cut -f1 -d.)
 	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_hosts: Delete hostsf from host map"
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts  > /dev/shm/nis-map.hosts 2>&1"
-		for host in $(awk '{print $2 }' /dev/shm/nis-map.hosts|cut -f1 -d.|egrep -v "$MASTER_S|$NISMASTER_S|$NISCLIENT_S" | sed "s/$/.$DOMAIN/g"); do
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts  > /opt/rhqa_ipa/nis-map.hosts 2>&1"
+		for host in $(awk '{print $2 }' /opt/rhqa_ipa/nis-map.hosts|cut -f1 -d.|egrep -v "$MASTER_S|$NISMASTER_S|$NISCLIENT_S" | sed "s/$/.$DOMAIN/g"); do
 			if [ $(ipa host-show $host 2>/dev/null|wc -l) -gt 0 ]; then
 				rlRun "ipa host-del $host --updatedns"
 			else
@@ -382,8 +382,8 @@ nisint_ipamaster_integration_del_nis_data_hosts()
 nisint_ipamaster_integration_del_nis_data_netgroup()
 {
 	rlPhaseStartTest "nisint_ipamaster_integration_del_nis_data_netgroup: Delete netgroups from map"
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup  > /dev/shm/nis-map.netgroup 2>&1"
-		for netgroup in $(awk '{print $1}' /dev/shm/nis-map.netgroup); do
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup  > /opt/rhqa_ipa/nis-map.netgroup 2>&1"
+		for netgroup in $(awk '{print $1}' /opt/rhqa_ipa/nis-map.netgroup); do
 			if [ $(ipa netgroup-show $netgroup 2>/dev/null | wc -l) -gt 0 ]; then
 				rlRun "ipa netgroup-del $netgroup"
 			else
@@ -410,9 +410,9 @@ nisint_ipamaster_integration_del_nis_data_ethers()
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 	
 		ORIGIFS="$IFS"
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER ethers > /opt/rhqa_ipa/nis-map.ethers 2>&1"
 		IFS=$'\n'
-		for line in $(cat /dev/shm/nis-map.ethers); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.ethers); do
 			IFS="$ORIGIFS"
 			echo "$line"
 			mac=$(echo "$line" | awk '{print $1}')
@@ -442,9 +442,9 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 		ORIGFS="$IFS"
 		IFS="
 "
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd  > /dev/shm/nis-map.passwd 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER passwd  > /opt/rhqa_ipa/nis-map.passwd 2>&1"
 		cat /dev/null > $tmpldif
-		for line in $(cat /dev/shm/nis-map.passwd); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.passwd); do
 			IFS="$ORIGIFS"
 			USERNAME=$(echo $line|cut -f1 -d:|tr '[:upper:]' '[:lower:]')
 			UIDNUM=$(echo $line|cut -f3 -d:)
@@ -494,7 +494,7 @@ nisint_ipamaster_integration_add_nis_data_ldif_passwd()
 
 		rlRun "ldapadd -av -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $tmpldif"
 
-		for USERNAME in $(cut -f1 -d: /dev/shm/nis-map.passwd|tr '[:upper:]' '[:lower:]'); do
+		for USERNAME in $(cut -f1 -d: /opt/rhqa_ipa/nis-map.passwd|tr '[:upper:]' '[:lower:]'); do
 			rlRun "echo \"dummy123@ipa.com\"| ipa passwd $USERNAME"
 			FirstKinitAs $USERNAME "dummy123@ipa.com" passw0rd1
 			KinitAsAdmin
@@ -509,9 +509,9 @@ nisint_ipamaster_integration_add_nis_data_ldif_group()
 		ORIGFS="$IFS"
 		IFS="
 "
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group  > /dev/shm/nis-map.group 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER group  > /opt/rhqa_ipa/nis-map.group 2>&1"
 		cat /dev/null > $tmpldif
-		for line in $(cat /dev/shm/nis-map.group); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.group); do
 			GROUPNAME=$(echo $line|cut -f1 -d:|tr '[:upper:]' '[:lower:]')
 			GIDNUM=$(echo $line|cut -f3 -d:)
 			USERS=$(echo $line|cut -f4 -d:|tr '[:upper:]' '[:lower:]')
@@ -550,9 +550,9 @@ nisint_ipamaster_integration_add_nis_data_ldif_hosts()
 		ORIGFS="$IFS"
 		IFS="
 "
-		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|sort -u|egrep -v 'localhost|$MASTER|$NISMASTER|$NISCLIENT'  > /dev/shm/nis-map.hosts 2>&1"
+		rlRun "ypcat -d $NISDOMAIN -h $NISMASTER hosts|sort -u|egrep -v 'localhost|$MASTER|$NISMASTER|$NISCLIENT'  > /opt/rhqa_ipa/nis-map.hosts 2>&1"
 		cat /dev/null > $tmpldif
-		for line in $(cat /dev/shm/nis-map.hosts); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.hosts); do
 			IFS="$ORIGIFS"
 			date=$(date +%Y%m%d)
 			ip=$(echo $line|awk '{print $1}')
@@ -641,9 +641,9 @@ nisint_ipamaster_integration_add_nis_data_ldif_netgroup()
 		ORIGFS="$IFS"
 		IFS="
 "
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup > /dev/shm/nis-map.netgroup 2>&1"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER netgroup > /opt/rhqa_ipa/nis-map.netgroup 2>&1"
 		cat /dev/null > $tmpldif
-		for line in $(cat /dev/shm/nis-map.netgroup); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.netgroup); do
 			IFS="$ORIGIFS"
 			NGNAME=$(echo $line|awk '{print $1}')
 			USERCAT=0
@@ -735,9 +735,9 @@ nisint_ipamaster_integration_add_nis_data_ldif_automount()
 		echo "" >> $tmpldif
 
 		ORIGFS="$IFS"
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER auto.master > /dev/shm/nis-map.auto.master 2>&1"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER auto.master > /opt/rhqa_ipa/nis-map.auto.master 2>&1"
 		
-		MAPS=$(echo auto.master ; awk '{print $2}' /dev/shm/nis-map.auto.master)
+		MAPS=$(echo auto.master ; awk '{print $2}' /opt/rhqa_ipa/nis-map.auto.master)
 		for MAP in $MAPS; do
 
 			cat >> $tmpldif <<-EOF
@@ -747,12 +747,12 @@ nisint_ipamaster_integration_add_nis_data_ldif_automount()
 			automountMapName: $MAP
 			EOF
 
-			rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER $MAP > /dev/shm/nis-map.$MAP 2>&1"
+			rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER $MAP > /opt/rhqa_ipa/nis-map.$MAP 2>&1"
 			echo "" >> $tmpldif
 			IFS="
 "
 
-			for line in $(cat /dev/shm/nis-map.$MAP); do
+			for line in $(cat /opt/rhqa_ipa/nis-map.$MAP); do
 				IFS="$ORIGIFS"
 				KEY=$(echo "$line" | awk '{print $1}')
 				INFO=$(echo "$line" | sed -e "s#^$KEY[ \t]*##")
@@ -795,9 +795,9 @@ nisint_ipamaster_integration_add_nis_data_ldif_ethers()
 		local tmpldif=/tmp/nis-map.ethers.ldif
 	
 		ORIGIFS="$IFS"
-		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER ethers > /dev/shm/nis-map.ethers 2>&1"
+		rlRun "ypcat -k -d $NISDOMAIN -h $NISMASTER ethers > /opt/rhqa_ipa/nis-map.ethers 2>&1"
 		IFS=$'\n'
-		for line in $(cat /dev/shm/nis-map.ethers); do
+		for line in $(cat /opt/rhqa_ipa/nis-map.ethers); do
 			IFS="$ORIGIFS"
 			echo "$line"
 			mac=$(echo "$line" | awk '{print $1}')

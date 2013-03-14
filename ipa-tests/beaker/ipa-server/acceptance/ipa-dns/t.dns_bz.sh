@@ -675,7 +675,7 @@ bz805430()
 
 		kdestroy
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-		outfile="/dev/shm/utmosr-zone-addtest.txt"
+		outfile="/opt/rhqa_ipa/utmosr-zone-addtest.txt"
 		ipa dnszone-add --name-server=$MASTER. --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone &> $outfile
 		ipa dnszone-del maxtzone
 		rlRun "ipa dnszone-add --name-server=$MASTER. --serial=4294123199 --admin-email=admin@$DOMAIN maxtzone" 0 "test to make sure the maxtzone dnszone-add returns 0"

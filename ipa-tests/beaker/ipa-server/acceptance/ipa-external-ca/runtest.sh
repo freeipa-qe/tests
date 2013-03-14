@@ -34,8 +34,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include tests file
@@ -56,7 +56,7 @@ DOMAIN=`os_getdomainname`
 echo "The hostname of IPA Server is $MASTER"
 echo "The beaker hostname of IPA Server is $BEAKERMASTER"
 
-cat /dev/shm/env.sh
+cat /opt/rhqa_ipa/env.sh
 ########################################################################
 
 
@@ -82,7 +82,7 @@ rlJournalStart
 	rlPhaseStartSetup "ipa-external-ca: ipa-server installation"
 
                 rlRun "service iptables stop" 0 "Stop the firewall on the client"
-        	rlRun "cat /dev/shm/env.sh"
+        	rlRun "cat /opt/rhqa_ipa/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"
 

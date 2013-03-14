@@ -566,7 +566,7 @@ ipaserverinstall_bz827321()
     rlPhaseStartTest "ipa-server-install - BZ 827321 : ipa-server-install does not fill the default value for --subject option and it crashes later."
 	kdestroy
 	ipa-server-install --uninstall -U
-	fileout="/dev/shm/bz827321out.txt"
+	fileout="/opt/rhqa_ipa/bz827321out.txt"
 	ipa-server-install --external_cert_file=/root/ipa-ca/ipa.crt --external_ca_file=/root/ipa-ca/ipacacert.asc -p Secret123 -U -a Secret123 -r TESTRELM.COM &> $fileout
 	rlRun "grep 'Unexpected error' $fileout" 1 "See if install failed as specified in BZ 827321."
 	rlRun "grep 'DEBUG must be str,unicode,tuple, or RDN' /var/log/ipaserver-install.log" 1 "See if ipaserver-install log contains error reported in BZ 827321"

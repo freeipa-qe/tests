@@ -36,10 +36,10 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
-. /dev/shm/nis.sh
+. /opt/rhqa_ipa/nis.sh
 
 # Force initialization of TESTORDER for rhts-sync for RHEL5
 export TESTORDER=1

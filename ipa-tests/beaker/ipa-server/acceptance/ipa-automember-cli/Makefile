@@ -34,9 +34,9 @@ FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipaautomember.sh t.ipaautomember
 .PHONY: all install download clean
 
 run: $(FILES) build
-	#rm -f /dev/shm/ipa-automember-cli-lib.sh
-	#cp ./ipa-automember-cli-lib.sh /dev/shm/.
-	#chmod 755 /dev/shm/*.sh
+	#rm -f /opt/rhqa_ipa/ipa-automember-cli-lib.sh
+	#cp ./ipa-automember-cli-lib.sh /opt/rhqa_ipa/.
+	#chmod 755 /opt/rhqa_ipa/*.sh
 	./runtest.sh
 
 build: $(BUILT_FILES)

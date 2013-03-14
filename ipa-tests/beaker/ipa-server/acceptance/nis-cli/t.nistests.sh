@@ -53,44 +53,44 @@ runtests()
         rlPhaseEnd
 
         # enumerate maps into some files for analysis. 
-        ypcat -h $MASTER -d $DOMAIN passwd > /dev/shm/passwd-map
-        ypcat -h $MASTER -d $DOMAIN group > /dev/shm/group-map
-        ypcat -h $MASTER -d $DOMAIN netgroup > /dev/shm/netgroup-map
+        ypcat -h $MASTER -d $DOMAIN passwd > /opt/rhqa_ipa/passwd-map
+        ypcat -h $MASTER -d $DOMAIN group > /opt/rhqa_ipa/group-map
+        ypcat -h $MASTER -d $DOMAIN netgroup > /opt/rhqa_ipa/netgroup-map
 
         rlPhaseStartTest "ipa-nis-cli-06: check to ensure user $user1 is in nis"
-                rlRun "grep $user1 /dev/shm/passwd-map" 0 "Verifying that user1 is in the nis passwd map"
+                rlRun "grep $user1 /opt/rhqa_ipa/passwd-map" 0 "Verifying that user1 is in the nis passwd map"
 	rlPhaseEnd 
 
         rlPhaseStartTest "ipa-nis-cli-07: check to ensure user $user2 is in nis"
-                rlRun "grep $user2 /dev/shm/passwd-map" 0 "Verifying that user2 is in the nis passwd map"
+                rlRun "grep $user2 /opt/rhqa_ipa/passwd-map" 0 "Verifying that user2 is in the nis passwd map"
 	rlPhaseEnd 
 
         rlPhaseStartTest "ipa-nis-cli-08: check to ensure user $user3 is in nis"
-                rlRun "grep $user3 /dev/shm/passwd-map" 0 "Verifying that user3 is in the nis passwd map"
+                rlRun "grep $user3 /opt/rhqa_ipa/passwd-map" 0 "Verifying that user3 is in the nis passwd map"
 	rlPhaseEnd 
 
         rlPhaseStartTest "ipa-nis-cli-09: check to ensure user $user4 is in nis"
-                rlRun "grep $user4 /dev/shm/passwd-map" 0 "Verifying that user4 is in the nis passwd map"
+                rlRun "grep $user4 /opt/rhqa_ipa/passwd-map" 0 "Verifying that user4 is in the nis passwd map"
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-nis-cli-10: check to ensure that group $group1 in the nis group map"
-                rlRun "grep $group1 /dev/shm/group-map" 0 "Verifying that group1 is in the nis password map"
+                rlRun "grep $group1 /opt/rhqa_ipa/group-map" 0 "Verifying that group1 is in the nis password map"
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-nis-cli-11: check to ensure that group $group2 in the nis group map"
-                rlRun "grep $group2 /dev/shm/group-map" 0 "Verifying that group2 is in the nis password map"
+                rlRun "grep $group2 /opt/rhqa_ipa/group-map" 0 "Verifying that group2 is in the nis password map"
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-nis-cli-12: check to ensure that group $group3 in the nis group map"
-                rlRun "grep $group3 /dev/shm/group-map" 0 "Verifying that group3 is in the nis password map"
+                rlRun "grep $group3 /opt/rhqa_ipa/group-map" 0 "Verifying that group3 is in the nis password map"
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-nis-cli-13: check to ensure that group $group4 in the nis group map"
-                rlRun "grep $group4 /dev/shm/group-map" 0 "Verifying that group4 is in the nis password map"
+                rlRun "grep $group4 /opt/rhqa_ipa/group-map" 0 "Verifying that group4 is in the nis password map"
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-nis-cli-14: check to ensure invalid users are not in nis"
-                rlRun "grep baduser1 /dev/shm/passwd-map" 1 "Verifying that user1 is in the nis passwd map"
+                rlRun "grep baduser1 /opt/rhqa_ipa/passwd-map" 1 "Verifying that user1 is in the nis passwd map"
         rlPhaseEnd
 
         rlPhaseStartTest "ipa-nis-cli-08: checking that using netgroups with nis works."
@@ -112,8 +112,8 @@ runtests()
                 ipa hostgroup-add-member --hosts=$MASTER stage-live
                 ipa netgroup-add-member --groups=muppets --hostgroups=host-live net-live
                 ipa netgroup-add-member --groups=muppets --hostgroups=host-stage net-stage
-                ypcat -h $MASTER -d $DOMAIN netgroup > /dev/shm/netgroup-map
-                rlRun "grep $MASTER /dev/shm/netgroup-map" 0 "Checking to ensure that nis is able to find a created netgroup"
+                ypcat -h $MASTER -d $DOMAIN netgroup > /opt/rhqa_ipa/netgroup-map
+                rlRun "grep $MASTER /opt/rhqa_ipa/netgroup-map" 0 "Checking to ensure that nis is able to find a created netgroup"
         rlPhaseEnd
 }
 

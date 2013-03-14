@@ -220,7 +220,7 @@ verifyErrorMsg()
 #######################################################################
 AddToKnownHosts()
 {
-	TET_TMP_DIR=/dev/shm
+	TET_TMP_DIR=/opt/rhqa_ipa
 	if [ "$1" != "" ]; then 
 		rlLog "creating expect file to add $1 to known hosts file"
 		export SHELL="/bin/bash"
@@ -245,11 +245,11 @@ expect eof' >> $TET_TMP_DIR/setup-ssh-remote.exp
 			mkdir -p ~/.ssh
 			chmod 600 ~/.ssh
 		fi
-		cat ~/.ssh/known_hosts | grep -v $1 > /dev/shm/known_hosts
-		cat /dev/shm/known_hosts > ~/.ssh/known_hosts
+		cat ~/.ssh/known_hosts | grep -v $1 > /opt/rhqa_ipa/known_hosts
+		cat /opt/rhqa_ipa/known_hosts > ~/.ssh/known_hosts
 		chmod 600 ~/.ssh/known_hosts
 		chmod 777 $TET_TMP_DIR/setup-ssh-remote.exp
-		expect $TET_TMP_DIR/setup-ssh-remote.exp &> /dev/shm/ssh-known-setup-update.txt
+		expect $TET_TMP_DIR/setup-ssh-remote.exp &> /opt/rhqa_ipa/ssh-known-setup-update.txt
 		return 0
 	else
 		rlLog "AddToKnownHosts called improperly, please see shared lib for usage"
@@ -510,8 +510,8 @@ execManageNGPPlugin()
 #######################################################################
 fixResolv()
 {
-	rm -f /dev/shm/ipa-resolv.conf-backup
-	cat /etc/resolv.conf > /dev/shm/ipa-resolv.conf-backup
+	rm -f /opt/rhqa_ipa/ipa-resolv.conf-backup
+	cat /etc/resolv.conf > /opt/rhqa_ipa/ipa-resolv.conf-backup
 	if [ $MASTER ]; then
 		ipofmaster=`ping $MASTER -c 1 | grep PING | sed s/\(//g | sed s/\)//g | cut -d\  -f3`
 		sed -i s/^nameserver/#nameserver/g /etc/resolv.conf

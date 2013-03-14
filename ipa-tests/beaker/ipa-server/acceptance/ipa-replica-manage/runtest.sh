@@ -36,8 +36,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 # Include test case files
 for file in $(ls tests.d/t.*.sh); do
@@ -73,13 +73,13 @@ SLAVE1_IP=$(dig +short $SLAVE1)
 SLAVE2=$(echo "$SLAVE"|awk '{print $2}'|cut -f1 -d.|sed s/$/.$DOMAIN/)
 SLAVE2_IP=$(dig +short $SLAVE2)
 
-echo "export SLAVE1=$SLAVE1" >> /dev/shm/env.sh
-echo "export SLAVE1_IP=$SLAVE1_IP" >> /dev/shm/env.sh
-echo "export SLAVE2=$SLAVE2" >> /dev/shm/env.sh
-echo "export SLAVE2_IP=$SLAVE2_IP" >> /dev/shm/env.sh
+echo "export SLAVE1=$SLAVE1" >> /opt/rhqa_ipa/env.sh
+echo "export SLAVE1_IP=$SLAVE1_IP" >> /opt/rhqa_ipa/env.sh
+echo "export SLAVE2=$SLAVE2" >> /opt/rhqa_ipa/env.sh
+echo "export SLAVE2_IP=$SLAVE2_IP" >> /opt/rhqa_ipa/env.sh
 
-echo "export BEAKERSLAVE1=${BEAKERREPLICA1_env1}" >> /dev/shm/env.sh
-echo "export BEAKERSLAVE2=${BEAKERREPLICA2_env1}" >> /dev/shm/env.sh
+echo "export BEAKERSLAVE1=${BEAKERREPLICA1_env1}" >> /opt/rhqa_ipa/env.sh
+echo "export BEAKERSLAVE2=${BEAKERREPLICA2_env1}" >> /opt/rhqa_ipa/env.sh
 
 if [ -z "$MYENV" ]; then
 	MYENV=1

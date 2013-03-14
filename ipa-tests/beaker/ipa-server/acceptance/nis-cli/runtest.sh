@@ -36,10 +36,10 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/ipa-netgroup-cli-lib.sh
-. /dev/shm/nis.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-netgroup-cli-lib.sh
+. /opt/rhqa_ipa/nis.sh
+. /opt/rhqa_ipa/env.sh
 
 # Include test case file
 . ./t.nistests.sh
@@ -60,7 +60,7 @@ rlJournalStart
         echo $MASTER | grep $HOSTNAME
         rc=$?
         if [ $rc -eq 0 ] ; then
-		pwdfile=/dev/shm/password.txt
+		pwdfile=/opt/rhqa_ipa/password.txt
 		echo $ADMINPW > $pwdfile
 		yum -y install yptools rpcbind ypbind ypserv yp-tools
         	ipa-compat-manage -y $pwdfile enable
@@ -87,7 +87,7 @@ rlJournalStart
         if [ $rc -eq 0 ] ; then
 		rhts-sync-block -s READY $MASTER
 	        rlPhaseStartTest "ipa-nis-cli-slave-bogus-01: A no op test to make sure things are working"
-        	        rlRun "/dev/shm/nis.sh" 0 "Check to see that the nis lib is there"
+        	        rlRun "/opt/rhqa_ipa/nis.sh" 0 "Check to see that the nis lib is there"
 	        rlPhaseEnd
 
 		rhts-sync-set -s READY

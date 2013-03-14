@@ -40,13 +40,13 @@ installMaster()
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
 
-	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /dev/shm/installipa.bash
+	echo "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" > /opt/rhqa_ipa/installipa.bash
 
 	rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
 
         rlRun "setenforce 1" 0 "Making sure selinux is enforced"
-        rlRun "chmod 755 /dev/shm/installipa.bash" 0 "Making ipa install script executable"
-        rlRun "/bin/bash /dev/shm/installipa.bash" 0 "Installing IPA Server"
+        rlRun "chmod 755 /opt/rhqa_ipa/installipa.bash" 0 "Making ipa install script executable"
+        rlRun "/bin/bash /opt/rhqa_ipa/installipa.bash" 0 "Installing IPA Server"
 
         if [ -f /var/log/ipaserver-install.log ]; then
                 rhts-submit-log -l /var/log/ipaserver-install.log
@@ -111,12 +111,12 @@ installSlave()
         # stop the firewall
         service iptables stop
         service ip6tables stop
-	. /dev/shm/env.sh
+	. /opt/rhqa_ipa/env.sh
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
 	rlRun "fixhostname" 0 "Fix hostname"
 
-        cd /dev/shm/
+        cd /opt/rhqa_ipa/
         hostname_s=$(hostname -s)
 
 	AddToKnownHosts $MASTERIP
@@ -124,7 +124,7 @@ installSlave()
         rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
         rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
-        ls /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg
+        ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
                 rlFail "ERROR: Replica Package not found"
         else
@@ -137,10 +137,10 @@ installSlave()
                 rlRun "fixHostFile" 0 "Set up /etc/hosts"
         	rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
 
-                echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-                chmod 755 /dev/shm/replica-install.bash
-                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-                rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+                echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+                chmod 755 /opt/rhqa_ipa/replica-install.bash
+                rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+                rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
                 rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
@@ -206,13 +206,13 @@ echo 'expect eof ' >> $expfile
 
 	rlRun "nslookup $MASTER"
 	rlRun "nslookup $SLAVE"
-	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=757681"
-	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
-        chmod 755 /dev/shm/replica-ca-install.bash
+	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
+        chmod 755 /opt/rhqa_ipa/replica-ca-install.bash
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-        rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
+        rlRun "/bin/bash /opt/rhqa_ipa/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
 
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
@@ -261,17 +261,17 @@ echo 'expect eof ' >> $expfile
 	rlRun "cat /etc/hosts"
 	rlRun "cat /etc/resolv.conf"
 
-        echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-install.bash
-        chmod 755 /dev/shm/replica-install.bash
-        rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-        rlRun "/bin/bash /dev/shm/replica-install.bash" 0 "Replica installation"
+        echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+        chmod 755 /opt/rhqa_ipa/replica-install.bash
+        rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
-	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg" > /dev/shm/replica-ca-install.bash
-	chmod 755 /dev/shm/replica-ca-install.bash
+	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
+	chmod 755 /opt/rhqa_ipa/replica-ca-install.bash
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
-	rlRun "/bin/bash /dev/shm/replica-ca-install.bash" 0 "CA Replica installation"
+	rlRun "/bin/bash /opt/rhqa_ipa/replica-ca-install.bash" 0 "CA Replica installation"
 
 	if [ -f /var/log/ipareplica-ca-install.log ]; then
 		rhts-submit-log -l /var/log/ipareplica-ca-install.log

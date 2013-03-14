@@ -35,13 +35,13 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 
 rlJournalStart
-    rlPhaseStartSetup "list files in /dev/shm"
+    rlPhaseStartSetup "list files in /opt/rhqa_ipa"
 	/sbin/restorecon -v /root/.ssh/authorized_keys
         /sbin/restorecon -v /root/.ssh/authorized_keys2
-	rlRun "ls /dev/shm" 0 "Listing files in /dev/shm"
+	rlRun "ls /opt/rhqa_ipa" 0 "Listing files in /opt/rhqa_ipa"
     rlPhaseEnd
 
 rlJournalPrintText

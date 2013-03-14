@@ -139,9 +139,9 @@ echo "nameserver $MASTERIP" >> /etc/resolv.conf
 echo "nameserver $SLAVEIP" >> /etc/resolv.conf
 cat /etc/resolv.conf
 
-sftp root@$MASTERIP:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg /dev/shm
+sftp root@$MASTERIP:/var/lib/ipa/replica-info-$SLAVE_S.$DOMAIN.gpg /opt/rhqa_ipa
 
-ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$SLAVE_S.$DOMAIN.gpg
+ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$SLAVE_S.$DOMAIN.gpg
 
 # client
 sed -i s/^nameserver/#nameserver/g /etc/resolv.conf

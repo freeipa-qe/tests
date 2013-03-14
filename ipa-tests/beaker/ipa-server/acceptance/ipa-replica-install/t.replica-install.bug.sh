@@ -34,7 +34,7 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 . ./install-lib.sh
 
 
@@ -209,7 +209,7 @@ replicaBugTest_bz823657()
 {
 	rlPhaseStartTest "bz823657 - ipa-replica-manage connect fails with GSSAPI error after delete if using previous kerberos ticket "
 		# This test is to be run on a MASTER with a already connected SLAVE.
-		file=/dev/shm/bz823657-output.txt # Output file to be used in next tests
+		file=/opt/rhqa_ipa/bz823657-output.txt # Output file to be used in next tests
 		rlRun "ipa-replica-manage del $SLAVE" 0 "Disconnect the slave agreement"
 		rlRun "echo $ADMINPW | ipa-replica-manage connect $SLAVE $> $file" 0 "Reconnect the SLAVE."
 		rlRun "grep 'Unspecified GSS failure' $file" 1 "Ensure that a failure specified in BZ 823657 does not appear to be in the output file $file"
@@ -221,7 +221,7 @@ replicaBugTest_bz824492()
 	rlPhaseStartTest "bz824492 - Cannot re-connect replica to previously disconnected master."
 		# This test is to be run on a MASTER with a already connected SLAVE.
 		rlLog "This test may fail if bz823567 fails."
-		file=/dev/shm/bz824492-output.txt # Output file to be used in next tests
+		file=/opt/rhqa_ipa/bz824492-output.txt # Output file to be used in next tests
 		rlRun "ipa-replica-manage disconnect $SLAVE" 0 "Disconnect the slave agreement"
 		rlRun "echo $ADMINPW | ipa-replica-manage connect $SLAVE $> $file" 0 "Reconnect the SLAVE."
 		rlRun "grep 'You cannot connect to a previously deleted master' $file" 1 "Ensure that a failure specified in BZ 824492 does not appear to be in the output file $file"
@@ -235,12 +235,12 @@ replicaInstallBug748987()
 		rlLog "Test for https://bugzilla.redhat.com/show_bug.cgi?id=748987"
 		# This test attempts to install a replica. The install should fail because the a and ptr dns records on the master has been deleted
 		# A pass will be seeing a error message  
-		file=/dev/shm/replica-install-output
+		file=/opt/rhqa_ipa/replica-install-output
 		rlRun "ipa-server-install --uninstall -U"
 		rlRun "ssh $MASTERIP \"ipa-replica-manage -p $ADMINPW list $MASTER\""
 
-		rlLog "Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
-		rlRun "ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg > $file 2>&1" 3
+		rlLog "Executing ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+		rlRun "ipa-replica-install -U  -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg > $file 2>&1" 3
 		rlRun "cat $file"
 		rlLog "Make sure that expected warning message appears in ipa-replica-install output"
 		rlAssertGrep "A replication agreement for this host already exists. It needs to be removed" $file 

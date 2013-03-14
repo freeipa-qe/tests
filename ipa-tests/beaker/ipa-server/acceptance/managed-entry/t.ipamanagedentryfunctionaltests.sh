@@ -10,20 +10,20 @@ HTTPKRBCFG="/etc/httpd/conf.d/krb.conf"
 FAKEHOSTNAME="managedby-fakehost.testrelm"
 FAKEHOSTREALNAME="managedby-fakehost.idm.lab.bos.redhat.com"
 FAKEHOSTNAMEIP="10.16.98.239"
-FAKEHOSTKEYTABFILE="/dev/shm/$FAKEHOSTNAME.host.keytab"
-CLIENTKEYTABFILE="/dev/shm/$CLIENT.host.keytab"
+FAKEHOSTKEYTABFILE="/opt/rhqa_ipa/$FAKEHOSTNAME.host.keytab"
+CLIENTKEYTABFILE="/opt/rhqa_ipa/$CLIENT.host.keytab"
 USERA="nusr19"
 USERB="altnur19"
 NEWUSERA="uid=$USERA,cn=users,cn=accounts,dc=testrelm,dc=com"
 NEWUSERAGROUP="cn=$USERA,cn=groups,cn=accounts,dc=testrelm,dc=com"
 NEWUSERB="uid=$USERB,cn=users,cn=accounts,dc=testrelm,dc=com"
 NEWUSERBGROUP="cn=$USERB,cn=groups,cn=accounts,dc=testrelm,dc=com"
-NEWUSERALDIF=/dev/shm/managedentrynewuser.ldif
-RNUSERLDIF=/dev/shm/modrdnB.ldif
-MODUSERLDIF=/dev/shm/modgroupentry.ldif
-MODUSERLDIF2=/dev/shm/modgroupentry2.ldif
-MODUSERLDIF3=/dev/shm/modgroupentry3.ldif
-MODUSERLDIF4=/dev/shm/modgroupentry4.ldif
+NEWUSERALDIF=/opt/rhqa_ipa/managedentrynewuser.ldif
+RNUSERLDIF=/opt/rhqa_ipa/modrdnB.ldif
+MODUSERLDIF=/opt/rhqa_ipa/modgroupentry.ldif
+MODUSERLDIF2=/opt/rhqa_ipa/modgroupentry2.ldif
+MODUSERLDIF3=/opt/rhqa_ipa/modgroupentry3.ldif
+MODUSERLDIF4=/opt/rhqa_ipa/modgroupentry4.ldif
 
 echo " HTTP configuration directory:  $HTTPCFGDIR"
 echo " HTTP certificate directory:  $HTTPCERTDIR"

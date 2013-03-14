@@ -1,5 +1,5 @@
 #!/bin/sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/env.sh
 
 ########################################################################
 #  GROUP CLI SHARED LIBRARY

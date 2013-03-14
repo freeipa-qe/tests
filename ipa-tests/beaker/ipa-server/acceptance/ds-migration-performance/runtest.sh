@@ -36,10 +36,10 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/lib.ds-migration.sh
-. /dev/shm/lib.user-cli.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/lib.ds-migration.sh
+. /opt/rhqa_ipa/lib.user-cli.sh
+. /opt/rhqa_ipa/env.sh
 
 # Include test case file
 . ./t.ds-migration-performance.sh

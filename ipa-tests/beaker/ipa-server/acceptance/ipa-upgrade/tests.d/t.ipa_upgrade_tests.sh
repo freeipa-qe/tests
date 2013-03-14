@@ -36,7 +36,7 @@ ipa_upgrade_master_replica_client_all()
 {   
     USEDNS="yes"
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
-    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$REPLICA1_S.$DOMAIN.gpg"
+    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
     IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_all_setup: setup to test full setup for master, then replica, then client"
@@ -79,7 +79,7 @@ ipa_upgrade_master_replica_client_all()
 ipa_upgrade_master_replica_client_inc_setup()
 {   
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
-    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$REPLICA1_S.$DOMAIN.gpg"
+    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
     IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
     USEDNS="yes"
 
@@ -139,7 +139,7 @@ ipa_upgrade_master_replica_client_inc_64()
     myrepo1=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/\$basearch/os/
     myrepo2=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/optional/\$basearch/os/
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
-    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$REPLICA1_S.$DOMAIN.gpg"
+    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
     IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
     USEDNS="yes"
 
@@ -173,7 +173,7 @@ ipa_upgrade_client_replica_master_all()
 {
     USEDNS="yes"
     IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$REPLICA1_S.$DOMAIN.gpg"
+    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
     IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
 
     local tmpout=/tmp/errormsg.out
@@ -221,7 +221,7 @@ ipa_upgrade_master_replica_client_nodns()
 {
     USEDNS="no"
     IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-    IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$MYBEAKERREPLICA1.gpg"
+    IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"
     IPA_CLIENT_OPTIONS="-U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER"
 
     rlPhaseStartTest "ipa_upgrade_master_replica_client_nodns: Test setup without dns for master, then replica, then client"

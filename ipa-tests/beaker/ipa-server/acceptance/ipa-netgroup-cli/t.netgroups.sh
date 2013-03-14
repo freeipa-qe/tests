@@ -1493,7 +1493,7 @@ netgroup_find_positive_other()
 	hostb=thostb
 	hgrpa=hostga
 	hgrpb=hostgb
-	tmpout=/dev/shm/netgroup-tempout.txt
+	tmpout=/opt/rhqa_ipa/netgroup-tempout.txt
 
 	rlPhaseStartTest "ipa_netgroup_find_positive_other_01: Positive in-netgroup find user test."
 		rlRun "ipa netgroup-add --desc=desc1 $ng" 0 "add netgroup for testing --in-netgroup with"

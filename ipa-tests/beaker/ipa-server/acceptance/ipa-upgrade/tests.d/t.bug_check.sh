@@ -541,8 +541,8 @@ upgrade_bz_819629_setup()
     MASTER*)
         dc=$(date +%m-%d-%Y-%s)
         cp -a /etc/named.conf /etc/named-conf-backup-$dc
-        cat /etc/named.conf | grep -v psearch > /dev/shm/named.conf-tmp
-        cat /dev/shm/named.conf-tmp > /etc/named.conf
+        cat /etc/named.conf | grep -v psearch > /opt/rhqa_ipa/named.conf-tmp
+        cat /opt/rhqa_ipa/named.conf-tmp > /etc/named.conf
         # For fedora
         systemctl restart named.service
         # For RHEL

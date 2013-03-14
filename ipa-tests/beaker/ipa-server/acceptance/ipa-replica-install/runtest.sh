@@ -37,8 +37,8 @@ CA2INSTALL=false
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 . ./lib.ipa-rhts.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -54,7 +54,7 @@ CA2INSTALL=false
 echo "The hostname of IPA Server is $MASTER"
 echo "The beaker hostname of IPA Server is $BEAKERMASTER"
 
-cat /dev/shm/env.sh
+cat /opt/rhqa_ipa/env.sh
 ########################################################################
 
 # If you change the style of setting MYROLE, remember
@@ -92,16 +92,16 @@ rlJournalStart
 	rlLog "CLIENT: $CLIENT"
 	rlLog "CLIENT2: $CLIENT2"
 
-	eval "echo \"export BEAKERMASTER=$MASTER\" >> /dev/shm/env.sh"
-	eval "echo \"export BEAKERSLAVE=$SLAVE\" >> /dev/shm/env.sh"
-	eval "echo \"export BEAKERCLIENT=$CLIENT\" >> /dev/shm/env.sh"
-	eval "echo \"export BEAKERCLIENT2=$CLIENT2\" >> /dev/shm/env.sh"
+	eval "echo \"export BEAKERMASTER=$MASTER\" >> /opt/rhqa_ipa/env.sh"
+	eval "echo \"export BEAKERSLAVE=$SLAVE\" >> /opt/rhqa_ipa/env.sh"
+	eval "echo \"export BEAKERCLIENT=$CLIENT\" >> /opt/rhqa_ipa/env.sh"
+	eval "echo \"export BEAKERCLIENT2=$CLIENT2\" >> /opt/rhqa_ipa/env.sh"
 	MASTER_S=`echo $MASTER | cut -d . -f 1`
-	eval "echo \"export MASTER=$MASTER_S.$DOMAIN\" >> /dev/shm/env.sh"
+	eval "echo \"export MASTER=$MASTER_S.$DOMAIN\" >> /opt/rhqa_ipa/env.sh"
 	SLAVE_S=`echo $SLAVE | cut -d . -f 1`
-	eval "echo \"export SLAVE=$SLAVE_S.$DOMAIN\" >> /dev/shm/env.sh"
+	eval "echo \"export SLAVE=$SLAVE_S.$DOMAIN\" >> /opt/rhqa_ipa/env.sh"
 
-	. /dev/shm/env.sh
+	. /opt/rhqa_ipa/env.sh
 
 	# Determine it's RHEL/Fedora
 	echo $FAMILY | grep Fedora
@@ -124,11 +124,11 @@ rlJournalStart
 	ipofm=`dig +short $BEAKERMASTER`
 	ipofs=`dig +short $BEAKERSLAVE`
 
-	eval "echo \"export MASTERIP=$ipofm\" >> /dev/shm/env.sh"
-	eval "echo \"export SLAVEIP=$ipofs\" >> /dev/shm/env.sh"
+	eval "echo \"export MASTERIP=$ipofm\" >> /opt/rhqa_ipa/env.sh"
+	eval "echo \"export SLAVEIP=$ipofs\" >> /opt/rhqa_ipa/env.sh"
 
-	. /dev/shm/env.sh
-	cat /dev/shm/env.sh
+	. /opt/rhqa_ipa/env.sh
+	cat /opt/rhqa_ipa/env.sh
 
 	echo $BEAKERMASTER | grep $HOSTNAME
 	if [ $? -eq 0 ] ; then
@@ -138,7 +138,7 @@ rlJournalStart
 
 			rlRun "service iptables stop" 0 "Stop the firewall on the MASTER"
 			rlRun "service ip6tables stop" 0 "Stop the ipv6 firewall on the MASTER"
-			rlRun "cat /dev/shm/env.sh"
+			rlRun "cat /opt/rhqa_ipa/env.sh"
 			rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
 			rlRun "pushd $TmpDir"
 
@@ -149,9 +149,9 @@ rlJournalStart
 			installMaster
 			createReplica1
 
-			# Backing up /dev/shm/
+			# Backing up /opt/rhqa_ipa/
 			mkdir -p /root/dev-shm-backup
-			cp -a /dev/shm/* /root/dev-shm-backup
+			cp -a /opt/rhqa_ipa/* /root/dev-shm-backup
 
 			rhts-sync-set -s READY_REPLICA1 -m $BEAKERMASTER
 			rhts-sync-block -s DONE_REPLICA1 $BEAKERSLAVE
@@ -230,7 +230,7 @@ rlJournalStart
 
 			rlRun "service iptables stop" 0 "Stop the firewall on the MASTER"
 			rlRun "service ip6tables stop" 0 "Stop the ipv6 firewall on the MASTER"
-			rlRun "cat /dev/shm/env.sh"
+			rlRun "cat /opt/rhqa_ipa/env.sh"
 			rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
 			rlRun "pushd $TmpDir"
 

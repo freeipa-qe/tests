@@ -76,7 +76,7 @@ ipa_install_set_vars()
         M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
         export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
         export BEAKERMASTER_env${I}=$M
-        echo "export BEAKERMASTER_env${I}=$M" >> /dev/shm/env.sh
+        echo "export BEAKERMASTER_env${I}=$M" >> /opt/rhqa_ipa/env.sh
         export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
         if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
             export MYROLE=MASTER_env${I}
@@ -101,7 +101,7 @@ ipa_install_set_vars()
             export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
             echo "export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN"
             export BEAKERREPLICA${J}_env${I}=$R
-            echo "export BEAKERREPLICA${J}_env${I}=$R" >> /dev/shm/env.sh
+            echo "export BEAKERREPLICA${J}_env${I}=$R" >> /opt/rhqa_ipa/env.sh
             export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype|tail -1)
             if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
                 export MYROLE=REPLICA${J}_env${I}
@@ -129,9 +129,9 @@ ipa_install_set_vars()
         export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
         for C in $(eval echo \$CLIENT_env${I}); do
             export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN
-            echo "export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN" >> /dev/shm/env.sh
+            echo "export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN" >> /opt/rhqa_ipa/env.sh
             export BEAKERCLIENT${J}_env${I}=$C
-            echo "export BEAKERCLIENT${J}_env${I}=$C" >> /dev/shm/env.sh
+            echo "export BEAKERCLIENT${J}_env${I}=$C" >> /opt/rhqa_ipa/env.sh
             export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype|tail -1)
             if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
                 export MYROLE=CLIENT${J}_env${I}
@@ -149,34 +149,34 @@ ipa_install_set_vars()
     # Make sure Simple Vars are set in env.sh for simplicity and
     # backwards compatibility with older tests.  This means no
     # _env<NUM> suffix.
-    echo "export MYENV=${MYENV}" >> /dev/shm/env.sh
-    echo "export MYROLE=${MYROLE}" >> /dev/shm/env.sh
-    echo "export MASTER=$(eval echo \$MASTER_env${MYENV})" >> /dev/shm/env.sh
-    echo "export MASTERIP=$(eval echo \$BEAKERMASTER_IP_env${MYENV})" >> /dev/shm/env.sh
-    echo "export SLAVE=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /dev/shm/env.sh
-    echo "export SLAVEIP=$(eval echo \$BEAKERREPLICA1_IP_env${MYENV})" >> /dev/shm/env.sh
-    echo "export REPLICA=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /dev/shm/env.sh
-    echo "export CLIENT=$(eval echo \$CLIENT1_env${MYENV})" >> /dev/shm/env.sh
-    echo "export CLIENT2=$(eval echo \$CLIENT2_env${MYENV})" >> /dev/shm/env.sh
-    echo "export BEAKERMASTER=$(eval echo \$BEAKERMASTER_env${MYENV})" >> /dev/shm/env.sh
-    echo "export BEAKERREPLICA_env${MYENV}=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /dev/shm/env.sh
-    echo "export BEAKERSLAVE=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /dev/shm/env.sh
-    echo "export BEAKERCLIENT=$(eval echo \$BEAKERCLIENT1_env${MYENV})" >> /dev/shm/env.sh
-    echo "export BEAKERCLIENT2=$(eval echo \$BEAKERCLIENT2_env${MYENV})" >> /dev/shm/env.sh
+    echo "export MYENV=${MYENV}" >> /opt/rhqa_ipa/env.sh
+    echo "export MYROLE=${MYROLE}" >> /opt/rhqa_ipa/env.sh
+    echo "export MASTER=$(eval echo \$MASTER_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export MASTERIP=$(eval echo \$BEAKERMASTER_IP_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export SLAVE=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export SLAVEIP=$(eval echo \$BEAKERREPLICA1_IP_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export REPLICA=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export CLIENT=$(eval echo \$CLIENT1_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export CLIENT2=$(eval echo \$CLIENT2_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERMASTER=$(eval echo \$BEAKERMASTER_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERREPLICA_env${MYENV}=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERSLAVE=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERCLIENT=$(eval echo \$BEAKERCLIENT1_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERCLIENT2=$(eval echo \$BEAKERCLIENT2_env${MYENV})" >> /opt/rhqa_ipa/env.sh
 
     # FIX Env specific vars like RELM, DOMAIN, BASEDN
     if [ $MYENV -gt 1 ]; then 
         NEWRELM=$(echo $RELM|sed "s/^\([^\.]*\)/\1$MYENV/g")
-        sed -i "s/RELM=.*$/RELM=$NEWRELM/" /dev/shm/env.sh
+        sed -i "s/RELM=.*$/RELM=$NEWRELM/" /opt/rhqa_ipa/env.sh
 
         NEWDOMAIN=$(echo $DOMAIN|sed "s/^\([^\.]*\)/\1$MYENV/g")
-        sed -i "s/DOMAIN=.*$/DOMAIN=$NEWDOMAIN/" /dev/shm/env.sh
+        sed -i "s/DOMAIN=.*$/DOMAIN=$NEWDOMAIN/" /opt/rhqa_ipa/env.sh
 
         NEWBASEDN=$(echo $BASEDN|sed "s/^\([^\,]*\)/\1$MYENV/g")
-        sed -i "s/BASEDN=.*$/BASEDN=\"$NEWBASEDN\"/" /dev/shm/env.sh
+        sed -i "s/BASEDN=.*$/BASEDN=\"$NEWBASEDN\"/" /opt/rhqa_ipa/env.sh
     fi
 
-    . /dev/shm/env.sh
+    . /opt/rhqa_ipa/env.sh
 
     ### Set OS/YUM/RPM related variables here
     if [ $(grep Fedora /etc/redhat-release|wc -l) -gt 0 ]; then
@@ -199,15 +199,15 @@ ipa_install_set_vars()
         IPADEBUG=1
     fi
         
-    # Copy ipa-install.sh to /dev/shm 
+    # Copy ipa-install.sh to /opt/rhqa_ipa 
     # Some tests like install-server-cli like to call the scipt as a library
-    rm -f /dev/shm/ipa-install.sh
-    cp -a ./ipa-install.sh /dev/shm/.
+    rm -f /opt/rhqa_ipa/ipa-install.sh
+    cp -a ./ipa-install.sh /opt/rhqa_ipa/.
  
     rlLog "===================== env|sort =========================="
     rlRun "env|sort"
     rlLog "===================== env.sh   =========================="
-    rlRun "cat /dev/shm/env.sh"
+    rlRun "cat /opt/rhqa_ipa/env.sh"
     rlLog "==============================================="
 }
 
@@ -650,9 +650,9 @@ ipa_install_envs()
             fi
             I=$(( I += 1 ))
         done
-        # Backup /dev/shm/ to /root/dev-shm-backup
+        # Backup /opt/rhqa_ipa/ to /root/dev-shm-backup
         mkdir /root/dev-shm-backup
-        cp -a /dev/shm/* /root/dev-shm-backup/.
+        cp -a /opt/rhqa_ipa/* /root/dev-shm-backup/.
     rlPhaseEnd
 }
 
@@ -756,8 +756,8 @@ fixForwarderIPv6()
 {
     ipa_install_prep_initVars
     
-    rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /dev/shm/env.sh"
-    . /dev/shm/env.sh
+    rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /opt/rhqa_ipa/env.sh"
+    . /opt/rhqa_ipa/env.sh
 }
 
 rmIPv4addr()
@@ -838,13 +838,13 @@ SetUpAuthKeys()
     [ ! -d /root/.ssh/ ] && rlRun "mkdir -p /root/.ssh"
     chmod 700 /root/.ssh
     restorecon -R /root/.ssh
-    diff -q /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa > /dev/null 2>&1
+    diff -q /opt/rhqa_ipa/id_rsa_global.pub /root/.ssh/id_rsa > /dev/null 2>&1
     if [ $? -eq 1 ]; then   
-        /bin/cp -f /dev/shm/id_rsa_global /root/.ssh/id_rsa
-        /bin/cp -f /dev/shm/id_rsa_global.pub /root/.ssh/id_rsa.pub
+        /bin/cp -f /opt/rhqa_ipa/id_rsa_global /root/.ssh/id_rsa
+        /bin/cp -f /opt/rhqa_ipa/id_rsa_global.pub /root/.ssh/id_rsa.pub
         for var in ${!BEAKERMASTER_env*} ${!BEAKERREPLICA_env*} ${!BEAKERCLIENT_env*}; do
             for server in $(eval echo \$$var); do
-                sed -e s/localhost/$server/g /dev/shm/id_rsa_global.pub >> /root/.ssh/authorized_keys
+                sed -e s/localhost/$server/g /opt/rhqa_ipa/id_rsa_global.pub >> /root/.ssh/authorized_keys
             done
         done
     fi
@@ -1037,11 +1037,11 @@ ipa_install_replica()
     rlRun "sleep 60"
 
     rlLog "RUN sftp to get gpg file"
-    rlRun "sftp -o StrictHostKeyChecking=no root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /dev/shm/"
+    rlRun "sftp -o StrictHostKeyChecking=no root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /opt/rhqa_ipa/"
 
     rlLog "RUN ipa-replica-install"
     if [ -z "$IPA_REPLICA_OPTIONS" ];then
-        IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /dev/shm/replica-info-$hostname_s.$DOMAIN.gpg"
+        IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
     fi
     rlRun "ipa-replica-install $IPA_REPLICA_OPTIONS"
     if [ $? -gt 0 ]; then

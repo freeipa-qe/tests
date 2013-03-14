@@ -9,8 +9,8 @@
 #joe1:asdfghjk:501:501::/home/joe1:/bin/bash
 # Michael Gregg
 
-. /dev/shm/env.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 
 KinitAsAdmin
 

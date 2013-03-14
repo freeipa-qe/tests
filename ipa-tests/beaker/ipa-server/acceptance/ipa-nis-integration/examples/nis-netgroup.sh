@@ -1,9 +1,9 @@
 #!/bin/sh
 # 1 is the nis domain, 2 is the nis master server
-ypcat -k -d $1 -h $2 netgroup > /dev/shm/nis-map.netgroup 2>&1
+ypcat -k -d $1 -h $2 netgroup > /opt/rhqa_ipa/nis-map.netgroup 2>&1
 
 IFS=$'\n'
-for line in $(cat /dev/shm/nis-map.netgroup); do 
+for line in $(cat /opt/rhqa_ipa/nis-map.netgroup); do 
 	IFS=' '
         netgroupname=$(echo $line|awk '{print $1}')
 	triples=$(echo $line|sed "s/^$netgroupname //")

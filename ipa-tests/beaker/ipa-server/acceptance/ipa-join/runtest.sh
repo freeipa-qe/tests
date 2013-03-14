@@ -36,8 +36,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 # Include test case file
 . ./lib.ipajoin.sh
@@ -66,8 +66,8 @@ rlJournalStart
         rlLog "BEAKERSLAVE: $BEAKERSLAVE"
         rlLog "BEAKERCLIENT: $BEAKERCLIENT"
    
-        #echo "export BEAKERMASTER=$MASTER" >> /dev/shm/env.sh
-        #echo "export BEAKERSLAVE=$SLAVE" >> /dev/shm/env.sh
+        #echo "export BEAKERMASTER=$MASTER" >> /opt/rhqa_ipa/env.sh
+        #echo "export BEAKERSLAVE=$SLAVE" >> /opt/rhqa_ipa/env.sh
 
         #####################################################################
         #               IS THIS MACHINE A CLIENT?                           #

@@ -36,8 +36,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 
 PACKAGE="ipa-server"
@@ -508,9 +508,9 @@ rlPhaseStartTest "ipa-ctl-25 restart services as non-root user"
 
 	rlPhaseStartTest "ipa-ctl bz840381 At times ipactl fails to start DNS service and a crash is detected."
 		rlRun "ipactl stop" 0 "Stop all ipa services"
-		#outfile=/dev/shm/bz840381.txt
+		#outfile=/opt/rhqa_ipa/bz840381.txt
                 # check output of ipactl start and search for error instead of writing it out to a file.
-                # ipactl writing to /dev/shm causes avc errors, so not using that apprach. 
+                # ipactl writing to /opt/rhqa_ipa causes avc errors, so not using that apprach. 
                 # Test ipa-ctl-20 tests that DNS service start correctly
 		rlRun "ipactl start | grep 'Failed to start DNS Service'" 1 "Start ipa services. Ensure that a DNS failure is not in the output - BZ 840381"
 		#rlRun "grep 'Failed to start DNS Service' $outfile" 1 "Ensure that a DNS failure is not in the output file BZ 840381"

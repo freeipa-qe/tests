@@ -36,55 +36,56 @@ run: $(FILES) build
 	#yum -y install expect
 	#expect ./set-root-pw.exp
 	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
-	rm -f /dev/shm/env.sh
-	cp ./env.sh /dev/shm/.
-	rm -f /dev/shm/ipa-server-shared.sh
-	cp ./ipa-server-shared.sh /dev/shm/.
-	rm -f /dev/shm/ipa-install.sh
-	cp ./ipa-install.sh /dev/shm/.
-	rm -f /dev/shm/ipa-host-cli-lib.sh
-	cp ./ipa-host-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/ipa-hostgroup-cli-lib.sh
-	cp ./ipa-hostgroup-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/ipa-netgroup-cli-lib.sh
-	cp ./ipa-netgroup-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/ipa-group-cli-lib.sh
-	cp ./ipa-group-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/ipa-hbac-cli-lib.sh
-	cp ./ipa-hbac-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/ipa-automember-cli-lib.sh
-	cp ./ipa-automember-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/lib.ds-migration.sh
-	cp ./lib.ds-migration.sh /dev/shm/.
-	rm -f /dev/shm/lib.user-cli.sh
-	cp ./lib.user-cli.sh /dev/shm/.
-	rm -f /dev/shm/ipa-service-cli-lib.sh
-	cp ./ipa-service-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/nis.sh
-	cp ./nis.sh /dev/shm/.
-	rm -f /dev/shm/lib.ipa-rhts.sh
-	cp ./lib.ipa-rhts.sh /dev/shm/.
-	rm -f /dev/shm/ipa-rbac-cli-lib.sh
-	cp ./ipa-rbac-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/ipa-selinuxusermap-cli-lib.sh
-	cp ./ipa-selinuxusermap-cli-lib.sh /dev/shm/.
-	rm -f /dev/shm/install-lib.sh
-	cp ./install-lib.sh /dev/shm/.
-	rm -f /dev/shm/set-root-pw.exp
-	cp ./set-root-pw.exp /dev/shm/.
-	rm -f /dev/shm/id_rsa*
-	cp ./id_rsa* /dev/shm/.
+	mkdir /opt/rhqa_ipa
+	rm -f /opt/rhqa_ipa/env.sh
+	cp ./env.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-server-shared.sh
+	cp ./ipa-server-shared.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-install.sh
+	cp ./ipa-install.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-host-cli-lib.sh
+	cp ./ipa-host-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-hostgroup-cli-lib.sh
+	cp ./ipa-hostgroup-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-netgroup-cli-lib.sh
+	cp ./ipa-netgroup-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-group-cli-lib.sh
+	cp ./ipa-group-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-hbac-cli-lib.sh
+	cp ./ipa-hbac-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-automember-cli-lib.sh
+	cp ./ipa-automember-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/lib.ds-migration.sh
+	cp ./lib.ds-migration.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/lib.user-cli.sh
+	cp ./lib.user-cli.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-service-cli-lib.sh
+	cp ./ipa-service-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/nis.sh
+	cp ./nis.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/lib.ipa-rhts.sh
+	cp ./lib.ipa-rhts.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-rbac-cli-lib.sh
+	cp ./ipa-rbac-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/ipa-selinuxusermap-cli-lib.sh
+	cp ./ipa-selinuxusermap-cli-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/install-lib.sh
+	cp ./install-lib.sh /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/set-root-pw.exp
+	cp ./set-root-pw.exp /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/id_rsa*
+	cp ./id_rsa* /opt/rhqa_ipa/.
 	mkdir -p /root/.ssh
 	cp ./id_rsa* /root/.ssh/.
-	rm -f /dev/shm/id_dsa*
-	cp ./id_dsa* /dev/shm/.
+	rm -f /opt/rhqa_ipa/id_dsa*
+	cp ./id_dsa* /opt/rhqa_ipa/.
 	cp ./id_dsa* /root/.ssh/.
 	cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 	cat /root/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys2
-	cp -f ./id_rsa_global.pub /dev/shm/.
-	cp -f ./id_rsa_global /dev/shm/.
-	cp -f ./known_hosts /dev/shm/.
-	chmod 755 /dev/shm/*.sh
+	cp -f ./id_rsa_global.pub /opt/rhqa_ipa/.
+	cp -f ./id_rsa_global /opt/rhqa_ipa/.
+	cp -f ./known_hosts /opt/rhqa_ipa/.
+	chmod 755 /opt/rhqa_ipa/*.sh
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
 	chmod 600 /root/.ssh/authorized_keys

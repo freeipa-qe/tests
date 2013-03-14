@@ -3,15 +3,15 @@
 # https://engineering.redhat.com/trac/ipa-tests/ticket/278, aka:
 # https://bugzilla.redhat.com/show_bug.cgi?id=783606
 # Run the master-setup.bash script on the master, then run the ron-on-slave.bash script on the replica 
-. /dev/shm/env.sh
-. /dev/shm/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
 
 hostnames=$(hostname -s)
-REPLICAFILE="/dev/shm/replica-info-$hostnames.$DOMAIN.gpg"
+REPLICAFILE="/opt/rhqa_ipa/replica-info-$hostnames.$DOMAIN.gpg"
 NEWPORT=29719
 maxusers=100
 
-if [ ! -f /dev/shm/env.sh ]; then
+if [ ! -f /opt/rhqa_ipa/env.sh ]; then
         echo 'ERROR - Sorry, this script needs to be run on a IPA provisioned slave from beaker'
         exit
 fi
