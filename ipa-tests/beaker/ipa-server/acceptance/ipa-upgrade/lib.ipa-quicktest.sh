@@ -487,8 +487,8 @@ function ipa_quicktest_automember_check()
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
     rlRun "getent -s sss group ${amgroup1}|grep ${amuser1}"
-    rlLog "DEBUG SLEEP"
-    rlRun "sleep 10000"
+    #rlLog "DEBUG SLEEP"
+    #rlRun "sleep 10000"
 
     rlLog "Confirm host added as member of ${amhostgroup1}"
     rlRun "ipa host-show ${amhost1} > $tmpout 2>&1"
