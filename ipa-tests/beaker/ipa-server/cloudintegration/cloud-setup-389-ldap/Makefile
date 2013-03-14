@@ -25,7 +25,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/tests/cloudintegration/cloud-setup-389-ldap
-export TESTVERSION=1.8
+export TESTVERSION=3.0
 
 BUILT_FILES=
 

@@ -25,7 +25,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-delegation-cli
-export TESTVERSION=1.0
+export TESTVERSION=3.0
 
 BUILT_FILES=
 

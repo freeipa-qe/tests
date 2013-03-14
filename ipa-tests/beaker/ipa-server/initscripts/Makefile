@@ -25,7 +25,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export TEST=/CoreOS/ipa-server/initscripts
-export TESTVERSION=1.0
+export TESTVERSION=3.0
 
 BUILT_FILES=
 
