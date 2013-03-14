@@ -445,6 +445,16 @@ function ipa_quicktest_automember_check()
     rlLog "data_check_automember: check automember data"
     KinitAsAdmin
 
+    #if [ ! -f /etc/sssd/sssd.conf.$FUNCNAME.backup ]; then
+    #    rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.$FUNCNAME.backup"
+    #    rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 9/' /etc/sssd/sssd.conf"
+    #    sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+    #    rlRun "cat /etc/sssd/sssd.conf"
+    #    rlRun "service sssd restart"
+    #    rlRun "sleep 5"
+    #fi
+
+
     if [ "$runtype" = "new" -o $OSVER -ge 63 ]; then
         rlLog "Find automember group rule"
         rlRun "ipa automember-find --type=group > $tmpout 2>&1" 
@@ -477,6 +487,8 @@ function ipa_quicktest_automember_check()
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
     rlRun "getent -s sss group ${amgroup1}|grep ${amuser1}"
+    rlLog "DEBUG SLEEP"
+    rlRun "sleep 10000"
 
     rlLog "Confirm host added as member of ${amhostgroup1}"
     rlRun "ipa host-show ${amhost1} > $tmpout 2>&1"

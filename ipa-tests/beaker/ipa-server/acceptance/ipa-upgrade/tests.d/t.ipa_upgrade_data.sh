@@ -126,7 +126,7 @@ ipa_upgrade_data_check()
     fi
 
     if [ $runver -ge 63 ]; then
-        rlRun "sleep 600"
+        #rlRun "sleep 600"
         ipa_quicktest_automember_check $runtype
     fi
 
