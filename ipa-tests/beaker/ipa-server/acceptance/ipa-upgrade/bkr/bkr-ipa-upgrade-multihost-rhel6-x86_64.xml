@@ -33,7 +33,7 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="MASTER">
@@ -72,7 +72,7 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="REPLICA">
@@ -111,7 +111,7 @@
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
 				<params/>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="CLIENT">
