@@ -34,6 +34,8 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 
+moresecondsfile=$(cat /tmp/ipa-reservation-extend-seconds.dat)
+
 send_start_notice()
 {
 hostname=$(hostname)
@@ -166,16 +168,16 @@ rlJournalStart
 		while [ $rescomplete -eq 0 ]; do
 			sleep 500
 			currenttime=$(date +%s)
-			if [ -f /tmp/ipa-reservation-extend-seconds.dat ]; then
-				moreseconds=$(cat /tmp/ipa-reservation-extend-seconds.dat)
-				oldstart=$starttime
-				let $starttime=$starttime+$moreseconds
-				rlLog "old start time is $oldstart"
-				rlLog "new start time is $starttime"
+			if [ -f $moresecondsfile ]; then
+				oldseconds=$RESERVETIME
+				moreseconds=$(cat moresecondsfile)
+				let $RESERVETIME=$RESERVETIME+$moreseconds
+				rlLog "Original reservation time is $RESERVETIME"
+				rlLog "New reservation time is $starttime"
 				rlLog "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				export moreseconds
 				send_extended_email
-				rm -f /tmp/ipa-reservation-extend-seconds.dat
+				rm -f $moresecondsfile
 			fi
 			let endseconds=$starttime+$RESERVETIME
 			let timediff=$endseconds-$currenttime

@@ -18,6 +18,7 @@ if [ $1 -gt 0 ] && [ $1 -lt 1209600 ]; then
 		exit 1
 	else
 		echo "$1" > $extendfile
+		echo "Reservation extended $1 seconds. You will recieve a email with the updated reservation end time."
 	fi
 	exit 0
 else
