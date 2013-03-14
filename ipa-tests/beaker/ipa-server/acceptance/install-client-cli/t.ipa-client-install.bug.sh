@@ -234,3 +234,68 @@ ipaclientinstall_bugcheck_790105()
         rlAssertGrep "\[ok_for_dns\] (0x0200): Link local IPv6 address" "$sssd_log_file"
 
 }
+
+ipaclientinstall_bugcheck_817030()
+{
+
+        rlPhaseStartTest "BZ-817030 ipa-client-install sets "KerberosAuthenticate no" in sshd.conf"
+        #Installing client
+        uninstall_fornexttest
+
+        sshd_config="/etc/ssh/sshd_config"
+        #rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
+
+        rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER --enable-dns-updates --mkhomedir"
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER --enable-dns-updates --mkhomedir" 0 "Installing ipa client and configuring - with all params"
+
+        #Checking sshd_config does not contains "KerberosAuthentication yes"
+ 
+        rlAssertGrep "KerberosAuthentication no" "$sshd_config"
+
+	#Modifying sssd config for kerberos renewal 
+	
+	SSSD=/etc/sssd/sssd.conf
+	rlRun "sed '/cache_credentials/ a krb5_renewable_lifetime = 5d' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+	rlRun "sed '/cache_credentials/ a krb5_renew_interval = 500' $SSSD > /tmp/sssd.conf;cp /tmp/sssd.conf $SSSD"
+	rlRun "service sssd restart"
+		
+        klist_before=/tmp/klist_before.out
+        klist_after=/tmp/klist_after.out
+        klist_diff=/tmp/klist_diff.out
+        userpw="Secret123"
+
+        cat > /tmp/sudo_list.exp << EOF
+#!/usr/bin/expect -f
+
+set timeout 30
+set send_slow {1 .1}
+match_max 100000
+
+spawn ssh -o StrictHostKeyChecking=no -l admin localhost
+expect "*: "
+send -s "$userpw\r"
+expect "*$ "
+send -s "klist > $klist_before 2>&1 \r"
+expect "*$ "
+send -s "kinit -R\r"
+expect "*$ "
+send -s "klist > $klist_after 2>&1 \r"
+expect eof
+EOF
+
+	chmod 755 /tmp/sudo_list.exp
+	cat /tmp/sudo_list.exp
+	/tmp/sudo_list.exp
+        rlRun "cat $klist_before"
+        rlRun "cat $klist_after"
+        rlRun "diff $klist_before $klist_after > $klist_diff" 1 
+        rlRun "cat $klist_diff"
+        if [ -s $klist_diff ] ; then
+           rlPass "Kerberos tkt is renewed"
+        else
+           rlFail "Kerberos tkt renewal failed"
+        fi
+        rlRun "rm -rf /tmp/sudo_list.exp /tmp/klist*"
+   rlPhaseEnd
+}
+
