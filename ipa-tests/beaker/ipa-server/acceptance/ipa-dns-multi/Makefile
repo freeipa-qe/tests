@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/ipa-server/acceptance/ipa-dns-multi
+export TEST=/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-dns-multi
 export TESTVERSION=3.0
 
 BUILT_FILES=

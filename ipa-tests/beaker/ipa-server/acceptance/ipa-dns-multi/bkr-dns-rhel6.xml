@@ -20,7 +20,7 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
-                        <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+                        <task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
                                <params/>
                         </task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
@@ -28,10 +28,10 @@
 					<param name="PKGARGNAME" value="expect ipa-server ipa-client vim-enhanced"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER_env1">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns-multi" role="MASTER_env1">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-dns-multi" role="MASTER_env1">
 				<params/>
 			</task>
 		</recipe>
@@ -52,7 +52,7 @@
 			<task name="/distribution/install" role="STANDALONE">
 				<params/>
 			</task>
-                        <task name="/CoreOS/ipa-server/shared" role="STANDALONE">
+                        <task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
                                <params/>
                         </task>
 			<task name="/distribution/pkginstall" role="STANDALONE">
@@ -60,10 +60,10 @@
 					<param name="PKGARGNAME" value="expect ipa-server ipa-client vim-enhanced"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/quickinstall" role="MASTER_env2">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall" role="MASTER_env2">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/acceptance/ipa-dns-multi" role="MASTER_env2">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-dns-multi" role="MASTER_env2">
 				<params/>
 			</task>
 		</recipe>

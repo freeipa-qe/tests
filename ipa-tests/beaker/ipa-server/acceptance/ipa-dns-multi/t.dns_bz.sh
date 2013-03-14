@@ -81,7 +81,7 @@ bz766233()
 
 bz869658()
 {
-    rlPhaseStartTest "BZ 869658 - It is not possible to disable forwarding on per-zone basics."
+    rlPhaseStartTest "BZ 869658 - It is not possible to disable forwarding on per-zone basis."
 	tzone="newtransferzone.com"
 	if [ "$MYROLE" == "MASTER1" ]; then
         	iparhts-sync-set -s 869658_READY_REPLICA1 -m $MASTER_env1
