@@ -23,7 +23,7 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export TEST=/CoreOS/ipa-server/shared
+export TEST=/CoreOS/ipa-server/rhel70-ipa/shared
 export TESTVERSION=3.0
 
 BUILT_FILES=
