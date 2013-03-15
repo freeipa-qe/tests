@@ -482,11 +482,22 @@ function ipa_quicktest_automember_check()
         rlAssertGrep "unknown command" $tmpout
     fi
 
+    DDATE=$(date +%Y%m%d%H%M%S)
+    rlRun "cat /dev/null > /var/log/sssd/sssd_testrelm.com.log"
     rlLog "Confirm user added to group ${amgroup1}"
     rlRun "ipa user-show ${amuser1} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
+    rlRun "strace -vtf -o /tmp/getentfailure.strace getent -s sss group ${amgroup1}"
     rlRun "getent -s sss group ${amgroup1}|grep ${amuser1}"
+    rlRun "id ${amuser1}"
+
+    rlRun "cp /var/log/sssd/sssd_testrelm.com.log /tmp/sssd_testrelm.com.log.$DDATE"
+    rlRun "submit_log /tmp/sssd_testrelm.com.log.$DDATE"
+    for strace_file in $(ls /tmp/getentfailure.strace* 2>/dev/null); do
+        rlRun "submit_log $strace_file"
+        rlRun "rm $strace_file"
+    done
     #rlLog "DEBUG SLEEP"
     #rlRun "sleep 10000"
 
