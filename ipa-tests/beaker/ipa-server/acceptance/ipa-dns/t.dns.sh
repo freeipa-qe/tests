@@ -35,7 +35,8 @@ naptrfind="info@example.com"
 
 a="1.2.3.4"
 ahost="1.testrelm.com"  #format must be specified as "PREFERENCE EXCHANGER" (see RFC 2230 for details)
-a2="1.2.3.4,2.3.4.5"
+multiarecord1="1.2.3.4"
+multiarecord2="2.3.4.5"
 aaaa="fec0:0:a10:6000:10:16ff:fe98:193"
 aaaabad1="bada:aaaa:real:ly:bad:dude:extr:a"
 aaaabad2="aaaa:bbbb:cccc:dddd:eeee:fffff"
@@ -139,7 +140,7 @@ dnsreplicaprepare()
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-replicaprepare-04 check reverse entry of the replica was created in dns correctly with dig"
-		sleep 45
+		sleep 75
 		rlLog "EXECUTING: dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN"
 		rlRun "dig -x $newfakehostip | grep newfakehost$newip.$DOMAIN" 0 "Checking to ensure that reverse of newfakehost$newip.$DOMAIN is set up correctly"
 	rlPhaseEnd
@@ -277,47 +278,43 @@ dnsarecord()
 
 	# Type Multiple A's
 	rlPhaseStartTest "ipa-dns-arecord-05 add record of type multiple A records"
-		rlRun "ipa dnsrecord-add $zone aa2 --a-rec $a2" 0 "add record type a"
+		rlRun "ipa dnsrecord-add $zone aa2 --a-rec $multiarecord1 --a-rec $multiarecord2" 0 "add record type a"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-06 make sure that IPA saved the first type A record"
-		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $1}')
-		rlRun "ipa dnsrecord-find $zone aa2 | grep $thisa" 0 "make sure ipa recieved record type A"
+		rlRun "ipa dnsrecord-find $zone aa2 | grep \"$multiarecord1\"" 0 "make sure ipa recieved record type A"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-07 make sure that dig can find the first a record"
-		rlRun "dig aa2.$zone | grep $thisa" 0 "make sure dig finds the first A record"
+		rlRun "dig aa2.$zone | grep \"$multiarecord1\"" 0 "make sure dig finds the first A record"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-08 make sure that IPA saved the second type A record"
-		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $2}')
-		rlRun "ipa dnsrecord-find $zone aa2 | grep $thisa" 0 "make sure ipa recieved second record type A"
+		rlRun "ipa dnsrecord-find $zone aa2 | grep \"$multiarecord2\"" 0 "make sure ipa recieved second record type A"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-09 make sure that dig can find the second a record"
-		rlRun "dig aa2.$zone | grep $thisa" 0 "make sure dig finds the first A record"
+		rlRun "dig aa2.$zone | grep \"$multiarecord2\"" 0 "make sure dig finds the first A record"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-10 delete record of type multiple A"
-		rlRun "ipa dnsrecord-del $zone aa2 --a-rec $a2" 0 "delete record type multiple a"
+		rlRun "ipa dnsrecord-del $zone aa2 --a-rec $multiarecord1 --a-rec $multiarecord2" 0 "delete record type multiple a"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-11 make sure that IPA removed the first type A record"
-		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $1}')
-		rlRun "ipa dnsrecord-find $zone aa2 | grep $thisa" 1 "make sure ipa removed record type A"
+		rlRun "ipa dnsrecord-find $zone aa2 | grep $multiarecord1" 1 "make sure ipa removed record type A"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-12 make sure that dig cannot find the first a record"
-		rlRun "dig aa2.$zone | grep $thisa" 1 "make sure dig does not find the first A record"
+		rlRun "dig aa2.$zone | grep $multiarecord1" 1 "make sure dig does not find the first A record"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-13 make sure that IPA removed the second type A record"
-		thisa=$(echo $a2 | sed s/,/\ /g | awk '{print $2}')
-		rlRun "ipa dnsrecord-find $zone aa2 | grep $thisa" 1 "make sure ipa removed second record type A"
+		rlRun "ipa dnsrecord-find $zone aa2 | grep $multiarecord2" 1 "make sure ipa removed second record type A"
 	rlPhaseEnd
 
 	rlPhaseStartTest "ipa-dns-arecord-14 make sure that dig can not find the second a record"
-		rlRun "dig aa2.$zone | grep $thisa" 1 "make sure dig does not finds the first A record"
+		rlRun "dig aa2.$zone | grep $multiarecord2" 1 "make sure dig does not finds the first A record"
 	rlPhaseEnd
 }
 
