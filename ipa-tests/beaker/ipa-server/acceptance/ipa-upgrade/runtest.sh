@@ -94,7 +94,7 @@ rlJournalStart
     if rlIsRHEL "6.8"; then
         ipa_upgrade_master_replica_client_inc_69
     fi
-    ipa_upgrade_master_replica_client_inc_cleanup
+    #ipa_upgrade_master_replica_client_inc_cleanup
 
     #upgrade_test_master_slave_client_all
     #upgrade_test_client_slave_master_all
