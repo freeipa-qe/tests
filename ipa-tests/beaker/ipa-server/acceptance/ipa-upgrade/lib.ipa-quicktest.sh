@@ -490,13 +490,15 @@ function ipa_quicktest_automember_check()
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
     rlRun "id ${amuser1}"
     rlRun "strace -vtf -o /tmp/getentfailure.strace getent -s sss group ${amgroup1}"
+    if [ $? -gt 0 ]; then
+        for strace_file in $(ls /tmp/getentfailure.strace* 2>/dev/null); do
+            rlRun "submit_log $strace_file"
+        done
+    fi
     rlRun "getent -s sss group ${amgroup1}|grep ${amuser1}"
     if [ $? -gt 0 ]; then
         rlRun "cp /var/log/sssd/sssd_testrelm.com.log /tmp/sssd_testrelm.com.log.$DDATE"
         rlRun "submit_log /tmp/sssd_testrelm.com.log.$DDATE"
-        for strace_file in $(ls /tmp/getentfailure.strace* 2>/dev/null); do
-            rlRun "submit_log $strace_file"
-        done
     fi
     rlRun "rm -f /tmp/getentfailure.strace*"
     #rlLog "DEBUG SLEEP"
