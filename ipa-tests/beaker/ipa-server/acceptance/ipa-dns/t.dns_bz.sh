@@ -268,11 +268,11 @@ bz733371()
 		rlRun "ipa dnszone-add example.com --name-server=$MASTER. --admin-email=admin@example.com"
                 rlRun "ipa dnsrecord-add example.com foo --a-rec=10.0.1.1"
 		rlRun "ipa dnszone-mod example.com --allow-query=$MASTERIP"
-		rlRun "service named reload"
+                rlRun "systemctl reload named"
 		sleep 5
                 rlRun "dig +short -t A foo.example.com | grep 10.0.1.1"
 		rlRun "ipa dnszone-mod example.com --allow-query=10.0.1.1"
-		rlRun "service named reload"
+                rlRun "systemctl reload named"
                 sleep 5
                 rlRun "nslookup foo.example.com | grep \"server can't find foo.example.com\""
                 rlRun "ipa dnszone-del example.com"
@@ -589,21 +589,21 @@ bz767489()
 
 	named_ldapi_domain=`hostname -d | sed s/[.]/-/g | tr '[:lower:]' '[:upper:]'`
 
-	rlRun "service named status"
+        rlRun "systemctl status named"
 	rlRun "cp /etc/named.conf /root/"
 	rlRun "sed -i 's/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ldapi:\/\/127.0.0.1/g' /etc/named.conf"
 	rlRun "iptables -A INPUT -j REJECT -p TCP --destination-port ldap --reject-with icmp-port-unreachable"
 	rlRun "iptables -A INPUT -j REJECT -p TCP --destination-port ldaps --reject-with icmp-port-unreachable"
 	rlRun "iptables -L"
 
-	rlRun "service named restart"
-	rlRun "service named status"
+        rlRun "systemctl restart named"
+        rlRun "systemctl status named"
 
 	rlRun "iptables -F"
-	rlRun "service iptables stop"
+        rlRun "systemctl stop iptables"
 	rlRun "mv -f /root/named.conf /etc/"
         rlRun "chgrp named /etc/named.conf"
-	rlRun "service named restart"
+        rlRun "systemctl restart named"
 
     rlPhaseEnd
 }
@@ -615,17 +615,17 @@ bz802375()
     rlPhaseStartTest "802375 BIND cannot be shutdown correctly, if psearch is enabled and LDAP connect fails"
 
 	rlAssertGrep "psearch yes" "/etc/named.conf"
-	rlRun "service named status"
+        rlRun "systemctl status named"
         rlRun "cp /etc/named.conf /root/"
         rlRun "sed -i 's/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ldapi:\/\/127.0.0.1/g' /etc/named.conf"
-	rlRun "service named restart"
+        rlRun "systemctl restart named"
 	rlRun "rndc stop"
 
-	rlRun "service named status" 3 "Verifying that named is not running"
+        rlRun "systemctl status named" 3 "Verifying that named is not running"
 
         rlRun "mv -f /root/named.conf /etc/"
         rlRun "chgrp named /etc/named.conf"
-        rlRun "service named restart"
+        rlRun "systemctl restart named"
 
     rlPhaseEnd
 }
@@ -636,13 +636,13 @@ bz767496()
     rlPhaseStartTest "767496 assertion failure when using persistent search"
 
         rlAssertGrep "psearch yes" "/etc/named.conf"
-        rlRun "service named status" 0 "get named status"
+        rlRun "systemctl status named" 0 "get named status"
         rlRun "cp /etc/named.conf /root/" 0 "make a copy of named.conf"
-        rlRun "service named stop" 0 "stop named"
+        rlRun "systemctl stop named" 0 "stop named"
         rlRun "iptables-save > /tmp/iptables.backup" 0 "save iptables"
         rlRun "iptables -I INPUT -p tcp --dport 389 -j REJECT" 0 "add rule for port 389"
         rlRun "iptables -I INPUT -p tcp --dport 636 -j REJECT" 0 "add rule for port 636"
-        rlRun "service named start" 0 "start named"
+        rlRun "systemctl start named"  0 "start named"
         rlRun "rndc-confgen > /etc/rndc.conf" 0 "set up rndc.conf"
         rlRun "tail -11 /etc/rndc.conf >> /etc/named.conf" 0 "add rndc key to named.conf"
         end1=`wc -l /etc/named.conf | cut -d " "  -f1 | xargs echo`
@@ -653,15 +653,15 @@ bz767496()
         rlLog "start - $start"
         rlLog "Executing: sed \"${start},${end} s/^#//g\" /etc/named.conf"
         rlRun "sed -i \"${start},${end} s/^#//g\" /etc/named.conf" 0 "updated named.conf with rndc key"
-        rlRun "service named restart" 0 "restart named"
+        rlRun "systemctl restart named"  0 "restart named"
         rlRun "rndc reload" 0 " rndc reload was successful"
 
         #restore back:
-        rlRun "service named stop" 0 "stop named"
+        rlRun "systemctl stop named"  0 "stop named"
         rlRun "iptables-restore -c /tmp/iptables.backup" 0 "restore iptables" 
         rlRun "cp -f /root/named.conf /etc/"
         rlRun "chgrp named /etc/named.conf"
-        rlRun "service named restart"
+        rlRun "systemctl restart named"
 
     rlPhaseEnd
 
@@ -1112,8 +1112,8 @@ bz829728()
        rlRun "named -u named -d 0" 0 "run named as user named"
        rlLog "Executing: rndc reload"
        rlRun "rndc reload" 0 " rndc reload was successful"
-       rlLog "Executing: service named status"
-       rlRun "service named status" 0 "Verifying that named is running"
+       rlLog "Executing: systemctl status named"
+       rlRun "systemctl status named" 0 "Verifying that named is running"
     rlPhaseEnd
 }
 
