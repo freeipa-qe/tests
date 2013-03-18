@@ -496,6 +496,10 @@ function ipa_quicktest_automember_check()
     #    done
     #fi
     rlRun "getent -s sss group ${amgroup1}|grep ${amuser1}"
+    if [ $? -gt 0 ]; then
+        rlLog "DEBUGGING getent failure...sleeping now to find it"
+        rlRun "sleep 100000"
+    fi
     #if [ $? -gt 0 ]; then
     #    rlRun "cp /var/log/sssd/sssd_testrelm.com.log /tmp/sssd_testrelm.com.log.$DDATE"
     #    rlRun "submit_log /tmp/sssd_testrelm.com.log.$DDATE"
