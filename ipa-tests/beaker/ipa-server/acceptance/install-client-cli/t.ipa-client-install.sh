@@ -4,18 +4,18 @@
 #################################################################
 ipamastersetup()
 {
-	rlPhaseStartTest "ipamastersetup - setup stuff on master that strictly requires ipa command"
+    rlPhaseStartTest "ipamastersetup - setup stuff on master that strictly requires ipa command"
        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials before uninstalling"
        create_ipauser $testuser $testuser $testuser $testpwd
-	rlPhaseEnd
+    rlPhaseEnd
 }
 
 ipamastercleanup()
 {
-	rlPhaseStartTest "ipamastercleanup - clean up master server"
-		# delete the user added for this test
-		delete_ipauser	$testuser
-	rlPhaseEnd
+    rlPhaseStartTest "ipamastercleanup - clean up master server"
+        # delete the user added for this test
+        delete_ipauser    $testuser
+    rlPhaseEnd
 }
 
 ipaclientinstall()
@@ -23,33 +23,33 @@ ipaclientinstall()
 
    install_setup
 #   -U, --unattended  Unattended installation. The user will not be prompted.
-   ipaclientinstall_adminpwd
+##   ipaclientinstall_adminpwd
 
 #   install with multiple params including
 #   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
-   ipaclientinstall_allparam
+##   ipaclientinstall_allparam
 
    #--uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
-   ipaclientinstall_uninstall
+##   ipaclientinstall_uninstall
 
-   ipaclientinstall_noparam
+##   ipaclientinstall_noparam
 
 #   -N, --no-ntp  Do not configure or enable NTP.
    ipaclientinstall_noNTP
 
 #   --domain=DOMAIN Set the domain name to DOMAIN 
-    ipaclientinstall_invaliddomain
+##    ipaclientinstall_invaliddomain
 
 #   --server=SERVER Set the IPA server to connect to
-   ipaclientinstall_server_nodomain 
-   ipaclientinstall_server_invalidserver
+##   ipaclientinstall_server_nodomain 
+##   ipaclientinstall_server_invalidserver
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
-   ipaclientinstall_realm_casesensitive 
-   ipaclientinstall_invalidrealm 
+##   ipaclientinstall_realm_casesensitive 
+##   ipaclientinstall_invalidrealm 
 
 #   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
-   ipaclientinstall_hostname 
+##   ipaclientinstall_hostname 
 
 
 
@@ -58,67 +58,67 @@ ipaclientinstall()
 ####   End user will not use it. So no tests here for this option. #####
 
 #   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm. Assumes bulk password unless principal is also set.
-    ipaclientinstall_password
+##    ipaclientinstall_password
 
 #   -W  Prompt for the password for joining a machine to the IPA realm.
 
 #   -p, --principal  Authorized kerberos principal to use to join the IPA realm.
-   ipaclientinstall_nonexistentprincipal
-   ipaclientinstall_nonadminprincipal
-   ipaclientinstall_principalwithinvalidpassword
+##   ipaclientinstall_nonexistentprincipal
+##   ipaclientinstall_nonadminprincipal
+##   ipaclientinstall_principalwithinvalidpassword
 
 #   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
-    ipaclientinstall_permit
+##    ipaclientinstall_permit
 
 
 #   --mkhomedir  Configure pam to create a users home directory if it does not exist.
-    ipaclientinstall_mkhomedir
+##    ipaclientinstall_mkhomedir
 
 
 #   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
-     ipaclientinstall_enablednsupdates
+##     ipaclientinstall_enablednsupdates
 
 # Bug 852746 RHEL5 ipa-client-install --no-sssd fails because of authconfig --enableforcelegacy option
 #   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
-   ipaclientinstall_nosssd
+##   ipaclientinstall_nosssd
 
 #  install with random password
 #   ipaclientinstall_randompassword
 
 #  --f, --force Force the settings even if errors occur
-   ipaclientinstall_force 
+##   ipaclientinstall_force 
 
 # Bug 714600 - ipa-client-install should configure sssd to store password if offline
 #  --no-krb5-offline-passwords Configure SSSD not to store user password when the server is offline
-      ipaclientinstall_nokrb5offlinepasswords
+##      ipaclientinstall_nokrb5offlinepasswords
 
 # Bug 698219 - Uninstalling ipa-client fails, if it joined replica when being installed
-      ipaclientinstall_joinreplica
+##      ipaclientinstall_joinreplica
 
 
-      ipaclientinstall_withmasterdown
+##      ipaclientinstall_withmasterdown
 
 # Bug 736684 - ipa-client-install should sync time before kinit 
-       ipaclientinstall_synctime
+##       ipaclientinstall_synctime
 
 
 # Bug 736617 - ipa-client-install mishandles ntp service configuration
-       ipaclientinstall_ntpservice     
+##       ipaclientinstall_ntpservice     
 
 # Bug 817869 - Clean keytabs before installing new keys into them 
-      ipaclientinstall_dirty_keytab
+##      ipaclientinstall_dirty_keytab
 
 #  --preserve-sssd     Preserve old SSSD configuration if possible
-      ipaclientinstall_preservesssd
+##      ipaclientinstall_preservesssd
 
 # Bug 753526 - ipa-client-install rejects machines with hostname as localhost or localhost.localdomain #Added by Kaleem
-      ipaclientinstall_client_hostname_localhost
+##      ipaclientinstall_client_hostname_localhost
 
 # Bug 845691 - ipa-client-install Failed to obtain host TGT
-	ipaclientinstall_bugcheck_845691_fulltest
+##    ipaclientinstall_bugcheck_845691_fulltest
 
 # Bug 790105 - Filter inappropriate address for dns dynamic update
-       ipaclientinstall_bugcheck_790105
+##       ipaclientinstall_bugcheck_790105
 
 # Bug 817030 - ipa-client-install sets "KerberosAuthenticate no" in sshd.conf 
        ipaclientinstall_bugcheck_817030
@@ -127,13 +127,22 @@ ipaclientinstall()
 # Moving back here for everything after fixing hang issue with at job to
 # stop iptables
    #if [ $slave_count -eq 1 ];then
-   ipaclientinstall_server_unreachableserver
+##   ipaclientinstall_server_unreachableserver
    #fi
 
    install_cleanup
 
 }
 
+ipa_bug_verification(){
+    ipa-client-install --uninstall -U
+    bug_833505
+    bug_813387
+    bug_805203
+    bug_831010
+    bug_883166
+    ipa-client-install --uninstall -U
+}
 
 install_setup()
 {
@@ -167,21 +176,21 @@ install_setup()
         ## Moved them here from data.ipaclientinstall.acceptance since MASTER is not set there.
         #ipa_server_master="_srv_, $MASTER" # sssd.conf updates
         ipa_server_master="$MASTER" # sssd.conf updates
-		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
-			domain_realm_force_master="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
-		else
-			RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
-			domain_realm_force_master="$MASTER:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
-		fi
+        if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
+            domain_realm_force_master="$MASTER:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+        else
+            RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
+            domain_realm_force_master="$MASTER:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
+        fi
         slavetoverify=`echo $SLAVE_ACTIVE | sed 's/\"//g' | sed 's/^ //g'`
         #ipa_server_slave="_srv_, $slavetoverify" # sssd.conf updates
         ipa_server_slave="$slavetoverify" # sssd.conf updates
-		if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
-			domain_realm_force_slave="$SLAVE_ACTIVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
-		else
-			RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
-			domain_realm_force_slave="$SLAVE_ACTIVE:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
-		fi
+        if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -eq 0 ]; then
+            domain_realm_force_slave="$SLAVE_ACTIVE:88 $MASTER:749 ${RELM,,} $RELM $RELM" # krb5.conf updates
+        else
+            RELMLOWERCASE=$(echo $RELM|tr '[:upper:]' '[:lower:]')
+            domain_realm_force_slave="$SLAVE_ACTIVE:88 $MASTER:749 $RELMLOWERCASE $RELM $RELM" # krb5.conf updates
+        fi
 
     rlPhaseEnd
 }
@@ -208,9 +217,9 @@ ipaclientinstall_adminpwd()
 {
     rlPhaseStartTest "ipa-client-install-01- [Positive] Install with admin & password - with -U"
         uninstall_fornexttest
-		rlLog "Changing time to make sure client install sets it and doesn't fail"
+        rlLog "Changing time to make sure client install sets it and doesn't fail"
         rlRun "service ntpd stop" 0 "Stopping the ntp server"
-		rlRun "date --set='-2 hours'"
+        rlRun "date --set='-2 hours'"
         rlLog "EXECUTING: ipa-client-install -p $ADMINID -w $ADMINPW -U "
         rlRun "ipa-client-install -p $ADMINID -w $ADMINPW -U " 0 "Installing ipa client and configuring - passing admin and password"
         if [ $slave_count -eq 3 ]; then
@@ -276,17 +285,19 @@ IPA client is not configured on this system."
 ipaclientinstall_noNTP()
 {
     rlPhaseStartTest "ipa-client-install-05- [Positive] Install with no NTP configured"
-        uninstall_fornexttest
+        #uninstall_fornexttest
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -N -p $ADMINID -w $ADMINPW -U --server=$MASTER"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -N -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with no NTP configured"
-        verify_install true nontp
+        #rlRun "/usr/bin/coverage run /usr/sbin/ipa-client-install --domain=$DOMAIN --realm=$RELM -N -p $ADMINID -w $ADMINPW -U --server=$MASTER" 0 "Installing ipa client and configuring - with no NTP configured"
+        #/usr/bin/coverage run /usr/sbin/ipa-client-install --domain=$DOMAIN --realm=$RELM -N -p $ADMINID -w $ADMINPW -U --server=$MASTER
+        #verify_install true nontp
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-client-install-06- [Positive] Uninstall after install with no NTP"
-        rlLog "EXECUTING: ipa-client-install --uninstall -U"
-        rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client after install with no NTP"
-        verify_install false
-    rlPhaseEnd
+    #rlPhaseStartTest "ipa-client-install-06- [Positive] Uninstall after install with no NTP"
+    #    rlLog "EXECUTING: ipa-client-install --uninstall -U"
+    #    rlRun "ipa-client-install --uninstall -U" 0 "Uninstalling ipa client after install with no NTP"
+    #    verify_install false
+    #rlPhaseEnd
     #TODO: Repeat for --no-ntp?
 }
 
@@ -370,12 +381,12 @@ ipaclientinstall_server_unreachableserver()
        if [ $(grep "$expmsg1" $tmpout|wc -l) -gt 0 ]; then
            rlPass "Expected error seen:  $expmsg1"
        elif [ $(grep "$expmsg2" $tmpout|wc -l) -gt 0 ]; then
-           rlPass "Alternate expected error seen due to environment: $expmsg2"	
+           rlPass "Alternate expected error seen due to environment: $expmsg2"    
        else
            rlFail "Unexpected output seen"
            submit_log /var/log/ipaclient-install.log
        fi
-	   ipaclientinstall_bugcheck_905626
+       ipaclientinstall_bugcheck_905626
        rlRun "sleep 150"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTER \"service iptables stop\"" 0 "Stop Firewall on MASTER IPA server"
        rlRun "ssh  -o StrictHostKeyChecking=no root@$SLAVE_ACTIVE \"service iptables stop\"" 0 "Stop Firewall on SLAVE IPA server"
@@ -402,12 +413,12 @@ ipaclientinstall_realm_casesensitive()
        expmsg="The provided realm name [$relminlowercase] does not match with the discovered one [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_realm_casesensitive.out
 
-	if [ -f /etc/fedora-release ] ; then
-		rlRun "$command > $tmpout 2>&1" 1
-		rlAssertGrep "The provided realm name \[$relminlowercase\] does not match discovered one \[$RELM\]" "$tmpout"
-	else
-       		qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with incorrect case realmname" 
-	fi
+    if [ -f /etc/fedora-release ] ; then
+        rlRun "$command > $tmpout 2>&1" 1
+        rlAssertGrep "The provided realm name \[$relminlowercase\] does not match discovered one \[$RELM\]" "$tmpout"
+    else
+               qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with incorrect case realmname" 
+    fi
 
     rlPhaseEnd
 }
@@ -421,12 +432,12 @@ ipaclientinstall_invalidrealm()
        expmsg="The provided realm name [xxx] does not match with the discovered one [$RELM]"
        local tmpout=$TmpDir/ipaclientinstall_invalidrealm.out
 
-	if [ -f /etc/fedora-release ] ; then
+    if [ -f /etc/fedora-release ] ; then
                 rlRun "$command > $tmpout 2>&1" 1
                 rlAssertGrep "The provided realm name \[xxx\] does not match discovered one \[$RELM\]" "$tmpout"
-	else
-	        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid realmname" 
-	fi
+    else
+            qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with invalid realmname" 
+    fi
 
     rlPhaseEnd
 }
@@ -450,15 +461,15 @@ ipaclientinstall_hostname()
        expmsg1="Hostname ($CLIENT.nonexistent) not found in DNS"
        expmsg2="Could not update DNS SSHFP records."
 
-		if [ -f /etc/fedora-release ] ; then
-			rlRun "$command > $tmpout 2>&1" 
-			rlAssertGrep "Hostname ($CLIENT.nonexistent) not found in DNS" "$tmpout"
-			rlAssertGrep "Could not update DNS SSHFP records." "$tmpout"
-		elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
-			qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1"
-		else
-			qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
-		fi
+        if [ -f /etc/fedora-release ] ; then
+            rlRun "$command > $tmpout 2>&1" 
+            rlAssertGrep "Hostname ($CLIENT.nonexistent) not found in DNS" "$tmpout"
+            rlAssertGrep "Could not update DNS SSHFP records." "$tmpout"
+        elif [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
+            qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1"
+        else
+            qaExpectedRun "$command" "$tmpout" 0 "Verify expected message for IPA Install with different hostname" "$expmsg1" "$expmsg2" 
+        fi
 
        verify_install true nonexistent
        verify_hostname $CLIENT.nonexistent
@@ -479,7 +490,7 @@ ipaclientinstall_hostname()
        if [ $(grep 5\.[0-9] /etc/redhat-release|wc -l) -gt 0 ]; then
           rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa host-del $CLIENT.nonexistent\"" 0 "Deleting client record and DNS entry from server"
        else
-	      rlRun "ipa host-del $CLIENT.nonexistent" 0 "Deleting client record and DNS entry from server"
+          rlRun "ipa host-del $CLIENT.nonexistent" 0 "Deleting client record and DNS entry from server"
        fi
     rlPhaseEnd
 
@@ -530,11 +541,11 @@ ipaclientinstall_nonexistentprincipal()
     rlPhaseStartTest "ipa-client-install-15- [Negative] Install with non-existent principal"
         uninstall_fornexttest
         command="ipa-client-install -p $testuserbad -w $testpwd -U" 
-		if [ $(grep 5\.[0-9] /etc/redhat-release | wc -l) -gt 0 ]; then
-			expmsg="kinit(v5): Client not found in Kerberos database while getting initial credentials"
-		else
-			expmsg="kinit: Client '$testuserbad@$RELM' not found in Kerberos database while getting initial credentials"
-		fi
+        if [ $(grep 5\.[0-9] /etc/redhat-release | wc -l) -gt 0 ]; then
+            expmsg="kinit(v5): Client not found in Kerberos database while getting initial credentials"
+        else
+            expmsg="kinit: Client '$testuserbad@$RELM' not found in Kerberos database while getting initial credentials"
+        fi
         local tmpout=$TmpDir/ipaclientinstall_nonexistentprincipal.out
         qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with non-existent principal"
        # rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for IPA Install with non-existent principal"
@@ -557,7 +568,7 @@ ipaclientinstall_nonadminprincipal()
                 rlRun "$command > $tmpout 2>&1" 1
                 rlAssertGrep "Joining realm failed: No permission to join this host to the IPA domain." "$tmpout"
         else
-       		qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with non-admin principal" "$expmsg"
+               qaExpectedRun "$command" "$tmpout" 1 "Verify expected error message for IPA Install with non-admin principal" "$expmsg"
         fi
         if [ $slave_count -eq 3 ]; then
             ipaclientinstall_bugcheck_905626
@@ -572,21 +583,21 @@ ipaclientinstall_nonadminprincipal()
 
 ipaclientinstall_principalwithinvalidpassword()
 {
-	rlPhaseStartTest "ipa-client-install-17- [Negative] Install with principal with invalid password"
-		uninstall_fornexttest
-		rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $testpwd -U" 
-		command="ipa-client-install  -p $ADMINID -w $testpwd -U" 
-		if [ $(grep 5\.[0-9] /etc/redhat-release | wc -l) -gt 0 ]; then
-			expmsg="kinit(v5): Password incorrect while getting initial credentials"
-		else
-			expmsg="kinit: Password incorrect while getting initial credentials"
-		fi
-		tmpout=$TmpDir/ipaclientinstall_principalwithinvalidpassword.out
-		qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with principal with invalid password" 
+    rlPhaseStartTest "ipa-client-install-17- [Negative] Install with principal with invalid password"
+        uninstall_fornexttest
+        rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $testpwd -U" 
+        command="ipa-client-install  -p $ADMINID -w $testpwd -U" 
+        if [ $(grep 5\.[0-9] /etc/redhat-release | wc -l) -gt 0 ]; then
+            expmsg="kinit(v5): Password incorrect while getting initial credentials"
+        else
+            expmsg="kinit: Password incorrect while getting initial credentials"
+        fi
+        tmpout=$TmpDir/ipaclientinstall_principalwithinvalidpassword.out
+        qaRun "$command" "$tmpout" 1 $expmsg "Verify expected error message for IPA Install with principal with invalid password" 
         if [ $slave_count -eq 3 ]; then
             ipaclientinstall_bugcheck_905626
         fi
-	rlPhaseEnd
+    rlPhaseEnd
 }
 
 
@@ -645,7 +656,7 @@ ipaclientinstall_enablednsupdates()
 {
     rlPhaseStartTest "ipa-client-install-22- [Positive] Install and enable dynamic dns updates"
         uninstall_fornexttest
-	sleep 10
+    sleep 10
         rlLog "EXECUTING: ipa-client-install  -p $ADMINID -w $ADMINPW -U --enable-dns-updates"
         rlRun "ipa-client-install  -p $ADMINID -w $ADMINPW -U --enable-dns-updates" 0 "Installing ipa client and enable dynamic dns updates"
         if [ $slave_count -eq 3 ]; then
@@ -672,19 +683,19 @@ ipaclientinstall_nosssd()
     rlPhaseStartTest "ipa-client-install-24- [Positive] Install with no SSSD configured"
         uninstall_fornexttest
 
-	rpm -q nss-pam-ldapd
-	if [ $? = 1 ] ; then
-		rlRun "yum install -y nss-pam-ldapd"
-	fi
+    rpm -q nss-pam-ldapd
+    if [ $? = 1 ] ; then
+        rlRun "yum install -y nss-pam-ldapd"
+    fi
 
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW -U --server=$MASTER --no-sssd" 0 "Installing ipa client and configuring - with no SSSD configured"
         verify_install true nosssd
-		if [ $(grep "authconfig: error: no such option: --enableforcelegacy" /var/log/ipaclient-install.log|wc -l) -gt 0 ]; then
-			rlFail "BZ 852746 found...RHEL5 ipa-client-install --no-sssd fails because of authconfig --enableforcelegacy option"
-		else
-			rlPass "BZ 852746 not found...no error related to authconfig enableforcelegacy"
-		fi
+        if [ $(grep "authconfig: error: no such option: --enableforcelegacy" /var/log/ipaclient-install.log|wc -l) -gt 0 ]; then
+            rlFail "BZ 852746 found...RHEL5 ipa-client-install --no-sssd fails because of authconfig --enableforcelegacy option"
+        else
+            rlPass "BZ 852746 not found...no error related to authconfig enableforcelegacy"
+        fi
     rlPhaseEnd
     rlPhaseStartTest "ipa-client-install-25- [Positive] Uninstall after install with -no-sssd "
         rlLog "EXECUTING: ipa-client-install --uninstall -U"
@@ -724,12 +735,12 @@ ipaclientinstall_force()
       expmsg="IPA client is already configured on this system."
       local tmpout=$TmpDir/ipaclientinstall_force1.out
 
-	if [ -f /etc/fedora-release ] ; then 
-		rlRun "$command > $tmpout 2>&1" 3
-		rlAssertGrep "IPA client is already configured on this system." "$tmpout"
-	else
-		qaRun "$command" "$tmpout" 3 $expmsg "Verify expected error message for reinstall of IPA Install"
-	fi
+    if [ -f /etc/fedora-release ] ; then 
+        rlRun "$command > $tmpout 2>&1" 3
+        rlAssertGrep "IPA client is already configured on this system." "$tmpout"
+    else
+        qaRun "$command" "$tmpout" 3 $expmsg "Verify expected error message for reinstall of IPA Install"
+    fi
     rlPhaseEnd
     rlPhaseStartTest "ipa-client-install-27- [Positive] Reinstall Client with force" 
       # But now force it to install even though it has been previously installed here.
@@ -867,8 +878,8 @@ ipaclientinstall_ntpservice()
         # the current hour should be stored in $currenthour 
 
         currenthour=$(date +%H) # Get the current hours to be used in a later test
-	    rlLog "Current hour is $currenthour, Machine time is $(date)"
-	    rlRun "date +%H | grep $currenthour" 0 "Make sure the machine time contains the current hour."
+        rlLog "Current hour is $currenthour, Machine time is $(date)"
+        rlRun "date +%H | grep $currenthour" 0 "Make sure the machine time contains the current hour."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-client-install-34- [Negative] Verify ntp service with client uninstall"
@@ -896,14 +907,14 @@ ipaclientinstall_synctime()
 
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
 
-	if [ -f /etc/fedora-release ] ; then
-		# Setting return code as 1 in fedora since installation failure is expected because of 
-		# "kinit: Clock skew too great while getting initial credentials"
-		# verify_time is success though
-	        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 1
-	else
-	        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
-	fi
+    if [ -f /etc/fedora-release ] ; then
+        # Setting return code as 1 in fedora since installation failure is expected because of 
+        # "kinit: Clock skew too great while getting initial credentials"
+        # verify_time is success though
+            rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER" 1
+    else
+            rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW -U --server=$MASTER"
+    fi
 
         # time on this system should match the server time
         verify_time
@@ -919,7 +930,7 @@ ipaclientinstall_joinreplica()
 {
     rlPhaseStartTest "ipa-client-install-36- [Positive] Install, and join REPLICA, then uninstall"
         uninstall_fornexttest
-      	sleep 5 
+          sleep 5 
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE_ACTIVE  -p $ADMINID -w $ADMINPW --unattended "
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM --server=$SLAVE_ACTIVE  -p $ADMINID -w $ADMINPW --unattended " 0 "Installing ipa client and configuring - with all params"
         verify_install true
@@ -937,20 +948,20 @@ ipaclientinstall_joinreplica()
 ##########################################
 ipaclientinstall_withmasterdown()
 {
-	local ipalog=/var/log/ipaclient-install.log
+    local ipalog=/var/log/ipaclient-install.log
     rlPhaseStartTest "ipa-client-install-37- [Positive] Install with MASTER down, SLAVE up [BZ 905626]"
         uninstall_fornexttest
        
         # Stop the MASTER 
         rlRun "ssh -o StrictHostKeyChecking=no  root@$MASTER \"ipactl stop\"" 0 "Stop MASTER IPA server"
-		#rlRun "cp /etc/resolv.conf /etc/resolv.conf.withmasterdown"
-		#rlRun "echo 'nameserver $SLAVEIP' > /etc/resolv.conf"
+        #rlRun "cp /etc/resolv.conf /etc/resolv.conf.withmasterdown"
+        #rlRun "echo 'nameserver $SLAVEIP' > /etc/resolv.conf"
         rlLog "EXECUTING: ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended"
         rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM  -p $ADMINID -w $ADMINPW --unattended " 0 \
-			"Installing ipa client and configuring - with all params"
-			
-		ipaclientinstall_bugcheck_905626
-		submit_log /var/log/ipaclient-install.log
+            "Installing ipa client and configuring - with all params"
+            
+        ipaclientinstall_bugcheck_905626
+        submit_log /var/log/ipaclient-install.log
 
         # Start the MASTER back
         #rlRun "ssh  -o StrictHostKeyChecking=no root@$MASTERIP \"ipactl start\"" 0 "Start MASTER IPA server"
@@ -989,9 +1000,9 @@ ipaclientinstall_client_hostname_localhost() #Added by Kaleem
 verify_install()
 {
 # check for bug 845691
-	if [ "$1" == "true" ]; then
-		ipaclientinstall_bugcheck_845691
-	fi
+    if [ "$1" == "true" ]; then
+        ipaclientinstall_bugcheck_845691
+    fi
 
 # verify files changed during install/uninstall
    verify_nsswitch $1 $2
