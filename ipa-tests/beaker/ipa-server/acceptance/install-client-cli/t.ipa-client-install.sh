@@ -1,7 +1,7 @@
-##################################################################
+  ################################################################
 #                      test suite                                #
 #   perform the various combinations of install and uninstall    #
-#################################################################
+  ###############################################################
 ipamastersetup()
 {
     rlPhaseStartTest "ipamastersetup - setup stuff on master that strictly requires ipa command"
@@ -23,102 +23,102 @@ ipaclientinstall()
 
    install_setup
 #   -U, --unattended  Unattended installation. The user will not be prompted.
-##   ipaclientinstall_adminpwd
+     ipaclientinstall_adminpwd
 
 #   install with multiple params including
 #   --ntp-server=NTP_SERVER Configure ntpd to use this NTP server.
-##   ipaclientinstall_allparam
+     ipaclientinstall_allparam
 
    #--uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
-##   ipaclientinstall_uninstall
+     ipaclientinstall_uninstall
 
-##   ipaclientinstall_noparam
+     ipaclientinstall_noparam
 
 #   -N, --no-ntp  Do not configure or enable NTP.
    ipaclientinstall_noNTP
 
 #   --domain=DOMAIN Set the domain name to DOMAIN 
-##    ipaclientinstall_invaliddomain
+      ipaclientinstall_invaliddomain
 
 #   --server=SERVER Set the IPA server to connect to
-##   ipaclientinstall_server_nodomain 
-##   ipaclientinstall_server_invalidserver
+     ipaclientinstall_server_nodomain 
+     ipaclientinstall_server_invalidserver
 
 #   --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
-##   ipaclientinstall_realm_casesensitive 
-##   ipaclientinstall_invalidrealm 
+     ipaclientinstall_realm_casesensitive 
+     ipaclientinstall_invalidrealm 
 
 #   --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
-##   ipaclientinstall_hostname 
+     ipaclientinstall_hostname 
 
 
 
 #  --on-master The client is being configured on an IPA server.
-####   IPA Server uses this to install client on server machine.   #####
-####   End user will not use it. So no tests here for this option. #####
+  ##   IPA Server uses this to install client on server machine.   #####
+  ##   End user will not use it. So no tests here for this option. #####
 
 #   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm. Assumes bulk password unless principal is also set.
-##    ipaclientinstall_password
+      ipaclientinstall_password
 
 #   -W  Prompt for the password for joining a machine to the IPA realm.
 
 #   -p, --principal  Authorized kerberos principal to use to join the IPA realm.
-##   ipaclientinstall_nonexistentprincipal
-##   ipaclientinstall_nonadminprincipal
-##   ipaclientinstall_principalwithinvalidpassword
+     ipaclientinstall_nonexistentprincipal
+     ipaclientinstall_nonadminprincipal
+     ipaclientinstall_principalwithinvalidpassword
 
 #   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled by the Host-based Access Controls (HBAC) on the IPA server.
-##    ipaclientinstall_permit
+      ipaclientinstall_permit
 
 
 #   --mkhomedir  Configure pam to create a users home directory if it does not exist.
-##    ipaclientinstall_mkhomedir
+      ipaclientinstall_mkhomedir
 
 
 #   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
-##     ipaclientinstall_enablednsupdates
+       ipaclientinstall_enablednsupdates
 
 # Bug 852746 RHEL5 ipa-client-install --no-sssd fails because of authconfig --enableforcelegacy option
 #   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
-##   ipaclientinstall_nosssd
+     ipaclientinstall_nosssd
 
 #  install with random password
 #   ipaclientinstall_randompassword
 
 #  --f, --force Force the settings even if errors occur
-##   ipaclientinstall_force 
+     ipaclientinstall_force 
 
 # Bug 714600 - ipa-client-install should configure sssd to store password if offline
 #  --no-krb5-offline-passwords Configure SSSD not to store user password when the server is offline
-##      ipaclientinstall_nokrb5offlinepasswords
+        ipaclientinstall_nokrb5offlinepasswords
 
 # Bug 698219 - Uninstalling ipa-client fails, if it joined replica when being installed
-##      ipaclientinstall_joinreplica
+        ipaclientinstall_joinreplica
 
 
-##      ipaclientinstall_withmasterdown
+        ipaclientinstall_withmasterdown
 
 # Bug 736684 - ipa-client-install should sync time before kinit 
-##       ipaclientinstall_synctime
+         ipaclientinstall_synctime
 
 
 # Bug 736617 - ipa-client-install mishandles ntp service configuration
-##       ipaclientinstall_ntpservice     
+         ipaclientinstall_ntpservice     
 
 # Bug 817869 - Clean keytabs before installing new keys into them 
-##      ipaclientinstall_dirty_keytab
+        ipaclientinstall_dirty_keytab
 
 #  --preserve-sssd     Preserve old SSSD configuration if possible
-##      ipaclientinstall_preservesssd
+        ipaclientinstall_preservesssd
 
 # Bug 753526 - ipa-client-install rejects machines with hostname as localhost or localhost.localdomain #Added by Kaleem
-##      ipaclientinstall_client_hostname_localhost
+        ipaclientinstall_client_hostname_localhost
 
 # Bug 845691 - ipa-client-install Failed to obtain host TGT
-##    ipaclientinstall_bugcheck_845691_fulltest
+      ipaclientinstall_bugcheck_845691_fulltest
 
 # Bug 790105 - Filter inappropriate address for dns dynamic update
-##       ipaclientinstall_bugcheck_790105
+         ipaclientinstall_bugcheck_790105
 
 # Bug 817030 - ipa-client-install sets "KerberosAuthenticate no" in sshd.conf 
        ipaclientinstall_bugcheck_817030
@@ -127,7 +127,7 @@ ipaclientinstall()
 # Moving back here for everything after fixing hang issue with at job to
 # stop iptables
    #if [ $slave_count -eq 1 ];then
-##   ipaclientinstall_server_unreachableserver
+     ipaclientinstall_server_unreachableserver
    #fi
 
    install_cleanup
@@ -200,9 +200,9 @@ install_cleanup()
         fi
 }
 
-#############################################################################
+  ###########################################################################
 #   -U, --unattended  Unattended installation. The user will not be prompted.
-#############################################################################
+  ###########################################################################
 ipaclientinstall_adminpwd()
 {
     rlPhaseStartTest "ipa-client-install-01- [Positive] Install with admin & password - with -U"
@@ -220,7 +220,7 @@ ipaclientinstall_adminpwd()
 }
 
 
-############################################################
+  ##########################################################
 
 ipaclientinstall_allparam()
 {
@@ -235,9 +235,9 @@ ipaclientinstall_allparam()
 }
 
 
-#################################################################################################
+  ###############################################################################################
 #   --uninstall Remove the IPA client software and restore the configuration to the pre-IPA state.
-#################################################################################################
+  ###############################################################################################
 ipaclientinstall_uninstall()
 {
     rlPhaseStartTest "ipa-client-install-03- [Positive] Uninstall"
@@ -252,7 +252,7 @@ ipaclientinstall_uninstall()
     rlPhaseEnd
 }
 
-#######################################################
+  #####################################################
 
 ipaclientinstall_noparam()
 {
@@ -269,9 +269,9 @@ IPA client is not configured on this system."
 }
 
 
-################################################
+  ##############################################
 #   -N, --no-ntp  Do not configure or enable NTP.
-################################################
+  ##############################################
 ipaclientinstall_noNTP()
 {
     rlPhaseStartTest "ipa-client-install-05- [Positive] Install with no NTP configured"
@@ -292,9 +292,9 @@ ipaclientinstall_noNTP()
 }
 
 
-#################################################
+  ###############################################
 #   --domain=DOMAIN Set the domain name to DOMAIN 
-#################################################
+  ###############################################
 #negative tests for --domain option
 ipaclientinstall_invaliddomain()
 {
@@ -310,9 +310,9 @@ IPA client is not configured on this system."
     rlPhaseEnd
 }
 
-####################################################
+  ##################################################
 #   --server=SERVER Set the IPA server to connect to
-####################################################
+  ##################################################
 #negative tests for --server option
 ipaclientinstall_server_nodomain()
 {
@@ -384,9 +384,9 @@ ipaclientinstall_server_unreachableserver()
 }
 
 
-#########################################################
+  #######################################################
 # --realm=REALM_NAME Set the IPA realm name to REALM_NAME 
-#########################################################
+  #######################################################
 #negative tests for --realm option
 ipaclientinstall_realm_casesensitive()
 {
@@ -432,15 +432,15 @@ ipaclientinstall_invalidrealm()
     rlPhaseEnd
 }
 
-###############################################################################################
+  #############################################################################################
 #  --hostname The hostname of this server (FQDN). By default of nodename from uname(2) is used. 
 #  Bug 690473 - Installing ipa-client indicates DNS is updated for this unknown hostname, but is not on server 
 #  Bug 714919 - ipa-client-install should configure hostname
 #  Bug 734013 - ipa-client-install breaks network configuration
 #  Bug 833505 - ipa-client-install crashes when --hostname is given
-###############################################################################################
+  #############################################################################################
 #negative tests for --hostname option
-## in the case below - client is installed, but a DNS entry is not available on server for this client.
+   in the case below - client is installed, but a DNS entry is not available on server for this client.
 ipaclientinstall_hostname()
 {
     rlPhaseStartTest "ipa-client-install-13- [Positive-Negative] IPA Install with different hostname"
@@ -487,10 +487,10 @@ ipaclientinstall_hostname()
 }
 
 
-####################################################################################
+  ##################################################################################
 #   -w PASSWORD, --password=PASSWORD Password for joining a machine to the IPA realm.
 #                                 Assumes bulk password unless principal is also set.
-####################################################################################
+  ##################################################################################
 ipaclientinstall_password()
 {
     rlPhaseStartTest "ipa-client-install-14- [Negative] Install with password, but missing principal"
@@ -514,17 +514,17 @@ ipaclientinstall_password()
 
 
 
-#######################################################################
+  #####################################################################
 #   -W  Prompt for the password for joining a machine to the IPA realm.
 # TODO: test with -W. So far - looks like -w
-#######################################################################
+  #####################################################################
 
 
 
 
-################################################################################
+  ##############################################################################
 #   -p, --principal  Authorized kerberos principal to use to join the IPA realm.
-################################################################################
+  ##############################################################################
 #negative tests for --principal option
 ipaclientinstall_nonexistentprincipal()
 {
@@ -591,10 +591,10 @@ ipaclientinstall_principalwithinvalidpassword()
 }
 
 
-#############################################################################################
+  ###########################################################################################
 #   --permit Configure  SSSD  to  permit all access. Otherwise the machine will be controlled
 #             by the Host-based Access Controls (HBAC) on the IPA server.
-#############################################################################################
+  ###########################################################################################
 ipaclientinstall_permit()
 {
     rlPhaseStartTest "ipa-client-install-18- [Positive] Install and configure SSSD to permit all access"
@@ -611,9 +611,9 @@ ipaclientinstall_permit()
     rlPhaseEnd
 }
 
-######################################################################################
+  ####################################################################################
 #   --mkhomedir  Configure pam to create a users home directory if it does not exist.
-######################################################################################
+  ####################################################################################
 ipaclientinstall_mkhomedir()
 {
     rlPhaseStartTest "ipa-client-install-20- [Positive] Install and configure pam to create home dir if it does not exist"
@@ -639,9 +639,9 @@ ipaclientinstall_mkhomedir()
 
 
 
-###############################################################################################################
+  #############################################################################################################
 #   --enable-dns-updates This option tells SSSD to automatically update DNS with the IP address of this client.
-###############################################################################################################
+  #############################################################################################################
 ipaclientinstall_enablednsupdates()
 {
     rlPhaseStartTest "ipa-client-install-22- [Positive] Install and enable dynamic dns updates"
@@ -665,9 +665,9 @@ ipaclientinstall_enablednsupdates()
 
 
 
-####################################################################################################
+  ##################################################################################################
 #   -S, --no-sssd  Do not configure the client to use SSSD for authentication, use nss_ldap instead.
-####################################################################################################
+  ##################################################################################################
 ipaclientinstall_nosssd()
 {
     rlPhaseStartTest "ipa-client-install-24- [Positive] Install with no SSSD configured"
@@ -712,9 +712,9 @@ ipaclientinstall_randompassword()
 
 }
 
-#######################################################
+  #####################################################
 #  --f, --force Force the settings even if errors occur
-#######################################################
+  #####################################################
 # includes positive and negative tests to force reinstalling and uninsatlling multiple times.
 ipaclientinstall_force()
 {
@@ -766,10 +766,10 @@ ipaclientinstall_force()
 }
 
 
-#######################################################
+  #####################################################
 #  --no-krb5-offline-passwords Configure SSSD not to store user password when the server is offline
 #  Bug 714600 - ipa-client-install should configure sssd to store password if offline
-#######################################################
+  #####################################################
 ipaclientinstall_nokrb5offlinepasswords()
 {
    rlPhaseStartTest "ipa-client-install-31- [Positive] Install with no-krb5-offline-passwords"
@@ -782,9 +782,9 @@ ipaclientinstall_nokrb5offlinepasswords()
 }
 
 
-#######################################################
+  #####################################################
 #  --preserve-sssd     Preserve old SSSD configuration if possible
-#######################################################
+  #####################################################
 ipaclientinstall_preservesssd()
 {
    rlPhaseStartTest "ipa-client-install-32- [Positive] Install with preserve-sssd (BZ 851318)"
@@ -851,9 +851,9 @@ ipaclientinstall_preservesssd()
     rlPhaseEnd
 }
 
-#######################################################
+  #####################################################
 # Bug 736617 - ipa-client-install mishandles ntp service configuration
-#######################################################
+  #####################################################
 ipaclientinstall_ntpservice()
 {
     rlPhaseStartTest "ipa-client-install-33- [Positive] Verify ntp service with client install"
@@ -879,9 +879,9 @@ ipaclientinstall_ntpservice()
 }
 
      
-##############################################################
+  ############################################################
 #Bug 736684 - ipa-client-install should sync time before kinit 
-##############################################################
+  ############################################################
 ipaclientinstall_synctime()
 {
    rlPhaseStartTest "ipa-client-install-35- [Positive] Verify time is sync'd with client install"
@@ -912,10 +912,10 @@ ipaclientinstall_synctime()
    rlPhaseEnd
 }
 
-##########################################
+  ########################################
 # Client Install joining replica server specifically, then uninstall 
 # Bug 698219 - Uninstalling ipa-client fails, if it joined replica when being installed
-##########################################
+  ########################################
 ipaclientinstall_joinreplica()
 {
     rlPhaseStartTest "ipa-client-install-36- [Positive] Install, and join REPLICA, then uninstall"
@@ -933,9 +933,9 @@ ipaclientinstall_joinreplica()
 }
 
 
-##########################################
+  ########################################
 # Client Install with primary down, replica up
-##########################################
+  ########################################
 ipaclientinstall_withmasterdown()
 {
     local ipalog=/var/log/ipaclient-install.log
@@ -980,13 +980,13 @@ ipaclientinstall_client_hostname_localhost() #Added by Kaleem
     rlPhaseEnd
 }
 
-##############################################################
+  ############################################################
 # Verify files updated during install and unistall
 # Also does kinit to verify the install
 # $1: true for install; false for uninstall
 # $2: can be one of nosssd, nontp, nontpspecified, mkhomedir, 
 #     permit, force, nokrb5offlinepasswords, preserve
-##############################################################
+  ############################################################
 verify_install()
 {
 # check for bug 845691
