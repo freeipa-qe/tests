@@ -2,15 +2,15 @@
 # vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-adtrust
-#   Description: Adtrust test cases
+#   runtest.sh of /CoreOS/ipa-tests/acceptance/ipa-trust-cli
+#   Description: IPA trust cli test cases
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The following ipa will be tested:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Author: Steeve Goveas <sgoveas@redhat.com>
-#   Date  : August 13, 2012
+#   Date  : March 07, 2013
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
@@ -46,12 +46,13 @@ if [ $? -eq 0 ]; then
   rpm5="samba4-common"
 else
   rpm1="freeipa-server-trust-ad"
-  rpm5="samba-common"
+  rpm5="samba-common 4.0"
 fi
 
 rpm2="expect"
 rpm3="coreutils"
 rpm4="glibc-common"
+rpm6="telnet"
 
 rlJournalStart
   rlPhaseStartSetup "Check for essential RPM packages"
@@ -80,6 +81,11 @@ rlJournalStart
 	if [ $? -ne 0 ]; then
            rlRun "yum install -y $rpm5"
         fi
+
+   rlCheckRpm "$rpm6"
+	if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm6"
+        fi
   rlPhaseEnd
 
 # Include test case file
@@ -90,48 +96,39 @@ rlJournalStart
 #   Sanity Tests
 #########################################
 
-	adtrust_connect() {
-		"adtrust_test_0001"
-		"adtrust_test_0002"
-		"adtrust_test_0003"
-		"adtrust_test_0004"
-		"adtrust_test_0005"
-		"adtrust_test_0006"
-		"adtrust_test_0007"
-		"adtrust_test_0008"
-		"adtrust_test_0009"
-		"adtrust_test_0010"
-		"adtrust_test_0011"
-		"adtrust_test_0012"
-		"adtrust_test_0013"
-		"adtrust_test_0014"
-		"adtrust_test_0015"
-		"adtrust_test_0016"
-		"adtrust_test_0017"
-		"adtrust_test_0018"
-		"adtrust_test_0019"
-		"adtrust_test_0020"
-		"adtrust_test_0021"
-		"adtrust_test_0022"
-		"adtrust_test_0023"
-		"adtrust_test_0024"
-		"adtrust_test_0025"
-		"adtrust_test_0026"
-		"adtrust_test_0027"
-		"adtrust_test_0028"
-		"adtrust_test_0029"
-		"adtrust_test_0030"
-		"adtrust_test_0031"
-		"adtrust_test_0032"
-		"adtrust_test_0033"
-		"adtrust_test_0034"
+	trust_connect() {
+		"trust_test_0001"
+		"trust_test_0002"
+		"trust_test_0003"
+		"trust_test_0004"
+		"trust_test_0005"
+		"trust_test_0006"
+		"trust_test_0007"
+		"trust_test_0008"
+		"trust_test_0009"
+		"trust_test_0010"
+		"trust_test_0011"
+		"trust_test_0012"
+		"trust_test_0013"
+		"trust_test_0014"
+		"trust_test_0015"
+		"trust_test_0016"
+		"trust_test_0017"
+		"trust_test_0018"
+		"trust_test_0019"
+		"trust_test_0020"
+		"trust_test_0021"
+		"trust_test_0022"
+		"trust_test_0023"
+		"trust_test_0024"
+		"trust_test_0025"
 	}
 
     # Setup
 	setup
 
     # tests start...
-	adtrust_connect
+	trust_connect
     # tests end...
 
     # Cleanup

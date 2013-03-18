@@ -34,8 +34,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /opt/rhqa_ipa/ipa-server-shared.sh
-. /opt/rhqa_ipa/env.sh
+. /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 # AD libs
 . ./adlib.sh
@@ -49,11 +49,6 @@ RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
 ######################
 #     Variables      #
 ######################
-PACKAGE1="ipa-admintools"
-PACKAGE2="ipa-client"
-PACKAGE3="ipa-server-trust-ad"
-PACKAGE4="samba4-common"
-PACKAGE5="expect"
 
 ipainstall=`which ipa-server-install`
 dmpaswd="Secret123"
@@ -66,6 +61,7 @@ IPAhostIP=`ip addr | egrep 'inet ' | grep "global" | cut -f1 -d/ | awk '{print $
 IPAhostIP6=`ip addr | egrep 'inet6 ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 IPAdomain="testrelm.com"
 IPARealm="TESTRELM.COM"
+srv_name=`hostname -s`
 NBname="TESTRELM"
 NBname2="TESTRELM2"
 dotname1=".TESTRELM"
@@ -80,7 +76,7 @@ TID="10999"
 STID="332233991"
 fakeIP="10.25.11.21"
 invalid_V6IP="3632:51:0:c41c:7054:ff:ae3c:c981"
-smbfile=`/bin/rpm -ql $PACKAGE4 | grep "smb.conf" | grep etc`
+smbfile="/etc/samba/smb.conf"
 group1="editors"
 group2="tgroup"
 ipacmd=`which ipa`
@@ -88,21 +84,13 @@ sidgen_ldif="/usr/share/ipa/ipa-sidgen-task-run.ldif"
 newsuffix='dc=testrelm,dc=com'
 DS_binddn="CN=Directory Manager"
 DMpswd="Secret123"
+samba_cc="/var/run/samba/krb5cc_samba"
+abrt_econf="/etc/libreport/events.d/abrt_event.conf"
 
 setup() {
-rlPhaseStartTest "Setup for adtrust sanity tests"
+rlPhaseStartSetup "Setup for adtrust sanity tests"
 	# check for packages
 	rlRun "rlDistroDiff ipa_pkg_check"
-
-	# Checking other important pacakges	
-	for item in $PACKAGE3 $PACKAGE4 $PACKAGE5; do
-        	rpm -qa | grep $item
-        	if [ $? -eq 0 ] ; then
-                	rlPass "$item package is installed"
-        	else
-                	rlFail "$item package NOT found!"
-        	fi
-	done
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "create_ipauser $user test user $userpw"
@@ -111,23 +99,8 @@ rlPhaseStartTest "Setup for adtrust sanity tests"
 	rlRun "$ipacmd group-add --desc Test-Group $group2" 0 "Adding a test group"
 
 	# stopping firewall
-#	rlRun "service iptables stop"
 	rlServiceStop "iptables"
 	rlServiceStop "ip6tables"
-
-	# Adding conditional forwarder
-#        rlRun "cp -p $named_conf $named_conf_bkp" 0 "Backup $named_conf before adding conditional forwarder for AD"
-#        echo -e "\nzone \"$ADdomain\" IN {\n\ttype forward;\n\tforwarders { $ADip; };\n\tforward only;\n};" >> $named_conf
-#        rlServiceStop "named"
-#        rlServiceStart "named"
-#        sleep 30
-#        rlRun "host $ADhost"
-
-#	rlRun "./adsetup.exp add $ADadmin $ADpswd $ADip $IPAhost $IPAhostIP > /dev/null 2>&1" 0 "Adding conditional forwarder for IPA domain in ADS"
-
-#	rlRun "cp -p $krb5_conf $krb5_conf_bkp" 0 "Backup $krb5_conf"
-#	rlRun "sed \"s/\(dns_lookup_kdc\).*/\dns_lookup_kdc = true/\" $krb5_conf"
-#not required	rlrun "setenforce 0" 0 "Setting selinux in permissive mode"
 
 rlPhaseEnd
 }
@@ -408,7 +381,36 @@ rlPhaseEnd
 
 adtrust_test_0026() {
 
-rlPhaseStartTest "0026 Adtrust install with start value of RID Base"
+rlPhaseStartTest "0026 Adtrust install with adding sids for existing IPA users and groups interactively"
+	# Deleting samba cache credential
+	[ -e $samba_cc ] && rm -f $samba_cc
+	rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U"
+	
+	#Creating users and groups to check the creation of SIDs post adtrust-install
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "create_ipauser $user1 new user $userpw"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "$ipacmd group-add --desc \"Test Group\" $group2" 0 "Adding a test group"
+
+	rlLog "Adtrust install not run yet"
+        rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 1 "SID not created for $user1 as expected"
+        rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 1 "SID not created for default $group1 group as expected"
+        rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 1 "SID not created for $group2 as expected"
+
+	rlRun "Interactive_Exp sidgen" 0 "Creating expect script with"
+        rlRun "$exp $expfile" 0 "ADtrust installed with populating SIDS interactively for existing users"
+        rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 0 "SID created for $user1 as expected"
+        rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 0 "SID created for default $group1 group as expected"
+        rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 0 "SID created for $group2 as expected"
+
+rlPhaseEnd
+}
+
+adtrust_test_0027() {
+
+rlPhaseStartTest "0027 Adtrust install with start value of RID Base"
+	rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+	[ -e $samba_cc ] && rm -f $samba_cc
 	# Install IPA and create users and groups
 	rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
@@ -419,10 +421,12 @@ rlPhaseStartTest "0026 Adtrust install with start value of RID Base"
 rlPhaseEnd
 }
 
-adtrust_test_0027() {
+adtrust_test_0028() {
 
-rlPhaseStartTest "0027 Adtrust with start value of Secondary RID Base"
+rlPhaseStartTest "0028 Adtrust with start value of Secondary RID Base"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+	# Deleting samba cache credential
+        [ -e $samba_cc ] && rm -f $samba_cc
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "Valid_RID_Exp" 0 "Creating expect script"
@@ -432,10 +436,12 @@ rlPhaseStartTest "0027 Adtrust with start value of Secondary RID Base"
 rlPhaseEnd
 }
 
-adtrust_test_0028() {
+adtrust_test_0029() {
 
-rlPhaseStartTest "0028 Adtrust install with both base and secondary RIDs"
+rlPhaseStartTest "0029 Adtrust install with both base and secondary RIDs"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+	# Deleting samba cache credential
+        [ -e $samba_cc ] && rm -f $samba_cc
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	[ -e $smbfile ] && rm -f $smbfile
 	rlRun "Valid_RID_Exp both" 0 "Creating expect script"
@@ -446,10 +452,17 @@ rlPhaseStartTest "0028 Adtrust install with both base and secondary RIDs"
 rlPhaseEnd
 }
 
-adtrust_test_0029() {
+adtrust_test_0030() {
 
-rlPhaseStartTest "0029 Adtrust install on IPA server without DNS with --no-msdcs"
+rlPhaseStartTest "0030 Adtrust install on IPA server without DNS with --no-msdcs"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+
+	# Deleting samba cache credential
+        [ -e $samba_cc ] && rm -f $samba_cc
+
+	# Adding hostname and IP details to /etc/hosts file
+	grep $IPAhost /etc/hosts || echo -e "$IPAhostIP\t$IPAhost\t$srv_name" >> /etc/hosts
+
         rlRun "$ipainstall -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install without DNS"
 
 	#Creating users and groups to check the creation of SIDs post adtrust-install
@@ -466,9 +479,9 @@ rlPhaseStartTest "0029 Adtrust install on IPA server without DNS with --no-msdcs
 rlPhaseEnd
 }
 
-adtrust_test_0030() {
+adtrust_test_0031() {
 
-rlPhaseStartTest "0030 Adtrust install on IPA server with no integrated DNS"
+rlPhaseStartTest "0031 Adtrust install on IPA server with no integrated DNS"
 	rlRun "[ -e $smbfile ] && rm -f $smbfile" 0 "Deleting $smbfile for convenience"
 	rlRun "No_SRV_Exp" 0 "Creating expect script"
         rlRun "$exp $expfile" 0 "SRV records not created without integrated DNS"
@@ -476,9 +489,9 @@ rlPhaseStartTest "0030 Adtrust install on IPA server with no integrated DNS"
 rlPhaseEnd
 }
 
-adtrust_test_0031() {
+adtrust_test_0032() {
 
-rlPhaseStartTest "0031 Add SIDs for exiting IPA users and groups after adtrust install"
+rlPhaseStartTest "0032 Add SIDs for exiting IPA users and groups after adtrust install"
 	rlRun "$ipacmd user-show $user1 --all | grep ipantsecurityidentifier" 1 "SID not created for $user1 as expected"
         rlRun "$ipacmd group-show $group1 --all | grep ipantsecurityidentifier" 1 "SID not created for default $group1 group as expected"
         rlRun "$ipacmd group-show $group2 --all | grep ipantsecurityidentifier" 1 "SID not created for $group2 as expected"	
@@ -512,13 +525,42 @@ rlPhaseStartTest "0031 Add SIDs for exiting IPA users and groups after adtrust i
 rlPhaseEnd
 }
 
+adtrust_test_0033() {
+
+rlPhaseStartTest "0033 ipa-adtrust-install fails with syntax error in ipachangecon - BZ 916209 and 917065"
+	sed -i 's/dns_lookup_kdc.*/dns_lookup_kdc \= false/' /etc/krb5.conf
+	if [ $? -eq 0 ]; then 
+	  rlPass "Setting dns_lookup_kdc to false"
+	else
+	  rlFail "Setting dns_lookup_kdc to false"
+	fi
+	rlRun "Interactive_Exp" 0 "Creating expect script"
+        rlRun "$exp $expfile" 0 "No errors while amending dns_lookup_kdc to true"
+rlPhaseEnd
+}
+
+adtrust_test_0034() {
+
+rlPhaseStartTest "0034 Adtrust install unattented, ticket 3497"
+        rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
+	# Deleting samba cache credential
+        [ -e $samba_cc ] && rm -f $samba_cc
+	[ -e $smbfile ] && rm -f $smbfile
+        rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
+	rlRun "Unattended_Exp" 0 "Creating expect script"
+	rlRun "$exp $expfile" 1 "Unattended ADtrust install failed, https://fedorahosted.org/freeipa/ticket/3497"
+	sleep 30
+	rlRun "$exp $expfile" 1 "Unattended ADtrust install re-run failed, https://fedorahosted.org/freeipa/ticket/3497"
+
+rlPhaseEnd
+}
+
 cleanup() {
 
-rlPhaseStartTest "Clean up for adtrust sanity tests"
-	sleep 120
-	rlRun "check_coredump"
+rlPhaseStartCleanup "Clean up for adtrust sanity tests"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "rm -fr /tmp/krb5cc_*"
+	rlRun "rm -fr $expfile"
 
 rlPhaseEnd
 }

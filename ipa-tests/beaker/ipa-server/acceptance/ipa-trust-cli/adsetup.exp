@@ -1,0 +1,67 @@
+#!/usr/bin/expect
+# vim: dict=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Author: Steeve Goveas <stv@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2010 Red Hat, Inc. All rights reserved.
+#
+#   This copyrighted material is made available to anyone wishing
+#   to use, modify, copy, or redistribute it subject to the terms
+#   and conditions of the GNU General Public License version 2.
+#
+#   This program is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public
+#   License along with this program; if not, write to the Free
+#   Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+#   Boston, MA 02110-1301, USA.
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+set action [lrange $argv 0 0]
+set username [lrange $argv 1 1]
+set password  [lrange $argv 2 2]
+set adhostip [lrange $argv 3 3]
+set ipadomain [lrange $argv 4 4]
+set ipahostip [lrange $argv 5 5]
+
+set timeout 20
+
+if { [string compare $action add ] == 0 } {
+# Add forwarder for testrelm.com
+spawn telnet $adhostip;
+expect "login: ";
+send -- "$username\r";
+expect "*?assword:*";
+send -- "$password\r";
+expect "*>";
+send -- "dnscmd /zoneadd $ipadomain /forwarder $ipahostip\r";
+sleep 5;
+send -- "exit\r";
+expect eof;
+
+} elseif { [string compare $action delete ] == 0 } {
+# Delete Forwarder for testrelm.com
+spawn telnet $adhostip;
+expect "login: ";
+send -- "$username\r";
+expect "*?assword:*";
+send -- "$password\r";
+expect "*>";
+send -- "dnscmd /zonedelete $ipadomain /f\r";
+sleep 5;
+send -- "exit\r";
+expect eof;
+
+} else {
+  puts "Usage: $argv0 add ADadmin ADpswd ADhostip IPAdomain IPAhostIP";
+  puts "Usage: $argv0 delete ADadmin ADpswd ADhostip IPAdomain";
+}

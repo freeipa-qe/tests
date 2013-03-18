@@ -1,0 +1,13 @@
+ADdomain="adlab.qe"
+ADhost="win2k8r2.$ADdomain"
+ADip="10.65.201.187"
+ADpswd="Secret123"
+ADdc="DC=adlab,DC=qe"
+ADadmin="administrator"
+
+ADdomain2="adrelm.com"
+ADhost2="squab.$ADdomain"
+ADip2="10.65.207.213"
+ADpswd2="Secret123"
+ADdc2="DC=adrelm,DC=com"
+ADadmin2="administrator"

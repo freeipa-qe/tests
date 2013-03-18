@@ -36,8 +36,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /opt/rhqa_ipa/ipa-server-shared.sh
-. /opt/rhqa_ipa/env.sh
+. /dev/shm/ipa-server-shared.sh
+. /dev/shm/env.sh
 
 # Install samba-common package if not already installed
 rpm1="samba-common"
@@ -110,18 +110,14 @@ PACKAGE="ipa-server"
 	}
 
 
-#    rlPhaseStartSetup "ipa-winsync-startup - Check for admintools package, setup certificates."
 # Begin Setup for Tests
 setup
-#    rlPhaseEnd
 
-	# tests start...
+# tests start...
 winsync_connect
-	# tests end...
+# tests end...
 
-#    rlPhaseStartCleanup "ipa-winsync-cleanup - Destroying admin credentials & removing certificates."
 cleanup
-#    rlPhaseEnd
 
 
 rlJournalPrintText

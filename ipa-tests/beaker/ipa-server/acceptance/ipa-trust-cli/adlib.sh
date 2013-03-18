@@ -32,14 +32,12 @@
 . /dev/shm/ipa-server-shared.sh
 . /dev/shm/env.sh
 
+# AD values
+. ./Config
+
 trust_bin=`which ipa-adtrust-install`
+ipacmd=`which ipa`
 IPAhost=`hostname`
-rec1="_ldap._tcp.Default-First-Site-Name._sites.dc._msdcs"
-rec2="_ldap._tcp.dc._msdcs"
-rec3="_kerberos._tcp.Default-First-Site-Name._sites.dc._msdcs"
-rec4="_kerberos._tcp.dc._msdcs"
-rec5="_kerberos._udp.Default-First-Site-Name._sites.dc._msdcs"
-rec6="_kerberos._udp.dc._msdcs"
 expfile="/tmp/adtrust_install.exp"
 exp=`which expect`
 user="tuser"
@@ -47,6 +45,46 @@ user1="nuser"
 userpw="Secret123"
 adminpw="Secret123"
 
+
+ADuser_ldif() {
+# $1 first name # $2 Surname # $3 Username # $4 Password # $5 Userctrl # $6 changetype (add/ modify)
+PASSWD=`echo -n \"$4\" | iconv -f UTF8 -t UTF16LE | base64 -w 0`
+[ $# -eq 6 ] && DN="CN=$1 $2,CN=Users,$ADdc"
+cat > ADuser.ldif << EOF
+dn: $DN
+changetype: $6
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: $1 $2
+sn: $2
+givenName: $1
+distinguishedName: $DN
+name: $1 $2
+sAMAccountName: $3
+displayName: $1 $2
+unicodePwd::$PASSWD
+userAccountControl: $5
+EOF
+}
+
+Add_Trust() {
+rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]
+        set var2 [lindex $argv 1]
+        set timeout 10
+        set send_slow {1 .1}' >> $expfile
+        echo "spawn $ipacmd --type=ad trust-add $var1 --admin $var2 --password" >> $expfile
+	echo 'expect "*assword: "' >> $expfile
+	echo "send -s -- \"$adminpw\r\"" >> $expfile
+	echo 'expect {
+	"ipa: ERROR: Unable to resolve domain controller for \'$var1\' domain" { exit 1 }
+	""
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+	
+}
 
 NB_Exp() {
 	rm -rf $expfile
@@ -144,34 +182,40 @@ No_SRV_Exp() {
 	fi
 	echo 'expect "*assword: "' >> $expfile
 	echo "send -- \"$adminpw\r\"" >> $expfile
+	echo 'expect "*]: "' >> $expfile
+	echo 'send -- "\r"' >> $expfile
 	if [ "$1" = "no-msdcs" ]; then
-	 echo 'expect "*]: "' >> $expfile
-	 echo 'send -- "\r"' >> $expfile
-	fi
-	echo 'expect "*ipa-sidgen task? *]: "' >> $expfile
-        echo 'send -- "\r"' >> $expfile
-	if [ "$1" = "no-msdcs" ]; then
-	 echo 'expect "*no-msdcs was given, *"' >> $expfile
-#	 send_user -- "\n------------------\n"' >> $expfile
+	 echo 'expect {
+	    timeout { send_user "\nExpected message not received\n"; exit 1 }
+	    eof { send_user "\nSome issue\n"; exit 1 }
+	"no-msdcs was given" {
+	send_user "\n------------------\n" }
+	}' >> $expfile
 	else
-	 echo 'expect "DNS management was not enabled *"' >> $expfile
-#	 send_user -- "\n------------------\n"' >> $expfile
+	 echo 'expect {
+	    timeout { send_user "\nExpected message not received\n"; exit 1 }
+	    eof { send_user "\nSome issue\n"; exit 1 }
+	"DNS management was not enabled" {
+	send_user "\n------------------\n" }
+	}' >> $expfile
 	fi
-	echo "expect \"* $rec1\"" >> $expfile
-#	echo 'send_user -- "\n------------------\n"' >> $expfile
-	echo "expect \"* $rec2\"" >> $expfile
-#	echo 'send_user -- "\n------------------\n"' >> $expfile
-	echo "expect \"* $rec3\"" >> $expfile
-#	echo 'send_user -- "\n------------------\n"' >> $expfile
-	echo "expect \"* $rec4\"" >> $expfile
-#	echo 'send_user -- "\n------------------\n"' >> $expfile
-	echo "expect \"* $rec5\"" >> $expfile
-#	echo 'send_user -- "\n------------------\n"' >> $expfile
-	echo "expect \"* $rec6\"" >> $expfile
-	echo 'send_user -- "\n------------------\n"' >> $expfile
+	echo "expect \"*$rec1\"" >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
+	echo "expect \"*$rec2\"" >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
+	echo "expect \"*$rec3\"" >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
+	echo "expect \"*$rec4\"" >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
+	echo "expect \"*$rec5\"" >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
+	echo "expect \"*$rec6\"" >> $expfile
+	echo 'send_user "\n------------------\n"' >> $expfile
 	echo 'expect {
-        "Setup*complete" { sleep 10 ; send "exit\r" }
-   }
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+        "Setup*complete" { sleep 30 ; send "exit\r" }
+}
 	send_user "\nAdtrust installed successfully without creating service records\n"' >> $expfile
 }
 
@@ -189,20 +233,10 @@ Interactive_Exp() {
 	echo 'send -- "y\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -- \"$adminpw\r\"" >> $expfile
-	if [ "$1" = "sidgen" ]; then
-	  echo 'expect "*]: "' >> $expfile
-          echo 'send -- "\r"' >> $expfile
-        fi
-	echo 'expect "*ipa-sidgen task? *]: "' >> $expfile
-	if [ "$1" = "sidgen" ]; then
-	  echo 'send -- "y\r"' >> $expfile
-	else
-	  echo 'send -- "\r"' >> $expfile
-	fi
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { sleep 10 ; send -- "exit\r" }
+        "Setup*complete" { sleep 30 ; send -- "exit\r" }
 }
 	send_user "\nInteractive ADtrust install was successful.\n"' >> $expfile
 }
@@ -221,12 +255,13 @@ Valid_NB_Exp() {
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
         echo 'expect {
-	"*ipa-sidgen task? *]: " { send -- "\r" }
-	"*reset the NetBIOS domain name? *]: " {
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+	"*]: " { 
 	send -s -- "y\r" 
-	expect "*ipa-sidgen task? *]: "
-	send -- "\r"  } }
-	expect "Setup*complete" { sleep 10 ; send -- "exit\r" }' >> $expfile
+	expect "Setup*complete" { sleep 30 ; send -- "exit\r" } }
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
+}' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
 
@@ -241,14 +276,14 @@ Valid_IP_Exp() {
         echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
         echo 'expect "Overwrite smb.conf?*: "' >> $expfile
         echo 'send -s -- "y\r"' >> $expfile
+#	echo 'expect "*]: "' >> $expfile
+#        echo 'send -s -- "\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
-	echo 'expect "*ipa-sidgen task? *]: "' >> $expfile
-        echo 'send -- "\r"' >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-	"Setup*complete" { sleep 10 ; send -- "exit\r" }
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
 }' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -268,13 +303,13 @@ Valid_NBIP_Exp() {
         echo 'send -s -- "y\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
-	echo 'expect {
-        "*ipa-sidgen task? *]: " { send -- "\r" }
-        "*reset the NetBIOS domain name? *]: " {
+        echo 'expect {
+  timeout { send_user "\nExpected error not received\n"; exit 1 }
+  eof { send_user "\nSome issue\n"; exit 1 }
+	"*]: " { 
         send -s -- "y\r" 
-        expect "*ipa-sidgen task? *]: "
-        send -- "\r"  } }
-        expect "Setup*complete" { sleep 10 ; send -- "exit\r" }' >> $expfile
+        expect "Setup*complete" { sleep 30 ; send -- "exit\r" } }
+}' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
 
@@ -293,17 +328,16 @@ Valid_RID_Exp() {
 	else
 	  echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
 	fi
+#        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
+#        echo 'sleep .5' >> $expfile
+#        echo 'send -s -- "y\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
-	echo 'expect "*]: "' >> $expfile
-        echo 'send -- "\r"' >> $expfile
-	echo 'expect "*ipa-sidgen task? *]: "' >> $expfile
-        echo 'send -- "\r"' >> $expfile
         echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-	"Setup*complete" { sleep 10 ; send -- "exit\r" }
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
 } ' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -348,12 +382,10 @@ AdminPriv_Exp() {
           echo 'expect "*assword: "' >> $expfile
           echo "send -s -- \"$userpw\r\"" >> $expfile
 	fi
-	echo 'expect "*ipa-sidgen task? *]: "' >> $expfile
-        echo 'send -- "\r"' >> $expfile
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-    "Setup*complete" { sleep 10 ; send -- "exit\r" }
+    "Setup*complete" { sleep 30 ; send -- "exit\r" }
 } ' >> $expfile
 	echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
@@ -374,21 +406,17 @@ SID_Exp() {
         echo 'send -s -- "y\r"' >> $expfile
         echo 'expect "*assword: "' >> $expfile
         echo "send -s -- \"$adminpw\r\"" >> $expfile
-	if [ "$1" != "add-sids" ]; then
-	  echo 'expect "*ipa-sidgen task? *]: "' >> $expfile
-          echo 'send -- "\r"' >> $expfile
-	fi
         echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-	"Setup*complete" { sleep 10 ; send -- "exit\r" }
+	"Setup*complete" { sleep 30 ; send -- "exit\r" }
 }' >> $expfile
         echo 'send_user "\nADtrust installed.\n"' >> $expfile
 }
 
 Unattended_Exp() {
 	rm -rf $expfile
-        echo 'set timeout 60
+        echo 'set timeout 300
         set send_slow {1 .1}' > $expfile
         echo 'spawn /bin/bash' >> $expfile
         echo 'expect "# "' >> $expfile
@@ -396,7 +424,8 @@ Unattended_Exp() {
 	echo 'expect {
   timeout { send_user "\nExpected error not received\n"; exit 1 }
   eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { sleep 10 ; send -- "exit\r" }
+        "Setup*complete" { sleep 30 ; send -- "exit\r" }
 }
         send_user "\nUnattended ADtrust install was successful.\n"' >> $expfile
 }
+
