@@ -299,3 +299,106 @@ EOF
    rlPhaseEnd
 }
 
+bug_833505(){
+    rlPhaseStartTest "bug automation: 833505"
+        local original="/etc/sysconfig/network"
+        local preserv="/tmp/network.$RANDOM"
+        rlRun "mv -fv $original $preserv" 0 "save $original to $preserv" 0 "move [$original] to [$preserv]"
+        #install ipa client as noted in bug report
+        ipa-client-install --hostname=`hostname` --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER -U
+        if [ "$?" = "0" ];then
+            rlPass "ipa client install with missing $original and use --hostname success"
+            rlRun "mv $preserv $original" 0 "restore $original file"
+            uninstall_ipa_client
+        else
+            rlFail "ipa client install with missing $original and use --hotname failed"
+        fi
+    rlPhaseEnd
+}
+
+bug_813387(){
+    rlPhaseStartTest "bug automation: 813387"
+        # preserv the network file: /etc/sysconfig/network
+        local original="/etc/sysconfig/network"
+        local preserv="/tmp/network.$RANDOM"
+        rlRun "cp -fv $original $preserv" 0 "save $original to $preserv"
+        #install ipa client as noted in bug report
+        rlRun "ipa-client-install --no-ntp --force --hostname=`hostname` --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER -U" 
+        if diff $preserv $original
+        then
+            rlFail "the original network file $original has been modified after ipa client install"
+            echo "========== original content from preserved file [$preserv] ==========="
+            cat $preseerv
+            echo "========== current content [$original] ==============================="
+            cat $original
+        else
+            rlPass "the original network file $origianl is untouched before and after ipa client install"
+            uninstall_ipa_client
+        fi
+    rlPhaseEnd    
+}
+
+bug_805203(){
+    rlPhaseStartTest "bug automation: 805203"
+        local sssd_conf="/etc/sssd/sssd.conf"
+        if ipa-client-install  --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER -U
+        then
+            if grep "ipa_hostname" $sssd_conf
+            then
+                rlPass "ipa_hostname has been set in $sssd_conf file"
+            else
+                rlFail "ipa_hostname does not being set in sssd conf file [$sssd_conf]"
+            fi
+            echo "========== [$sssd_conf] ===================="
+            cat $sssd_conf
+            echo "=============================================="
+            uninstall_ipa_client
+        else
+            rlFail "ipa-client-install failed, test can not continue"
+        fi
+    rlPhaseEnd
+}
+
+bug_831010(){
+    rlPhaseStartTest "bug automation: 831010"
+        local sssd_conf="/etc/sssd/sssd.conf"
+        if ipa-client-install  --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER --fixed-primary -U
+        then
+            # expect a line like "ipa_server =  <ipa master>" NO "_srv_" appears
+            if grep "ipa_server" $sssd_conf | grep "_srv_"
+            then
+                rlFail "found _srv_ record in $sssd_conf file, this is NOT expected when --fixed-primary option used in ipa client install"
+            else
+                rlPass "no _srv_ record found in $sssd_conf file, test pass"
+            fi
+            echo "========== [$sssd_conf] ===================="
+            cat $sssd_conf
+            echo "=============================================="
+            uninstall_ipa_client
+        else
+            rlFail "ipa-client-install failed, test can not continue"
+        fi       
+    rlPhaseEnd
+}
+
+bug_883166(){
+    rlPhaseStartTest "bug automation: 883166"
+        local sys_file_to_check="/etc/krb5.conf"
+        local desired_line="includedir /var/lib/sss/pubconf/krb5.include.d/"
+        if ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER -U
+        then
+            if grep "$desired_line" $sys_file_to_check
+            then
+                rlPass "subdirectory [includedir /var/lib/sss/pubconf/krb5.include.d/] has detected in $sys_file_to_check file"
+            else
+                rlFail "subdirectory [includedir /var/lib/sss/pubconf/krb5.include.d/] not found in $sys_file_to_check file"
+            fi
+            echo "========== [$sys_file_to_check] ===================="
+            cat $sys_file_to_check
+            echo "=============================================="
+            uninstall_ipa_client
+        else
+            rlFail "ipa-client-install failed, test can not continue"
+        fi
+    rlPhaseEnd
+}
