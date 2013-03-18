@@ -134,16 +134,6 @@ ipaclientinstall()
 
 }
 
-ipa_bug_verification(){
-    ipa-client-install --uninstall -U
-    bug_833505
-    bug_813387
-    bug_805203
-    bug_831010
-    bug_883166
-    ipa-client-install --uninstall -U
-}
-
 install_setup()
 {
         echo $SLAVE

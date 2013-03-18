@@ -299,11 +299,21 @@ EOF
    rlPhaseEnd
 }
 
+ipa_bug_verification(){
+    ipa-client-install --uninstall -U
+    bug_833505
+    bug_813387
+    bug_805203
+    bug_831010
+    bug_883166
+    ipa-client-install --uninstall -U
+}
+
 bug_833505(){
-    rlPhaseStartTest "bug automation: 833505"
+    rlPhaseStartTest "bug automation 833505"
         local original="/etc/sysconfig/network"
         local preserv="/tmp/network.$RANDOM"
-        rlRun "mv -fv $original $preserv" 0 "save $original to $preserv" 0 "move [$original] to [$preserv]"
+        rlRun "mv -fv $original $preserv" 0 "move [$original] to [$preserv]"
         #install ipa client as noted in bug report
         ipa-client-install --hostname=`hostname` --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER -U
         if [ "$?" = "0" ];then
@@ -317,11 +327,11 @@ bug_833505(){
 }
 
 bug_813387(){
-    rlPhaseStartTest "bug automation: 813387"
+    rlPhaseStartTest "bug automation 813387"
         # preserv the network file: /etc/sysconfig/network
         local original="/etc/sysconfig/network"
         local preserv="/tmp/network.$RANDOM"
-        rlRun "cp -fv $original $preserv" 0 "save $original to $preserv"
+        rlRun "cp -fv $original $preserv" 0 "copy $original to $preserv"
         #install ipa client as noted in bug report
         rlRun "ipa-client-install --no-ntp --force --hostname=`hostname` --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER -U" 
         if diff $preserv $original
@@ -339,11 +349,11 @@ bug_813387(){
 }
 
 bug_805203(){
-    rlPhaseStartTest "bug automation: 805203"
+    rlPhaseStartTest "bug automation 805203"
         local sssd_conf="/etc/sssd/sssd.conf"
         if ipa-client-install  --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER -U
         then
-            if grep "ipa_hostname" $sssd_conf
+            if grep "^ipa_hostname" $sssd_conf
             then
                 rlPass "ipa_hostname has been set in $sssd_conf file"
             else
@@ -360,12 +370,12 @@ bug_805203(){
 }
 
 bug_831010(){
-    rlPhaseStartTest "bug automation: 831010"
+    rlPhaseStartTest "bug automation 831010"
         local sssd_conf="/etc/sssd/sssd.conf"
         if ipa-client-install  --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER --fixed-primary -U
         then
             # expect a line like "ipa_server =  <ipa master>" NO "_srv_" appears
-            if grep "ipa_server" $sssd_conf | grep "_srv_"
+            if grep "^ipa_server" $sssd_conf | grep "_srv_"
             then
                 rlFail "found _srv_ record in $sssd_conf file, this is NOT expected when --fixed-primary option used in ipa client install"
             else
@@ -382,12 +392,12 @@ bug_831010(){
 }
 
 bug_883166(){
-    rlPhaseStartTest "bug automation: 883166"
+    rlPhaseStartTest "bug automation 883166"
         local sys_file_to_check="/etc/krb5.conf"
         local desired_line="includedir /var/lib/sss/pubconf/krb5.include.d/"
         if ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER -U
         then
-            if grep "$desired_line" $sys_file_to_check
+            if grep "^$desired_line" $sys_file_to_check
             then
                 rlPass "subdirectory [includedir /var/lib/sss/pubconf/krb5.include.d/] has detected in $sys_file_to_check file"
             else
