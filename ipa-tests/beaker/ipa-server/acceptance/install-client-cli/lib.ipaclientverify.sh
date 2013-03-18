@@ -634,3 +634,9 @@ debug_pause()
 		sleep 60
 	done
 }
+
+uninstall_ipa_client(){
+    rlRun "ipa-client-install --uninstall -U"
+}
+
+
