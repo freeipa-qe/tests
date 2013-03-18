@@ -117,13 +117,13 @@ upgrade_replica()
         rlRun "yum -y update redhat-release"
         rlRun "ipactl status"
 
-        if [ ! -f /etc/sssd/sssd.conf.getent ]; then
-            rlRun "yum -y install strace"
-            rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.getent"
-            rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 9/' /etc/sssd/sssd.conf"
-            sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
-            rlRun "cat /etc/sssd/sssd.conf"
-        fi
+        #if [ ! -f /etc/sssd/sssd.conf.getent ]; then
+        #    rlRun "yum -y install strace"
+        #    rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.getent"
+        #    rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 9/' /etc/sssd/sssd.conf"
+        #    sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+        #    rlRun "cat /etc/sssd/sssd.conf"
+        #fi
 
         rlRun "service sssd status"
         rlRun "service sssd restart"
@@ -172,13 +172,13 @@ upgrade_client()
         rlRun "rpm -q $PKG-client sssd"
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
 
-        if [ ! -f /etc/sssd/sssd.conf.bak1 ]; then
-            rlRun "yum -y install strace"
-            rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.bak1"
-            rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 9/' /etc/sssd/sssd.conf"
-            sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
-            rlRun "cat /etc/sssd/sssd.conf"
-        fi
+        #if [ ! -f /etc/sssd/sssd.conf.bak1 ]; then
+        #    rlRun "yum -y install strace"
+        #    rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.bak1"
+        #    rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 9/' /etc/sssd/sssd.conf"
+        #    sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+        #    rlRun "cat /etc/sssd/sssd.conf"
+        #fi
 
         rlRun "service sssd status"
         rlRun "service sssd restart"
