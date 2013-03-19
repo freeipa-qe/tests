@@ -488,20 +488,9 @@ function ipa_quicktest_automember_check()
     rlRun "ipa user-show ${amuser1} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
-    rlRun "strace -vtf -o /tmp/getentfailure.strace getent -s sss group ${amgroup1}| grep ${amuser1}"
-    if [ $? -gt 0 ]; then
-        for strace_file in $(ls /tmp/getentfailure.strace* 2>/dev/null); do
-            rlRun "submit_log $strace_file"
-            rlRun "rm -f $strace_file"
-        done
 
-        rlRun "tar zcvf /tmp/sssd_cache.$DDATE.getent_failure.tgz /var/lib/sss"
-        rlRun "submit_log /tmp/sssd_cache.$DDATE.getent_failure.tgz"
-
-        rlRun "cp /var/log/sssd/sssd_testrelm.com.log /tmp/sssd_testrelm.com.log.$DDATE"
-        rlRun "submit_log /tmp/sssd_testrelm.com.log.$DDATE"
-    fi
-    rlRun "rm -f /tmp/getentfailure.strace*"
+    rlRun "id ${amuser1}"
+    rlRun "getent -s sss group ${amgroup1}| grep ${amuser1}"
 
     rlLog "Confirm host added as member of ${amhostgroup1}"
     rlRun "ipa host-show ${amhost1} > $tmpout 2>&1"
