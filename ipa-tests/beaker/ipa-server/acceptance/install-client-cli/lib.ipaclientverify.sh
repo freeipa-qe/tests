@@ -33,16 +33,16 @@ ipacompare_forinstalluninstall()
 
 ipacompare_simple()
 {
-	local label="$1"
-	local expected="$2"
-	local actual="$3"
-	
-	if [ "$actual" = "$expected" ]; then
-		rlPass "Value is set correctly for $label"
-	else
-		rlFail "[$label] does NOT match"
-		rlLog "expect [$expected], actual got [$actual]"
-	fi
+    local label="$1"
+    local expected="$2"
+    local actual="$3"
+    
+    if [ "$actual" = "$expected" ]; then
+        rlPass "Value is set correctly for $label"
+    else
+        rlFail "[$label] does NOT match"
+        rlLog "expect [$expected], actual got [$actual]"
+    fi
 }
 
 ipacompare_forinstalluninstall_withmasterslave()
@@ -71,47 +71,47 @@ ipacompare_forinstalluninstall_withmasterslave()
 
 uninstall_fornexttest()
 {
-	if [ -f $DEFAULT  ] ; then
-		rlLog "Uninstall for next test"
-	       # before uninstalling ipa client, first remove its references from server
+    if [ -f $DEFAULT  ] ; then
+        rlLog "Uninstall for next test"
+           # before uninstalling ipa client, first remove its references from server
 #       rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials after installing"
 #       rlRun "ipa host-del $CLIENT --updatedns" 0 "Deleting client record and DNS entry from server"
-		# now uninstall
-		rlLog "Uninstalling ipa client for next test"
-		ipa-client-install --uninstall -U 
-			if [ $? -ne 0 ]; then
-				rlLog "Unsuccessful uninstall"
-				rhts-submit-log -l /var/log/ipaclient-uninstall.log
-			fi
+        # now uninstall
+        rlLog "Uninstalling ipa client for next test"
+        ipa-client-install --uninstall -U 
+        if [ $? -ne 0 ]; then
+            rlLog "Unsuccessful uninstall"
+            rhts-submit-log -l /var/log/ipaclient-uninstall.log
+        fi
 
-		fi
-	# Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
-	PRESERVESSSDCHK=$(grep "'preserve_sssd': True," /var/log/ipaclient-install.log|wc -l)
-	if [ -f $SSSD -a $PRESERVESSSDCHK -eq 0 ];then
-		rlRun "grep $RELM $SSSD" 1 "Making sure that $SSSD does not contain the IPA relm. BZ 819982"
-		rlRun "grep $DOMAIN $SSSD" 1 "Making sure that $SSSD does not contain the IPA DOMAIN. BZ 819982"
+    fi
+    # Checking to see if the sssd.conf files has been deleted as per https://bugzilla.redhat.com/show_bug.cgi?id=819982
+    PRESERVESSSDCHK=$(grep "'preserve_sssd': True," /var/log/ipaclient-install.log|wc -l)
+    if [ -f $SSSD -a $PRESERVESSSDCHK -eq 0 ];then
+        rlRun "grep $RELM $SSSD" 1 "Making sure that $SSSD does not contain the IPA relm. BZ 819982"
+        rlRun "grep $DOMAIN $SSSD" 1 "Making sure that $SSSD does not contain the IPA DOMAIN. BZ 819982"
 
-		grep -e LDAP-KRB5 $SSSD 
-		if [ $? -eq 0 ];then
-			rlLog "BZ 819982 does not exists. This is preserve sssd scenario"
-		fi
-	elif [ ! -f $SSSD ]; then 
-		rlLog "sssd.conf for testing BZ 819982 does not exists"
-	else
-		rlLog "preserve-sssd option used....skipping check"
-	fi
+        grep -e LDAP-KRB5 $SSSD 
+        if [ $? -eq 0 ];then
+            rlLog "BZ 819982 does not exists. This is preserve sssd scenario"
+        fi
+    elif [ ! -f $SSSD ]; then 
+        rlLog "sssd.conf for testing BZ 819982 does not exists"
+    else
+        rlLog "preserve-sssd option used....skipping check"
+    fi
 
-	if [ -f $SSSD ] ; then
-		rlLog "renaming last sssd.conf"
-		mv $SSSD $SSSD.old
-	fi
-	if [ -f $DEFAULT ] ; then
-		rlLog "renaming last default.conf"
-		mv $DEFAULT $DEFAULT.old
-	fi
-	rlRun "service ntpd stop"
-	rlRun "ssh root@$MASTERIP \"echo Secret123|kinit admin;ipa host-del $CLIENT\"" 0,1,2
-	rlRun "sleep 60"
+    if [ -f $SSSD ] ; then
+        rlLog "renaming last sssd.conf"
+        mv $SSSD $SSSD.old
+    fi
+    if [ -f $DEFAULT ] ; then
+        rlLog "renaming last default.conf"
+        mv $DEFAULT $DEFAULT.old
+    fi
+    rlRun "service ntpd stop"
+    rlRun "ssh root@$MASTERIP \"echo Secret123|kinit admin;ipa host-del $CLIENT\"" 0,1,2
+    rlRun "sleep 60"
 }
 
 install_fornexttest()
@@ -140,93 +140,91 @@ verify_kinit()
 
 verify_default() 
 {
-
     local installcheck="$1"
-     if [ -f $DEFAULT ];then
+    if [ -f $DEFAULT ];then
         if $installcheck ; then 
-          rlPass "$DEFAULT created"
+            rlPass "$DEFAULT created"
         else
-          rlFail "$DEFAULT not removed when IPA was uninstalled"
+            rlFail "$DEFAULT not removed when IPA was uninstalled"
         fi
-     else
+    else
         if $installcheck ; then 
             rlFail "$DEFAULT not created when IPA was installed"
         else
             rlPass "$DEFAULT removed "
         fi
-     fi
-
+    fi
 }
 
 verify_sssd()
 {
-echo "verify_sssd"
+    echo "verify_sssd"
     local installcheck="$1"
 
     if [ "$2" == "nosssd" -a -f $SSSD ] ; then
-       rlLog "Verify sssd.conf - with no sssd"
-       testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "id_provider " "$id_provider_nosssd" "$testidprovider" "$1" 
-       testcachecredentials=`grep "^cache_credentials"  $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "cache_credentials " "$cache_credentials_nosssd" "$testcachecredentials" "$1" 
-       testauthprovider=`grep "^auth_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "auth_provider " "$auth_provider_nosssd" "$testauthprovider" "$1" 
-       testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider_nosssd" "$testchpassprovider" "$1" 
-       testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm_nosssd" "$testkrb5realm" "$1" 
-	elif [ "$2" == "nosssd" -a ! -f $SSSD ] ; then
-       rlLog "nosssd verification selected but, no sssd.conf found."
-       rlLog "newer versions of IPA with nosssd move sssd.conf out of the way"
+        rlLog "Verify sssd.conf - with no sssd"
+        testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+        ipacompare_forinstalluninstall "id_provider " "$id_provider_nosssd" "$testidprovider" "$1" 
+        testcachecredentials=`grep "^cache_credentials"  $SSSD | cut -d "=" -f2 | xargs echo`
+        ipacompare_forinstalluninstall "cache_credentials " "$cache_credentials_nosssd" "$testcachecredentials" "$1" 
+        testauthprovider=`grep "^auth_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+        ipacompare_forinstalluninstall "auth_provider " "$auth_provider_nosssd" "$testauthprovider" "$1" 
+        testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+        ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider_nosssd" "$testchpassprovider" "$1" 
+        testkrb5realm=`grep "^krb5_realm" $SSSD | cut -d "=" -f2 | xargs echo`
+        ipacompare_forinstalluninstall "krb5_realm " "$krb5_realm_nosssd" "$testkrb5realm" "$1" 
+    elif [ "$2" == "nosssd" -a ! -f $SSSD ] ; then
+        rlLog "nosssd verification selected but, no sssd.conf found."
+        rlLog "newer versions of IPA with nosssd move sssd.conf out of the way"
     else
-       rlLog "Verify sssd.conf - with sssd"
-       if [ "$2" == "force" ] ; then
-          testcachecredentials=`grep "^cache_credentials"  $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "cache_credentials " "$cache_credentials" "$testcachecredentials" "$1" 
-          testauthprovider=`grep "^auth_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "auth_provider " "$auth_provider" "$testauthprovider" "$1" 
-          testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider" "$testchpassprovider" "$1" 
-       fi
-       if [ "$2" != "preserve" ] ; then
-         testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-         ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
-       fi
-       testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
-       ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1"
-       testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | sed 's/_srv_,//g' | xargs echo`
-       ipacompare_forinstalluninstall_withmasterslave "ipa_server " "$ipa_server_master" "$ipa_server_slave" "$testipaserver" "$1"
-       if [ "$2" == "enablednsupdates" ] ; then
-          testipadyndnsupdate=`grep "^ipa_dyndns_update" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "ipa_dyndns_update " "$ipa_dyndns_update" "$testipadyndnsupdate" "$1" 
-       fi
-       if [ "$2" == "permit" ] ; then
-          testaccessproviderpermit=`grep "^access_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "access_provider " "$access_provider_permit" "$testaccessproviderpermit" "$1" 
-       else
-          testaccessprovider=`grep "^access_provider" $SSSD | cut -d "=" -f2 | xargs echo`
-          ipacompare_forinstalluninstall "access_provider " "$access_provider" "$testaccessprovider" "$1" 
-       fi
-       if [ "$2" == "nokrb5offlinepasswords" ] ; then
+        rlLog "Verify sssd.conf - with sssd"
+        if [ "$2" == "force" ] ; then
+            testcachecredentials=`grep "^cache_credentials"  $SSSD | cut -d "=" -f2 | xargs echo`
+            ipacompare_forinstalluninstall "cache_credentials " "$cache_credentials" "$testcachecredentials" "$1" 
+            testauthprovider=`grep "^auth_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+            ipacompare_forinstalluninstall "auth_provider " "$auth_provider" "$testauthprovider" "$1" 
+            testchpassprovider=`grep "^chpass_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+            ipacompare_forinstalluninstall "chpass_provider " "$chpass_provider" "$testchpassprovider" "$1" 
+        fi
+        if [ "$2" != "preserve" ] ; then
+            testidprovider=`grep "^id_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+            ipacompare_forinstalluninstall "id_provider " "$id_provider" "$testidprovider" "$1" 
+        fi
+        testipadomain=`grep "^ipa_domain" $SSSD | cut -d "=" -f2 | xargs echo`
+        ipacompare_forinstalluninstall "ipa_domain " "$ipa_domain" "$testipadomain" "$1"
+        testipaserver=`grep "^ipa_server" $SSSD | cut -d "=" -f2 | sed 's/_srv_,//g' | xargs echo`
+        ipacompare_forinstalluninstall_withmasterslave "ipa_server " "$ipa_server_master" "$ipa_server_slave" "$testipaserver" "$1"
+        if [ "$2" == "enablednsupdates" ] ; then
+            testipadyndnsupdate=`grep "^ipa_dyndns_update" $SSSD | cut -d "=" -f2 | xargs echo`
+            ipacompare_forinstalluninstall "ipa_dyndns_update " "$ipa_dyndns_update" "$testipadyndnsupdate" "$1" 
+        fi
+        if [ "$2" == "permit" ] ; then
+            testaccessproviderpermit=`grep "^access_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+            ipacompare_forinstalluninstall "access_provider " "$access_provider_permit" "$testaccessproviderpermit" "$1" 
+        else
+            testaccessprovider=`grep "^access_provider" $SSSD | cut -d "=" -f2 | xargs echo`
+            ipacompare_forinstalluninstall "access_provider " "$access_provider" "$testaccessprovider" "$1" 
+        fi
+        if [ "$2" == "nokrb5offlinepasswords" ] ; then
           grep "krb5_store_password_if_offline" $SSSD
           if [ $? -eq 0 ]; then
-            rlFail "krb5_store_password_if_offline is set in sssd.conf"
-            rlLog `grep "krb5_store_password_if_offline" $SSSD`
+             rlFail "krb5_store_password_if_offline is set in sssd.conf"
+             rlLog `grep "krb5_store_password_if_offline" $SSSD`
           else
-            rlPass "krb5_store_password_if_offline is not set in sssd.conf"
+             rlPass "krb5_store_password_if_offline is not set in sssd.conf"
           fi
-       else
+        else
           testnokrb5offlinepasswords=`grep "krb5_store_password_if_offline" $SSSD | cut -d "=" -f2 | xargs echo`
           ipacompare_forinstalluninstall "krb5_store_password_if_offline " "True" "$testnokrb5offlinepasswords" "$1" 
-       fi
-       if [ "$2" == "preserve" ] ; then
-          grep "LDAP-KRB5" $SSSD
-          if [ $? -eq 0 ]; then
+        fi
+        if [ "$2" == "preserve" ] ; then
+            grep "LDAP-KRB5" $SSSD
+            if [ $? -eq 0 ]; then
             rlPass "$SSSD was preserved during client install"
-          else
-            rlFail "$SSSD was NOT preserved during client install"
-          fi
-       fi
+            else
+                rlFail "$SSSD was NOT preserved during client install"
+            fi
+        fi
 
     fi
 }
@@ -235,19 +233,19 @@ verify_krb5()
 {
     rlLog "Verify krb5.conf"
 
-	# INSTSRVOPT = 0 when --server is used in ipa-client-install
-	# INSTSRVOPT = 1 when --server is NOT used in ipa-client-install
-	INSTSRVOPT=$(grep "'server': None," /var/log/ipaclient-install.log |wc -l)
-	klist -ekt /etc/krb5.keytab | grep $HOSTNAME
-	if [ $? -ne 0 ] ; then
-		if [ -f /etc/fedora-release ] ; then
-			#rlAssertGrep "# default_realm = $RELM" $KRB5
-			rlAssertNotGrep "default_realm = $RELM" $KRB5
-		else
-			testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
-	    		ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
-		fi
-	fi
+    # INSTSRVOPT = 0 when --server is used in ipa-client-install
+    # INSTSRVOPT = 1 when --server is NOT used in ipa-client-install
+    INSTSRVOPT=$(grep "'server': None," /var/log/ipaclient-install.log |wc -l)
+    klist -ekt /etc/krb5.keytab | grep $HOSTNAME
+    if [ $? -ne 0 ] ; then
+        if [ -f /etc/fedora-release ] ; then
+            #rlAssertGrep "# default_realm = $RELM" $KRB5
+            rlAssertNotGrep "default_realm = $RELM" $KRB5
+        else
+            testdefaultrealm=`grep "default_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
+                ipacompare_forinstalluninstall "default_realm " "$default_realm" "$testdefaultrealm" "$1" 
+        fi
+    fi
     testrdns=`grep "rdns" $KRB5 | cut -d "=" -f2 | xargs echo` 
     ipacompare_forinstalluninstall "rdns " "$rdns" "$testrdns" "$1" 
     #testticketlifetime=`grep "ticket_lifetime" $KRB5 | cut -d "=" -f2 | xargs echo` 
@@ -270,9 +268,9 @@ verify_krb5()
        ipacompare_simple "dns_lookup_kdc " "$dns_lookup_kdc_force" "$testdnslookupkdc"
        testdnslookuprealm=`grep "dns_lookup_realm" $KRB5 | cut -d "=" -f2 | xargs echo` 
        ipacompare_simple "dns_lookup_realm " "$dns_lookup_realm_force" "$testdnslookuprealm"
-	   testdomain=`grep "$DOMAIN = " $KRB5 | cut -d "=" -f2 | xargs echo`
+       testdomain=`grep "$DOMAIN = " $KRB5 | cut -d "=" -f2 | xargs echo`
        if [ "$1" = "true" ]; then # true=install, false=uninstall
-		   ipacompare_simple "domain_realm " "$domain_realm" "$testdomain"
+           ipacompare_simple "domain_realm " "$domain_realm" "$testdomain"
        else
            ipacompare_simple "domain_realm " "" "$testdomain"
        fi    
@@ -398,8 +396,8 @@ verify_authconfig()
       testusesssdauth=`grep "USESSSDAUTH"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
       ipacompare_forinstalluninstall "USESSSDAUTH: " "$USESSSDAUTH" "$testusesssdauth" "$1" 
       if $1 ; then
-      	testusekerberos=`grep "USEKERBEROS"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
-      	ipacompare_forinstalluninstall "USEKERBEROS: " "$USEKERBEROS" "$testusekerberos" "$1" 
+          testusekerberos=`grep "USEKERBEROS"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
+          ipacompare_forinstalluninstall "USEKERBEROS: " "$USEKERBEROS" "$testusekerberos" "$1" 
       fi
       testusesssd=`grep -w "USESSSD"  $AUTHCONFIG | cut -d "=" -f2 | xargs echo`
       ipacompare_forinstalluninstall "USESSSD: " "$USESSSD" "$testusesssd" "$1" 
@@ -515,13 +513,13 @@ verify_keytab_afteruninstall()
 {
     client=$1
     out=$2
-	if [ $(grep 5\.[0-9] /etc/redhat-release |wc -l) -gt 0 ]; then
-		rlLog "Running: ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out"
-		rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out 2>&1"
-	else
-		rlLog "Running: ipa  host-show --all $client > $out"
-		rlRun "ipa  host-show --all $client > $out 2>&1"
-	fi
+    if [ $(grep 5\.[0-9] /etc/redhat-release |wc -l) -gt 0 ]; then
+        rlLog "Running: ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out"
+        rlRun "ssh -o StrictHostKeyChecking=no root@$MASTER \"echo $ADMINPW|kinit admin; ipa  host-show --all $client\" > $out 2>&1"
+    else
+        rlLog "Running: ipa  host-show --all $client > $out"
+        rlRun "ipa  host-show --all $client > $out 2>&1"
+    fi
     rlLog "Out: $out"
     chkkeytab="Keytab: False"
     if grep -i "$chkkeytab" $out 2>&1 >/dev/null
@@ -557,8 +555,8 @@ verify_hostname()
 updateResolv()
 {
         fakeip=99.99.99.999
-	sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
-	echo "nameserver $fakeip" >> /etc/resolv.conf
+    sed -i s/^nameserver/#nameserver/g /etc/resolv.conf
+    echo "nameserver $fakeip" >> /etc/resolv.conf
         rlLog "Updated contents are: `cat /etc/resolv.conf`"
 }
 
@@ -566,8 +564,8 @@ updateResolv()
 restoreResolv()
 {
         fakeip="99.99.99.999"
-	sed -i s/"^#nameserver $MASTERIP"/"nameserver $MASTERIP"/g /etc/resolv.conf
-	sed -i s/"^#nameserver $SLAVEIP"/"nameserver $SLAVEIP"/g /etc/resolv.conf
+    sed -i s/"^#nameserver $MASTERIP"/"nameserver $MASTERIP"/g /etc/resolv.conf
+    sed -i s/"^#nameserver $SLAVEIP"/"nameserver $SLAVEIP"/g /etc/resolv.conf
         sed -i /"nameserver $fakeip"/d /etc/resolv.conf
         rlLog "Restored contents are: `cat /etc/resolv.conf`"
 }
@@ -591,52 +589,47 @@ verify_time()
 
 getRandomPassword()
 {
-     out="$1"
-     ssh -o StrictHostKeyChecking=no root@$MASTER "ipa host-add $CLIENT --random" > $out
+    out="$1"
+    ssh -o StrictHostKeyChecking=no root@$MASTER "ipa host-add $CLIENT --random" > $out
 
-#     $cmd > $out
-     randomPassword=`grep "Random password:" $out | cut -d ":" -f2`
-     return $randomPassword
-
+#   $cmd > $out
+    randomPassword=`grep "Random password:" $out | cut -d ":" -f2`
+    return $randomPassword
 }
 
 
 writesssdconf()
 {
-
-   rlRun "echo \"[sssd]\" > $SSSD"
-   rlRun "echo \"config_file_version = 2\" >> $SSSD"
-   rlRun "echo \"domains = LDAP-KRB5\" >> $SSSD"
-   rlRun "echo \"debug_level = 6\" >> $SSSD"
-   rlRun "echo \"reconnection_retries = 3\" >> $SSSD"
-   rlRun "echo \"services = nss, pam\" >> $SSSD"
-   rlRun "echo \"\" >> $SSSD"
-   rlRun "echo \"[nss]\" >> $SSSD"
-   rlRun "echo \"filter_groups = root\" >> $SSSD"
-   rlRun "echo \"filter_users = root\" >> $SSSD"
-   rlRun "echo \"\" >> $SSSD"
-   rlRun "echo \"[pam]\" >> $SSSD"
-   rlRun "echo \"\" >> $SSSD"
-   rlRun "echo \"[domain/LDAP-KRB5]\" >> $SSSD"
-   rlRun "echo \"id_provider = ldap\" >> $SSSD"
-   rlRun "echo \"auth_provider = krb5\" >> $SSSD"
-   rlRun "echo \"ldap_uri = ldap://$MASTER\" >> $SSSD"
-   rlRun "echo \"debug_level = 9\" >> $SSSD"
-   rlRun "echo \"krb5_server = $MASTER\" >> $SSSD"
-   rlRun "echo \"krb5_realm = $RELM\" >> $SSSD"
-
+    rlRun "echo \"[sssd]\" > $SSSD"
+    rlRun "echo \"config_file_version = 2\" >> $SSSD"
+    rlRun "echo \"domains = LDAP-KRB5\" >> $SSSD"
+    rlRun "echo \"debug_level = 6\" >> $SSSD"
+    rlRun "echo \"reconnection_retries = 3\" >> $SSSD"
+    rlRun "echo \"services = nss, pam\" >> $SSSD"
+    rlRun "echo \"\" >> $SSSD"
+    rlRun "echo \"[nss]\" >> $SSSD"
+    rlRun "echo \"filter_groups = root\" >> $SSSD"
+    rlRun "echo \"filter_users = root\" >> $SSSD"
+    rlRun "echo \"\" >> $SSSD"
+    rlRun "echo \"[pam]\" >> $SSSD"
+    rlRun "echo \"\" >> $SSSD"
+    rlRun "echo \"[domain/LDAP-KRB5]\" >> $SSSD"
+    rlRun "echo \"id_provider = ldap\" >> $SSSD"
+    rlRun "echo \"auth_provider = krb5\" >> $SSSD"
+    rlRun "echo \"ldap_uri = ldap://$MASTER\" >> $SSSD"
+    rlRun "echo \"debug_level = 9\" >> $SSSD"
+    rlRun "echo \"krb5_server = $MASTER\" >> $SSSD"
+    rlRun "echo \"krb5_realm = $RELM\" >> $SSSD"
 }
 
 debug_pause()
 {
-	while [ -f /tmp/IPAQE_DEBUG_PAUSE ]; do
-		rlLog "Paused for debugging...sleeping"
-		sleep 60
-	done
+    while [ -f /tmp/IPAQE_DEBUG_PAUSE ]; do
+        rlLog "Paused for debugging...sleeping"
+        sleep 60
+    done
 }
 
 uninstall_ipa_client(){
     rlRun "ipa-client-install --uninstall -U"
 }
-
-
