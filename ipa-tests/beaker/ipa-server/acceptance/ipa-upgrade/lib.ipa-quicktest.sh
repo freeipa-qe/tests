@@ -488,7 +488,6 @@ function ipa_quicktest_automember_check()
     rlRun "ipa user-show ${amuser1} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
-    #rlRun "id ${amuser1}"
     #rlRun "strace -vtf -o /tmp/getentfailure.strace getent -s sss group ${amgroup1}"
     #if [ $? -gt 0 ]; then
     #    for strace_file in $(ls /tmp/getentfailure.strace* 2>/dev/null); do
@@ -497,16 +496,13 @@ function ipa_quicktest_automember_check()
     #fi
     rlRun "getent -s sss group ${amgroup1}|grep ${amuser1}"
     if [ $? -gt 0 ]; then
-        rlLog "DEBUGGING getent failure...sleeping now to find it"
-        rlRun "sleep 100000"
+        rlRun "tar zcvf /tmp/sssd_cache.$DDATE.getent_failure.tgz /var/lib/sss"
+        rlRun "submit_log /tmp/sssd_cache.$DDATE.getent_failure.tgz"
+
+        rlRun "cp /var/log/sssd/sssd_testrelm.com.log /tmp/sssd_testrelm.com.log.$DDATE"
+        rlRun "submit_log /tmp/sssd_testrelm.com.log.$DDATE"
     fi
-    #if [ $? -gt 0 ]; then
-    #    rlRun "cp /var/log/sssd/sssd_testrelm.com.log /tmp/sssd_testrelm.com.log.$DDATE"
-    #    rlRun "submit_log /tmp/sssd_testrelm.com.log.$DDATE"
-    #fi
     rlRun "rm -f /tmp/getentfailure.strace*"
-    #rlLog "DEBUG SLEEP"
-    #rlRun "sleep 10000"
 
     rlLog "Confirm host added as member of ${amhostgroup1}"
     rlRun "ipa host-show ${amhost1} > $tmpout 2>&1"

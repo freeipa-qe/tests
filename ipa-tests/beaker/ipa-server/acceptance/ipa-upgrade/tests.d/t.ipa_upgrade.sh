@@ -112,6 +112,10 @@ upgrade_replica()
 
         ipa_yum_repo_setup
 
+        DDATE=$(date +%Y%m%d%H%M%S)
+        rlRun "tar zcvf /tmp/sssd_cache.$DDATE.pre-upgrade.tgz /var/lib/sss"
+        rlRun "submit_log /tmp/sssd_cache.$DDATE.pre-upgrade.tgz"
+
         rlRun "yum clean all"
         rlRun "yum -y update 'ipa*'"    
         rlRun "yum -y update redhat-release"
