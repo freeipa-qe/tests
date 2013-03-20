@@ -44,6 +44,11 @@
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/install-server-cli" role="MASTER">
 				<params/>
 			</task>
+			<task name="/CoreOS/ipa-server/IpaReserveSys" role="STANDALONE">
+				<params>
+					<param name="RESERVETIME" value="3600"/>
+				</params>
+			</task>
 		</recipe>
 	</recipeSet>
 </job>
