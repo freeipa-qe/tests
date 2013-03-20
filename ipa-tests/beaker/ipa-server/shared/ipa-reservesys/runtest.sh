@@ -34,7 +34,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 
-moresecondsfile=$(cat /tmp/ipa-reservation-extend-seconds.dat)
+moresecondsfile="/tmp/ipa-reservation-extend-seconds.dat"
 ipatmp=/opt/rhqa_ipa
 
 send_start_notice()
