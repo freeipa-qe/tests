@@ -122,6 +122,8 @@ rlJournalStart
 		rlRun "ls $ipatmp/reservetime.txt" 0 "Making sure RESERVETIME was defined in this job"
 	rlPhaseEnd
 
+	send_start_notice
+
 	rlPhaseStartSetup "Make sure RESERVETIME is less than 20160 min"
 		let maxseconds=1209600
 		if [ $RESERVETIME -gt $maxseconds ]; then
