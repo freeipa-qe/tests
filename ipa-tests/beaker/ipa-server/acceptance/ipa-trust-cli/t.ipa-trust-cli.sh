@@ -62,9 +62,6 @@ exp=`which expect`
 slapd_dir="/etc/dirsrv/slapd-TESTRELM-COM"
 ldap_conf="/etc/openldap/ldap.conf"
 ADcrt="ADcert.cer"
-ADfn="New"
-ADsn="user" 
-ADln="nuser"
 AD_binddn="CN=Administrator,CN=Users,$ADdc" 
 userpw="Secret123"
 user="tuser"
@@ -98,7 +95,7 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 	# Prepare IPA server for trust
 	rlRun "$trust_bin -a $adminpw --netbios-name $NBname -U" 0 "Preparing server to establish trust"
 	
->>>	# Checking DNS records are in place or AD and IPA, Needs improovement #####
+	# Checking DNS records are in place or AD and IPA, Needs improovement #####
 	rlRun "dig +short SRV @$ADip _ldap._tcp.$IPAdomain | grep $IPAhost" 0 "Conditional forwarder for IPA server setup on $ADhost"
 	rlRun "dig +short SRV @$ADip2 _ldap._tcp.$IPAdomain | grep $IPAhost" 0 "Conditional forwarder for IPA server setup on $ADhost2"
 
@@ -123,11 +120,11 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 	# Make temp directory to work with ldif files
 	rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
->>>	# Adding a user in AD
+	# Adding a user in AD
         rlRun "ADuser_ldif $ADfn $ADsn $aduser1 $userpw 512 add" 0 "Generate ldif file to add $aduser1"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user $aduser1 in AD before"
 
->>>	# Adding a user in AD and adding to Administrators group
+	# Adding a user in AD and adding to Administrators group
         rlRun "ADuser_ldif $ADfn2 $ADsn $aduser2 $userpw 512 add" 0 "Generate ldif file to add $aduser2"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuser.ldif" 0 "Adding new user $aduser2 in AD before"
 	rlRun "User_Admin_ldif $ADfn2 $ADsn modify" 0 "Generate ldif file to add $aduser2 to administrators group"
@@ -140,8 +137,6 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 	rlRun "create_ipauser $user2 new user $userpw"
 	rlRun "$ipacmd group-add-member admins --users=$user2" 0 "Adding $user2 to IPA admins group"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
-
 rlPhaseEnd
 }
 
@@ -150,7 +145,6 @@ trust_test_0001() {
 rlPhaseStartTest "0001 Add trust for invalid domain"
 	rlRun "Add_Trust" 0 "Creating expect script"
 	rlRun "$exp $expfile bad$ADdomain $ADadmin $ADpswd" 2 "Unable to resolve domain controller as expected"
-
 rlPhaseEnd
 }
 
@@ -159,7 +153,6 @@ trust_test_0002() {
 rlPhaseStartTest "0002 Add trust with type and domain"
 	rlRun "Add_Trust type" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain" 1 "Trust add needs more arguments"
-
 rlPhaseEnd
 }
 
@@ -170,7 +163,6 @@ rlPhaseStartTest "0003 Give invalid server name in --server option"
 	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd zombie.$ADdomain" 2 "Fails as expected"
 	rlRun "Add_Trust no_ad" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd zombie.$ADdomain" 2 "Fails as expected"
-
 rlPhaseEnd
 }
 
@@ -181,7 +173,6 @@ rlPhaseStartTest "0004 Give password on CLI for --password"
 	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd" 1 "Expected. Giving password for --password is assumed as an argument"
 	rlRun "Passwd_Cli passwd" 0 "Creating expect script"
         rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd" 2 "Expected. --password does not take a value"
-
 rlPhaseEnd
 }
 
@@ -202,7 +193,6 @@ trust_test_0006() {
 rlPhaseStartTest "0006 trust-add interactively"
 	rlRun "Interactive_trust" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain" 1 "Trust-add is not Interactive, https://fedorahosted.org/freeipa/ticket/3034"
-
 rlPhaseEnd
 }
 
@@ -211,7 +201,6 @@ trust_test_0007() {
 rlPhaseStartTest "0007 Trust add with minimum options on CLI"
 	rlRun "Add_Trust" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd" 0 "Active Directory Trust added for $ADdomain"
-
 rlPhaseEnd
 }
 
@@ -220,7 +209,6 @@ trust_test_0008() {
 rlPhaseStartTest "0008 Delete trust with invalid domain"
 	rlRun "Trust_Del domain" 0 "Creating expect script"
 	rlRun "$exp $expfile bad$ADdomain" 2 "bad$ADdomain Domain does not have trust relation"
-
 rlPhaseEnd
 }
 
@@ -229,7 +217,6 @@ trust_test_0009() {
 rlPhaseStartTest "0009 Delete trust interactively"
 	rlRun "Trust_Del" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain" 0 "Trust deleted with $ADdomain"
-
 rlPhaseEnd
 }
 
@@ -238,7 +225,6 @@ trust_test_0010() {
 rlPhaseStartTest "0010 Add trust with --server option"
 	rlRun "Add_Trust server" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd $ADhost" 0 "Active Directory Trust added with --server"
-
 rlPhaseEnd
 }
 
@@ -247,7 +233,6 @@ trust_test_0011() {
 rlPhaseStartTest "0011 Delete trust with --continue and invalid domain"
 	rlRun "Trust_Del continue" 0 "Creating expect script"
 	rlRun "$exp $expfile bad$ADdomain" 1 "Invalid domain fails deletion as expected"
-
 rlPhaseEnd
 }
 
@@ -272,7 +257,6 @@ trust_test_0014() {
 rlPhaseStartTest "0014 Add trust with --trust-secret"
 	rlRun "Add_Trust secret" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain2 $ADadmin2 $ADpswd2 $trust_secret" 0 "Trust added for $ADdomain2 with Secret"
-
 rlPhaseEnd
 }
 
@@ -292,7 +276,6 @@ trust_test_0016() {
 rlPhaseStartTest "0016 Add trust with --trust-secret with empty string"
         rlRun "Add_Trust secret" 0 "Creating expect script"
         rlRun "$exp $expfile $ADdomain2 $ADadmin2 $ADpswd2" 0 "Trust add for $ADdomain2 with empty string as Secret"
-
 rlPhaseEnd
 }
 
@@ -302,7 +285,6 @@ rlPhaseStartTest "0017 Provide user with admin rights in --admin option"
 	rlRun "ipa trust-del $ADdomain --continue" 0 "Deleting trust to continue testing"
 	rlRun "Add_Trust" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain $aduser2 $userpw" 0 "Trust add for $ADdomain2 by $aduser2 member of administrators group"
-
 rlPhaseEnd
 }
 
@@ -314,7 +296,6 @@ rlPhaseStartTest "0018 Delete trust as a non-admin user"
 	rlRun "$exp $expfile $ADdomain" 1 "IPA user fails to delete trust"
 	rlRun "kdestroy" 0 "Destroy any credentials"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-
 rlPhaseEnd
 }
 
@@ -412,7 +393,6 @@ trust_test_0030() {
 rlPhaseStartTest "0030 Show trust raw data"
 	rlRun "Trust_Show raw" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain" 0 "Show entries as stored on the server"
-
 rlPhaseEnd
 }
 
@@ -431,7 +411,7 @@ rlPhaseStartCleanup "Clean up for trust-cli tests"
 	rlRun "pushd $TmpDir"
 	rlRun "ADuserdel_ldif $ADfn $ADsn" 0 "Create ldif file to delete $aduser1"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete $aduser1 from AD"
-	rlRun "ADuserdel_ldif $ADfn $ADsn" 0 "Create ldif file to delete $aduser2"
+	rlRun "ADuserdel_ldif $ADfn2 $ADsn" 0 "Create ldif file to delete $aduser2"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete $aduser2 from AD"	
 	rlRun "rm -f *.ldif"
 	rlRun "popd"

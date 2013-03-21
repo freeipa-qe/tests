@@ -46,7 +46,7 @@ if [ $? -eq 0 ]; then
   rpm5="samba4-common"
 else
   rpm1="freeipa-server-trust-ad"
-  rpm5="samba-common 4.0"
+  rpm5="samba-common"
 fi
 
 rpm2="expect"
@@ -89,7 +89,7 @@ rlJournalStart
   rlPhaseEnd
 
 # Include test case file
-. ./t.ipa-adtrust.sh
+. ./t.ipa-trust-cli.sh
 
 #PACKAGE="ipa-server"
 ##########################################
