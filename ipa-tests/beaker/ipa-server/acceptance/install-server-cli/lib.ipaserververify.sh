@@ -742,6 +742,17 @@ verify_zonerefresh()
 
 }
 
+verify_cachememsize_error()
+{
+	# Detailed in:
+	# https://bugzilla.redhat.com/show_bug.cgi?id=820003
+	# https://fedorahosted.org/freeipa/ticket/2739
+	logfile="/var/log/dirsrv/slapd-$(echo $RELM| sed s/'\.'/-/g)/errors"
+	rlLog "Errors file to check is $logfile"
+	rlRun "grep 'entry cache size' $logfile | grep 'is less than db size'" 1 "Ensure that offending error message is not coming up in the slapd error log"
+	
+}
+
 verify_bz878288()
 {
 	if [ $(ps -ef|grep "/usr/libexec/s[s]sd"|wc -l) -eq 0 ]; then

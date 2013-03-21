@@ -808,6 +808,7 @@ verify_install()
     verify_833515 $1 $3
     verify_782920 $1 $3
     verify_819629 $1 $3
+    verify_cachememsize_error $1
 }
 
 
