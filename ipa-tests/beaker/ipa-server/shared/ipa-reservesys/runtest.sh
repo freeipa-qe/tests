@@ -100,6 +100,8 @@ send_extended_email()
 hostname=$(hostname)
 currentseconds=$(date +%s)
 let endseconds=$starttime+$RESERVETIME-$currentseconds
+rlLog "Attempting to compute endtime with let endseconds=$starttime+$RESERVETIME-$currentseconds"
+rlLog "computing enddate with date --date='$endseconds seconds'"
 enddate=$(date --date="$endseconds seconds")
 echo "Subject: $hostname reservation extended by $moreseconds
 This is the machine at $hostname,
@@ -179,8 +181,9 @@ rlJournalStart
 				oldseconds=$RESERVETIME
 				moreseconds=$(cat $moresecondsfile)
 				let $RESERVETIME=$RESERVETIME+$moreseconds
-				rlLog "Original reservation time is $RESERVETIME"
-				rlLog "New reservation time is $starttime"
+				export $RESERVETIME
+				rlLog "Original reservation time is $oldseconds"
+				rlLog "New reservation time is $RESERVETIME"
 				rlLog "$moreseconds seconds added to this reservation under jobid of $JOBID."
 				export moreseconds
 				send_extended_email
