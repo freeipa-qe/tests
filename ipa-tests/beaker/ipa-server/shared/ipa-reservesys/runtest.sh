@@ -180,7 +180,7 @@ rlJournalStart
 			if [ -f $moresecondsfile ]; then
 				oldseconds=$RESERVETIME
 				moreseconds=$(cat $moresecondsfile)
-				let $RESERVETIME=$RESERVETIME+$moreseconds
+				let RESERVETIME=$RESERVETIME+$moreseconds
 				export $RESERVETIME
 				rlLog "Original reservation time is $oldseconds"
 				rlLog "New reservation time is $RESERVETIME"
