@@ -815,6 +815,9 @@ rlPhaseStartTest "sudorule-add-hostgrp_func001: Adding hostgroup and verifying f
 	rlRun "sudo_list $user1"
 	rlRun "cat $sudoout"
 	rlAssertGrep "(root) /bin/mkdir" "$sudoout"
+        if [ $? -eq 1 ];then
+         rlLog "Failing because of https://bugzilla.redhat.com/show_bug.cgi?id=923753"
+        fi
 	#rlAssertGrep "sudo: ldap sudoHost '+hostgrp1' ... MATCH" "$sudoout"
 	
 	rlRun "rm -fr $sudoout"
@@ -1423,6 +1426,9 @@ rlPhaseStartTest "sudorule-offline-caching-hostgroup-command"
         rlRun "sudo_list_client $user1 root date"
 	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "($user2) /bin/date" "$sudoout"
+        if [ $? -eq 1 ];then
+         rlLog "Failing because of https://bugzilla.redhat.com/show_bug.cgi?id=923753"
+        fi
         dat=`date|cut -d " " -f1`
 	rlAssertGrep "$dat" "$sudoout"
 	rlRun "cat $sudoout"
@@ -1432,6 +1438,9 @@ rlPhaseStartTest "sudorule-offline-caching-hostgroup-command"
         rlRun "sudo_list_client $user1 root date"
 	rlAssertGrep "User $user1 may run the following commands on this host:" "$sudoout"
 	rlAssertGrep "($user2) /bin/date" "$sudoout"
+        if [ $? -eq 1 ];then
+         rlLog "Failing because of https://bugzilla.redhat.com/show_bug.cgi?id=923753"
+        fi
 	rlAssertGrep "$dat" "$sudoout"
 	rlRun "cat $sudoout"
 
