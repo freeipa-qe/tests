@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ADcert.cer  adlib.sh  adsetup.exp  Config  Makefile  PURPOSE  runtest.sh  t.ipa-trust-cli.sh
+FILES=$(METADATA) ADcert.cer adlib.sh adsetup.exp clear_trust.exp Config Makefile PURPOSE runtest.sh t.ipa-trust-cli.sh
 
 .PHONY: all install download clean
 

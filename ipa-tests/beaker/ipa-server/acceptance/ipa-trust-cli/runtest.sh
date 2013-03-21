@@ -122,6 +122,12 @@ rlJournalStart
 		"trust_test_0023"
 		"trust_test_0024"
 		"trust_test_0025"
+		"trust_test_0026"
+		"trust_test_0027"
+		"trust_test_0028"
+		"trust_test_0029"
+		"trust_test_0030"
+		"trust_test_0031"
 	}
 
     # Setup

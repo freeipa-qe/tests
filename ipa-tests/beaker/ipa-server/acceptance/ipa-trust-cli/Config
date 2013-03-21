@@ -1,8 +1,8 @@
 ADdomain="adlab.qe"
-ADhost="win2k8r2.$ADdomain"
+ADhost="win-i94qhqmthd4.$ADdomain"
 ADip="10.65.201.187"
 ADpswd="Secret123"
-ADdc="DC=adlab,DC=qe"
+ADdc="DC=adlabs,DC=com"
 ADadmin="administrator"
 
 ADdomain2="adrelm.com"

@@ -35,16 +35,8 @@
 # AD values
 . ./Config
 
-trust_bin=`which ipa-adtrust-install`
 ipacmd=`which ipa`
-IPAhost=`hostname`
-expfile="/tmp/adtrust_install.exp"
-exp=`which expect`
-user="tuser"
-user1="nuser"
-userpw="Secret123"
-adminpw="Secret123"
-
+expfile="/tmp/trust_add.exp"
 
 ADuser_ldif() {
 # $1 first name # $2 Surname # $3 Username # $4 Password # $5 Userctrl # $6 changetype (add/ modify)
@@ -69,363 +61,179 @@ userAccountControl: $5
 EOF
 }
 
+User_Admin_ldif() {
+cat > User_Admin.ldif << EOF
+dn: CN=Administrators,CN=Builtin,$ADdc
+changetype: $3
+add: member
+member: CN=$1 $2,CN=Users,$ADdc
+EOF
+}
+
+ADuserdel_ldif() {
+[ $# -eq 2 ] && DN="CN=$1 $2,CN=Users,$ADdc"
+cat > ADuserdel.ldif << EOF
+dn: $DN
+changetype: delete
+EOF
+}
+
 Add_Trust() {
-rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]
-        set var2 [lindex $argv 1]
-        set timeout 10
-        set send_slow {1 .1}' >> $expfile
-        echo "spawn $ipacmd --type=ad trust-add $var1 --admin $var2 --password" >> $expfile
-	echo 'expect "*assword: "' >> $expfile
-	echo "send -s -- \"$adminpw\r\"" >> $expfile
-	echo 'expect {
-	"ipa: ERROR: Unable to resolve domain controller for \'$var1\' domain" { exit 1 }
-	""
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-	
-}
-
-NB_Exp() {
-	rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]' > $expfile
-        echo 'set var2 [lindex $argv 1]' >> $expfile
-        echo 'set timeout 10
-        set send_slow {1 .1}' >> $expfile
-        echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
-	echo 'expect "*assword: "' >> $expfile
-	echo "send -s -- \"$adminpw\r\"" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-  "Illegal*NetBIOS*name*\[$var2\]*ASCII*\."
-}' >> $expfile
-        echo "send_user \"\n$var2 name not permitted for netbios name.\n\" ; exit 2" >> $expfile
-}
-
-IP_Exp() {
-	rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]' > $expfile
-        echo 'set var2 [lindex $argv 1]' >> $expfile
-        echo 'set timeout 10
-        set send_slow {1 .1}' >> $expfile
-        echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-  "error:*option*--ip-address:*invalid*IP*address"
-}' >> $expfile
-        echo 'send_user "\n$var2 is not a valid ip address\n" ; exit 2' >> $expfile
-}
-
-NBIP_Exp() {
-	rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]' > $expfile
-        echo 'set var2 [lindex $argv 1]' >> $expfile
-        echo 'set var3 [lindex $argv 2]' >> $expfile
-        echo 'set var4 [lindex $argv 3]' >> $expfile
-        echo 'set timeout 10
-        set send_slow {1 .1}' >> $expfile
-        echo "spawn $trust_bin --\$var1=\$var2 --\$var3=\"\$var4\"" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-  "error:*option*--ip-address:*invalid*IP*address" {
-     send_user "\n$var2 is not a valid ip address\n" ; exit 2 }
-  "*assword: " {
-     send -s -- \$adminpw\r
-     expect "Illegal*NetBIOS*name*\[$var4\]*ASCII*\." {
-     send_user "\n Invalid Netbios name \"$var4\" fails as expected\n" ; exit 2 } 
-  } }' >>  $expfile
-}
-
-NonRoot_Exp() {
-	rm -rf $expfile
-        echo 'set timeout 10
-        set send_slow {1 .1}' > $expfile
-        echo "spawn ssh -o StrictHostKeychecking=no -l $user $IPAhost" >> $expfile
-        echo 'expect "*password:*"' >> $expfile
-        echo 'sleep 3' >> $expfile
-        echo "send -s -- \"$userpw\\r\"" >> $expfile
-        echo 'expect "*$ "' >> $expfile
-        echo "send -s -- \"$trust_bin\\r\"" >> $expfile
-        echo 'expect "Must*be*root*" {' >> $expfile
-        echo 'send_user "\nUser is not root\n" ; exit 2 }' >> $expfile
-}
-
-RID_Exp() {
-	rm -rf $expfile
-	echo 'set var1 [lindex $argv 0]' > $expfile
-        echo 'set var2 [lindex $argv 1]' >> $expfile
-        echo 'set var3 [lindex $argv 2]' >> $expfile
-        echo 'set timeout 10
-        set send_slow {1 .1}
-        spawn /bin/bash
-        expect "*#"' >> $expfile
-        echo "send \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
-        echo 'expect "invalid integer value:*"
-        expect "*#" {' >> $expfile
-        echo "send \"$trust_bin --\$var1=\$var3\r\"" >> $expfile
-        echo 'expect "invalid integer value:*" }' >> $expfile
-        echo 'send_user "\n\nOnly intergers accepted\n" ; exit 2' >> $expfile
-}
-
-No_SRV_Exp() {
-	rm -rf $expfile
-	echo 'set timeout 300
-	spawn /bin/bash
-        expect "*# "' >> $expfile
-	if [ "$1" = "no-msdcs" ]; then
-	  echo "send -- \"$trust_bin --no-msdcs\r\"" >> $expfile
-	else
-	  echo "send -- \"$trust_bin\r\"" >> $expfile
-	fi
-	echo 'expect "*assword: "' >> $expfile
-	echo "send -- \"$adminpw\r\"" >> $expfile
-	echo 'expect "*]: "' >> $expfile
-	echo 'send -- "\r"' >> $expfile
-	if [ "$1" = "no-msdcs" ]; then
-	 echo 'expect {
-	    timeout { send_user "\nExpected message not received\n"; exit 1 }
-	    eof { send_user "\nSome issue\n"; exit 1 }
-	"no-msdcs was given" {
-	send_user "\n------------------\n" }
-	}' >> $expfile
-	else
-	 echo 'expect {
-	    timeout { send_user "\nExpected message not received\n"; exit 1 }
-	    eof { send_user "\nSome issue\n"; exit 1 }
-	"DNS management was not enabled" {
-	send_user "\n------------------\n" }
-	}' >> $expfile
-	fi
-	echo "expect \"*$rec1\"" >> $expfile
-	echo 'send_user "\n------------------\n"' >> $expfile
-	echo "expect \"*$rec2\"" >> $expfile
-	echo 'send_user "\n------------------\n"' >> $expfile
-	echo "expect \"*$rec3\"" >> $expfile
-	echo 'send_user "\n------------------\n"' >> $expfile
-	echo "expect \"*$rec4\"" >> $expfile
-	echo 'send_user "\n------------------\n"' >> $expfile
-	echo "expect \"*$rec5\"" >> $expfile
-	echo 'send_user "\n------------------\n"' >> $expfile
-	echo "expect \"*$rec6\"" >> $expfile
-	echo 'send_user "\n------------------\n"' >> $expfile
-	echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { sleep 30 ; send "exit\r" }
-}
-	send_user "\nAdtrust installed successfully without creating service records\n"' >> $expfile
-}
-
-Interactive_Exp() {
-	rm -rf $expfile
-        echo 'set timeout 300
-        set send_slow {1 .1}' > $expfile
-        echo 'spawn /bin/bash' >> $expfile
-	echo 'expect "# "' >> $expfile
-	echo "send -- \"$trust_bin\r\"" >> $expfile
-        echo 'expect {
-	"IPA is not configured on this system." { send_user "\nNeed IPA configured on the server before ipa-adtrust-install\n" ; exit 2 }
-	"Overwrite smb.conf?*: "
-	}' >> $expfile
-	echo 'send -- "y\r"' >> $expfile
-        echo 'expect "*assword: "' >> $expfile
-        echo "send -- \"$adminpw\r\"" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { sleep 30 ; send -- "exit\r" }
-}
-	send_user "\nInteractive ADtrust install was successful.\n"' >> $expfile
-}
-
-Valid_NB_Exp() {
-	rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]
-        set var2 [lindex $argv 1]
-        set timeout 300
-        set send_slow {1 .1}' > $expfile
-	echo 'spawn /bin/bash' >> $expfile
-        echo 'expect "# "' >> $expfile
-        echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
-        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*assword: "' >> $expfile
-        echo "send -s -- \"$adminpw\r\"" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-	"*]: " { 
-	send -s -- "y\r" 
-	expect "Setup*complete" { sleep 30 ; send -- "exit\r" } }
-	"Setup*complete" { sleep 30 ; send -- "exit\r" }
-}' >> $expfile
-        echo 'send_user "\nADtrust installed.\n"' >> $expfile
-}
-
-Valid_IP_Exp() {
-	rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]
-        set var2 [lindex $argv 1]
-        set timeout 300
-        set send_slow {1 .1}' > $expfile
-        echo 'spawn /bin/bash' >> $expfile
-        echo 'expect "# "' >> $expfile
-        echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
-        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'send -s -- "y\r"' >> $expfile
-#	echo 'expect "*]: "' >> $expfile
-#        echo 'send -s -- "\r"' >> $expfile
-        echo 'expect "*assword: "' >> $expfile
-        echo "send -s -- \"$adminpw\r\"" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-	"Setup*complete" { sleep 30 ; send -- "exit\r" }
-}' >> $expfile
-        echo 'send_user "\nADtrust installed.\n"' >> $expfile
-}
-
-Valid_NBIP_Exp() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]
         set var3 [lindex $argv 2]
         set var4 [lindex $argv 3]
-        set timeout 300
-        set send_slow {1 .1}' > $expfile
-	echo 'spawn /bin/bash' >> $expfile
-        echo 'expect "# "' >> $expfile
-        echo "send -- \"$trust_bin --\$var1=\$var2 --\$var3=\$var4\r\"" >> $expfile
-        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*assword: "' >> $expfile
-        echo "send -s -- \"$adminpw\r\"" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-	"*]: " { 
-        send -s -- "y\r" 
-        expect "Setup*complete" { sleep 30 ; send -- "exit\r" } }
-}' >> $expfile
-        echo 'send_user "\nADtrust installed.\n"' >> $expfile
+        set timeout 10
+        set send_slow {1 .1}' >> $expfile
+	echo 'spawn /bin/bash
+        expect "*#"' >> $expfile
+	if [ "$1" = "type" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad \$var1\r\"" >> $expfile
+	  echo "expect {
+	  \"ipa: ERROR: invalid Gettext(\'AD Trust setup\', domain=\'ipa\', localedir=None): Not enough arguments specified to perform trust setup\" { exit 1 } }" >> $expfile
+	elif [ "$1" = "server" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password --server=\$var4\r\"" >> $expfile
+	elif [ "$1" = "no_ad" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --server=\$var4\r\"" >> $expfile
+	  echo 'expect "Realm name: " { send -s -- "$var1\r" }' >> $expfile
+	elif [ "$1" = "secret" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --trust-secret\r\"" >> $expfile
+	elif [ "$1" = "domain" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password\r\"" >> $expfile
+	  echo 'expect "Realm name: " { send -s -- "$var1\r" }' >> $expfile
+	elif [ "$1" = "onlyserver" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --server=\$var4\r\"" >> $expfile
+          echo 'expect "Realm name: " { send -s -- "$var1\r" }' >> $expfile
+	else
+          echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password\r\"" >> $expfile
+	fi
+	echo 'expect "*assword: "' >> $expfile
+	echo 'send -s -- "$var3\r"' >> $expfile
+	echo "expect {
+	\"ipa: ERROR: Unable to resolve domain controller for \'$var1\' domain\" { exit 2 }" >> $expfile
+	echo '"Trust status: Established and verified" { send_user "\nTrust added\n"; exit 0 } }' >> $expfile
+	echo '"Shared secret for the trust: " { 
+	send -s -- "$var4\r"
+	expect "Trust status: Established and verified" { send_user "\nTrust added with Secret"; exit 0 } }' >> $expfile
+	
 }
 
-Valid_RID_Exp() {
+Passwd_Cli() {
 	rm -rf $expfile
 	echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]
         set var3 [lindex $argv 2]
-        set var4 [lindex $argv 3]
-        set timeout 300
+        set timeout 10
         set send_slow {1 .1}' > $expfile
-	echo 'spawn /bin/bash' >> $expfile
-        echo 'expect "# "' >> $expfile
-	if [ -n "$1" -a "$1" = both ]; then
-	  echo "send -- \"$trust_bin --\$var1=\$var2 --\$var3=\$var4\r\"" >> $expfile
-	else
-	  echo "send -- \"$trust_bin --\$var1=\$var2\r\"" >> $expfile
-	fi
-#        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-#        echo 'sleep .5' >> $expfile
-#        echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*assword: "' >> $expfile
-        echo "send -s -- \"$adminpw\r\"" >> $expfile
-        echo 'expect "*]: " { send -s -- "\r" } ' >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-	"Setup*complete" { sleep 30 ; send -- "exit\r" }
-} ' >> $expfile
-        echo 'send_user "\nADtrust installed.\n"' >> $expfile
+        echo 'spawn /bin/bash
+        expect "*#"' >> $expfile
+        if [ -n "$1" -a "$1" = "passwd" ]; then
+          echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password=\$var3\r\"" >> $expfile
+          echo 'expect {
+          "ipa: error: --password option does not take a value" { send_user "\nError as expected with password value\n"; exit 2 } }' >> $expfile
+        else
+          echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password \$var3\r\"" >> $expfile
+          echo "expect {
+          \"ipa: ERROR: command 'trust_add' takes at most 1 argument\" { send_user \"\nError as expected with password on cli\n\"; exit 1 } }" >> $expfile
+        fi
 }
 
-NoAdminPriv_Exp() {
+Non_Admin() {
+	rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]
+        set var2 [lindex $argv 1]
+        set var3 [lindex $argv 2]
+        set timeout 10
+        set send_slow {1 .1}' > $expfile
+	echo 'spawn /bin/bash
+        expect "*#"' >> $expfile
+        if [ -n "$1" -a "$1" = "wrng_passwd" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password\r\"" >> $expfile
+	  echo 'expect "*assword: "' >> $expfile
+	  echo 'send -s -- "$var3\r' >> $expfile
+	  echo 'expect {
+	  "ipa: ERROR: Insufficient access: CIFS server denied your credentials" { exit 1 } }' >> $expfile
+	else
+	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password\r\"" >> $expfile
+          echo 'expect "*assword: "' >> $expfile
+          echo 'send -s -- "$var3\r"' >> $expfile
+	  echo 'expect {
+	  "ipa: ERROR: Insufficient access: CIFS server * denied your credentials\" { exit 1 } }' >> $expfile
+	fi
+}
+
+Interactive_trust() {
+	rm -rf $expfile
+	echo 'set var1 [lindex $argv 0]
+        set timeout 10
+        set send_slow {1 .1}' > $expfile
+        echo 'spawn /bin/bash
+        expect "*#"' >> $expfile
+	echo "send \"$ipacmd trust-add\r\"" >> $expfile
+	echo 'expect "Realm name: " {
+	send -s -- "$var1\r" }
+	expect "ipa: ERROR: invalid *: Not enough arguments specified to perform trust setup" { 
+	send_user "\nTrust add needs more arguments\n"; exit 1 }' >> $expfile
+}
+
+Trust_Del() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
 	set var2 [lindex $argv 1]
-	set var3 [lindex $argv 2]
-        set timeout 300
+        set timeout 10
         set send_slow {1 .1}' > $expfile
-        echo "spawn $trust_bin -\$var1 \$var2 " >> $expfile
-	if [ "$1" = "A" ]; then 
-          echo 'expect "*assword: "' >> $expfile
-          echo "send -s -- \"\$var3\r\"" >> $expfile
+        echo 'spawn /bin/bash
+        expect "*#"' >> $expfile
+	if [ "$1" = "domain" ]; then
+	  echo "send \"$ipacmd trust-del \$var1\r\"" >> $expfile
 	  echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-        "Must have administrative privileges to setup AD trusts on server" { expect "*#" ; exit 2}
-} ' >> $expfile
-	else
+	  "ipa: ERROR: $var1: trust not found" { exit 2 }
+	  "Deleted trust \"$var1\"" { exit 0 }
+	  "ipa: ERROR: Insufficient access: Insufficient *" { send_user "User as no admin rights in IPA server"; exit 1 } }' >> $expfile 
+	elif [ "$1" = "continue" ]; then
+	  echo "send \"$ipacmd trust-del \$var1 --continue\r\"" >> $expfile
 	  echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-        "error to automatically re-kinit your admin user ticket" { expect "*#" ; exit 2}
-} ' >> $expfile
-	fi
-}
-
-AdminPriv_Exp() {
-	rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]
-	set var2 [lindex $argv 1]
-        set timeout 300
-        set send_slow {1 .1}' > $expfile
-	echo 'spawn /bin/bash' >> $expfile
-        echo 'expect "# "' >> $expfile
-        echo "send -- \"$trust_bin -\$var1 \$var2\r\"" >> $expfile
-	echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'send -s -- "y\r"' >> $expfile
-	if [ "$1" = "A" ]; then 
-          echo 'expect "*assword: "' >> $expfile
-          echo "send -s -- \"$userpw\r\"" >> $expfile
-	fi
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-    "Setup*complete" { sleep 30 ; send -- "exit\r" }
-} ' >> $expfile
-	echo 'send_user "\nADtrust installed.\n"' >> $expfile
-}
-
-SID_Exp() {
-	rm -rf $expfile
-        echo 'set var1 [lindex $argv 0]
-        set timeout 300
-        set send_slow {1 .1}' > $expfile
-	echo 'spawn /bin/bash' >> $expfile
-        echo 'expect "# "' >> $expfile
-	if [ "$1" = "add-sids" ]; then
-          echo "send -- \"$trust_bin --add-sids\r\"" >> $expfile
+	  "Failed to remove: $var1" { send_user "\nDomain invalid\n"; exit 1 }
+	  "Deleted trust \"$var1\"" { send_user "\nValid domain trust deleted\n"; exit 0 } }' >> $expfile
+	elif [ "$1" = "multi" ]; then
+	  echo "send \"$ipacmd trust-del \$var1 \$var2\r\"" >> $expfile
+	  echo 'expect "Deleted trust \"$var1,$var2\"" { send_user "2 trusts detelte"; exit 0 }' >> $expfile
 	else
-	  echo "send -- \"$trust_bin\r\"" >> $expfile
+	  echo "send \"$ipacmd trust-del\r\"" >> $expfile
+	  echo 'expect "Realm name: " {
+          send -s -- "$var1\r" }
+          expect "Deleted trust \"$var1\"" { send_user "\nRealm given interactively\n"; exit 0 }' >> $expfile
 	fi
-        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
-        echo 'send -s -- "y\r"' >> $expfile
-        echo 'expect "*assword: "' >> $expfile
-        echo "send -s -- \"$adminpw\r\"" >> $expfile
-        echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-	"Setup*complete" { sleep 30 ; send -- "exit\r" }
-}' >> $expfile
-        echo 'send_user "\nADtrust installed.\n"' >> $expfile
+
 }
 
-Unattended_Exp() {
+Trust_Show() {
 	rm -rf $expfile
-        echo 'set timeout 300
+	echo 'set var1 [lindex $argv 0]
+        set timeout 10
         set send_slow {1 .1}' > $expfile
-        echo 'spawn /bin/bash' >> $expfile
-        echo 'expect "# "' >> $expfile
-        echo "send -- \"$trust_bin -a $adminpw -U\r\"" >> $expfile
-	echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
-        "Setup*complete" { sleep 30 ; send -- "exit\r" }
+        echo 'spawn /bin/bash
+        expect "*#"' >> $expfile
+	if [ "$1" = "allraw" ]; then
+	  echo "send \"$ipacmd trust-show \$var1 --raw --all\r\"" >> $expfile
+	  echo 'expect "ipa: ERROR: an internal error has occurred" { send_user "Needs fixing https://fedorahosted.org/freeipa/ticket/3525" { exit 1} }' >> $expfile
+	elif [ "$1" = "all" ]; then
+	  echo "send \"$ipacmd trust-show \$var1 --all\r\"" >> $expfile
+	  echo 'expect "objectclass: ipaNTTrustedDomain, ipaIDobject, top" { exit 0 }' >> $expfile
+	elif [ "$1" = "raw" ]; then
+	  echo "send \"$ipacmd trust-show \$var1 --raw\r\"" >> $expfile
+	  echo 'expect "trusttype: Active Directory domain" { exit 0 }' >> $expfile
+	elif [ "$1" = "rights" ]; then
+	  echo "send \"$ipacmd trust-show \$var1 --rigths --all\r\"" >> $expfile
+	  echo 'expect "attributelevelrights: *" { exit 0 }' >> $expfile
+	elif [ "$1" = "domain" ]; then
+	  echo "send \"$ipacmd trust-show \$var1\r\"" >> $expfile
+	  echo 'expect "Trust type: Active Directory domain" { exit 0 }' >> $expfile
+	else
+	  echo "send \"$ipacmd trust-show\r\"" >> $expfile
+	  echo 'expect "Realm name: "
+	  send -s -- "$var1\r"
+	  expect "Trust type: Active Directory domain" { send_user "Showing trust interactively"; exit 0 }' >> $expfile
+	fi
 }
-        send_user "\nUnattended ADtrust install was successful.\n"' >> $expfile
-}
-
