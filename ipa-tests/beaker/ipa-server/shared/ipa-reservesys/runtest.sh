@@ -62,7 +62,9 @@ Good luck" > $ipatmp/setup-email.txt
 send_day_remaining_notice()
 {
 hostname=$(hostname)
-enddate=$(date --date="$endseconds seconds")
+currentseconds=$(date +%s)
+let endfromnow=$endseconds-$currentseconds
+enddate=$(date --date="$endfromnow seconds")
 echo "Subject: Reservation expiration notice for $hostname with job $JOBID
 This is the machine at $hostname.
 
@@ -96,7 +98,8 @@ Have a nice day." > $ipatmp/end-email.txt
 send_extended_email()
 {
 hostname=$(hostname)
-let endseconds=$starttime+$RESERVETIME
+currentseconds=$(date +%s)
+let endseconds=$starttime+$RESERVETIME-$currentseconds
 enddate=$(date --date="$endseconds seconds")
 echo "Subject: $hostname reservation extended by $moreseconds
 This is the machine at $hostname,
@@ -174,7 +177,7 @@ rlJournalStart
 			currenttime=$(date +%s)
 			if [ -f $moresecondsfile ]; then
 				oldseconds=$RESERVETIME
-				moreseconds=$(cat moresecondsfile)
+				moreseconds=$(cat $moresecondsfile)
 				let $RESERVETIME=$RESERVETIME+$moreseconds
 				rlLog "Original reservation time is $RESERVETIME"
 				rlLog "New reservation time is $starttime"
