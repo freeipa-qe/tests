@@ -72,30 +72,32 @@ rlJournalStart
     
     # Main test functions in tests.d/t.tests.sh:
 
-    ipa_upgrade_master_replica_client_inc_setup
-    if rlIsRHEL "<6.3"; then
-        ipa_upgrade_master_replica_client_inc_63
-    fi
-    if rlIsRHEL "6.3"; then
-        ipa_upgrade_master_replica_client_inc_64
-    fi
-    if rlIsRHEL "6.4"; then
-        ipa_upgrade_master_replica_client_inc_65
-    fi
-    if rlIsRHEL "6.5"; then
-        ipa_upgrade_master_replica_client_inc_66
-    fi
-    if rlIsRHEL "6.6"; then
-        ipa_upgrade_master_replica_client_inc_67
-    fi
-    if rlIsRHEL "6.7"; then
-        ipa_upgrade_master_replica_client_inc_68
-    fi
-    if rlIsRHEL "6.8"; then
-        ipa_upgrade_master_replica_client_inc_69
-    fi
+    # First run the incremental upgrade tests:
+    #ipa_upgrade_master_replica_client_inc_setup
+    #if rlIsRHEL "<6.3"; then
+    #    ipa_upgrade_master_replica_client_inc_63
+    #fi
+    #if rlIsRHEL "6.3"; then
+    #    ipa_upgrade_master_replica_client_inc_64
+    #fi
+    #if rlIsRHEL "6.4"; then
+    #    ipa_upgrade_master_replica_client_inc_65
+    #fi
+    #if rlIsRHEL "6.5"; then
+    #    ipa_upgrade_master_replica_client_inc_66
+    #fi
+    #if rlIsRHEL "6.6"; then
+    #    ipa_upgrade_master_replica_client_inc_67
+    #fi
+    #if rlIsRHEL "6.7"; then
+    #    ipa_upgrade_master_replica_client_inc_68
+    #fi
+    #if rlIsRHEL "6.8"; then
+    #    ipa_upgrade_master_replica_client_inc_69
+    #fi
     #ipa_upgrade_master_replica_client_inc_cleanup
 
+    ipa_upgrade_test_master_replica_parallel
     #upgrade_test_master_slave_client_all
     #upgrade_test_client_slave_master_all
     #upgrade_test_master_slave_client_nodns

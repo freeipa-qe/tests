@@ -15,7 +15,8 @@ fi
 
 export OS VER PKG
 
-# Adding support only for Fedora 17 and Rhel 6 at this time. Maybe a case statemet will be required for other OS's in the future.
+# Adding support only for Fedora 17 and Rhel 6 at this time. 
+# Maybe a case statemet will be required for other OS's in the future.
 if [ "$OS" = "fedora" ]; then
 	# Disable fedora updates repo
 	sed -i s/^enabled=1/enabled=0/g /etc/yum.repos.d/fedora-updates.repo 

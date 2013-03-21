@@ -42,6 +42,26 @@
 ######################################################################
 # test suite
 ######################################################################
+use_beaker_repos()
+{
+    if [ -n "$MYNEWREPO1" ]; then
+        unset ${!myrepo*}
+        myrepo1="$MYNEWREPO1"
+    fi
+    if [ -n "$MYNEWREPO2" ]; then
+        myrepo2="$MYNEWREPO2"
+    fi
+    if [ -n "$MYNEWREPO3" ]; then
+        myrepo3="$MYNEWREPO3"
+    fi
+    if [ -n "$MYNEWREPO4" ]; then
+        myrepo4="$MYNEWREPO4"
+    fi
+    if [ -n "$MYNEWREPO5" ]; then
+        myrepo5="$MYNEWREPO5"
+    fi
+}
+
 ipa_yum_repo_setup()
 {
     rlLog "ipa_yum_repo_setup: Setup Yum Repos"
@@ -70,6 +90,45 @@ upgrade_master()
         rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
 
         ipa_yum_repo_setup
+
+        rlRun "yum clean all"
+        rlRun "yum -y update 'ipa*'"    
+        rlRun "yum -y update redhat-release"
+        rlRun "ipactl status"
+        rlRun "service sssd status"
+        rlRun "service sssd restart"
+        rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+        export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
+
+        rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERMASTER"
+        ;;
+    REPLICA*)
+        rlLog "Machine in recipe is REPLICA"
+        rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MYBEAKERMASTER"
+        ;;
+    CLIENT*)
+        rlLog "Machine in recipe is CLIENT"
+        rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MYBEAKERMASTER"
+        ;;
+    *)
+        rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+        ;;
+    esac
+}
+
+upgrade_master_replica()
+{
+    local repoi=0
+    TESTCOUNT=$(( TESTCOUNT += 1 ))
+    rlLog "upgrade_master_replica: upgrade ipa master and replica"
+    case "$MYROLE" in
+    MASTER*|REPLICA*)
+        rlLog "Machine in recipe is $MYROLE"
+        rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
+
+        ipa_yum_repo_setup
+        rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.start'"
+        rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT.start' $MYBEAKERMASTER $MYBEAKERREPLICA1"
 
         rlRun "yum clean all"
         rlRun "yum -y update 'ipa*'"    

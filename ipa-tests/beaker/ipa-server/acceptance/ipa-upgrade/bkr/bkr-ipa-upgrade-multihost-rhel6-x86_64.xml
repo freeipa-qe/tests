@@ -14,7 +14,7 @@
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_virt op="=" value=""/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_name op="=" value="RHEL-6.2"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -39,6 +39,8 @@
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="MASTER">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
+                    <param name="MYNEWREPO1" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/x86_64/os/"/>
+                    <param name="MYNEWREPO2" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/optional/x86_64/os/"/>
 				</params>
 			</task>
             <task name="/distribution/reservesys" role="STANDALONE">
@@ -56,7 +58,7 @@
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_virt op="=" value=""/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_name op="=" value="RHEL-6.2"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -81,6 +83,8 @@
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="REPLICA">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
+                    <param name="MYNEWREPO1" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/x86_64/os/"/>
+                    <param name="MYNEWREPO2" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/optional/x86_64/os/"/>
 				</params>
 			</task>
             <task name="/distribution/reservesys" role="STANDALONE">
@@ -98,7 +102,7 @@
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_virt op="=" value=""/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_name op="=" value="RHEL-6.2"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -123,6 +127,8 @@
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="CLIENT">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
+                    <param name="MYNEWREPO1" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/x86_64/os/"/>
+                    <param name="MYNEWREPO2" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/optional/x86_64/os/"/>
 				</params>
 			</task>
             <task name="/distribution/reservesys" role="STANDALONE">

@@ -76,6 +76,37 @@ ipa_upgrade_master_replica_client_all()
     rlPhaseEnd
 }
     
+ipa_upgrade_test_master_replica_parallel()
+{
+    use_beaker_repos
+    USEDNS="yes"
+    IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
+    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
+    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+
+    rlPhaseStartSetup "ipa_upgrade_test_master_replica_parallel_setup: setup to test parallel upgrade for master and replica, then client"
+        rlRun "env|sort"
+        # Install and setup environment and add data
+        ipa_upgrade_install_master
+        ipa_upgrade_install_replica
+        ipa_upgrade_install_client
+        ipa_upgrade_data_add $MYBEAKERMASTER
+    rlPhaseEnd
+        
+    rlPhaseStartTest "ipa_upgrade_test_master_replica_parallel_1: test upgrade with new master, old replica, and old client"
+        upgrade_master_replica
+        ipa_upgrade_data_check $MYBEAKERMASTER
+        ipa_upgrade_data_check $MYBEAKERREPLICA1
+        ipa_upgrade_data_check $MYBEAKERCLIENT
+    rlPhaseEnd
+
+    rlPhaseStartCleanup "ipa_upgrade_master_replica_parallel_cleanup: cleanup from test full setup for master, then replica, then client"
+        ipa_upgrade_uninstall_client
+        ipa_upgrade_uninstall_replica
+        ipa_upgrade_uninstall_master
+    rlPhaseEnd
+}
+
 ipa_upgrade_master_replica_client_inc_setup()
 {   
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
