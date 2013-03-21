@@ -482,15 +482,20 @@ function ipa_quicktest_automember_check()
         rlAssertGrep "unknown command" $tmpout
     fi
 
-    DDATE=$(date +%Y%m%d%H%M%S)
-    #rlRun "cat /dev/null > /var/log/sssd/sssd_testrelm.com.log"
+    #DDATE=$(date +%Y%m%d%H%M%S)
+    rlRun "cat /dev/null > /var/log/sssd/sssd_${DOMAIN}.log"
     rlLog "Confirm user added to group ${amgroup1}"
     rlRun "ipa user-show ${amuser1} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
 
-    rlRun "id ${amuser1}"
     rlRun "getent -s sss group ${amgroup1}| grep ${amuser1}"
+    if [ $? -ne 0 ]; then
+        rlRun "tar zcvf /tmp/sssd_cache.$DDATE.getent-failure.tgz /var/lib/sss"
+        rlRun "rhts-submit-log -l /tmp/sssd_cache.$DDATE.getent-failure.tgz"
+        rlRun "rhts-submit-log -l /var/log/sssd/sssd_${DOMAIN}.log"
+    fi
+
 
     rlLog "Confirm host added as member of ${amhostgroup1}"
     rlRun "ipa host-show ${amhost1} > $tmpout 2>&1"

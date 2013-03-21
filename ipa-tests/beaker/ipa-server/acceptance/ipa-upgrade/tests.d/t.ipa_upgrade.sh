@@ -114,7 +114,7 @@ upgrade_replica()
 
         DDATE=$(date +%Y%m%d%H%M%S)
         rlRun "tar zcvf /tmp/sssd_cache.$DDATE.pre-upgrade.tgz /var/lib/sss"
-        rlRun "submit_log /tmp/sssd_cache.$DDATE.pre-upgrade.tgz"
+        rlRun "rhts-submit-log -l /tmp/sssd_cache.$DDATE.pre-upgrade.tgz"
 
         rlRun "yum clean all"
         rlRun "yum -y update 'ipa*'"    
@@ -133,6 +133,10 @@ upgrade_replica()
         rlRun "service sssd restart"
         rlRun "rpm -q $PKG-server 389-ds-base bind bind-dyndb-ldap pki-common sssd"
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
+
+        
+        rlRun "tar zcvf /tmp/sssd_cache.$DDATE.post-upgrade.tgz /var/lib/sss"
+        rlRun "rhts-submit-log -l /tmp/sssd_cache.$DDATE.post-upgrade.tgz"
 
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERREPLICA1"
         ;;

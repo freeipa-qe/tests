@@ -80,6 +80,16 @@ ipa_upgrade_install_replica()
     REPLICA*)
         rlLog "Machine in recipe is REPLICA"
         ipa_install_replica $MASTER
+
+        if [ ! -f /etc/sssd/sssd.conf.backup.getent ]; then
+            rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.backup.getent"
+            rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf"
+            sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+            rlRun "cat /etc/sssd/sssd.conf"
+            rlRun "service sssd restart"
+            rlRun "sleep 5"
+        fi
+
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERREPLICA1"
         ;;
     CLIENT*)
@@ -108,6 +118,16 @@ ipa_upgrade_install_client()
     CLIENT*)
         rlLog "Machine in recipe is CLIENT"
         ipa_install_client $MASTER
+
+        if [ ! -f /etc/sssd/sssd.conf.backup.getent ]; then
+            rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.backup.getent"
+            rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf"
+            sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+            rlRun "cat /etc/sssd/sssd.conf"
+            rlRun "service sssd restart"
+            rlRun "sleep 5"
+        fi
+
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERCLIENT"
         ;;
     *)
