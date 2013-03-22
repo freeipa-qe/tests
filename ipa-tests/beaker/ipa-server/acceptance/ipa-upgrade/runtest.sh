@@ -76,7 +76,7 @@ rlJournalStart
     ipa_upgrade_master_replica_client_inc_setup
     if rlIsRHEL "<6.3"; then
         ipa_upgrade_master_replica_client_inc_63
-    i
+    fi
     if rlIsRHEL "6.3"; then
         ipa_upgrade_master_replica_client_inc_64
     fi
