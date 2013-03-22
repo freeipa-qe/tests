@@ -75,8 +75,8 @@ ipa_yum_repo_setup()
             enabled=1
             gpgcheck=0
             skip_if_unavailable=1"
+            rlRun "cat /etc/yum.repos.d/mytestrepo$repoi.repo"
         fi
-        rlRun "cat /etc/yum.repos.d/mytestrepo$repoi.repo"
     done
 }
 
