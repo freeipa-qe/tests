@@ -41,6 +41,7 @@
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
                     <param name="MYNEWREPO1" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/x86_64/os/"/>
                     <param name="MYNEWREPO2" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/optional/x86_64/os/"/>
+                    <param name="MYNEWREPO3" value="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64/"/>
 				</params>
 			</task>
             <task name="/distribution/reservesys" role="STANDALONE">
@@ -85,6 +86,7 @@
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
                     <param name="MYNEWREPO1" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/x86_64/os/"/>
                     <param name="MYNEWREPO2" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/optional/x86_64/os/"/>
+                    <param name="MYNEWREPO3" value="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64/"/>
 				</params>
 			</task>
             <task name="/distribution/reservesys" role="STANDALONE">
@@ -129,6 +131,7 @@
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
                     <param name="MYNEWREPO1" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/x86_64/os/"/>
                     <param name="MYNEWREPO2" value="http://download.devel.redhat.com/nightly/latest-RHEL6/6/Server/optional/x86_64/os/"/>
+                    <param name="MYNEWREPO3" value="http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/x86_64/"/>
 				</params>
 			</task>
             <task name="/distribution/reservesys" role="STANDALONE">
