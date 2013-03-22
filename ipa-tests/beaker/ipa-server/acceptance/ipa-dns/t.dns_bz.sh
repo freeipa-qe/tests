@@ -997,6 +997,8 @@ bz809565()
 		tzone="idnszone.com"
                 recordName="ARecord"
                 newRecordName="ARenameRecord"
+                recordName2="cRecord"
+                newRecordName2="cRenameRecord"
 		ipaddr=$(hostname -i)
 		rlLog "Ip address is $ipaddr"
 		ipoc1=$(echo $ipaddr | cut -d\. -f1)
@@ -1017,6 +1019,15 @@ bz809565()
                 
                 rlRun "ipa dnsrecord-find $tzone | grep $recordName" 1 "Verify dnsrecord $recordName is not found"
                 rlRun "ipa dnsrecord-find $tzone | grep $newRecordName" 0 "Verify renamed dnsrecord $newRecordName is found"
+
+                # Add an A Record
+                rlRun "ipa dnsrecord-add $tzone $recordName2 --cname-rec=$newRecordName.$DOMAIN." 0 "Add cname Record"
+                rlRun "ipa dnsrecord-find $tzone | grep $recordName2 | grep $newRecordName" 0 "Verify dnsrecord $recordName2 is added"
+                # Rename this record
+                rlRun "ipa dnsrecord-mod $tzone $recordName2 --rename $newRecordName2" 0 "Rename $recordName2 to be $newRecordName2"
+                
+                rlRun "ipa dnsrecord-find $tzone | grep $recordName2 | grep $newRecordName" 1 "Verify dnsrecord $recordName2 is not found"
+                rlRun "ipa dnsrecord-find $tzone | grep $newRecordName2 | grep $newRecordName" 0 "Verify renamed dnsrecord $newRecordName is found"
 
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 		
