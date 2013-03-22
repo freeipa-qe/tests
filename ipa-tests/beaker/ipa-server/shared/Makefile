@@ -36,7 +36,7 @@ run: $(FILES) build
 	#yum -y install expect
 	#expect ./set-root-pw.exp
 	#wget http://apoc.dsdev.sjc.redhat.com/tet/rhts-get.txt
-	mkdir /opt/rhqa_ipa
+	mkdir -p /opt/rhqa_ipa
 	rm -f /opt/rhqa_ipa/env.sh
 	cp ./env.sh /opt/rhqa_ipa/.
 	rm -f /opt/rhqa_ipa/ipa-server-shared.sh
