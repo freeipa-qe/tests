@@ -74,6 +74,7 @@ ADsn="user"
 aduser1="aduser1"
 aduser2="aduser2"
 trust_secret="TrUsTsEcRet"
+samba_cc="/var/run/samba/krb5cc_samba"
 
 setup() {
 rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
@@ -92,6 +93,9 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 	rlRun "$ipacmd dnszone-add $ADdomain --name-server=$ADhost --admin-email=hostmaster@$ADdomain --force --forwarder=$ADip --forward-policy=only" 0 "Adding forwarder for  $ADdomain"
 	rlRun "$ipacmd dnszone-add $ADdomain2 --name-server=$ADhost2 --admin-email=hostmaster@$ADdomain2 --force --forwarder=$ADip2 --forward-policy=only" 0 "Adding forwarder for  $ADdomain2"
 	sleep 30
+
+	# Deleting samba cache credential. Remove this after https://fedorahosted.org/freeipa/ticket/3479 is resolved
+        [ -e $samba_cc ] && rm -f $samba_cc
 
 	# Prepare IPA server for trust
 	rlRun "$trust_bin -a $adminpw --netbios-name $NBname -U" 0 "Preparing server to establish trust"

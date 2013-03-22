@@ -91,7 +91,7 @@ Add_Trust() {
 	if [ "$1" = "type" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad \$var1\r\"" >> $expfile
 	  echo "expect {
-	  \"ipa: ERROR: invalid 'AD Trust setup': Not enough arguments specified to perform trust setup\" { send_user \"\n\"; exit 1 } }" >> $expfile
+	  \"ipa: ERROR: invalid 'AD Trust setup': Not enough arguments specified to perform trust setup\" { send_user \"More arguments required\n\"; exit 1 } }" >> $expfile
 	elif [ "$1" = "server" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password --server=\$var4\r\"" >> $expfile
 	elif [ "$1" = "no_ad" ]; then
@@ -111,7 +111,7 @@ Add_Trust() {
 	echo 'expect "*assword: "' >> $expfile
 	echo 'send -s -- "$var3\r"' >> $expfile
 	echo "expect {
-	\"ipa: ERROR: Unable to resolve domain controller for '\$var1' domain\" { send_user \"\n\"; exit 2 }" >> $expfile
+	\"ipa: ERROR: Unable to resolve domain controller for '\$var1' domain\" { send_user \"\n\n\"; exit 2 }" >> $expfile
 	echo '"Trust status: Established and verified" { send_user "\nTrust added\n"; exit 0 }' >> $expfile
 	echo '"Shared secret for the trust: " { 
 	send -s -- "$var4\r"
