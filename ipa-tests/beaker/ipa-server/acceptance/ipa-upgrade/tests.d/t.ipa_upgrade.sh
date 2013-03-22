@@ -42,10 +42,15 @@
 ######################################################################
 # test suite
 ######################################################################
-use_beaker_repos()
+
+reset_repos()
 {
+    unset ${!myrepo*}
+    myrepo1=$latestrepo1
+    myrepo2=$latestrepo2
+    myrepo3=$latestrepo3
+
     if [ -n "$MYNEWREPO1" ]; then
-        unset ${!myrepo*}
         myrepo1="$MYNEWREPO1"
     fi
     if [ -n "$MYNEWREPO2" ]; then

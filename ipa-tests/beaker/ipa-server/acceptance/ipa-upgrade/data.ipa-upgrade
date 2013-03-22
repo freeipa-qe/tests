@@ -15,21 +15,36 @@ fi
 
 export OS VER PKG
 
+
 # Adding support only for Fedora 17 and Rhel 6 at this time. 
 # Maybe a case statemet will be required for other OS's in the future.
 if [ "$OS" = "fedora" ]; then
+    if [ -z "$LATESTNEWVER" ]; then
+        export LATESTVER=17 # must match same format as OSVER 
+    fi
+
 	# Disable fedora updates repo
 	sed -i s/^enabled=1/enabled=0/g /etc/yum.repos.d/fedora-updates.repo 
 	# Define some repos for Fedora 
-	myrepo1=http://jdennis.fedorapeople.org/ipa-devel/fedora/\$releasever/\$basearch/os/
-	myrepo2=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/$basearch/
-	myrepo3=http://download.fedoraproject.org/pub/fedora/linux/updates/\$releasever/\$basearch/
+	latestrepo1=http://jdennis.fedorapeople.org/ipa-devel/fedora/\$releasever/\$basearch/os/
+	latestrepo2=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/$basearch/
+	latestrepo3=http://download.fedoraproject.org/pub/fedora/linux/updates/\$releasever/\$basearch/
+
+    myrepo1=$latestrepo1
+    myrepo2=$latestrepo2
+    myrepo3=$latestrepo3
 else
-	myrepo1=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130116.3/6.4/Server/\$basearch/os/
-	myrepo2=http://download.devel.redhat.com/rel-eng/RHEL6.4-20130116.3/6.4/Server/optional/\$basearch/os/
-	myrepo3=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
-	myrepo4=http://10.65.201.171/pki/9.0.3-30/\$basearch
-	myrepo5=http://download.devel.redhat.com/nightly/latest-RHEL6.4/6.4/Server/\$basearch/os
+    if [ -z "$LATESTNEWVER" ]; then
+        export LATESTVER=64 # must match same format as OSVER 
+    fi
+
+    latestrepo1=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/\$basearch/os/
+    latestrepo2=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/optional/\$basearch/os/
+	latestrepo3=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
+
+    myrepo1=$latestrepo1
+    myrepo2=$latestrepo2
+    myrepo3=$latestrepo3
 fi
 
 # Users

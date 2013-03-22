@@ -34,6 +34,7 @@
 
 ipa_upgrade_master_replica_client_all()
 {   
+    reset_repos
     USEDNS="yes"
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
@@ -45,28 +46,28 @@ ipa_upgrade_master_replica_client_all()
         ipa_upgrade_install_master
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
-        ipa_upgrade_data_add $MYBEAKERMASTER
+        ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
     rlPhaseEnd
         
     rlPhaseStartTest "ipa_upgrade_master_replica_client_all_1: test upgrade with new master, old replica, and old client"
         upgrade_master 
-        ipa_upgrade_data_check $MYBEAKERMASTER
-        ipa_upgrade_data_check $MYBEAKERREPLICA1
-        ipa_upgrade_data_check $MYBEAKERCLIENT
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
     rlPhaseEnd
 
     rlPhaseStartTest "ipa_upgrade_master_replica_client_all_2: test upgrade with new master, new replica, and old client"
         upgrade_replica
-        ipa_upgrade_data_check $MYBEAKERMASTER
-        ipa_upgrade_data_check $MYBEAKERREPLICA1
-        ipa_upgrade_data_check $MYBEAKERCLIENT
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
     rlPhaseEnd
 
     rlPhaseStartTest "ipa_upgrade_master_replica_client_all_3: test upgrade with new master, new replica, and new client"
         upgrade_client
-        ipa_upgrade_data_check $MYBEAKERMASTER
-        ipa_upgrade_data_check $MYBEAKERREPLICA1
-        ipa_upgrade_data_check $MYBEAKERCLIENT
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER new
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa_upgrade_master_replica_client_all_cleanup: cleanup from test full setup for master, then replica, then client"
@@ -78,7 +79,7 @@ ipa_upgrade_master_replica_client_all()
     
 ipa_upgrade_test_master_replica_parallel()
 {
-    use_beaker_repos
+    reset_repos
     USEDNS="yes"
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
@@ -202,6 +203,7 @@ ipa_upgrade_master_replica_client_inc_64()
 
 ipa_upgrade_client_replica_master_all()
 {
+    reset_repos
     USEDNS="yes"
     IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
@@ -250,6 +252,7 @@ ipa_upgrade_client_replica_master_all()
 
 ipa_upgrade_master_replica_client_nodns()
 {
+    reset_repos
     USEDNS="no"
     IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"
@@ -285,6 +288,7 @@ ipa_upgrade_master_replica_client_nodns()
 
 ipa_upgrade_master_replica_client_dirsrv_off()
 {
+    reset_repos
     rlPhaseStartTest "ipa_upgrade_master_replica_client_dirsrv_off: Test upgrade with dirsrv down before upgrade"
         rlRun "env|sort"
         # Install and setup environment and add data
@@ -324,6 +328,7 @@ ipa_upgrade_master_replica_client_dirsrv_off()
 
 ipa_upgrade_master_bz_tests()
 {
+    reset_repos
     rlPhaseStartTest "ipa_upgrade_master_bz_tests: execute bug tests against a master upgrade"
         rlRun "env|sort"
         # Install and setup master for bug checks
@@ -378,6 +383,7 @@ ipa_upgrade_master_bz_866977()
 
 ipa_upgrade_master_replica_client_all_final()
 {   
+    reset_repos
     rlPhaseStartTest "ipa_upgrade_master_replica_client_all_final: Install and upgrade to leave in a state for other testing"
         rlRun "env|sort"
         ipa_install_master_all
