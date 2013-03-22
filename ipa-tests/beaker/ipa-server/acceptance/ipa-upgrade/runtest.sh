@@ -73,13 +73,13 @@ rlJournalStart
     # Main test functions in tests.d/t.tests.sh:
 
     # First run the incremental upgrade tests:
-    #ipa_upgrade_master_replica_client_inc_setup
-    #if rlIsRHEL "<6.3"; then
-    #    ipa_upgrade_master_replica_client_inc_63
-    #fi
-    #if rlIsRHEL "6.3"; then
-    #    ipa_upgrade_master_replica_client_inc_64
-    #fi
+    ipa_upgrade_master_replica_client_inc_setup
+    if rlIsRHEL "<6.3"; then
+        ipa_upgrade_master_replica_client_inc_63
+    i
+    if rlIsRHEL "6.3"; then
+        ipa_upgrade_master_replica_client_inc_64
+    fi
     #if rlIsRHEL "6.4"; then
     #    ipa_upgrade_master_replica_client_inc_65
     #fi
@@ -95,7 +95,7 @@ rlJournalStart
     #if rlIsRHEL "6.8"; then
     #    ipa_upgrade_master_replica_client_inc_69
     #fi
-    #ipa_upgrade_master_replica_client_inc_cleanup
+    ipa_upgrade_master_replica_client_inc_cleanup
 
     ipa_upgrade_test_master_replica_parallel
     #upgrade_test_master_slave_client_all
