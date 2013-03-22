@@ -51,6 +51,7 @@ ipa_upgrade_uninstall_master()
         rlLog "Machine in recipe is MASTER"
         ipa_quick_uninstall
         ipa_quick_remove
+        rlRun "yum -y downgrade redhat-release-server"
         [ -n $MYBEAKERMASTER ] && MASTER=$(dig +short -x $MYBEAKERMASTER|sed 's/\.$//g')
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERMASTER"
         ;;
@@ -92,6 +93,7 @@ ipa_upgrade_uninstall_replica()
         rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT.1' $MYBEAKERMASTER"
         ipa_quick_uninstall
         ipa_quick_remove
+        rlRun "yum -y downgrade redhat-release-server"
         [ -n $MYBEAKERREPLICA1 ] && REPLICA=$(dig +short -x $MYBEAKERREPLICA1|sed 's/\.$//g')
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.2' -m $MYBEAKERREPLICA1"
         ;;
@@ -140,6 +142,7 @@ ipa_upgrade_uninstall_client()
         kdestroy
         ipa_quick_uninstall
         ipa_quick_remove
+        rlRun "yum -y downgrade redhat-release-server"
         rlRun "yum -y remove http*"
         [ -n $MYBEAKERCLIENT ] && CLIENT=$(dig +short -x $MYBEAKERCLIENT|sed 's/\.$//g')
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.1' -m $MYBEAKERCLIENT"
