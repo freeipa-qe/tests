@@ -29,8 +29,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 # AD values
 . ./Config
@@ -84,21 +84,21 @@ Add_Trust() {
         set var2 [lindex $argv 1]
         set var3 [lindex $argv 2]
         set var4 [lindex $argv 3]
-        set timeout 10
+        set timeout 30
         set send_slow {1 .1}' >> $expfile
 	echo 'spawn /bin/bash
         expect "*#"' >> $expfile
 	if [ "$1" = "type" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad \$var1\r\"" >> $expfile
 	  echo "expect {
-	  \"ipa: ERROR: invalid Gettext(\'AD Trust setup\', domain=\'ipa\', localedir=None): Not enough arguments specified to perform trust setup\" { exit 1 } }" >> $expfile
+	  \"ipa: ERROR: invalid 'AD Trust setup': Not enough arguments specified to perform trust setup\" { send_user \"\n\"; exit 1 } }" >> $expfile
 	elif [ "$1" = "server" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password --server=\$var4\r\"" >> $expfile
 	elif [ "$1" = "no_ad" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --server=\$var4\r\"" >> $expfile
 	  echo 'expect "Realm name: " { send -s -- "$var1\r" }' >> $expfile
 	elif [ "$1" = "secret" ]; then
-	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --trust-secret\r\"" >> $expfile
+	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password --trust-secret\r\"" >> $expfile
 	elif [ "$1" = "domain" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password\r\"" >> $expfile
 	  echo 'expect "Realm name: " { send -s -- "$var1\r" }' >> $expfile
@@ -111,11 +111,11 @@ Add_Trust() {
 	echo 'expect "*assword: "' >> $expfile
 	echo 'send -s -- "$var3\r"' >> $expfile
 	echo "expect {
-	\"ipa: ERROR: Unable to resolve domain controller for \'$var1\' domain\" { exit 2 }" >> $expfile
-	echo '"Trust status: Established and verified" { send_user "\nTrust added\n"; exit 0 } }' >> $expfile
+	\"ipa: ERROR: Unable to resolve domain controller for '\$var1' domain\" { send_user \"\n\"; exit 2 }" >> $expfile
+	echo '"Trust status: Established and verified" { send_user "\nTrust added\n"; exit 0 }' >> $expfile
 	echo '"Shared secret for the trust: " { 
 	send -s -- "$var4\r"
-	expect "Trust status: Established and verified" { send_user "\nTrust added with Secret"; exit 0 } }' >> $expfile
+	expect "Trust status: Established and verified" { send_user "\nTrust added with Secret\n"; exit 0 } } }' >> $expfile
 	
 }
 
@@ -151,15 +151,15 @@ Non_Admin() {
         if [ -n "$1" -a "$1" = "wrng_passwd" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password\r\"" >> $expfile
 	  echo 'expect "*assword: "' >> $expfile
-	  echo 'send -s -- "$var3\r' >> $expfile
-	  echo 'expect {
-	  "ipa: ERROR: Insufficient access: CIFS server denied your credentials" { exit 1 } }' >> $expfile
+	  echo 'send -s -- "$var3\r"' >> $expfile
+	  echo "expect {
+	  \"ipa: ERROR: Insufficient access: CIFS server *.\$var1 denied your credentials\" { send_user \"\n\"; exit 1 } }" >> $expfile
 	else
 	  echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password\r\"" >> $expfile
           echo 'expect "*assword: "' >> $expfile
           echo 'send -s -- "$var3\r"' >> $expfile
 	  echo 'expect {
-	  "ipa: ERROR: Insufficient access: CIFS server * denied your credentials\" { exit 1 } }' >> $expfile
+	  "ipa: ERROR: Insufficient access: CIFS server denied your credentials" { send_user "\n"; exit 1 } }' >> $expfile
 	fi
 }
 
@@ -171,26 +171,26 @@ Interactive_trust() {
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
 	echo "send \"$ipacmd trust-add\r\"" >> $expfile
-	echo 'expect "Realm name: " {
-	send -s -- "$var1\r" }
-	expect "ipa: ERROR: invalid *: Not enough arguments specified to perform trust setup" { 
-	send_user "\nTrust add needs more arguments\n"; exit 1 }' >> $expfile
+	echo "expect \"Realm name: \" {
+	send -s -- \"\$var1\r\" }
+	expect \"ipa: ERROR: invalid 'AD Trust setup': Not enough arguments specified to perform trust setup\" { 
+	send_user \"\nTrust add needs more arguments\n\"; exit 1 }" >> $expfile
 }
 
 Trust_Del() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
 	set var2 [lindex $argv 1]
-        set timeout 10
+        set timeout 20
         set send_slow {1 .1}' > $expfile
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
 	if [ "$1" = "domain" ]; then
 	  echo "send \"$ipacmd trust-del \$var1\r\"" >> $expfile
 	  echo 'expect {
-	  "ipa: ERROR: $var1: trust not found" { exit 2 }
-	  "Deleted trust \"$var1\"" { exit 0 }
-	  "ipa: ERROR: Insufficient access: Insufficient *" { send_user "User as no admin rights in IPA server"; exit 1 } }' >> $expfile 
+	  "ipa: ERROR: $var1: trust not found" { send_user "\nTrust does not exist\n"; exit 2 }
+	  "Deleted trust \"$var1\"" { send_user "\nTrust deleted\n"; exit 0 }
+	  "ipa: ERROR: Insufficient access: Insufficient *" { send_user "\nUser as no admin rights in IPA server\n"; exit 1 } }' >> $expfile 
 	elif [ "$1" = "continue" ]; then
 	  echo "send \"$ipacmd trust-del \$var1 --continue\r\"" >> $expfile
 	  echo 'expect {
@@ -198,7 +198,7 @@ Trust_Del() {
 	  "Deleted trust \"$var1\"" { send_user "\nValid domain trust deleted\n"; exit 0 } }' >> $expfile
 	elif [ "$1" = "multi" ]; then
 	  echo "send \"$ipacmd trust-del \$var1 \$var2\r\"" >> $expfile
-	  echo 'expect "Deleted trust \"$var1,$var2\"" { send_user "2 trusts detelte"; exit 0 }' >> $expfile
+	  echo 'expect "Deleted trust \"$var1,$var2\"" { send_user "2 Trusts deleted"; exit 0 }' >> $expfile
 	else
 	  echo "send \"$ipacmd trust-del\r\"" >> $expfile
 	  echo 'expect "Realm name: " {
@@ -217,23 +217,23 @@ Trust_Show() {
         expect "*#"' >> $expfile
 	if [ "$1" = "allraw" ]; then
 	  echo "send \"$ipacmd trust-show \$var1 --raw --all\r\"" >> $expfile
-	  echo 'expect "ipa: ERROR: an internal error has occurred" { send_user "Needs fixing https://fedorahosted.org/freeipa/ticket/3525" { exit 1} }' >> $expfile
+	  echo 'expect "ipa: ERROR: an internal error has occurred" { send_user "\nNeeds fixing https://fedorahosted.org/freeipa/ticket/3525\n"; exit 1 }' >> $expfile
 	elif [ "$1" = "all" ]; then
 	  echo "send \"$ipacmd trust-show \$var1 --all\r\"" >> $expfile
-	  echo 'expect "objectclass: ipaNTTrustedDomain, ipaIDobject, top" { exit 0 }' >> $expfile
+	  echo 'expect "objectclass: ipaNTTrustedDomain, ipaIDobject, top" { send_user "\nTrust show all\n"; exit 0 }' >> $expfile
 	elif [ "$1" = "raw" ]; then
 	  echo "send \"$ipacmd trust-show \$var1 --raw\r\"" >> $expfile
-	  echo 'expect "trusttype: Active Directory domain" { exit 0 }' >> $expfile
+	  echo 'expect "trusttype: Active Directory domain" { send_user "\nTrust show raw\n"; exit 0 }' >> $expfile
 	elif [ "$1" = "rights" ]; then
-	  echo "send \"$ipacmd trust-show \$var1 --rigths --all\r\"" >> $expfile
-	  echo 'expect "attributelevelrights: *" { exit 0 }' >> $expfile
+	  echo "send \"$ipacmd trust-show \$var1 --rights --all\r\"" >> $expfile
+	  echo 'expect "attributelevelrights: *" { send_user "\nTrust show rights\n"; exit 0 }' >> $expfile
 	elif [ "$1" = "domain" ]; then
 	  echo "send \"$ipacmd trust-show \$var1\r\"" >> $expfile
-	  echo 'expect "Trust type: Active Directory domain" { exit 0 }' >> $expfile
+	  echo 'expect "Trust type: Active Directory domain" { send_user "\nTrust show\n"; exit 0 }' >> $expfile
 	else
 	  echo "send \"$ipacmd trust-show\r\"" >> $expfile
 	  echo 'expect "Realm name: "
 	  send -s -- "$var1\r"
-	  expect "Trust type: Active Directory domain" { send_user "Showing trust interactively"; exit 0 }' >> $expfile
+	  expect "Trust type: Active Directory domain" { send_user "\nShowing trust interactively\n"; exit 0 }' >> $expfile
 	fi
 }

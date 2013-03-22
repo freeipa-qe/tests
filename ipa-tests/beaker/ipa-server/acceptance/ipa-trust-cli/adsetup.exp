@@ -44,6 +44,8 @@ expect "*?assword:*";
 send -- "$password\r";
 expect "*>";
 send -- "dnscmd /zoneadd $ipadomain /forwarder $ipahostip\r";
+expect "*>";
+send -- "dnscmd /clearcache\r";
 sleep 5;
 send -- "exit\r";
 expect eof;

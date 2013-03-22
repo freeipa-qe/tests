@@ -34,8 +34,8 @@
 # Include rhts environment
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
-. /dev/shm/ipa-server-shared.sh
-. /dev/shm/env.sh
+. /opt/rhqa_ipa/ipa-server-shared.sh
+. /opt/rhqa_ipa/env.sh
 
 # AD values
 . ./Config
@@ -55,6 +55,7 @@ RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
 
 IPAhost=`hostname`
 IPAdomain="testrelm.com"
+IPAhostIP=`ip addr | egrep 'inet ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 srv_name=`hostname -s`
 NBname="TESTRELM"
 trust_bin=`which ipa-adtrust-install`
@@ -80,8 +81,8 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 	rlRun "rlDistroDiff ipa_pkg_check" 0 "Packages installed for current OS flavor"
 
 	# stopping firewall
-	rlServiceStop "iptables"
-	rlServiceStop "ip6tables"
+	rlServiceStop "firewalld"
+#	rlServiceStop "ip6tables"
 
 	# Setup both ADs with conditional forwarder for IPA domain
 	rlRun "./adsetup.exp add $ADadmin $ADpswd $ADip $IPAdomain $IPAhostIP" 0 "Add conditional forwarder for $ADdomain"
@@ -135,8 +136,8 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 
 	rlRun "create_ipauser $user test user $userpw"
 	rlRun "create_ipauser $user2 new user $userpw"
-	rlRun "$ipacmd group-add-member admins --users=$user2" 0 "Adding $user2 to IPA admins group"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "$ipacmd group-add-member admins --users=$user2" 0 "Adding $user2 to IPA admins group"
 rlPhaseEnd
 }
 
@@ -160,9 +161,9 @@ trust_test_0003() {
 
 rlPhaseStartTest "0003 Give invalid server name in --server option"
 	rlRun "Add_Trust server" 0 "Creating expect script"
-	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd zombie.$ADdomain" 2 "Fails as expected"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd zombie.$ADdomain" 2 "Invalid server and correct domain on cli fails"
 	rlRun "Add_Trust no_ad" 0 "Creating expect script"
-	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd zombie.$ADdomain" 2 "Fails as expected"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd zombie.$ADdomain" 2 "Invalid server and correct domain given interactively fails"
 rlPhaseEnd
 }
 
@@ -232,7 +233,7 @@ trust_test_0011() {
 
 rlPhaseStartTest "0011 Delete trust with --continue and invalid domain"
 	rlRun "Trust_Del continue" 0 "Creating expect script"
-	rlRun "$exp $expfile bad$ADdomain" 1 "Invalid domain fails deletion as expected"
+	rlRun "$exp $expfile bad$ADdomain" 1 "Invalid domain deletion fails"
 rlPhaseEnd
 }
 
@@ -240,7 +241,7 @@ trust_test_0012() {
 
 rlPhaseStartTest "0012 Having existing AD trust add trust with a new domain"
 	rlRun "Add_Trust" 0 "Creating expect script"
-        rlRun "$exp $expfile $ADdomain2 $ADadmin2 $ADpswd2" 0 "Active Directory Trust added for $ADdomain2"
+        rlRun "$exp $expfile $ADdomain2 $ADadmin2 $ADpswd2" 0 "Active Directory Trust add for $ADdomain2"
 rlPhaseEnd
 }
 
@@ -256,7 +257,7 @@ trust_test_0014() {
 
 rlPhaseStartTest "0014 Add trust with --trust-secret"
 	rlRun "Add_Trust secret" 0 "Creating expect script"
-	rlRun "$exp $expfile $ADdomain2 $ADadmin2 $ADpswd2 $trust_secret" 0 "Trust added for $ADdomain2 with Secret"
+	rlRun "$exp $expfile $ADdomain2 $ADadmin2 $ADpswd2 $trust_secret" 0 "Trust add for $ADdomain2 with Secret"
 rlPhaseEnd
 }
 
@@ -293,7 +294,7 @@ trust_test_0018() {
 rlPhaseStartTest "0018 Delete trust as a non-admin user"
 	rlRun "kinitAs $user $userpw" 0 "Kinit as $user"
 	rlRun "Trust_Del domain" 0 "Creating expect script"
-	rlRun "$exp $expfile $ADdomain" 1 "IPA user fails to delete trust"
+	rlRun "$exp $expfile $ADdomain" 1 "Delete trust by IPA user fails"
 	rlRun "kdestroy" 0 "Destroy any credentials"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 rlPhaseEnd
@@ -351,7 +352,7 @@ trust_test_0025() {
 rlPhaseStartTest "0025 Show trust for valid domain"
 	rlRun "Trust_Show" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain" 0 "Show trust interactively"
-	rlRun "Trust_Show" 0 "Creating expect script"
+	rlRun "Trust_Show domain" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain" 0 "Show trust with domain as argument"
 rlPhaseEnd
 }
@@ -407,7 +408,7 @@ rlPhaseEnd
 cleanup() {
 
 rlPhaseStartCleanup "Clean up for trust-cli tests"
-	rlrun "$ipacmd trust-del $ADdomain $ADdomain2" 0 "Delete trusts for cleanup"
+	rlRun "$ipacmd trust-del $ADdomain $ADdomain2" 0 "Delete trusts for cleanup"
 	rlRun "pushd $TmpDir"
 	rlRun "ADuserdel_ldif $ADfn $ADsn" 0 "Create ldif file to delete $aduser1"
 	rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete $aduser1 from AD"
@@ -425,6 +426,7 @@ rlPhaseStartCleanup "Clean up for trust-cli tests"
         rlRun "./adsetup.exp delete $ADadmin $ADpswd $ADip $IPAdomain" 0 "Delete conditional forwarder for IPA on $ADadmin"
 	rlRun "./adsetup.exp delete $ADadmin2 $ADpswd2 $ADip2 $IPAdomain" 0 "Delete conditional forwarder for IPA on $ADadmin2"
 
+	rlRun "certutil -d $slapd_dir -D -n \"AD cert\"" 0 "Delete AD cert"
 	rlRun "kdestroy" 0 "Destroy any credentials"
 	rlRun "rm -fr /tmp/krb5cc_*"
 rlPhaseEnd
