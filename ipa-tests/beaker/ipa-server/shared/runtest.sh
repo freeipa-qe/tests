@@ -39,13 +39,20 @@
 
 rlJournalStart
     rlPhaseStartSetup "list files in /opt/rhqa_ipa"
-	/sbin/restorecon -v /root/.ssh/authorized_keys
+        /sbin/restorecon -v /root/.ssh/authorized_keys
         /sbin/restorecon -v /root/.ssh/authorized_keys2
-	rlRun "ls /opt/rhqa_ipa" 0 "Listing files in /opt/rhqa_ipa"
+        
+        DNSFORWARD=$(grep nameserver /etc/resolv.conf |grep -v "^[ \t]*#"|head -1|awk '{print $2}')
+        if [ -z ${DNSFORWARD} ]; then 
+            DNSFORWARD=10.11.5.19
+        fi      
+        sed -i "s/DNSFORWARD=.*$/DNSFORWARD=$DNSFORWARD/g" /opt/rhqa_ipa/env.sh
+
+        rlRun "ls /opt/rhqa_ipa" 0 "Listing files in /opt/rhqa_ipa"
     rlPhaseEnd
 
-rlJournalPrintText
-report=/tmp/rhts.report.$RANDOM.txt
-makereport $report
-rhts-submit-log -l $report
+    rlJournalPrintText
+    report=/tmp/rhts.report.$RANDOM.txt
+    makereport $report
+    rhts-submit-log -l $report
 rlJournalEnd
