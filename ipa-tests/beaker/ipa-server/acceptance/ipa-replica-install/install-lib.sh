@@ -221,7 +221,7 @@ appendEnvIPv6()
 fixForwarderIPv6()
 {
   ipv6addr=$(ifconfig $currenteth | grep "inet6 " | grep -E 'Scope:Site|Scope:Global' | awk '{print $3}' | awk -F / '{print $1}' | head -1)
-  sed -i "s/10.14.63.12/$ipv6addr/g" /opt/rhqa_ipa/env.sh
+  sed -i "s/$DNSFORWARD/$ipv6addr/g" /opt/rhqa_ipa/env.sh
   . /opt/rhqa_ipa/env.sh
   rlRun "cat /opt/rhqa_ipa/env.sh"
   rlLog "fixing DNSFORWARD in env.sh"
