@@ -158,6 +158,8 @@ function ipa_quicktest_dnszone_add()
     else
         rlLog "DNS Zone ${dnsptr2} already exists"
     fi
+
+    rlRun "service named restart"
 }
 
 function ipa_quicktest_dnszone_check()
