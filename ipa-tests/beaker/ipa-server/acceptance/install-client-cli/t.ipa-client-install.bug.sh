@@ -298,6 +298,71 @@ EOF
         rlRun "rm -rf /tmp/sudo_list.exp /tmp/klist*"
    rlPhaseEnd
 }
+ipaclientinstall_bugcheck_767725()
+{
+
+        rlPhaseStartTest "BZ-767725 GSS-TSIG DNS updates should update reverse entries as well"
+        #Installing client
+        uninstall_fornexttest
+
+        rlRun "ipa-client-install --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --unattended --server=$MASTER --enable-dns-updates" 0 "Installing ipa client and configuring - with all params"
+
+        TmpDir=`mktemp -d`
+        #Checking existence of ipa-admintools
+        rpm -q ipa-admintools
+        if [ $? -eq 0 ] ; then
+         rlLog "ipa-admintools is installed"
+        else
+         rlRun "yum install ipa-admintools -y" 0 "Installing ipa-admintools"
+        fi
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+
+        client_ip=`ip addr|grep brd|grep inet|cut -d "/" -f1|cut -d " " -f6`
+
+        client_ptr=`echo $client_ip|cut -d "." -f4`
+        client_revzone=$(echo $client_ip|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
+        client_hostnamepart=`hostname|cut -d "." -f1`
+        client_newptr=`expr $client_ptr + 1`
+        client_newip=$(echo $client_ip|awk -F. '{print $1 "." $2 "." $3 "."$4+1}')
+
+        rlRun "ipa dnsrecord-add $client_revzone $client_ptr --ptr-rec $CLIENT."
+        rlRun "ipa dnszone-mod $DOMAIN --allow-sync-ptr=1"
+
+        rlRun "ipa dnsrecord-find $DOMAIN $client_hostnamepart > $TmpDir/output.txt"
+        rlRun "cat $TmpDir/output.txt"
+        rlAssertGrep "Record name: $client_hostnamepart" "$TmpDir/output.txt"
+
+        rlRun "ipa dnsrecord-find $client_revzone $client_hostnamepart > $TmpDir/output.txt"
+        rlRun "cat $TmpDir/output.txt"
+        rlAssertGrep "Record name: $client_ptr" "$TmpDir/output.txt"
+
+        #rlRun "/usr/bin/kinit -k -t /etc/krb5.keytab host/`hostname`"
+        rlRun "/usr/bin/kinit -k -t /etc/krb5.keytab"
+        rlRun "klist > $TmpDir/output.txt"
+        rlRun "cat $TmpDir/output.txt"
+
+        nsupdate=$TmpDir/nsupdate.txt
+        echo "zone $DOMAIN" > $nsupdate
+        echo "update delete `hostname` IN A " >> $nsupdate
+        echo "update add `hostname` 86400 IN A $client_newip " >> $nsupdate
+        echo "send" >> $nsupdate
+
+        rlRun "cat $nsupdate"
+        rlRun "nsupdate -dg $nsupdate > $TmpDir/nsoutput.txt"
+        rlRun "cat $TmpDir/nsoutput.txt"
+
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+        rlRun "ipa dnsrecord-find $DOMAIN $client_hostnamepart > $TmpDir/output.txt"
+        rlRun "cat $TmpDir/output.txt"
+        rlAssertGrep "A record: $client_newip" "$TmpDir/output.txt"
+
+        rlRun "ipa dnsrecord-find $client_revzone $client_hostnamepart > $TmpDir/output.txt"
+        rlRun "cat $TmpDir/output.txt"
+        rlAssertGrep "Record name: $client_newptr" "$TmpDir/output.txt"
+
+        rlPhaseEnd
+}
 
 ipa_bug_verification(){
     ipa-client-install --uninstall -U

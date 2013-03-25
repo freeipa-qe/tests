@@ -119,6 +119,9 @@ ipaclientinstall()
     # Bug 817030 - ipa-client-install sets "KerberosAuthenticate no" in sshd.conf 
     ipaclientinstall_bugcheck_817030
 
+    # Bug 767725 - GSS-TSIG DNS updates should update reverse entries as well
+    ipaclientinstall_bugcheck_767725
+
     # Moved it to be last test because it causes connection failure to IPA Servers, so thats why moved it to last test case even after fixed-primary server test cases
     # Moving back here for everything after fixing hang issue with at job to
     # stop iptables
