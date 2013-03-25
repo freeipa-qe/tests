@@ -756,7 +756,7 @@ fixForwarderIPv6()
 {
     ipa_install_prep_initVars
     
-    rlRun "sed -i \"s/10.14.63.12/$ipv6addr/g\" /opt/rhqa_ipa/env.sh"
+    rlRun "sed -i \"s/$DNSFORWARD/$ipv6addr/g\" /opt/rhqa_ipa/env.sh"
     . /opt/rhqa_ipa/env.sh
 }
 
