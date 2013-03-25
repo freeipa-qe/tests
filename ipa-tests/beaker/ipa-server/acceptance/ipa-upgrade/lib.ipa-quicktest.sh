@@ -325,6 +325,7 @@ function ipa_quicktest_automount_add()
                 info=$(echo "$line" | sed -e "s#^$key[ \t]*##")
                 rlRun "ipa automountkey-add testloc ${automountmap[$i]} --key=\"$key\" --info=\"$info\""
             done
+            IFS="$ORIGIFS"
         done
     else
         rlLog "Automount location testloc already exists"
@@ -347,6 +348,7 @@ function ipa_quicktest_automount_check()
             info=$(echo "$line" | sed -e "s#^$key[ \t]*##")
             rlRun "ipa automountkey-show testloc ${automountmap[$i]} --key=\"$key\""
         done
+        IFS="$ORIGIFS"
     done
 }
 
