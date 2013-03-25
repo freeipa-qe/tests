@@ -301,7 +301,7 @@ EOF
 ipaclientinstall_bugcheck_767725()
 {
 
-        rlPhaseStartTest "BZ-767725 GSS-TSIG DNS updates should update reverse entries as well"
+        rlPhaseStartTest "BZ-767725 GSS-TSIG DNS updates should update reverse entries as well.Also covers upstream tkt https://fedorahosted.org/bind-dyndb-ldap/ticket/113"
         #Installing client
         uninstall_fornexttest
 
@@ -309,7 +309,7 @@ ipaclientinstall_bugcheck_767725()
 
         TmpDir=`mktemp -d`
         #Checking existence of ipa-admintools
-        rpm -q ipa-admintools
+        rpm -qa|grep ipa-admintools
         if [ $? -eq 0 ] ; then
          rlLog "ipa-admintools is installed"
         else
@@ -326,8 +326,8 @@ ipaclientinstall_bugcheck_767725()
         client_newptr=`expr $client_ptr + 1`
         client_newip=$(echo $client_ip|awk -F. '{print $1 "." $2 "." $3 "."$4+1}')
 
-        rlRun "ipa dnsrecord-add $client_revzone $client_ptr --ptr-rec $CLIENT."
-        rlRun "ipa dnszone-mod $DOMAIN --allow-sync-ptr=1"
+        #rlRun "ipa dnsrecord-add $client_revzone $client_ptr --ptr-rec $CLIENT."
+        #rlRun "ipa dnszone-mod $DOMAIN --allow-sync-ptr=1"
 
         rlRun "ipa dnsrecord-find $DOMAIN $client_hostnamepart > $TmpDir/output.txt"
         rlRun "cat $TmpDir/output.txt"
