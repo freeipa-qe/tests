@@ -52,7 +52,8 @@ ipa_upgrade_uninstall_master()
         ipa_quick_uninstall
         ipa_quick_remove
         rlRun "yum -y downgrade redhat-release-server"
-        [ -n $MYBEAKERMASTER ] && MASTER=$(dig +short -x $MYBEAKERMASTER|sed 's/\.$//g')
+        rlLog "MASTER=$MASTER"
+        #[ -n "$MYBEAKERMASTER" ] && MASTER="$(echo $MYBEAKERMASTER|cut -f1 -d.).${DOMAIN}"
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERMASTER"
         ;;
     REPLICA*)
@@ -94,7 +95,7 @@ ipa_upgrade_uninstall_replica()
         ipa_quick_uninstall
         ipa_quick_remove
         rlRun "yum -y downgrade redhat-release-server"
-        [ -n $MYBEAKERREPLICA1 ] && REPLICA=$(dig +short -x $MYBEAKERREPLICA1|sed 's/\.$//g')
+        #[ -n $MYBEAKERREPLICA1 ] && REPLICA="$(echo $MYBEAKERREPLICA1|cut -f1 -d.).${DOMAIN}"
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.2' -m $MYBEAKERREPLICA1"
         ;;
     CLIENT*)
@@ -126,7 +127,7 @@ ipa_upgrade_uninstall_client()
                 rlRun "ipa dnsrecord-del $DOMAIN $CLIENT_S --del-all" 
             fi
         else
-            [ -n $MYBEAKERCLIENT ] && CLIENT=$(dig +short -x $MYBEAKERCLIENT|sed 's/\.$//g')
+            #[ -n "$MYBEAKERCLIENT" ] && CLIENT="$(echo $MYBEAKERCLIENT|cut -f1 -d.).${DOMAIN}"
             rlRun "ipa host-del $CLIENT"
         fi
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.2' -m $MYBEAKERMASTER"
@@ -144,7 +145,7 @@ ipa_upgrade_uninstall_client()
         ipa_quick_remove
         rlRun "yum -y downgrade redhat-release-server"
         rlRun "yum -y remove http*"
-        [ -n $MYBEAKERCLIENT ] && CLIENT=$(dig +short -x $MYBEAKERCLIENT|sed 's/\.$//g')
+        #[ -n "$MYBEAKERCLIENT" ] && CLIENT="$(echo $MYBEAKERCLIENT|cut -f1 -d.).${DOMAIN}"
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.1' -m $MYBEAKERCLIENT"
         rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT.2' $MYBEAKERMASTER"
         ;;

@@ -1034,8 +1034,8 @@ ipa_quick_remove()
     rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client 'pki*' 'tomcat6*' mod_nss"
     rlRun "yum -y remove memcached python-memcached"
     rlRun "yum -y remove libldb libsss_autofs"
-	rlRun "yum -y downgrade krb5-devel krb5-libs bind-*"
-	rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
+    rlRun "yum -y downgrade krb5-devel krb5-libs bind-*"
+    rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
