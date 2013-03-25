@@ -490,7 +490,7 @@ function ipa_quicktest_automember_check()
     rlRun "ipa user-show ${amuser1} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
-
+    rlRun "sleep 10"
     rlRun "strace -vtfo /tmp/strace_getent.$DDATE getent -s sss group ${amgroup1}| grep ${amuser1}"
     if [ $? -ne 0 ]; then
         rlRun "tar zcvf /tmp/sssd_cache.$DDATE.getent-failure.tgz /var/lib/sss"
