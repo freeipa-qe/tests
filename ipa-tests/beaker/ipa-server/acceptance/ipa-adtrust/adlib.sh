@@ -394,8 +394,7 @@ Unattended_Exp() {
         echo 'expect "# "' >> $expfile
         echo "send -- \"$trust_bin -a $adminpw -U\r\"" >> $expfile
 	echo 'expect {
-  timeout { send_user "\nExpected error not received\n"; exit 1 }
-  eof { send_user "\nSome issue\n"; exit 1 }
+	"Illegal NetBIOS name *" { send_user "\n Error expected - BZ 924079\n"; exit 1 }
         "Setup*complete" { sleep 10 ; send -- "exit\r" }
 }
         send_user "\nUnattended ADtrust install was successful.\n"' >> $expfile

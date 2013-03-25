@@ -266,10 +266,13 @@ rlPhaseEnd
 
 adtrust_test_0016() {
 
-rlPhaseStartTest "0016 Install adtrust without options on CLI. Check srv records"
+rlPhaseStartTest "0016 Install adtrust without options on CLI. Check srv records. - BZ 866572"
+	rpm -qa samba-client && yum remove -y samba-client
+	rlRun "which smbpasswd"  1 "/usr/bin/smbpasswd binary not found"
 	rlRun "Interactive_Exp" 0 "Creating expect script"
 	rlRun "$exp $expfile" 0 "Running $trust_bin without cli options"
 	if [ "$?" -eq 0 ]; then
+	rlPass "Adtrust intall interactively and no failure if /usr/bin/smbpasswd is not found - BZ 866572"
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	  for i in $rec{1..6}; do
@@ -381,7 +384,7 @@ rlPhaseEnd
 
 adtrust_test_0026() {
 
-rlPhaseStartTest "0026 Adtrust install with adding sids for existing IPA users and groups interactively"
+rlPhaseStartTest "0026 Adtrust install with adding sids for existing IPA users and groups interactively - Ticket 3195"
 	# Deleting samba cache credential
 	[ -e $samba_cc ] && rm -f $samba_cc
 	rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U"
@@ -541,16 +544,14 @@ rlPhaseEnd
 
 adtrust_test_0034() {
 
-rlPhaseStartTest "0034 Adtrust install unattented, ticket 3497"
+rlPhaseStartTest "0034 Adtrust install unattented, ticket 3497 - BZ 924079"
         rlRun "$ipainstall --uninstall -U" 0 "Uninstalling IPA server"
 	# Deleting samba cache credential
         [ -e $samba_cc ] && rm -f $samba_cc
 	[ -e $smbfile ] && rm -f $smbfile
         rlRun "$ipainstall --setup-dns --no-forwarder -p $dmpaswd -P $dmpaswd -a $adminpw -r $IPARealm -n $IPAdomain --ip-address=$IPAhostIP --hostname=$IPAhost -U" 0 "IPA server install with DNS"
 	rlRun "Unattended_Exp" 0 "Creating expect script"
-	rlRun "$exp $expfile" 1 "Unattended ADtrust install failed, https://fedorahosted.org/freeipa/ticket/3497"
-	sleep 30
-	rlRun "$exp $expfile" 1 "Unattended ADtrust install re-run failed, https://fedorahosted.org/freeipa/ticket/3497"
+	rlRun "$exp $expfile" 0 "Unattended ADtrust install - Ticket 3497 and BZ 924079 resolved"
 
 rlPhaseEnd
 }
