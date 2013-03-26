@@ -165,6 +165,10 @@ function ipa_quicktest_dnszone_add()
 function ipa_quicktest_dnszone_check()
 {
     dlog_start $FUNCNAME
+    rlRun "cat /etc/resolv.conf"
+    rlRun "echo MASTER_IP=$MASTER_IP"
+    rlRun "echo REPLICA_IP=$REPLICA1_IP"
+    rlLog
     rlRun "ipa dnszone-show ${dnsptr1}"
     rlRun "ipa dnszone-show ${dnsptr2}"
     rlRun "dig +short ${dnsptr1} ns > $tmpout 2>&1"

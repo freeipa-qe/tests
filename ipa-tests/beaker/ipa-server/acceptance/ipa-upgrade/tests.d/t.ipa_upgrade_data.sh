@@ -60,7 +60,9 @@ ipa_upgrade_data_add()
         return 0
     fi
 
-    KinitAsAdmin
+    rlRun "cat /etc/resolv.conf"
+    rlRun "dig +short $(hostname)"
+    rlRun "KinitAsAdmin"
 
     if [ $runver -ge 62 ]; then
         ipa_quicktest_user_add
