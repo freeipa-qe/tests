@@ -50,6 +50,10 @@ ipa_upgrade_uninstall_master()
     MASTER*)
         rlLog "Machine in recipe is MASTER"
         ipa_quick_uninstall
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+
         ipa_quick_remove
         rlRun "yum -y downgrade redhat-release-server"
         rlLog "MASTER=$MASTER"
