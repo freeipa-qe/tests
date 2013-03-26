@@ -49,7 +49,7 @@
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/install-client-cli" role="MASTER">
 				<params/>
 			</task>
-			<task name="/distribution/reservesys" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/IpaReserveSys" role="STANDALONE">
 				<params>
 					<param name="RESERVETIME" value="6400"/>
 				</params>
@@ -98,7 +98,7 @@
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/install-client-cli" role="CLIENT">
 				<params/>
 			</task>
-			<task name="/distribution/reservesys" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/IpaReserveSys" role="STANDALONE">
 				<params>
 					<param name="RESERVETIME" value="6400"/>
 				</params>

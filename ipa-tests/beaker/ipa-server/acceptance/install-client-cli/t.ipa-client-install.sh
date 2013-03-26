@@ -131,6 +131,93 @@ ipaclientinstall()
    install_cleanup
 }
 
+##########################################################
+# Test set to cover the dynamic updates feature of IPA server
+# Test designed to run with one master, and one client
+# This is the portion of code that is to run on the master
+# Prequists are that the client has had uninstall_fornexttest run before starting this test.
+##########################################################
+dynamic_update_server()
+{
+	# Remove any entried for the current client
+	client_s=$(echo  $BEAKERCLIENT | cut -d\. -f1)
+	echo y | ipa dnsrecord-del $DOMAIN $client_s
+	
+	# Get the IP address of the client.
+	ipaddr=$(host $BEAKERCLIENT | cut -d\  -f4)
+	rlLog "Client IP address is $ipaddr"
+	ipoc1=$(echo $ipaddr | cut -d\. -f1)
+	ipoc2=$(echo $ipaddr | cut -d\. -f2)
+	ipoc3=$(echo $ipaddr | cut -d\. -f3)
+	ipoc4=$(echo $ipaddr | cut -d\. -f4)
+
+	# Add bad IP address to test with negative test case.
+	badip="$ipoc1.$ipoc2.$ipoc3.254"
+	rlRun "ipa dnsrecord-add  $DOMAIN $client_s --a-rec=$badip" 0 "create A record for client with a bad IP"
+	rlRun "ipa dnsrecord-find $DOMAIN $client_s | grep $badip" 0 "Make sure the bad A record was created."
+	
+	# Disable Dynamic update
+	ipa dnszone-mod $DOMAIN --dynamic-update=TRUE # Make sure dynamic update is enabled to prevent false failures on the next line.
+	rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=FALSE" 0 "Disable dynamic updates"
+	
+	# Now, the client can run a install
+	rlRun "iparhts-sync-set -s DUPDATE-READY"
+	rlRun "iparhts-sync-block -s DUPDATE-FIRST-INSTALL-COMPLETE $BEAKERCLIENT"
+	
+	rlRun "ipa dnsrecord-find $DOMAIN $client_s | grep $badip" 0 "Positive test. Make sure that the A record did not change after ipa-client-install"
+
+	rlRun "iparhts-sync-set -s DUPDATE-NEXT-CLEANUP"
+	rlRun "iparhts-sync-block -s DUPDATE-NEXT-CLEANUP-COMPLETE $BEAKERCLIENT"
+	
+	# First test group complete. Try it all again with dynamic updates enabled
+	echo y | ipa dnsrecord-del $DOMAIN $client_s
+	rlRun "ipa dnsrecord-add  $DOMAIN $client_s --a-rec=$badip" 0 "create A record for client with a bad IP"
+	rlRun "ipa dnsrecord-find $DOMAIN $client_s | grep $badip" 0 "Make sure the bad A record was created."
+	
+	# Enable Dynamic update
+	rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=TRUE" 0 "Enable dynamic updates"
+
+	# Now, let the client install again to ensure dynamic update behavior.
+	rlRun "iparhts-sync-set -s DUPDATE-FINAL-INSTALL"
+
+	# Wait for the client to install.
+	rlRun "iparhts-sync-block -s DUPDATE-FINAL-UPDATE-COMPLETE $BEAKERCLIENT"
+
+	rlRun "ipa dnsrecord-find $DOMAIN $client_s | grep $badip" 1 "Negative test. Make sure that the A record did change after ipa-client-install"
+	rlRun "ipa dnsrecord-find $DOMAIN $client_s | grep $ipaddr" 0 "Positive test. Make sure that the A record changed to the current ipa client address."
+
+	# Now we are done. Time to clean up.
+	rlRun "iparhts-sync-set -s DUPDATE-MASTER-COMPLETE"
+
+}
+
+##########################################################
+# Test set to cover the dynamic updates feature of IPA server
+# Test designed to run with one master, and one client
+# This is the portion of the code to run on the client
+# Prequists are that the client has had uninstall_fornexttest run before starting this test.
+##########################################################
+dynamic_update_client()
+{
+	rlRun "iparhts-sync-block -s DUPDATE-READY $MASTER"
+	# Master is set up. Run client install.
+	rlRun "ipa-client-install -p admin -w $ADMINPW --server=$MASTER --domain=$DOMAIN -U --enable-dns-updates" 0 "Install the client. The IP on the master should not update"
+	rlRun "iparhts-sync-set -s DUPDATE-FIRST-INSTALL-COMPLETE"
+	rlRun "iparhts-sync-block -s DUPDATE-NEXT-CLEANUP $MASTER"
+	uninstall_fornexttest
+	rlRun "iparhts-sync-set -s DUPDATE-NEXT-CLEANUP-COMPLETE"
+	rlRun "iparhts-sync-block -s DUPDATE-FINAL-INSTALL $MASTER"
+	# Repeat the install. 
+	rlRun "ipa-client-install -p admin -w $ADMINPW --server=$MASTER --domain=$DOMAIN -U --enable-dns-updates" 0 "Install the client. The IP on the master should not update"
+	ipaddr=$(host $BEAKERCLIENT | cut -d\  -f4)
+	rlRun "ipa dnsrecord-find $DOMAIN $client_s | grep $ipaddr" 0 "Positive test. Make sure that the A record changed to the current ipa client address."
+	rlRun "iparhts-sync-set -s DUPDATE-FINAL-UPDATE-COMPLETE"
+	
+	rlRun "iparhts-sync-block -s DUPDATE-MASTER-COMPLETE $MASTER"
+	uninstall_fornexttest
+	rlRun "iparhts-sync-set -s DUPDATE-COMPLETE"
+}
+
 install_setup()
 {
     echo $SLAVE
@@ -215,9 +302,7 @@ ipaclientinstall_adminpwd()
     rlPhaseEnd
 }
 
-
   ##########################################################
-
 ipaclientinstall_allparam()
 {
     rlPhaseStartTest "ipa-client-install-02- [Positive] Install with all param"

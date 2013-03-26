@@ -42,6 +42,7 @@
 . ./t.ipa-client-install.bug.sh
 #. ../quickinstall/install-lib.sh
 . ../quickinstall/ipa-install.sh
+. /opt/rhqa_ipa/lib.ipa-rhts.sh
 
 
 PACKAGE="ipa-client"
@@ -57,6 +58,7 @@ rlJournalStart
         rlLog "Creating tmp directory"
         TmpDir=`mktemp -d`
         pushd $TmpDir
+	setup_iparhts_sync
         slave_count=$(echo $SLAVE | wc -w)
         echo "Slave count is $slave_count"
         #####################################################################
@@ -82,7 +84,11 @@ rlJournalStart
            ipaclientinstall
            ipa_bug_verification
           fi
-	   rlRun "rhts-sync-set -s DONE"
+           uninstall_fornexttest # Ensure cleanup
+	   rlRun "iparhts-sync-set -s DONE"
+	  if [ $slave_count -eq 1 ];then
+           dynamic_update_client # run client tests covering the dynamic update feature
+	  fi
 	else
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
 	fi
@@ -93,9 +99,12 @@ rlJournalStart
         rc=0
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-				ipamastersetup
-                rlRun "rhts-sync-block -s DONE $BEAKERCLIENT"
-				ipamastercleanup
+		ipamastersetup
+                rlRun "iparhts-sync-block -s DONE $BEAKERCLIENT"
+		if [ $slave_count -eq 1 ];then
+			dynamic_update_master # Run portion of tests covering the dynamic update feature
+		fi
+		ipamastercleanup
                 rlPass
         else
                 rlLog "Machine in recipe in not a MASTER"
@@ -108,7 +117,7 @@ rlJournalStart
         for R in $(eval echo $SLAVE); do
          echo $R | grep $HOSTNAME
           if [ $? -eq 0 ] ; then
-                rlRun "rhts-sync-block -s DONE $BEAKERCLIENT"
+                rlRun "iparhts-sync-block -s DONE $BEAKERCLIENT"
                 rlPass
           else
                 rlLog "Machine in recipe in not a SLAVE"
