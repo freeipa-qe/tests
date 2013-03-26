@@ -68,6 +68,8 @@ rlJournalStart
         export CLIENT_IP=$(dig +short $(eval echo \$BEAKERCLIENT1_env${MYENV}) A)
         export MYBEAKERCLIENT=$(eval echo \$BEAKERCLIENT1_env${MYENV})
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
+
+        rlRun "yum -y install strace"
     rlPhaseEnd
     
     # Main test functions in tests.d/t.tests.sh:
