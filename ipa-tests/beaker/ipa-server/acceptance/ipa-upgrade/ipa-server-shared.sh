@@ -1026,6 +1026,11 @@ ipa_quick_uninstall(){
 		rlRun "certutil -D -d /etc/pki/nssdb -n 'IPA CA'"
 	fi
 
+    rlRun "service certmonger stop"
+    if [ -d /var/lib/certmonger ]; then
+        rlRun "rm -rf /var/lib/certmonger"
+    fi
+
 } #ipa_quick_uninstall 
 
 ipa_quick_remove()
