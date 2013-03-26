@@ -137,7 +137,7 @@ ipaclientinstall()
 # This is the portion of code that is to run on the master
 # Prequists are that the client has had uninstall_fornexttest run before starting this test.
 ##########################################################
-dynamic_update_server()
+dynamic_update_master()
 {
     rlPhaseStartTest "ipa-client-install: Dynamic update test"
 	# Remove any entried for the current client
