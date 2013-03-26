@@ -47,7 +47,7 @@
 
 PACKAGE="ipa-client"
 SERVICE="ipa_kpasswd"
-HOSTNAME=$(hostname)
+HOSTNAME=$(hostname -s)
 
 ##########################################
 #   test main
