@@ -139,6 +139,7 @@ ipaclientinstall()
 ##########################################################
 dynamic_update_server()
 {
+    rlPhaseStartTest "ipa-client-install: Dynamic update test"
 	# Remove any entried for the current client
 	client_s=$(echo  $BEAKERCLIENT | cut -d\. -f1)
 	echo y | ipa dnsrecord-del $DOMAIN $client_s
@@ -188,6 +189,7 @@ dynamic_update_server()
 
 	# Now we are done. Time to clean up.
 	rlRun "iparhts-sync-set -s DUPDATE-MASTER-COMPLETE"
+    rlPhaseEnd
 
 }
 
@@ -199,6 +201,7 @@ dynamic_update_server()
 ##########################################################
 dynamic_update_client()
 {
+    rlPhaseStartTest "ipa-client-install: Dynamic update test"
 	rlRun "iparhts-sync-block -s DUPDATE-READY $MASTER"
 	# Master is set up. Run client install.
 	rlRun "ipa-client-install -p admin -w $ADMINPW --server=$MASTER --domain=$DOMAIN -U --enable-dns-updates" 0 "Install the client. The IP on the master should not update"
@@ -216,6 +219,7 @@ dynamic_update_client()
 	rlRun "iparhts-sync-block -s DUPDATE-MASTER-COMPLETE $MASTER"
 	uninstall_fornexttest
 	rlRun "iparhts-sync-set -s DUPDATE-COMPLETE"
+    rlPhaseEnd
 }
 
 install_setup()
