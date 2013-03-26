@@ -89,6 +89,11 @@ ipa_upgrade_master_replica_parallel()
         rlRun "env|sort"
         # Install and setup environment and add data
         ipa_upgrade_install_master
+        if [ -f /var/log/ipaserver-install.log ]; then
+            log1=/var/log/ipaserver-install.log
+            rlRun "cp $log1 $log1.parallel"
+            rlRun "rhts-submit-log -l $log1.parallel"
+        fi
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
         ipa_upgrade_data_add $MYBEAKERMASTER

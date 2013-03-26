@@ -725,6 +725,7 @@ fixHostFile()
     done
 
     rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+    rlRun "cat /etc/hosts"
 }
 
 fixHostFileIPv6()
@@ -784,6 +785,7 @@ fixResolv()
         rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
         rlRun "rm -f /etc/resolv.conf.new"
     fi
+    rlRun "cat /etc/resolv.conf"
 }
 
 fixResolvIPv6()
