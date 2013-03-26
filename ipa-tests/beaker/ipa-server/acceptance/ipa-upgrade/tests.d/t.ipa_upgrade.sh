@@ -139,6 +139,7 @@ upgrade_master_replica()
         rlRun "yum clean all"
         rlRun "yum -y update 'ipa*'"    
         rlRun "yum -y update redhat-release"
+        rlRun "ipactl restart"
         rlRun "ipactl status"
         rlRun "service sssd status"
         rlRun "service sssd restart"

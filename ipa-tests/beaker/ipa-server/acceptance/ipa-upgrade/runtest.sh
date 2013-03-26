@@ -99,8 +99,8 @@ rlJournalStart
     #fi
     ipa_upgrade_master_replica_client_inc_cleanup
 
-    ipa_upgrade_test_master_replica_parallel
-    ipa_upgrade_test_master_slave_client_all
+    ipa_upgrade_master_replica_parallel
+    ipa_upgrade_master_slave_client_all
     #upgrade_test_client_slave_master_all
     #upgrade_test_master_slave_client_nodns
     #upgrade_test_master_slave_client_dirsrv_off

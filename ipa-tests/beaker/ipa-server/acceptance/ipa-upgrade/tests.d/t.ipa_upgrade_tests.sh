@@ -77,7 +77,7 @@ ipa_upgrade_master_replica_client_all()
     rlPhaseEnd
 }
     
-ipa_upgrade_test_master_replica_parallel()
+ipa_upgrade_master_replica_parallel()
 {
     reset_repos
     USEDNS="yes"
@@ -92,6 +92,7 @@ ipa_upgrade_test_master_replica_parallel()
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
         ipa_upgrade_data_add $MYBEAKERMASTER
+        ipa_upgrade_data_check $MYBEAKERMASTER
     rlPhaseEnd
         
     rlPhaseStartTest "ipa_upgrade_test_master_replica_parallel_1: test upgrade with new master, old replica, and old client"
