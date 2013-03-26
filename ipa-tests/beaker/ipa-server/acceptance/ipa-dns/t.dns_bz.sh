@@ -56,9 +56,7 @@ dnsbugs()
    # Note: this test possibly creates an env that is not good for further tests. Not recovering correctly
    # bz767496
 
-# test to be rewritten - in backlog
-#   bz798355
-
+   #   bz798355 Test moved to install-client-cli test
    dnsbugcleanup
 }
 
@@ -1031,21 +1029,6 @@ bz809565()
 
 		ipa dnszone-del $tzone # Cleanup the zone in case it was created
 		
-	rlPhaseEnd
-}
-
-bz798355()
-{
-	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=798355
-        # https://engineering.redhat.com/trac/ipa-tests/ticket/553
-        # automation moved to backlog. test below should be updated based on steps to verify listed in bz.
-	rlPhaseStartTest "Bug 798355 -  Fill DNS update policy by default"
-		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=TRUE" 0 "Enable Dynamic update." 
-		rlRun "ipa dnszone-show --rights $DOMAIN --all | grep BIND\ update | grep 'grant $RELM krb5-self'" 0 "Make sure that the correct update string was added"
-		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=FALSE" 0 "Diable Dynamic update." 
-		rlRun "ipa dnszone-show --rights $DOMAIN --all | grep BIND\ update | grep 'grant $RELM krb5-self'" 2 "Make sure that the correct update string no longer exists"
-		rlRun "ipa dnszone-mod $DOMAIN --dynamic-update=TRUE" 0 "Enable Dynamic update." 
-
 	rlPhaseEnd
 }
 
