@@ -86,9 +86,7 @@ rlJournalStart
           fi
            uninstall_fornexttest # Ensure cleanup
 	   rlRun "iparhts-sync-set -s DONE"
-	  if [ $slave_count -eq 1 ];then
            dynamic_update_client # run client tests covering the dynamic update feature
-	  fi
 	else
 	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
 	fi
@@ -101,9 +99,8 @@ rlJournalStart
         if [ $? -eq 0 ] ; then
 		ipamastersetup
                 rlRun "iparhts-sync-block -s DONE $BEAKERCLIENT"
-		if [ $slave_count -eq 1 ];then
-			dynamic_update_master # Run portion of tests covering the dynamic update feature
-		fi
+		dynamic_update_master # Run portion of tests covering the dynamic update feature
+                                      # AKA Bug https://bugzilla.redhat.com/show_bug.cgi?id=798355 test
 		ipamastercleanup
                 rlPass
         else

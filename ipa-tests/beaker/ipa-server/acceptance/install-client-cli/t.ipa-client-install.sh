@@ -212,8 +212,6 @@ dynamic_update_client()
 	rlRun "iparhts-sync-block -s DUPDATE-FINAL-INSTALL $MASTER"
 	# Repeat the install. 
 	rlRun "ipa-client-install -p admin -w $ADMINPW --server=$MASTER --domain=$DOMAIN -U --enable-dns-updates" 0 "Install the client. The IP on the master should not update"
-	ipaddr=$(host $BEAKERCLIENT | cut -d\  -f4)
-	rlRun "ipa dnsrecord-find $DOMAIN $client_s | grep $ipaddr" 0 "Positive test. Make sure that the A record changed to the current ipa client address."
 	rlRun "iparhts-sync-set -s DUPDATE-FINAL-UPDATE-COMPLETE"
 	
 	rlRun "iparhts-sync-block -s DUPDATE-MASTER-COMPLETE $MASTER"
