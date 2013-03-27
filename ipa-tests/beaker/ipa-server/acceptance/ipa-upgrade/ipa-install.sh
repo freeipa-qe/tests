@@ -1071,7 +1071,7 @@ ipa_install_client()
     fi
     rlRun "ipa-client-install $IPA_CLIENT_OPTIONS"
     if [ $? -gt 0 ]; then
-        rlRun "submit_log /var/log/ipareplica-install.log"
+        rlRun "submit_log /var/log/ipaclient-install.log"
     fi
 
     ipa_install_sssd_workarounds

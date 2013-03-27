@@ -96,6 +96,8 @@ ipa_upgrade_master_replica_parallel()
         fi
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
+        rlLog "DEBUG SLEEP"
+        rlRun "sleep 1000000"
         ipa_upgrade_data_add $MYBEAKERMASTER
         ipa_upgrade_data_check $MYBEAKERMASTER
     rlPhaseEnd
