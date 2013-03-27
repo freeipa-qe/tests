@@ -343,11 +343,11 @@ bz804619()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=804619
         rlPhaseStartTest "bz804619 DNS zone serial number is not updated"
-		rlRun "ipa dnszone-show $DOMAIN"
-		serial=`ipa dnszone-show $DOMAIN  --all --raw | grep idnssoaserial | cut -d :  -f 2`
+		rlLog "Executing: ipa dnszone-show $DOMAIN --all --raw to get idnssoaserial"
+		serial=`ipa dnszone-show $DOMAIN  --all --raw | grep -i idnssoaserial | cut -d :  -f 2`
 
 		rlRun "ipa dnsrecord-add $DOMAIN dns175 --a-rec=192.168.0.1"
-		newserial=`ipa dnszone-show $DOMAIN  --all --raw | grep idnssoaserial | cut -d :  -f 2`
+		newserial=`ipa dnszone-show $DOMAIN  --all --raw | grep -i idnssoaserial | cut -d :  -f 2`
 		if [ $serial -eq $newserial ]; then
 			rlFail "idnssoaserial has not changed, not as expected, GOT: $newserial"
 		else
@@ -373,7 +373,7 @@ bz795414()
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=795414
 	rlPhaseStartTest "bz795414 Dynamic database plug-in cannot change BIND root zone forwarders while plug-in start"
 		rlAssertGrep "forwarders" "/etc/named.conf"
-		rlRun "ipa dnszone-mod $DOMAIN --forwarder=10.65.202.128,10.65.202.129 --forward-policy=first" 
+		rlRun "ipa dnszone-mod $DOMAIN --forwarder=10.65.202.128 --forwarder=10.65.202.129 --forward-policy=first" 
 
 		rlRun "ipa dnszone-mod $DOMAIN --forwarder= --forward-policy=" 0 "Removing forwarders and forward-policy"
 
@@ -691,7 +691,7 @@ bz819635()
 		kdestroy
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep global\ forwarders" 1 "Ensure old string does not exist in help section"
-		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep per-zone\ forwarders" 0 "Ensure new string does not exist in help section"
+		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep -i per-zone\ forwarders" 0 "Ensure new string does not exist in help section"
 
 	rlPhaseEnd
 }
@@ -760,6 +760,7 @@ bz817413()
 	# 2. top-level domain must be alphabetic: sub.123
 	# 3. Valid characters are a-z0-9. dash is allowed but it can't be first or last.
 	# 4. An component can't be longer than 63 characters.
+        # 03/26 Update: Condition 2 is dropped - discussed with akrivoka, pspacek
 	rlPhaseStartTest "817413: test of invalid characters in domain name"
 		temail="ipaqar.redhat.com"
 		tserial=2010010701
@@ -780,9 +781,10 @@ bz817413()
 		# 2.
 		# Attempt adding a zone with a numeric TLD
 		tzone="domain.numeric.123"
-		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 1 "Attempt adding a domain with a numeric TLD"
-		rlRun "ipa dnszone-find $tzone" 1 "ensure that ipa cannot find the zone."
-		ipa dnszone-del $tzone # Cleanup the zone in case it was created
+		rlLog "Executing: ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone"
+		rlRun "ipa dnszone-add --name-server=$tipaddr --admin-email=$temail --serial=$tserial --refresh=$trefresh --retry=$tretry --expire=$texpire --minimum=$tminimum --ttl=$tttl $tzone" 0 "adding a domain with a numeric TLD"
+		rlRun "ipa dnszone-find $tzone" 0 "ensure that ipa can find the zone."
+		ipa dnszone-del $tzone # Cleanup the zone 
 
 		# 3.
 		# Attempt adding a zone with a dash at the start
@@ -1042,6 +1044,7 @@ bz829388()
 		rlRun "ipa dnsrecord-add $DOMAIN $host --cname-rec=$host" 0 "Add a dns record to test zone transfers with"
 		rlRun "dig -t AXFR @$MASTER $DOMAIN | grep $host.$DOMAIN." 0 "Ensure that $host.$DOMAIN is in the list of AXFR records as a FQDN BZ 829388"
 		rlRun "ipa dnsrecord-del $DOMAIN $host --cname-rec=$host" 0 "Cleanup added DNS record."
+		rlRun "ipa dnszone-mod $DOMAIN --allow-transfer='none;'" 0 "Reset DNS zone transfers setting"
 	rlPhaseEnd
 }
 
