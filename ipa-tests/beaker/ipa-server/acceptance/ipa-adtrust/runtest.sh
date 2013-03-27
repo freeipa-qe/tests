@@ -84,7 +84,7 @@ rlJournalStart
 
 # Include test case file
 . ./t.ipa-adtrust.sh
-
+. ./t.ipa-adtrust.bug.sh
 #PACKAGE="ipa-server"
 ##########################################
 #   Sanity Tests
@@ -125,13 +125,18 @@ rlJournalStart
 		"adtrust_test_0032"
 		"adtrust_test_0033"
 		"adtrust_test_0034"
-	}
+        }
+	
+	adtrust_bug() {
+		"bz_867442"
+	}	
 
     # Setup
 	setup
 
     # tests start...
 	adtrust_connect
+        adtrust_bug
     # tests end...
 
     # Cleanup
