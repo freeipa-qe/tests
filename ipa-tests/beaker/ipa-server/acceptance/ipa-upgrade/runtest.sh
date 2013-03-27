@@ -55,9 +55,9 @@ done
 
 rlJournalStart
     rlPhaseStartSetup "ipa-upgrade startup: Initial upgrade setup and pre-checks"
+        ipa_install_set_vars
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
-        ipa_install_set_vars
         export MASTER_S=$(echo $MASTER|cut -f1 -d.)
         export MASTER_IP=$(dig +short $(eval echo \$BEAKERMASTER_env${MYENV}) A)
         export MYBEAKERMASTER=$(eval echo \$BEAKERMASTER_env${MYENV})
