@@ -1705,7 +1705,8 @@ stop_ipa_master()
        #Stoping ipa sevice on $MASTER
         echo "service ipa stop" > $TmpDir/local.sh
         chmod +x $TmpDir/local.sh
-        ssh -o StrictHostKeyChecking=no root@$BEAKERMASTER 'bash -s' < $TmpDir/local.sh
+        #ssh -o StrictHostKeyChecking=no root@$BEAKERMASTER 'bash -s' < $TmpDir/local.sh
+        ssh root@$MASTER 'bash -s' < $TmpDir/local.sh
         sleep 2
 }
 
@@ -1714,7 +1715,8 @@ start_ipa_master()
       #Starting ipa sevice on $MASTER
         echo "service ipa start" > $TmpDir/local.sh
         chmod +x $TmpDir/local.sh
-        ssh -o StrictHostKeyChecking=no root@$BEAKERMASTER 'bash -s' < $TmpDir/local.sh
+        #ssh -o StrictHostKeyChecking=no root@$BEAKERMASTER 'bash -s' < $TmpDir/local.sh
+        ssh root@$MASTER 'bash -s' < $TmpDir/local.sh
         sleep 2
 }
 
@@ -1726,10 +1728,12 @@ sssd_cache_cleanup()
         echo "sleep 3" >> $TmpDir/local.sh
         chmod +x $TmpDir/local.sh
         if [ -n $CLIENT ] ; then
-         ssh -o StrictHostKeyChecking=no root@$BEAKERCLIENT 'bash -s' < $TmpDir/local.sh
+         #ssh -o StrictHostKeyChecking=no root@$BEAKERCLIENT 'bash -s' < $TmpDir/local.sh
+         ssh root@$CLIENT 'bash -s' < $TmpDir/local.sh
         else
         sleep 2
-         ssh -o StrictHostKeyChecking=no root@$BEAKERMASTER 'bash -s' < $TmpDir/local.sh
+         #ssh -o StrictHostKeyChecking=no root@$BEAKERMASTER 'bash -s' < $TmpDir/local.sh
+         ssh root@$MASTER 'bash -s' < $TmpDir/local.sh
         fi
         sleep 2
 }
