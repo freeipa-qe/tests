@@ -90,7 +90,7 @@ rlJournalStart
 
 # Include test case file
 . ./t.ipa-trust-cli.sh
-
+. ./t.ipa-trust-cli.bug.sh
 #PACKAGE="ipa-server"
 ##########################################
 #   Sanity Tests
@@ -130,11 +130,15 @@ rlJournalStart
 		"trust_test_0031"
 	}
 
+	trust_bug() {
+		"bz_867442"
+	}
     # Setup
 	setup
 
     # tests start...
 	trust_connect
+	trust_bug
     # tests end...
 
     # Cleanup
