@@ -237,3 +237,32 @@ Trust_Show() {
 	  expect "Trust type: Active Directory domain" { send_user "\nShowing trust interactively\n"; exit 0 }' >> $expfile
 	fi
 }
+
+NBAD_Exp() {
+
+        rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]' > $expfile
+        echo 'set var2 [lindex $argv 1]' >> $expfile
+        echo 'set var3 [lindex $argv 2]' >> $expfile
+        echo 'set var4 [lindex $argv 3]' >> $expfile
+        echo 'set var5 [lindex $argv 4]' >> $expfile
+        echo 'set timeout 30
+        set send_slow {1 .1}' >> $expfile
+        echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
+        echo 'expect "Overwrite smb.conf?*: "' >> $expfile
+        echo 'send -s -- "y\r"' >> $expfile
+        echo 'expect "*assword: "' >> $expfile
+        echo "send -s -- \"$adminpw\r\"" >> $expfile
+#       echo 'expect  "*ipa-sidgen task? *: "' >> $expfile 
+#       echo 'send -- "\r"' >> $expfile
+        echo 'expect "*reset the NetBIOS domain name? *: "' >> $expfile
+        echo 'send -s -- "y\r"' >> $expfile
+        echo 'expect "Setup*complete"' >> $expfile
+        echo 'send_user "\nADtrust installed.\n"' >> $expfile
+        echo "spawn $ipacmd trust-add --type=ad \$var3 --admin \$var4 --password" >> $expfile
+        echo 'expect "*assword: "' >> $expfile
+        echo 'send -s -- "$var5\r"' >> $expfile
+        echo 'expect "*the IPA server and the remote domain cannot share the same NetBIOS name*" {send_user "\nTrust added failed as expected\n"; exit 2}' >> $expfile
+
+
+}
