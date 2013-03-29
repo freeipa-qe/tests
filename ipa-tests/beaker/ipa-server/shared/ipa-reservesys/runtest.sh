@@ -63,8 +63,8 @@ send_day_remaining_notice()
 {
 hostname=$(hostname)
 currentseconds=$(date +%s)
-let endfromnow=$endseconds-$currentseconds
-enddate=$(date --date="$endfromnow seconds")
+let endseconds=$starttime+$RESERVETIME
+enddate=$(date --date="$endseconds seconds")
 echo "Subject: Reservation expiration notice for $hostname with job $JOBID
 This is the machine at $hostname.
 
@@ -79,6 +79,9 @@ and extend the reservation with the extendreservation.sh script.
 Find information on this job at: Watch the progress at: https://beaker.engineering.redhat.com/jobs/$JOBID
 Or, if in mountain view: http://hammer1.dsdev.sjc.redhat.com/bkr/jobs/$JOBID
 
+endseconds is $endseconds
+starttime is $starttime
+reservetime is $RESERVETIME
 Have a nice day." > $ipatmp/end-email.txt
         sendmail -fbeaker@redhat.com $SUBMITTER < $ipatmp/end-email.txt
 }
