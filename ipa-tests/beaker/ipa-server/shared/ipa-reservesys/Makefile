@@ -24,7 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export TEST=/CoreOS/ipa-server/IpaReserveSys
-export TESTVERSION=3.9
+export TESTVERSION=3.10
 
 BUILT_FILES=
 

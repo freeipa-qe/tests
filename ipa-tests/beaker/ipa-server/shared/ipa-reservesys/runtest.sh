@@ -64,7 +64,7 @@ send_day_remaining_notice()
 hostname=$(hostname)
 currentseconds=$(date +%s)
 let endseconds=$starttime+$RESERVETIME
-enddate=$(date --date="$endseconds seconds")
+enddate=$(date --date="$RESERVETIME seconds")
 echo "Subject: Reservation expiration notice for $hostname with job $JOBID
 This is the machine at $hostname.
 
@@ -84,6 +84,7 @@ starttime is $starttime
 reservetime is $RESERVETIME
 Have a nice day." > $ipatmp/end-email.txt
         sendmail -fbeaker@redhat.com $SUBMITTER < $ipatmp/end-email.txt
+env
 }
 
 send_end_notice()
