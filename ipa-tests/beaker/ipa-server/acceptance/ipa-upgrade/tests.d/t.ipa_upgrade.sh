@@ -201,8 +201,8 @@ upgrade_replica()
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
 
         
-        rlRun "tar zcvf /tmp/sssd_cache.$DDATE.post-upgrade.tgz /var/lib/sss"
-        rlRun "rhts-submit-log -l /tmp/sssd_cache.$DDATE.post-upgrade.tgz"
+        #rlRun "tar zcvf /tmp/sssd_cache.$DDATE.post-upgrade.tgz /var/lib/sss"
+        #rlRun "rhts-submit-log -l /tmp/sssd_cache.$DDATE.post-upgrade.tgz"
 
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERREPLICA1"
         ;;

@@ -100,13 +100,13 @@ rlJournalStart
     ipa_upgrade_master_replica_client_inc_cleanup
 
     ipa_upgrade_master_replica_parallel
-    ipa_upgrade_master_slave_client_all
-    #upgrade_test_client_slave_master_all
-    #upgrade_test_master_slave_client_nodns
-    #upgrade_test_master_slave_client_dirsrv_off
+    ipa_upgrade_master_replica_client_all
+    #upgrade_test_client_replica_master_all
+    #upgrade_test_master_replica_client_nodns
+    #upgrade_test_master_replica_client_dirsrv_off
     #upgrade_test_master_bz_866977
     #upgrade_test_master_bz_tests
-    #upgrade_test_master_slave_client_all_final
+    #upgrade_test_master_replica_client_all_final
 
     rlPhaseStartCleanup "ipa-upgrade cleanup"
         rlRun "popd"

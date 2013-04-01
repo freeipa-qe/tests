@@ -497,15 +497,18 @@ function ipa_quicktest_automember_check()
     rlRun "cat $tmpout"
     rlAssertGrep "Member of groups.*${amgroup1}" $tmpout
     rlRun "sleep 10"
-    rlRun "strace -vtfo /tmp/strace_getent.$DDATE getent -s sss group ${amgroup1}| grep ${amuser1}"
-    if [ $? -ne 0 ]; then
-        rlRun "tar zcvf /tmp/sssd_cache.$DDATE.getent-failure.tgz /var/lib/sss"
-        rlRun "rhts-submit-log -l /tmp/sssd_cache.$DDATE.getent-failure.tgz"
-        rlRun "rhts-submit-log -l /var/log/sssd/sssd_${DOMAIN}.log"
-        for sfile in $(/bin/ls /tmp/strace_getent.${DDATE}*); do
-            rlRun "rhts-submit-log -l $sfile"
-        done
-    fi
+    rlRun "id $amuser1"
+    rlRun "getent -s sss group ${amgroup1}| grep ${amuser1}"
+    # commenting out debugging for automember getent failure
+    #rlRun "strace -vtfo /tmp/strace_getent.$DDATE getent -s sss group ${amgroup1}| grep ${amuser1}"
+    #if [ $? -ne 0 ]; then
+    #    rlRun "tar zcvf /tmp/sssd_cache.$DDATE.getent-failure.tgz /var/lib/sss"
+    #    rlRun "rhts-submit-log -l /tmp/sssd_cache.$DDATE.getent-failure.tgz"
+    #    rlRun "rhts-submit-log -l /var/log/sssd/sssd_${DOMAIN}.log"
+    #    for sfile in $(/bin/ls /tmp/strace_getent.${DDATE}*); do
+    #        rlRun "rhts-submit-log -l $sfile"
+    #    done
+    #fi
 
 
     rlLog "Confirm host added as member of ${amhostgroup1}"
