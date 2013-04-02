@@ -400,3 +400,12 @@ Unattended_Exp() {
 }
         send_user "\nUnattended ADtrust install was successful.\n"' >> $expfile
 }
+
+NB_Unattached() {
+        rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]' > $expfile
+        echo 'set timeout 30
+        set send_slow {1 .1}' >> $expfile
+        echo "spawn $trust_bin -a \$var1 -U" >> $expfile
+        echo 'expect "Setup*complete"' >> $expfile
+}
