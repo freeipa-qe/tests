@@ -19,3 +19,11 @@ rlPhaseEnd
 
 }
 
+bz_924079() {
+
+rlPhaseStartTest "Unattended install should use the default netbios name otherwise it prompts"
+	rlRun "NB_Unattached" 0 "Creating expected script"
+	rlRun "$exp $expfile  $adminpw" 0 "Unattended install succeeded  as expected"
+
+
+}
