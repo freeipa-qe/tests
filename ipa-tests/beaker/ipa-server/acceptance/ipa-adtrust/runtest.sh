@@ -128,7 +128,8 @@ rlJournalStart
         }
 	
 	adtrust_bug() {
-		"bz_866966"	
+		"bz_866966"
+		"bz_924079"	
 	}	
 
     # Setup
