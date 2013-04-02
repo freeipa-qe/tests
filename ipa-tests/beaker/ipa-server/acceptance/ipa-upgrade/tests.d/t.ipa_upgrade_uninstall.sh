@@ -58,6 +58,7 @@ ipa_upgrade_uninstall_master()
         fi
 
         rlLog "MASTER=$MASTER"
+        export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
         #[ -n "$MYBEAKERMASTER" ] && MASTER="$(echo $MYBEAKERMASTER|cut -f1 -d.).${DOMAIN}"
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERMASTER"
         ;;
@@ -105,6 +106,7 @@ ipa_upgrade_uninstall_replica()
             rlRun "rm -rf /var/lib/certmonger"
         fi
 
+        export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
         #[ -n $MYBEAKERREPLICA1 ] && REPLICA="$(echo $MYBEAKERREPLICA1|cut -f1 -d.).${DOMAIN}"
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.2' -m $MYBEAKERREPLICA1"
         ;;
@@ -160,6 +162,7 @@ ipa_upgrade_uninstall_client()
             rlRun "rm -rf /var/lib/certmonger"
         fi
 
+        export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
         #[ -n "$MYBEAKERCLIENT" ] && CLIENT="$(echo $MYBEAKERCLIENT|cut -f1 -d.).${DOMAIN}"
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.1' -m $MYBEAKERCLIENT"
         rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT.2' $MYBEAKERMASTER"
