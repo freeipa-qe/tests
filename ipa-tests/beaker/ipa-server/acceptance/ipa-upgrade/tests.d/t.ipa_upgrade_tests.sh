@@ -46,11 +46,12 @@ ipa_upgrade_master_replica_client_all()
         ipa_upgrade_install_master
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
-        ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
+        ipa_upgrade_data_add $MYBEAKERMASTER
     rlPhaseEnd
         
     rlPhaseStartTest "ipa_upgrade_master_replica_client_all_1: test upgrade with new master, old replica, and old client"
         upgrade_master 
+        ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
