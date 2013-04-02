@@ -1035,12 +1035,13 @@ ipa_quick_uninstall(){
 
 ipa_quick_remove()
 {
-    rlRun "yum --rpmverbosity=debug -y remove 'ipa*' '389-ds-base*' bind krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd httpd-tools"
-    rlRun "yum --rpmverbosity=debug -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client 'pki*' 'tomcat6*' mod_nss"
-    rlRun "yum --rpmverbosity=debug -y remove memcached python-memcached"
-    rlRun "yum --rpmverbosity=debug -y remove libldb libsss_autofs"
-    rlRun "yum --rpmverbosity=debug -y downgrade krb5-devel krb5-libs bind-*"
-    rlRun "yum --rpmverbosity=debug -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
+    yum_opts="--rpmverbosity=debug"
+    rlRun "yum -y remove 'ipa*' '389-ds-base*' bind krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd httpd-tools"
+    rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client 'pki*' 'tomcat6*' mod_nss"
+    rlRun "yum -y remove memcached python-memcached"
+    rlRun "yum -y remove libldb libsss_autofs"
+    rlRun "yum -y downgrade krb5-devel krb5-libs bind-*"
+    rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

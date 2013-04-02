@@ -598,6 +598,11 @@ function ipa_quicktest_ssh_add()
         rlLog "User ${sshuser1} already exists"
     fi
     
+    if [ -f /tmp/id_rsa_${sshuser1} ]; then
+        rlRun "rm -f /tmp/id_rsa_${sshuser1}"
+        rlRun "rm -f /tmp/id_rsa_${sshuser1}.pub"
+    fi
+
     ipa user-show ${sshuser1} --raw|grep sshpubkeyfp >/dev/null 2>&1
     if [ $? -ne 0 ]; then
         rlRun "ssh-keygen -q -t rsa -N '' -f /tmp/id_rsa_${sshuser1}"
