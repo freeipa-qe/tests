@@ -107,7 +107,7 @@ ipa_upgrade_data_check()
         return 0
     fi
 
-    KinitAsAdmin
+    rlRun "KinitAsAdmin"
     rlRun "sleep 10" # delay before starting tests...
 
     # check replica update schedule 
@@ -158,7 +158,7 @@ ipa_upgrade_data_del()
         return 0
     fi
 
-    KinitAsAdmin
+    rlRun "KinitAsAdmin"
     
     if [ $runver -ge 60 ]; then
         ipa_quicktest_selfservice_del
