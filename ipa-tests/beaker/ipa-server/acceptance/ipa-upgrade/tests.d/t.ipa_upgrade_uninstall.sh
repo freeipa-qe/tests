@@ -49,8 +49,23 @@ ipa_upgrade_uninstall_master()
     case "$MYROLE" in
     MASTER*)
         rlLog "Machine in recipe is MASTER"
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
         ipa_quick_uninstall
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
         ipa_quick_remove
+
+        rlRun "find /var/lib/certmonger -ls"
+
         rlRun "yum -y downgrade redhat-release-server"
 
         if [ -d /var/lib/certmonger ]; then
@@ -98,8 +113,23 @@ ipa_upgrade_uninstall_replica()
     REPLICA*)
         rlLog "Machine in recipe is REPLICA"
         rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT.1' $MYBEAKERMASTER"
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
         ipa_quick_uninstall
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
         ipa_quick_remove
+
+        rlRun "find /var/lib/certmonger -ls"
+
         rlRun "yum -y downgrade redhat-release-server"
 
         if [ -d /var/lib/certmonger ]; then
@@ -153,8 +183,23 @@ ipa_upgrade_uninstall_client()
         rlLog "Machine in recipe is CLIENT"
         KinitAsAdmin
         kdestroy
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
         ipa_quick_uninstall
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
         ipa_quick_remove
+
+        rlRun "find /var/lib/certmonger -ls"
+
         rlRun "yum -y downgrade redhat-release-server"
         rlRun "yum -y remove http*"
 
