@@ -100,6 +100,7 @@ upgrade_master()
         rlRun "yum clean all"
         rlRun "yum -y update 'ipa*'"    
         rlRun "yum -y update redhat-release"
+        rlRun "ipactl restart"
         rlRun "ipactl status"
         rlRun "service sssd status"
         rlRun "service sssd restart"
@@ -185,6 +186,7 @@ upgrade_replica()
         rlRun "yum clean all"
         rlRun "yum -y update 'ipa*'"    
         rlRun "yum -y update redhat-release"
+        rlRun "ipactl restart"
         rlRun "ipactl status"
 
         #if [ ! -f /etc/sssd/sssd.conf.getent ]; then
