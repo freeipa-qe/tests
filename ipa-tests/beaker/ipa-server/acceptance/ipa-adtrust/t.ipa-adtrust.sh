@@ -530,7 +530,7 @@ rlPhaseEnd
 
 adtrust_test_0033() {
 
-rlPhaseStartTest "0033 ipa-adtrust-install fails with syntax error in ipachangecon - BZ 916209 and 917065"
+rlPhaseStartTest "0033 ipa-adtrust-install fails with syntax error in ipachangeconf - BZ 916209 and 917065"
 	sed -i 's/dns_lookup_kdc.*/dns_lookup_kdc \= false/' /etc/krb5.conf
 	if [ $? -eq 0 ]; then 
 	  rlPass "Setting dns_lookup_kdc to false"
