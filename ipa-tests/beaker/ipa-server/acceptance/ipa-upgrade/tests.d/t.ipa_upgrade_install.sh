@@ -51,6 +51,12 @@ ipa_upgrade_install_master()
     MASTER*)
         rlLog "Machine in recipe is MASTER"
         ipa_install_master
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERMASTER"
         ;;
     REPLICA*)
@@ -80,6 +86,12 @@ ipa_upgrade_install_replica()
     REPLICA*)
         rlLog "Machine in recipe is REPLICA"
         ipa_install_replica $MASTER
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
 
         #if [ ! -f /etc/sssd/sssd.conf.backup.getent ]; then
         #    rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.backup.getent"
@@ -118,6 +130,12 @@ ipa_upgrade_install_client()
     CLIENT*)
         rlLog "Machine in recipe is CLIENT"
         ipa_install_client $MASTER
+
+        rlRun "service certmonger start"
+        rlRun "getcert list"
+        rlRun "getcert list-cas"
+        rlRun "find /var/lib/certmonger -ls"
+
 
         #if [ ! -f /etc/sssd/sssd.conf.backup.getent ]; then
         #    rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.backup.getent"
