@@ -47,10 +47,12 @@ ipa_upgrade_master_replica_client_all()
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
         ipa_upgrade_data_add $MYBEAKERMASTER
+        ipa_upgrade_data_check $MYBEAKERREPLICA1
     rlPhaseEnd
         
     rlPhaseStartTest "ipa_upgrade_master_replica_client_all_1: test upgrade with new master, old replica, and old client"
         upgrade_master 
+        rlRun "ssh -o StrictHostKeyChecking=no $MASTER \"dig $REPLICA1_S.$DOMAIN\""
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
