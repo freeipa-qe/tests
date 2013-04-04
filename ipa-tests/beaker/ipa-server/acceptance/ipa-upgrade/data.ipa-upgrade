@@ -1,16 +1,16 @@
 # Yum Repos
 echo $FAMILY | grep Fedora
 if [ $? -eq 0 ]; then
-	OS=fedora
-	VER=17
-        PKG="freeipa"
+    OS=fedora
+    VER=17
+    PKG="freeipa"
 fi
 
 echo $FAMILY | grep RedHatEnterpriseLinux
 if [ $? -eq 0 ]; then
-	OS=rhel
-	VER=6
-        PKG="ipa"
+    OS=rhel
+    VER=6
+    PKG="ipa"
 fi
 
 export OS VER PKG
@@ -23,12 +23,12 @@ if [ "$OS" = "fedora" ]; then
         export LATESTVER=17 # must match same format as OSVER 
     fi
 
-	# Disable fedora updates repo
-	sed -i s/^enabled=1/enabled=0/g /etc/yum.repos.d/fedora-updates.repo 
-	# Define some repos for Fedora 
-	latestrepo1=http://jdennis.fedorapeople.org/ipa-devel/fedora/\$releasever/\$basearch/os/
-	latestrepo2=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/$basearch/
-	latestrepo3=http://download.fedoraproject.org/pub/fedora/linux/updates/\$releasever/\$basearch/
+    # Disable fedora updates repo
+    sed -i s/^enabled=1/enabled=0/g /etc/yum.repos.d/fedora-updates.repo 
+    # Define some repos for Fedora 
+    latestrepo1=http://jdennis.fedorapeople.org/ipa-devel/fedora/\$releasever/\$basearch/os/
+    latestrepo2=http://alpha.dsdev.sjc.redhat.com/export/archives/rhel/fc17-updates/$basearch/
+    latestrepo3=http://download.fedoraproject.org/pub/fedora/linux/updates/\$releasever/\$basearch/
 
     myrepo1=$latestrepo1
     myrepo2=$latestrepo2
@@ -40,7 +40,7 @@ else
 
     latestrepo1=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/\$basearch/os/
     latestrepo2=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/optional/\$basearch/os/
-	latestrepo3=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
+    latestrepo3=http://cosmos.lab.eng.pnq.redhat.com/ipa-latest/\$basearch
 
     myrepo1=$latestrepo1
     myrepo2=$latestrepo2
