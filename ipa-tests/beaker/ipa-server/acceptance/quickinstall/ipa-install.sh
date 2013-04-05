@@ -675,6 +675,10 @@ ipa_install_topo()
 ipa_install_prep_initVars()
 {
 	tmpout=/tmp/error_msg.out
+        rpm -qa|grep net-tools
+        if [ $? -eq 1 ];then
+          rlRun "yum install net-tools -y" 
+        fi
 	currenteth=$(route | grep ^default | awk '{print $8}')
 	ipaddr=$(ip -o -4 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
 	ipv6addr=$(ip -o -6 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
@@ -744,7 +748,8 @@ fixhostname()
 		rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
 	fi
 	rlRun "hostname $hostname_s.$DOMAIN"
-	rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
+	#rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
+	rlRun "sed -i \"s/$hostname/$hostname_s.$DOMAIN/\" /etc/hostname"
 	. /etc/sysconfig/network
 }
 
@@ -803,30 +808,33 @@ fixResolvIPv6()
 
 ipa_install_prep_disableFirewall()
 {
-	rlRun "chkconfig iptables off"
-	rlRun "chkconfig ip6tables off"
+	#rlRun "chkconfig iptables off"
+	#rlRun "chkconfig ip6tables off"
+	rlRun "systemctl disable firewalld.service"
 
 	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
-		service iptables stop
+		#service iptables stop
+		systemctl stop firewalld.service
 		if [ $? -eq 1 ]; then
 			rlLog "BZ 845301 found -- service iptables stop returns 1 when already stopped"
 		else
 			rlPass "BZ 845301 not found -- service iptables stop succeeeded"
 		fi
 	else    
-		rlRun "service iptables stop"
+		#rlRun "service iptables stop"
+		rlRun "systemctl stop firewalld.service"
 	fi
 
-	if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
-		service ip6tables stop
-		if [ $? -eq 1 ]; then
-			rlLog "BZ 845301 found -- service ip6tables stop returns 1 when already stopped"
-		else
-			rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
-		fi
-	else    
-		rlRun "service ip6tables stop"
-	fi
+	#if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
+	#	service ip6tables stop
+	#	if [ $? -eq 1 ]; then
+	#		rlLog "BZ 845301 found -- service ip6tables stop returns 1 when already stopped"
+	#	else
+	#		rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
+	#	fi
+	#else    
+	#	rlRun "service ip6tables stop"
+	#fi
 }
 
 SetUpAuthKeys()
