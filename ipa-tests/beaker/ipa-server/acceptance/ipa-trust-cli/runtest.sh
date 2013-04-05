@@ -132,6 +132,7 @@ rlJournalStart
 
 	trust_bug() {
 		"bz_867442"
+		"bz_869741"
 	}
     # Setup
 	setup
