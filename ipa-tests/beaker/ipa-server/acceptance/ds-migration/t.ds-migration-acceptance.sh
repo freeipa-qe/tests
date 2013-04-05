@@ -80,8 +80,8 @@ migratecmd()
 		rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://ldap.example.com:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" ldap://ldap.example.com:389" 1 "Check return code"
                 echo $ADMINPW | ipa migrate-ds --user-container="$USERCONTAINER" --group-container="$GROUPCONTAINER" ldap://ldap.example.com:389 > /tmp/error.out 2>&1
-                #rlAssertGrep "ipa: ERROR: Can't contact LDAP server:" "/tmp/error.out"
-		rlAssertGrep "ipa: ERROR: cannot connect to u'ldap://ldap.example.com:389': LDAP Server Down" "/tmp/error.out"
+                rlAssertGrep "ipa: ERROR: cannot connect to 'ldap://ldap.example.com:389':" "/tmp/error.out"
+		#rlAssertGrep "ipa: ERROR: cannot connect to u'ldap://ldap.example.com:389': LDAP Server Down" "/tmp/error.out"
 	rlPhaseEnd
 
         rlPhaseStartTest "ds-migration-cmd-002 Invalid User Container"
@@ -184,8 +184,8 @@ migratecmd()
         rlPhaseEnd
 
 	rlPhaseStartTest "ds-migration-cmd-011 Exclude Mulitple Users"
-                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 ldap://$CLIENT:389"
-                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 ldap://$CLIENT:389" 0
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users={$USER1,$USER2} ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users={$USER1,$USER2} ldap://$CLIENT:389" 0
 
                 rlRun "ipa user-show $USER1" 2 "Verifying '$USER1' was NOT migrated"
                 rlRun "ipa user-show $USER2" 2 "Verifying user '$USER2' was NOT migrated"
@@ -202,8 +202,8 @@ migratecmd()
         rlPhaseEnd
 
 	rlPhaseStartTest "ds-migration-cmd-012 Exclude Mulitple Groups"
-                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389"
-                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389" 0
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups={$GROUP1,$GROUP2} ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-groups={$GROUP1,$GROUP2} ldap://$CLIENT:389" 0
 
                 rlRun "ipa user-show $USER1" 0 "Verifying '$USER1' was migrated"
                 rlRun "ipa user-show $USER2" 0 "Verifying user '$USER2' was migrated"
@@ -220,8 +220,8 @@ migratecmd()
         rlPhaseEnd
 
 	rlPhaseStartTest "ds-migration-cmd-013 Exclude Users and Groups"
-                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389"
-                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users=$USER1,$USER2 --exclude-groups=$GROUP1,$GROUP2 ldap://$CLIENT:389" 0
+                rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users={$USER1,$USER2} --exclude-groups={$GROUP1,$GROUP2} ldap://$CLIENT:389"
+                rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --exclude-users={$USER1,$USER2} --exclude-groups={$GROUP1,$GROUP2} ldap://$CLIENT:389" 0
 
                 rlRun "ipa user-show $USER1" 2 "Verifying '$USER1' was NOT migrated"
                 rlRun "ipa user-show $USER2" 2 "Verifying user '$USER2' was NOT migrated"
