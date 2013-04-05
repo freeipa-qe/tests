@@ -52,6 +52,8 @@ ipa_upgrade_master_replica_client_all()
         
     rlPhaseStartTest "ipa_upgrade_master_replica_client_all_1: test upgrade with new master, old replica, and old client"
         upgrade_master 
+        rlRun "submit_log /var/log/dirsrv/slapd-TESTRELM-COM/errors"
+        rlRun "submit_log /var/log/dirsrv/slapd-TESTRELM-COM/access"
         rlRun "ssh -o StrictHostKeyChecking=no $MASTER \"dig $REPLICA1_S.$DOMAIN\""
         rlRun "sleep 10000000"
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER

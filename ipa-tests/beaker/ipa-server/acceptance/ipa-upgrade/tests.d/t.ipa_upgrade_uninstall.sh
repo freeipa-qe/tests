@@ -68,9 +68,9 @@ ipa_upgrade_uninstall_master()
 
         rlRun "yum -y downgrade redhat-release-server"
 
-#        if [ -d /var/lib/certmonger ]; then
-#            rlRun "rm -rf /var/lib/certmonger"
-#        fi
+        if [ -d /var/lib/certmonger ]; then
+            rlRun "rm -rf /var/lib/certmonger"
+        fi
 
         rlLog "MASTER=$MASTER"
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
@@ -132,9 +132,9 @@ ipa_upgrade_uninstall_replica()
 
         rlRun "yum -y downgrade redhat-release-server"
 
-#        if [ -d /var/lib/certmonger ]; then
-#            rlRun "rm -rf /var/lib/certmonger"
-#        fi
+        if [ -d /var/lib/certmonger ]; then
+            rlRun "rm -rf /var/lib/certmonger"
+        fi
 
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
         #[ -n $MYBEAKERREPLICA1 ] && REPLICA="$(echo $MYBEAKERREPLICA1|cut -f1 -d.).${DOMAIN}"
@@ -203,9 +203,9 @@ ipa_upgrade_uninstall_client()
         rlRun "yum -y downgrade redhat-release-server"
         rlRun "yum -y remove http*"
 
-#        if [ -d /var/lib/certmonger ]; then
-#            rlRun "rm -rf /var/lib/certmonger"
-#        fi
+        if [ -d /var/lib/certmonger ]; then
+            rlRun "rm -rf /var/lib/certmonger"
+        fi
 
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
         #[ -n "$MYBEAKERCLIENT" ] && CLIENT="$(echo $MYBEAKERCLIENT|cut -f1 -d.).${DOMAIN}"
