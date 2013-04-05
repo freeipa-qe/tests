@@ -246,7 +246,7 @@ NBAD_Exp() {
         echo 'set var3 [lindex $argv 2]' >> $expfile
         echo 'set var4 [lindex $argv 3]' >> $expfile
         echo 'set var5 [lindex $argv 4]' >> $expfile
-        echo 'set timeout 30
+	echo 'set timeout 30
         set send_slow {1 .1}' >> $expfile
         echo "spawn $trust_bin --\$var1=\$var2" >> $expfile
         echo 'expect "Overwrite smb.conf?*: "' >> $expfile
@@ -265,4 +265,35 @@ NBAD_Exp() {
         echo 'expect "*the IPA server and the remote domain cannot share the same NetBIOS name*" {send_user "\nTrust added failed as expected\n"; exit 2}' >> $expfile
 
 
+
 }
+
+
+
+Readd_Exp() {
+
+        rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]' > $expfile
+        echo 'set var2 [lindex $argv 1]' >> $expfile
+        echo 'set var3 [lindex $argv 2]' >> $expfile
+        echo 'set timeout 60
+        set send_slow {1 .1}' >> $expfile
+        echo "spawn $ipacmd trust-add --type=ad \$var1 --admin \$var2 --password" >> $expfile
+        echo 'expect "*assword: "' >> $expfile
+        echo 'send -s -- "$var3\r"' >> $expfile
+        echo 'expect "Added Active Directory trust for realm \"$var1\"" {
+        send_user "\n\n----Trust added as expected----\n\n"}' >> $expfile
+        echo "spawn $ipacmd trust-add --type=ad \$var1 --admin \$var2 --password" >> $expfile
+        echo 'expect "*assword: "'>> $expfile
+        echo 'send -s -- "$var3\r"'>> $expfile
+        echo 'expect "Re-established trust to domain \"$var1\"" {
+        send_user "\n\n----Trust re-added as expected----\n\n"; exit 1}' >> $expfile 
+
+        
+
+}
+
+
+
+
+
