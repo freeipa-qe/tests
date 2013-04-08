@@ -224,15 +224,16 @@ ipa_upgrade_client_replica_master_all()
     IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
 
     local tmpout=/tmp/errormsg.out
-    rlPhaseStartTest "ipa_upgrade_client_replica_master_all: test full setup for client, then replica, then master"
+    rlPhaseStartSetup "ipa_upgrade_client_replica_master_all_setup: setup to test full setup for client, then replica, then master"
         rlRun "env|sort"
         # Install and setup environment and add data
-        ipa_install_master_all
-        ipa_install_replica_all
-        ipa_install_client
-        data_add
+        ipa_upgrade_install_master
+        ipa_upgrade_install_replica
+        ipa_upgrade_install_client
+        ipa_upgrade_data_add $MYBEAKERMASTER
+    rlPhaseEnd
 
-        # test upgrade with old master, old replica, and new client
+    rlPhaseStartTest "ipa_upgrade_client_replica_master_all_1: test upgrade with old master, old replica, and new client"
         upgrade_client
         # No data_check here because it will fail...need negative checks for ipa commands
         # can't upgrade client first or ipa commands won't work.  native ones do but, ipa ones don't.
@@ -245,22 +246,25 @@ ipa_upgrade_client_replica_master_all()
             fi
             rlRun "cat $tmpout"
         fi
+    rlPhaseEnd
 
-        # test upgrade with old master, new replica, and new client 
+    rlPhaseStartTest "ipa_upgrade_client_replica_master_all_2: test upgrade with old master, new replica, and new client"
         upgrade_replica
-        data_check $REPLICA1_IP
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
+    rlPhaseEnd
 
-        # test upgrade with new master, new replica, and new client
+    rlPhaseStartTest "ipa_upgrade_client_replica_master_all_3: test upgrade with new master, new replica, and new client"
         upgrade_master 
-        data_check $MYBEAKERMASTER
-        
-        # check data from client again to make sure things look good now
-        data_check $MYBEAKERCLIENT
+        ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
+    rlPhaseEnd
 
-        # uninstall everything so we can start over
-        ipa_uninstall_client
-        ipa_uninstall_replica
-        ipa_uninstall_master
+    rlPhaseStartCleanup "ipa_upgrade_client_replica_master_all_cleanup: cleanup from test full setup for client, then replica, then master"
+        ipa_upgrade_uninstall_client
+        ipa_upgrade_uninstall_replica
+        ipa_upgrade_uninstall_master
     rlPhaseEnd
 }
 
@@ -272,30 +276,41 @@ ipa_upgrade_master_replica_client_nodns()
     IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"
     IPA_CLIENT_OPTIONS="-U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER"
 
-    rlPhaseStartTest "ipa_upgrade_master_replica_client_nodns: Test setup without dns for master, then replica, then client"
+    rlPhaseStartSetup "ipa_upgrade_master_replica_client_nodns_setup: setup to test without dns for master, then replica, then client"
         rlRun "env|sort"
-        # Install and setup environment and add data
-        ipa_install_master_nodns
-        ipa_install_replica_nodns
-        ipa_install_client
-        data_add
+        ipa_upgrade_install_master
+        ipa_upgrade_install_replica
+        ipa_upgrade_install_client
+        ipa_upgrade_data_add $MYBEAKERMASTER
+        ipa_upgrade_data_check $MYBEAKERREPLICA1
+    rlPhaseEnd
+        
+    rlPhaseStartTest "ipa_upgrade_master_replica_client_nodns_1: test upgrade with new master, old replica, and old client"
+        upgrade_master 
+        ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
+    rlPhaseEnd
 
-        # test upgrade with old master, old replica, and old client
-        upgrade_master
-        data_check $MYBEAKERMASTER
-
-        # test upgrade with new master, new replica, and old client
+    rlPhaseStartTest "ipa_upgrade_master_replica_client_nodns_2: test upgrade with new master, new replica, and old client"
         upgrade_replica
-        data_check $REPLICA1_IP
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
+    rlPhaseEnd
 
-        # test upgrade with new master, new replica, and new client
+    rlPhaseStartTest "ipa_upgrade_master_replica_client_nodns_3: test upgrade with new master, new replica, and new client"
         upgrade_client
-        data_check $MYBEAKERCLIENT
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER new
+    rlPhaseEnd
 
-        # uninstall everything so we can start over
-        ipa_uninstall_client
-        ipa_uninstall_replica
-        ipa_uninstall_master
+    rlPhaseStartCleanup "ipa_upgrade_master_replica_client_nodns_cleanup: cleanup from test without dns for master, then replica, then client"
+        ipa_upgrade_uninstall_client
+        ipa_upgrade_uninstall_replica
+        ipa_upgrade_uninstall_master
     rlPhaseEnd
 }
 
@@ -303,40 +318,57 @@ ipa_upgrade_master_replica_client_nodns()
 ipa_upgrade_master_replica_client_dirsrv_off()
 {
     reset_repos
-    rlPhaseStartTest "ipa_upgrade_master_replica_client_dirsrv_off: Test upgrade with dirsrv down before upgrade"
+    USEDNS="yes"
+    IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
+    IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
+    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+
+    rlPhaseStartSetup "ipa_upgrade_master_replica_client_dirsrv_off_setup: setup to test full setup for master, then replica, then client"
         rlRun "env|sort"
         # Install and setup environment and add data
-        ipa_install_master_all
-        ipa_install_replica_all
-        ipa_install_client
-        data_add
-
-        # test master upgrade with dirsrv down
-        if [ "$MYROLE" = "MASTER" ]; then
-            rlLog "Shutting down dirsrv before upgrading MASTER ($MASTER)"
+        ipa_upgrade_install_master
+        ipa_upgrade_install_replica
+        ipa_upgrade_install_client
+        ipa_upgrade_data_add $MYBEAKERMASTER
+        ipa_upgrade_data_check $MYBEAKERREPLICA1
+    rlPhaseEnd
+        
+    rlPhaseStartTest "ipa_upgrade_master_replica_client_dirsrv_off_1: test with dirsrv off before upgrade with new master, old replica, and old client"
+        if [ $(echo "$MYROLE" | grep -i "MASTER" | wc -l) -gt 0 ]; then
+            rlLog "Shutting down dirsrv before upgrading MASTER ($(hostname))"
             rlRun "service dirsrv stop"
         fi
-        upgrade_master
+        upgrade_master 
         upgrade_bz_895298_check_master  
-        data_check $MYBEAKERMASTER
-        
-        # test replica upgrade with dirsrv down
-        if [ "$MYROLE" = "REPLICA" ]; then
-            rlLog "Shutting down dirsrv before upgrading REPLICA ($REPLICA)"
+        ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
+    rlPhaseEnd
+
+    rlPhaseStartTest "ipa_upgrade_master_replica_client_dirsrv_off_2: test dirsrv off before upgrade with new master, new replica, and old client"
+        if [ $(echo "$MYROLE" | grep -i "REPLICA" | wc -l) -gt 0 ]; then
+            rlLog "Shutting down dirsrv before upgrading REPLICA ($(hostname))"
             rlRun "service dirsrv stop"
         fi
         upgrade_replica
         upgrade_bz_895298_check_replica
-        data_check $REPLICA1_IP
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
+    rlPhaseEnd
 
-        # test client upgrade after master and replica upgrades with dirsrv down
+    rlPhaseStartTest "ipa_upgrade_master_replica_client_dirsrv_off_3: test upgrade with new master, new replica, and new client"
         upgrade_client
-        data_check $MYBEAKERCLIENT
+        ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
+        ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER new
+    rlPhaseEnd
 
-        # uninstall everything so we can start over
-        ipa_uninstall_client
-        ipa_uninstall_replica
-        ipa_uninstall_master
+    rlPhaseStartCleanup "ipa_upgrade_master_replica_client_dirsrv_off_cleanup: cleanup from test full setup for master, then replica, then client"
+        ipa_upgrade_uninstall_client
+        ipa_upgrade_uninstall_replica
+        ipa_upgrade_uninstall_master
     rlPhaseEnd
 }
 
