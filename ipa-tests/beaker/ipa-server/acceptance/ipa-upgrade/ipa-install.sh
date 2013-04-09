@@ -60,9 +60,9 @@ ipa_install_set_vars()
     fi
 
     # Try to set our ENV first.  Will confirm/fix this later as well for full confirmation
-    MYENV=$(env|grep $(hostname -s)|grep -v HOSTNAME|egrep "MASTER|REPLICA|SLAVE|CLIENT"|grep "_env"|sed 's/^.*_env\([0-9]*\)=.*$/\1/'|head)
-    
-    
+    MYENV=$(env|grep $(hostname -s)|grep -v HOSTNAME|egrep \
+        "MASTER|REPLICA|SLAVE|CLIENT"|grep "_env"|sed \
+        's/^.*_env\([0-9]*\)=.*$/\1/'|head -1)
 
     # Process MASTER variables
     I=1
