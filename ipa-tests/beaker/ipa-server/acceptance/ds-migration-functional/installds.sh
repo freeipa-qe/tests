@@ -23,7 +23,8 @@ installds(){
 ####################################################
 # turn off firewall
 ####################################################
-service iptables stop
+#service iptables stop
+systemctl stop firewalld.service
 
 ####################################################
 # set up directory server instance

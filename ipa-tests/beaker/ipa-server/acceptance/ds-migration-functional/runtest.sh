@@ -76,7 +76,8 @@ rlJournalStart
                                 	rlFail "$item package NOT found!"
                         	fi
                 	done
-                	rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                	#rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                	rlRun "systemctl stop firewalld.service" 0 "Stop the firewall on the client"
                 	installds
 			rhts-sync-set -s DONE
 			rhts-sync-block -s DONE $BEAKERMASTER

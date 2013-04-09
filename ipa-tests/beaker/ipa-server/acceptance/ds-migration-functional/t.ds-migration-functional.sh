@@ -18,7 +18,7 @@ ds-migration-functional()
 {
     setup
     hashedpwdmigration_sssd
-    hashedpwdmigration_http
+    #hashedpwdmigration_http
     cleanup
 }
 
@@ -48,9 +48,13 @@ hashedpwdmigration_sssd()
 		rlRun "verifyUserAttr $USER2 \"Kerberos keys available\" False" 0 "Verify migrated user $USER2 does not have a keytab"
 	rlPhaseEnd
 
+                #sleep 300
         rlPhaseStartTest "ds-migration-functional-002 SSSD password migration $USER1"
 		rlRun "ssh_auth_success $USER1 $USER1PWD $HOSTNAME"
 		rlRun "verifyUserAttr $USER1 \"Kerberos keys available\" True" 0 "Verify migrated user $USER1 now has a keytab"
+                if [ $? -eq 1 ] ;then
+                 rlLog "Failing because of https://fedorahosted.org/sssd/ticket/1873"
+                fi
 		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
                 KinitAsUser $USER1 $USER1PWD
                 rlRun "klist | grep $USER1" 0 "Ensuring that kinit as $USER1 worked"
@@ -62,6 +66,9 @@ hashedpwdmigration_sssd()
         rlPhaseStartTest "ds-migration-functional-003 SSSD password migration $USER2"
 		rlRun "ssh_auth_success $USER2 $USER2PWD $HOSTNAME"
 		rlRun "verifyUserAttr $USER2 \"Kerberos keys available\" True" 0 "Verify migrated user $USER2 now has a keytab"
+                if [ $? -eq 1 ] ;then
+                 rlLog "Failing because of https://fedorahosted.org/sssd/ticket/1873"
+                fi
                 # https://bugzilla.redhat.com/show_bug.cgi?id=822608
                 KinitAsUser $USER2 $USER2PWD
                 rlRun "klist | grep $USER2" 0 "Ensuring that kinit as $USER2 worked"
