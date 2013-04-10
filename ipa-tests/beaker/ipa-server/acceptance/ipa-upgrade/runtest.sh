@@ -101,9 +101,9 @@ rlJournalStart
 
 #    ipa_upgrade_master_replica_parallel
     ipa_upgrade_master_replica_client_all
-    ipa_upgrade_client_replica_master_all
-    ipa_upgrade_master_replica_client_nodns
-    ipa_upgrade_master_replica_client_dirsrv_off
+#    ipa_upgrade_client_replica_master_all
+#    ipa_upgrade_master_replica_client_nodns
+#    ipa_upgrade_master_replica_client_dirsrv_off
     #upgrade_test_master_bz_866977
     #upgrade_test_master_bz_tests
     #upgrade_test_master_replica_client_all_final
