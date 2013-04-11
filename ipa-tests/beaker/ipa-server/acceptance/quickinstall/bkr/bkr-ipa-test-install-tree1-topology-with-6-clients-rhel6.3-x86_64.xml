@@ -47,7 +47,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 1"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -97,7 +97,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -147,7 +147,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -197,7 +197,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -247,7 +247,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -297,7 +297,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -347,7 +347,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -397,7 +397,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -447,7 +447,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -497,7 +497,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -547,7 +547,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
@@ -597,7 +597,7 @@
 					<param name="CMDS_TO_RUN" value="sleep 300"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-test-install" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/quickinstall">
 				<params>
 					<param name="TOPO1" value="tree1"/>
 				</params>
