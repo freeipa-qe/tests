@@ -127,12 +127,12 @@ ipa_upgrade_data_check()
         ipa_quicktest_selfservice_check
     fi
 
-    if [ $runver -ge 63 ]; then
+    if [ $runver -ge 63 -a $runtype = "new" ]; then
         #rlRun "sleep 600"
         ipa_quicktest_automember_check $runtype
     fi
 
-    if [ $runver -ge 64 ]; then
+    if [ $runver -ge 64 -a $runtype = "new" ]; then
         ipa_quicktest_ssh_check $runtype
         ipa_quicktest_selinuxusermap_check $runtype
     fi
