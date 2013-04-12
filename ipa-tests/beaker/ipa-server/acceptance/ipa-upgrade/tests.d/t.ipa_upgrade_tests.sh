@@ -233,7 +233,7 @@ ipa_upgrade_client_replica_master_all()
         upgrade_client
         # No data_check here because it will fail...need negative checks for ipa commands
         # can't upgrade client first or ipa commands won't work.  native ones do but, ipa ones don't.
-        if [ "$MYROLE" = "CLIENT" ]; then
+        if [ $(echo "$MYROLE" |grep "CLIENT"|wc -l) -gt 0 ]; then
             KinitAsAdmin 
             rlLog "Running negative test for ipa commands failing when client upgraded first"
             rlRun "ipa --delegate user-find > $tmpout 2>&1" 1
@@ -252,6 +252,9 @@ ipa_upgrade_client_replica_master_all()
     rlPhaseStartTest "ipa_upgrade_client_replica_master_all_3: test upgrade with new master, new replica, and new client"
         upgrade_master 
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
+        if [ $(echo "$MYROLE" |grep "REPLICA"|wc -l) -gt 0 ]; then
+            rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER"
+        fi
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER new
@@ -278,7 +281,7 @@ ipa_upgrade_master_replica_client_nodns()
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
         ipa_upgrade_data_add $MYBEAKERMASTER
-        ipa_upgrade_data_check $MYBEAKERREPLICA1
+        ipa_upgrade_data_check $MYBEAKERMASTER
     rlPhaseEnd
         
     rlPhaseStartTest "ipa_upgrade_master_replica_client_nodns_1: test upgrade with new master, old replica, and old client"
