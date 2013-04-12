@@ -219,13 +219,13 @@ rlJournalStart
 
     rlPhaseStartTest "ipa-hbacsvc-cli-020: Verify Add Existing Services to New Service Group"
 	rlRun "addHBACServiceGroup $servicegroup2 $servicegroup2" 0 "Adding HBAC service Group $servicegroup2."
-	rlRun "addServiceGroupMembers \"sshd,ftp\" $servicegroup2" 0 "Adding service members to service group."
+	rlRun "addServiceGroupMembers \"{sshd,ftp}\" $servicegroup2" 0 "Adding service members to service group."
         rlRun "verifyHBACGroupMember sshd $servicegroup2" 0 "Verifying service group member was added."
         rlRun "verifyHBACGroupMember ftp $servicegroup2" 0 "Verifying service group member was added."
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacsvc-cli-021: Verify Remove Existing Services to New Service Group"
-        rlRun "removeServiceGroupMembers \"sshd,ftp\" $servicegroup2" 0 "Removing service members to service group."
+        rlRun "removeServiceGroupMembers \"{sshd,ftp}\" $servicegroup2" 0 "Removing service members to service group."
         rlRun "verifyHBACGroupMember sshd $servicegroup2" 4 "Verifying service group member was removed."
         rlRun "verifyHBACGroupMember ftp $servicegroup2" 4 "Verifying service group member was removed."
     rlPhaseEnd
@@ -234,8 +234,8 @@ rlJournalStart
  	for item in $service2 $service3 ; do
     		rlRun "addHBACService $item \"$item service\"" 0 "Adding new service $item."
 	done
-    	rlRun "addServiceGroupMembers \"sshd,ftp,rlogin\" $servicegroup1" 0 "Adding service members to service group."
-    	rlRun "addServiceGroupMembers \"http,https,rlogin\" $servicegroup2" 0 "Adding service members to service group."
+    	rlRun "addServiceGroupMembers \"{sshd,ftp,rlogin}\" $servicegroup1" 0 "Adding service members to service group."
+    	rlRun "addServiceGroupMembers \"{http,https,rlogin}\" $servicegroup2" 0 "Adding service members to service group."
     	rlRun "verifyHBACGroupMember rlogin $servicegroup1" 0 "Verifying service group member was added."
 	rlRun "verifyHBACGroupMember rlogin $servicegroup2" 0 "Verifying service group member was added."
 	rlRun "deleteHBACService $service3" 0 "Deleting service that is member of 2 service groups."
