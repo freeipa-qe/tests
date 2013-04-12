@@ -18,7 +18,7 @@ ds-migration-functional()
 {
     setup
     hashedpwdmigration_sssd
-    #hashedpwdmigration_http
+    hashedpwdmigration_http
     cleanup
 }
 
