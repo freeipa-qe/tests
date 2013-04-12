@@ -652,8 +652,8 @@ addServiceGroupMembers()
   rc=0
 
 
-  rlLog "Executing: ipa hbacsvcgroup-add-member --hbacsvcs=\"$memberlist\" \"$mygroup\""
-  ipa hbacsvcgroup-add-member --hbacsvcs="$memberlist" $mygroup
+  rlLog "Executing: ipa hbacsvcgroup-add-member --hbacsvcs=$memberlist $mygroup"
+  rlRun "ipa hbacsvcgroup-add-member --hbacsvcs=$memberlist $mygroup"
   rc=$?
   if [ $rc -ne 0 ] ; then
         rlLog "WARNING: Adding \"$memberlist\" to HBAC service group $mygroup failed."
@@ -675,8 +675,8 @@ removeServiceGroupMembers()
   mygroup=$2
   rc=0
 
-  rlLog "Executing: ipa hbacsvcgroup-remove-member --hbacsvcs=\"$memberlist\" \"$mygroup\""
-  ipa hbacsvcgroup-remove-member --hbacsvcs="$memberlist" "$mygroup"
+  rlLog "Executing: ipa hbacsvcgroup-remove-member --hbacsvcs=$memberlist $mygroup"
+  rlRun "ipa hbacsvcgroup-remove-member --hbacsvcs=$memberlist $mygroup"
   rc=$?
   if [ $rc -ne 0 ] ; then
         rlLog "WARNING: Removing \"$memberlist\" from Service group \"$mygroup\" failed."
