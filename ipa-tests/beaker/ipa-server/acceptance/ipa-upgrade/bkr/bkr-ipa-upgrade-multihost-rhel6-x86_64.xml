@@ -25,18 +25,18 @@
 				</and>
 			</hostRequires>
 			<partitions/>
-			<task name="/distribution/install" role="STANDALONE">
+			<task name="/distribution/install">
 				<params/>
 			</task>
-			<task name="/distribution/pkginstall" role="STANDALONE">
+			<task name="/distribution/pkginstall">
 				<params>
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="MASTER">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
 				</params>
@@ -64,18 +64,18 @@
 				</and>
 			</hostRequires>
 			<partitions/>
-			<task name="/distribution/install" role="STANDALONE">
+			<task name="/distribution/install">
 				<params/>
 			</task>
-			<task name="/distribution/pkginstall" role="STANDALONE">
+			<task name="/distribution/pkginstall">
 				<params>
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="REPLICA">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
 				</params>
@@ -103,18 +103,18 @@
 				</and>
 			</hostRequires>
 			<partitions/>
-			<task name="/distribution/install" role="STANDALONE">
+			<task name="/distribution/install">
 				<params/>
 			</task>
-			<task name="/distribution/pkginstall" role="STANDALONE">
+			<task name="/distribution/pkginstall">
 				<params>
 					<param name="PKGARGNAME" value="expect"/>
 				</params>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/shared" role="STANDALONE">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared">
 				<params/>
 			</task>
-			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade" role="CLIENT">
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
 				<params>
 					<param name="KILLTIMEOVERRIDE" value="84600"/>
 				</params>

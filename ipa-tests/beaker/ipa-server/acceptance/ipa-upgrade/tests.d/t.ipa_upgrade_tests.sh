@@ -280,7 +280,7 @@ ipa_upgrade_master_replica_client_nodns()
 {
     reset_repos
     USEDNS="no"
-    IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+    IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"
     IPA_CLIENT_OPTIONS="-U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER"
 
