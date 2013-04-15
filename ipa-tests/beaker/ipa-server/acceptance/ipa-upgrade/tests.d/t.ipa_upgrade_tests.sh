@@ -246,6 +246,12 @@ ipa_upgrade_client_replica_master_all()
 
     rlPhaseStartTest "ipa_upgrade_client_replica_master_all_2: test upgrade with old master, new replica, and new client"
         upgrade_replica
+        log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
+        if [ $(echo "$MYROLE" |grep "REPLICA"|wc -l) -gt 0 ]; then
+            rlLog "DEBUGGING:"
+            rlRun "cp $log $log.ipa_upgrade_client_replica_master_all_2"
+            rlRun "rhts-submit-log -l $log.ipa_upgrade_client_replica_master_all_2"
+        fi
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
     rlPhaseEnd
 
@@ -253,7 +259,10 @@ ipa_upgrade_client_replica_master_all()
         upgrade_master 
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         if [ $(echo "$MYROLE" |grep "REPLICA"|wc -l) -gt 0 ]; then
-            rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER"
+            rlRun "ipa-replica-manage list -v `hostname`"
+            rlRun "cp $log $log.ipa_upgrade_client_replica_master_all_3"
+            rlRun "rhts-submit-log -l $log.ipa_upgrade_client_replica_master_all_3"
+            #rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER"
         fi
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
