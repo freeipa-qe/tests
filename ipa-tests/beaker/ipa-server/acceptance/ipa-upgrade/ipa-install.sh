@@ -715,41 +715,53 @@ ipa_install_prep_setTime()
 
 fixHostFile()
 {
-    ipa_install_prep_initVars
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
 
-    cp -af /etc/hosts /etc/hosts.ipabackup
-    rlRun "sed -i s/$hostname//g    /etc/hosts"
-    rlRun "sed -i s/$hostname_s//g  /etc/hosts"
-    for i in $(echo $ipaddr); do
-        rlRun "sed -i /$i/d    /etc/hosts"
-    done
+        cp -af /etc/hosts /etc/hosts.ipabackup
+        rlRun "sed -i s/$hostname//g    /etc/hosts"
+        rlRun "sed -i s/$hostname_s//g  /etc/hosts"
+        for i in $(echo $ipaddr); do
+            rlRun "sed -i /$i/d    /etc/hosts"
+        done
 
-    rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+        rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+    else
+        rlLog "USEDNS=no, skipping hosts reconfig"
+    fi
     rlRun "cat /etc/hosts"
 }
 
 fixHostFileIPv6()
 {
-    ipa_install_prep_initVars
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
 
-    cp -af /etc/hosts /etc/hosts.ipabackup
-    rlRun "sed -i s/$hostname//g    /etc/hosts"
-    rlRun "sed -i s/$hostname_s//g  /etc/hosts"
-    for i6 in $(echo $ipv6addr); do
-        rlRun "sed -i '/$i6/d'  /etc/hosts"
-    done
-    rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+        cp -af /etc/hosts /etc/hosts.ipabackup
+        rlRun "sed -i s/$hostname//g    /etc/hosts"
+        rlRun "sed -i s/$hostname_s//g  /etc/hosts"
+        for i6 in $(echo $ipv6addr); do
+            rlRun "sed -i '/$i6/d'  /etc/hosts"
+        done
+        rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+    else
+        rlLog "USEDNS=no, skipping hosts reconfig for IPv6"
+    fi
 }
 
 fixhostname()
 {
-    ipa_install_prep_initVars
-    
-    if [ ! -f /etc/sysconfig/network-ipabackup ]; then
-        rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
+        
+        if [ ! -f /etc/sysconfig/network-ipabackup ]; then
+            rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
+        fi
+        rlRun "hostname $hostname_s.$DOMAIN"
+        rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
+    else
+        rlLog "USEDNS=no, skipping hostname reconfig"
     fi
-    rlRun "hostname $hostname_s.$DOMAIN"
-    rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
     . /etc/sysconfig/network
 }
 
