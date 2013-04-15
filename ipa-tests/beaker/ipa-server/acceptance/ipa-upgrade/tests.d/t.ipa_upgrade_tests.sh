@@ -280,7 +280,18 @@ ipa_upgrade_master_replica_client_nodns()
 {
     reset_repos
     USEDNS="no"
-    IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+    TESTDOMAIN=${DOMAIN}
+
+    # Reset variables for nodns test
+    ipa_install_envcleanup
+    DOMAIN=$(dnsdomainname)
+    MASTER=$MYBEAKERMASTER
+    REPLICA=$MYBEAKERREPLICA1
+    CLIENT=$MYBEAKERCLIENT
+    ipa_install_set_vars
+    DOMAIN=$(dnsdomainname)
+
+    IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"
     IPA_CLIENT_OPTIONS="-U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER"
 
@@ -320,6 +331,8 @@ ipa_upgrade_master_replica_client_nodns()
         ipa_upgrade_uninstall_replica
         ipa_upgrade_uninstall_master
     rlPhaseEnd
+
+    DOMAIN=${TESTDOMAIN}
 }
 
 
