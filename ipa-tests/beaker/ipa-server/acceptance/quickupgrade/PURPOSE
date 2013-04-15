@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/quickupgrade
+Description: IPA quickupgrade test case to upgrade to passed repo version
+Author: Scott Poore <spoore@redhat.com>

@@ -940,10 +940,10 @@ installSlave_nouiredirect() {
 				#commenting out since this test is properly handled in installSlave_nodnssshfp
                 #rlRun "ipa dnsrecord-find $DOMAIN $hostname_s | grep -i \"sshfp record\"" 1 "SSHFP record should not be created"
 
-		rlRun "curl http://$hostname_s.$DOMAIN > /tmp/curl.out 2>&1"
-		rlAssertGrep "Test Page for the Apache HTTP" "/tmp/curl.out"
-		rlAssertNotGrep "301 Moved Permanently" "/tmp/curl.out"
-		rlAssertNotGrep "ipa/ui" "/tmp/curl.out"
+rlRun "curl http://$hostname_s.$DOMAIN > /tmp/curl.out 2>&1"
+rlAssertGrep "Test Page for the Apache HTTP" "/tmp/curl.out"
+rlAssertNotGrep "301 Moved Permanently" "/tmp/curl.out"
+rlAssertNotGrep "ipa/ui" "/tmp/curl.out"
 
         fi
 
