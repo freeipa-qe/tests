@@ -20,7 +20,8 @@
 #   <params> <param name="TOPO1" value="star"/> </params>
 #
 
-ipa_install_envcleanup() {
+ipa_install_envcleanup()
+{
     for i in $(seq 1 10); do
         unset ${!BEAKERCLIENT*}
         unset ${!BEAKERSLAVE*}
@@ -38,7 +39,8 @@ ipa_install_envcleanup() {
     done
 }
 
-ipa_install_set_vars() {
+ipa_install_set_vars()
+{
     # Initialize Global TESTCOUNT variable
     TESTCOUNT=1
 
@@ -58,9 +60,9 @@ ipa_install_set_vars() {
     fi
 
     # Try to set our ENV first.  Will confirm/fix this later as well for full confirmation
-    MYENV=$(env|grep $(hostname -s)|grep -v HOSTNAME|egrep "MASTER|REPLICA|SLAVE|CLIENT"|grep "_env"|sed 's/^.*_env\([0-9]*\)=.*$/\1/'|head)
-    
-    
+    MYENV=$(env|grep $(hostname -s)|grep -v HOSTNAME|egrep \
+        "MASTER|REPLICA|SLAVE|CLIENT"|grep "_env"|sed \
+        's/^.*_env\([0-9]*\)=.*$/\1/'|head -1)
 
     # Process MASTER variables
     I=1
@@ -97,6 +99,7 @@ ipa_install_set_vars() {
         export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
         for R in $(eval echo \$REPLICA_env${I}); do
             export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
+            echo "export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN"
             export BEAKERREPLICA${J}_env${I}=$R
             echo "export BEAKERREPLICA${J}_env${I}=$R" >> /opt/rhqa_ipa/env.sh
             export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype|tail -1)
@@ -126,6 +129,7 @@ ipa_install_set_vars() {
         export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
         for C in $(eval echo \$CLIENT_env${I}); do
             export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN
+            echo "export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN" >> /opt/rhqa_ipa/env.sh
             export BEAKERCLIENT${J}_env${I}=$C
             echo "export BEAKERCLIENT${J}_env${I}=$C" >> /opt/rhqa_ipa/env.sh
             export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype|tail -1)
@@ -145,21 +149,20 @@ ipa_install_set_vars() {
     # Make sure Simple Vars are set in env.sh for simplicity and
     # backwards compatibility with older tests.  This means no
     # _env<NUM> suffix.
-    echo "export MASTER=$MASTER_env1" >> /opt/rhqa_ipa/env.sh
-    echo "export MASTERIP=$BEAKERMASTER_IP_env1" >> /opt/rhqa_ipa/env.sh
-    echo "export SLAVE=\"$REPLICA_env1\"" >> /opt/rhqa_ipa/env.sh
-    echo "export SLAVEIP=$BEAKERREPLICA1_IP_env1" >> /opt/rhqa_ipa/env.sh
-    echo "export REPLICA=\"$REPLICA_env1\"" >> /opt/rhqa_ipa/env.sh
-    echo "export CLIENT=$CLIENT1_env1" >> /opt/rhqa_ipa/env.sh
-    echo "export CLIENT2=$CLIENT2_env1" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERMASTER=$BEAKERMASTER_env1" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERREPLICA_env1=\"$BEAKERREPLICA_env1\"" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERSLAVE=\"$BEAKERREPLICA_env1\"" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERCLIENT=$BEAKERCLIENT1_env1" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERCLIENT2=$BEAKERCLIENT2_env1" >> /opt/rhqa_ipa/env.sh
-    # CONSIDER: changing env1 to env${MYENV} let each environment set
-    # things specific to itself.  otherwise, current tests as of 2012-08-01
-    # won't work in env's other than 1.
+    echo "export MYENV=${MYENV}" >> /opt/rhqa_ipa/env.sh
+    echo "export MYROLE=${MYROLE}" >> /opt/rhqa_ipa/env.sh
+    echo "export MASTER=$(eval echo \$MASTER_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export MASTERIP=$(eval echo \$BEAKERMASTER_IP_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export SLAVE=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export SLAVEIP=$(eval echo \$BEAKERREPLICA1_IP_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export REPLICA=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export CLIENT=$(eval echo \$CLIENT1_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export CLIENT2=$(eval echo \$CLIENT2_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERMASTER=$(eval echo \$BEAKERMASTER_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERREPLICA_env${MYENV}=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERSLAVE=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERCLIENT=$(eval echo \$BEAKERCLIENT1_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    echo "export BEAKERCLIENT2=$(eval echo \$BEAKERCLIENT2_env${MYENV})" >> /opt/rhqa_ipa/env.sh
 
     # FIX Env specific vars like RELM, DOMAIN, BASEDN
     if [ $MYENV -gt 1 ]; then 
@@ -675,10 +678,10 @@ ipa_install_topo()
 ipa_install_prep_initVars()
 {
     tmpout=/tmp/error_msg.out
-        rpm -qa|grep net-tools
-        if [ $? -eq 1 ];then
-          rlRun "yum install net-tools -y" 
-        fi
+    rpm -qa|grep net-tools
+    if [ $? -eq 1 ];then
+        rlRun "yum install net-tools -y" 
+    fi
     currenteth=$(route | grep ^default | awk '{print $8}')
     ipaddr=$(ip -o -4 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
     ipv6addr=$(ip -o -6 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
@@ -698,11 +701,12 @@ ipa_install_prep_pkgInstalls()
     rlRun "yum clean all"
     rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
     if [ $(echo $MYROLE|grep CLIENT|wc -l) -gt 0 ]; then
+        rlRun "yum -y install nscd httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
         rlRun "yum -y install $YUM_OPTIONS $IPA_CLIENT_PACKAGES"
     else
         rlRun "yum -y install $YUM_OPTIONS $IPA_SERVER_PACKAGES"
     fi
-    rlRun "yum -y update"
+    #rlRun "yum -y update"
 }
 
 ipa_install_prep_setTime()
@@ -715,41 +719,61 @@ ipa_install_prep_setTime()
 
 fixHostFile()
 {
-    ipa_install_prep_initVars
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
 
-    cp -af /etc/hosts /etc/hosts.ipabackup
-    rlRun "sed -i s/$hostname//g    /etc/hosts"
-    rlRun "sed -i s/$hostname_s//g  /etc/hosts"
-    for i in $(echo $ipaddr); do
-        rlRun "sed -i /$i/d    /etc/hosts"
-    done
+        cp -af /etc/hosts /etc/hosts.ipabackup
+        rlRun "sed -i s/$hostname//g    /etc/hosts"
+        rlRun "sed -i s/$hostname_s//g  /etc/hosts"
+        for i in $(echo $ipaddr); do
+            rlRun "sed -i /$i/d    /etc/hosts"
+        done
 
-    rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+        rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+    else
+        rlLog "USEDNS=no, skipping hosts reconfig"
+    fi
+    rlRun "cat /etc/hosts"
 }
 
 fixHostFileIPv6()
 {
-    ipa_install_prep_initVars
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
 
-    cp -af /etc/hosts /etc/hosts.ipabackup
-    rlRun "sed -i s/$hostname//g    /etc/hosts"
-    rlRun "sed -i s/$hostname_s//g  /etc/hosts"
-    for i6 in $(echo $ipv6addr); do
-        rlRun "sed -i '/$i6/d'  /etc/hosts"
-    done
-    rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+        cp -af /etc/hosts /etc/hosts.ipabackup
+        rlRun "sed -i s/$hostname//g    /etc/hosts"
+        rlRun "sed -i s/$hostname_s//g  /etc/hosts"
+        for i6 in $(echo $ipv6addr); do
+            rlRun "sed -i '/$i6/d'  /etc/hosts"
+        done
+        rlRun "echo \"$netaddr $hostname_s.$DOMAIN $hostname_s\" >> /etc/hosts"
+    else
+        rlLog "USEDNS=no, skipping hosts reconfig for IPv6"
+    fi
 }
 
 fixhostname()
 {
-    ipa_install_prep_initVars
-    
-    if [ ! -f /etc/sysconfig/network-ipabackup ]; then
-        rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
+        
+        if [ -f /etc/sysconfig/network ]; then
+            if [ ! -f /etc/sysconfig/network-ipabackup ]; then
+                rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
+            fi
+            rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
+        else
+            if [ ! -f /etc/hostname ]; then
+                rlRun "cp /etc/hostname /etc/hostname-ipabackup"
+            fi
+            rlRun "echo \"$hostname_s.$DOMAIN\" > /etc/hostname"
+        fi
+
+        rlRun "hostname $hostname_s.$DOMAIN"
+    else
+        rlLog "USEDNS=no, skipping hostname reconfig"
     fi
-    rlRun "hostname $hostname_s.$DOMAIN"
-    #rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
-    rlRun "sed -i \"s/$hostname/$hostname_s.$DOMAIN/\" /etc/hostname"
     . /etc/sysconfig/network
 }
 
@@ -785,6 +809,7 @@ fixResolv()
         rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
         rlRun "rm -f /etc/resolv.conf.new"
     fi
+    rlRun "cat /etc/resolv.conf"
 }
 
 fixResolvIPv6()
@@ -808,33 +833,47 @@ fixResolvIPv6()
 
 ipa_install_prep_disableFirewall()
 {
-    #rlRun "chkconfig iptables off"
-    #rlRun "chkconfig ip6tables off"
-    rlRun "systemctl disable firewalld.service"
+    # Disable iptables, ip6tables, or firewalld
+    if [ -f /etc/init.d/iptables ]; then
+        rlRun "chkconfig iptables off"
+    fi
+    if [ -f /etc/init.d/ip6tables ]; then
+        rlRun "chkconfig ip6tables off"
+    fi
+    if [ -f /usr/lib/systemd/system/firewalld.service ]; then
+        rlRun "systemctl disable firewalld"
+    fi
 
+    # Turn off iptables or firewalld
     if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
-        #service iptables stop
-        systemctl stop firewalld.service
+        service iptables stop
         if [ $? -eq 1 ]; then
             rlLog "BZ 845301 found -- service iptables stop returns 1 when already stopped"
         else
             rlPass "BZ 845301 not found -- service iptables stop succeeeded"
         fi
     else    
-        #rlRun "service iptables stop"
-        rlRun "systemctl stop firewalld.service"
+        if [ -f /etc/init.d/iptables ]; then
+            rlRun "service iptables stop"
+        fi
+        if [ -f /usr/lib/systemd/system/firewalld.service ]; then
+            rlRun "systemctl stop firewalld"
+        fi
     fi
 
-    #if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
-    #   service ip6tables stop
-    #   if [ $? -eq 1 ]; then
-    #       rlLog "BZ 845301 found -- service ip6tables stop returns 1 when already stopped"
-    #   else
-    #       rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
-    #   fi
-    #else    
-    #   rlRun "service ip6tables stop"
-    #fi
+    # Turn off ip6tables if it exists
+    if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
+        service ip6tables stop
+        if [ $? -eq 1 ]; then
+            rlLog "BZ 845301 found -- service ip6tables stop returns 1 when already stopped"
+        else
+            rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
+        fi
+    else    
+        if [ -f /etc/init.d/ip6tables ]; then
+            rlRun "service ip6tables stop"
+        fi
+    fi
 }
 
 SetUpAuthKeys()
@@ -895,19 +934,20 @@ configAbrt()
             eval $(echo $(grep JOBID /etc/motd))
         fi
 
-        cat > /etc/abrt/abrt-action-save-package-data.conf <<-EOF
+    
+        alias unindent="sed -e 's/^[[:space:]]*//'"
+
+        unindent > /etc/abrt/abrt-action-save-package-data.conf <<<"\
         OpenGPGCheck = no
         BlackList = nspluginwrapper, valgrind, strace, mono-core
         ProcessUnpackaged = yes
-        BlackListedPaths = /usr/share/doc/*, */example*, /usr/bin/nspluginviewer, /usr/lib/xulrunner-*/plugin-container
-        EOF
+        BlackListedPaths = /usr/share/doc/*, */example*, /usr/bin/nspluginviewer, /usr/lib/xulrunner-*/plugin-container"
 
-        cat > /etc/libreport/plugins/mailx.conf <<-EOF
+        unindent > /etc/libreport/plugins/mailx.conf <<<"\
         Subject=CRASH ALERT: Crash detected in ipa automation [Beaker Job: $JOBID].
         EmailFrom=root@$hostname_s
         EmailTo=seceng-idm-qe-list@redhat.com
-        SendBinaryData=no
-        EOF
+        SendBinaryData=no"
 
         rlRun "service abrtd restart"
     fi
@@ -947,14 +987,14 @@ ipa_install_prep()
 
 ipa_install_sssd_workarounds()
 {
-
     # BZ 878420 Workaround
-    rlLog "Adding ldap_sasl_authid to sssd.conf"
-    rlLog "Working around BZ 878420"
-    M1="\[domain\/$DOMAIN\]"
-    M2="\[sssd\]"
-    A1="ldap_sasl_authid = host\/$(hostname)\@$RELM"
-    sed -i "/$M1/,/$M2/ s/^\(.*\[sssd\]\)/$A1\n\n\1/" /etc/sssd/sssd.conf
+    # commenting since it breaks rhel6.3 installs.
+    #rlLog "Adding ldap_sasl_authid to sssd.conf"
+    #rlLog "Working around BZ 878420"
+    #M1="\[domain\/$DOMAIN\]"
+    #M2="\[sssd\]"
+    #A1="ldap_sasl_authid = host\/$(hostname)\@$RELM"
+    #sed -i "/$M1/,/$M2/ s/^\(.*\[sssd\]\)/$A1\n\n\1/" /etc/sssd/sssd.conf
 
     # BZ 878288 Workaround
     rlLog "Starting SSSD in case it is not running"
@@ -965,146 +1005,129 @@ ipa_install_sssd_workarounds()
 ipa_install_master()
 {
     tmpout=/tmp/error_msg.out
-    rlPhaseStartTest "ipa_install_master - Install IPA Master Server"
-        rlLog "$FUNCNAME"
+    rlLog "ipa_install_master - Install IPA Master Server"
+    rlLog "$FUNCNAME"
+
+    ipa_install_prep
     
-        ipa_install_prep
-        
-        for PKG in $IPA_SERVER_PACKAGES; do
-            rlAssertRpm $PKG
-        done
-        
-        rlRun "ipa-server-install $IPAOPTIONS --setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
-        if [ $? -gt 0 ]; then
-            rlRun "submit_log /var/log/ipaserver-install.log"
+    for THISPKG in $IPA_SERVER_PACKAGES; do
+        rlAssertRpm $THISPKG
+    done
+    
+    if [ -z "$IPA_SERVER_OPTIONS" ]; then
+        IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
+    fi
+    rlRun "ipa-server-install $IPA_SERVER_OPTIONS"
+
+    if [ $? -gt 0 ]; then
+        rlRun "submit_log /var/log/ipaserver-install.log"
+    fi
+
+    if [ $(dig +short download.devel.redhat.com|wc -l) -eq 0 ]; then 
+        KinitAsAdmin
+        rlLog "[FAIL]: BZ 872372 found...IPA server DNS forwarding broken with bind-dyndb-ldap-2.2-1.el6.x86_64"
+        rlLog "Adding workaround for BZ 872372 to fix broken forwarding"
+        rlRun "echo $ADMINPW|kinit admin"
+        rlRun "ipa dnsconfig-mod --forwarder=$DNSFORWARD"
+        rlRun "service named restart"
+    fi
+
+    ipa_install_sssd_workarounds
+
+    if [ $IPADEBUG ]; then
+        if [ -f /usr/share/ipa/bind.named.conf.template ]; then
+            rlLog "Forcing debug logging in named.conf template"
+            sed -i 's/severity dynamic/severity debug 10/' /usr/share/ipa/bind.named.conf.template
         fi
-
-        if [ $(dig +short download.devel.redhat.com|wc -l) -eq 0 ]; then 
-            KinitAsAdmin
-            rlLog "[FAIL]: BZ 872372 found...IPA server DNS forwarding broken with bind-dyndb-ldap-2.2-1.el6.x86_64"
-            rlLog "Adding workaround for BZ 872372 to fix broken forwarding"
-            rlRun "echo $ADMINPW|kinit admin"
-            rlRun "ipa dnsconfig-mod --forwarder=$DNSFORWARD"
-            rlRun "service named restart"
+        DATE=$(date +%Y%m%d-%H%M%S) 
+        INSTANCE=$(echo $RELM|sed 's/\./-/g')
+        rlLog "DEBUG selected.  submitting logs"
+        if [ -f /var/log/ipaserver-install.log ]; then
+            cp /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
+            rhts-submit-log -l /var/log/ipaserver-install.log.$DATE 
         fi
-
-        ipa_install_sssd_workarounds
-
-        if [ $IPADEBUG ]; then
-            if [ -f /usr/share/ipa/bind.named.conf.template ]; then
-                rlLog "Forcing debug logging in named.conf template"
-                sed -i 's/severity dynamic/severity debug 10/' /usr/share/ipa/bind.named.conf.template
-            fi
-            DATE=$(date +%Y%m%d-%H%M%S) 
-            INSTANCE=$(echo $RELM|sed 's/\./-/g')
-            rlLog "DEBUG selected.  submitting logs"
-            if [ -f /var/log/ipaserver-install.log ]; then
-                cp /var/log/ipaserver-install.log /var/log/ipaserver-install.log.$DATE
-                rhts-submit-log -l /var/log/ipaserver-install.log.$DATE 
-            fi
-            if [ -f /var/log/ipaclient-install.log ]; then
-                cp /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$DATE
-                rhts-submit-log -l /var/log/ipaclient-install.log.$DATE 
-            fi
-            if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
-                cp /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
-                rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
-            fi
-            if [ -f /var/log/dirsrv/slapd-$INSTANCE/access ]; then
-                cp /var/log/dirsrv/slapd-$INSTANCE/access /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
-                rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
-            fi
-        fi  
-    rlPhaseEnd
+        if [ -f /var/log/ipaclient-install.log ]; then
+            cp /var/log/ipaclient-install.log /var/log/ipaclient-install.log.$DATE
+            rhts-submit-log -l /var/log/ipaclient-install.log.$DATE 
+        fi
+        if [ -f /var/log/dirsrv/slapd-$INSTANCE/errors ]; then
+            cp /var/log/dirsrv/slapd-$INSTANCE/errors /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+            rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/errors.$DATE
+        fi
+        if [ -f /var/log/dirsrv/slapd-$INSTANCE/access ]; then
+            cp /var/log/dirsrv/slapd-$INSTANCE/access /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
+            rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
+        fi
+    fi  
 }
 
 ipa_install_replica()
 {
     local MYMASTER=$1
     local MYREVNET=$(hostname -i|awk -F. '{print $3 "." $2 "." $1 ".in-addr.arpa."}')
-    rlPhaseStartTest "ipa_install_replica - Install IPA Replica Server"
-        rlLog "$FUNCNAME $MYMASTER"
+    rlLog "ipa_install_replica - Install IPA Replica Server"
+    rlLog "$FUNCNAME $MYMASTER"
 
-        ipa_install_prep
+    ipa_install_prep
 
-        for PKG in $IPA_SERVER_PACKAGES; do
-            rlAssertRpm $PKG
-        done
-    
-        rlLog "RUN ipa-replica-prepare on $MYMASTER"
-        rlRun "ssh root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\" ; service named restart"
-        # named can take a little time to update sometimes?
-        rlRun "sleep 60"
+    for THISPKG in $IPA_SERVER_PACKAGES; do
+        rlAssertRpm $THISPKG
+    done
 
-        rlLog "RUN sftp to get gpg file"
-        rlRun "sftp root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /opt/rhqa_ipa/"
+    rlLog "RUN ipa-replica-prepare on $MYMASTER"
+    rlRun "ssh -o StrictHostKeyChecking=no root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\" ; service named restart"
+    # named can take a little time to update sometimes?
+    rlRun "sleep 60"
 
-        # Do we need DelayUntilMasterReady???
-        rlLog "RUN ipa-replica-install"
-        rlRun "ipa-replica-install $IPAOPTIONS -U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
-        if [ $? -gt 0 ]; then
-            rlRun "submit_log /var/log/ipareplica-install.log"
-        fi
+    rlLog "RUN sftp to get gpg file"
+    rlRun "sftp -o StrictHostKeyChecking=no root@$MYMASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg /opt/rhqa_ipa/"
 
-        ipa_install_sssd_workarounds
+    rlLog "RUN ipa-replica-install"
+    if [ -z "$IPA_REPLICA_OPTIONS" ];then
+        IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+    fi
+    rlRun "ipa-replica-install $IPA_REPLICA_OPTIONS"
+    if [ $? -gt 0 ]; then
+        rlRun "submit_log /var/log/ipareplica-install.log"
+    fi
 
-    rlPhaseEnd
+    ipa_install_sssd_workarounds
 }
 
 ipa_install_client()
 {
     local MYMASTER=$1
-    rlPhaseStartTest "ipa_install_client - Install IPA Client"
-        rlLog "$FUNCNAME $MYMASTER"
+    rlLog "ipa_install_client - Install IPA Client"
+    rlLog "$FUNCNAME $MYMASTER"
 
-        ipa_install_prep
+    ipa_install_prep
 
-        for PKG in $IPA_CLIENT_PACKAGES; do
-            rlAssertRpm $PKG
-        done
+    for THISPKG in $IPA_CLIENT_PACKAGES; do
+        rlAssertRpm $THISPKG
+    done
 
-        rlLog "RUN ipa dns-add for client?"
+    rlLog "RUN ipa-client-install"
+    if [ -z "$IPA_CLIENT_OPTIONS" ]; then
+        IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
+    fi
+    rlRun "ipa-client-install $IPA_CLIENT_OPTIONS"
+    if [ $? -gt 0 ]; then
+        rlRun "submit_log /var/log/ipaclient-install.log"
+    fi
 
-        #rlLog "Starting master ($MYMASTER) tcpdump"
-        #ssh root@$MYMASTER "nohup tcpdump -s 0 -w /var/tmp/ipa-server.pcap > /tmp/nohup 2>&1 &"
+    ipa_install_sssd_workarounds
 
-        #rlLog "Starting local ($HOSTNAME) tcpdump"
-        #nohup tcpdump -s 0 -w /var/tmp/ipa-client.pcap > /tmp/nohup 2>&1 &
-        
-        rlLog "RUN ipa-client-install"
-        rlRun "ipa-client-install $IPAOPTIONS -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
-        if [ $? -gt 0 ]; then
-            rlRun "submit_log /var/log/ipareplica-install.log"
-        fi
+    CHK1=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+    if [ $CHK1 -gt 0 ]; then
+        rlLog "[FAIL1] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
+        submit_log /var/log/ipaclient-install.log
+    fi
 
-        ipa_install_sssd_workarounds
-
-        #rlLog "Killing local ($HOSTNAME) tcpdump"
-        #TCPDPID=""
-        #TCPDPID=$(ps -ef|grep tcpdump.*i[p]a-client.pcap|awk '{print $2}')
-        #if [ -n "$TCPDPID" ]; then
-        #   kill $TCPDPID
-        #fi
-
-        #rlLog "Killing master ($MYMASTER) tcpdump"
-        #TCPDPID=""
-        #TCPDPID=$(ssh root@$MYMASTER "ps -ef|grep tcpdump.*ip[a]-server.pcap|awk '{print \$2}'")
-        #if [ -n "$TCPDPID" ]; then
-        #   ssh root@$MYMASTER "kill $TCPDPID"
-        #fi
-
-        CHK1=$(grep "kinit: Preauthentication failed while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
-        if [ $CHK1 -gt 0 ]; then
-            rlLog "[FAIL1] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
-            submit_log /var/log/ipaclient-install.log
-        fi
-
-        CHK2=$(grep "kinit: Client.*not found in Kerberos database while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
-        if [ $CHK2 -gt 0 ]; then
-            rlLog "[FAIL2] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
-            submit_log /var/log/ipaclient-install.log
-        fi
-    rlPhaseEnd
+    CHK2=$(grep "kinit: Client.*not found in Kerberos database while getting initial credentials" /var/log/ipaclient-install.log|wc -l)
+    if [ $CHK2 -gt 0 ]; then
+        rlLog "[FAIL2] BZ 845691 found...ipa-client-install Failed to obtain host TGT"
+        submit_log /var/log/ipaclient-install.log
+    fi
 }
 
 ipa_connect_replica()
@@ -1112,10 +1135,8 @@ ipa_connect_replica()
     local REP1=$(echo $1|cut -f1 -d.).$DOMAIN
     local REP2=$(echo $2|cut -f1 -d.).$DOMAIN
     
-    rlPhaseStartTest "ipa_connect_replica - Create Replication Agreement between two servers"
-        rlLog "$FUNCNAME $REP1 $REP2"
-    
-        rlLog "RUN ipa-replica-manage connect $REP1 $REP2"
-        rlRun "ipa-replica-manage -p $ADMINPW connect $REP1 $REP2"
-    rlPhaseEnd
+    rlLog "ipa_connect_replica - Create Replication Agreement between two servers"
+    rlLog "$FUNCNAME $REP1 $REP2"
+    rlLog "RUN ipa-replica-manage connect $REP1 $REP2"
+    rlRun "ipa-replica-manage -p $ADMINPW connect $REP1 $REP2"
 }   
