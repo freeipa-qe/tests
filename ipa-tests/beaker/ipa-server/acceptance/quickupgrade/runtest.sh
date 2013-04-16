@@ -44,6 +44,9 @@ ISMASTER=$(echo "$MYROLE" |grep "MASTER"|wc -l)
 ISREPLICA=$(echo "$MYROLE" |grep "REPLICA"|wc -l)
 ISCLIENT=$(echo "$MYROLE" |grep "CLIENT"|wc -l)
 
+# Define unindent for this test
+alias unindent="sed -e 's/^[[:space:]]*//'"
+
 ##########################################
 #   test main 
 #########################################
