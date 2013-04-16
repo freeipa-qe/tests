@@ -67,7 +67,11 @@ ipa_upgrade_data_add()
     if [ $runver -ge 62 ]; then
         ipa_quicktest_user_add
         ipa_quicktest_group_add
-        ipa_quicktest_dnszone_add
+        if [ "$USEDNS" != "no" ]; then
+            ipa_quicktest_dnszone_add
+        else
+            rlLog "Skipping DNS zone add because we do not run DNS"
+        fi
         ipa_quicktest_host_add
         ipa_quicktest_hostgroup_add
         ipa_quicktest_netgroup_add
@@ -118,7 +122,11 @@ ipa_upgrade_data_check()
     if [ $runver -ge 60 ]; then
         ipa_quicktest_user_check
         ipa_quicktest_group_check
-        ipa_quicktest_dnszone_check
+        if [ "$USEDNS" != "no" ]; then
+            ipa_quicktest_dnszone_check
+        else
+            rlLog "Skipping DNS zone check because we do not run DNS"
+        fi
         ipa_quicktest_host_check
         ipa_quicktest_hostgroup_check
         ipa_quicktest_netgroup_check
