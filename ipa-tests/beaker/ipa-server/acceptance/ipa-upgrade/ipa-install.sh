@@ -678,6 +678,10 @@ ipa_install_topo()
 ipa_install_prep_initVars()
 {
     tmpout=/tmp/error_msg.out
+    rpm -qa|grep net-tools
+    if [ $? -eq 1 ];then
+        rlRun "yum install net-tools -y" 
+    fi
     currenteth=$(route | grep ^default | awk '{print $8}')
     ipaddr=$(ip -o -4 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
     ipv6addr=$(ip -o -6 addr show $currenteth|awk '{print $4}'|awk -F/ '{print $1}')
@@ -754,11 +758,19 @@ fixhostname()
     if [ "$USEDNS" != "no" ]; then
         ipa_install_prep_initVars
         
-        if [ ! -f /etc/sysconfig/network-ipabackup ]; then
-            rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
+        if [ -f /etc/sysconfig/network ]; then
+            if [ ! -f /etc/sysconfig/network-ipabackup ]; then
+                rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
+            fi
+            rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
+        else
+            if [ ! -f /etc/hostname ]; then
+                rlRun "cp /etc/hostname /etc/hostname-ipabackup"
+            fi
+            rlRun "echo \"$hostname_s.$DOMAIN\" > /etc/hostname"
         fi
+
         rlRun "hostname $hostname_s.$DOMAIN"
-        rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
     else
         rlLog "USEDNS=no, skipping hostname reconfig"
     fi
@@ -821,9 +833,18 @@ fixResolvIPv6()
 
 ipa_install_prep_disableFirewall()
 {
-    rlRun "chkconfig iptables off"
-    rlRun "chkconfig ip6tables off"
+    # Disable iptables, ip6tables, or firewalld
+    if [ -f /etc/init.d/iptables ]; then
+        rlRun "chkconfig iptables off"
+    fi
+    if [ -f /etc/init.d/ip6tables ]; then
+        rlRun "chkconfig ip6tables off"
+    fi
+    if [ -f /usr/lib/systemd/system/firewalld.service ]; then
+        rlRun "systemctl disable firewalld"
+    fi
 
+    # Turn off iptables or firewalld
     if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
         service iptables stop
         if [ $? -eq 1 ]; then
@@ -832,9 +853,15 @@ ipa_install_prep_disableFirewall()
             rlPass "BZ 845301 not found -- service iptables stop succeeeded"
         fi
     else    
-        rlRun "service iptables stop"
+        if [ -f /etc/init.d/iptables ]; then
+            rlRun "service iptables stop"
+        fi
+        if [ -f /usr/lib/systemd/system/firewalld.service ]; then
+            rlRun "systemctl stop firewalld"
+        fi
     fi
 
+    # Turn off ip6tables if it exists
     if [ $(cat /etc/redhat-release|grep "5\.[0-9]"|wc -l) -gt 0 ]; then
         service ip6tables stop
         if [ $? -eq 1 ]; then
@@ -843,7 +870,9 @@ ipa_install_prep_disableFirewall()
             rlPass "BZ 845301 not found -- service ip6tables stop succeeeded"
         fi
     else    
-        rlRun "service ip6tables stop"
+        if [ -f /etc/init.d/ip6tables ]; then
+            rlRun "service ip6tables stop"
+        fi
     fi
 }
 

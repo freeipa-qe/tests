@@ -69,6 +69,17 @@ rlJournalStart
         export MYBEAKERCLIENT=$(eval echo \$BEAKERCLIENT1_env${MYENV})
         export OSVER=$(sed 's/^.* \([0-9]\)\.\([0-9]\) .*$/\1\2/' /etc/redhat-release)
 
+        CFG=/opt/rhqa_ipa/env.sh
+        echo "export MASTER_S=$MASTER_S" >> $CFG
+        echo "export MASTER_IP=$MASTER_IP" >> $CFG
+        echo "export MYBEAKERMASTER=$MYBEAKERMASTER" >> $CFG
+        echo "export REPLICA1_S=$REPLICA1_S" >> $CFG
+        echo "export REPLICA1_IP=$REPLICA1_IP" >> $CFG
+        echo "export MYBEAKERREPLICA1=$MYBEAKERREPLICA1" >> $CFG
+        echo "export CLIENT_S=$CLIENT_S" >> $CFG
+        echo "export CLIENT_IP=$CLIENT_IP" >> $CFG
+        echo "export MYBEAKERCLIENT=$MYBEAKERCLIENT" >> $CFG
+
         rlRun "yum -y install strace"
     rlPhaseEnd
     

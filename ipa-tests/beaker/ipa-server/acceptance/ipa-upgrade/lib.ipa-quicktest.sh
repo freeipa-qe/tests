@@ -547,8 +547,10 @@ function ipa_quicktest_automember_del()
 function ipa_quicktest_ssh_add()
 {
     dlog_start $FUNCNAME
+    rlRun "hostname -s"
     if [ "$(hostname -s)" != "$MASTER_S" ]; then
         rlLog "$FUNCNAME must be run on MASTER ($MASTER)"
+        rlLog "MASTER_S=$MASTER_S"
         return 0
     fi
 
