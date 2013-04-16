@@ -794,40 +794,48 @@ rmIPv4addr()
 
 fixResolv()
 {
-    ipa_install_prep_initVars
-    
-    # we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
-    if [ ! -f /etc/resolv.conf.ipabackup ]; then
-        rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
-    fi
-    if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
-        for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
-            nsaddr=$(dig +short $ns $rrtype|tail -1)
-            rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
-        done
-        rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
-        rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
-        rlRun "rm -f /etc/resolv.conf.new"
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
+        
+        # we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
+        if [ ! -f /etc/resolv.conf.ipabackup ]; then
+            rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
+        fi
+        if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
+            for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
+                nsaddr=$(dig +short $ns $rrtype|tail -1)
+                rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
+            done
+            rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+            rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
+            rlRun "rm -f /etc/resolv.conf.new"
+        fi
+    else
+        rlLog "USEDNS=no, skipping resolv.conf reconfig"
     fi
     rlRun "cat /etc/resolv.conf"
 }
 
 fixResolvIPv6()
 {
-    ipa_install_prep_initVars
-    
-    # we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
-    if [ ! -f /etc/resolv.conf.ipabackup ]; then
-        rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
-    fi
-    if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
-        for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
-            nsaddr=$(dig +short $ns $rrtype|tail -1)
-            rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
-        done
-        rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
-        rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
-        rlRun "rm -f /etc/resolv.conf.new"
+    if [ "$USEDNS" != "no" ]; then
+        ipa_install_prep_initVars
+        
+        # we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
+        if [ ! -f /etc/resolv.conf.ipabackup ]; then
+            rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
+        fi
+        if [ $(echo $MYROLE | egrep "REPLICA|CLIENT"|wc -l) -gt 0 ]; then
+            for ns in $(eval echo \$BEAKERMASTER_env${MYENV}) $(eval echo \$BEAKERREPLICA_env${MYENV}); do
+                nsaddr=$(dig +short $ns $rrtype|tail -1)
+                rlRun "echo \"nameserver $nsaddr\" >> /etc/resolv.conf.new"
+            done
+            rlRun "sed -i s/^nameserver/#nameserver/g /etc/resolv.conf"
+            rlRun "cat /etc/resolv.conf.new >> /etc/resolv.conf"
+            rlRun "rm -f /etc/resolv.conf.new"
+        fi
+    else
+        rlLog "USEDNS=no, skipping resolv.conf reconfig"
     fi
 }
 
