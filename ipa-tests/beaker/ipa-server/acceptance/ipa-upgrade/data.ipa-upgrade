@@ -62,8 +62,8 @@ dnsptr1=2.2.4.in-addr.arpa.
 dnsptr2=2.3.4.in-addr.arpa.
 
 # Hosts
-host1=web.$DOMAIN
-host2=ftp.$DOMAIN
+host1=web
+host2=ftp
 ipv41=4.2.2.100
 ipv42=4.3.2.101
 
@@ -91,8 +91,8 @@ amgroup1=finance
 amhostgroup1=calchostgroup
 amuser1=todd
 amuser2=tedd
-amhost1=bank.${DOMAIN}
-amhost2=postoffice.${DOMAIN}
+amhost1=bank
+amhost2=postoffice
 
 # SSH
 sshuser1=sshuser1

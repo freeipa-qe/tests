@@ -192,35 +192,35 @@ function ipa_quicktest_dnszone_del()
 function ipa_quicktest_host_add()
 {
     dlog_start $FUNCNAME
-    ipa host-show ${host1} > /dev/null 2>&1
+    ipa host-show ${host1}.${DOMAIN} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
-        rlRun "ipa host-add ${host1} --ip-address=${ipv41}"
+        rlRun "ipa host-add ${host1}.${DOMAIN} --ip-address=${ipv41}"
     else
-        rlLog "Host ${host1} already exists"
+        rlLog "Host ${host1}.${DOMAIN} already exists"
     fi
 
-    ipa host-show ${host2} > /dev/null 2>&1
+    ipa host-show ${host2}.${DOMAIN} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
-        rlRun "ipa host-add ${host2} --ip-address=${ipv42}"
+        rlRun "ipa host-add ${host2}.${DOMAIN} --ip-address=${ipv42}"
     else
-        rlLog "Host ${host2} already exists"
+        rlLog "Host ${host2}.${DOMAIN} already exists"
     fi
 }
 
 function ipa_quicktest_host_check()
 {
     dlog_start $FUNCNAME
-    rlRun "ipa host-show ${host1}"
-    rlRun "ipa host-show ${host2}"
+    rlRun "ipa host-show ${host1}.${DOMAIN}"
+    rlRun "ipa host-show ${host2}.${DOMAIN}"
 }
 
 function ipa_quicktest_host_dns_check()
 {
     dlog_start $FUNCNAME
-    rlRun "dig +short ${host1} a > $tmpout 2>&1"
+    rlRun "dig +short ${host1}.${DOMAIN} a > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "${ipv41}" $tmpout
-    rlRun "dig +short ${host2} a > $tmpout 2>&1"
+    rlRun "dig +short ${host2}.${DOMAIN} a > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "${ipv42}" $tmpout
 }
@@ -228,8 +228,8 @@ function ipa_quicktest_host_dns_check()
 function ipa_quicktest_host_del()
 {
     dlog_start $FUNCNAME
-    rlRun "ipa host-del ${host1} --updatedns"
-    rlRun "ipa host-del ${host2} --updatedns"
+    rlRun "ipa host-del ${host1}.${DOMAIN} --updatedns"
+    rlRun "ipa host-del ${host2}.${DOMAIN} --updatedns"
 }
 
 ######################################################################
@@ -241,7 +241,7 @@ function ipa_quicktest_hostgroup_add()
     ipa hostgroup-show ${hostgroup1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa hostgroup-add ${hostgroup1} --desc=hostgroupdesc"
-        rlRun "ipa hostgroup-add-member ${hostgroup1} --hosts=${host1}"
+        rlRun "ipa hostgroup-add-member ${hostgroup1} --hosts=${host1}.${DOMAIN}"
     else
         rlLog "Hostgroup ${hostgroup1} already exists"
     fi
@@ -249,7 +249,7 @@ function ipa_quicktest_hostgroup_add()
     ipa hostgroup-show ${hostgroup2} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa hostgroup-add ${hostgroup2} --desc=hostgroupdesc"
-        rlRun "ipa hostgroup-add-member ${hostgroup2} --hosts=${host2}"
+        rlRun "ipa hostgroup-add-member ${hostgroup2} --hosts=${host2}.${DOMAIN}"
     else
         rlLog "Hostgroup ${hostgroup2} already exists"
     fi
@@ -280,7 +280,7 @@ function ipa_quicktest_netgroup_add()
     ipa netgroup-show ${netgroup1} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa netgroup-add ${netgroup1} --desc=netgroupdesc"
-        rlRun "ipa netgroup-add-member ${netgroup1} --hosts=${host1} --users=${user1}"
+        rlRun "ipa netgroup-add-member ${netgroup1} --hosts=${host1}.${DOMAIN} --users=${user1}"
     else
         rlLog "Netgroup ${netgroup1} already exists"
     fi
@@ -288,7 +288,7 @@ function ipa_quicktest_netgroup_add()
     ipa netgroup-show ${netgroup2} > /dev/null 2>&1
     if [ $? -eq 2 ]; then
         rlRun "ipa netgroup-add ${netgroup2} --desc=netgroupdesc"
-        rlRun "ipa netgroup-add-member ${netgroup2} --hosts=${host2} --users=${user2}"
+        rlRun "ipa netgroup-add-member ${netgroup2} --hosts=${host2}.${DOMAIN} --users=${user2}"
     else
         rlLog "Netgroup ${netgroup2} already exists"
     fi
@@ -434,12 +434,12 @@ function ipa_quicktest_automember_add()
         rlRun "ipa automember-add ${amgroup1} --type=group"
         rlRun "ipa automember-add ${amhostgroup1} --type=hostgroup"
         rlRun "ipa automember-add-condition ${amgroup1} --type=group --key=sn --inclusive=one"
-        rlRun "ipa automember-add-condition ${amhostgroup1} --type=hostgroup --key=fqdn --exclusive-regex=^${host2}"
+        rlRun "ipa automember-add-condition ${amhostgroup1} --type=hostgroup --key=fqdn --exclusive-regex=^${host2}.${DOMAIN}"
         rlRun "ipa automember-add-condition ${amhostgroup1} --type=hostgroup --key=fqdn --inclusive-regex=^.*\.${DOMAIN}"
         rlRun "ipa user-add ${amuser1} --first=First --last=one"
         rlRun "ipa user-add ${amuser2} --first=First --last=two"
-        rlRun "ipa host-add ${amhost1} --force"
-        rlRun "ipa host-add ${amhost2} --force"
+        rlRun "ipa host-add ${amhost1}.${DOMAIN} --force"
+        rlRun "ipa host-add ${amhost2}.${DOMAIN} --force"
     else
         rlLog "Automember ${amgroup1} already exists"
     fi
@@ -482,7 +482,7 @@ function ipa_quicktest_automember_check()
         rlRun "cat $tmpout"
         rlAssertGrep "${amhostgroup1}" $tmpout
         rlAssertGrep "Inclusive Regex: fqdn=^.*\.${DOMAIN}" $tmpout
-        rlAssertGrep "Exclusive Regex: fqdn=^${host2}" $tmpout
+        rlAssertGrep "Exclusive Regex: fqdn=^${host2}.${DOMAIN}" $tmpout
     else
         rlLog "automember-show should fail for old version"
         rlRun "ipa automember-show --type=hostgroup ${amhostgroup1} > $tmpout 2>&1" 1
@@ -512,7 +512,7 @@ function ipa_quicktest_automember_check()
 
 
     rlLog "Confirm host added as member of ${amhostgroup1}"
-    rlRun "ipa host-show ${amhost1} > $tmpout 2>&1"
+    rlRun "ipa host-show ${amhost1}.${DOMAIN} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "Member of host-groups.*${amhostgroup1}" $tmpout
 
@@ -520,10 +520,10 @@ function ipa_quicktest_automember_check()
     rlRun "ipa host-show ${amhost2} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertGrep "Member of host-groups.*${amhostgroup1}" $tmpout
-    rlRun "getent -s sss netgroup ${amhostgroup1}|grep ${amhost1}"
+    rlRun "getent -s sss netgroup ${amhostgroup1}|grep ${amhost1}.${DOMAIN}"
 
     rlLog "Confirming host not a member of excluded hostgroup"
-    rlRun "ipa host-show ${host2} > $tmpout 2>&1"
+    rlRun "ipa host-show ${host2}.${DOMAIN} > $tmpout 2>&1"
     rlRun "cat $tmpout"
     rlAssertNotGrep "Member of host-groups.*${amhostgroup1}" $tmpout
 }
@@ -537,8 +537,8 @@ function ipa_quicktest_automember_del()
     rlRun "ipa user-del ${amuser2}"
     rlRun "ipa group-del ${amgroup1}"
     rlRun "ipa hostgroup-del ${amhostgroup1}"
-    rlRun "ipa host-del ${amhost1}"
-    rlRun "ipa host-del ${amhost2}"
+    rlRun "ipa host-del ${amhost1}.${DOMAIN}"
+    rlRun "ipa host-del ${amhost2}.${DOMAIN}"
 }
 
 ######################################################################
