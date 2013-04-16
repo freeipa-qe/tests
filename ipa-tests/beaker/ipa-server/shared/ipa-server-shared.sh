@@ -29,6 +29,7 @@
 #   submit_log
 #   submit_logs
 #	rlDistroDiff
+#   unindent
 ######################################################################
 cat /etc/redhat-release | grep "5\.[0-9]"
 if [ $? -eq 0 ] ; then
@@ -963,10 +964,6 @@ ipa_quick_uninstall(){
 		rlRun "yum -y reinstall pki-selinux"
 	fi
 
-	rlRun "yum -y remove 'ipa*' '389-ds-base*' bind krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd httpd-tools"
-	rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client 'pki*' 'tomcat6*' mod_nss"
-	rlRun "yum -y remove memcached python-memcached"
-	rlRun "yum -y remove libldb libsss_autofs"
 	if [ -d /var/lib/ipa ]; then
 		rlRun "/bin/rm -rf /var/lib/ipa/"
 	fi
@@ -1022,8 +1019,6 @@ ipa_quick_uninstall(){
 	fi
 	. /etc/sysconfig/network
 	rlRun "hostname $HOSTNAME"
-	rlRun "yum -y downgrade krb5-devel krb5-libs bind-*"
-	rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
 
 	CERTCHK=$(certutil -L -d /etc/pki/nssdb 2>/dev/null |grep "IPA CA"|wc -l)
 	if [ $CERTCHK -gt 0 ]; then
@@ -1031,7 +1026,23 @@ ipa_quick_uninstall(){
 		rlRun "certutil -D -d /etc/pki/nssdb -n 'IPA CA'"
 	fi
 
+    #rlRun "service certmonger stop"
+    #if [ -d /var/lib/certmonger ]; then
+    #    rlRun "rm -rf /var/lib/certmonger"
+    #fi
+
 } #ipa_quick_uninstall 
+
+ipa_quick_remove()
+{
+    yum_opts="--rpmverbosity=debug"
+    rlRun "yum -y remove 'ipa*' '389-ds-base*' bind krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd httpd-tools"
+    rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client 'pki*' 'tomcat6*' mod_nss"
+    rlRun "yum -y remove memcached python-memcached"
+    rlRun "yum -y remove libldb libsss_autofs"
+    rlRun "yum -y downgrade krb5-devel krb5-libs bind-*"
+    rlRun "yum -y downgrade curl nss* openldap* libselinux* nspr* libcurl*"
+}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # check_coredump
@@ -1175,6 +1186,17 @@ rlDistroDiff() {
                 os_rhel
         fi
 
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# unindent function useful for here-strings (and/or here-docs)
+# unindent > /path/to/file <<<"\
+#     this will all be left 
+#     justified when it's read in"
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+function unindent()
+{ 
+    sed -e 's/^[[:space:]]*//'
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
