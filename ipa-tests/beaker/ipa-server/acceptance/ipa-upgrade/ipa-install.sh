@@ -1082,8 +1082,14 @@ ipa_install_replica()
         rlAssertRpm $THISPKG
     done
 
+    if [ "$USEDNS" != "no" ]; then
+        PREPOPTS="-p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN"
+    else
+        PREPOPTS="-p $ADMINPW $hostname_s.$DOMAIN"
+    fi
+
     rlLog "RUN ipa-replica-prepare on $MYMASTER"
-    rlRun "ssh -o StrictHostKeyChecking=no root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\" ; service named restart"
+    rlRun "ssh -o StrictHostKeyChecking=no root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare $PREPOPTS\" ; service named restart"
     # named can take a little time to update sometimes?
     rlRun "sleep 60"
 
