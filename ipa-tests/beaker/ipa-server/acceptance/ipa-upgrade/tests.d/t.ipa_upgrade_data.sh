@@ -113,6 +113,11 @@ ipa_upgrade_data_check()
 
     rlRun "KinitAsAdmin"
     rlRun "sleep 10" # delay before starting tests...
+    if [ "$runtype" = "old" ]; then
+        rlLog "Debugging possible sssd issues when not yet upgraded"
+        rlRun "ps -ef|grep sssd"
+        rlRun "service sssd status"
+    fi
 
     # check replica update schedule 
     rlLog "CHECKING: ldapsearch -x -h $MYBEAKERMASTER -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -b \"cn=mapping tree,cn=config\"|grep 'nsDS5ReplicaUpdateSchedule'"
