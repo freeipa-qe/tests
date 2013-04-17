@@ -309,6 +309,29 @@ ipa_upgrade_master_replica_client_nodns()
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
+
+        if [ $(echo "$MYROLE" | grep -i "CLIENT" | wc -l) -gt 0 ]; then
+
+            rlLog "DEBUG LOCALLOOKUPFAILURES !!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            rlLog
+            rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.nodns_1"
+            rlLog "Running: sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf"
+            sed -i 's/\(\[domain.*\]\)$/\1\ndebug_level = 6/' /etc/sssd/sssd.conf
+            rlRun "cat /etc/sssd/sssd.conf"
+            rlRun "service sssd restart"
+            rlRun "sleep 5"
+            rlRun "cat /dev/null > /var/log/sssd/sssd_${DOMAIN}.log"
+            rlRun "id jack"
+            rlRun "submit_log /var/log/sssd/sssd_${DOMAIN}.log"
+            rlRun "cp -f /etc/sssd/sssd.conf.nodns_1 /etc/sssd/sssd.conf"
+            rlRun "rm -f /etc/sssd/sssd.conf.nodns_1"
+            rlRun "service sssd restart"
+            rlRun "sleep 5"
+            rlLog
+            rlLog "DEBUG LOCALLOOKUPFAILURES !!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
+        fi
+
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
     rlPhaseEnd
 
