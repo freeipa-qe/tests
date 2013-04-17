@@ -719,9 +719,9 @@ ipa_install_prep_setTime()
 
 fixHostFile()
 {
-    if [ "$USEDNS" != "no" ]; then
-        ipa_install_prep_initVars
+    ipa_install_prep_initVars
 
+    if [ "$USEDNS" != "no" ]; then
         cp -af /etc/hosts /etc/hosts.ipabackup
         rlRun "sed -i s/$hostname//g    /etc/hosts"
         rlRun "sed -i s/$hostname_s//g  /etc/hosts"
@@ -738,9 +738,9 @@ fixHostFile()
 
 fixHostFileIPv6()
 {
-    if [ "$USEDNS" != "no" ]; then
-        ipa_install_prep_initVars
+    ipa_install_prep_initVars
 
+    if [ "$USEDNS" != "no" ]; then
         cp -af /etc/hosts /etc/hosts.ipabackup
         rlRun "sed -i s/$hostname//g    /etc/hosts"
         rlRun "sed -i s/$hostname_s//g  /etc/hosts"
@@ -755,9 +755,9 @@ fixHostFileIPv6()
 
 fixhostname()
 {
-    if [ "$USEDNS" != "no" ]; then
-        ipa_install_prep_initVars
+    ipa_install_prep_initVars
         
+    if [ "$USEDNS" != "no" ]; then
         if [ -f /etc/sysconfig/network ]; then
             if [ ! -f /etc/sysconfig/network-ipabackup ]; then
                 rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
@@ -794,9 +794,9 @@ rmIPv4addr()
 
 fixResolv()
 {
+    ipa_install_prep_initVars
+
     if [ "$USEDNS" != "no" ]; then
-        ipa_install_prep_initVars
-        
         # we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
         if [ ! -f /etc/resolv.conf.ipabackup ]; then
             rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
@@ -818,9 +818,9 @@ fixResolv()
 
 fixResolvIPv6()
 {
-    if [ "$USEDNS" != "no" ]; then
-        ipa_install_prep_initVars
+    ipa_install_prep_initVars
         
+    if [ "$USEDNS" != "no" ]; then
         # we use the RRTYPE here in $rrtype to determine if IPv4 vs IPv6 address needed.
         if [ ! -f /etc/resolv.conf.ipabackup ]; then
             rlRun "cp /etc/resolv.conf /etc/resolv.conf.ipabackup"
