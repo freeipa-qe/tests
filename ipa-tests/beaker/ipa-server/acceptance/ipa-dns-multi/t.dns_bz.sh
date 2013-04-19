@@ -15,6 +15,7 @@ dnsbugs()
    bz766233
    bz869658
    bz869324
+   bz869325
 
    dnsbugcleanup
 }
@@ -126,7 +127,8 @@ bz869324()
 
 	export MASTER_env1_short=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 1 | cut -d\. -f1)
 	export MASTER_env2_short=$(host -4 $MASTER_env2 |  grep -v IPv6 | cut -d\  -f 1 | cut -d\. -f1)
-	hname=$(hostname)
+	hname=$(hostname)	
+	export hname
 	ipOfMaster1=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 4)
 	ipOfMaster2=$(host -4 $MASTER_env2 |  grep -v IPv6 | cut -d\  -f 4)
 
@@ -156,6 +158,46 @@ bz869324()
 		rlRun "ipa dnszone-del $tzone" 0 "cleaning up test zone."
         	rlLog "test complete"
 	fi
+	rlPhaseEnd
+}
+
+bz869325()
+{
+	tzone="bz669325zone.com"
+	rlPhaseStartTest "BZ 869325 - Zones with conditional forwarder are not removed properly when persistent search is enabled"
+		export MASTER_env1_short=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 1 | cut -d\. -f1)
+		export MASTER_env2_short=$(host -4 $MASTER_env2 |  grep -v IPv6 | cut -d\  -f 1 | cut -d\. -f1)
+		hname=$(hostname)	
+		export hname
+		ipOfMaster1=$(host -4 $MASTER_env1 |  grep -v IPv6 | cut -d\  -f 4)
+		ipOfMaster2=$(host -4 $MASTER_env2 |  grep -v IPv6 | cut -d\  -f 4)
+
+		if [ "$MYROLE" == "MASTER1" ]; then
+			rlRun "dig @127.0.0.1 -t ANY $tzone | grep ANSWER\ SECTION" 1 "Before we begin, ensure that $tzone does not exist on master1 in any way"
+			rlRun "ipa dnszone-add $tzone --name-server=$hname. --admin-email='$hname' --force --forwarder=$ipOfMaster2 --forward-policy=only" 0 "Adding $tzone on master 1 with forward policy set to only"
+			rlRun "dig @127.0.0.1 test.$tzone | grep ANSWER\ SECTION" 1 "Ensure that we cannot resolve the test record from the second master"
+			iparhts-sync-set -s 869325_MASTER1_SETUP_COMPLETE -m $MASTER_env2		
+	        	iparhts-sync-block -s 869325_MASTER2_SETUP_COMPLETE $MASTER_env2
+			# Now the records and zones should exist
+			rlRun "dig @127.0.0.1 -t ANY $tzone | grep ANSWER\ SECTION" 0 "Make sure the zone is created and returning answers"
+			rlRun "dig @127.0.0.1 test.$tzone | grep ANSWER\ SECTION | grep 4.2.2.2" 0 "Ensure that test.$tzone is set up correctly and pulling from master 2."
+			# The initial phase seting up forwarding is complete. Delete the zone and make sure it now does not work after.
+			rlRun "ipa dnszone-del $tzone" 0 "Deleting the test zone"
+			rlRun "dig @127.0.0.1 -t ANY $tzone | grep ANSWER\ SECTION" 1 "Make sure the zone does not return any answers after removing forwarding zone"
+			rlRun "dig @127.0.0.1 test.$tzone | grep ANSWER\ SECTION" 1 "Ensure that test.$tzone does not resolve anywhere"
+			iparhts-sync-set -s 869325_MASTER1_TEST_COMPLETE -m $MASTER_env2		
+	        	iparhts-sync-block -s 869325_MASTER2_TEST_COMPLETE $MASTER_env2
+		else
+	        	iparhts-sync-block -s 869325_MASTER1_SETUP_COMPLETE $MASTER_env1
+			rlRun "dig @127.0.0.1 -t ANY $tzone | grep ANSWER\ SECTION" 1 "Before we begin, ensure that $tzone does not exist on master2 in any way"
+			rlRun "ipa dnszone-add $tzone --name-server=$hname. --admin-email='$hname' --force" 0 "Adding $tzone on master 2"
+			rlRun "ipa dnsrecord-add $tzone test --a-rec=4.2.2.2" 0 "Add record to test resolving to on first master"
+			iparhts-sync-set -s 869325_MASTER2_SETUP_COMPLETE -m $MASTER_env1
+	        	iparhts-sync-block -s 869325_MASTER1_TEST_COMPLETE $MASTER_env1
+			# Tests should be completed, waiting on Master 1.
+			rlRun "ipa dnszone-del $tzone" 0 "Deleting the test zone"
+			iparhts-sync-set -s 869325_MASTER2_TEST_COMPLETE -m $MASTER_env1
+		fi
 	rlPhaseEnd
 }
 
