@@ -264,6 +264,7 @@ ipa_upgrade_client_replica_master_all()
     rlPhaseStartTest "ipa_upgrade_client_replica_master_all_3: test upgrade with new master, new replica, and new client"
         upgrade_master 
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
+        log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
         if [ $(echo "$MYROLE" |grep "REPLICA"|wc -l) -gt 0 ]; then
             rlRun "ipa-replica-manage list -v `hostname`"
             rlRun "cp $log $log.ipa_upgrade_client_replica_master_all_3"

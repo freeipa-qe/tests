@@ -92,14 +92,14 @@ ipa_upgrade_install_replica()
         rlRun "getcert list-cas"
         rlRun "find /var/lib/certmonger -ls"
 
-        rlLog "Enable LDAP ACI Summary Debugging"
-        LLOG=/tmp/ldap.enable.errlog
-        unindent > $LLOG <<<"\
-        dn: cn=config
-        changetype: modify
-        replace: nsslapd-errorlog-level
-        nsslapd-errorlog-level: 262144"
-        rlRun "ldapmodify -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $LLOG"
+        #rlLog "Enable LDAP ACI Summary Debugging"
+        #LLOG=/tmp/ldap.enable.errlog
+        #unindent > $LLOG <<<"\
+        #dn: cn=config
+        #changetype: modify
+        #replace: nsslapd-errorlog-level
+        #nsslapd-errorlog-level: 262144"
+        #rlRun "ldapmodify -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $LLOG"
 
         #if [ ! -f /etc/sssd/sssd.conf.backup.getent ]; then
         #    rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.backup.getent"
