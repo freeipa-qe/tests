@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/tests/Regression/ipa-replica-manage
+Description: IPA ipa-replica-manage Acceptance Tests
+Author: Scott Poore <spoore@redhat.com>
