@@ -54,6 +54,7 @@ ipa_upgrade_master_replica_client_all()
         upgrade_master 
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
+        ipa_upgrade_bz_949885 $MYBEAKERREPLICA1
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
     rlPhaseEnd
@@ -281,6 +282,7 @@ ipa_upgrade_master_replica_client_nodns()
     reset_repos
     USEDNS="no"
     TESTDOMAIN=${DOMAIN}
+    TESTCOUNTLAST=${TESTCOUNT}
 
     # Reset variables for nodns test
     ipa_install_envcleanup
@@ -290,6 +292,7 @@ ipa_upgrade_master_replica_client_nodns()
     CLIENT=$MYBEAKERCLIENT
     ipa_install_set_vars
     DOMAIN=$(dnsdomainname)
+    TESTCOUNT=${TESTCOUNTLAST}
 
     IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"

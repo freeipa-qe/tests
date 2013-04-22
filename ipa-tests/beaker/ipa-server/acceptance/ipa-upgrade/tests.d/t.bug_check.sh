@@ -873,6 +873,56 @@ upgrade_bz_902474()
     [ -f $tmpout ] && rm -f $tmpout
 }
 
+ipa_upgrade_bz_949885()
+{
+    local runhost=$1
+    local tmpout=/tmp/errormsg.out
+    TESTCOUNT=$(( TESTCOUNT += 1 ))
+    rlLog "ipa_upgrade_bz_949885 - checking for DNS/KRB failure due to Dirsrv upgrade incompat"
+    rlLog "Machine in recipe is $MYROLE ($HOSTNAME)"
+    if [ -z "$runhost" ]; then
+        rlFail "$FUNCNAME: requires paramater to determine host to run on"
+        return 0
+    fi
+
+    if [ "$(hostname -s)" != $(echo $runhost|cut -f1 -d.) ]; then
+        rlLog "ipa_upgrade_bz_949885_other: checking for bug on another server right now"
+        rlLog "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT.1' $runhost"
+        rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT.1' $runhost"
+        return 0
+    fi
+
+    if [ ! -f /var/kerberos/krb5kdc/ldappwd ]; then
+        rlLog "No /var/kerberos/krb5kdc/ldappwd file to pull kdc user password from"
+        rlLog "May not be succeptible to bug"
+        RELEASEFILE=$(cat /etc/redhat-release)
+        rlLog "$RELEASEFILE"
+        return 0
+    fi
+
+    rlRun "KinitAsAdmin"
+    if [ $? -ne 0 ]; then
+        KDCUID="uid=kdc,cn=sysaccounts,cn=etc,dc=testrelm,dc=com"
+        KDCPASSHEX=$(cat /var/kerberos/krb5kdc/ldappwd |sed 's/^.*#{HEX}//')
+        KDCPASSWORD=""
+        for letter in $(echo $KDCPASSHEX| sed 's/\(.\{2\}\)/\1 /g'); do
+            KDCPASSWORD="$KDCPASSWORD$(echo 0x$letter|gawk '{printf "%c\n",strtonum($0)}')"
+        done 
+
+        ldapsearch -h localhost -D "$KDCUID" -x -w "$KDCPASSWORD" \
+            -b "dc=testrelm,dc=com" > $tmpout 2>&1
+
+        if [ $(grep dn: $tmpout|grep -v kerberos|wc -l) -eq 0 ]; then
+            rlFail "BZ 949885 found...Nonfunctional ACI disallows global access to IPA DIT and breaks Kerberos KDC"
+        fi
+    fi
+
+
+    rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.1' -m $runhost"
+}
+    
+
+
 replicaBugCheck_bz830314()
 {
     rlLog "replicaBugCheck_bz830314 - ipa-replica-install named failed to start"
