@@ -914,6 +914,7 @@ ipa_upgrade_bz_949885()
 
         if [ $(grep dn: $tmpout|grep -v kerberos|wc -l) -eq 0 ]; then
             rlFail "BZ 949885 found...Nonfunctional ACI disallows global access to IPA DIT and breaks Kerberos KDC"
+            return 1
         fi
     fi
 

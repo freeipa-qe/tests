@@ -55,7 +55,12 @@ ipa_upgrade_master_replica_client_all()
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_bz_949885 $MYBEAKERREPLICA1
-        ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
+        if [ $? -ne 1 ]; then
+            ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
+        else
+            rlFail "Skipping ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old"
+            rlFail "Bug 949885 hit and data checks will fail until replica upgraded"
+        fi
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
     rlPhaseEnd
 
