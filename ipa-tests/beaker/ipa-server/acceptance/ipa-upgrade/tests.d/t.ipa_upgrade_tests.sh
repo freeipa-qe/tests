@@ -46,6 +46,11 @@ ipa_upgrade_master_replica_client_all()
         ipa_upgrade_install_master
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
+
+        rlLog "DEBUGGING client failure"
+        rlRun "cat /etc/ipa/.dns_update.txt"
+        rlRun "sleep 10000000"
+
         ipa_upgrade_data_add $MYBEAKERMASTER
         ipa_upgrade_data_check $MYBEAKERREPLICA1
     rlPhaseEnd
@@ -122,6 +127,33 @@ ipa_upgrade_master_replica_parallel()
         ipa_upgrade_uninstall_replica
         ipa_upgrade_uninstall_master
     rlPhaseEnd
+}
+
+ipa_upgrade_master_replica_client_inc()
+{
+    ipa_upgrade_master_replica_client_inc_setup
+    if rlIsRHEL "<6.3"; then
+        ipa_upgrade_master_replica_client_inc_63
+    fi
+    if rlIsRHEL "6.3"; then
+        ipa_upgrade_master_replica_client_inc_64
+    fi
+    #if rlIsRHEL "6.4"; then
+    #    ipa_upgrade_master_replica_client_inc_65
+    #fi
+    #if rlIsRHEL "6.5"; then
+    #    ipa_upgrade_master_replica_client_inc_66
+    #fi
+    #if rlIsRHEL "6.6"; then
+    #    ipa_upgrade_master_replica_client_inc_67
+    #fi
+    #if rlIsRHEL "6.7"; then
+    #    ipa_upgrade_master_replica_client_inc_68
+    #fi
+    #if rlIsRHEL "6.8"; then
+    #    ipa_upgrade_master_replica_client_inc_69
+    #fi
+    ipa_upgrade_master_replica_client_inc_cleanup
 }
 
 ipa_upgrade_master_replica_client_inc_setup()

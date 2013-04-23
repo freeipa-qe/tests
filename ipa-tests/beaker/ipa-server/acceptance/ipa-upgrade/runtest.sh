@@ -85,35 +85,22 @@ rlJournalStart
     
     # Main test functions in tests.d/t.tests.sh:
 
-    # First run the incremental upgrade tests:
-    ipa_upgrade_master_replica_client_inc_setup
-    if rlIsRHEL "<6.3"; then
-        ipa_upgrade_master_replica_client_inc_63
+    if [ "$TESTTYPE" = "incremental" -o -z "$TESTTYPE" ]; then
+        ipa_upgrade_master_replica_client_inc
     fi
-    if rlIsRHEL "6.3"; then
-        ipa_upgrade_master_replica_client_inc_64
+    if [ "$TESTTYPE" = "parallel" -o -z "$TESTTYPE" ]; then
+        ipa_upgrade_master_replica_parallel
     fi
-    #if rlIsRHEL "6.4"; then
-    #    ipa_upgrade_master_replica_client_inc_65
-    #fi
-    #if rlIsRHEL "6.5"; then
-    #    ipa_upgrade_master_replica_client_inc_66
-    #fi
-    #if rlIsRHEL "6.6"; then
-    #    ipa_upgrade_master_replica_client_inc_67
-    #fi
-    #if rlIsRHEL "6.7"; then
-    #    ipa_upgrade_master_replica_client_inc_68
-    #fi
-    #if rlIsRHEL "6.8"; then
-    #    ipa_upgrade_master_replica_client_inc_69
-    #fi
-    ipa_upgrade_master_replica_client_inc_cleanup
+    if [ "$TESTTYPE" = "normal" -o -z "$TESTTYPE" ]; then
+        ipa_upgrade_master_replica_client_all
+    fi
+    if [ "$TESTTYPE" = "reverse" -o -z "$TESTTYPE" ]; then
+        ipa_upgrade_client_replica_master_all
+    fi
+    if [ "$TESTTYPE" = "nodns" -o -z "$TESTTYPE" ]; then
+        ipa_upgrade_master_replica_client_nodns 
+    fi
 
-    ipa_upgrade_master_replica_parallel
-    ipa_upgrade_master_replica_client_all
-    ipa_upgrade_client_replica_master_all
-    ipa_upgrade_master_replica_client_nodns 
 #    ipa_upgrade_master_replica_client_dirsrv_off
     #upgrade_test_master_bz_866977
     #upgrade_test_master_bz_tests
