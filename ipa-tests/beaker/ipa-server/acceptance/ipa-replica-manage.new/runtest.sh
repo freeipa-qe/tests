@@ -42,7 +42,7 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /opt/rhqa_ipa/ipa-server-shared.sh
 . /opt/rhqa_ipa/env.sh
-. ./ipa-install.sh
+. /opt/rhqa_ipa/ipa-install.sh
 
 # Include test case files
 for file in $(ls tests.d/t.*.sh); do
@@ -73,7 +73,6 @@ echo "export MY_BR4=$(eval echo \$BEAKERREPLICA4_env${MYENV})" >> $CFG
 
 rlJournalStart
     rlPhaseStartSetup "ipa-replica-manage startup: Check for ipa-server package"
-        rlAssertRpm $PACKAGE
 		rlRun "env|sort"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
