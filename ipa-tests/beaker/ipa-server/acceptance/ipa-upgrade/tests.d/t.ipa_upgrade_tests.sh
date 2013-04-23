@@ -38,7 +38,7 @@ ipa_upgrade_master_replica_client_all()
     USEDNS="yes"
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_all_setup: setup to test full setup for master, then replica, then client"
         rlRun "env|sort"
@@ -128,7 +128,7 @@ ipa_upgrade_master_replica_client_inc_setup()
 {   
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
     USEDNS="yes"
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_inc_setup: setup to test full setup for master, then replica, then client"
@@ -188,7 +188,7 @@ ipa_upgrade_master_replica_client_inc_64()
     myrepo2=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/optional/\$basearch/os/
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
     USEDNS="yes"
 
     rlPhaseStartTest "ipa_upgrade_master_replica_client_inc_64_1: test upgrade with new master, old replica, and old client"
@@ -223,7 +223,7 @@ ipa_upgrade_client_replica_master_all()
     USEDNS="yes"
     IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
 
     local tmpout=/tmp/errormsg.out
     rlPhaseStartSetup "ipa_upgrade_client_replica_master_all_setup: setup to test full setup for client, then replica, then master"
@@ -288,7 +288,6 @@ ipa_upgrade_master_replica_client_nodns()
     reset_repos
     USEDNS="no"
     TESTDOMAIN=${DOMAIN}
-    TESTCOUNTLAST=${TESTCOUNT}
 
     # Reset variables for nodns test
     ipa_install_envcleanup
@@ -298,11 +297,10 @@ ipa_upgrade_master_replica_client_nodns()
     CLIENT=$MYBEAKERCLIENT
     ipa_install_set_vars
     DOMAIN=$(dnsdomainname)
-    TESTCOUNT=${TESTCOUNTLAST}
 
     IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"
-    IPA_CLIENT_OPTIONS="-U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER --domain=$DOMAIN"
+    IPA_CLIENT_OPTIONS="-d -U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER --domain=$DOMAIN"
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_nodns_setup: setup to test without dns for master, then replica, then client"
         rlRun "env|sort"
@@ -374,7 +372,7 @@ ipa_upgrade_master_replica_client_dirsrv_off()
     USEDNS="yes"
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_dirsrv_off_setup: setup to test full setup for master, then replica, then client"
         rlRun "env|sort"
