@@ -42,7 +42,7 @@ ipa_install_envcleanup()
 ipa_install_set_vars()
 {
     # Initialize Global TESTCOUNT variable
-    TESTCOUNT=1
+    # TESTCOUNT=1
 
     # First let's normalize the data to use <ROLE>_env<NUM> variables:
     [ -n "$MASTER"  -a -z "$MASTER_env1"  ] && export MASTER_env1="$MASTER"
@@ -700,6 +700,7 @@ ipa_install_prep_pkgInstalls()
 {
     rlRun "yum clean all"
     rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
+    rlRun "yum -y install ntp autogen-libopts"
     if [ $(echo $MYROLE|grep CLIENT|wc -l) -gt 0 ]; then
         rlRun "yum -y install nscd httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
         rlRun "yum -y install $YUM_OPTIONS $IPA_CLIENT_PACKAGES"
@@ -1082,8 +1083,14 @@ ipa_install_replica()
         rlAssertRpm $THISPKG
     done
 
+    if [ "$USEDNS" != "no" ]; then
+        PREPOPTS="-p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN"
+    else
+        PREPOPTS="-p $ADMINPW $hostname_s.$DOMAIN"
+    fi
+
     rlLog "RUN ipa-replica-prepare on $MYMASTER"
-    rlRun "ssh -o StrictHostKeyChecking=no root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare -p $ADMINPW --ip-address=$ipaddr $hostname_s.$DOMAIN\" ; service named restart"
+    rlRun "ssh -o StrictHostKeyChecking=no root@$MYMASTER \"echo $ADMINPW|kinit admin; ipa-replica-prepare $PREPOPTS\" ; service named restart"
     # named can take a little time to update sometimes?
     rlRun "sleep 60"
 
