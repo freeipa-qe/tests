@@ -10,7 +10,7 @@
 #  hbacrule-add-accesstime     Add an access time to an HBAC rule.
 #  hbacrule-add-host           Add target hosts and hostgroups to an HBAC rule
 #  hbacrule-add-service        Add services to an HBAC rule.
-#  hbacrule-add-sourcehost     Add source hosts and hostgroups from a HBAC rule.
+#  hbacrule-add-sourcehost     Add source hosts and hostgroups from a HBAC rule. #commenting this as this option has been removed
 #  hbacrule-add-user           Add users and groups to an HBAC rule.
 #  hbacrule-del                Delete an HBAC rule.
 #  hbacrule-disable            Disable an HBAC rule.
@@ -20,7 +20,7 @@
 #  hbacrule-remove-accesstime  Remove access time to HBAC rule.
 #  hbacrule-remove-host        Remove target hosts and hostgroups from a HBAC rule.
 #  hbacrule-remove-service     Remove source hosts and hostgroups from an HBAC rule.
-#  hbacrule-remove-sourcehost  Remove source hosts and hostgroups from an HBAC rule.
+#  hbacrule-remove-sourcehost  Remove source hosts and hostgroups from an HBAC rule. #commenting this as this option has been removed
 #  hbacrule-remove-user        Remove users and groups from an HBAC rule.
 #  hbacrule-show               Display the properties of an HBAC rule.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,20 +135,22 @@ rlJournalStart
         expmsg="ipa: ERROR: invalid 'hostcat': must be 'all'"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown host category"
     rlPhaseEnd
-
-    rlPhaseStartTest "ipa-hbacrule-cli-006: Source Host Category - unknown"
-        command="ipa hbacrule-add --srchostcat=bad test"
-        expmsg="ipa: ERROR: invalid 'srchostcat': must be 'all'"
-        rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown source host category"
-    rlPhaseEnd
+    
+    #Commenting because of https://fedorahosted.org/sssd/ticket/1078
+    #rlPhaseStartTest "ipa-hbacrule-cli-006: Source Host Category - unknown"
+    #    command="ipa hbacrule-add --srchostcat=bad test"
+    #    expmsg="ipa: ERROR: invalid 'srchostcat': must be 'all'"
+    #    rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for Unknown source host category"
+    #rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-007: Add Duplicate Rule"
-        command="ipa hbacrule-add --srchostcat=all test"
+        #command="ipa hbacrule-add --srchostcat=all test"
+        command="ipa hbacrule-add --hostcat=all test"
         expmsg="ipa: ERROR: HBAC rule with name test already exists"
-	rlRun "addHBACRule all all all all test" 0 "Adding HBAC test rule."
+	rlRun "addHBACRule all all all test" 0 "Adding HBAC test rule."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for adding duplicate rule"
     rlPhaseEnd
-
+	
     rlPhaseStartTest "ipa-hbacrule-cli-008: Negative - setattr and addattr on dn"
         command="ipa hbacrule-mod --setattr \"ipaUniqueID=blah,cn=hbac,$BASEDN\" test"
 	expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
@@ -260,13 +262,14 @@ rlJournalStart
          rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-021: Negative - Add Host and Host Group When Source Host Category is all"
-         command="ipa hbacrule-add-sourcehost --hosts=$host1 test"
-         expmsg="ipa: ERROR: source hosts cannot be added when sourcehost category='all'"
-         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-         command="ipa hbacrule-add-sourcehost --hostgroups=$hostgroup1 test"
-         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
-    rlPhaseEnd
+    #Commenting because of https://fedorahosted.org/sssd/ticket/1078
+    #rlPhaseStartTest "ipa-hbacrule-cli-021: Negative - Add Host and Host Group When Source Host Category is all"
+    #     command="ipa hbacrule-add-sourcehost --hosts=$host1 test"
+    #     expmsg="ipa: ERROR: source hosts cannot be added when sourcehost category='all'"
+    #     rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    #     command="ipa hbacrule-add-sourcehost --hostgroups=$hostgroup1 test"
+    #     rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
+    #rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-022: Disable Rule"
         rlRun "disableHBACRule test" 0 "Disabling test rule."
@@ -286,7 +289,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-025: Add host to Rule"
-	rlRun "addHBACRule \" \" \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
+	rlRun "addHBACRule \" \" \" \" \" \" Engineering" 0 "Adding HBAC rule."
 	rlRun "addToHBAC Engineering host hosts $host1" 0 "Adding host $host1 to Engineering rule."
 	rlRun "verifyHBACAssoc Engineering Hosts $host1" 0 "Verifying host $host1 is associated with the Engineering rule."
     rlPhaseEnd
@@ -366,10 +369,11 @@ rlJournalStart
         rlRun "verifyHBACAssoc Engineering \"Service category\" all" 0 "Verifying Service Category"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-041: Modify Source Host Category"
-        rlRun "modifyHBACRule Engineering srchostcat all" 0 "Modifying Engineering Rule's Source Host Category"
-        rlRun "verifyHBACAssoc Engineering \"Source host category\" all" 0 "Verifying Source Host Category"
-    rlPhaseEnd
+    #Commenting because of https://fedorahosted.org/sssd/ticket/1078
+    #rlPhaseStartTest "ipa-hbacrule-cli-041: Modify Source Host Category"
+    #    rlRun "modifyHBACRule Engineering srchostcat all" 0 "Modifying Engineering Rule's Source Host Category"
+    #    rlRun "verifyHBACAssoc Engineering \"Source host category\" all" 0 "Verifying Source Host Category"
+    #rlPhaseEnd
 
     # disabling test .. --type has now been removed
     #rlPhaseStartTest "ipa-hbacrule-cli-042: Deprecation of deny rule"
@@ -401,7 +405,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-046: Delete Host Group Associated with a Rule"
-	rlRun "modifyHBACRule Engineering srchostcat \"\" " 0 "Modifying Engineering Rule's Source Host Category"
+	#rlRun "modifyHBACRule Engineering srchostcat \"\" " 0 "Modifying Engineering Rule's Source Host Category"
 	rlRun "addToHBAC Engineering host hostgroups $hostgroup1" 0 "Adding host group $hostgroup1 to Engineering rule."
         rlRun "verifyHBACAssoc Engineering \"Host Groups\" $hostgroup1" 0 "Verifying host group $hostgroup1 is associated with the Engineering rule."
 	rlRun "deleteHostGroup $hostgroup1" 0 "Deleting Host Group associated with rule."
@@ -410,10 +414,10 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-047: Find Rules by name"
-	rlRun "addHBACRule \" \" \" \" \" \" \" \" test1" 0 "Adding HBAC rule."
-	rlRun "addHBACRule all all all all test2" 0 "Adding HBAC rule."
-	rlRun "addHBACRule all all all all test3" 0 "Adding HBAC rule."
-	rlRun "addHBACRule \" \" \" \" \" \" \" \" test4" 0 "Adding HBAC rule."
+	rlRun "addHBACRule \" \" \" \" \" \" test1" 0 "Adding HBAC rule."
+	rlRun "addHBACRule all all all test2" 0 "Adding HBAC rule."
+	rlRun "addHBACRule all all all test3" 0 "Adding HBAC rule."
+	rlRun "addHBACRule \" \" \" \" \" \" test4" 0 "Adding HBAC rule."
 
 	for item in test1 test2 test3 test4 ; do
 		rlRun "findHBACRuleByOption name $item $item" 0 "Finding rule $item by name"	
@@ -440,10 +444,11 @@ rlJournalStart
         rlRun "findHBACRuleByOption hostcat all \"test1 test4\"" 1 "Finding rules by host category none"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-hbacrule-cli-050: Find Rules by source host category"
-        rlRun "findHBACRuleByOption srchostcat all \"allow_all test2 test3\"" 0 "Finding rules by source host category all"
-        rlRun "findHBACRuleByOption srchostcat all \"test1 test4\"" 1 "Finding rules by source host category none"
-    rlPhaseEnd
+    #Commenting because of https://fedorahosted.org/sssd/ticket/1078
+    #rlPhaseStartTest "ipa-hbacrule-cli-050: Find Rules by source host category"
+    #    rlRun "findHBACRuleByOption srchostcat all \"allow_all test2 test3\"" 0 "Finding rules by source host category all"
+    #    rlRun "findHBACRuleByOption srchostcat all \"test1 test4\"" 1 "Finding rules by source host category none"
+    #rlPhaseEnd
 
     rlPhaseStartTest "ipa-hbacrule-cli-051: Find Rules by service category"
         rlRun "findHBACRuleByOption servicecat all \"allow_all test2 test3\"" 0 "Finding rules by service category all"
@@ -472,3 +477,4 @@ report=$TmpDir/rhts.report.$RANDOM.txt
 makereport $report
 rhts-submit-log -l $report
 rlJournalEnd
+
