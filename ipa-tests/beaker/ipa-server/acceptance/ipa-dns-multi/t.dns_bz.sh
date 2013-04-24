@@ -180,7 +180,7 @@ bz869325()
 	        	iparhts-sync-block -s 869325_MASTER2_SETUP_COMPLETE $MASTER_env2
 			# Now the records and zones should exist
 			rlRun "dig @127.0.0.1 -t ANY $tzone | grep ANSWER\ SECTION" 0 "Make sure the zone is created and returning answers"
-			rlRun "dig @127.0.0.1 test.$tzone | grep ANSWER\ SECTION | grep 4.2.2.2" 0 "Ensure that test.$tzone is set up correctly and pulling from master 2."
+			rlRun "dig @127.0.0.1 test.$tzone | grep 4.2.2.2" 0 "Ensure that test.$tzone is set up correctly and pulling from master 2."
 			# The initial phase seting up forwarding is complete. Delete the zone and make sure it now does not work after.
 			rlRun "ipa dnszone-del $tzone" 0 "Deleting the test zone"
 			rlRun "dig @127.0.0.1 -t ANY $tzone | grep ANSWER\ SECTION" 1 "Make sure the zone does not return any answers after removing forwarding zone"
