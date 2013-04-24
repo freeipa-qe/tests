@@ -28,7 +28,7 @@ irm_version_pos_0001()
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.4' $MY_BR4"
         ;;
     REPLICA2_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0'"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
 
         rlRun "ipa-replica-manage --version > $tmpout 2>&1"
@@ -40,7 +40,7 @@ irm_version_pos_0001()
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.4' $MY_BR4"
         ;;
     REPLICA3_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0'"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR2"
 
@@ -52,7 +52,7 @@ irm_version_pos_0001()
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.4' $MY_BR4"
         ;;
     REPLICA4_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0'"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR2"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BR3"
