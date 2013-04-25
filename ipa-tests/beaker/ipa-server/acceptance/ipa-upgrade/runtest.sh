@@ -85,9 +85,9 @@ rlJournalStart
     
     # Main test functions in tests.d/t.tests.sh:
 
-    #if [ "$TESTTYPE" = "incremental" -o -z "$TESTTYPE" ]; then
-    #    ipa_upgrade_master_replica_client_inc
-    #fi
+    if [ "$TESTTYPE" = "incremental" -o -z "$TESTTYPE" ]; then
+        ipa_upgrade_master_replica_client_inc
+    fi
     if [ "$TESTTYPE" = "parallel" -o -z "$TESTTYPE" ]; then
         ipa_upgrade_master_replica_parallel
     fi
