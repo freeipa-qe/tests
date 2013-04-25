@@ -45,6 +45,9 @@ ipa_upgrade_master_replica_client_all()
         # Install and setup environment and add data
         ipa_upgrade_install_master
         ipa_upgrade_install_replica
+        if [ $(echo "$MYROLE" |grep "CLIENT"|wc -l) -gt 0 ]; then
+            rlRun "echo \"$MASTER_IP $MASTER $MASTER_S\" >> /etc/hosts"
+        fi
         ipa_upgrade_install_client
 
         rlLog "DEBUGGING client failure"
@@ -85,6 +88,9 @@ ipa_upgrade_master_replica_client_all()
 
     rlPhaseStartCleanup "ipa_upgrade_master_replica_client_all_cleanup: cleanup from test full setup for master, then replica, then client"
         ipa_upgrade_uninstall_client
+        if [ $(echo "$MYROLE" |grep "CLIENT"|wc -l) -gt 0 ]; then
+            rlRun "sed -i '/$MASTER_IP/d' /etc/hosts"
+        fi
         ipa_upgrade_uninstall_replica
         ipa_upgrade_uninstall_master
     rlPhaseEnd
