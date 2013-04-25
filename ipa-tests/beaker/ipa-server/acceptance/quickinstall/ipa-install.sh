@@ -75,6 +75,7 @@ ipa_install_set_vars()
         fi
         M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
         export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
+        echo "export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN" >> /opt/rhqa_ipa/env.sh
         export BEAKERMASTER_env${I}=$M
         echo "export BEAKERMASTER_env${I}=$M" >> /opt/rhqa_ipa/env.sh
         export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
@@ -99,7 +100,7 @@ ipa_install_set_vars()
         export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
         for R in $(eval echo \$REPLICA_env${I}); do
             export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
-            echo "export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN"
+            echo "export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN" >> /opt/rhqa_ipa/env.sh
             export BEAKERREPLICA${J}_env${I}=$R
             echo "export BEAKERREPLICA${J}_env${I}=$R" >> /opt/rhqa_ipa/env.sh
             export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype|tail -1)
