@@ -4,11 +4,22 @@
    <test name="IPAAutomember User Group Tests">
             	<groups>
             	    <run>
-            	    	<include name="init" />
+            	    	<!--<include name="init" />
          				<include name="add" />
          				<include name="addDuplicate" />
          				<include name="addNegative" />
          				<include name="modify" />
+						<include name="search" />
+						<include name="searchNegative" />
+						<include name="delete" />-->
+						
+						<include name="init" />
+         				<include name="add" />
+         				<include name="addDuplicate" />
+         				<include name="addNegative" />
+         				<include name="modify" />
+         				<include name="modify_Condition1" />
+         				<include name="modify_Condition" />
 						<include name="search" />
 						<include name="searchNegative" />
 						<include name="delete" />
@@ -25,11 +36,22 @@
    <test name="IPAAutomember Host Group Tests">
             	<groups>
             	    <run>
-            	    	<include name="init" />
+            	    	<!--<include name="init" />
          				<include name="add" />
          				<include name="addDuplicate" />
          				<include name="addNegative" />
          				<include name="modify" />
+						<include name="search" />
+						<include name="searchNegative" />
+						<include name="delete" />-->
+						
+						<include name="init" />
+         				<include name="add" />
+         				<include name="addDuplicate" />
+         				<include name="addNegative" />
+         				<include name="modify" />
+         				<include name="modify_Condition1" />
+         				<include name="modify_Condition" />
 						<include name="search" />
 						<include name="searchNegative" />
 						<include name="delete" />
