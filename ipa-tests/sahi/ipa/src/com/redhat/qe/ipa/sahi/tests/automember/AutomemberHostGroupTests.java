@@ -138,7 +138,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	}
 	
 	
-	@Test (groups={"modify"}, description="Automember Condition Add Single",dataProvider="getAutomemberConditionAddSingleObjects",dependsOnGroups="add")	
+	@Test (groups={"modify_Condition1"}, description="Automember Condition Add Single",dataProvider="getAutomemberConditionAddSingleObjects",dependsOnGroups="add")	
 	
 	public void testAutomemberConditionAddSingle(String testName,String groupName,String attribute,String expression) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
@@ -149,7 +149,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
 	}
 	
-	@Test (groups={"modify"}, description="Automember Condition Add And Add Another",dataProvider="getAutomemberConditionAddAndAddAnotherObjects",dependsOnGroups="add")	
+	@Test (groups={"modify_Condition1"}, description="Automember Condition Add And Add Another",dataProvider="getAutomemberConditionAddAndAddAnotherObjects",dependsOnGroups="add")	
 		
 	public void testAutomemberConditionAddAndAddAnother(String testName,String groupName,String attribute1,String attribute2,String expression1,String expression2) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
@@ -162,7 +162,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
 	}
 	
-	@Test (groups={"modify"}, description="Automember Condition Add Then Cancel",dataProvider="getAutomemberConditionAddThenCancelObjects",dependsOnGroups="add")	
+	@Test (groups={"modify_Condition1"}, description="Automember Condition Add Then Cancel",dataProvider="getAutomemberConditionAddThenCancelObjects",dependsOnGroups="add")	
 	
 	public void testAutomemberConditionAddThenCancel(String testName,String groupName,String attribute,String expression) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
@@ -173,7 +173,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
 	}
 	
-	@Test (groups={"modify"}, description="Automember Condition Delete Single",dataProvider="getAutomemberConditionDeleteSingleObjects",dependsOnGroups="add")	
+	@Test (groups={"modify_Condition"}, description="Automember Condition Delete Single",dataProvider="getAutomemberConditionDeleteSingleObjects",dependsOnGroups={"add","modify_Condition1"})	
 	
 	public void testAutomemberConditionDeleteSingle(String testName,String groupName,String attribute,String expression) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
@@ -184,7 +184,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
 	}
 	
-	@Test (groups={"modify"}, description="Automember Condition Delete Multiple",dataProvider="getAutomemberConditionDeleteMultipleObjects",dependsOnGroups="add")	
+	@Test (groups={"modify_Condition"}, description="Automember Condition Delete Multiple",dataProvider="getAutomemberConditionDeleteMultipleObjects",dependsOnGroups={"add","modify_Condition1"})	
 	
 	public void testAutomemberConditionDeleteMultiple(String testName,String groupName,String attribute1,String attribute2,String expression1,String expression2) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
@@ -207,7 +207,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 
 	}
 	
-	@Test (groups={"modify"}, description="Automember Generic Edit",dataProvider="getAutomemberGenericEditObjects",dependsOnGroups="add")	
+	@Test (groups={"modify"}, description="Automember Generic Edit",dataProvider="getAutomemberGenericEditObjects",dependsOnGroups={"add","modify_Condition","modify_Condition1"})		
 	
 	public void testAutomemberGenericEdit(String testName,String groupName) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
