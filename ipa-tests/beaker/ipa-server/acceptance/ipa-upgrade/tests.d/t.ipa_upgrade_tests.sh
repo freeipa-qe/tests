@@ -133,11 +133,6 @@ ipa_upgrade_master_replica_client_inc()
 {
     ipa_upgrade_master_replica_client_inc_setup
     if rlIsRHEL "<6.3"; then
-        # workaround for client install bug in rhel6.2 causing backtrace
-        # on name lookup
-        if [ $(echo "$MYROLE" |grep "CLIENT"|wc -l) -gt 0 ]; then
-            rlRun "echo \"$MASTER_IP $MASTER $MASTER_S\" >> /etc/hosts"
-        fi
         ipa_upgrade_master_replica_client_inc_63
     fi
     if rlIsRHEL "6.3"; then
@@ -210,6 +205,12 @@ ipa_upgrade_master_replica_client_inc_63()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa_upgrade_master_replica_client_inc_63_3: test upgrade with new master, new replica, and new client"
+        # workaround for client install bug in rhel6.2 causing backtrace
+        # on name lookup
+        rlLog "Adding Workaround to later avoid BZ#739040"
+        if [ $(echo "$MYROLE" |grep "CLIENT"|wc -l) -gt 0 ]; then
+            rlRun "echo \"$MASTER_IP $MASTER $MASTER_S\" >> /etc/hosts"
+        fi
         upgrade_client
 
         ipa_upgrade_data_check $MYBEAKERMASTER   63 new
@@ -341,6 +342,17 @@ ipa_upgrade_master_replica_client_nodns()
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_nodns_setup: setup to test without dns for master, then replica, then client"
         rlRun "env|sort"
+        rlLog "Setting up  IPv6 AAAA resolvable workaround"
+        for THISHOST in $MYBEAKERMASTER $MYBEAKERREPLICA1 $MYBEAKERCLIENT; do
+            THISA="$(dig +short $THISHOST a)"
+            THISAAAA="$(dig +short $THISHOST aaaa)"
+            rlLog "First remove IP entry from /etc/hosts if found."
+            rlRun "sed -i '/$THISA/d' /etc/hosts"
+            if [ -n "$THISAAAA" -a -n "$THISA" ]; then
+                rlLog "$THISHOST has AAAA record.  Adding A to /etc/hosts"
+                rlRun "echo \"$THISA $THISHOST\" >> /etc/hosts" 
+            fi
+        done
         ipa_upgrade_install_master
         ipa_upgrade_install_replica
         ipa_upgrade_install_client
@@ -397,6 +409,14 @@ ipa_upgrade_master_replica_client_nodns()
         ipa_upgrade_uninstall_client
         ipa_upgrade_uninstall_replica
         ipa_upgrade_uninstall_master
+        
+        rlLog "Cleaning up IPv6 AAAA resolvable workaround"
+        for THISHOST in $MYBEAKERMASTER $MYBEAKERREPLICA1 $MYBEAKERCLIENT; do
+            if [ $(grep $THISHOST /etc/hosts|wc -l) -gt 0 ]; then
+                rlLog "Removing $THISHOST from /etc/hosts"
+                rlRun "sed -i '/$THISHOST/d' /etc/hosts"
+            fi
+        done
     rlPhaseEnd
 
     DOMAIN=${TESTDOMAIN}
