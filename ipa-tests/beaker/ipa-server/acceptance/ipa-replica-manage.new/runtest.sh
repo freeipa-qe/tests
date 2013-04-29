@@ -76,6 +76,14 @@ rlJournalStart
 		rlRun "env|sort"
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
+        if [ $(echo "$USEPWOPT"|grep -i "yes"|wc -l) -gt 0 ]; then
+            rlLog "Setting PWOPT and running kdestroy to ensure password is used"
+            rlRun "kdestroy"
+            PWOPT="-p $ADMINPW"
+        else
+            rlLog "Zeroing PWOPT and running kinit to ensure password is not used"
+            PWOPT=""
+        fi
     rlPhaseEnd
 
 	irm_run

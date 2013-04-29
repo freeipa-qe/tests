@@ -6,8 +6,7 @@ function irm_list_pos_0001()
     rlPhaseStartTest "irm_list_pos_0001: list, no name"
     case "$MYROLE" in
     MASTER_*)
-        rlRun "KinitAsAdmin"
-        rlRun "ipa-replica-manage list > $tmpout 2>&1"
+        rlRun "ipa-replica-manage $PWOPT list > $tmpout 2>&1"
         rlRun "cat $tmpout"
         rlAssertGrep "$MASTER" $tmpout
         rlAssertGrep "$REPLICA1" $tmpout
@@ -35,6 +34,37 @@ function irm_list_pos_0001()
 }
 
 # irm_list_pos_0002 # list, with name
+function irm_list_pos_0002()
+{
+    tmpout=/tmp/test_${FUNCNAME}.out
+    TESTCOUNT=$(( TESTCOUNT += 1 ))
+    rlPhaseStartTest "irm_list_pos_0002: list, with name"
+    case "$MYROLE" in
+    MASTER_*)
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
+        ;;
+    REPLICA1_*)
+        rlRun "ipa-replica-manage $PWOPT list $REPLICA2 > $tmpout 2>&1"
+        rlRun "cat $tmpout"
+        rlAssertGrep "$MASTER" $tmpout
+        rlAssertGree "$REPLICA3" $tmpout
+
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR1"
+        ;;
+    REPLICA2_*)
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
+        ;;
+    REPLICA3_*)
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
+        ;;
+    REPLICA4_*)
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
+        ;;
+    *)
+    esac
+    rlPhaseEnd
+}
+
 # irm_list_pos_0003 # list, no name, with verbose
 # irm_list_pos_0004 # list, with name, with verbose
 # irm_list_pos_0005 # list, with name, remote

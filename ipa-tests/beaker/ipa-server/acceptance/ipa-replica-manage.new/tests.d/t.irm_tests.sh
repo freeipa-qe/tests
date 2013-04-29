@@ -2,8 +2,8 @@ irm_run()
 {
     irm_version_pos_0001 # version
 
-    # irm_list_pos_0001 # list, no name
-    # irm_list_pos_0002 # list, with name
+    irm_list_pos_0001 # list, no name
+    irm_list_pos_0002 # list, with name
     # irm_list_pos_0003 # list, no name, with verbose
     # irm_list_pos_0004 # list, with name, with verbose
     # irm_list_pos_0005 # list, with name, remote
