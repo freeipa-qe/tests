@@ -312,46 +312,38 @@ function irm_list_neg_0004()
     case "$MYROLE" in
     MASTER_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR4"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR3"
 
         rlRun "ipa-replica-manage $PWOPT list $REPLICA4 > $tmpout 2>&1" 1
         rlRun "cat $tmpout"
         rlAssertGrep "Unknown host $REPLICA4" $tmpout 
 
-        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.3' -m $MY_BM"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.4' $MY_BR4"
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.2' -m $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BR4"
         ;;
     REPLICA1_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR4"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR3"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BM"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.4' $MY_BR4"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BR4"
         ;;
     REPLICA2_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR4"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR3"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BM"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.4' $MY_BR4"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BR4"
         ;;
     REPLICA3_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR4"
-
-        rlRun "ipa-replica-manage $PWOPT del $REPLICA4 --force"
-
-        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.2' -m $MY_BR3"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BM"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.4' $MY_BR4"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BR4"
         ;;
     REPLICA4_*)
         irm_uninstall 
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR4"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2'  $MY_BR3"
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3'  $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2'  $MY_BM"
 
         irm_install $REPLICA3
 
-        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.4' -m $MY_BR4"
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.3' -m $MY_BR4"
 
         ;;
     *)
