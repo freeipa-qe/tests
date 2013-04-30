@@ -43,6 +43,7 @@
 . /opt/rhqa_ipa/ipa-server-shared.sh
 . /opt/rhqa_ipa/env.sh
 . /opt/rhqa_ipa/ipa-install.sh
+. ./ipa-install.sh
 
 # Include test case files
 for file in $(ls tests.d/t.*.sh); do
@@ -84,6 +85,11 @@ rlJournalStart
             rlLog "Zeroing PWOPT and running kinit to ensure password is not used"
             PWOPT=""
         fi
+        rlRun "AddToKnownHosts $MY_BM"
+        rlRun "AddToKnownHosts $MY_BR1"
+        rlRun "AddToKnownHosts $MY_BR2"
+        rlRun "AddToKnownHosts $MY_BR3"
+        rlRun "AddToKnownHosts $MY_BR4"
     rlPhaseEnd
 
 	irm_run
