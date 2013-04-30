@@ -54,6 +54,7 @@ ipa_upgrade_uninstall_master()
         rlRun "yum -y downgrade redhat-release-server"
 
         if [ -d /var/lib/certmonger ]; then
+            rlLog "Workaround to avoid BZ#948993"
             rlRun "rm -rf /var/lib/certmonger"
         fi
 
@@ -103,6 +104,7 @@ ipa_upgrade_uninstall_replica()
         rlRun "yum -y downgrade redhat-release-server"
 
         if [ -d /var/lib/certmonger ]; then
+            rlLog "Workaround to avoid BZ#948993"
             rlRun "rm -rf /var/lib/certmonger"
         fi
 
@@ -159,6 +161,7 @@ ipa_upgrade_uninstall_client()
         rlRun "yum -y remove http*"
 
         if [ -d /var/lib/certmonger ]; then
+            rlLog "Workaround to avoid BZ#948993"
             rlRun "rm -rf /var/lib/certmonger"
         fi
 
