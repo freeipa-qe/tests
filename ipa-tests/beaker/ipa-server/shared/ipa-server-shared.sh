@@ -964,15 +964,66 @@ ipa_quick_uninstall(){
 		rlRun "yum -y reinstall pki-selinux"
 	fi
 
+	rlRun "ls /var/lib/sss/pubconf/kdcinfo.$RELM" 2 "Make sure that uninstall removed /var/lib/sss/pubconf/kdcinfo.$RELM. Bug BZ 829070"
+	rlRun "ps -ef|grep -v grep|grep sssd" 1 "Make sure that sssd appears to be stopped as per BZ 830598"
+
+	rlLog "pushd /etc/yum.repos.d"
+	pushd /etc/yum.repos.d
+	if [ ! -d /etc/yum.repos.d/deleted ]; then
+		rlRun "mkdir deleted"
+	fi	
+	for repo in $(ls -1 *.repo|egrep -v "^beaker|^cobbler|^redhat.repo|^rhel-source.repo|^fedora"); do
+		rlRun "/bin/mv -f $repo deleted/"
+	done	
+	rlLog "popd"
+	popd
+
+	rlRun "yum clean all"
+	if [ -f /etc/hosts.ipabackup ]; then
+		rlRun "/bin/cp -f /etc/hosts.ipabackup /etc/hosts"
+        rlRun "/bin/rm -f /etc/hosts.ipabackup"
+	fi
+	if [ -f /etc/sysconfig/network-ipabackup ]; then
+		rlRun "/bin/cp -f /etc/sysconfig/network-ipabackup /etc/sysconfig/network"
+		rlRun "/bin/rm -f /etc/sysconfig/network-ipabackup"
+	fi
+    if [ -f /etc/hostname-ipabackup ]; then
+        rlRun "/bin/cp -f /etc/hostname-ipabackup /etc/hostname"
+        rlRun "/bin/rm -f /etc/hostname-ipabackup"
+    fi
+	if [ -f /etc/resolv.conf.ipabackup ]; then
+		rlRun "/bin/cp -f /etc/resolv.conf.ipabackup /etc/resolv.conf"
+		rlRun "/bin/rm -f /etc/resolv.conf.ipabackup"
+	fi
+    if [ $(grep HOSTNAME= /etc/sysconfig/network|wc -l) -gt 0 ]; then
+        . /etc/sysconfig/network
+    elif [ -f /etc/hostname ]; then
+        HOSTNAME="$(cat /etc/hostname)"
+    fi
+    rlRun "hostname $HOSTNAME"
+
+	CERTCHK=$(certutil -L -d /etc/pki/nssdb 2>/dev/null |grep "IPA CA"|wc -l)
+	if [ $CERTCHK -gt 0 ]; then
+		rlLog "Found left over Certificate in NSS DB...removing"
+		rlRun "certutil -D -d /etc/pki/nssdb -n 'IPA CA'"
+	fi
+
+    #rlRun "service certmonger stop"
+    #if [ -d /var/lib/certmonger ]; then
+    #    rlRun "rm -rf /var/lib/certmonger"
+    #fi
+
+} #ipa_quick_uninstall 
+
+ipa_quick_remove()
+{
 	if [ -d /var/lib/ipa ]; then
 		rlRun "/bin/rm -rf /var/lib/ipa/"
 	fi
-	rlRun "ls /var/lib/sss/pubconf/kdcinfo.$RELM" 2 "Make sure that uninstall removed /var/lib/sss/pubconf/kdcinfo.$RELM. Bug BZ 829070"
-	rlRun "ps -ef|grep -v grep|grep sssd" 1 "Make sure that sssd appears to be stopped as per BZ 830598"
 	if [ -d /var/lib/sss/ ]; then
 		rlRun "/bin/rm -rf /var/lib/sss/"
 	fi
-	if [ -d /var/log/dirsrv/ ]; then
+	if [ -d /usr/share/ipa ]; then
 		rlRun "/bin/rm -rf /usr/share/ipa"
 	fi
 	if [ -d /var/log/dirsrv/ ]; then
@@ -991,51 +1042,7 @@ ipa_quick_uninstall(){
 		rlRun "/bin/rm -f /etc/krb5.keytab"
 	fi
 
-	rlLog "pushd /etc/yum.repos.d"
-	pushd /etc/yum.repos.d
-	if [ ! -d /etc/yum.repos.d/deleted ]; then
-		rlRun "mkdir deleted"
-	fi	
-	for repo in $(ls -1 *.repo|egrep -v "^beaker|^cobbler|^redhat.repo|^rhel-source.repo|^fedora"); do
-		rlRun "/bin/mv -f $repo deleted/"
-	done	
-	rlLog "popd"
-	popd
-
-	rlRun "yum clean all"
-	if [ -f /etc/hosts.ipabackup ]; then
-		rlRun "/bin/cp -f /etc/hosts.ipabackup /etc/hosts"
-	fi
-	if [ -f /etc/hosts.ipabackup ]; then
-		rlRun "/bin/rm -f /etc/hosts.ipabackup"
-	fi
-	if [ -f /etc/sysconfig/network-ipabackup ]; then
-		rlRun "/bin/cp -f /etc/sysconfig/network-ipabackup /etc/sysconfig/network"
-		rlRun "/bin/rm -f /etc/sysconfig/network-ipabackup"
-	fi
-	if [ -f /etc/resolv.conf.ipabackup ]; then
-		rlRun "/bin/cp -f /etc/resolv.conf.ipabackup /etc/resolv.conf"
-		rlRun "/bin/rm -f /etc/resolv.conf.ipabackup"
-	fi
-	. /etc/sysconfig/network
-	rlRun "hostname $HOSTNAME"
-
-	CERTCHK=$(certutil -L -d /etc/pki/nssdb 2>/dev/null |grep "IPA CA"|wc -l)
-	if [ $CERTCHK -gt 0 ]; then
-		rlLog "Found left over Certificate in NSS DB...removing"
-		rlRun "certutil -D -d /etc/pki/nssdb -n 'IPA CA'"
-	fi
-
-    #rlRun "service certmonger stop"
-    #if [ -d /var/lib/certmonger ]; then
-    #    rlRun "rm -rf /var/lib/certmonger"
-    #fi
-
-} #ipa_quick_uninstall 
-
-ipa_quick_remove()
-{
-    yum_opts="--rpmverbosity=debug"
+    #yum_opts="--rpmverbosity=debug"
     rlRun "yum -y remove 'ipa*' '389-ds-base*' bind krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl httpd httpd-tools"
     rlRun "yum -y remove sssd libipa_hbac krb5-server certmonger slapi-nis sssd-client 'pki*' 'tomcat6*' mod_nss"
     rlRun "yum -y remove memcached python-memcached"
