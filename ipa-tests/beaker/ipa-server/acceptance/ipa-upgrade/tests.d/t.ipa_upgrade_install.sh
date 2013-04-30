@@ -136,6 +136,14 @@ ipa_upgrade_install_client()
         ;;
     CLIENT*)
         rlLog "Machine in recipe is CLIENT"
+
+        # workaround for client install bug in rhel6.2 causing backtrace
+        # on name lookup
+        if rlIsRHEL "<6.3"; then
+            rlLog "Adding Workaround to avoid BZ#739040"
+            rlRun "echo \"$MASTER_IP $MASTER $MASTER_S\" >> /etc/hosts"
+        fi
+
         ipa_install_client $MASTER
 
         #if [ ! -f /etc/sssd/sssd.conf.backup.getent ]; then

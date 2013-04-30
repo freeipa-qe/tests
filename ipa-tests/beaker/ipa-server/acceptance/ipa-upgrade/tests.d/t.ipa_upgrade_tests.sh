@@ -160,7 +160,7 @@ ipa_upgrade_master_replica_client_inc_setup()
 {   
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
     USEDNS="yes"
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_inc_setup: setup to test full setup for master, then replica, then client"
@@ -205,12 +205,6 @@ ipa_upgrade_master_replica_client_inc_63()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa_upgrade_master_replica_client_inc_63_3: test upgrade with new master, new replica, and new client"
-        # workaround for client install bug in rhel6.2 causing backtrace
-        # on name lookup
-        rlLog "Adding Workaround to later avoid BZ#739040"
-        if [ $(echo "$MYROLE" |grep "CLIENT"|wc -l) -gt 0 ]; then
-            rlRun "echo \"$MASTER_IP $MASTER $MASTER_S\" >> /etc/hosts"
-        fi
         upgrade_client
 
         ipa_upgrade_data_check $MYBEAKERMASTER   63 new
@@ -226,7 +220,7 @@ ipa_upgrade_master_replica_client_inc_64()
     myrepo2=http://download.devel.redhat.com/released/RHEL-6/6.4/Server/optional/\$basearch/os/
     IPA_SERVER_OPTIONS="-U --setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
     USEDNS="yes"
 
     rlPhaseStartTest "ipa_upgrade_master_replica_client_inc_64_1: test upgrade with new master, old replica, and old client"
@@ -261,7 +255,7 @@ ipa_upgrade_client_replica_master_all()
     USEDNS="yes"
     IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$MASTER_S.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$REPLICA1_S.$DOMAIN.gpg"
-    IPA_CLIENT_OPTIONS="-d -U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
+    IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MASTER_S.$DOMAIN"
 
     local tmpout=/tmp/errormsg.out
     rlPhaseStartSetup "ipa_upgrade_client_replica_master_all_setup: setup to test full setup for client, then replica, then master"
