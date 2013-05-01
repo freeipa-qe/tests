@@ -313,9 +313,9 @@ function irm_list_neg_0004()
     MASTER_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR4"
 
-        rlRun "ipa-replica-manage $PWOPT list $REPLICA4 > $tmpout 2>&1" 1
+        rlRun "ipa-replica-manage $PWOPT list $REPLICA4 > $tmpout 2>&1" 
         rlRun "cat $tmpout"
-        rlAssertGrep "Unknown host $REPLICA4" $tmpout 
+        rlAssertGrep "Cannot find $REPLICA4 in public server list" $tmpout 
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.2' -m $MY_BM"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.3' $MY_BR4"
