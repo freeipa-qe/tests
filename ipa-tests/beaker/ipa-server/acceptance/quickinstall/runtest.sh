@@ -60,7 +60,7 @@ rlJournalStart
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "cp ./ipa-install.sh $TmpDir"
         rlRun "pushd $TmpDir"
-        rlRun "yum -y bind-utils"
+        rlRun "yum -y install bind-utils"
     rlPhaseEnd
 
 	ipa_install_set_vars
