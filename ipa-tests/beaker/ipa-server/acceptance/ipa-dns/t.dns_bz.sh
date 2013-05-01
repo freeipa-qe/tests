@@ -51,9 +51,9 @@ dnsbugs()
 
 # Revisit commented tests below - since they are failing in beaker. 
 # Trac tasks for these have been moved to backlog
-#   bz701677
+   bz701677
    bz802375
-#   bz767489
+   bz767489
    # Note: this test possibly creates an env that is not good for further tests. Not recovering correctly
     bz767496
 
@@ -590,7 +590,8 @@ bz767489()
 
         rlRun "systemctl status named"
 	rlRun "cp /etc/named.conf /root/"
-	rlRun "sed -i 's/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ldapi:\/\/127.0.0.1/g' /etc/named.conf"
+         rlRun "sed -i 's/arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/#arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/g' /etc/named.conf"
+        rlRun "sed -i '/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ i arg \"uri ldapi:\/\/127.0.0.1\";' /etc/named.conf"
 	rlRun "iptables -A INPUT -j REJECT -p TCP --destination-port ldap --reject-with icmp-port-unreachable"
 	rlRun "iptables -A INPUT -j REJECT -p TCP --destination-port ldaps --reject-with icmp-port-unreachable"
 	rlRun "iptables -L"
@@ -599,8 +600,9 @@ bz767489()
         rlRun "systemctl status named"
 
 	rlRun "iptables -F"
-        rlRun "systemctl stop iptables"
-	rlRun "mv -f /root/named.conf /etc/"
+        rlRun "systemctl stop firewalld"
+        rlRun "sed -i '/ldapi:\/\/127.0.0.1/d' /etc/named.conf"
+        rlRun "sed -i 's/#arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/g' /etc/named.conf"
         rlRun "chgrp named /etc/named.conf"
         rlRun "systemctl restart named"
 
@@ -616,20 +618,15 @@ bz802375()
 	rlAssertGrep "psearch yes" "/etc/named.conf"
         rlRun "systemctl status named"
         rlRun "cp /etc/named.conf /root/"
-  #      rlRun "sed -i 's/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ldapi:\/\/127.0.0.1/g' /etc/named.conf"
         rlRun "sed -i 's/arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/#arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/g' /etc/named.conf"
         rlRun "sed -i '/ldapi:\/\/\%2fvar\%2frun\%2fslapd-TESTRELM-COM.socket/ i arg \"uri ldapi:\/\/127.0.0.1\";' /etc/named.conf"
-        cat /etc/named.conf  # NAMITA
         rlRun "systemctl restart named"
 	rlRun "rndc stop"
 
         rlRun "systemctl status named" 3 "Verifying that named is not running"
 
-#        rlRun "mv -f /root/named.conf /etc/"
-#        rlRun "chgrp named /etc/named.conf"
         rlRun "sed -i '/ldapi:\/\/127.0.0.1/d' /etc/named.conf"
         rlRun "sed -i 's/#arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/arg \"uri ldapi:\/\/%2fvar%2frun%2fslapd-TESTRELM-COM.socket\";/g' /etc/named.conf"
-        cat /etc/named.conf  # NAMITA
         rlRun "systemctl restart named"
 
     rlPhaseEnd
