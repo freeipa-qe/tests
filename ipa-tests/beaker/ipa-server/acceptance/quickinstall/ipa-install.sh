@@ -90,9 +90,9 @@ ipa_install_set_vars()
             THISDOMAIN=$DOMAIN
         fi
         M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
-	ipa_add_to_env "MASTER_env${I}" "$(echo $M|cut -f1 -d.).$THISDOMAIN"
+        ipa_add_to_env "MASTER_env${I}" "$(echo $M|cut -f1 -d.).$THISDOMAIN"
         ipa_add_to_env "BEAKERMASTER_env${I}" "$M"
-	export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
+        export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
         if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
             export MYROLE=MASTER_env${I}
             export MYENV=${I}
