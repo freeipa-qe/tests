@@ -976,6 +976,14 @@ configAbrt()
     fi
 }
 
+ipa_install_dogtag_workarounds()
+{
+    rlLog "setting up workaround for dogtag 10.0.2."
+    rlRun "mkdir /root/.dogtag"
+    rlRun "chmod 775 /root/.dogtag"
+    rlRun "ln -s /root/.dogtag /root/.pki"
+}
+
 ipa_install_prep() 
 {
     rlLog "$FUNCNAME"
@@ -1006,6 +1014,8 @@ ipa_install_prep()
     SetUpKnownHosts
 
     configAbrt
+
+    ipa_install_dogtag_workarounds
 }
 
 ipa_install_sssd_workarounds()

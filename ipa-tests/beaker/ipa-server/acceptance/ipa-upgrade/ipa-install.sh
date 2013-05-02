@@ -39,6 +39,22 @@ ipa_install_envcleanup()
     done
 }
 
+ipa_add_to_env()
+{
+    local VAR1=$1
+    local VAL1=$2
+
+    if [ -z "$VAR1" ]; then
+        echo "CANNOT run $FUNCNAME with no VAR name provided."
+        echo "Usage: $FUNCNAME <VARNAME> <VALUE>"
+        return 1
+    fi
+
+    sed -i "/^export $VAR1=/d" /opt/rhqa_ipa/env.sh
+    echo "export $VAR1=\"$VAL1\"" >> /opt/rhqa_ipa/env.sh
+    . /opt/rhqa_ipa/env.sh
+}
+
 ipa_install_set_vars()
 {
     # Initialize Global TESTCOUNT variable
@@ -74,9 +90,8 @@ ipa_install_set_vars()
             THISDOMAIN=$DOMAIN
         fi
         M=$(eval echo \$MASTER_env${I}|awk '{print $1}')
-        export MASTER_env${I}=$(echo $M|cut -f1 -d.).$THISDOMAIN
-        export BEAKERMASTER_env${I}=$M
-        echo "export BEAKERMASTER_env${I}=$M" >> /opt/rhqa_ipa/env.sh
+        ipa_add_to_env "MASTER_env${I}" "$(echo $M|cut -f1 -d.).$THISDOMAIN"
+        ipa_add_to_env "BEAKERMASTER_env${I}" "$M"
         export BEAKERMASTER_IP_env${I}=$(dig +short $M $rrtype|tail -1)
         if [ "$(hostname -s)" = "$(echo $M|cut -f1 -d.)" ]; then
             export MYROLE=MASTER_env${I}
@@ -98,10 +113,8 @@ ipa_install_set_vars()
         fi
         export BEAKERREPLICA_env${I}="$(eval echo \$REPLICA_env${I})"
         for R in $(eval echo \$REPLICA_env${I}); do
-            export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN
-            echo "export REPLICA${J}_env${I}=$(echo $R|cut -f1 -d.).$THISDOMAIN"
-            export BEAKERREPLICA${J}_env${I}=$R
-            echo "export BEAKERREPLICA${J}_env${I}=$R" >> /opt/rhqa_ipa/env.sh
+            ipa_add_to_env "REPLICA${J}_env${I}" "$(echo $R|cut -f1 -d.).$THISDOMAIN"
+            ipa_add_to_env "BEAKERREPLICA${J}_env${I}" "$R"
             export BEAKERREPLICA${J}_IP_env${I}=$(dig +short $R $rrtype|tail -1)
             if [ "$(hostname -s)" = "$(echo $R|cut -f1 -d.)" ]; then
                 export MYROLE=REPLICA${J}_env${I}
@@ -128,10 +141,8 @@ ipa_install_set_vars()
         fi
         export BEAKERCLIENT_env${I}="$(eval echo \$CLIENT_env${I})"
         for C in $(eval echo \$CLIENT_env${I}); do
-            export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN
-            echo "export CLIENT${J}_env${I}=$(echo $C|cut -f1 -d.).$THISDOMAIN" >> /opt/rhqa_ipa/env.sh
-            export BEAKERCLIENT${J}_env${I}=$C
-            echo "export BEAKERCLIENT${J}_env${I}=$C" >> /opt/rhqa_ipa/env.sh
+            ipa_add_to_env "CLIENT${J}_env${I}" "$(echo $C|cut -f1 -d.).$THISDOMAIN"
+            ipa_add_to_env "BEAKERCLIENT${J}_env${I}" "$C"
             export BEAKERCLIENT${J}_IP_env${I}=$(dig +short $C $rrtype|tail -1)
             if [ "$(hostname -s)" = "$(echo $C|cut -f1 -d.)" ]; then
                 export MYROLE=CLIENT${J}_env${I}
@@ -149,20 +160,20 @@ ipa_install_set_vars()
     # Make sure Simple Vars are set in env.sh for simplicity and
     # backwards compatibility with older tests.  This means no
     # _env<NUM> suffix.
-    echo "export MYENV=${MYENV}" >> /opt/rhqa_ipa/env.sh
-    echo "export MYROLE=${MYROLE}" >> /opt/rhqa_ipa/env.sh
-    echo "export MASTER=$(eval echo \$MASTER_env${MYENV})" >> /opt/rhqa_ipa/env.sh
-    echo "export MASTERIP=$(eval echo \$BEAKERMASTER_IP_env${MYENV})" >> /opt/rhqa_ipa/env.sh
-    echo "export SLAVE=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
-    echo "export SLAVEIP=$(eval echo \$BEAKERREPLICA1_IP_env${MYENV})" >> /opt/rhqa_ipa/env.sh
-    echo "export REPLICA=\"$(eval echo \$REPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
-    echo "export CLIENT=$(eval echo \$CLIENT1_env${MYENV})" >> /opt/rhqa_ipa/env.sh
-    echo "export CLIENT2=$(eval echo \$CLIENT2_env${MYENV})" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERMASTER=$(eval echo \$BEAKERMASTER_env${MYENV})" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERREPLICA_env${MYENV}=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERSLAVE=\"$(eval echo \$BEAKERREPLICA_env${MYENV})\"" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERCLIENT=$(eval echo \$BEAKERCLIENT1_env${MYENV})" >> /opt/rhqa_ipa/env.sh
-    echo "export BEAKERCLIENT2=$(eval echo \$BEAKERCLIENT2_env${MYENV})" >> /opt/rhqa_ipa/env.sh
+    ipa_add_to_env "MYENV" "${MYENV}"
+    ipa_add_to_env "MYROLE" "${MYROLE}"
+    ipa_add_to_env "MASTER" "$(eval echo \$MASTER_env${MYENV})"
+    ipa_add_to_env "MASTERIP" "$(eval echo \$BEAKERMASTER_IP_env${MYENV})"
+    ipa_add_to_env "SLAVE" "$(eval echo \$REPLICA_env${MYENV})"
+    ipa_add_to_env "SLAVEIP" "$(eval echo \$BEAKERREPLICA1_IP_env${MYENV})"
+    ipa_add_to_env "REPLICA" "$(eval echo \$REPLICA_env${MYENV})"
+    ipa_add_to_env "CLIENT" "$(eval echo \$CLIENT1_env${MYENV})"
+    ipa_add_to_env "CLIENT2" "$(eval echo \$CLIENT2_env${MYENV})"
+    ipa_add_to_env "BEAKERMASTER" "$(eval echo \$BEAKERMASTER_env${MYENV})"
+    ipa_add_to_env "BEAKERREPLICA_env${MYENV}" "$(eval echo \$BEAKERREPLICA_env${MYENV})"
+    ipa_add_to_env "BEAKERSLAVE" "$(eval echo \$BEAKERREPLICA_env${MYENV})"
+    ipa_add_to_env "BEAKERCLIENT" "$(eval echo \$BEAKERCLIENT1_env${MYENV})"
+    ipa_add_to_env "BEAKERCLIENT2" "$(eval echo \$BEAKERCLIENT2_env${MYENV})"
 
     # FIX Env specific vars like RELM, DOMAIN, BASEDN
     if [ $MYENV -gt 1 ]; then 
@@ -176,29 +187,30 @@ ipa_install_set_vars()
         sed -i "s/BASEDN=.*$/BASEDN=\"$NEWBASEDN\"/" /opt/rhqa_ipa/env.sh
     fi
 
-    . /opt/rhqa_ipa/env.sh
-
     ### Set OS/YUM/RPM related variables here
     if [ $(grep Fedora /etc/redhat-release|wc -l) -gt 0 ]; then
-        export DISTRO="Fedora"
-        export IPA_SERVER_PACKAGES="freeipa-server"
-        export IPA_CLIENT_PACKAGES="freeipa-admintools freeipa-client"
-        export YUM_OPTIONS="--disablerepo=updates-testing"
+        ipa_add_to_env "DISTRO" "Fedora"
+        ipa_add_to_env "IPA_SERVER_PACKAGES" "freeipa-server"
+        ipa_add_to_env "IPA_CLIENT_PACKAGES" "freeipa-admintools freeipa-client"
+        #ipa_add_to_env "YUM_OPTIONS" ""
+        ipa_add_to_env "YUM_OPTIONS" "--disablerepo=updates-testing"
     else
-        export DISTRO="RedHat"
-        export IPA_SERVER_PACKAGES="ipa-server"
+        ipa_add_to_env "DISTRO" "RedHat"
+        ipa_add_to_env "IPA_SERVER_PACKAGES" "ipa-server"
         if [ $(grep "Red Hat.*5\.[0-9]" /etc/redhat-release|wc -l) -gt 0 ]; then
-            export IPA_CLIENT_PACKAGES="ipa-client"
+            ipa_add_to_env "IPA_CLIENT_PACKAGES" "ipa-client"
         else
-            export IPA_CLIENT_PACKAGES="ipa-admintools ipa-client"
+            ipa_add_to_env "IPA_CLIENT_PACKAGES" "ipa-admintools ipa-client"
         fi
-        export YUM_OPTIONS=""
+        ipa_add_to_env "YUM_OPTIONS" ""
     fi
 
     if [ -n "${IPADEBUG}" -o -f /tmp/IPADEBUG ]; then 
         IPADEBUG=1
     fi
         
+    . /opt/rhqa_ipa/env.sh
+
     # Copy ipa-install.sh to /opt/rhqa_ipa 
     # Some tests like install-server-cli like to call the scipt as a library
     rm -f /opt/rhqa_ipa/ipa-install.sh
@@ -700,6 +712,7 @@ ipa_install_prep_pkgInstalls()
 {
     rlRun "yum clean all"
     rlRun "yum -y install bind expect krb5-workstation bind-dyndb-ldap krb5-pkinit-openssl nmap"
+    rlRun "yum -y install ntp autogen-libopts"
     if [ $(echo $MYROLE|grep CLIENT|wc -l) -gt 0 ]; then
         rlRun "yum -y install nscd httpd curl mod_nss mod_auth_kerb 389-ds-base expect ntpdate"
         rlRun "yum -y install $YUM_OPTIONS $IPA_CLIENT_PACKAGES"
@@ -763,18 +776,20 @@ fixhostname()
                 rlRun "cp /etc/sysconfig/network /etc/sysconfig/network-ipabackup"
             fi
             rlRun "sed -i \"s/HOSTNAME=.*$/HOSTNAME=$hostname_s.$DOMAIN/\" /etc/sysconfig/network"
-        else
-            if [ ! -f /etc/hostname ]; then
+            . /etc/sysconfig/network
+        fi
+        if [ -f /etc/hostname ]; then
+            if [ ! -f /etc/hostname-ipabackup ]; then
                 rlRun "cp /etc/hostname /etc/hostname-ipabackup"
             fi
             rlRun "echo \"$hostname_s.$DOMAIN\" > /etc/hostname"
         fi
+        export HOSTNAME=$hostname_s.$DOMAIN
 
         rlRun "hostname $hostname_s.$DOMAIN"
     else
         rlLog "USEDNS=no, skipping hostname reconfig"
     fi
-    . /etc/sysconfig/network
 }
 
 fixForwarderIPv6()
@@ -961,6 +976,14 @@ configAbrt()
     fi
 }
 
+ipa_install_dogtag_workarounds()
+{
+    rlLog "setting up workaround for dogtag 10.0.2."
+    rlRun "mkdir /root/.dogtag"
+    rlRun "chmod 775 /root/.dogtag"
+    rlRun "ln -s /root/.dogtag /root/.pki"
+}
+
 ipa_install_prep() 
 {
     rlLog "$FUNCNAME"
@@ -991,6 +1014,8 @@ ipa_install_prep()
     SetUpKnownHosts
 
     configAbrt
+
+    ipa_install_dogtag_workarounds
 }
 
 ipa_install_sssd_workarounds()
