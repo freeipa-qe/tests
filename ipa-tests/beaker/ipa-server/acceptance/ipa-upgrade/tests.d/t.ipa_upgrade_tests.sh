@@ -298,7 +298,7 @@ ipa_upgrade_client_replica_master_all()
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
         if [ $(echo "$MYROLE" |grep "REPLICA"|wc -l) -gt 0 ]; then
-            rlRun "ipa-replica-manage list -v `hostname`"
+            rlRun "ipa-replica-manage -p $ADMINPW list -v `hostname`"
             rlRun "cp $log $log.ipa_upgrade_client_replica_master_all_3"
             rlRun "rhts-submit-log -l $log.ipa_upgrade_client_replica_master_all_3"
             #rlRun "ipa-replica-manage -p $ADMINPW re-initialize --from=$MASTER"
