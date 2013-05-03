@@ -983,8 +983,13 @@ ipa_install_dogtag_workarounds()
         rlRun "mkdir /root/.dogtag"
         rlRun "chmod 775 /root/.dogtag"
     fi
-    if [ ! -d /root/.pki ]; then
-        rlRun "ln -s /root/.dogtag /root/.pki"
+    if [ -e /root/.pki ]; then
+        rlRun "mv /root/.pki /root/.pki.ipabackup"
+    fi
+    rlRun "ln -s /root/.dogtag /root/.pki"
+    if [ ! -d /root/.pki/nssdb ]; then
+        rlRun "mkdir /root/.pki/nssdb"
+        rlRun "chmod 700 /root/.pki/nssdb"
     fi
 }
 
@@ -1133,6 +1138,7 @@ ipa_install_replica()
     rlRun "ipa-replica-install $IPA_REPLICA_OPTIONS"
     if [ $? -gt 0 ]; then
         rlRun "submit_log /var/log/ipareplica-install.log"
+        rlRun "submit_log /var/log/ipareplica-conncheck.log"
     fi
 
     ipa_install_sssd_workarounds
