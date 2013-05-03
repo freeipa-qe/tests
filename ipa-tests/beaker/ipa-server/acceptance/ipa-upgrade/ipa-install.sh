@@ -979,9 +979,13 @@ configAbrt()
 ipa_install_dogtag_workarounds()
 {
     rlLog "setting up workaround for dogtag 10.0.2."
-    rlRun "mkdir /root/.dogtag"
-    rlRun "chmod 775 /root/.dogtag"
-    rlRun "ln -s /root/.dogtag /root/.pki"
+    if [ ! -d /root/.dogtag ]; then
+        rlRun "mkdir /root/.dogtag"
+        rlRun "chmod 775 /root/.dogtag"
+    fi
+    if [ ! -d /root/.pki ]; then
+        rlRun "ln -s /root/.dogtag /root/.pki"
+    fi
 }
 
 ipa_install_prep() 
@@ -991,6 +995,8 @@ ipa_install_prep()
         rlFail "IPA_SERVER_PACKAGES variable not set.  Run ipa_install_set_vars first"
         return 1
     fi
+
+    ipa_install_dogtag_workarounds
 
     ipa_install_prep_pkgInstalls
 
@@ -1015,7 +1021,6 @@ ipa_install_prep()
 
     configAbrt
 
-    ipa_install_dogtag_workarounds
 }
 
 ipa_install_sssd_workarounds()

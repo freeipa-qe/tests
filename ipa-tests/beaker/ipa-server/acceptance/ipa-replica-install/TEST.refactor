@@ -1,0 +1,323 @@
+* Must support multiple slaves
+
+# Positive Tests:
+
+iri_prepnoip_pos_0001 - install, prep without ip-address
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW $GPGFILE
+    replicaBugCheck_bz784696 
+    replicaBugCheck_bz845405
+    iri_uninstall
+
+iri_prepnoip_pos_0002 - install, prep without ip-address, post-ca
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW $GPGFILE
+    ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended \
+        /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
+    replicaBugCheck_bz784696 
+    replicaBugCheck_bz845405
+    iri_uninstall
+     
+iri_prepnoip_pos_0003 - install, prep without ip-address, no dirsrv restart on master
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW $GPGFILE
+    RESTARTDS=0
+    iri_uninstall
+    installBug_bz830338
+    RESTARTDS=1
+    iri_uninstall
+
+iri_prepnoip_pos_0004 - install, prep without ip-address, no-reverse
+    ssh $MASTER "ipa dnszone-add $TEST_ZONE1..."
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE..."
+    ssh $MASTER "ipa dnszone-add $TEST_ZONE2..."
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --no-reverse $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    ipa dnszone-show $REPLICA_ZONE
+    ipa dnszone-show $TEST_ZONE1
+    ipa dnszone-show $TEST_ZONE2
+    iri_uninstall
+
+iri_prepnoipnozone_pos_0001 - install, prep without ip-address without rev zones, no-reverse
+    ssh $MASTER "ipa dnszone-add $TEST_ZONE1..."
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+    ssh $MASTER "ipa dnszone-del $REPLICA_ZONE..."
+    ssh $MASTER "ipa dnszone-add $TEST_ZONE2..."
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --no-reverse $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    ipa dnszone-show $REPLICA_ZONE # FAIL
+    ipa dnszone-show $TEST_ZONE1
+    ipa dnszone-show $TEST_ZONE2
+    iri_uninstall
+
+iri_prepnoipnozone_pos_0002 - install, prep without ip-address without rev zones, no-forwarders 
+    ssh $MASTER "ipa dnszone-add $TEST_ZONE1..."
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+    ssh $MASTER "ipa dnszone-del $REPLICA_ZONE..."
+    ssh $MASTER "ipa dnszone-add $TEST_ZONE2..."
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW \
+        -p $ADMINPW $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    replicaBugCheck_bz894131 $REPLICA_ZONE
+    replicaBugCheck_bz894143 
+    replicaBugCheck_bz895083
+    ipa dnszone-show $REPLICA_ZONE # FAIL
+    ipa dnszone-show $TEST_ZONE1
+    ipa dnszone-show $TEST_ZONE2
+    iri_uninstall
+
+iri_preppkcs12_pos_0001 - install, prep with pkcs12, no-forwarders
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW $s_short.$DOMAIN"
+    ssh $MASTER "cd /var/lib/ipa ; echo $ADMINPW | gpg --batch --passphrase-fd 0 \
+        -d replica-info-$SLAVE.gpg | tar xvf -"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$SLAVEIP \
+        $hostname_s.$DOMAIN --dirsrv_pkcs12=realm_info/dscert.p12 --dirsrv_pin='' \
+        --http_pkcs12=realm_info/httpcert.p12 --http_pin=''"
+    sftp $MASTER:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg
+    ipa-replica-install -U --setup-dns --no-forwarders -w $ADMINPW \
+        -p $ADMINPW $GPGFILE
+    grep -v "$DNSFORWARD" /etc/named.conf
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    iri_uninstall
+    
+iri_prepwithip_pos_0001 - install, prep with ip-address with rev zone, no-sshd
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    ssh $MASTER "ipa dnsrecord-find $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-find $DOMAIN"
+    ssh $MASTER "dig +short $s_short.$DOMAIN"
+    ssh $MASTER "dig +short -x $s_ip"
+    replicaBugCheck_bz894143
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --no-sshd $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    grep "#KerberosAuthentication no"  /etc/ssh/sshd_config
+    grep "GSSAPIAuthentication yes"    /etc/ssh/sshd_config
+    grep "#AuthorizedKeysCommand none" /etc/ssh/sshd_config
+    ipa dnsrecord-find $DOMAIN $s_short|grep "sshfp record" 
+    iri_uninstall
+
+iri_prepwithip_pos_0002 - install, prep with ip-address, ssh-trust-dns
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --ssh-trust-dns $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    grep "^[ ]*VerifyHostKeyDNS yes" /etc/ssh/ssh_config
+
+iri_prepwithipnozone_pos_0001 - install, prep with ip-address without rev zones
+    ssh $MASTER "ipa dnszone-del $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    ssh $MASTER "ipa dnsrecord-find $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-find $DOMAIN"
+    ssh $MASTER "dig +short $s_short.$DOMAIN"
+    ssh $MASTER "dig +short -x $s_ip"
+    replicaBugCheck_bz894143
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --no-sshd $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    grep "#KerberosAuthentication no"  /etc/ssh/sshd_config
+    grep "GSSAPIAuthentication yes"    /etc/ssh/sshd_config
+    grep "#AuthorizedKeysCommand none" /etc/ssh/sshd_config
+    ipa dnsrecord-find $DOMAIN $s_short|grep "sshfp record" 
+    iri_uninstall
+
+iri_prepwithip_pos_0003 - install, prep with ip-address, configure-sshd
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --configure-sshd $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    grep "KerberosAuthentication no" /etc/ssh/sshd_config
+    grep "GSSAPIAuthentication yes" /etc/ssh/sshd_config
+    grep "AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys" /etc/ssh/sshd_config
+    iri_uninstall
+
+iri_prepwithip_pos_0004 - install, prep with ip-address, no-dns-sshfp
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --no-dns-sshfp $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    ipa dnsrecord-find $DOMAIN $s_short | grep "sshfp record" # fail
+    iri_uninstall
+
+iri_prepwithip_pos_0005 - install, prep with ip-address, no-host-dns
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --no-host-dns $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    ???? need a check to find out if it worked???
+    iri_uninstall
+
+iri_prepwithip_pos_0006 - install, prep with ip-address, no-ui-redirect
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --no-ui-redirect $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    curl http://$hostname_s.$DOMAIN > /tmp/curl.out 2>&1
+    grep "Test Page for the Apache HTTP"
+    grep -v "301 Moved Permanently"
+    grep -v "ipa/ui"
+    iri_uninstall
+
+installSlave_ca
+iri_prepwithip_pos_0007 - install, prep with ip-address, setup-ca
+    ssh $MASTER "ipa dnszone-add $REPLICA_ZONE"
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW --setup-ca $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    replicaBugCheck_bz867640
+    replicaBugCheck_bz782979
+    replicaBugCheck_bz788726
+
+iri_prepwithipnodnsrecs_pos_0001
+    ssh $MASTER "ipa dnsrecord-del --a-rec=$s_ip $DOMAIN $s_short --del-all"
+    ssh $MASTER "ipa dnsrecord-del $REPLICA_ZONE $s_ip_oct4 --ptr-rec=$SLAVE."
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW $GPGFILE
+    replicaBugCheck_bz830314
+    replicaBugCheck_bz905064 /var/log/ipareplica-install.log
+    ipa dnsrecord-find $DOMAIN |grep $s_short
+    ipa dnsrecord-find $REPLICA_ZONE | grep $s_short
+
+# Negative Tests:
+
+iri_prepwithip_neg_0001 - install, prep with ip-address, port 80 down
+    ssh $MASTER "iptables -A INPUT -m tcp -p tcp --dport 80  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    grep "HTTP Server: Unsecure port (80): FAILED" 
+    grep "Port check failed! Inaccessible port(s): 80 (TCP)"
+    ssh $MASTER "iptables -D INPUT -m tcp -p tcp --dport 80  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    iri_uninstall
+
+iri_prepwithip_neg_0002 - install, prep with ip-address, port 443 down
+    ssh $MASTER "iptables -A INPUT -m tcp -p tcp --dport 443  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    grep "HTTP Server: Unsecure port (443): FAILED" 
+    grep "Port check failed! Inaccessible port(s): 443 (TCP)"
+    ssh $MASTER "iptables -D INPUT -m tcp -p tcp --dport 443  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    iri_uninstall
+
+iri_prepwithip_neg_0003 - install, prep with ip-address, port 389 down
+    ssh $MASTER "iptables -A INPUT -m tcp -p tcp --dport 389  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    grep "HTTP Server: Unsecure port (389): FAILED" 
+    grep "Port check failed! Inaccessible port(s): 389 (TCP)"
+    ssh $MASTER "iptables -D INPUT -m tcp -p tcp --dport 389  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    iri_uninstall
+
+iri_prepwithip_neg_0004 - install, prep with ip-address, port 636 down
+    ssh $MASTER "iptables -A INPUT -m tcp -p tcp --dport 636  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    grep "HTTP Server: Unsecure port (636): FAILED" 
+    grep "Port check failed! Inaccessible port(s): 636 (TCP)"
+    ssh $MASTER "iptables -D INPUT -m tcp -p tcp --dport 636  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    iri_uninstall
+
+iri_prepwithip_neg_0005 - install, prep with ip-address, port 88 down
+    ssh $MASTER "iptables -A INPUT -m tcp -p tcp --dport 88  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    grep "HTTP Server: Unsecure port (88): FAILED" 
+    grep "Port check failed! Inaccessible port(s): 88 (TCP)"
+    ssh $MASTER "iptables -D INPUT -m tcp -p tcp --dport 88  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    iri_uninstall
+
+iri_prepwithip_neg_0006 - install, prep with ip-address, port 464 down
+    ssh $MASTER "iptables -A INPUT -m tcp -p tcp --dport 464  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    grep "HTTP Server: Unsecure port (464): FAILED" 
+    grep "Port check failed! Inaccessible port(s): 464 (TCP)"
+    ssh $MASTER "iptables -D INPUT -m tcp -p tcp --dport 464  -j REJECT \
+        --reject-with icmp-host-prohibited"
+    iri_uninstall
+
+# Bug tests:
+
+replicaInstallBug748987
+iri_prepwithip_bug_0001 - BZ748987 - replica fail if leftover agreement in place
+    ssh $MASTER "ipa-replica-prepare -p $ADMINPW --ip-address=$s_ip $s_short.$DOMAIN"
+    sftp $MASTER:$GPGFILE $GPGFILE
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    ssh $MASTER "ipa dnsrecord-del $REPLICA_ZONE $IPOCT4 --ptr-rec=$REPLICA."
+    ssh $MASTER "ipa dnsrecord-del $DOMAIN $REPLICA_S --a-rec=$REPLICA_IP --del-all"
+    ipa-server-install --uninstall -U
+    ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW \
+        -p $ADMINPW  $GPGFILE
+    grep "A replication agreement for this host already exists. It needs to be removed"
+

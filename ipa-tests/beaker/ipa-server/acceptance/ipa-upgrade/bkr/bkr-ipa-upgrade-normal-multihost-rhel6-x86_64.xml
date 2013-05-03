@@ -1,0 +1,127 @@
+<job retention_tag="scratch">
+	<whiteboard>
+		IPA :: RHEL 6.4 :: x86_64 :: IPA Upgrade 6.2 to 6.4 Tests
+	</whiteboard>
+	<recipeSet priority="Normal">
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="MASTER" whiteboard="IPA MASTER">
+			<autopick random="false"/>
+			<watchdog panic="None"/>
+			<packages/>
+			<ks_appends/>
+			<repos/>
+			<distroRequires>
+				<and>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_virt op="=" value=""/>
+					<distro_variant op="=" value="Server"/>
+					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_arch op="=" value="x86_64"/>
+				</and>
+			</distroRequires>
+			<hostRequires>
+				<and>
+					<system_type value="Machine"/>
+					<memory op="&gt;=" value="1000"/>
+				</and>
+			</hostRequires>
+			<partitions/>
+			<task name="/distribution/install">
+				<params/>
+			</task>
+			<task name="/distribution/pkginstall">
+				<params>
+					<param name="PKGARGNAME" value="expect"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
+				<params>
+                    <param name="TESTTYPE" value="normal"/>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
+			</task>
+		</recipe>
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="IPA REPLICA">
+			<autopick random="false"/>
+			<watchdog panic="None"/>
+			<packages/>
+			<ks_appends/>
+			<repos/>
+			<distroRequires>
+				<and>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_virt op="=" value=""/>
+					<distro_variant op="=" value="Server"/>
+					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_arch op="=" value="x86_64"/>
+				</and>
+			</distroRequires>
+			<hostRequires>
+				<and>
+					<system_type value="Machine"/>
+					<memory op="&gt;=" value="1000"/>
+				</and>
+			</hostRequires>
+			<partitions/>
+			<task name="/distribution/install">
+				<params/>
+			</task>
+			<task name="/distribution/pkginstall">
+				<params>
+					<param name="PKGARGNAME" value="expect"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
+				<params>
+                    <param name="TESTTYPE" value="normal"/>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
+			</task>
+		</recipe>
+		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="IPA CLIENT">
+			<autopick random="true"/>
+			<watchdog panic="None"/>
+			<packages/>
+			<ks_appends/>
+			<repos/>
+			<distroRequires>
+				<and>
+					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
+					<distro_virt op="=" value=""/>
+					<distro_variant op="=" value="Server"/>
+					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_arch op="=" value="x86_64"/>
+				</and>
+			</distroRequires>
+			<hostRequires>
+				<and>
+					<system_type value="Machine"/>
+					<memory op="&gt;=" value="1000"/>
+				</and>
+			</hostRequires>
+			<partitions/>
+			<task name="/distribution/install">
+				<params/>
+			</task>
+			<task name="/distribution/pkginstall">
+				<params>
+					<param name="PKGARGNAME" value="expect"/>
+				</params>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/shared">
+				<params/>
+			</task>
+			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
+				<params>
+                    <param name="TESTTYPE" value="normal"/>
+					<param name="KILLTIMEOVERRIDE" value="84600"/>
+				</params>
+			</task>
+		</recipe>
+	</recipeSet>
+</job>
