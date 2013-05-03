@@ -987,8 +987,10 @@ ipa_install_dogtag_workarounds()
         rlRun "mv /root/.pki /root/.pki.orig"
     fi
     rlRun "ln -s /root/.dogtag /root/.pki"
-    rlRun "mkdir /root/.pki/nssdb"
-    rlRun "chmod 700 /root/.pki/nssdb"
+    if [ ! -d /root/.pki/nssdb ]; then
+        rlRun "mkdir /root/.pki/nssdb"
+        rlRun "chmod 700 /root/.pki/nssdb"
+    fi
 }
 
 ipa_install_prep() 
