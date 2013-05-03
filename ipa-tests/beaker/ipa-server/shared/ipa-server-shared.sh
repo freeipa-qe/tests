@@ -995,6 +995,9 @@ ipa_quick_uninstall(){
 		rlRun "/bin/cp -f /etc/resolv.conf.ipabackup /etc/resolv.conf"
 		rlRun "/bin/rm -f /etc/resolv.conf.ipabackup"
 	fi
+    if [ -e /root/.pki.ipabackup ]; then
+        rlRun "/bin/mv -f /root/.pki.ipabackup /root/.pki"
+    fi
     if [ $(grep HOSTNAME= /etc/sysconfig/network|wc -l) -gt 0 ]; then
         . /etc/sysconfig/network
     elif [ -f /etc/hostname ]; then
