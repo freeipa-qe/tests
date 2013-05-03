@@ -1138,6 +1138,7 @@ ipa_install_replica()
     rlRun "ipa-replica-install $IPA_REPLICA_OPTIONS"
     if [ $? -gt 0 ]; then
         rlRun "submit_log /var/log/ipareplica-install.log"
+        rlRun "submit_log /var/log/ipareplica-conncheck.log"
     fi
 
     ipa_install_sssd_workarounds
