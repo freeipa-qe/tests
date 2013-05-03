@@ -983,8 +983,13 @@ ipa_install_dogtag_workarounds()
         rlRun "mkdir /root/.dogtag"
         rlRun "chmod 775 /root/.dogtag"
     fi
-    if [ ! -d /root/.pki ]; then
-        rlRun "ln -s /root/.dogtag /root/.pki"
+    if [ -e /root/.pki ]; then
+        rlRun "mv /root/.pki /root/.pki.ipabackup"
+    fi
+    rlRun "ln -s /root/.dogtag /root/.pki"
+    if [ ! -d /root/.pki/nssdb ]; then
+        rlRun "mkdir /root/.pki/nssdb"
+        rlRun "chmod 700 /root/.pki/nssdb"
     fi
 }
 
