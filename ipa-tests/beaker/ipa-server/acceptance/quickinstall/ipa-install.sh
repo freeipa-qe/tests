@@ -996,6 +996,8 @@ ipa_install_prep()
         return 1
     fi
 
+    ipa_install_dogtag_workarounds
+
     ipa_install_prep_pkgInstalls
 
     ipa_install_prep_setTime
@@ -1019,7 +1021,6 @@ ipa_install_prep()
 
     configAbrt
 
-    ipa_install_dogtag_workarounds
 }
 
 ipa_install_sssd_workarounds()
