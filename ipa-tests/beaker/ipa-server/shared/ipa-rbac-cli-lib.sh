@@ -56,12 +56,12 @@ addPermission()
     permissionTarget=$3
     rc=0
 
-        if [ -z $permissionAttr ] ; then
-           rlLog "ipa permission-add $permissionName --permissions=$permissionRights $permissionTarget"
-            ipa permission-add $permissionName --permissions=$permissionRights $permissionTarget
+        if [ -z \"$permissionAttr\" ] ; then
+           rlLog "ipa permission-add $permissionName $permissionRights $permissionTarget"
+            ipa permission-add $permissionName $permissionRights $permissionTarget
         else 
-           rlLog " Executing: ipa permission-add $permissionName --permissions=\"$permissionRights\" $permissionTarget --attr=$permissionAttr $permissionOtherParam"
-           ipa permission-add $permissionName --permissions=$permissionRights $permissionTarget --attr=$permissionAttr $permissionOtherParam 
+           rlLog " Executing: ipa permission-add $permissionName \"$permissionRights\" $permissionTarget $permissionAttr $permissionOtherParam"
+           ipa permission-add $permissionName $permissionRights $permissionTarget $permissionAttr $permissionOtherParam 
         fi
         rc=$?
         if [ $rc -ne 0 ] ; then

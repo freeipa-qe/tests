@@ -62,7 +62,8 @@ cleanupPermissionTests()
     rlRun "deletePermission $permissionName783502" 0 "Deleting $permissionName783502"
     rlRun "deleteGroup groupone" 0 "Deleting groupone"
     ipa permission-mod --permissions=add  "add Automount keys" --attrs= 
-    ipa permission-mod --attrs="userpassword,krbprincipalkey,sambalmpassword,sambantpassword,passwordhistory" --all "Change a user password"
+#NAMITA
+    ipa permission-mod --attrs=userpassword --attrs=krbprincipalkey --attrs=sambalmpassword --attrs=sambantpassword --attrs=passwordhistory --all "Change a user password"
     ipa permission-mod --type=netgroup "Remove Netgroups"
 }
 
@@ -89,38 +90,47 @@ ipapermission_add_positive()
    ipapermission_params_hostgroup_type
    ipapermission_params_netgroup_filter
    ipapermission_params_dnsrecord_subtree
-}
+
 
 ################################################
 #  test: ipapermission-add: Positive: Type User 
 ################################################
 ipapermission_params_user_type()
 {
-    permissionRights="write"
+    permissionRights="--permissions=write"
+    permissionVerifyRights=`echo $permissionRights | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
     permissionLocalTarget="--type=user"
     permissionLocalTargetToVerify=`echo $permissionLocalTarget | sed 's/--type=//'`
 
     permissionName="ManageUser1"
-    permissionLocalAttr="carlicense,description"
+    permissionLocalAttr="--attr=carlicense --attr=description"
+    permissionVerifyAttr=`echo $permissionLocalAttr | sed 's/--attr=/,/g' | sed 's/^,//' | sed 's/ //g'`
     objectclass="groupofnames,ipapermission,top"
 
    rlPhaseStartTest "ipa-permission-cli-1001 - add permission for type user, with multiple attr"
-     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
-     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr   $objectclass
+     rlRun "addPermission $permissionName \"$permissionRights\" $permissionLocalTarget \"$permissionLocalAttr\"" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionVerifyRights "Type" $permissionLocalTargetToVerify $permissionVerifyAttr $objectclass
    rlPhaseEnd
 
    permissionName="ManageUser2"
-   permissionRights="read,write"
+   permissionRights="--permissions=read --permissions=write"
+   permissionVerifyRights=`echo $permissionRights | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
+    permissionLocalAttr="--attr=carlicense --attr=description"
+    permissionVerifyAttr=`echo $permissionLocalAttr | sed 's/--attr=/,/g' | sed 's/^,//' | sed 's/ //g'`
    rlPhaseStartTest "ipa-permission-cli-1003 - add permission for type user, with multiple attr, and multiple permissions"
-     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Adding $permissionName"
-     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     rlRun "addPermission $permissionName \"$permissionRights\" $permissionLocalTarget \"$permissionLocalAttr\"" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionVerifyRights "Type" $permissionLocalTargetToVerify $permissionVerifyAttr $objectclass
    rlPhaseEnd
 
    permissionName="ManageUser3"
    permissionAddAttr="--addattr=\"description=test\""
+   permissionRights="--permissions=read --permissions=write"
+   permissionVerifyRights=`echo $permissionRights | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
+    permissionLocalAttr="--attr=carlicense --attr=description"
+    permissionVerifyAttr=`echo $permissionLocalAttr | sed 's/--attr=/,/g' | sed 's/^,//' | sed 's/ //g'`
    rlPhaseStartTest "ipa-permission-cli-1004 - add permission for type user, with multiple attr, multiple permissions, and add an attribute"
-     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
-     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     rlRun "addPermission $permissionName \"$permissionRights\" $permissionLocalTarget \"$permissionLocalAttr\" $permissionAddAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionVerifyRights "Type" $permissionLocalTargetToVerify $permissionVerifyAttr $objectclass
      verifyPermissionRawTypeAttr $permissionName $objectclass
      rlRun "verifyPermissionAttr $permissionName raw \"description\" \"test\"" 0 "Verify Added Attr"
    rlPhaseEnd
@@ -128,30 +138,38 @@ ipapermission_params_user_type()
 
    permissionName="ManageUser4"
    permissionAddAttr="--setattr=\"owner=cn=test\""
+   permissionRights="--permissions=read --permissions=write"
+   permissionVerifyRights=`echo $permissionRights | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
+    permissionLocalAttr="--attr=carlicense --attr=description"
+    permissionVerifyAttr=`echo $permissionLocalAttr | sed 's/--attr=/,/g' | sed 's/^,//' | sed 's/ //g'`
    rlPhaseStartTest "ipa-permission-cli-1005 - add permission for type user, with multiple attr, multiple permissions, and set an attribute"
-     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
-     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     rlRun "addPermission $permissionName \"$permissionRights\" $permissionLocalTarget \"$permissionLocalAttr\" $permissionAddAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionVerifyRights "Type" $permissionLocalTargetToVerify $permissionVerifyAttr $objectclass
      verifyPermissionRawTypeAttr $permissionName $objectclass
      rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test\"" 0 "Verify Set Attr"
    rlPhaseEnd
 
    permissionName="ManageUser5"
    permissionAddAttr="--setattr=\"owner=cn=test\"\ --addattr=\"owner=cn=test2\""
+   permissionRights="--permissions=read --permissions=write"
+   permissionVerifyRights=`echo $permissionRights | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
+    permissionLocalAttr="--attr=carlicense --attr=description"
+    permissionVerifyAttr=`echo $permissionLocalAttr | sed 's/--attr=/,/g' | sed 's/^,//' | sed 's/ //g'`
    rlPhaseStartTest "ipa-permission-cli-1006 - add permission for type user, with multiple attr, multiple permissions, and add and set multivalued attributes"
-     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr $permissionAddAttr" 0 "Adding $permissionName"
-     verifyPermissionTargetAttr $permissionName $permissionRights "Type" $permissionLocalTargetToVerify $permissionLocalAttr $objectclass
+     rlRun "addPermission $permissionName \"$permissionRights\" $permissionLocalTarget \"$permissionLocalAttr\" $permissionAddAttr" 0 "Adding $permissionName"
+     verifyPermissionTargetAttr $permissionName $permissionVerifyRights "Type" $permissionLocalTargetToVerify $permissionVerifyAttr $objectclass
      verifyPermissionRawTypeAttr $permissionName $objectclass
      rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test\"" 0 "Verify Set Attr"
      rlRun "verifyPermissionAttr $permissionName raw \"owner\" \"cn=test2\"" 0 "Verify Set Attr"
    rlPhaseEnd
 
 
-    permissionRights="read"
+    permissionRights="--permissions=read"
     permissionLocalTarget="--type=user"
     permissionName="ManageUser_783502"
     permissionLocalAttr="ipaclientversion"
    rlPhaseStartTest "ipa-permission-cli-1016 - add permission with invalid attr for the type being added (bug 783502)" 
-     rlRun "addPermission $permissionName $permissionRights $permissionLocalTarget $permissionLocalAttr" 0 "Verify bz 783502 for $permissionLocalAttr" 
+     rlRun "addPermission $permissionName \"$permissionRights\" $permissionLocalTarget \"$permissionLocalAttr\"" 0 "Verify bz 783502 for $permissionLocalAttr" 
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Permission name\" \"$permissionName\"" 0 "Verify Permissions"
    rlPhaseEnd
    #TODO: Add with type and memberof
