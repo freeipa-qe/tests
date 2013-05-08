@@ -993,6 +993,15 @@ ipa_install_dogtag_workarounds()
     fi
 }
 
+ipa_install_openldap_workarounds()
+{
+    rlLog "implementing workaround for openldap change in handling SASL_NOCANON"
+    if [ -f /etc/openldap/ldap.conf ]; then
+        rlRun "cp /etc/openldap/ldap.conf /etc/openldap/ldap.conf.ipabackup"
+        rlRun "sed -i 's/^SASL_NOCANON.*$/SASL_NOCANON off/g' /etc/openldap/ldap.conf"
+    fi
+}
+
 ipa_install_prep() 
 {
     rlLog "$FUNCNAME"
@@ -1004,6 +1013,8 @@ ipa_install_prep()
     ipa_install_dogtag_workarounds
 
     ipa_install_prep_pkgInstalls
+
+    ipa_install_openldap_workarounds
 
     ipa_install_prep_setTime
 
