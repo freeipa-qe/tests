@@ -44,24 +44,35 @@
 
 addPermission()
 {
-    if [ `echo $#` > 3 ] ; then
-       permissionAttr=$4   
-       permissionOtherParam=$5   
-    else
-       permissionAttr=""  
-       permissionOtherParam=""  
-    fi
+#    if [ `echo $#` > 3 ] ; then
+#       permissionAttr=$4   
+#       permissionOtherParam=$5   
+#    else
+#       permissionAttr=""  
+#       permissionOtherParam=""  
+#    fi
     permissionName=$1
-    permissionRights=$2
-    permissionTarget=$3
+    shift
+    restOfCommand=""
+   while [ "$#" -gt "0" ]
+   do
+     restOfCommand=$restOfCommand$1
+     restOfCommand=$restOfCommand" "
+     shift
+     rlLog "cmd: $restOfCommand"
+   done
+#    permissionRights=$2
+#    permissionTarget=$3
     rc=0
 
         if [ -z \"$permissionAttr\" ] ; then
            rlLog "ipa permission-add $permissionName $permissionRights $permissionTarget"
             ipa permission-add $permissionName $permissionRights $permissionTarget
         else 
-           rlLog " Executing: ipa permission-add $permissionName \"$permissionRights\" $permissionTarget $permissionAttr $permissionOtherParam"
-           ipa permission-add $permissionName $permissionRights $permissionTarget $permissionAttr $permissionOtherParam 
+#           rlLog " Executing: ipa permission-add $permissionName \"$permissionRights\" $permissionTarget $permissionAttr $permissionOtherParam"
+#           ipa permission-add $permissionName $permissionRights $permissionTarget $permissionAttr $permissionOtherParam 
+            rlLog " Executing: ipa permission-add $permissionName $restOfCommand" 
+            ipa permission-add $permissionName $restOfCommand 
         fi
         rc=$?
         if [ $rc -ne 0 ] ; then
