@@ -49,7 +49,7 @@ for file in $(ls tests.d/t.*.sh); do
 	. ./$file
 done
 
-IRMVERSION=3.1
+IRMVERSION="3."
 TESTCOUNT=0
 CFG=/opt/rhqa_ipa/env.sh
 
