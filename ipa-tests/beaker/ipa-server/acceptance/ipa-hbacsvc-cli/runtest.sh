@@ -277,6 +277,16 @@ rlJournalStart
 	rlRun "ipa hbacsvc-show crond | grep crond" 0 "crond has been added into the list of hbac-services in default install"
     rlPhaseEnd
     
+    # Verifying https://bugzilla.redhat.com/show_bug.cgi?id=950018 
+    rlPhaseStartTest "ipa-hbacsvc-cli-028:  Fix of help docstring for hbacsvcgroup"
+       
+	rlRun "ipa help hbacsvcgroup > $TmpDir/output-28.txt" 0 "help text output"
+        rlRun "cat $TmpDir/output-28.txt"
+        rlAssertNotGrep "Add a new group to the \"login\" group:" "$TmpDir/output-28.txt"
+        rlAssertNotGrep "ipa hbacsvcgroup-add --desc=\"switch users\" login" "$TmpDir/output-28.txt"
+        rlAssertNotGrep "ipa hbacsvcgroup-add-member --hbacsvcs=su,su-l login" "$TmpDir/output-28.txt"
+    rlPhaseEnd
+
     rlPhaseStartCleanup "ipa-hbacsvc-cli-cleanup: Destroying admin credentials."
 	# delete service groups
 	rlRun "deleteHBACService $service1" 0 "CLEANUP: Deleting service $service1"
