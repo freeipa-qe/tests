@@ -1070,6 +1070,7 @@ ipa_install_master()
         rlAssertRpm $THISPKG
     done
     
+    rlRun "ausearch -f /tmp/hsperfdata_root"
     rlRun "ls -ldZ /tmp/hsperfdata_root" 0,1,2
 
     if [ -z "$IPA_SERVER_OPTIONS" ]; then
