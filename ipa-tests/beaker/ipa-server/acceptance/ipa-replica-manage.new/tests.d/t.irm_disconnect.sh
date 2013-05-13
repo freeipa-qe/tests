@@ -11,10 +11,10 @@ function irm_disconnect_pos_0001()
         testuser="testuser$(date +%H%M%S)"
         rlRun "ipa-replica-manage $PWOPT disconnect $MASTER $REPLICA2 > $tmpout 2>&1"
         rlRun "cat $tmpout"
-        rlAssertGrep "test" $tmpout
+        rlAssertGrep "Deleted replication agreement" $tmpout
 
         irm_useradd $MASTER $testuser 
-        rlRun "sleep 60"
+        irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
         irm_userchk $REPLICA1 $testuser
         irm_userchk $REPLICA2 $testuser
         irm_userchk $REPLICA3 $testuser
