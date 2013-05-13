@@ -45,7 +45,7 @@
             <task name="/distribution/reservesys" role="STANDALONE">
                 <params>
                     <param name="RESERVE_IF_FAIL" value="True"/>
-                <params>
+                </params>
             </task>
         </recipe>
         <recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="IPA REPLICA">
@@ -90,7 +90,7 @@
             <task name="/distribution/reservesys" role="STANDALONE">
                 <params>
                     <param name="RESERVE_IF_FAIL" value="True"/>
-                <params>
+                </params>
             </task>
         </recipe>
         <recipe kernel_options="" kernel_options_post="" ks_meta="" role="CLIENT" whiteboard="IPA CLIENT">
@@ -135,7 +135,7 @@
             <task name="/distribution/reservesys" role="STANDALONE">
                 <params>
                     <param name="RESERVE_IF_FAIL" value="True"/>
-                <params>
+                </params>
             </task>
         </recipe>
     </recipeSet>
