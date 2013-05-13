@@ -100,7 +100,8 @@ rlJournalStart
 				rlLog "[ PASS ] BZ 845301 not found -- service iptables stop succeeeded"
 			fi
 		else	
-			rlRun "service iptables stop" 0 "Stop the firewall on the client"
+			#rlRun "service iptables stop" 0 "Stop the firewall on the client"
+			rlRun "systemctl stop firewalld.service" 0 "Stop the firewall on the client"
 		fi
 		rlRun "yum install -y ftp"
 		rlRun "cat /etc/krb5.conf"
@@ -386,7 +387,8 @@ rlJournalStart
 				rlLog "[ PASS ] BZ 845301 not found -- service iptables stop succeeeded"
 			fi
 		else	
-			rlRun "service iptables stop" 0 "Stop the firewall on the client"
+			#rlRun "service iptables stop" 0 "Stop the firewall on the client"
+			rlRun "systemctl stop firewalld.service" 0 "Stop the firewall on the client"
 		fi
 		rlRun "yum install -y ftp"
 		rlRun "cat /etc/krb5.conf"
@@ -652,7 +654,8 @@ rlJournalStart
 
 	rlPhaseStartSetup "ipa-hbacsvc-func: Setup of users"
 
-                rlRun "service iptables stop" 0 "Stop the firewall on the client"
+                #rlRun "service iptables stop" 0 "Stop the firewall on the client"
+		rlRun "systemctl stop firewalld.service" 0 "Stop the firewall on the Master"
 		rlRun "authconfig --enablemkhomedir --updateall"
         rlRun "service sssd restart"
         	rlRun "cat /opt/rhqa_ipa/env.sh"
@@ -731,6 +734,7 @@ rlJournalStart
 		hbacsvc_master_002
 		rlRun "rhts-sync-set -s DONE_hbacsvc_master_002 -m $BEAKERMASTER"
                 rlRun "rhts-sync-block -s DONE_hbacsvc_client_002 -s DONE_hbacsvc_client2_002 $BEAKERCLIENT $BEAKERCLIENT2"
+		
 
 	# hbacsvc_master_002_1
 		hbacsvc_master_002_1
