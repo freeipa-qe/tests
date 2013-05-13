@@ -285,7 +285,7 @@ ipa_upgrade_client_replica_master_all()
     rlPhaseStartTest "ipa_upgrade_client_replica_master_all_2: test upgrade with old master, new replica, and new client"
         upgrade_replica
         log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
-        if [ $(echo "$MYROLE" |grep "REPLICA"|wc -l) -gt 0 ]; then
+        if [ $(echo "$MYROLE" |egrep "REPLICA|MASTER"|wc -l) -gt 0 ]; then
             rlLog "DEBUGGING:"
             rlRun "cp $log $log.ipa_upgrade_client_replica_master_all_2"
             rlRun "rhts-submit-log -l $log.ipa_upgrade_client_replica_master_all_2"
@@ -307,7 +307,7 @@ ipa_upgrade_client_replica_master_all()
 
 
         log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
-        if [ $(echo "$MYROLE" |grep "REPLICA"|wc -l) -gt 0 ]; then
+        if [ $(echo "$MYROLE" |egrep "REPLICA|MASTER"|wc -l) -gt 0 ]; then
             rlRun "ipa-replica-manage -p $ADMINPW list -v `hostname`"
             rlRun "cp $log $log.ipa_upgrade_client_replica_master_all_3"
             rlRun "rhts-submit-log -l $log.ipa_upgrade_client_replica_master_all_3"
