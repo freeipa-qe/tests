@@ -1,0 +1,8 @@
+%testcaseName(){
+    rlPhaseStartTest "%testcaseName"
+        rlLog "[%testcaseType] %testcaseComment"
+        rlLog "%testcaseData"
+        rlRun "%testcaseCommand" %testcaseExceptedReturnCode 
+        %testresultVerification
+    rlPhaseEnd
+}
