@@ -777,17 +777,16 @@ ipapermission_find()
 ##################################################
 ipapermission_find_name()
 {
-    option="name"
-    value="ManageUser1"
+    value="--name=ManageUser1"
     permissions="ManageUser1"
 
     rlPhaseStartTest "ipa-permission-cli-1041 - find permission using --name (bug 785251)"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
+      rlRun "findPermissionByOption $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 
-    value="\ "
+    value="--name=\ "
     rlPhaseStartTest "ipa-permission-cli-1042 - find permission using invalid --name (bug 785251)"
-      command="findPermissionByOption $option $value \"all\" $permissions"
+      command="findPermissionByOption $value \"all\" $permissions"
       expmsg="Number of entries returned 0"
       rlRun "ipa permission-find --name=\  --all > $TmpDir/ipapermission_invalidname.log 2>&1" 1 "Verify error message for invalid $option"
       rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidname.log"
@@ -801,17 +800,16 @@ ipapermission_find_name()
 ##################################################
 ipapermission_find_permissions()
 {
-    option="permissions"
-    value="all"
+    value="--permissions=all"
     permissions="ManageNetgroup1"
 
     rlPhaseStartTest "ipa-permission-cli-1043 - find permission - --permissions"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
+      rlRun "findPermissionByOption $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 
-    value="xyz"
+    value="--permissions=xyz"
     rlPhaseStartTest "ipa-permission-cli-1044 - find permission using invalid --permissions (bug 785257)"
-      #command="findPermissionByOption $option $value \"all\" $permissions"
+      #command="findPermissionByOption $value \"all\" $permissions"
       command="ipa permission-find --permissions=$value --all"
       expmsg="Number of entries returned 0"
       rlRun "$command > $TmpDir/ipapermission_invalidpermission-1044.log 2>&1" 1 "Verify return message for invalid $option"
@@ -827,13 +825,12 @@ ipapermission_find_permissions()
 ##################################################
 ipapermission_find_attrs()
 {
-    option="attrs"
-    value="krbprincipalkey,krblastpwdchange"
+    value="--attrs=krbprincipalkey --attrs=krblastpwdchange"
     permissions1="\"Manage host keytab\""
     permissions2="\"Manage service keytab\""
 
     rlPhaseStartTest "ipa-permission-cli-1045 - find permission - --attrs"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions1 $permissions2" 0 "Verify permissions are found for --$option=$value"
+      rlRun "findPermissionByOption \"$value\" \"all\" $permissions1 $permissions2" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
@@ -843,15 +840,14 @@ ipapermission_find_attrs()
 ##################################################
 ipapermission_find_type()
 {
-    option="type"
-    value="dnsrecord"
+    value="--type=dnsrecord"
     permissions1="\"add dns entries\""
     permissions2="\"remove dns entries\""
     permissions3="\"update dns entries\""
     permissions4="\"TestPermission\""
 
     rlPhaseStartTest "ipa-permission-cli-1046 - find permission - --type"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions1 $permissions2 $permissions3 $permissions4" 0 "Verify permissions are found for --$option=$value"
+      rlRun "findPermissionByOption $value \"all\" $permissions1 $permissions2 $permissions3 $permissions4" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
@@ -862,12 +858,11 @@ ipapermission_find_type()
 ##################################################
 ipapermission_find_memberof()
 {
-    option="memberof"
-    value="groupone"
+    value="--memberof=groupone"
     permissions="ManageHost1"
 
     rlPhaseStartTest "ipa-permission-cli-1047 - find permission - --memberof"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
+      rlRun "findPermissionByOption $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
@@ -876,12 +871,11 @@ ipapermission_find_memberof()
 ##################################################
 ipapermission_find_filter()
 {
-    option="filter"
-    value="\(\&\(!\(objectclass=posixgroup\)\)\(objectclass=ipausergroup\)\)"
+    value="--filter=\(\&\(!\(objectclass=posixgroup\)\)\(objectclass=ipausergroup\)\)"
     permissions="ManageGroup1"
 
     rlPhaseStartTest "ipa-permission-cli-1048 - find permission - --filter"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
+      rlRun "findPermissionByOption $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
@@ -893,14 +887,14 @@ ipapermission_find_filter()
 ipapermission_find_subtree()
 {
     option="subtree"
-    value="cn=computers,cn=accounts,dc=testrelm,dc=com"
+    value="--subtree=cn=computers,cn=accounts,dc=testrelm,dc=com"
     local value2="ldap:///fqdn=*,cn=computers,cn=accounts,dc=testrelm,dc=com"
     permissions="ManageHost1"
 
     rlPhaseStartTest "ipa-permission-cli-1049 - find permission - --subtree (bug 785254)"
       # Note that we don't do validation on search terms so we aren't going to report whether a subtree is valid or not, 
       # just which entries match.	
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 1 "No permissions matched - as expected."
+      rlRun "findPermissionByOption $value \"all\" $permissions" 1 "No permissions matched - as expected."
       #rlRun "findPermissionByOption $option $value2 \"all\" $permissions" 0 "Verify permissions are found for --subtree=$value2"
       rlRun "ipa permission-find --subtree=ldap:///fqdn=*,cn=computers,cn=accounts,dc=testrelm,dc=com --all" 0 "Verify permissions are found for --subtree=$value2"
       rlRun "ipa permission-find --subtree=$value2"
@@ -912,12 +906,11 @@ ipapermission_find_subtree()
 ##################################################
 ipapermission_find_targetgroup()
 {
-    option="targetgroup"
-    value="ipausers"
+    value="--targetgroup=ipausers"
     permissions="\"Add user to default group\""
 
     rlPhaseStartTest "ipa-permission-cli-1050 - find permission - --targetgroup (bz 893827)"
-      rlRun "findPermissionByOption $option $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
+      rlRun "findPermissionByOption $value \"all\" $permissions" 0 "Verify permissions are found for --$option=$value"
     rlPhaseEnd
 }
 
@@ -930,12 +923,9 @@ ipapermission_find_multiplefilters()
 {
 
     numberOfOptions="3"
-    option1="attrs"
-    value1="description"
-    option2="permissions"
-    value2="write"
-    option3="type"
-    value3="user"
+    value1="--attrs=description"
+    value2="--permissions=write"
+    value3="--type=user"
     permissions1="ManageUser1"
     permissions2="ManageUser2"
     permissions3="ManageUser3"
@@ -944,15 +934,14 @@ ipapermission_find_multiplefilters()
     permissions6="\"Modify Users\""
 
     rlPhaseStartTest "ipa-permission-cli-1051 - find permission - --attrs --permissions --type"
-      rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $permissions1 $permissions2 $permissions3 $permissions4 $permissions5 $permissions6" 0 "Verify permissions are found"
+      rlRun "findPermissionByMultipleOptions $numberOfOptions $value1 $value2 $value3 $permissions1 $permissions2 $permissions3 $permissions4 $permissions5 $permissions6" 0 "Verify permissions are found"
     rlPhaseEnd
 
 
     numberOfOptions="4"
-    option4="sizelimit"
-    value4="3"
+    value4="--sizelimit=3"
     rlPhaseStartTest "ipa-permission-cli-1052 - find permission - --attrs --permissions --type --sizelimit (bug 785257)"
-      rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $option4 $value4" 0 "Verify permissions are found"
+      rlRun "findPermissionByMultipleOptions $numberOfOptions $value1 $value2 $value3 $value4" 0 "Verify permissions are found"
       value4="2" # Lower the number of values 
       rlRun "findPermissionByMultipleOptions $numberOfOptions $option1 $value1 $option2 $value2 $option3 $value3 $option4 $value4" 0 "Verify setting permissions to a lower number does not return all of the above values"
     rlPhaseEnd
@@ -982,18 +971,20 @@ ipapermission_find_pkey_only()
 ##################################################
 ipapermission_find_all_raw()
 {
-    localOption="memberof"
-    localValue="groupone"
+#    localOption="memberof"
+    localValue="--memberof=groupone"
     permissions="ManageHost1"
-    permissionRights="write"
+    permissionRights="--permissions=write"
+    permissionVerifyRights=`echo $permissionRights | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
     permissionLocalTarget="--subtree=cn=computers,cn=accounts,dc=testrelm,dc=com"
     permissionLocalTargetToVerify="ldap:\/\/\/`echo $permissionLocalTarget | sed 's/--subtree=//'`"
-    permissionLocalMemberOf="groupone"
-    permissionLocalAttr="nshostlocation"
+    permissionLocalMemberOf="--memberof=groupone"
+    permissionLocalAttr="--attrs=nshostlocation"
+    permissionVerifyAttr=`echo $permissionLocalAttr | sed 's/--attrs=/,/g' | sed 's/^,//' | sed 's/ //g'`
 
    rlPhaseStartTest "ipa-permission-cli-1054 - verify permission attrs after a find --all"
-      rlRun "findPermissionByOption $localOption $localValue \"all\" $permissions" 0 "Verify permissions are found for $permissions"
-      verifyPermissionFindOptions $permissions $permissionRights "Subtree" $permissionLocalTargetToVerify $permissionLocalAttr $permissionLocalMemberOf 
+      rlRun "findPermissionByOption $localValue \"all\" $permissions" 0 "Verify permissions are found for $permissions"
+      verifyPermissionFindOptions $permissions $permissionVerifyRights "Subtree" $permissionLocalTargetToVerify $permissionVerifyAttr $permissionLocalMemberOf 
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1055 - verify permission attrs after a find --raw (bug 785259)"

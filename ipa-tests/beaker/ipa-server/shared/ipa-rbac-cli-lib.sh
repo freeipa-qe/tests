@@ -172,8 +172,6 @@ verifyPermissionAttr()
 
 findPermissionByOption()
 {
-   option=$1
-   shift
    value=$1
    shift
    if [ "$1" == "raw" ] ; then
@@ -184,12 +182,12 @@ findPermissionByOption()
    shift
    rc=0
 
-   flag="--$option"
+#   flag="--$option"
    tmpfile=$TmpDir/findpermissionbyoption.txt
    rm -rf $tmpfile
 
-   rlLog "Executing: ipa permission-find $flag=$value $allOrRaw"
-   ipa permission-find $flag=$value $allOrRaw > $tmpfile
+   rlLog "Executing: ipa permission-find $value $allOrRaw"
+   ipa permission-find $value $allOrRaw > $tmpfile
    rc=$?
    if [ $rc -eq 0 ] ; then
         if [ "$allOrRaw" == "--all" ] ; then
@@ -235,11 +233,11 @@ findPermissionByMultipleOptions()
    partOfCommand=""
    limit=${#-($numberOfOptions*2)}
    for ((i=1; i<=$numberOfOptions; i++)); do
-      partOfCommand=$partOfCommand" --$1=$2"
-      if [ "$1" == "sizelimit" ] ; then
-         limit=$2
-      fi
-     shift
+      partOfCommand=$partOfCommand" $1"
+#      if [ "$1" == "--sizelimit" ] ; then
+#         limit=$2
+#         shift
+#      fi
      shift
    done
    tmpfile=$TmpDir/findpermissionbyoption.txt
