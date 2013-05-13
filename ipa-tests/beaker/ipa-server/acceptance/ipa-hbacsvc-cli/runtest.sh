@@ -272,6 +272,11 @@ rlJournalStart
 	rlRun "ipa hbacsvc-find --not-in-hbacrule=$hbacrule | grep $service1" 1 "making sure that service 1 is not returned when searching for services not in the hbacrule"
     rlPhaseEnd
 
+    # Verifying https://bugzilla.redhat.com/show_bug.cgi?id=896589 
+    rlPhaseStartTest "ipa-hbacsvc-cli-027: crond into the list of hbac-services in default install"
+	rlRun "ipa hbacsvc-show crond | grep crond" 0 "crond has been added into the list of hbac-services in default install"
+    rlPhaseEnd
+    
     rlPhaseStartCleanup "ipa-hbacsvc-cli-cleanup: Destroying admin credentials."
 	# delete service groups
 	rlRun "deleteHBACService $service1" 0 "CLEANUP: Deleting service $service1"
