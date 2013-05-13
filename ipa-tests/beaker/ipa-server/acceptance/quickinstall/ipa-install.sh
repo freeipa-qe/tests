@@ -1062,6 +1062,8 @@ ipa_install_master()
     rlLog "ipa_install_master - Install IPA Master Server"
     rlLog "$FUNCNAME"
 
+    rlRun "auditctl -w /tmp/hsperfdata_root -p wrax -k hsperfdata-watch"
+
     ipa_install_prep
     
     for THISPKG in $IPA_SERVER_PACKAGES; do
