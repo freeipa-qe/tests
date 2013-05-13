@@ -12,7 +12,6 @@ function irm_disconnect_pos_0001()
         rlRun "ipa-replica-manage $PWOPT disconnect $MASTER $REPLICA2 > $tmpout 2>&1"
         rlRun "cat $tmpout"
         rlAssertGrep "Deleted replication agreement" $tmpout
-
         irm_useradd $MASTER $testuser 
         irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
         irm_userchk $REPLICA1 $testuser
@@ -21,6 +20,7 @@ function irm_disconnect_pos_0001()
         irm_userchk $REPLICA4 $testuser
 
         rlRun "ipa-replica-manage $PWOPT connect $MASTER $REPLICA2"
+        rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
         ;;

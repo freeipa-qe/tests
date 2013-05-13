@@ -36,13 +36,13 @@ function irm_userdel()
 {
     local runhost=$1
     local user=$2
-    if [ -z "$PWOPT" ]; then
-        rlRun "ssh $runhost 'echo $ADMINPW; kinit admin'"
+    if [ -n "$PWOPT" ]; then
+        rlRun "ssh $runhost 'echo $ADMINPW| kinit admin'"
     fi
 
     rlRun "ssh $runhost 'ipa user-del $user'"
 
-    if [ -z "$PWOPT" ]; then
+    if [ -n "$PWOPT" ]; then
         rlRun "ssh $runhost 'kdestroy'"
     fi
 }
@@ -51,13 +51,13 @@ function irm_userchk()
 {
     local runhost=$1
     local user=$2
-    if [ -z "$PWOPT" ]; then
-        rlRun "ssh $runhost 'echo $ADMINPW; kinit admin'"
+    if [ -n "$PWOPT" ]; then
+        rlRun "ssh $runhost 'echo $ADMINPW| kinit admin'"
     fi
 
     rlRun "ssh $runhost 'ipa user-show $user'"
 
-    if [ -z "$PWOPT" ]; then
+    if [ -n "$PWOPT" ]; then
         rlRun "ssh $runhost 'kdestroy'"
     fi
 }
