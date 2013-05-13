@@ -1068,6 +1068,8 @@ ipa_install_master()
         rlAssertRpm $THISPKG
     done
     
+    rlRun "ls -ldZ /tmp/hsperfdata_root" 0,1,2
+
     if [ -z "$IPA_SERVER_OPTIONS" ]; then
         IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     fi
