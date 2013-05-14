@@ -19,10 +19,10 @@ ipapermissionTests() {
 ########################
 setupPermissionTests()
 {
-   rlRun "kinitAs $ADMINID $ADMINPW"
+   kinitAs $ADMINID $ADMINPW
    groupName="groupone"
    groupDesc="groupone"
-   rlRun "addGroup $groupName $groupDesc"
+   addGroup $groupName $groupDesc
 }
 
 
@@ -44,27 +44,29 @@ cleanupPermissionTests()
     permissionName11="ManageDNSRecord1"
     permissionName12="TestPermission"
     permissionName13="APermission"
+    permissionName14="ABCPermission"
     #permissionNameBUG="ManageUser"
     permissionName783502="ManageUser_783502"
-    rlRun "deletePermission $permissionName1" 0 "Deleting $permissionName1"
-    rlRun "deletePermission $permissionName2" 0 "Deleting $permissionName2"
-    rlRun "deletePermission $permissionName3" 0 "Deleting $permissionName3"
-    rlRun "deletePermission $permissionName4" 0 "Deleting $permissionName4"
-    rlRun "deletePermission $permissionName5" 0 "Deleting $permissionName5"
-    rlRun "deletePermission $permissionName6" 0 "Deleting $permissionName6"
-    rlRun "deletePermission $permissionName7" 0 "Deleting $permissionName7"
-    rlRun "deletePermission $permissionName8" 0 "Deleting $permissionName8"
-    rlRun "deletePermission $permissionName9" 0 "Deleting $permissionName9"
-    rlRun "deletePermission $permissionName10" 0 "Deleting $permissionName10"
-    rlRun "deletePermission $permissionName11" 0 "Deleting $permissionName11"
-    rlRun "deletePermission $permissionName12" 0 "Deleting $permissionName12"
-    rlRun "deletePermission $permissionName13" 0 "Deleting $permissionName13"
-    rlRun "deletePermission $permissionName783502" 0 "Deleting $permissionName783502"
-    rlRun "deleteGroup groupone" 0 "Deleting groupone"
+    deletePermission $permissionName1
+    deletePermission $permissionName2
+    deletePermission $permissionName3
+    deletePermission $permissionName4
+    deletePermission $permissionName5
+    deletePermission $permissionName6
+    deletePermission $permissionName7
+    deletePermission $permissionName8
+    deletePermission $permissionName9
+    deletePermission $permissionName10
+    deletePermission $permissionName11
+    deletePermission $permissionName12
+    deletePermission $permissionName13
+    deletePermission $permissionName14
+    deletePermission $permissionName783502
+    deleteGroup groupone
     ipa permission-mod --permissions=add  "add Automount keys" --attrs= 
-#NAMITA
     ipa permission-mod --attrs=userpassword --attrs=krbprincipalkey --attrs=sambalmpassword --attrs=sambantpassword --attrs=passwordhistory --all "Change a user password"
     ipa permission-mod --type=netgroup "Remove Netgroups"
+    ipa permission-mod "Modify Users" --type=user
 }
 
 
@@ -237,8 +239,8 @@ ipapermission_params_host_subtree()
      verifyPermissionTargetAttr $permissionName $permissionVerifyRights "Subtree" $permissionLocalTargetToVerify $permissionVerifyAttr $objectclass 
    rlPhaseEnd
 
-    rlRun "deletePermission ManageHost2" 0 "Deleting ManageHost2"
-    rlRun "deletePermission ManageHost3" 0 "Deleting ManageHost3"
+   deletePermission ManageHost2
+   deletePermission ManageHost3
 }
 
 
@@ -1009,67 +1011,63 @@ ipapermission_mod_positive()
 {
    rlLog "Add a dummy permission to modify"
    permissionName="APermission"
-   permissionRights="write"
+   permissionRights="--permissions=write"
    permissionTarget="--type=user"
-   permissionAttr="description"
-  rlRun "addPermission $permissionName $permissionRights $permissionTarget $permissionAttr" 0 "Adding $permissionName"
+   permissionAttr="--attr=description"
+   addPermission $permissionName $permissionRights $permissionTarget $permissionAttr
 
 
-   rlPhaseStartTest "ipa-permission-cli-1056 - modify permission --permissions (bz 893850)"
+   rlPhaseStartTest "ipa-permission-cli-1056 - modify permission --permissions (bz 893850 - pilsner)"
      permissionName="Add Automount Keys"
-     attr="permissions"
-     value="add,write"
+     value="--permissions=add --permissions=write"
+     valueToVerify=`echo $value | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
      restOfRequiredCommand="--attrs="
-     rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
-     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$value\"" 0 "Verify Permissions"
+     rlRun "modifyPermission \"$permissionName\" \"$value\" $restOfRequiredCommand"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Permissions\" \"$valueToVerify\"" 0 "Verify Permissions"
    rlPhaseEnd 
 
-  rlPhaseStartTest "ipa-permission-cli-1057 - modify permission --attrs (bug 817909)"
+  rlPhaseStartTest "ipa-permission-cli-1057 - modify permission --attrs (bug 817909 - pilsner)"
      permissionName="Change a user password"
-     attr="attrs"
-     value="userpassword,krbprincipalkey,sambalmpassword,passwordhistory"
-     rlRun "modifyPermission \"$permissionName\" $attr $value"
-     rlRun "verifyPermissionAttr \"$permissionName\" all \"Attributes\" \"$value\"" 0 "Verify Permissions"
+     value="--attrs=userpassword --attrs=krbprincipalkey --attrs=sambalmpassword --attrs=passwordhistory"
+     valueToVerify=`echo $value | sed 's/--attrs=/,/g' | sed 's/^,//' | sed 's/ //g'`
+     rlRun "modifyPermission \"$permissionName\" \"$value\""
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Attributes\" \"$valueToVerify\"" 0 "Verify Permissions"
    rlPhaseEnd
 
   rlPhaseStartTest "ipa-permission-cli-1058 - modify permission --type"
      permissionName="Remove Netgroups"
-     attr="type"
-     value="dnsrecord"
-     rlRun "modifyPermission \"$permissionName\" $attr $value"
-     rlRun "verifyPermissionAttr \"$permissionName\" all \"Type\" \"$value\"" 0 "Verify Permissions"
+     value="--type=dnsrecord"
+     valueToVerify=`echo $value | sed 's/--type=/,/g' | sed 's/^,//' | sed 's/ //g'`
+     rlRun "modifyPermission \"$permissionName\" $value"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Type\" \"$valueToVerify\"" 0 "Verify Permissions"
    rlPhaseEnd
 
    #TODO - Combination of bug 783502 & 782861 - is causing issues writing testcase - revisit.
    rlPhaseStartTest "ipa-permission-cli-1059 - modify permission --setattr (bug 782861)"
      permissionName="APermission"
-     attr="setattr"
-     value="description=NewDescription"
+     value="--setattr=description=NewDescription"
      restOfRequiredCommand="--attrs="
-     rlRun "modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     rlRun "modifyPermission \"$permissionName\" $value $restOfRequiredCommand"
      rlRun "verifyPermissionAttr \"$permissionName\" all \"Description\" \"NewDescription\"" 0 "Verify Permissions"
    rlPhaseEnd
 
 # affected by Bug 782847
    rlPhaseStartTest "ipa-permission-cli-1060 - modify permission --rename (bug 805478 and Bug 782847)"
      permissionName="APermission"
-     attr="rename"
-     value="ABCPermission"
+     value="--rename=ABCPermission"
+     valueToVerify=`echo $value | sed 's/--rename=/,/g' | sed 's/^,//' | sed 's/ //g'`
      restOfRequiredCommand="--attrs= --permissions=write --type=user"
-     rlRun "modifyPermission \"$permissionName\" $attr $value"
-     rlRun "verifyPermissionAttr \"$value\" all \"Permission name\" \"ABCPermission\"" 0 "Verify Permissions"
+     rlRun "modifyPermission \"$permissionName\" $value"
+     rlRun "verifyPermissionAttr \"$valueToVerify\" all \"Permission name\" \"ABCPermission\"" 0 "Verify Permissions"
    rlPhaseEnd
 
    rlPhaseStartTest "ipa-permission-cli-1063 - modify permission  --type - for which chosen attr are invalid"
      permissionName="Modify Users"
-     attr="type"
-     value="hostgroup"
-     rlRun "modifyPermission \"$permissionName\" $attr $value" 0 "Modify permission to be of different type, keeping original attributes"
-     rlRun "verifyPermissionAttr \"$permissionName\" all \"Type\" \"$value\"" 0 "Verify Permissions"
+     value="--type=hostgroup"
+     valueToVerify=`echo $value | sed 's/--type=/,/g' | sed 's/^,//' | sed 's/ //g'`
+     rlRun "modifyPermission \"$permissionName\" $value" 0 "Modify permission to be of different type, keeping original attributes"
+     rlRun "verifyPermissionAttr \"$permissionName\" all \"Type\" \"$valueToVerify\"" 0 "Verify Permissions"
    rlPhaseEnd
-
-#   #TODO: Bug - Uncomment later   
-#   ipa permission-mod --rename=APermission "ABCPermission"
 
 }
 
@@ -1078,22 +1076,22 @@ ipapermission_mod_negative()
 {
    rlPhaseStartTest "ipa-permission-cli-1061 - modify permission invalid --permissions"
      permissionName="Add Automount Keys"
-     attr="permissions"
-     value="xyz"
+     value="--permissions=xyz"
+     valueToVerify=`echo $value | sed 's/--permissions=/,/g' | sed 's/^,//' | sed 's/ //g'`
      restOfRequiredCommand="--attrs="
-     command="modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
-     expMsg="ipa: ERROR: invalid 'permissions': \"$value\" is not a valid permission"
+     command="modifyPermission \"$permissionName\" $value $restOfRequiredCommand"
+     expMsg="ipa: ERROR: invalid 'permissions': \"$valueToVerify\" is not a valid permission"
      rlRun "$command > $TmpDir/ipapermission_invalidpermission.log 2>&1" 1 "Verify error message for invalid permission"
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidpermission.log"
    rlPhaseEnd 
 
-  rlPhaseStartTest "ipa-permission-cli-1062 - modify permission invalid attrs (bug 817909)"
+  rlPhaseStartTest "ipa-permission-cli-1062 - modify permission invalid attrs (bug 817909 - pilsner)"
      permissionName="Change a user password"
-     attr="attrs"
-     value="xyz"
+     value="--attrs=xyz"
+     valueToVerify=`echo $value | sed 's/--attrs=/,/g' | sed 's/^,//' | sed 's/ //g'`
      #command="modifyPermission \"$permissionName\" $attr \"$value\""
-     command="ipa permission-mod --attrs=\"$value\" \"$permissionName\""
-     expMsg="ipa: ERROR: attribute(s) \"$value\" not allowed"
+     command="ipa permission-mod \"$value\" \"$permissionName\""
+     expMsg="ipa: ERROR: attribute(s) \"$valueToVerify\" not allowed"
      rlRun "$command > $TmpDir/ipapermission_invalidattr.log 2>&1" 1 "Verify error message for invalid attr"
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidattr.log"
    rlPhaseEnd
@@ -1101,21 +1099,19 @@ ipapermission_mod_negative()
 
    rlPhaseStartTest "ipa-permission-cli-1064 - modify permission invalid --type"
      permissionName="Modify Users"
-     attr="type"
-     value="users"
-     command="modifyPermission \"$permissionName\" $attr $value"
-#     command="ipa permission-mod --type=\"$value\" \"$permissionName\""
+     value="--type=users"
+     command="modifyPermission \"$permissionName\" $value"
+#     command="ipa permission-mod \"$value\" \"$permissionName\""
      expmsg="ipa: ERROR: invalid 'type': must be one of 'user', 'group', 'host', 'service', 'hostgroup', 'netgroup', 'dnsrecord'"
      rlRun "$command > $TmpDir/ipapermission_invalidtype2.log 2>&1" 1 "Verify error message for invalid type"
      rlAssertGrep "$expmsg" "$TmpDir/ipapermission_invalidtype2.log"
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-permission-cli-1065 - modify permission --addattr - to add multivalue to single valued attr - (bug 782861)"
+   rlPhaseStartTest "ipa-permission-cli-1065 - modify permission --addattr - to add multivalue to single valued attr - (bug 782861 - beer exchange)"
      permissionName="APermission"
-     attr="addattr"
-     value="description=NewDescriptionAgain"
+     value="--addattr=description=NewDescriptionAgain"
      restOfRequiredCommand="--attrs="
-     command="modifyPermission \"$permissionName\" $attr $value $restOfRequiredCommand"
+     command="modifyPermission \"$permissionName\" $value $restOfRequiredCommand"
      expMsg="ipa: ERROR: - not allowed"
      rlRun "ipa permission-add \"$permissionName\" --permissions=write --type=user --attr=description"
      rlRun "$command > $TmpDir/ipapermission_invalidaddattr.log 2>&1" 1 "Verify error message for invalid addattr"

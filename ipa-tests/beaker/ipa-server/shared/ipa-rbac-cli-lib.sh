@@ -323,17 +323,17 @@ modifyPermission()
 {
 
    permissionName="$1"
-   attrToUpdate="--$2"
-   value="$3"
-   if [ `echo $#` = 4 ] ; then
-      restOfCommand="$4"
+  # attrToUpdate="--$2"
+   value="$2"
+   if [ `echo $#` = 3 ] ; then
+      restOfCommand="$3"
    else
       restOfCommand=""
    fi
    rc=0
 
-   rlLog "Executing: ipa permission-mod $permissionName $attrToUpdate=$value $restOfCommand"
-   ipa permission-mod "$permissionName" $attrToUpdate=$value $restOfCommand
+   rlLog "Executing: ipa permission-mod $permissionName $value $restOfCommand"
+   ipa permission-mod "$permissionName" $value $restOfCommand
    rc=$?
    if [ $rc -ne 0 ] ; then
      rlLog "There was an error modifying $permissionName"
