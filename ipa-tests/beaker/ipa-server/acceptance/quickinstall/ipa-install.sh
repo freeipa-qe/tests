@@ -1002,6 +1002,15 @@ ipa_install_openldap_workarounds()
     fi
 }
 
+
+ipa_install_bz962513_workarounds()
+{
+    if [ -d /tmp/hsperfdata_root ]; then
+        rlLog "implementing workaround for BZ#962513"
+        rlRun "rm -rf /tmp/hsperfdata_root"
+    fi
+}
+
 ipa_install_prep() 
 {
     rlLog "$FUNCNAME"
@@ -1014,6 +1023,7 @@ ipa_install_prep()
 
     ipa_install_prep_pkgInstalls
 
+    ipa_install_bz962513_workarounds
     ipa_install_openldap_workarounds
 
     ipa_install_prep_setTime
@@ -1070,13 +1080,10 @@ ipa_install_master()
         rlAssertRpm $THISPKG
     done
     
-    rlRun "ausearch -f /tmp/hsperfdata_root"
-    rlRun "ls -ldZ /tmp/hsperfdata_root" 0,1,2
-
+    
     if [ -z "$IPA_SERVER_OPTIONS" ]; then
         IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     fi
-    rlRun "ipa-server-install $IPA_SERVER_OPTIONS"
 
     if [ $? -gt 0 ]; then
         rlRun "submit_log /var/log/ipaserver-install.log"
