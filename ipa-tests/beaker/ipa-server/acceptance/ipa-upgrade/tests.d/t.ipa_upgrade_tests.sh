@@ -283,7 +283,26 @@ ipa_upgrade_client_replica_master_all()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa_upgrade_client_replica_master_all_2: test upgrade with old master, new replica, and new client"
+        rlRun "ipa-replica-manage -p $ADMINPW list -v $MASTER_S.$DOMAIN"
+        rlRun "ipa-replica-manage -p $ADMINPW list -v $REPLICA1_S.$DOMAIN"
+        ldapsearch -xLLL -h localhost \
+            -D "$ROOTDN" \
+            -w "$ROOTDNPWD" \
+            -b "cn=mapping tree,cn=config" \
+            objectClass=nsDS5ReplicationAgreement \
+            > /var/log/repagreements.$(hostname -s).replica.0
+        rlRun "rhts-submit-log -l /var/log/repagreements.$(hostname -s).replica.0"
+
         upgrade_replica
+
+        ldapsearch -xLLL -h localhost \
+            -D "$ROOTDN" \
+            -w "$ROOTDNPWD" \
+            -b "cn=mapping tree,cn=config" \
+            objectClass=nsDS5ReplicationAgreement \
+            > /var/log/repagreements.$(hostname -s).replica.1
+        rlRun "rhts-submit-log -l /var/log/repagreements.$(hostname -s).replica.1"
+
         log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
         if [ $(echo "$MYROLE" |egrep "REPLICA|MASTER"|wc -l) -gt 0 ]; then
             rlLog "DEBUGGING:"
@@ -294,6 +313,17 @@ ipa_upgrade_client_replica_master_all()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa_upgrade_client_replica_master_all_3: test upgrade with new master, new replica, and new client"
+        rlRun "ipa-replica-manage -p $ADMINPW list -v $MASTER_S.$DOMAIN"
+        rlRun "ipa-replica-manage -p $ADMINPW list -v $REPLICA1_S.$DOMAIN"
+
+        ldapsearch -xLLL -h localhost \
+            -D "$ROOTDN" \
+            -w "$ROOTDNPWD" \
+            -b "cn=mapping tree,cn=config" \
+            objectClass=nsDS5ReplicationAgreement \
+            > /var/log/repagreements.$(hostname -s).master.0
+        rlRun "rhts-submit-log -l /var/log/repagreements.$(hostname -s).master.0"
+
         upgrade_master 
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
 
@@ -302,8 +332,8 @@ ipa_upgrade_client_replica_master_all()
             -w "$ROOTDNPWD" \
             -b "cn=mapping tree,cn=config" \
             objectClass=nsDS5ReplicationAgreement \
-            > /var/log/repagreements.out.$(hostname -s)
-        rlRun "rhts-submit-log -l /var/log/repagreements.out.$(hostname -s)"
+            > /var/log/repagreements.$(hostname -s).master.1
+        rlRun "rhts-submit-log -l /var/log/repagreements.$(hostname -s).master.1"
 
 
         log="/var/log/dirsrv/slapd-TESTRELM-COM/errors"
