@@ -1084,6 +1084,7 @@ ipa_install_master()
     if [ -z "$IPA_SERVER_OPTIONS" ]; then
         IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     fi
+    rlRun "ipa-server-install $IPA_SERVER_OPTIONS"
 
     if [ $? -gt 0 ]; then
         rlRun "submit_log /var/log/ipaserver-install.log"

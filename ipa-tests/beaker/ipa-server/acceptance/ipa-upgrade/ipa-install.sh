@@ -993,6 +993,24 @@ ipa_install_dogtag_workarounds()
     fi
 }
 
+ipa_install_openldap_workarounds()
+{
+    rlLog "implementing workaround for openldap change in handling SASL_NOCANON"
+    if [ -f /etc/openldap/ldap.conf ]; then
+        rlRun "cp /etc/openldap/ldap.conf /etc/openldap/ldap.conf.ipabackup"
+        rlRun "sed -i 's/^SASL_NOCANON.*$/SASL_NOCANON off/g' /etc/openldap/ldap.conf"
+    fi
+}
+
+
+ipa_install_bz962513_workarounds()
+{
+    if [ -d /tmp/hsperfdata_root ]; then
+        rlLog "implementing workaround for BZ#962513"
+        rlRun "rm -rf /tmp/hsperfdata_root"
+    fi
+}
+
 ipa_install_prep() 
 {
     rlLog "$FUNCNAME"
@@ -1004,6 +1022,9 @@ ipa_install_prep()
     ipa_install_dogtag_workarounds
 
     ipa_install_prep_pkgInstalls
+
+    ipa_install_bz962513_workarounds
+    ipa_install_openldap_workarounds
 
     ipa_install_prep_setTime
 
@@ -1051,11 +1072,14 @@ ipa_install_master()
     rlLog "ipa_install_master - Install IPA Master Server"
     rlLog "$FUNCNAME"
 
+    rlRun "auditctl -w /tmp/hsperfdata_root -p wrax -k hsperfdata-watch"
+
     ipa_install_prep
     
     for THISPKG in $IPA_SERVER_PACKAGES; do
         rlAssertRpm $THISPKG
     done
+    
     
     if [ -z "$IPA_SERVER_OPTIONS" ]; then
         IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
