@@ -13,13 +13,13 @@ irm_run()
     irm_list_neg_0004 # list fail, after uninstalling replica, with name [BZ#754739]
 
     irm_disconnect_pos_0001 # disconnect, master to replica2 agreement
-    # irm_disconnect_pos_0002 # disconnect, master to replica2 agreement, remote
-    # irm_disconnect_neg_0001 # disconnect fail, replica with last agreement
-    # irm_disconnect_neg_0002 # disconnect fail, replica with last agreement, remote
-    # irm_disconnect_neg_0003 # disconnect fail, non-existent replica
-    # irm_disconnect_neg_0004 # disconnect fail, non-existent replica, remote
-    # irm_disconnect_neg_0005 # disconnect fail, after already disconnected
-    # irm_disconnect_neg_0006 # disconnect fail, after already disconnected, remote
+    irm_disconnect_pos_0002 # disconnect, master to replica2 agreement, remote
+    irm_disconnect_neg_0001 # disconnect fail, replica with last agreement
+    irm_disconnect_neg_0002 # disconnect fail, replica with last agreement, remote
+    irm_disconnect_neg_0003 # disconnect fail, non-existent replica
+    irm_disconnect_neg_0004 # disconnect fail, non-existent replica, remote
+    irm_disconnect_neg_0005 # disconnect fail, after already disconnected
+    irm_disconnect_neg_0006 # disconnect fail, after already disconnected, remote
 
     # irm_connect_pos_0001 # connect, replica1 to replica4
     # irm_connect_pos_0002 # connect, replica1 to replica4, remote
