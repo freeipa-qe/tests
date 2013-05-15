@@ -12,7 +12,7 @@ irm_run()
     irm_list_neg_0003 # list fail, non-existent host, with name
     irm_list_neg_0004 # list fail, after uninstalling replica, with name [BZ#754739]
 
-    # irm_disconnect_pos_0001 # disconnect, master to replica2 agreement
+    irm_disconnect_pos_0001 # disconnect, master to replica2 agreement
     # irm_disconnect_pos_0002 # disconnect, master to replica2 agreement, remote
     # irm_disconnect_neg_0001 # disconnect fail, replica with last agreement
     # irm_disconnect_neg_0002 # disconnect fail, replica with last agreement, remote

@@ -3,12 +3,14 @@ function irm_disconnect_pos_0001()
 {
     tmpout=/tmp/test_${FUNCNAME}.out
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    rlPhaseStartTest "irm_list_pos_0001 - list, no name"
+    rlPhaseStartTest "irm_disconnect_pos_0001 - disconnect, master to replica2 agreement"
     case "$MYROLE" in
     MASTER_*)
-        rlRun "ipa-replica-manage $PWOPT connect $REPLICA1 $REPLICA4"      
-
+        # Setup
+        rlRun "ipa-replica-manage $PWOPT connect $REPLICA1 $REPLICA4"
         testuser="testuser$(date +%H%M%S)"
+
+        # Test 
         rlRun "ipa-replica-manage $PWOPT disconnect $MASTER $REPLICA2 > $tmpout 2>&1"
         rlRun "cat $tmpout"
         rlAssertGrep "Deleted replication agreement" $tmpout
@@ -19,6 +21,8 @@ function irm_disconnect_pos_0001()
         irm_userchk $REPLICA3 $testuser
         irm_userchk $REPLICA4 $testuser
 
+        # Cleanup
+        irm_userdel $MASTER $testuser
         rlRun "ipa-replica-manage $PWOPT connect $MASTER $REPLICA2"
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
