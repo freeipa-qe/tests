@@ -14,7 +14,7 @@
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_virt op="=" value=""/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_name op="=" value="RHEL-6.2"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -53,7 +53,7 @@
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_virt op="=" value=""/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_name op="=" value="RHEL-6.2"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
@@ -92,7 +92,7 @@
 					<distro_family op="=" value="RedHatEnterpriseLinux6"/>
 					<distro_virt op="=" value=""/>
 					<distro_variant op="=" value="Server"/>
-					<distro_name op="=" value="RedHatEnterpriseLinux-6.2"/>
+					<distro_name op="=" value="RHEL-6.2"/>
 					<distro_arch op="=" value="x86_64"/>
 				</and>
 			</distroRequires>
