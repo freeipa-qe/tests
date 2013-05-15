@@ -206,7 +206,7 @@ ipa_install_set_vars()
     fi
 
     if [ -n "${IPADEBUG}" -o -f /tmp/IPADEBUG ]; then 
-        IPADEBUG=1
+        ipa_add_to_env "IPADEBUG" "1"
     fi
         
     . /opt/rhqa_ipa/env.sh
