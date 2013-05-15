@@ -570,7 +570,7 @@ bz818933()
 {
 
     # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=818933
-    rlPhaseStartTest "818933 bind-dyndb-ldap doesn't escape non-ASCII characters correctly"
+    rlPhaseStartTest "bz818933 bind-dyndb-ldap doesn't escape non-ASCII characters correctly"
 
 	rlRun "dig foo,bar.$DOMAIN"
 	rlRun "grep 'bug in handle_connection_error' /var/log/messages" 1 "Make sure bug has not shown up in /var/log/messages BA 818933"
@@ -583,7 +583,7 @@ bz767489()
 {
 
     # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=767489
-    rlPhaseStartTest "767489 Periodically reconnect to LDAP when the first connection fails"
+    rlPhaseStartTest "bz767489 Periodically reconnect to LDAP when the first connection fails"
 
 	named_ldapi_domain=`hostname -d | sed s/[.]/-/g | tr '[:lower:]' '[:upper:]'`
 
@@ -612,7 +612,7 @@ bz802375()
 {
 
     # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=802375
-    rlPhaseStartTest "802375 BIND cannot be shutdown correctly, if psearch is enabled and LDAP connect fails"
+    rlPhaseStartTest "bz802375 BIND cannot be shutdown correctly, if psearch is enabled and LDAP connect fails"
 
 	rlAssertGrep "psearch yes" "/etc/named.conf"
         rlRun "systemctl status named"
@@ -634,7 +634,7 @@ bz802375()
 bz767496()
 {
     # Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=767496
-    rlPhaseStartTest "767496 assertion failure when using persistent search"
+    rlPhaseStartTest "bz767496 assertion failure when using persistent search"
 
         rlAssertGrep "psearch yes" "/etc/named.conf"
         rlRun "systemctl status named" 0 "get named status"
@@ -658,7 +658,7 @@ bz767496()
 bz805430()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=805430
-	rlPhaseStartTest "805430 IPA dnszone-add does not accept the utmost valid serial number."
+	rlPhaseStartTest "bz805430 IPA dnszone-add does not accept the utmost valid serial number."
 
 		kdestroy
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -676,7 +676,7 @@ bz819635()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=819635
 	# There may be a better way to do this. 
-	rlPhaseStartTest "819635 Verify a help page change"
+	rlPhaseStartTest "bz819635 Verify a help page change"
 		kdestroy
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa dnszone-mod --help | grep 'forwarder=STR' | grep global\ forwarders" 1 "Ensure old string does not exist in help section"
@@ -688,7 +688,7 @@ bz819635()
 bz809562()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=809562
-	rlPhaseStartTest "809562 Constraints for CNAME records are not enforced "
+	rlPhaseStartTest "bz809562 Constraints for CNAME records are not enforced "
 		kdestroy
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa dnsrecord-add $DOMAIN tt --a-rec=1.2.3.4" 0 "Add a A record to conflict with the cname record"
@@ -708,7 +708,7 @@ bz809562()
 bz828687()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=828687
-	rlPhaseStartTest "828687 Unable to update dns when deleting host"
+	rlPhaseStartTest "bz828687 Unable to update dns when deleting host"
 		ipaddr=$(hostname -i)
 		rlLog "Ip address is $ipaddr"
 		ipoc1=$(echo $ipaddr | cut -d\. -f1)
@@ -750,7 +750,7 @@ bz817413()
 	# 3. Valid characters are a-z0-9. dash is allowed but it can't be first or last.
 	# 4. An component can't be longer than 63 characters.
         # 03/26 Update: Condition 2 is dropped - discussed with akrivoka, pspacek
-	rlPhaseStartTest "817413: test of invalid characters in domain name"
+	rlPhaseStartTest "bz817413: test of invalid characters in domain name"
 		temail="ipaqar.redhat.com"
 		tserial=2010010701
 		trefresh=303
@@ -838,7 +838,7 @@ bz813380()
 {
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=813380
 	# Bug 813380 - Improve NS record validation of non-fqdn records
-	rlPhaseStartTest "Bug 813380 - Improve NS record validation of non-fqdn records"
+	rlPhaseStartTest "bz813380 - Improve NS record validation of non-fqdn records"
 		ipaddr=$(hostname -i)
 		rlLog "Ip address is $ipaddr"
 		ipoc1=$(echo $ipaddr | cut -d\. -f1)
@@ -874,7 +874,7 @@ bz829340()
 {
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=829340
 	# Bug 829340 - plugin doesn't handle IPv6 elements in idnsForwarders attribute
-	rlPhaseStartTest "Bug 829340 - check support for IPv6 elements in idnsForwarders attribute"
+	rlPhaseStartTest "bz829340 - check support for IPv6 elements in idnsForwarders attribute"
 		temail="ipaqar.redhat.com"
 		tserial=2010010701
 		trefresh=303
@@ -946,7 +946,7 @@ bz798493()
 {
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=798493
 	# Bug 798493 - adding reverse zones in gui fails to create correct zone 
-	rlPhaseStartTest "Bug 798493 - adding reverse zones in gui fails to create correct zone"
+	rlPhaseStartTest "bz798493 - adding reverse zones in gui fails to create correct zone"
 		# Add a zone
 		forward='10.11.12.0/24'
 		reverse='12.11.10.in-addr.arpa.'
@@ -975,7 +975,7 @@ bz798493()
 bz809565()
 {
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=809565
-	rlPhaseStartTest "Bug 809565 - Cannot change DNS name without recreating it"
+	rlPhaseStartTest "bz809565 - Cannot change DNS name without recreating it"
 		temail="ipaqar.redhat.com"
 		tserial=2010010701
 		trefresh=303
@@ -1026,7 +1026,7 @@ bz809565()
 bz829388()
 {
 	# Test for bug https://bugzilla.redhat.com/show_bug.cgi?id=829388
-	rlPhaseStartTest "Bug 829388 - Zone transfers fail for certain non-FQDNs"
+	rlPhaseStartTest "bz829388 - Zone transfers fail for certain non-FQDNs"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		rlRun "ipa dnszone-mod $DOMAIN --allow-transfer='any;'" 0 "Enable DNS zone transfers"
 		host="bz829388"
@@ -1106,7 +1106,7 @@ bz829728()
 
 bz856281()
 {
-    rlPhaseStartTest "bz856281 - Internal server error when modifying nonexisting DNS record [BZ#856281]" 
+    rlPhaseStartTest "bz856281 - Internal server error when modifying nonexisting DNS record" 
      command="ipa dnsrecord-mod $DOMAIN this.does.not.exist --txt-rec=foo"
      expMsg="ipa: ERROR: this.does.not.exist: DNS resource record not found"
      rlLog "Executing: $command"
@@ -1121,7 +1121,7 @@ bz868956()
     shortHostname=$(hostname -s)
     bzZone="bz868956"
 
-    rlPhaseStartTest "bz868956 - Adding dnsone using name-server and ipaddress, adds zone with incorrect data (negative) [BZ#868956]"
+    rlPhaseStartTest "bz868956 - Adding dnsone using name-server and ipaddress, adds zone with incorrect data (negative)"
         expMsg="ipa: ERROR: Nameserver '$shortHostname.$bzZone.' does not have a corresponding A/AAAA record"
         command="ipa dnszone-add --name-server=$shortHostname --admin-email=$email $bzZone"
         rlLog "Executing: $command"
