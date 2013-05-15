@@ -293,7 +293,9 @@ ipa_upgrade_client_replica_master_all()
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER new
-        
+        if [ $IPADEBUG ]; then
+            rlRun "sleep 1000000"
+        fi
         upgrade_bz_962885
     rlPhaseEnd
 
