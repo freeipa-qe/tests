@@ -29,7 +29,7 @@ export TESTVERSION=3.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE tests.d data.ipa-upgrade ipa-install.sh ipa-server-shared.sh lib.ipa-quicktest.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE tests.d data.ipa-upgrade ipa-server-shared.sh lib.ipa-quicktest.sh
 
 .PHONY: all install download clean
 
