@@ -36,7 +36,7 @@
 . /usr/bin/rhts-environment.sh
 . /usr/share/beakerlib/beakerlib.sh
 . ./ipa-server-shared.sh
-. ./ipa-install.sh
+. /opt/rhqa_ipa/ipa-install.sh
 . ./lib.ipa-quicktest.sh
 . /opt/rhqa_ipa/env.sh
 
