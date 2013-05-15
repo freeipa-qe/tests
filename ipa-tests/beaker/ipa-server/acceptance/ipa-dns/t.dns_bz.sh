@@ -48,12 +48,11 @@ dnsbugs()
    bz829388
    bz829353
    bz840383
-
-# Revisit commented tests below - since they are failing in beaker. 
-# Trac tasks for these have been moved to backlog
    bz701677
    bz802375
    bz767489
+   bz856281
+   bz868956
    # Note: this test possibly creates an env that is not good for further tests. Not recovering correctly
     bz767496
 
@@ -1104,6 +1103,41 @@ bz829728()
     rlPhaseEnd
 }
 
+
+bz856281()
+{
+    rlPhaseStartTest "bz856281 - Internal server error when modifying nonexisting DNS record [BZ#856281]" 
+     command="ipa dnsrecord-mod $DOMAIN this.does.not.exist --txt-rec=foo"
+     expMsg="ipa: ERROR: this.does.not.exist: DNS resource record not found"
+     rlLog "Executing: $command"
+     rlRun "$command > $TmpDir/ipadns_bz856281.log 2>&1" 2 "Verify error message for bz856281"
+     rlAssertGrep "$expMsg" "$TmpDir/ipadns_bz856281.log"
+    rlPhaseEnd
+}
+
+bz868956()
+{
+    ipaddr=$(hostname -i)
+    shortHostname=$(hostname -s)
+    bzZone="bz868956"
+
+    rlPhaseStartTest "bz868956 - Adding dnsone using name-server and ipaddress, adds zone with incorrect data (negative) [BZ#868956]"
+        expMsg="ipa: ERROR: Nameserver '$shortHostname.$bzZone.' does not have a corresponding A/AAAA record"
+        command="ipa dnszone-add --name-server=$shortHostname --admin-email=$email $bzZone"
+        rlLog "Executing: $command"
+        rlRun "$command > $TmpDir/ipadns_bz868956.log 2>&1" 2 "Verify error message for bz868956"
+        rlAssertGrep "$expMsg" "$TmpDir/ipadns_bz868956.log"
+    rlPhaseEnd
+
+    rlPhaseStartTest "bz868956 - Adding dnsone using name-server and ipaddress, adds zone with incorrect data (positive) [BZ#868956]"
+	rlRun "ipa dnszone-add --name-server=$shortHostname --ip-address=$ipaddr --admin-email=$email $bzZone" 0 "Add test zone: $bzZone"
+        rlRun "ipa dnsrecord-find $bzZone | grep \"A record: $ipaddr\"" 0 "Verify the new zone has A record with the IP specified"
+        rlRun "ipa dnsrecord-find $bzZone | grep \"Authoritative nameserver: $shortHostname.\"" 1 "Verify the new zone does not have nameserver with period at end"
+    rlPhaseEnd
+
+    #cleanup
+    ipa dnszone-del $bzZone
+}
 
 dnsbugcleanup()
 {
