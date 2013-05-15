@@ -1005,6 +1005,7 @@ ipapermission_mod()
 {
    ipapermission_mod_positive
    ipapermission_mod_negative
+   ipapermission_mod_bz
 }
 
 ipapermission_mod_positive()
@@ -1117,4 +1118,37 @@ ipapermission_mod_negative()
      rlRun "$command > $TmpDir/ipapermission_invalidaddattr.log 2>&1" 1 "Verify error message for invalid addattr"
      rlAssertGrep "$expMsg" "$TmpDir/ipapermission_invalidaddattr.log"
    rlPhaseEnd
+}
+
+ipapermission_mod_bz()
+{
+
+   # Verify bz 837357 :: Attributelevelrights differs in permission-show and permission-mod for the same permission
+   rlPhaseStartTest "ipa-permission-cli-1066 - Verify bz 837357 - Attributelevelrights differs in permission-show and permission-mod for the same permission"
+      permissionName="APermission837357"
+      permissionRights="--permissions=write"
+      permissionTarget="--type=user"
+      permissionAttr="--attr=cn"
+      permissionModAttr="--attrs=cn --attrs=uid"
+      addPermission $permissionName $permissionRights $permissionTarget $permissionAttr
+
+      attributeLevelRights="{\'member\': u\'rscwo\', \'seealso\': u\'rscwo\', \'ipapermissiontype\': u\'rscwo\', \'cn\': u\'rscwo\', \'businesscategory\': u\'rscwo\', \'objectclass\': u\'rscwo\', \'memberof\': u\'rscwo\', \'aci\': u\'rscwo\', \'subtree\': u\'rscwo\', \'o\': u\'rscwo\', \'filter\': u\'rscwo\', \'attrs\': u\'rscwo\', \'owner\': u\'rscwo\', \'group\': u\'rscwo\', \'ou\': u\'rscwo\', \'targetgroup\': u\'rscwo\', \'type\': u\'rscwo\', \'permissions\': u\'rscwo\', \'nsaccountlock\': u\'rscwo\', \'description\': u\'rscwo\'}"
+     rlRun "verifyPermissionAttr $permissionName all \"attributelevelrights\" $attributeLevelRights \"--rights\"" 0 "Verify Added Attr"
+     command="ipa permission-mod $permissionModAttr \"$permissionName\" --all --rights"
+     
+     rlLog "Executing: $command > $TmpDir/ipapermission_bz837357.log 2>&1 "
+     rlRun "$command > $TmpDir/ipapermission_bz837357.log 2>&1 " 0 "Modify permission attr"
+
+     cat $TmpDir/ipapermission_bz837357.log | grep -i "attributelevelrights: $value"
+     rc=$?
+     if [ $rc -ne 0 ]; then
+           rlLog "ERROR: ipa permission $permissionName verification failed:  Value of $attribute != $value"
+           rlLog "ERROR: ipa permission $permissionName verification failed:  it is `cat $tmpfile | grep $attribute`"
+     else
+           rlLog "ipa permission $permissionName Verification successful: Value of $attribute = $value"
+     fi
+   rlPhaseEnd
+
+   #clean up
+   deletePermission $permissionName
 }
