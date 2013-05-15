@@ -38,7 +38,7 @@
             </task>
             <task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
                 <params>
-                    <param name="IPADEBUG" varlue="1"/>
+                    <param name="IPADEBUG" value="1"/>
                     <param name="TESTTYPE" value="reverse"/>
                     <param name="KILLTIMEOVERRIDE" value="84600"/>
                 </params>
@@ -84,7 +84,7 @@
             </task>
             <task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
                 <params>
-                    <param name="IPADEBUG" varlue="1"/>
+                    <param name="IPADEBUG" value="1"/>
                     <param name="TESTTYPE" value="reverse"/>
                     <param name="KILLTIMEOVERRIDE" value="84600"/>
                 </params>
@@ -130,7 +130,7 @@
             </task>
             <task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-upgrade">
                 <params>
-                    <param name="IPADEBUG" varlue="1"/>
+                    <param name="IPADEBUG" value="1"/>
                     <param name="TESTTYPE" value="reverse"/>
                     <param name="KILLTIMEOVERRIDE" value="84600"/>
                 </params>
