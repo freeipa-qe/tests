@@ -943,3 +943,36 @@ replicaBugCheck_bz830314()
     ####### debugging here #################
     #rlRun "grep named /var/log/ipareplica-install.log"
 }
+
+upgrade_bz_962885()
+{
+    TESTCOUNT=$(( TESTCOUNT += 1 ))
+    local tmpout=/tmp/errormsg.$FUNCNAME.out
+    local failcount=0
+    rlLog "upgrade_bz_962885: RHEL 6.2 to 6.4 ipa upgrade selinuxusermap data not replicating"
+    case "$MYROLE" in
+    MASTER*)
+        rlLog "Machine in recipe is MASTER"
+        rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MYBEAKERREPLICA1"
+        ;;
+    REPLICA*)
+        rlLog "Machine in recipe is REPLICA"
+        rlRun "ipa selinuxusermap-show ${serule} > $tmpout 2>&1"
+        GCHK=$(grep "SELinux User Map rule not found" $tmpout|wc -l)
+        if [ $GCHK -gt 0 ]; then
+            rlFail "BZ 962885 found...RHEL 6.2 to 6.4 ipa upgrade selinuxusermap data not replicating"
+        else
+            rlPass "BZ 962885 not found"
+        fi
+        rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT' -m $MYBEAKERREPLICA1"
+        ;;
+    CLIENT*)
+        rlLog "Machine in recipe is CLIENT"
+        rlRun "rhts-sync-block -s '$FUNCNAME.$TESTCOUNT' $MYBEAKERREPLICA1"
+        ;;
+    *)
+        rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
+        ;;
+    esac
+    [ -f $tmpout ] && rm -f $tmpout
+}

@@ -312,7 +312,7 @@ ipa_upgrade_client_replica_master_all()
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa_upgrade_client_replica_master_all_3: test upgrade with new master, new replica, and new client"
+    rlPhaseStartTest "ipa_upgrade_client_replica_master_all_3: test upgrade with new master, new replica, and new client [BZ962885]"
         rlRun "ipa-replica-manage -p $ADMINPW list -v $MASTER_S.$DOMAIN"
         rlRun "ipa-replica-manage -p $ADMINPW list -v $REPLICA1_S.$DOMAIN"
 
@@ -346,7 +346,8 @@ ipa_upgrade_client_replica_master_all()
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER new
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER new
-        rlRun "sleep 1000000"
+        
+        upgrade_bz_962885
     rlPhaseEnd
 
     rlPhaseStartCleanup "ipa_upgrade_client_replica_master_all_cleanup: cleanup from test full setup for client, then replica, then master"
