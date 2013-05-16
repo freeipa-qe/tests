@@ -34,7 +34,7 @@ public class PrivilegeTasks {
 		sahiTasks.link("Settings").click();
 		sahiTasks.textarea("description").setValue(newdescription);
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 	}
 
 	public static void verifyPrivilege(SahiTasks sahiTasks, String name, String newDescription) {
@@ -42,7 +42,7 @@ public class PrivilegeTasks {
 		sahiTasks.link(name).click();
 		sahiTasks.link("Settings").click();
 		Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
 
@@ -111,7 +111,7 @@ public class PrivilegeTasks {
 			//Verify data is visible
 			Assert.assertTrue(sahiTasks.textarea("description").exists(), "Now description is visible");
 			
-			sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 		}
 		CommonTasks.clearSearch(sahiTasks);
 		
@@ -128,7 +128,7 @@ public class PrivilegeTasks {
 		} else {
 			Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
 		}
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 	}
 
 	public static void modifyPrivilegeButNotSave(SahiTasks sahiTasks, String name, String description, String newDescription,
@@ -156,7 +156,7 @@ public class PrivilegeTasks {
 		} else {
 			Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
 			sahiTasks.span("Reset").click();
-			sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 		}
 	}
 
@@ -174,7 +174,7 @@ public class PrivilegeTasks {
 		else
 			sahiTasks.button("Cancel").click();
 		sahiTasks.span("Reset").click();
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -210,7 +210,7 @@ public class PrivilegeTasks {
 		}
 		sahiTasks.span(">>").click();
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 		sahiTasks.span("Refresh").click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
@@ -238,7 +238,7 @@ public class PrivilegeTasks {
 		sahiTasks.checkbox(member1).click(); // to unselect member1
 		sahiTasks.span("<<").click(); //take off member2 from list
 		sahiTasks.button("Add").click();
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -266,7 +266,7 @@ public class PrivilegeTasks {
 				}
 			}
 		}	
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
@@ -293,7 +293,7 @@ public class PrivilegeTasks {
 					sahiTasks.link("member_role").click();
 			}
 		}		
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void  deleteMemberFromPrivilege(SahiTasks sahiTasks, String name, String memberType, String[] members, 
@@ -315,7 +315,7 @@ public class PrivilegeTasks {
 				
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();		
+		sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();		
 	}
 		
 }
