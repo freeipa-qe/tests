@@ -80,8 +80,8 @@ public class RoleTests extends SahiTestScript {
 		currentPage = sahiTasks.fetch("top.location.href");
 		alternateCurrentPage = sahiTasks.fetch("top.location.href") + "&role-facet=search" ;
 		//previous tests cases in privileges has left roles page in IT Specialist,need to click backlink in Win
-		if (sahiTasks.link("Roles").in(sahiTasks.div("content")).exists())
-			sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).exists())
+			sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		
 	}
 	
@@ -355,29 +355,29 @@ public class RoleTests extends SahiTestScript {
 		//delete user, user group, host, host group added for this suite
 		sahiTasks.navigateTo(commonTasks.userPage, true);
 		//Since memberships were checked previously, may not be in the front page for User
-		if (sahiTasks.link("Users").in(sahiTasks.div("content")).exists())
-			sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link("Users").in(sahiTasks.div("content nav-space-3")).exists())
+			sahiTasks.link("Users").in(sahiTasks.div("content nav-space-3")).click();
 		if (sahiTasks.link(uid).exists())
 			UserTasks.deleteUser(sahiTasks, uid);
 
 		sahiTasks.navigateTo(commonTasks.groupPage, true);
 		//Since memberships were checked previously, may not be in the front page for User Group
-		if (sahiTasks.link("User Groups").in(sahiTasks.div("content")).exists())
-			sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link("User Groups").in(sahiTasks.div("content nav-space-3")).exists())
+			sahiTasks.link("User Groups").in(sahiTasks.div("content nav-space-3")).click();
 		if (sahiTasks.link(groupName).exists())
 			GroupTasks.deleteGroup(sahiTasks, groupName);
 		
 		sahiTasks.navigateTo(commonTasks.hostPage, true);
 		//Since memberships were checked previously, may not be in the front page for Hosts
-		if (sahiTasks.link("Hosts").in(sahiTasks.div("content")).exists())
-			sahiTasks.link("Hosts").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link("Hosts").in(sahiTasks.div("content nav-space-3")).exists())
+			sahiTasks.link("Hosts").in(sahiTasks.div("content nav-space-3")).click();
 		if (sahiTasks.link(fqdn.toLowerCase()).exists())
 			HostTasks.deleteHost(sahiTasks, fqdn);
 		
 		sahiTasks.navigateTo(commonTasks.hostgroupPage, true);
 		//Since memberships were checked previously, may not be in the front page for Host Groups
-		if (sahiTasks.link("Host Groups").in(sahiTasks.div("content")).exists())
-			sahiTasks.link("Host Groups").in(sahiTasks.div("content")).click();
+		if (sahiTasks.link("Host Groups").in(sahiTasks.div("content nav-space-3")).exists())
+			sahiTasks.link("Host Groups").in(sahiTasks.div("content nav-space-3")).click();
 		if (sahiTasks.link(hostgroupName).exists())
 			HostgroupTasks.deleteHostgroup(sahiTasks, hostgroupName, "Delete");
 		
