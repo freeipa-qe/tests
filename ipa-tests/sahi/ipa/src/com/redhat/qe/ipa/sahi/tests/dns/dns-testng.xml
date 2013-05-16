@@ -10,11 +10,11 @@
             	        <include name="setup" />
             	        <include name="init" />   
             	    
-            	        <include name="addDNSZoneTest" />
-            	        <include name="zoneEnableDisableTest" />
+            	       <include name="addDNSZoneTest" />
+            	       <include name="zoneEnableDisableTest" />
             	        <include name="addandanotherDNSZoneTest" />
             	        <include name="add_then_cancel_DNSZoneTest" />
-            	        <include name="addDNSZoneNegativeTest" />
+                        <include name="addDNSZoneNegativeTest" />
             	        <include name="dnsZone_addandedit" />
             	        <include name="recordType_NegativeTest" />
             	        <include name="dnsZoneRecordsNegativeTest_add" />
@@ -25,8 +25,8 @@
                         <include name="dnsZoneSettingsTest" />
                         <include name="dnsZoneSettingsNagativeTest" />
                         <include name="dnsZoneSettingsEnableDisableTest" />
-                       <include name="delDNSZoneTest" />
-                       
+                        <include name="delDNSZoneTest" />
+                     
                         <include name="addReverseDNSZone" />
                         <include name="addandanother_ReverseDNSZone" />
                         <include name="addReverseDNSZoneNegativeTest" />
@@ -37,7 +37,7 @@
                         <include name="dnsReverseZoneSettingsTest" />
                         <include name="deleteReverseDNSZone" />
                         <include name="dnsReverseSettingsNagativeTest" />
-            	        
+            	      
             	        
             	        <!--  the following are premature, comment out 
             	        
@@ -74,7 +74,7 @@
 		</classes>
 	</test>
     
-    
+   
   
 	
     <listeners>        
