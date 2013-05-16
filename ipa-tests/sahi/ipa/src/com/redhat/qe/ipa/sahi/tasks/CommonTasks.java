@@ -56,6 +56,7 @@ public class CommonTasks {
 	public static String trustsPage = serverUrl + "/ipa/ui/index.html#/e/trust/search"; 
 	public static String selinuxPage = serverUrl + "/ipa/ui/index.html#/e/selinuxusermap/search";
 	
+
 	
 	
 	public static String ipadomain = "";
