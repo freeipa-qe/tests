@@ -256,7 +256,7 @@ public class HBACRunTests extends SahiTestScript {
 			}
 			
 			sahiTasks.button("Delete").click();
-			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content nav-space-3")).click();
 			//adding smtp2
 			String searchString = "smtp2";
 			String searchResult[] = {"smtp2" };
@@ -297,7 +297,7 @@ public class HBACRunTests extends SahiTestScript {
 				sahiTasks.span("Delete").near(sahiTasks.tableHeader("ServicesDeleteAdd")).click();//for fireFox
 			}
 			sahiTasks.button("Delete").click();
-			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+			sahiTasks.link("HBAC Rules").in(sahiTasks.div("content nav-space-3")).click();
 			String searchString = "smtp1";
 			String searchResult[] = {"smtp1"};
 			HBACTasks.modifyHBACRuleViaServiceSection_forHBACTest(sahiTasks, rule, searchString, searchResult);
