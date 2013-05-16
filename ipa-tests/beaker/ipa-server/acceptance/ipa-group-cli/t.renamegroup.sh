@@ -47,7 +47,7 @@ renamegroup(){
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-01 Add user to create a private group and rename the group."
+    rlPhaseStartTest "ipa-group-cli-rename-01: Add user to create a private group and rename the group."
         rlRun "ipa user-add --first superuser --last crazylonglastname supercr1 " 0 "Adding Test User"
         rlRun "verifyGroupClasses \"supercr1\" upg" 0 "Verifying user private group."
         rlLog "Executing: ipa group-mod --rename=new_group1 supercr1" 0 "Renaming upg supercr1 to new_group1"
@@ -57,7 +57,7 @@ renamegroup(){
         rlRun "verifyGroupClasses \"supercr1\" upg" 0 "Verifying user's private group is not renamed."
     rlPhaseEnd
 
-        rlPhaseStartTest "ipa-group-cli-rename-02 Rename group after detaching from the UPG"
+        rlPhaseStartTest "ipa-group-cli-rename-02: Rename group after detaching from the UPG"
         rlRun "detachUPG supercr1" 0 "Detach user's private group."
         rlRun "verifyGroupClasses supercr1 posix" 0 "Verify group is regular group now."
         rlLog "Executing: ipa group-mod --rename=new_group1 supercr1" 
@@ -68,7 +68,7 @@ renamegroup(){
         rlRun "ipa user-del supercr1" 0 "Cleanup - Delete the test user."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-03 Rename a IPA Posix Group"
+    rlPhaseStartTest "ipa-group-cli-rename-03: Rename a IPA Posix Group"
         rlRun "addGroup \"My Posix Group\" myposixgroup" 0 "Adding IPA posix group"
         rlRun "verifyGroupClasses myposixgroup posix" 0 "Verify group has posixgroup objectclass."
         rlLog "Executing: ipa group-mod --rename=ren_posixgroup1 myposixgroup" 
@@ -78,7 +78,7 @@ renamegroup(){
         rlRun "deleteGroup ren_posixgroup1" 0 "Cleanup - Deleting renamed posix group."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-04 Rename and modify desc attribute of IPA Posix Group"
+    rlPhaseStartTest "ipa-group-cli-rename-04: Rename and modify desc attribute of IPA Posix Group"
         rlRun "addGroup \"My Posix Group\" myposixgroup" 0 "Adding IPA posix group"
         rlLog "Executing: ipa group-mod --rename=ren_posixgroup2 --desc=\"My New Posix Group Description\" myposixgroup"             
         rlRun "ipa group-mod --rename=ren_posixgroup2 --desc=\"My New Posix Group Description\" myposixgroup" 0 "Renaming myposixgroup to ren_posixgroup2 and changing description"
@@ -88,7 +88,7 @@ renamegroup(){
         rlRun "deleteGroup ren_posixgroup2" 0 "Cleanup - Deleting renamed posix group."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-05 Rename an IPA NON Posix Group"
+    rlPhaseStartTest "ipa-group-cli-rename-05: Rename an IPA NON Posix Group"
         rlRun "addNonPosixGroup \"My IPA Group\" regular" 0 "Adding regular IPA Group"
         rlRun "verifyGroupClasses regular ipa" 0 "Verify group has ipa group objectclass."
         rlLog "Executing: ipa group-mod --rename=ren_nonposixgroup1 regular"   
@@ -98,7 +98,7 @@ renamegroup(){
         rlRun "deleteGroup ren_nonposixgroup1" 0 "Cleanup - Deleting renamed IPA Non Posix group."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-06 Rename an IPA NON Posix Group and modify description attribute"
+    rlPhaseStartTest "ipa-group-cli-rename-06: Rename an IPA NON Posix Group and modify description attribute"
         rlRun "addNonPosixGroup \"My IPA Group\" regular" 0 "Adding regular IPA Group"
         rlRun "verifyGroupClasses regular ipa" 0 "Verify group has ipa group objectclass."
         rlLog "Executing: ipa group-mod --rename=ren_nonposixgroup1 --desc=\"My New IPA Group Description\" regular"
@@ -109,7 +109,7 @@ renamegroup(){
         rlRun "deleteGroup ren_nonposixgroup1" 0 "Cleanup - Deleting renamed IPA Non Posix group."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-07 Rename a NON Posix group and Modify to be Posix"
+    rlPhaseStartTest "ipa-group-cli-rename-07: Rename a NON Posix group and Modify to be Posix"
         rlRun "addNonPosixGroup test testgroup" 0 "Adding a non posix test group"
         rlRun "verifyGroupClasses testgroup ipa" 0 "Verify group has ipa non posix group objectclasses."
         rlLog "Executing: ipa group-mod --rename=ren_nonposixgroup1 --posix testgroup"
@@ -119,7 +119,7 @@ renamegroup(){
         rlRun "deleteGroup ren_nonposixgroup1" 0 "Cleanup - Deleting renamed IPA Non Posix group."
     rlPhaseEnd
 
-   rlPhaseStartTest "ipa-group-cli-rename-08 Negative - Rename a Posix group to a name that already posix"
+   rlPhaseStartTest "ipa-group-cli-rename-08: Negative - Rename a Posix group to a name that already posix"
         rlRun "addNonPosixGroup test testgroup1" 0 "Adding a non posix test group 1"
         rlRun "ipa group-mod --posix testgroup1" 0 "Modify group to be Posix"
         command="ipa group-mod --posix testgroup1"
@@ -131,7 +131,7 @@ renamegroup(){
         rlRun "deleteGroup testgroup2" 0 "Cleaning up the test group 2"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-09 Negative - Rename a Posix group to a name that's non posix"
+    rlPhaseStartTest "ipa-group-cli-rename-09: Negative - Rename a Posix group to a name that's non posix"
         rlRun "addNonPosixGroup test testgroup1" 0 "Adding a non posix test group 1"
         command="ipa group-mod --posix testgroup1"
         rlRun "addNonPosixGroup test testgroup2" 0 "Adding a non posix test group 2"
@@ -143,7 +143,7 @@ renamegroup(){
         rlRun "deleteGroup testgroup2" 0 "Cleaning up the test group 2"
     rlPhaseEnd
 
-     rlPhaseStartTest "ipa-group-cli-rename-10 Negative - Rename a non Posix group to a name that's user private group"
+     rlPhaseStartTest "ipa-group-cli-rename-10: Negative - Rename a non Posix group to a name that's user private group"
         rlRun "ipa user-add --first superuser --last crazylonglastname supercr1 " 0 "Adding Test User"
         rlRun "verifyGroupClasses \"supercr1\" upg" 0 "Verifying user private group."
         rlRun "addNonPosixGroup test testgroup1" 0 "Adding a non posix test group 1"
@@ -156,7 +156,7 @@ renamegroup(){
         rlRun "ipa user-del supercr1" 0 "Cleanup - Delete the test user."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-11 Negative - Rename a Posix group to a name that's user private group"
+    rlPhaseStartTest "ipa-group-cli-rename-11: Negative - Rename a Posix group to a name that's user private group"
         rlRun "ipa user-add --first superuser --last crazylonglastname supercr1 " 0 "Adding Test User"
         rlRun "verifyGroupClasses \"supercr1\" upg" 0 "Verifying user private group."
         rlRun "addNonPosixGroup \"My IPA Group\" regular" 0 "Adding regular IPA Group"
@@ -170,13 +170,13 @@ renamegroup(){
         rlRun "ipa user-del supercr1" 0 "Cleanup - Delete the test user."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-12 Negative - Rename a group that doesn't exist"
+    rlPhaseStartTest "ipa-group-cli-rename-12: Negative - Rename a group that doesn't exist"
         command="ipa group-mod --rename=mynewtestgroup doesntexist"
         expmsg="ipa: ERROR: doesntexist: group not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-13 Negative - Rename a group with the same old name"
+    rlPhaseStartTest "ipa-group-cli-rename-13: Negative - Rename a group with the same old name"
         rlRun "addGroup test test" 0 "Setup - Adding a group"
         command="ipa group-mod --rename=test test"
         expmsg="ipa: ERROR: no modifications to be performed"
@@ -184,7 +184,7 @@ renamegroup(){
         rlRun "deleteGroup test" 0 "Cleanup - Deleting the group"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-14 Rename a Parent group when groups are Nested"
+    rlPhaseStartTest "ipa-group-cli-rename-14: Rename a Parent group when groups are Nested"
         # add the groups
         rlRun "addGroup \"Florida Resort\" disneyworld" 0 "Adding Parent group"
         rlRun "addGroup \"All around the world\" epcot" 0 "Adding Second level group"
@@ -218,7 +218,7 @@ renamegroup(){
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-15 Rename a Child group when groups are Nested"
+    rlPhaseStartTest "ipa-group-cli-rename-15: Rename a Child group when groups are Nested"
         # Rename the child group
         rlLog "Executing: ipa group-mod --rename=animalkingdompark animalkingdom"
         rlRun "ipa group-mod --rename=animalkingdompark animalkingdom" 0 "Renaming animalkingdom to animalkingdompark"
@@ -245,7 +245,7 @@ renamegroup(){
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-16 Rename a Nested User Member"
+    rlPhaseStartTest "ipa-group-cli-rename-16: Rename a Nested User Member"
 	# add the users
 	rlRun "ipa user-add --first=Walt --last=Disney wdisney" 0 "Adding user wdisney"
 	rlRun "ipa user-add --first=Epcot --last=User1 euser1" 0 "Adding user euser1"
@@ -293,7 +293,7 @@ renamegroup(){
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-17 Rename a Nested Indirect Member user"
+    rlPhaseStartTest "ipa-group-cli-rename-17: Rename a Nested Indirect Member user"
 	#Rename a user
         rlRun "ipa user-mod --rename=newjuser2 juser2" 0 "Renaming user juser2 to newjuser2"
         rlRun "verifyUserAttr newjuser2 \"User login\" newjuser2 " 0 "Verify user Login attribute."
@@ -327,32 +327,32 @@ renamegroup(){
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-18 Negative - Rename a Group Member that is already a member"
+    rlPhaseStartTest "ipa-group-cli-rename-18: Negative - Rename a Group Member that is already a member"
 	command="ipa group-mod --rename=germany epcot"
         expmsg="ipa: ERROR: This entry already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-19 Negative - Rename a Group Member that is already a user member"
+    rlPhaseStartTest "ipa-group-cli-rename-19: Negative - Rename a Group Member that is already a user member"
         command="ipa group-mod --rename=epcot guser2"
         expmsg="ipa: ERROR: Server is unwilling to perform: Renaming a managed entry is not allowed. It needs to be manually unlinked first."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-20 Negative - Rename a User Member that is already a group member"
+    rlPhaseStartTest "ipa-group-cli-rename-20: Negative - Rename a User Member that is already a group member"
 	existing_group="epcot"
 	command="ipa user-mod --rename=euser1  $existing_group"
         expmsg="ipa: ERROR: $existing_group: user not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-21 Negative - Rename a User Member that is already a user member"
+    rlPhaseStartTest "ipa-group-cli-rename-21: Negative - Rename a User Member that is already a user member"
         command="ipa user-mod --rename=euser1  weliasdisney"
         expmsg="ipa: ERROR: This entry already exists"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-22 Rename a User that is a member of two Groups"
+    rlPhaseStartTest "ipa-group-cli-rename-22: Rename a User that is a member of two Groups"
 	rlRun "ipa user-mod --rename=newjuser1 juser1" 0 "Renaming user that is member of two groups"
         ipa group-find fish > $tempDir/rename_findgroup5.out
         users=`cat $tempDir/rename_findgroup5.out | grep "Member users:"`
@@ -367,7 +367,7 @@ renamegroup(){
 	rlAssert0 "Checking if user newjuser1 is a member of group japan - group-show" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-23 setattr, rename and addattr on description"
+    rlPhaseStartTest "ipa-group-cli-rename-23: setattr, rename and addattr on description"
         rlRun "setAttribute group description newdescfish fish" 0 "Setting attribute description value of new."
         rlRun "verifyGroupAttr fish Description newdescfish" 0 "Verifying group description was modified."
         # shouldn't be multivalue - additional add should fail
@@ -378,7 +378,7 @@ renamegroup(){
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-24 Rename group with allowed special characters"
+    rlPhaseStartTest "ipa-group-cli-rename-24: Rename group with allowed special characters"
         rlRun "addGroup \"Special Group\" specialgroup1" 0 "Adding a group"
         rlLog "Executing: ipa group-mod --rename=my_gr-ou.p$ specialgroup1"
         rlRun "ipa group-mod --rename=my_gr-ou.p$ specialgroup1" 0 "Renaming specialgroup1 to \"my_gr-ou.p$\""
@@ -389,50 +389,50 @@ renamegroup(){
         rlRun "deleteGroup \"my_gr-ou.p$\"" 0 "Deleting group with special characters"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-25 Rename group with Not Allowed special characters @"
+    rlPhaseStartTest "ipa-group-cli-rename-25: Rename group with Not Allowed special characters @"
         rlRun "addGroup \"Special Group\" specialgroup2" 0 "Adding a group"
         command="ipa group-mod --rename=\"test@\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-26 Rename group with Not Allowed special characters %"
+    rlPhaseStartTest "ipa-group-cli-rename-26: Rename group with Not Allowed special characters %"
         command="ipa group-mod --rename=\"test%\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-27 Rename group with Not Allowed special characters ^"
+    rlPhaseStartTest "ipa-group-cli-rename-27: Rename group with Not Allowed special characters ^"
         command="ipa group-mod --rename=\"test^\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-28 Rename group with Not Allowed special characters *"
+    rlPhaseStartTest "ipa-group-cli-rename-28: Rename group with Not Allowed special characters *"
         command="ipa group-mod --rename=\"test*\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-29 Rename group with Not Allowed special characters +"
+    rlPhaseStartTest "ipa-group-cli-rename-29: Rename group with Not Allowed special characters +"
         command="ipa group-mod --rename=\"test+\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-30 Rename group with Not Allowed special characters ~"
+    rlPhaseStartTest "ipa-group-cli-rename-30: Rename group with Not Allowed special characters ~"
         command="ipa group-mod --rename=\"test~\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-31 Rename group with Not Allowed special characters ="
+    rlPhaseStartTest "ipa-group-cli-rename-31: Rename group with Not Allowed special characters ="
         command="ipa group-mod --rename=\"test=\" specialgroup2"
         expmsg="ipa: ERROR: invalid 'rename': may only include letters, numbers, _, -, . and $"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-cli-rename-32 Delete renamed Groups"
+    rlPhaseStartTest "ipa-group-cli-rename-32: Delete renamed Groups"
         # lets clean up
         for item in waltdisneyworld animalkingdompark epcot japan germany dinasaurs fish specialgroup2; do
                 rlRun "deleteGroup $item" 0 "Deleting group $item"
