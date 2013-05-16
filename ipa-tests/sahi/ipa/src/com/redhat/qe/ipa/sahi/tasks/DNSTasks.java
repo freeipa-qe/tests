@@ -564,7 +564,7 @@ public class DNSTasks {
 		}
 	
 		//browser.link("DNS Zones").under(browser.div("DNS ZonesDNS Global ConfigurationDNS Resource Records")).click();
-		browser.link("DNS Zones").in(browser.div("content")).click();
+		browser.link("DNS Zones").near(browser.div("facet no-facet-tabs")).click();
 		browser.span("Refresh").click();
 		browser.waitFor(1000);
 		browser.checkbox(zoneName).click();
@@ -1061,7 +1061,7 @@ public class DNSTasks {
 	 * @param record_data
 	 * @param record_type
 	 */
-	public static void zoneRecords_addandedit(SahiTasks browser, String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
+	public static void zoneRecords_addandedit(SahiTasks browser, String rZoneName,String record_name, String record_data, String record_type,String other_data1, String other_data2,String other_data3,String other_data4,String other_data5,
 			String other_data6,String other_data7,String other_data8,String other_data9,String other_data10,String other_data11){
 		// assume the page is already in the dns modification page
 		browser.span("Add").click();
@@ -1074,7 +1074,8 @@ public class DNSTasks {
 		if (browser.heading3("DNS Resource Record: " + record_name).exists()){
 			log.info("verified: we are in record detail editing mode");
 			// go back to zone record list
-			browser.link("DNS Zones").click();
+			//browser.link("DNS Zones").in(browser.div("content nav-space-3")).click();
+			browser.link(rZoneName).click();
 			browser.span("Refresh").click();
 			// self-check to verify the newly added record
 			Assert.assertTrue(browser.link(record_name).exists(),"ensure new record name: (" + record_name + ") in the list");
@@ -1123,7 +1124,7 @@ public class DNSTasks {
 		// get into setting page
 				browser.link("Settings").click();
 		// save the original value
-		String originalValue = browser.textbox(fieldName).getValue();
+					String originalValue = browser.textbox(fieldName).getValue();
 		
 		// test for undo
 		if(fieldName.equals("dnsclass"))
@@ -1292,38 +1293,53 @@ public class DNSTasks {
 	 * query forwarder trans
 	 */
 	
-	public static void addField(SahiTasks browser,String fieldName)
+	/*public static void addField(SahiTasks browser,String fieldName)
 	{
-		if(fieldName.equals("idnsallowquery-1"))
+		if(fieldName.equals("idnsallowquery-0"))
 		{
 		browser.link("Add").click();
 		}
-		if(fieldName.equals("idnsallowtransfer-1"))
+		if(fieldName.equals("idnsallowtransfer-0"))
 		{
 		browser.link("Add").near(browser.label("Allow transfer:")).click();
 		}		
 		if(fieldName.equals("idnsforwarders-0"))
 		{
-		browser.link("Add").near(browser.label("Zone forwarders:")).click();
+			browser.link("Add").near(browser.label("Zone forwarders:")).click();
 		}
 		
-	}
+	}*/
 	
 	public static void zoneSettingsModification_queryAndTransfer(SahiTasks browser, String zoneName,String reverseZoneName, String fieldName, String fieldValue) {
 		// get into setting page
 				browser.link("Settings").click();
+				//String originalValue = browser.textbox(fieldName).getValue();
 				
-				DNSTasks.addField(browser, fieldName);
+				if(fieldName.equals("idnsforwarders-0"))
+				{
+					browser.link("Add").near(browser.label("Zone forwarders:")).click();
+				}
+				//DNSTasks.addField(browser, fieldName);
 				browser.textbox(fieldName).setValue(fieldValue);
 				browser.span("undo").click();
 				log.info("Undo works");
 				
-				DNSTasks.addField(browser, fieldName);
+				
+				if(fieldName.equals("idnsforwarders-0"))
+				{
+					browser.link("Add").near(browser.label("Zone forwarders:")).click();
+				}
+				//DNSTasks.addField(browser, fieldName);
 				browser.textbox(fieldName).setValue(fieldValue);
 				browser.span("undo all").click();
 				log.info("Undoall works");
 				
-				DNSTasks.addField(browser, fieldName);			
+				
+				if(fieldName.equals("idnsforwarders-0"))
+				{
+					browser.link("Add").near(browser.label("Zone forwarders:")).click();
+				}
+			//	DNSTasks.addField(browser, fieldName);			
 				browser.textbox(fieldName).setValue(fieldValue);
 				browser.span("Update").click();
 				browser.expectConfirm("Are you sure you want to proceed with the action.", true);
@@ -1336,6 +1352,11 @@ public class DNSTasks {
 				browser.span("Update").click();
 				browser.expectConfirm("Are you sure you want to proceed with the action.", true);
 				log.info("Delete Works");
+				
+			/*	log.info("Restoring Default values");
+				DNSTasks.addField(browser, fieldName);
+				browser.textbox(fieldName).setValue(originalValue);
+				browser.span("Update").click();*/
 	
 	
 	}
@@ -1479,7 +1500,7 @@ public class DNSTasks {
         {
             com.redhat.qe.auto.testng.Assert.assertFalse(sahiTasks.link(name).exists(), "Verify record " + name + " of type " + recordtype + " does NOT exists");
         }       
-        sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+        sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
     }
 	
 	
@@ -1494,7 +1515,7 @@ public class DNSTasks {
 		browser.checkbox(name).click();
 		browser.link("Delete").click();
 		browser.button("Delete").click();
-		browser.link("DNS Zones").in(browser.div("content")).click();
+		browser.link("DNS Zones").in(browser.div("content nav-space-3")).click();
 	}
 	
 	
