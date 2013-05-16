@@ -1,13 +1,45 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="IPARBACTestSuite">	
 
+<test name="Permission Tests">
+                <groups>
+                        <run>
+                            <include name="setup" />
+                            <include name="permissionAddTypeTests" />  
+                            <include name="permissionAddFilterTests" />  
+                            <include name="permissionAddSubtreeTests" /> 
+                            <include name="permissionAddTargetgroupTests" /> 
+                            <include name="permissionInvalidAddTypeTests" /> 
+                            <include name="permissionBug807755Tests" /> 
+                            <include name="permissionBug783500Tests" />
+                            <include name="permissionBug815364Tests" />
+                            <include name="permissionBug811207Tests"/>
+                            <include name="permissionRequiredFieldAddTests" />  
+                            <include name="permissionMemberOfAddTests" />
+                            TODO <include name="permissionMissingMemberOfAddTests" />
+                            <include name="permissionMultipleDeleteTests" /> 
+                            <include name="permissionAddAndAddAnotherTypeTests" />
+                            <include name="permissionAddAndEditTypeTests" /> 
+                            <include name="permissionAddCancelFilterTests" /> 
+                            <include name="permissionAddFilterUndoAttributeTests" /> 
+                            <include name="permissionExpandCollapseTests" /> 
+                            <include name="permissionModifyTests" /> 
+                            <include name="permissionInvalidModifyTests" />
+                            <include name="permissionAddAndAddPrivilegesTests" />
+                            <include name="permissionDeleteMemberTests" />
+                        </run>
+                </groups> 
+                <classes>
+                    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
+                </classes>
+        </test>  
 
   <test name="RBAC Functional Tests">
                 <groups>
                         <run>
                                 <include name="setup" />
                                 <include name="dnsUpdateAdmin" />
-                                <include name="dnsListZone" />
+                               <include name="dnsListZone" />
                                 <include name="ResetPassword_Bug784621" />
                                 <include name="ReaddingPrivilege_Bug811211" />
                                 <include name="IndirectRoles_Bug839008"/> 
@@ -23,38 +55,7 @@
         </test>
 
 
-	<test name="Permission Tests">
-                <groups>
-                        <run>
-                            <include name="setup" />
-                            <include name="permissionAddTypeTests" />  
-                            <include name="permissionAddFilterTests" />  
-                            <include name="permissionAddSubtreeTests" /> 
-                             <include name="permissionAddTargetgroupTests" /> 
-                            <include name="permissionInvalidAddTypeTests" /> 
-                            <include name="permissionBug807755Tests" /> 
-                            <include name="permissionBug783500Tests" />
-                            <include name="permissionBug815364Tests" />
-                            <include name="permissionBug811207Tests"/>
-                            <include name="permissionRequiredFieldAddTests" />  
-                            <include name="permissionMemberOfAddTests" />
-                             TODO <include name="permissionMissingMemberOfAddTests" />
-                            <include name="permissionMultipleDeleteTests" /> 
-                            <include name="permissionAddAndAddAnotherTypeTests" />
-                            <include name="permissionAddAndEditTypeTests" /> 
-                            <include name="permissionAddCancelFilterTests" /> 
-                            <include name="permissionAddFilterUndoAttributeTests" /> 
-                            <include name="permissionExpandCollapseTests" /> 
-                            <include name="permissionModifyTests" /> 
-                                <include name="permissionInvalidModifyTests" />
-                            <include name="permissionAddAndAddPrivilegesTests" />
-                            <include name="permissionDeleteMemberTests" />
-                        </run>
-                </groups> 
-                <classes>
-                    <class name="com.redhat.qe.ipa.sahi.tests.rbac.PermissionTests" />
-                </classes>
-        </test>  
+	
 
         
 	<test name="Privilege Tests">
@@ -84,7 +85,7 @@
                 </classes>
         </test>
  
-  
+ 
 
 	 <test name="Role Tests">
                 <groups>
@@ -112,5 +113,4 @@
         </test>
 
 
- 	
 </suite>
