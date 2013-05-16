@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="sahi_eval" default="compile">
 	<property environment="env" />
-	<property name="user.data" value="${env.SAHI_USERDATA_DIR}" location="/home/sahi/userdata/scripts" />
-	<property name="sahi.dir" value="${env.SAHI_BASE}" location="/home/sahi" />
+	<property name="user.data" value="${env.SAHI_USERDATA_DIR}" location="/home/test/sahi/userdata/scripts" />
+	<property name="sahi.dir" value="${env.SAHI_BASE}" location="/home/test/sahi" />
 	<property environment="env" />
 	<property name="test.build.dir" location="bin" />
 	<property name="test.src.dir" location="src" />
 	<property name="test.output.dir" location="test-output" />
 	<property name="report.dir" value="test-output/Hudson_Test_Suite" />
-	<condition property="webui-framework.dir" value="/home/webui-framework">
+	<condition property="webui-framework.dir" value="/home/test/webui-framework">
 		<not>
 			<isset property="webui-framework.dir" />
 		</not>
@@ -18,7 +18,7 @@
 		<fileset dir="${webui-framework.dir}/lib">
 			<include name="*.jar" />
 		</fileset>
-		<fileset dir="/home/sahi/lib">
+		<fileset dir="/home/test/sahi/lib">
 			<include name="*.jar" />
 		</fileset>
 	</path>
@@ -29,7 +29,7 @@
 		<path refid="utils.cp" />
 	</path>
 
-	<taskdef name="sahi" classname="net.sf.sahi.ant.RunSahiTask" classpath="/home/sahi/lib/ant-sahi.jar" />
+	<taskdef name="sahi" classname="net.sf.sahi.ant.RunSahiTask" classpath="/home/test/sahi/lib/ant-sahi.jar" />
 	<taskdef name="testng" classpathref="utils.cp" classname="org.testng.TestNGAntTask" />
 
 	<target name="deps">
@@ -53,26 +53,26 @@
 
 	<target name="run" description="run RHQ sahi java test" depends="compile">
 		<testng haltonfailure="false" classpathref="tests.cp" reporter="org.testng.reporters.JUnitXMLReporter" outputdir="${test.output.dir}" listeners="com.redhat.qe.auto.testng.TestNGListener">
-		<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/delegation" includes="delegation-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/rbac" includes="rbac-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/host" includes="host-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/service" includes="service-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/user" includes="user-testng.xml"/>
-            <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/group" includes="group-testng.xml"/>
-            <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hostgroup" includes="hostgroup-testng.xml" />
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/netgroup" includes="netgroup-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/dns" includes="dns-testng.xml"/>  
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hbac" includes="hbac-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/sudo" includes="sudo-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automount" includes="automount.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/passwordpolicy" includes="passwordpolicy-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/kerberosticketpolicy" includes="kerberosticketpolicy-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selinux" includes="selinux-testng.xml"/>
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selfservicepermission" includes="selfservicepermission-testng.xml"/> 
-			<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/configuration" includes="configuration-testng.xml"/>-->
-			<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automember" includes="automember.xml"/>-->
-		<!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/trusts" includes="trust-testng.xml"/> -->
-		 <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/globalization" includes="globalization-testng.xml"/> 
+		        <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/delegation" includes="delegation-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/rbac" includes="rbac-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/host" includes="host-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/service" includes="service-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/user" includes="user-testng.xml"/>
+                <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/group" includes="group-testng.xml"/>
+                <xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hostgroup" includes="hostgroup-testng.xml" />
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/netgroup" includes="netgroup-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/dns" includes="dns-testng.xml"/>  
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/hbac" includes="hbac-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/sudo" includes="sudo-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automount" includes="automount.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/passwordpolicy" includes="passwordpolicy-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/kerberosticketpolicy" includes="kerberosticketpolicy-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selinux" includes="selinux-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/selfservicepermission" includes="selfservicepermission-testng.xml"/> 
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/configuration" includes="configuration-testng.xml"/>
+				<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/automember" includes="automember.xml"/>
+		 <!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/trusts" includes="trust-testng.xml"/> -->
+		 <!--<xmlfileset dir="src/com/redhat/qe/ipa/sahi/tests/globalization" includes="globalization-testng.xml"/>-->
 		</testng>
 	</target>
 
