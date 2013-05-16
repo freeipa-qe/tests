@@ -97,7 +97,7 @@ public class SelinuxTests extends SahiTestScript {
 		sahiTasks.checkbox(usernames[0]).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Add").click();
-		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content nav-space-3")).click();
 		
 		sahiTasks.navigateTo(commonTasks.hbacRulesPolicyPage, true);
 		sahiTasks.span("Add").click();
@@ -321,8 +321,8 @@ public class SelinuxTests extends SahiTestScript {
 	
 	/*
 	 * Delete Single selinux user map
-	 */
-	@Test (groups={"selinuxUserMapDeleteSingleTests"}, dataProvider="getselinuxUserMapDeleteSingleTestObjects", dependsOnGroups="selinuxUserMapMemberCategory")	
+	 * 	 */
+	@Test (groups={"selinuxUserMapDeleteSingleTests"}, dataProvider="getselinuxUserMapDeleteSingleTestObjects", dependsOnGroups="selinuxUserMapMemberCategory" )	
 	public void testSelinuxUserMapDeleteSingle(String testName, String rulename) throws Exception {
 		
 		sahiTasks.navigateTo(commonTasks.selinuxPage, true);
@@ -582,6 +582,8 @@ public class SelinuxTests extends SahiTestScript {
 			ll.add(Arrays.asList(new Object[]{ 		"addselinuxusermap_MLS_singlelevel",	"selinux_rule1",	selinuxdefaultuser,			"Add" } ));
 			ll.add(Arrays.asList(new Object[]{ 		"addselinuxusermap_cancel",				"selinux_rule6",	selinuxdefaultuser,			"Cancel" } ));
 			ll.add(Arrays.asList(new Object[]{ 		"addselinuxusermap_disabledhbacrule",	"selinux_rule7",	selinuxusers[0],			"Add" } ));
+			ll.add(Arrays.asList(new Object[]{ 		"addselinuxusermap_special",            "selinux_rule@",    selinuxusers[0],			"Add" } ));
+			ll.add(Arrays.asList(new Object[]{ 		"addselinuxusermap_longname",			"selinuxruleveryveryveryveryveryveryveryveryveryverylongname",		selinuxusers[0], 		"Add" } ));
 			return ll;	
 		}
 
@@ -696,8 +698,8 @@ public class SelinuxTests extends SahiTestScript {
 			List<List<Object>> ll = new ArrayList<List<Object>>();
 		
 			//										testname						rulename								
-			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_delete",	"selinux_rule2"	 } ));
-			
+			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_delete1",	"selinux_rule2"	 } ));
+					
 			return ll;	
 		}
 		
@@ -779,8 +781,8 @@ public class SelinuxTests extends SahiTestScript {
 			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_invalidusersyntaxMLS",	"selinux_rule6",													"user",					"invalid 'selinuxuser': Invalid MLS value, must match s[0-15](-s[0-15])"	 } ));
 			
 			//https://fedorahosted.org/freeipa/ticket/2985
-			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_special_tkt2985",		"selinux_rule@",													selinuxusers[0],		"may only incude letters, numbers, _, -, . and $"	 } ));
-			ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_long_tkt2985",			"selinuxruleveryveryveryveryveryveryveryveryveryverylongname",		selinuxusers[0],		"invalid 'selinuxusermap': can be at most 32 characters"	 } ));
+			//ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_special_tkt2985",		"selinux_rule@",													selinuxusers[0],		"may only incude letters, numbers, _, -, . and $"	 } ));
+			//ll.add(Arrays.asList(new Object[]{ 		"selinuxusermap_long_tkt2985",			"selinuxruleveryveryveryveryveryveryveryveryveryverylongname",		selinuxusers[0],		"invalid 'selinuxusermap': can be at most 32 characters"	 } ));
 			return ll;	
 		}
 		
