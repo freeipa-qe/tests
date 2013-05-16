@@ -109,8 +109,17 @@ installSlave()
         
 	rlRun "service ntpd stop" 0 "Stopping the ntp server"
         # stop the firewall
-        service iptables stop
-        service ip6tables stop
+
+        if [ -f /etc/init.d/iptables ]; then
+         rlRun "service iptables stop"
+        fi
+        if [ -f /etc/init.d/ip6tables ]; then
+         rlRun "service ip6tables stop"
+        fi
+        if [ -f /usr/lib/systemd/system/firewalld.service ]; then
+         rlRun "systemctl stop firewalld"
+        fi
+        
 	. /opt/rhqa_ipa/env.sh
         rlRun "ntpdate $NTPSERVER" 0 "Synchronzing clock with valid time server"
         rlRun "fixHostFile" 0 "Set up /etc/hosts"
@@ -150,8 +159,7 @@ installSlave()
                 rhts-submit-log -l /var/log/ipareplica-install.log
         fi
         # stop the firewall
-        service iptables stop
-        service ip6tables stop
+
    rlPhaseEnd
  
 }

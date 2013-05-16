@@ -114,8 +114,17 @@ rlJournalStart
                 rlLog "Machine in recipe is MASTER"
 
 	rlPhaseStartSetup "ipa-ca-install: ipa-server installation"
+               
+         if [ -f /etc/init.d/iptables ]; then
+           rlRun "service iptables stop" 0 "Stoping firewall"
+         fi
+         if [ -f /etc/init.d/ip6tables ]; then
+          rlRun "service ip6tables stop"
+         fi
+         if [ -f /usr/lib/systemd/system/firewalld.service ]; then
+          rlRun "systemctl stop firewalld"
+         fi
 
-                rlRun "service iptables stop" 0 "Stop the firewall on the client"
         	rlRun "cat /opt/rhqa_ipa/env.sh"
 	        rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         	rlRun "pushd $TmpDir"
