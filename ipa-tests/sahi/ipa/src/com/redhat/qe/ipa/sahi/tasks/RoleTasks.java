@@ -34,7 +34,7 @@ public class RoleTasks {
 		sahiTasks.link("Settings").click();
 		sahiTasks.textarea("description").setValue(newdescription);
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 	}
 
 	
@@ -48,7 +48,7 @@ public class RoleTasks {
 		} else {
 			Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
 		}
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 	}
 
 	public static void modifyRoleButNotSave(SahiTasks sahiTasks, String name, String description, String newDescription,
@@ -56,7 +56,7 @@ public class RoleTasks {
 		sahiTasks.link(name).click();
 		sahiTasks.link("Settings").click();
 		sahiTasks.textarea("description").setValue(newDescription);
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		sahiTasks.button(buttonToClick).click();
 		
 		if (!buttonToClick.equals("Cancel")) {
@@ -67,7 +67,7 @@ public class RoleTasks {
 				sahiTasks.link("Settings").click();
 				sahiTasks.textarea("description").setValue(description);
 				sahiTasks.span("Update").click();
-				sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+				sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 				
 			}
 			else
@@ -76,7 +76,7 @@ public class RoleTasks {
 		} else {
 			Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
 			sahiTasks.span("Reset").click();
-			sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		}
 	}
 
@@ -105,7 +105,7 @@ public class RoleTasks {
 		else
 			sahiTasks.button("Cancel").click();
 		sahiTasks.span("Reset").click();
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -114,7 +114,7 @@ public class RoleTasks {
 		sahiTasks.link(name).click();
 		sahiTasks.link("Settings").click();
 		Assert.assertEquals(newDescription, sahiTasks.textarea("description").value());	
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -161,7 +161,7 @@ public class RoleTasks {
 			//Verify data is visible
 			Assert.assertTrue(sahiTasks.textarea("description").exists(), "Now description is visible");
 			
-			sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		}
 		CommonTasks.clearSearch(sahiTasks);
 		
@@ -203,7 +203,7 @@ public class RoleTasks {
 		}
 		sahiTasks.span(">>").click();
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		sahiTasks.span("Refresh").click();
 	}
 	
@@ -235,7 +235,7 @@ public class RoleTasks {
 		sahiTasks.checkbox(member).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button("Add").click();
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		sahiTasks.span("Refresh").click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
@@ -257,7 +257,7 @@ public class RoleTasks {
 				}
 			}
 		}	
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
@@ -280,7 +280,7 @@ public class RoleTasks {
 		sahiTasks.link("memberof_role").click();
 		Assert.assertTrue(sahiTasks.link(name).exists(), "Verified " + name + " is listed for " + member );
 		sahiTasks.link(name).click();
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
@@ -296,7 +296,7 @@ public class RoleTasks {
 			}
 		}	
 		
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void addRoleSelectDeselectPrivilegesToAdd(SahiTasks sahiTasks, String name, String description, String privilege1, String privilege2) {
@@ -317,7 +317,7 @@ public class RoleTasks {
 		sahiTasks.checkbox(privilege1).click(); // to unselect privilege1
 		sahiTasks.span("<<").click(); //take off permisison2 from list
 		sahiTasks.button("Add").click();
-		sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	/*
