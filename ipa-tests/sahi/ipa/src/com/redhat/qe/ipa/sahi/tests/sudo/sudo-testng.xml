@@ -33,6 +33,7 @@
 	<test name="Sudo Command Tests">
 		<groups>
 			<run>	
+			    <include name="setup" />
 			    <include name="sudoCommandAddTests" />
 			    <include name="sudoCommandModifySettingsTests" />
 			    <include name="invalidSudoCommandAddTests" />
@@ -59,9 +60,10 @@
 	<test name="Sudo Command Group Tests">
 		<groups>
 			<run>	
+			<include name="setup" />
 				<include name="sudoCommandGroupAddTests" />
 				<include name="sudoCommandGroupCancelAddTests" />
-				<include name="invalidSudoCommanGroupAddTests" />
+			    <include name="invalidSudoCommanGroupAddTests" />
 				<include name="sudoCommandGroupAddAndAddAnotherTests" />
 				<include name="sudoCommandGroupAddAndEditTests" />
 				<include name="sudoCommandGroupCancelEnrollTests" />
@@ -70,7 +72,7 @@
 				<include name="sudoDeleteFromCommandGroupTests" />
 				<include name="sudoTwoCommandGroupEnrollTests"/>
 				<include name="sudoCommandGroupEditTests"/>
-				<include name="sudoCommandGroupMultipleDeleteTests" />
+			    <include name="sudoCommandGroupMultipleDeleteTests" />
 				<include name="invalidSudoCommanGroupAddRequiredFieldTests" />
 				<include name="invalidSudoCommanGroupModifyTests" />
 				<include name="sudoCommandGroupCancelDelTests" />
