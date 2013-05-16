@@ -38,7 +38,7 @@ public class RBACFunctional extends SahiTestScript {
 		 sahiTasks.textbox("idnsname").setValue("servicehost1");
 		 sahiTasks.textbox("a_part_ip_address").setValue("10.16.96.199");
 		 sahiTasks.button("Add").click();
-		 sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+		 sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
 		 //sahiTasks.link("DNS Zones[1]").click();
 		
 	}
@@ -163,7 +163,7 @@ public class RBACFunctional extends SahiTestScript {
          sahiTasks.textbox("a_part_ip_address").setValue("10.16.96.199");
          sahiTasks.button("Update").click();
 
-         sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+         sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
          
 		CommonTasks.formauth(sahiTasks, "admin", System.getProperty("ipa.server.password"));
 	
@@ -308,7 +308,8 @@ public class RBACFunctional extends SahiTestScript {
              String roleName, String roleDesc, String uid, String givenName, String sn, String password, String groupName, String groupDesc) throws Exception {
 
 
-     log.info("Add Permission - read dns entries");
+     log.info("Add Permission - read dns entries");//
+     
      sahiTasks.navigateTo(commonTasks.privilegePage, true);
      String permissions[] = {permissionName};
      PrivilegeTasks.addPrivilege(sahiTasks, privilegeName, privilegedesc, "Add");
@@ -380,7 +381,7 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.link("Settings").click();
 			sahiTasks.select("action").choose("Add Permission");
 			sahiTasks.span("Apply").click();
-			sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+			sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			sahiTasks.textbox("filter").setValue(zonename);
 			sahiTasks.span("icon search-icon").click();
@@ -400,7 +401,7 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.span(">>").click();
 			sahiTasks.button("Add").click();
 			Assert.assertTrue(sahiTasks.link("manage dns zone " +zonename).exists(), "Permission Manage DNS zone " + zonename + " is added to Privilege "+ privilegename + " successfully");
-			sahiTasks.link("Privileges").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Privileges").in(sahiTasks.div("content nav-space-3")).click();
 			CommonTasks.clearSearch(sahiTasks);
 			//Add a role
 			sahiTasks.navigateTo(commonTasks.rolePage, true);
@@ -419,7 +420,7 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.span(">>").click();
 			sahiTasks.button("Add").click();
 			Assert.assertTrue(sahiTasks.link(privilegename).exists(), "privilege " + privilegename + " is added to role");
-			sahiTasks.link("Roles").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Roles").in(sahiTasks.div("content nav-space-3")).click();
 			sahiTasks.span("Refresh").click();
 			CommonTasks.clearSearch(sahiTasks);
 		}
@@ -520,7 +521,7 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.link("Settings").click();
 			sahiTasks.select("action").choose("Add Permission");
 			sahiTasks.span("Apply").click();
-			sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+			sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			sahiTasks.textbox("filter").setValue(zoneName);
 			sahiTasks.span("icon search-icon").click();
@@ -535,7 +536,7 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.link("Settings").click();
 			sahiTasks.select("action").choose("Remove Permission");
 			sahiTasks.span("Apply").click();
-			sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+			sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			sahiTasks.textbox("filter").setValue(zoneName);
 			sahiTasks.span("icon search-icon").click();
@@ -547,7 +548,7 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.link("Settings").click();
 			sahiTasks.select("action").choose("Add Permission");
 			sahiTasks.span("Apply").click();
-			sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+			sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			sahiTasks.textbox("filter").setValue(zoneName);
 			sahiTasks.span("icon search-icon").click();
@@ -558,7 +559,7 @@ public class RBACFunctional extends SahiTestScript {
 			sahiTasks.link("Settings").click();
 			sahiTasks.select("action").choose("Remove Permission");
 			sahiTasks.span("Apply").click();
-			sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+			sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			sahiTasks.textbox("filter").setValue(zoneName);
 			sahiTasks.span("icon search-icon").click();
@@ -672,7 +673,7 @@ public class RBACFunctional extends SahiTestScript {
     		 sahiTasks.checkbox("servicehost1").click();
     		 sahiTasks.span("Delete").click();
     		 sahiTasks.button("Delete").click();
-    		 sahiTasks.link("DNS Zones").in(sahiTasks.div("content")).click();
+    		 sahiTasks.link("DNS Zones").in(sahiTasks.div("content nav-space-3")).click();
     		 
     		 
 
