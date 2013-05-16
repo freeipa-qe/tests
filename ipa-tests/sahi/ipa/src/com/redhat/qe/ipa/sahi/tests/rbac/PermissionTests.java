@@ -381,7 +381,7 @@ public class PermissionTests extends SahiTestScript {
 				sahiTasks.select("type").choose("Service");
 			Assert.assertFalse(sahiTasks.checkbox("description").exists(), "Attributes have been refreshed when type changed");
 			sahiTasks.span("Reset").click();
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 			
 		}
 		
@@ -561,8 +561,8 @@ public class PermissionTests extends SahiTestScript {
 		public void cleanup() throws CloneNotSupportedException {
 			sahiTasks.navigateTo(commonTasks.groupPage, true);
 			//Since memberships were checked previously, may not be in the front page for User Group
-			if (sahiTasks.link("User Groups").in(sahiTasks.div("content")).exists())
-				sahiTasks.link("User Groups").in(sahiTasks.div("content")).click();
+			if (sahiTasks.link("User Groups").in(sahiTasks.div("content nav-space-3")).exists())
+				sahiTasks.link("User Groups").in(sahiTasks.div("content nav-space-3")).click();
 			if (sahiTasks.link(groupName).exists())
 				GroupTasks.deleteGroup(sahiTasks, groupName);
 			
@@ -611,7 +611,7 @@ public class PermissionTests extends SahiTestScript {
 			sahiTasks.select("list").choose("");
 			sahiTasks.checkbox("description").click();
 			sahiTasks.span("Update").click();	
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 			
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.search(sahiTasks, "Remove Automount keys");
@@ -620,7 +620,7 @@ public class PermissionTests extends SahiTestScript {
 			sahiTasks.span("icon combobox-icon").click();
 			sahiTasks.select("list").choose("");
 			sahiTasks.span("Update").click();	
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 			//win specific ::error showed up because of ticket3028 ,and when hitting the backlink ,it will say unsaved changes ,have to click reset in win .otherwise it will lead to upcoming failures 
 		    if (sahiTasks.span("Reset[1]").exists()) {
 		    	sahiTasks.span("Reset[1]").click();
@@ -632,7 +632,7 @@ public class PermissionTests extends SahiTestScript {
 			sahiTasks.link("Enroll a host").click();
 			sahiTasks.checkbox("objectclass").click();
 			sahiTasks.span("Update").click();	
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 			
 			sahiTasks.navigateTo(commonTasks.permissionPage, true);
 			CommonTasks.clearSearch(sahiTasks);
