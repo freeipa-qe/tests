@@ -288,6 +288,7 @@ ipa_upgrade_client_replica_master_all()
     rlPhaseEnd
 
     rlPhaseStartTest "ipa_upgrade_client_replica_master_all_3: test upgrade with new master, new replica, and new client [BZ962885]"
+        rlRun "sleep 600"
         upgrade_master 
         ipa_upgrade_data_add $MYBEAKERMASTER $LATESTVER
         ipa_upgrade_data_check $MYBEAKERMASTER $LATESTVER new
