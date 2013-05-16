@@ -98,7 +98,8 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 		Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify automember " + groupName + " doesn't already exist");
 		//Add automember
 		AutomemberTasks.automember_AddAndEdit(sahiTasks, groupName);
-		sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
+		//sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
 		//verify automember was added successfully 
 		sahiTasks.span("Refresh").click();
 		Assert.assertTrue(sahiTasks.link(groupName).exists(), "Added automember " + groupName + "  successfully");
@@ -137,7 +138,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	    	Assert.assertTrue(sahiTasks.link(groupName).exists(),"after 'Add', hostgroup role exists");	    
 	}
 	
-	
+	//mvarun: avoiding dependence issues
 	@Test (groups={"modify_Condition1"}, description="Automember Condition Add Single",dataProvider="getAutomemberConditionAddSingleObjects",dependsOnGroups="add")	
 	
 	public void testAutomemberConditionAddSingle(String testName,String groupName,String attribute,String expression) throws Exception {
@@ -146,7 +147,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	       	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Not Exist Before Add");
 	    	AutomemberTasks.automember_ConditionAddSingle(sahiTasks,testName,attribute,expression);
 	    	Assert.assertTrue(sahiTasks.div(attribute).exists(), "Verified Condition Added Successfully");
-	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
+	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	@Test (groups={"modify_Condition1"}, description="Automember Condition Add And Add Another",dataProvider="getAutomemberConditionAddAndAddAnotherObjects",dependsOnGroups="add")	
@@ -159,7 +160,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	       	AutomemberTasks.automember_ConditionAddAndAddAnother(sahiTasks,testName,attribute1,attribute2,expression1,expression2);
 	    	Assert.assertTrue(sahiTasks.div(attribute1).exists(), "Verified Condition Added Successfully");
 	    	Assert.assertTrue(sahiTasks.div(attribute2).exists(), "Verified Condition Added Successfully");
-	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
+	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	@Test (groups={"modify_Condition1"}, description="Automember Condition Add Then Cancel",dataProvider="getAutomemberConditionAddThenCancelObjects",dependsOnGroups="add")	
@@ -170,7 +171,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	       	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Not Exist Before Add");
 	       	AutomemberTasks.automember_ConditionAddThenCancel(sahiTasks,testName,attribute,expression);
 	    	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Add Cancelled Successfully");
-	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
+	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	@Test (groups={"modify_Condition"}, description="Automember Condition Delete Single",dataProvider="getAutomemberConditionDeleteSingleObjects",dependsOnGroups={"add","modify_Condition1"})	
@@ -181,7 +182,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	       	Assert.assertTrue(sahiTasks.div(attribute).exists(), "Verified Condition Exist Before Delete");
 	    	AutomemberTasks.automember_ConditionDeleteSingle(sahiTasks,testName,attribute,expression);
 	    	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Deleted Successfully");
-	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
+	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	@Test (groups={"modify_Condition"}, description="Automember Condition Delete Multiple",dataProvider="getAutomemberConditionDeleteMultipleObjects",dependsOnGroups={"add","modify_Condition1"})	
@@ -194,7 +195,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 	    	AutomemberTasks.automember_ConditionDeleteMultiple(sahiTasks,testName,attribute1,attribute2,expression1,expression2);
 	    	Assert.assertFalse(sahiTasks.div(attribute1).exists(), "Verified Condition Deleted Successfully");
 	    	Assert.assertFalse(sahiTasks.div(attribute2).exists(), "Verified Condition Deleted Successfully");
-	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content")).click();
+	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	@Test (groups={"modify"}, description="Automember Default Host Group",dataProvider="getAutomemberDefaultGroupObjects",dependsOnGroups="add")	
@@ -207,7 +208,7 @@ public class AutomemberHostGroupTests extends SahiTestScript {
 
 	}
 	
-	@Test (groups={"modify"}, description="Automember Generic Edit",dataProvider="getAutomemberGenericEditObjects",dependsOnGroups={"add","modify_Condition","modify_Condition1"})		
+	@Test (groups={"modify"}, description="Automember Generic Edit",dataProvider="getAutomemberGenericEditObjects",dependsOnGroups={"add","modify_Condition","modify_Condition1"})	
 	
 	public void testAutomemberGenericEdit(String testName,String groupName) throws Exception {
 	       	sahiTasks.navigateTo(commonTasks.automemberHostGroupPage, true);
