@@ -267,7 +267,7 @@ public class PermissionTasks {
 				//sahiTasks.textbox("memberof").setValue("");
 			}
 			//sahiTasks.span("Update").click();
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 		}
 	}
 	
@@ -289,7 +289,7 @@ public class PermissionTasks {
 					i++;
 				}
 			}
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 			if(sahiTasks.button("Reset").exists())
 				sahiTasks.button("Reset").click();
 			CommonTasks.clearSearch(sahiTasks);
@@ -336,7 +336,7 @@ public class PermissionTasks {
 			//Verify data is visible
 			Assert.assertTrue(sahiTasks.checkbox("write").checked(), "Now Data is visible");
 			
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 			if(sahiTasks.button("Reset").exists())
 				sahiTasks.button("Reset").click();
 		}
@@ -359,7 +359,7 @@ public class PermissionTasks {
 			sahiTasks.checkbox("on").click();
 		}
 		sahiTasks.span("Update").click();	
-		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 		//win specific ::error showed up because of ticket3028 ,and when hitting the backlink ,it will say unsaved changes ,have to click reset in win .otherwise it will lead to upcoming failures 
 	    if (sahiTasks.span("Reset[1]").exists()) {
 	    	sahiTasks.span("Reset[1]").click();
@@ -382,7 +382,7 @@ public class PermissionTasks {
 		else
 			sahiTasks.button("Cancel").near(sahiTasks.button("Retry")).click();
 		sahiTasks.span("Reset").click();
-		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 	}
 
 	public static void undoResetUpdatePermission(SahiTasks sahiTasks, String cn, String dataToUpdate, String data, String buttonToClick) {
@@ -415,7 +415,7 @@ public class PermissionTasks {
 			}
 		}
         
-		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 	}
 
 	public static void verifyPermissionBug783500(SahiTasks sahiTasks, String cn) {
@@ -432,7 +432,7 @@ public class PermissionTasks {
 				}				
 				i++;
 			}
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 		}
 		
 	}
@@ -468,7 +468,7 @@ public class PermissionTasks {
 		}
 		
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 	}
 
 	
@@ -485,7 +485,7 @@ public class PermissionTasks {
 				}
 			}
 		}	
-		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -505,7 +505,7 @@ public class PermissionTasks {
 				
 		sahiTasks.span("Delete").click();
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();		
+		sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();		
 	}
 
 	public static void RevertChanges(SahiTasks sahiTasks, String cn, String right, String attribute) {
@@ -522,7 +522,7 @@ public class PermissionTasks {
 			sahiTasks.select("list").choose("");
 			}
 			sahiTasks.span("Update").click();
-			sahiTasks.link("Permissions").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Permissions").in(sahiTasks.div("content nav-space-3")).click();
 			CommonTasks.clearSearch(sahiTasks);
 		}
 		
