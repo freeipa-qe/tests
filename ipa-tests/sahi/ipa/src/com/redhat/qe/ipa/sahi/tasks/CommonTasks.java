@@ -24,38 +24,39 @@ public class CommonTasks {
 	//public static String serverUrl = System.getProperty("ipa.server.url");
 	public static String serverUrl = System.getProperty("ipa.server.url");
 	public static String adDomain = System.getProperty("ad.domain");
+	public static String userPage = serverUrl + "/ipa/ui/index.html#/e/user/search";
+	public static String groupPage = serverUrl + "/ipa/ui/index.html#/e/group/search";
+	public static String hostPage = serverUrl + "/ipa/ui/index.html#/e/host/search";
+	public static String hostgroupPage =  serverUrl + "/ipa/ui/index.html#/e/hostgroup/search";
+	public static String netgroupPage =  	serverUrl + "/ipa/ui/index.html#/e/netgroup/search";																				
+	public static String dnsPage =  serverUrl + "/ipa/ui/index.html#/e/dnszone/search";
+	public static String dnsConfigPage = serverUrl + "/ipa/ui/index.html#/e/dnsconfig/details"; 		
+	//public static String alternateDNSpage = serverUrl + "/ipa/ui/index.html#/e/		
+	public static String passwordPolicyPage = serverUrl + "/ipa/ui/index.html#/e/pwpolicy/search"; 		
+	public static String kerberosTicketPolicyPage =  serverUrl + "/ipa/ui/index.html#/e/krbtpolicy/details";		
+	public static String servicePage = serverUrl + "/ipa/ui/index.html#/e/service/search"; 		
+	public static String selfservicepermissionPage = serverUrl + "/ipa/ui/index.html#/e/selfservice/search";		
+	public static String hbacPage =  serverUrl + "/ipa/ui/index.html#/e/hbacrule/search";		
+	public static String hbacServicePage =  serverUrl + "/ipa/ui/index.html#/e/hbacsvc/search";		
+	public static String hbacServiceGroupPage = serverUrl + "/ipa/ui/index.html#/e/hbacsvcgroup/search"; 		
+	public static String hbacTest = serverUrl + "/ipa/ui/index.html#/e/hbactest/user"; 		
+	public static String sudoRulePage = serverUrl + "/ipa/ui/index.html#/e/sudorule/search"; 		
+	public static String sudoPage=sudoRulePage;		
+	public static String sudoCommandPage = serverUrl + "/ipa/ui/index.html#/e/sudocmd/search"; 		
+	public static String sudoCommandGroupPage = serverUrl + "/ipa/ui/index.html#/e/sudocmdgroup/search"; 		
+	public static String configurationPage = serverUrl + "/ipa/ui/index.html#/e/config/details";
+	public static String automountPage = serverUrl + "/ipa/ui/index.html#/e/automountlocation/search";
+	public static String hbacRulesPolicyPage = serverUrl + "/ipa/ui/index.html#/e/hbacrule/search";
+	public static String rolePage = serverUrl + "/ipa/ui/index.html#/e/role/search";
+	public static String privilegePage = serverUrl + "/ipa/ui/index.html#/e/privilege/search";
+	public static String permissionPage = serverUrl + "/ipa/ui/index.html#/e/permission/search";
+	public static String delegationPage = serverUrl + "/ipa/ui/index.html#/e/delegation/search";
+	public static String automemberUserGroupPage = serverUrl + "/ipa/ui/index.html#/e/automember/searchgroup";
+	public static String automemberHostGroupPage = serverUrl + "/ipa/ui/index.html#/e/automember/searchhostgroup";
+	public static String trustsPage = serverUrl + "/ipa/ui/index.html#/e/trust/search"; 
+	public static String selinuxPage = serverUrl + "/ipa/ui/index.html#/e/selinuxusermap/search";
 	
-	public static String userPage = serverUrl + "/ipa/ui/#identity=user&navigation=identity";	
-	public static String groupPage = serverUrl + "/ipa/ui/#identity=group&navigation=identity";
-	public static String hostPage =  serverUrl + "/ipa/ui/#identity=host&navigation=identity";
-	public static String hostgroupPage =  serverUrl + "/ipa/ui/#identity=hostgroup&navigation=identity";
-	public static String netgroupPage =  serverUrl + "/ipa/ui/#identity=netgroup&navigation=identity";
-	public static String dnsPage =  serverUrl + "/ipa/ui/#dns=dnszone&identity=dns&navigation=identity";
-	public static String dnsConfigPage =  serverUrl +"/ipa/ui/#dns=dnsconfig&identity=dns&navigation=identity"; 
-	public static String alternateDNSpage = dnsPage + "&dnszone-facet=search";
-	public static String passwordPolicyPage =  serverUrl + "/ipa/ui/#policy=pwpolicy&navigation=policy";
-	public static String kerberosTicketPolicyPage =  serverUrl + "/ipa/ui/#policy=krbtpolicy&navigation=policy";
-	public static String servicePage =  serverUrl + "/ipa/ui/#identity=service&navigation=identity";
-	public static String selfservicepermissionPage = serverUrl + "/ipa/ui/#ipaserver=selfservice&navigation=ipaserver";
-	public static String hbacPage =  serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";	
-	public static String hbacServicePage =  serverUrl + "/ipa/ui/#hbac=hbacsvc&policy=hbac&navigation=policy";
-	public static String hbacServiceGroupPage =  serverUrl + "/ipa/ui/#hbac=hbacsvcgroup&policy=hbac&navigation=policy";
-	public static String hbacTest =  serverUrl + "/ipa/ui/#hbac=hbactest&policy=hbac&navigation=policy";
-	public static String sudoRulePage =  serverUrl + "/ipa/ui/#sudo=sudorule&policy=sudo&navigation=policy";
-	public static String sudoPage=sudoRulePage;
-	public static String sudoCommandPage =  serverUrl + "/ipa/ui/#sudo=sudocmd&policy=sudo&navigation=policy";
-	public static String sudoCommandGroupPage =  serverUrl + "/ipa/ui/#sudo=sudocmdgroup&policy=sudo&navigation=policy"; 
-	public static String configurationPage = serverUrl + "/ipa/ui/#ipaserver=config&navigation=ipaserver"; 
-	public static String automountPage = serverUrl + "/ipa/ui/#automount=automountlocation&policy=automount&navigation=policy";  
-	public static String hbacRulesPolicyPage = serverUrl + "/ipa/ui/#hbac=hbacrule&policy=hbac&navigation=policy";
-	public static String rolePage = serverUrl + "/ipa/ui/#rolebased=role&ipaserver=rolebased&navigation=ipaserver";
-	public static String privilegePage = serverUrl + "/ipa/ui/#rolebased=privilege&ipaserver=rolebased&navigation=ipaserver";
-	public static String permissionPage = serverUrl + "/ipa/ui/#rolebased=permission&ipaserver=rolebased&navigation=ipaserver";
-	public static String delegationPage = serverUrl + "/ipa/ui/#ipaserver=delegation&navigation=ipaserver";
-	public static String automemberUserGroupPage = serverUrl + "/ipa/ui/#automember=amgroup&policy=automember&navigation=policy&automember-facet=searchgroup";//xdong ,have to add"automember-facet=searchgroup" otherwise there will be a problem for automation test
-	public static String automemberHostGroupPage = serverUrl + "/ipa/ui/#automember=amhostgroup&policy=automember&navigation=policy&automember-facet=searchhostgroup";//xdong,same above
-	public static String trustsPage =  serverUrl + "/ipa/ui/#ipaserver=trust&navigation=ipaserver";
-	public static String selinuxPage = serverUrl + "/ipa/ui/#policy=selinuxusermap&navigation=policy";
+	
 	
 	public static String ipadomain = "";
 	public static String ipafqdn= "";
