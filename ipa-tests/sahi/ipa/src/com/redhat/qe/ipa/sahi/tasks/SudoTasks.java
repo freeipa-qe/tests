@@ -111,7 +111,7 @@ public class SudoTasks {
 		
 		//Update and go back to Sudo Rules list
 		sahiTasks.link("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();
 		sahiTasks.span("Refresh").click();
 	}
 
@@ -140,7 +140,7 @@ public class SudoTasks {
 		//GroupTasks.verifyMemberOf(sahiTasks, runAsGroupName, "sudorules", cn, "direct", "YES", true);		
 		//sahiTasks.link(cn).click();
 		
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();	
 	}
 
 	
@@ -164,7 +164,7 @@ public class SudoTasks {
 		//Verify data is visible
 		Assert.assertTrue(sahiTasks.span("Add").under(sahiTasks.heading2(("Access this host"))).near(sahiTasks.div("Host Groups")).exists(), "Now Data is visible");
 		
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -173,13 +173,13 @@ public class SudoTasks {
 		
 		sahiTasks.select("action").choose("Disable");
 		sahiTasks.span("Apply").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();
 		//sahiTasks.link("Sudo Rules[1]").click();
 		Assert.assertTrue(sahiTasks.div("Disabled").exists(),"Varify Sudo rule is disabled sucessfully");
 		sahiTasks.link("SudoRule6").click();
 		sahiTasks.select("action").choose("Enable");
 		sahiTasks.span("Apply").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();
 		//sahiTasks.link("Sudo Rules[1]").click();
 		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Varify Sudo rule is enabled sucessfully");
 		sahiTasks.link("SudoRule6").click();
@@ -201,7 +201,7 @@ public class SudoTasks {
 		Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
 		Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-1").checked(), "Verified rule is disabled");		
 		
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	public static void modifySudoRuleOptionsSection(SahiTasks sahiTasks, String cn, String option1, String option2) {
@@ -221,7 +221,7 @@ public class SudoTasks {
 		sahiTasks.button("Add").click();
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();	
 		
 	}
 	
@@ -233,7 +233,7 @@ public class SudoTasks {
         Assert.assertTrue(sahiTasks.div(option2).exists(), "Verified option was added successfuly");
         
         
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 
 	
@@ -250,7 +250,7 @@ public class SudoTasks {
 		addToSudoRule(sahiTasks, cn, "Who", "User Groups", usergroup, "Add");			
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	
@@ -295,7 +295,7 @@ public class SudoTasks {
 		sahiTasks.link(">>").click();
 		sahiTasks.button("Add").click();
 		
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	/*
@@ -307,7 +307,7 @@ public class SudoTasks {
 		Assert.assertTrue(sahiTasks.checkbox(externalUser).under(sahiTasks.heading2(("Who"))).exists(), "Verified user " + externalUser + " added for Rule " + cn);
 		Assert.assertTrue(sahiTasks.checkbox(externalHost).under(sahiTasks.heading2(("Access this host"))).exists(), "Verified Host Group " + externalHost + " added for Rule " + cn);
 		
-	   sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+	   sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	/**
@@ -322,7 +322,7 @@ public class SudoTasks {
 	
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 
 	
@@ -342,7 +342,7 @@ public class SudoTasks {
 		deleteFromSudoRule(sahiTasks, cn, "Run Commands", "Deny", "Sudo Deny Command Groups", denyCommandGroupName, "Delete");	
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	
@@ -378,7 +378,7 @@ public class SudoTasks {
 		sahiTasks.button("Enroll").click();*/
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	
@@ -394,7 +394,7 @@ public class SudoTasks {
 			Assert.assertFalse(sahiTasks.link(runasUser).under(sahiTasks.heading2(("As Whom"))).exists(), "Verified " + runasUser + " is deleted from rule " + cn );
 			Assert.assertFalse(sahiTasks.link(runasUsergroup).under(sahiTasks.heading2(("As Whom"))).exists(), "Verified " + runasUsergroup + " is deleted from rule " + cn );			
 		}
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();	
 	}
 	
 	/**
@@ -410,7 +410,7 @@ public class SudoTasks {
 			deleteFromSudoRule(sahiTasks, cn,  "As Whom", "RunAs Groups", runasGroup, "Delete");
 		}		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	
@@ -422,7 +422,7 @@ public class SudoTasks {
 		} else {
 			Assert.assertFalse(sahiTasks.link(runasGroup).under(sahiTasks.heading2(("As Whom"))).exists(), "Verified " + runasGroup + " is deleted from rule " + cn );			
 		}
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();	
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();	
 	}
 	
 	public static void addToSudoRule(SahiTasks sahiTasks, String cn, String heading2, String type, String member, String buttonToClick ) {
@@ -479,7 +479,7 @@ public class SudoTasks {
 		Assert.assertTrue(sahiTasks.listItem(expectedError).exists(), "Verified Expected Error Details when enrolling same service twice");
 		sahiTasks.button("OK").click();
 		
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();		
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();		
 	}
 		
 	public static void verifySudoRuleCommandCategorySection(SahiTasks sahiTasks, String cn, String lsCommandName, String allowCommandGroupName, 
@@ -491,7 +491,7 @@ public class SudoTasks {
 		Assert.assertTrue(sahiTasks.checkbox(vimCommandName).exists(), "Verified Command " + vimCommandName + " is added to Deny section of " + cn);
 		Assert.assertFalse(sahiTasks.checkbox(denyCommandGroupName).exists(), "Verified Sudo Command Group" + denyCommandGroupName + " is deleted from Deny section of  " + cn);
 		
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}
 	
 	
@@ -510,7 +510,7 @@ public class SudoTasks {
 			Assert.assertFalse(sahiTasks.radio(category).checked(), "Verified " + category + " set after choosing to " + action);		
 		else
 			Assert.assertTrue(sahiTasks.radio(category).checked(), "Verified " + category + " set after choosing to " + action);
-		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content")).click();			
+		sahiTasks.link("Sudo Rules").in(sahiTasks.div("content nav-space-3")).click();			
 	}	
 	
 	
@@ -586,7 +586,7 @@ public class SudoTasks {
 		sahiTasks.textarea("description").setValue(description);
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 
@@ -597,7 +597,7 @@ public class SudoTasks {
 		//verify comamnd description
 		Assert.assertEquals(sahiTasks.textarea("description").value(), newdescription, "Verified description for command " + cn);
 
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 		CommonTasks.clearSearch(sahiTasks);
 	}
 	
@@ -610,7 +610,7 @@ public class SudoTasks {
 		sahiTasks.checkbox(commandGroup).under(sahiTasks.div("Available")).click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void deleteCommandFromCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {
@@ -626,7 +626,7 @@ public class SudoTasks {
 			sahiTasks.checkbox(commandGroup).click();
 		}
 		
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -641,7 +641,7 @@ public class SudoTasks {
 		else
 			Assert.assertFalse(sahiTasks.link(commandGroup).exists(), "Verified command " + command + " is not member of " + commandGroup);
 
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void createInvalidSudoCommand(SahiTasks sahiTasks,	String cn, String description, String expectedError) {		
@@ -660,7 +660,7 @@ public class SudoTasks {
 		sahiTasks.textarea("description").setValue(" ");
 		sahiTasks.textarea("description").setValue(description);
 		sahiTasks.span("Update").click();
-		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void deleteSudoruleCommandDel(SahiTasks sahiTasks, String cn, String description) {
@@ -701,7 +701,7 @@ public class SudoTasks {
 		sahiTasks.checkbox(commandName).click();
 		sahiTasks.span(">>").click();
 		sahiTasks.button(button).click();
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -722,7 +722,7 @@ public class SudoTasks {
 	
 	public static void modifySudoruleCommandGroupWithInvalidSetting(SahiTasks sahiTasks, String cn, String description, String expectedError) {
 		CommonTasks.modifyToInvalidSettingTextarea(sahiTasks, cn, "description", description, expectedError, "Cancel");
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void createInvalidSudoCommandGroup(SahiTasks sahiTasks,	String cn, String description, String expectedError) {		
@@ -772,7 +772,7 @@ public class SudoTasks {
 		sahiTasks.span(">>").click();		
 		sahiTasks.span("Add").near(sahiTasks.button("Cancel")).click();
 		
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 		sahiTasks.span("Refresh").click();
 	}
 	
@@ -783,7 +783,7 @@ public class SudoTasks {
 		Assert.assertTrue(sahiTasks.link(command).exists(), "Verified comand " + command + " is a memberof " + cn);
 		sahiTasks.link("Settings").click();
 		Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified description for  " + cn);
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void enrollIntoCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {
@@ -794,7 +794,7 @@ public class SudoTasks {
 		sahiTasks.checkbox(command).under(sahiTasks.div("Available")).click();
 		sahiTasks.link(">>").click();
 		sahiTasks.button(buttonToClick).click();
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void enrollAgainIntoCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String expectedError) {
@@ -807,7 +807,7 @@ public class SudoTasks {
 		sahiTasks.button("Add").click();
 		
 		CommonTasks.checkOperationsError(sahiTasks, expectedError);
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void verifySudoCommandGroupMembership (SahiTasks sahiTasks, String command, String commandGroup, boolean isMember) {
@@ -820,7 +820,7 @@ public class SudoTasks {
 		else
 			Assert.assertFalse(sahiTasks.link(command).exists(), "Verified command " + command + " is not member of " + commandGroup);
 
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	public static void deleteFromCommandGroup (SahiTasks sahiTasks, String command, String commandGroup, String buttonToClick) {
@@ -836,7 +836,7 @@ public class SudoTasks {
 			sahiTasks.checkbox(command).click();
 		}
 		
-		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+		sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 	}
 	
 	
@@ -850,9 +850,9 @@ public class SudoTasks {
 		sahiTasks.textarea("description").setValue(newDescription);
 		
 		if (isCommandGroup) 
-			sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 		else
-			sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+			sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 		
 		Assert.assertTrue(sahiTasks.span("Unsaved Changes").exists(), "Verified Error message title");
 		Assert.assertTrue(sahiTasks.div("This page has unsaved changes. Please save or revert.").exists(), "Verified expected error");
@@ -865,11 +865,11 @@ public class SudoTasks {
 			Assert.assertEquals(sahiTasks.textarea("description").value(), newDescription, "Verified description for service " + cn + " after Cancel");
 			
 			if (isCommandGroup) {
-				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 				sahiTasks.button("Reset").click();
 			}
 			else {
-				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 			    sahiTasks.button("Reset").click();
 			}
 		}
@@ -880,9 +880,9 @@ public class SudoTasks {
 			}
 			Assert.assertEquals(sahiTasks.textarea("description").value(), description, "Verified description for service " + cn + " after Reset");
 			if (isCommandGroup) 
-				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 			else
-				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 		}
 		else {
 			sahiTasks.link(cn).click();
@@ -891,9 +891,9 @@ public class SudoTasks {
 			}
 			Assert.assertEquals(sahiTasks.textarea("description").value(), newDescription, "Verified description for service " + cn + " after Reset");
 			if (isCommandGroup) 
-				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content")).click();
+				sahiTasks.link("Sudo Command Groups").in(sahiTasks.div("content nav-space-3")).click();
 			else
-				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content")).click();
+				sahiTasks.link("Sudo Commands").in(sahiTasks.div("content nav-space-3")).click();
 		}
 	}
 }
