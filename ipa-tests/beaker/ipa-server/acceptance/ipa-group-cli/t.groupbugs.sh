@@ -22,7 +22,7 @@ grpbugsetup()
 
 grpbugzillas()
 {
-    rlPhaseStartTest "ipa-group-bugzillas-001 bz786240 gid number 0 and negative number accepted"
+    rlPhaseStartTest "ipa-group-bugzillas-001: bz786240 gid number 0 and negative number accepted"
 	command="ipa group-add --desc=jennygn jennygn --gid=0"
 	expmsg="ipa: ERROR: invalid 'gid': must be at least 1"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
@@ -35,7 +35,7 @@ grpbugzillas()
 	ipa group-del jennygn
     rlPhaseEnd 
 
-    rlPhaseStartTest "ipa-group-bugzillas-002 bz773488 - Make ipausers a non-posix group on new installs"
+    rlPhaseStartTest "ipa-group-bugzillas-002: bz773488 Make ipausers a non-posix group on new installs"
         rlRun "verifyGroupClasses ipausers ipa" 0 "Verify ipauser group objectclasses."
     rlPhaseEnd
 
