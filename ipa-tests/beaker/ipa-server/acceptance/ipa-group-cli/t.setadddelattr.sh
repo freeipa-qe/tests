@@ -28,13 +28,13 @@ attrsetup()
 
 setaddattr()
 {
-    rlPhaseStartTest "ipa-group-setaddattr-001 - setattr group that doesn't exist"
+    rlPhaseStartTest "ipa-group-setaddattr-001: setattr group that doesn't exist"
         command="ipa group-mod --setattr dn=\"cn=mynewDN,cn=groups,cn=accounts,dc=testrelm,dc=com\" doesntexist"
         expmsg="ipa: ERROR: doesntexist: group not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-002 setattr and addattr on dn"
+    rlPhaseStartTest "ipa-group-setaddattr-002: setattr and addattr on dn"
         command="ipa group-mod --setattr dn=\"cn=mynewDN,cn=groups,cn=accounts,dc=testrelm,dc=com\" $grp"
         expmsg="ipa: ERROR: attribute \"distinguishedName\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -42,7 +42,7 @@ setaddattr()
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-003 setattr and addattr on cn"
+    rlPhaseStartTest "ipa-group-setaddattr-003: setattr and addattr on cn"
 	# add a test group
 	addGroup mynewgroup mynewgroup
 	rlRun "setAttribute group cn blah mynewgroup" 0 "Setting new cn attribute"
@@ -54,7 +54,7 @@ setaddattr()
 	deleteGroup blah
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-004 setattr and addattr on description"
+    rlPhaseStartTest "ipa-group-setaddattr-004: setattr and addattr on description"
         rlRun "setAttribute group description new $grp" 0 "Setting attribute $attr to value of new."
         rlRun "verifyGroupAttr $grp Description new" 0 "Verifying group $attr was modified."
         # shouldn't be multivalue - additional add should fail
@@ -63,7 +63,7 @@ setaddattr()
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-005 setattr and addattr on member"
+    rlPhaseStartTest "ipa-group-setaddattr-005: setattr and addattr on member"
 	member1="uid=$user1,$USERDN"
 	member2="uid=$user2,$USERDN"
 	rlRun "setAttribute group member \"$member1\" $grp" 0 "setting member attribute member to $member1"
@@ -73,7 +73,7 @@ setaddattr()
 	ipa group-remove-member --users="$user1,$user2" $grp
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-006 setattr and addattr on memberOf"
+    rlPhaseStartTest "ipa-group-setaddattr-006: setattr and addattr on memberOf"
         attr="memberOf"
         member1="uid=$user1,cn=users,cn=accounts,$BASEDN"
         member2="uid=$user2,cn=users,cn=accounts,$BASEDN"
@@ -84,7 +84,7 @@ setaddattr()
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-007 setattr and addattr on ipauniqueid"
+    rlPhaseStartTest "ipa-group-setaddattr-007: setattr and addattr on ipauniqueid"
         command="ipa group-mod --setattr ipauniqueid=mynew-unique-id $grp"
         expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -92,7 +92,7 @@ setaddattr()
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-008 setattr and addattr on invalid attribute"
+    rlPhaseStartTest "ipa-group-setaddattr-008: setattr and addattr on invalid attribute"
         command="ipa group-mod --setattr bad=test $grp"
         expmsg="ipa: ERROR: attribute \"bad\" not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -100,7 +100,7 @@ setaddattr()
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-setaddattr-009 group-mod --addattr memberUid"
+    rlPhaseStartTest "ipa-group-setaddattr-009: group-mod --addattr memberUid"
         rlRun "ipa group-mod --addattr memberUid=22344 $grp" 0 "Adding memberuid to $grp"
 	rlRun "ipa group-find --all --raw $grp | grep 22344" 0 "Making sure new uid is in $grp"
     rlPhaseEnd
@@ -108,40 +108,40 @@ setaddattr()
 
 delattr()
 {
-    rlPhaseStartTest "ipa-group-delattr-001 --delattr memberUid"
+    rlPhaseStartTest "ipa-group-delattr-001: --delattr memberUid"
 	rlRun "ipa group-mod --delattr memberUid=22344 $grp" 0 "Deleting new memberUid"
 	rlRun "ipa group-find --all --raw $grp | grep 22344" 1 "Making sure new uid is no longer in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-delattr-002 --delattr negative test case for Description"
+    rlPhaseStartTest "ipa-group-delattr-002: --delattr negative test case for Description"
 	var=Description
 	val=$(ipa group-find --all $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --delattr $var=$val $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-delattr-003 group-mod --delattr negative test case for cn"
+    rlPhaseStartTest "ipa-group-delattr-003: group-mod --delattr negative test case for cn"
 	var=cn
 	val=$(ipa group-find --all --raw $grp | grep $var: | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --delattr $var='$val' $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep '$val'" 0 "Making sure $var still exists as '$val' in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-delattr-004 group-mod --delattr negative test case for gidnumber"
+    rlPhaseStartTest "ipa-group-delattr-004: group-mod --delattr negative test case for gidnumber"
 	var=gidnumber
 	val=$(ipa group-find --all --raw $grp | grep $var: | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --delattr $var=$val $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-delattr-005 group-mod --delattr negative test case for ipauniqueid"
+    rlPhaseStartTest "ipa-group-delattr-005: group-mod --delattr negative test case for ipauniqueid"
 	var=ipauniqueid
 	val=$(ipa group-find --all --raw $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --delattr $var=$val $grp" 1 "trying to delete $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-delattr-006 delattr test of member attributes"
+    rlPhaseStartTest "ipa-group-delattr-006: delattr test of member attributes"
     	#1) add a group    	
 	#2) add a user to the group
     	#3) attempt to --delattr on the user's memberOf attribute (this should NOT be allowed)
@@ -161,13 +161,13 @@ delattr()
 multiop()
 {
     var=memberuid
-    rlPhaseStartTest "ipa-group-multiop-001 group-mod --delattr + --addattr null op for non existant var memberUid"
+    rlPhaseStartTest "ipa-group-multiop-001: group-mod --delattr + --addattr null op for non existant var memberUid"
 	val=928374
 	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value manipulation for $var"
 	rlRun "ipa group-find --all $grp | grep $var | grep $val" 1 "Making sure $var still does not exist in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-002 group-mod --setattr + --addattr null op for field in memberUid"
+    rlPhaseStartTest "ipa-group-multiop-002: group-mod --setattr + --addattr null op for field in memberUid"
 	val="928374"
 	val2="abcde"
 	rlRun "ipa group-mod --addattr $var=$val --setattr $var=$val2 $grp" 0 "Testing a multi-value manipulation for $var"
@@ -175,14 +175,14 @@ multiop()
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val2" 0 "Making sure $var exists as $val2 in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-003 group-mod --delattr + --addattr null op for Description"
+    rlPhaseStartTest "ipa-group-multiop-003: group-mod --delattr + --addattr null op for Description"
 	var=Description
 	val=$(ipa group-find --all $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value manipulation for $var"
 	rlRun "ipa group-find --all $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-004 group-mod --delattr + --addattr null op for cn"
+    rlPhaseStartTest "ipa-group-multiop-004: group-mod --delattr + --addattr null op for cn"
 	var=cn
 	val=$(ipa group-find --all --raw $grp | grep $var: | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --addattr $var='$val' --delattr $var='$val' $grp" 1 "Testing a multi-value manipulation for $var"
@@ -190,21 +190,21 @@ multiop()
     rlPhaseEnd
 
     var=gidnumber
-    rlPhaseStartTest "ipa-group-multiop-005 group-mod --delattr + --addattr null op for gidnumber  - bug 870446"
+    rlPhaseStartTest "ipa-group-multiop-005: group-mod --delattr + --addattr null op for gidnumber  - bug 870446"
 	var=gidnumber
 	val=$(ipa group-find --all --raw $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value manipulation for $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-006 group-mod --delattr + --addattr null op for ipauniqueid"
+    rlPhaseStartTest "ipa-group-multiop-006: group-mod --delattr + --addattr null op for ipauniqueid"
 	var=ipauniqueid
 	val=$(ipa group-find --all --raw $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	rlRun "ipa group-mod --addattr $var=$val --delattr $var=$val $grp" 1 "Testing a multi-value manipulation for $var"
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val" 0 "Making sure $var still exists as $val in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-007 group-mod --setattr + --addattr null op for Description"
+    rlPhaseStartTest "ipa-group-multiop-007: group-mod --setattr + --addattr null op for Description"
 	var=Description
 	val=$(ipa group-find --all $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	val2="alt-description"
@@ -213,7 +213,7 @@ multiop()
 	rlRun "ipa group-find --all $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-008 group-mod --setattr + --addattr null op for cn"
+    rlPhaseStartTest "ipa-group-multiop-008: group-mod --setattr + --addattr null op for cn"
 	var=cn
 	val=$(ipa group-find --all --raw $grp | grep $var: | cut -d: -f2 | sed s/\ //g)
 	val2="cn2"
@@ -222,7 +222,7 @@ multiop()
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-009 group-mod --setattr + --addattr null op for gidnumber"
+    rlPhaseStartTest "ipa-group-multiop-009: group-mod --setattr + --addattr null op for gidnumber"
 	var=gidnumber
 	val=$(ipa group-find --all --raw $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	val2="23456"
@@ -231,7 +231,7 @@ multiop()
 	rlRun "ipa group-find --all --raw $grp | grep $var | grep $val2" 1 "Making sure $var does not contain $val2 in $grp"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-multiop-010 group-mod --setattr + --addattr null op for ipauniqueid"
+    rlPhaseStartTest "ipa-group-multiop-010: group-mod --setattr + --addattr null op for ipauniqueid"
 	var=ipauniqueid
 	val=$(ipa group-find --all --raw $grp | grep $var | cut -d: -f2 | sed s/\ //g)
 	val2="b77627fc-5dae-11e1-a45f-111111111111"
