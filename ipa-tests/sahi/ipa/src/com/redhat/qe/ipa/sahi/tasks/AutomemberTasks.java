@@ -160,19 +160,19 @@ public class AutomemberTasks {
 		//test update, reset and cancel when modify and click backlink.
 		browser.textarea("description").setValue(unsavedChangesString);
 		//testName is either "User group rules" or "Host group rules"
-		browser.link(testName).in(browser.div("content")).click();
+		browser.link(testName).in(browser.div("content nav-space-3")).click();
 		Assert.assertTrue(browser.div(unsavedChangesString).exists(),"Unsaved changes prompt came out as expected");
 		browser.button("Update").click();
 		browser.link(groupName).click();
 		Assert.assertEquals(browser.textarea("description").getValue(),unsavedChangesString);
 		browser.textarea("description").setValue(editModeVerifyString);
-		browser.link(testName).in(browser.div("content")).click();
+		browser.link(testName).in(browser.div("content nav-space-3")).click();
 		Assert.assertTrue(browser.div(unsavedChangesString).exists(),"Unsaved changes prompt came out as expected");
 		browser.button("Reset").click();
 		browser.link(groupName).click();
 		Assert.assertEquals(browser.textarea("description").getValue(),unsavedChangesString);
 		browser.textarea("description").setValue(editModeVerifyString);
-		browser.link(testName).in(browser.div("content")).click();
+		browser.link(testName).in(browser.div("content nav-space-3")).click();
 		Assert.assertTrue(browser.div(unsavedChangesString).exists(),"Unsaved changes prompt came out as expected");
 		browser.button("Cancel").click();
 		browser.span("Update").click();
@@ -185,7 +185,7 @@ public class AutomemberTasks {
 		browser.waitFor(1000);
 		//Verify data is visible
 		Assert.assertTrue(browser.label("Description:").exists(), "Expand as expected");
-		browser.link(testName).in(browser.div("content")).click();
+		browser.link(testName).in(browser.div("content nav-space-3")).click();
 	}
 
 	public static void automember_DeleteSingle(SahiTasks browser,String groupName) {
