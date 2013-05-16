@@ -9,7 +9,7 @@
 			<run>
 			    <include name="setup" />
 			    <include name="userAddTests" /> 
-			   	<include name="userMismatchingPasswordNegativeTests" />
+			  	<include name="userMismatchingPasswordNegativeTests" />
 	            <include name="userCancelAddTests" />
 				<include name="invalidUserAddTests" />
 			    <include name="invalidCharUserAddTests" />
