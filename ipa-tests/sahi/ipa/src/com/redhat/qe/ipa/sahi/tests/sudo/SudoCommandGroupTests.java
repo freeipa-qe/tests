@@ -306,11 +306,11 @@ public class SudoCommandGroupTests extends SahiTestScript{
 	
 	/*
 	 * Edit an Sudo Command Group to verify
-	 * Cancel/Reset/Update buttons
+	 * Cancel/Reset/Update buttons   
 	 */
 	@Test (groups={"sudoCommandGroupEditTests"}, description="Verify Cancel/Update/Reset when editing a Command Group",
-			dataProvider="getSudoCommandGroupEditTestObjects", 
-			dependsOnGroups={"sudoCommandGroupAddAndEditTests" })			
+			dataProvider="getSudoCommandGroupEditTestObjects" , 
+					dependsOnGroups={"sudoCommandGroupAddAndEditTests"})			
 	public void testSudoCommandGroupEdit(String testName, String cn, String description) throws Exception {
 		//verify Sudo Command group to be edited exists
 		Assert.assertTrue(sahiTasks.link(cn).exists(), "Verify Sudo Command Group " + cn + "  to be edited exists");
