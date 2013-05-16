@@ -491,13 +491,17 @@ public class UserTests extends SahiTestScript{
 	
 	/*
 	 * Delete multiple users - for positive tests
+	 * 
+	 * 
+	 * 
 	 */
 	@Test (groups={"userMultipleDeleteTests"}, dataProvider="getMultipleUserDeleteTestObjects", dependsOnGroups={"userAddTests", "invalidUserAddTests", "userAddAndEditTests", "userAddAndAddAnotherTests",
- "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userDeleteSSHPubKeyTests", "userEditSSHPubKeyTests", "userEditUndoSSHPubKeyTests", "userEditEmpMiscInfoTests", "userSearchTests", "searchUsersNegativeTests", "userEditDeleteTests" })
+			 "userEditIdentitySettingsTests", "userEditAccountSettingsTests", "userEditMailingAddressTests", "userDeleteSSHPubKeyTests", "userEditSSHPubKeyTests", "userEditUndoSSHPubKeyTests", "userEditEmpMiscInfoTests", "userSearchTests", "searchUsersNegativeTests", "userEditDeleteTests" })
 	public void testMultipleUserDelete(String testName, String uid1, String uid2, String uid3, String uid4) throws Exception {		
 		String uids[] = {uid1, uid2, uid3, uid4};
 		
 		//verify user to be deleted exists
+		sahiTasks.navigateTo(commonTasks.userPage, true);
 		for (String uid : uids) {
 			Assert.assertTrue(sahiTasks.link(uid).exists(), "Verify user " + uid + "  to be deleted exists");
 		}
