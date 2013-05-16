@@ -9,6 +9,8 @@
          				<include name="addDuplicate" />
          				<include name="addNegative" />
          				<include name="modify" />
+         				<include name="modify_Condition1" />
+         				<include name="modify_Condition" />
 						<include name="search" />
 						<include name="searchNegative" />
 						<include name="delete" />-->
@@ -32,7 +34,7 @@
             	</classes>
     </test> 
     
-   
+  
    <test name="IPAAutomember Host Group Tests">
             	<groups>
             	    <run>
@@ -41,6 +43,8 @@
          				<include name="addDuplicate" />
          				<include name="addNegative" />
          				<include name="modify" />
+         				<include name="modify_Condition1" />
+         				<include name="modify_Condition" />
 						<include name="search" />
 						<include name="searchNegative" />
 						<include name="delete" />-->
