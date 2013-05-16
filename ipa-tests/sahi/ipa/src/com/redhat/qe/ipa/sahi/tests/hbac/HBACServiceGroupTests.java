@@ -177,7 +177,7 @@ private static Logger log = Logger.getLogger(UserTests.class.getName());
 		sahiTasks.navigateTo(commonTasks.hbacServiceGroupPage, true);//xdong
 		if (System.getProperty("os.name").startsWith("Windows"))//mvarun
 		{
-			sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content")).click();//Xdong
+			sahiTasks.link("HBAC Service Groups").in(sahiTasks.div("content nav-space-3")).click();//Xdong
 		}
 	
 	}
