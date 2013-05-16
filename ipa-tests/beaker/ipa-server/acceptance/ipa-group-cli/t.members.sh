@@ -26,7 +26,7 @@ memberships()
 	rlRun "kinitAs $ADMINID $ADMINPWD" 0 "Kinit as admin user"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-001 Add Nested Groups Memberships"
+    rlPhaseStartTest "ipa-group-members-001: Add Nested Groups Memberships"
 	# add the groups
         rlRun "addGroup \"Florida Resort\" disneyworld" 0 "Adding Parent group"
 	rlRun "addGroup \"All around the world\" epcot" 0 "Adding Second level group"
@@ -42,7 +42,7 @@ memberships()
 	rlRun "addGroupMembers groups \"dinasaurs,fish\" animalkingdom" 0 "Nesting second third level"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-002 Add Nested User Memberships"
+    rlPhaseStartTest "ipa-group-members-002: Add Nested User Memberships"
 	# add the users
 	rlRun "ipa user-add --first=Walt --last=Disney wdisney" 0 "Adding user wdisney"
 	rlRun "ipa user-add --first=Epcot --last=User1 euser1" 0 "Adding user euser1"
@@ -66,7 +66,7 @@ memberships()
 	rlRun "addGroupMembers users \"trex,guser1\" dinasaurs" 0 "Adding users trex and guser1 to group dinasaurs."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-003 Verify Group Memberships - Group: disneyworld"
+    rlPhaseStartTest "ipa-group-members-003: Verify Group Memberships - Group: disneyworld"
 
         rlRun "verifyGroupMember epcot group disneyworld" 0 "member and memberOf attribute verification"
         rlRun "verifyGroupMember animalkingdom group disneyworld" 0 "member and memberOf attribute verification"
@@ -133,7 +133,7 @@ memberships()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-004 Verify Group Memberships - Group: epcot"
+    rlPhaseStartTest "ipa-group-members-004: Verify Group Memberships - Group: epcot"
 
         rlRun "verifyGroupMember germany group epcot" 0 "member and memberOf attribute verification"
         rlRun "verifyGroupMember japan group epcot" 0 "member and memberOf attribute verification"
@@ -173,7 +173,7 @@ memberships()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-005 Verify Group Memberships - Group: animalkingdom"
+    rlPhaseStartTest "ipa-group-members-005: Verify Group Memberships - Group: animalkingdom"
 
         rlRun "verifyGroupMember fish group animalkingdom" 0 "member and memberOf attribute verification"
         rlRun "verifyGroupMember dinasaurs group animalkingdom" 0 "member and memberOf attribute verification"
@@ -213,7 +213,7 @@ memberships()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-006 Verify Group Memberships - Group: dinasaurs"
+    rlPhaseStartTest "ipa-group-members-006: Verify Group Memberships - Group: dinasaurs"
 
         rlRun "verifyGroupMember trex user dinasaurs" 0 "member and memberOf attribute verification"
         rlRun "verifyGroupMember guser1 user dinasaurs" 0 "member and memberOf attribute verification"
@@ -237,7 +237,7 @@ memberships()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-007 Verify Group Memberships - Group: fish"
+    rlPhaseStartTest "ipa-group-members-007: Verify Group Memberships - Group: fish"
 
         rlRun "verifyGroupMember mdolphin user fish" 0 "member and memberOf attribute verification"
         rlRun "verifyGroupMember juser1 user fish" 0 "member and memberOf attribute verification"
@@ -261,7 +261,7 @@ memberships()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-009 Verify Group Memberships - Group: germany"
+    rlPhaseStartTest "ipa-group-members-009: Verify Group Memberships - Group: germany"
 
         rlRun "verifyGroupMember guser1 user germany" 0 "member and memberOf attribute verification"
         rlRun "verifyGroupMember guser2 user germany" 0 "member and memberOf attribute verification"
@@ -286,7 +286,7 @@ memberships()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-010 Verify Group Memberships - Group: japan"
+    rlPhaseStartTest "ipa-group-members-010: Verify Group Memberships - Group: japan"
 
         rlRun "verifyGroupMember juser1 user japan" 0 "member and memberOf attribute verification"
         rlRun "verifyGroupMember juser2 user japan" 0 "member and memberOf attribute verification"
@@ -310,49 +310,49 @@ memberships()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-011 Negative - Add Group Member that is already a member"
+    rlPhaseStartTest "ipa-group-members-011: Negative - Add Group Member that is already a member"
         result=`ipa group-add-member --groups=germany epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-012 Negative - Add User Member that is already a member"
+    rlPhaseStartTest "ipa-group-members-012: Negative - Add User Member that is already a member"
         result=`ipa group-add-member --users=euser1 epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-013 Negative - Add Group Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-members-013: Negative - Add Group Member that doesn't exist"
         result=`ipa group-add-member --groups=doesntexist epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-014 Negative - Add User Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-members-014: Negative - Add User Member that doesn't exist"
         result=`ipa group-add-member --users=doesntexist epcot`
         echo $result | grep "Number of members added 0"
         rc=$?
         rlAssert0 "0 Members should be added" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-015 Negative - Remove Group Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-members-015: Negative - Remove Group Member that doesn't exist"
         result=`ipa group-remove-member --users=doesntexist epcot`
         echo $result | grep "Number of members removed 0"
         rc=$?
         rlAssert0 "0 Members should be removed" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-016 Negative - Remove User Member that doesn't exist"
+    rlPhaseStartTest "ipa-group-members-016: Negative - Remove User Member that doesn't exist"
         result=`ipa group-remove-member --users=doesntexist epcot`
         echo $result | grep "Number of members removed 0"
         rc=$?
         rlAssert0 "0 Members should be removed" $rc
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-017 Removed Single User Member"
+    rlPhaseStartTest "ipa-group-members-017: Removed Single User Member"
 	rlRun "removeGroupMembers users mdolphin fish" 0 "Removing user mdolphin from group fish."
         ipa group-find fish > /tmp/findgroup.out
         users=`cat /tmp/findgroup.out | grep "Member users:"`
@@ -363,7 +363,7 @@ memberships()
 	rlRun "verifyGroupMember mdolphin user fish" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-018 Removed Single Group Member"
+    rlPhaseStartTest "ipa-group-members-018: Removed Single Group Member"
 	rlRun "removeGroupMembers groups fish animalkingdom" 0 "Removing user mdolphin from group fish."
         ipa group-find animalkingdom > /tmp/findgroup.out
         groups=`cat /tmp/findgroup.out | grep "Member groups:"`
@@ -374,7 +374,7 @@ memberships()
 	rlRun "verifyGroupMember fish group animalkingdom" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-019 Removed Multiple Group Members"
+    rlPhaseStartTest "ipa-group-members-019: Removed Multiple Group Members"
         rlRun "removeGroupMembers groups \"germany,japan\" epcot" 0 "Removing groups germany and japan from group epcot."
         ipa group-find epcot > /tmp/findgroup.out
 	groups=`cat /tmp/findgroup.out | grep "Member groups:"`
@@ -388,7 +388,7 @@ memberships()
 	rlRun "verifyGroupMember japan group epcot" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-020 Removed Multiple User Members"
+    rlPhaseStartTest "ipa-group-members-020: Removed Multiple User Members"
         rlRun "removeGroupMembers users \"trainer1,trainer2\" animalkingdom" 0 "Removing users trainer1 and trainer2 from group animalkingdom."
         ipa group-find animalkingdom > /tmp/findgroup.out
         users=`cat /tmp/findgroup.out | grep "Member users:"`
@@ -402,7 +402,7 @@ memberships()
 	rlRun "verifyGroupMember trainer2 user animalkingdom" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-021 Delete User that is a member of two Groups"
+    rlPhaseStartTest "ipa-group-members-021: Delete User that is a member of two Groups"
 	rlRun "ipa user-del juser1" 0 "Deleting user that is member of two groups"
         ipa group-find fish > /tmp/findgroup.out
         users=`cat /tmp/findgroup.out | grep "Member users:"`
@@ -420,7 +420,7 @@ memberships()
 	rlRun "verifyGroupMember juser1 group fish" 3 "member and memberOf attributes removed verification"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-group-members-022 Delete group with two members"
+    rlPhaseStartTest "ipa-group-members-022: Delete group with two members"
 	rlRun "deleteGroup dinasaurs" 0 "Deleting lower level nested group"
         ipa group-find animalkingdom > /tmp/findgroup.out
         groups=`cat /tmp/findgroup.out | grep "Member groups:"`
