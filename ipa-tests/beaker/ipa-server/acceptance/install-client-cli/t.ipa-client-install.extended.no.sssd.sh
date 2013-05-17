@@ -1,5 +1,3 @@
-#!/bin/bash
-. ./lib.ipa-client-install.sh
 
 ipa_client_install_nosssd_option_test() {
     BaseCase

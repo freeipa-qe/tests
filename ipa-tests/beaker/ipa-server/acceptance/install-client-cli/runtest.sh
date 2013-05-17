@@ -40,6 +40,8 @@
 . ./t.client-install-primary-server.sh
 . ./lib.ipaclientverify.sh
 . ./t.ipa-client-install.bug.sh
+. ./t.ipa-client-install.no.sssd.sh
+. ./t.ipa-client-install.sssd.sh
 #. ../quickinstall/install-lib.sh
 . ../quickinstall/ipa-install.sh
 . /opt/rhqa_ipa/lib.ipa-rhts.sh
@@ -79,10 +81,14 @@ rlJournalStart
                 ipaclientinstall
                 clientinstall_primary_server
                 ipa_bug_verification
+                ipa_client_install_nosssd_option_test
+                ipa_client_install_sssd_option_test
             else
                 rlLog "Executing test cases with 1 Master and 1 Replica"
                 ipaclientinstall
                 ipa_bug_verification
+                ipa_client_install_nosssd_option_test
+                ipa_client_install_sssd_option_test
             fi
             uninstall_fornexttest # Ensure cleanup
             rlRun "iparhts-sync-set -s DONE"

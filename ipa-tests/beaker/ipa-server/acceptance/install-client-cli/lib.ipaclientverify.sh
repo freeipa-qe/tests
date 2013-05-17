@@ -633,3 +633,40 @@ debug_pause()
 uninstall_ipa_client(){
     rlRun "ipa-client-install --uninstall -U"
 }
+
+
+#functions for ipa extended test cases
+
+CheckFunction() {
+    conf="$@"
+    rlLog "CheckFunction: $conf"
+}
+
+CheckConfig() {
+    conf="$@"
+    rlLog "CheckConfig: $conf"
+    if [ "$conf" = "force_ldap" ]:then
+        echo "$conf"
+    fi
+
+    if [ "$conf" = "ssh_trust_dns" ]:then
+        echo "$conf"
+    fi
+
+    if [ "$conf" = "primaryServer" ]:then
+        echo "$conf"
+    fi
+
+    if [ "$conf" = "ntpserver_untouched" ]:then
+        echo "$conf"
+    fi
+
+    if [ "$conf" = "ntpserver_disabled" ]:then
+        echo "$conf"
+    fi
+
+    if [ "$conf" = "hostname=ClientHostname" ]:then
+        echo "$conf"
+    fi
+}
+

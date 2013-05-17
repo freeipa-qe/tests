@@ -1,6 +1,3 @@
-#!/bin/bash
-. ./lib.ipa-client-install.sh
-
 ipa_client_install_sssd_option_test() {
     BaseCase_0001_test_single_option__fixed_primary  # [positive] Single Option test: --fixed-primary
     BaseCase_0002_test_single_option__force          # [positive] Single Option test: --force
