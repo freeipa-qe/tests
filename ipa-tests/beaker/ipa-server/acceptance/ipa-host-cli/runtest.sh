@@ -75,24 +75,24 @@ rlJournalStart
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-001 Add lower case host"
+    rlPhaseStartTest "ipa-host-cli-001: Add lower case host"
         rlRun "addHost $host1 force" 0 "Adding new host with ipa host-add."
         rlRun "findHost $host1" 0 "Verifying host was added with ipa host-find lower case."
         rlRun "findHost $host2" 0 "Verifying host was added with ipa host-find upper case."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-02 Add upper case host"
+    rlPhaseStartTest "ipa-host-cli-002: Add upper case host"
         rlRun "addHost $host3 force" 0 "Adding new host with ipa host-add."
         rlRun "findHost $host3" 0 "Verifying host was added with ipa host-find lower case."
         rlRun "findHost $host4" 0 "Verifying host was added with ipa host-find upper case."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-03 Add host with dashes in hostname"
+    rlPhaseStartTest "ipa-host-cli-003: Add host with dashes in hostname"
         rlRun "addHost $host5 force" 0 "Adding new host with ipa host-add."
         rlRun "findHost $host5" 0 "Verifying host was added with ipa host-find lower case."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-04 Modify host location"
+    rlPhaseStartTest "ipa-host-cli-004: Modify host location"
 	for item in $host1 $host3 $host5 ; do
 		attr="location"
 		value='IDM Westford lab 3'
@@ -101,7 +101,7 @@ rlJournalStart
 	done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-05 Modify host platform"
+    rlPhaseStartTest "ipa-host-cli-005: Modify host platform"
         for item in $host1 $host3 $host5 ; do
 		attr="platform"
                 value='x86_64'
@@ -110,7 +110,7 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-06 Modify host os"
+    rlPhaseStartTest "ipa-host-cli-006: Modify host os"
         for item in $host1 $host3 $host5 ; do
 		attrToModify="os"
 		attrToVerify="\"Operating system\""
@@ -120,7 +120,7 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-07 Modify host description"
+    rlPhaseStartTest "ipa-host-cli-007: Modify host description"
         for item in $host1 $host3 $host5 ; do
 		attrToModify="desc"
 		attrToVerify="Description"
@@ -130,7 +130,7 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-08 Modify host locality"
+    rlPhaseStartTest "ipa-host-cli-008: Modify host locality"
         for item in $host1 $host3 $host5 ; do
                 attr="locality"
                 value="Mountain View, CA"
@@ -139,7 +139,7 @@ rlJournalStart
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-09 Show Host Objectclasses"
+    rlPhaseStartTest "ipa-host-cli-009: Show Host Objectclasses"
 	tmpfile=/tmp/showall.out
 	ipa host-show --all $host1 > /tmp/showall.out
 	classes=(ipaobject ipaservice nshost ipahost pkiuser krbprincipalaux krbprincipal top);
@@ -153,7 +153,7 @@ rlJournalStart
 	done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-10 Disable Host - Remove Keytab"
+    rlPhaseStartTest "ipa-host-cli-010: Disable Host - Remove Keytab"
 	# first get a keytab and verify it exists
 	for item in $host1 $host4 $host5 ; do
 		rlRun "ipa-getkeytab -s `hostname` -p host/$item -k /tmp/host.$item.keytab"
@@ -163,7 +163,7 @@ rlJournalStart
 	done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-11 Regression test for bug 499016"
+    rlPhaseStartTest "ipa-host-cli-011: ipa host-mod modifying platform modifies os bz499016"
 	for item in $host1 $host3 $host5 ; do
 		attrToModify="desc"
 		attrToVerify1="Description"
@@ -176,19 +176,19 @@ rlJournalStart
 	done
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-12 Negative - add duplicate host"
+    rlPhaseStartTest "ipa-host-cli-012: Negative - add duplicate host"
 	command="ipa host-add $host1 --force"
 	expmsg="ipa: ERROR: host with name nightcrawler.$DOMAIN already exists"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-13 Negative - Delete host that doesn't exist"
+    rlPhaseStartTest "ipa-host-cli-013: Negative - Delete host that doesn't exist"
         command="ipa host-del ghost.$DOMAIN"
         expmsg="ipa: ERROR: ghost.$DOMAIN: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-14 Negative - setattr and addattr on fqdn"
+    rlPhaseStartTest "ipa-host-cli-014: Negative - setattr and addattr on fqdn"
         command="ipa host-mod --setattr fqdn=newfqdn $host1"
         expmsg="ipa: ERROR: modifying primary key is not allowed"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -197,7 +197,7 @@ rlJournalStart
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-15 Negative - setattr and addattr on ipaUniqueID"
+    rlPhaseStartTest "ipa-host-cli-015: Negative - setattr and addattr on ipaUniqueID"
         command="ipa host-mod --setattr ipaUniqueID=127863947-84375973-gq9587 $host1"
         expmsg="ipa: ERROR: Insufficient access: Only the Directory Manager can set arbitrary values for ipaUniqueID"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -205,7 +205,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-16 Negative - setattr and addattr on krbPrincipalName"
+    rlPhaseStartTest "ipa-host-cli-016: Negative - setattr and addattr on krbPrincipalName"
         command="ipa host-mod --setattr krbPrincipalName=host/$host2@BOS.REDHAT.COM $host1"
         expmsg="ipa: ERROR: Insufficient access: Principal name already set, it is unchangeable."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -214,7 +214,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-17 Negative - setattr and addattr on serverHostName"
+    rlPhaseStartTest "ipa-host-cli-017: Negative - setattr and addattr on serverHostName"
         command="ipa host-mod --setattr serverHostName=$host2 $host1"
         expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'serverHostName' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -222,7 +222,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-18 setattr and addattr on nsHostLocation"
+    rlPhaseStartTest "ipa-host-cli-018: setattr and addattr on nsHostLocation"
 	attr="nsHostLocation"
 	rlRun "setAttribute host $attr mars $host1" 0 "Setting attribute $attr to value of mars."
 	rlRun "verifyHostAttr $host1 Location mars" 0 "Verifying host $attr was modified."
@@ -232,7 +232,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-19 setattr and addattr on l - locality"
+    rlPhaseStartTest "ipa-host-cli-019: setattr and addattr on l - locality"
 	attr="l"
 	rlRun "setAttribute host $attr sunnyside $host1" 0 "Setting attribute $attr to value of mars."
 	rlRun "verifyHostAttr $host1 locality sunnyside" 0 "Verifying host $attr was modified."
@@ -242,7 +242,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-20 setattr and addattr on nsOsVersion"
+    rlPhaseStartTest "ipa-host-cli-020: setattr and addattr on nsOsVersion"
         attr="nsOsVersion"
         attrToVerify="\"Operating system\""
         rlRun "setAttribute host $attr RHEL6 $host1" 0 "Setting attribute $attr to value of RHEL6."
@@ -253,7 +253,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-21  Negative - setattr and addattr on enrolledBy"
+    rlPhaseStartTest "ipa-host-cli-021: Negative - setattr and addattr on enrolledBy"
         command="ipa host-mod --setattr enrolledBy=\"uid=user,cn=users,cn=accounts,$BASEDN\" $host1"
         expmsg="ipa: ERROR: Insufficient access: Insufficient 'write' privilege to the 'enrolledBy' attribute of entry 'fqdn=$host1,cn=computers,cn=accounts,$BASEDN'."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -261,7 +261,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-22  Negative - setattr and addattr on enrolledBy - invalid syntax"
+    rlPhaseStartTest "ipa-host-cli-022: Negative - setattr and addattr on enrolledBy - invalid syntax"
         command="ipa host-mod --setattr enrolledBy=me $host1"
         expmsg="ipa: ERROR: enrolledby: Invalid syntax."
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
@@ -269,7 +269,7 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for invalid enrolledby syntax"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-23 setattr and addattr on description"
+    rlPhaseStartTest "ipa-host-cli-023: setattr and addattr on description"
         attr="description"
         rlRun "setAttribute host $attr new $host1" 0 "Setting attribute $attr to value of new."
         rlRun "verifyHostAttr $host1 Description new" 0 "Verifying host $attr was modified."
@@ -279,50 +279,50 @@ rlJournalStart
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --addattr."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-24 Delete Hosts"
+    rlPhaseStartTest "ipa-host-cli-024: Delete Hosts"
         for item in $host1 $host3 $host5 ; do
                 rlRun "deleteHost $item" 0 "Delete host $item."
                 rlRun "findHost $item" 1 "Verifying host $item was deleted."
         done
      rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-25  Negative - add host not fully qualified DN"
+    rlPhaseStartTest "ipa-host-cli-025: Negative - add host not fully qualified DN"
         command="ipa host-add myhost --force"
         expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: not fully qualified"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message for --setattr."
     rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-26 Modify Host that doesn't Exist"
+     rlPhaseStartTest "ipa-host-cli-026: Modify Host that doesn't Exist"
         command="ipa host-mod --location=mars $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-27 Find Host that doesn't Exist"
+     rlPhaseStartTest "ipa-host-cli-027: Find Host that doesn't Exist"
         command="ipa host-show $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-28 Show Host that doesn't Exist"
+     rlPhaseStartTest "ipa-host-cli-028: Show Host that doesn't Exist"
         command="ipa host-show $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-29 Disable Host that doesn't Exist"
+     rlPhaseStartTest "ipa-host-cli-029: Disable Host that doesn't Exist"
         command="ipa host-disable $host1"
         expmsg="ipa: ERROR: $host1: host not found"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-     rlPhaseStartTest "ipa-host-cli-30 Add Host without force or add DNS record options"
+     rlPhaseStartTest "ipa-host-cli-030: Add Host without force or add DNS record options"
         command="ipa host-add $host1"
         expmsg="ipa: ERROR: Host does not have corresponding DNS A record"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
      rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-31 Negative - setattr and addattr on dn"
+    rlPhaseStartTest "ipa-host-cli-031: Negative - setattr and addattr on dn"
         myhost="mytest.$DOMAIN"
         addHost $myhost
         command="ipa host-mod --setattr dn=\"cn=mynewDN,cn=computers,cn=accounts,$BASEDN\" $myhost"
@@ -333,7 +333,7 @@ rlJournalStart
         deleteHost $myhost
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-32 Negative - setattr and addattr on cn"
+    rlPhaseStartTest "ipa-host-cli-032: Negative - setattr and addattr on cn"
         myhost="mytest.$DOMAIN"
         addHost $myhost
         expmsg="ipa: ERROR: Insufficient access: cn is immutable"
@@ -345,7 +345,7 @@ rlJournalStart
 	deleteHost $myhost
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-33 Negative - setattr and addattr on keytab"
+    rlPhaseStartTest "ipa-host-cli-033: Negative - setattr and addattr on keytab"
 	myhost="mytest.$DOMAIN"
         addHost $myhost
         command="ipa host-mod --setattr \"keytab=true\" $myhost"
@@ -356,7 +356,7 @@ rlJournalStart
 	deleteHost $myhost
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-34 Add 10 hosts and test find returns search limit"
+    rlPhaseStartTest "ipa-host-cli-034: Add 10 hosts and test find returns search limit"
 	rlRun "ipa config-mod --searchrecordslimit=5" 0 "Set search records limit to 5"
         i=1
         while [ $i -le 10 ] ; do
@@ -371,7 +371,7 @@ rlJournalStart
 	fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-35 find 0 hosts"
+    rlPhaseStartTest "ipa-host-cli-035: find 0 hosts"
         ipa host-find --sizelimit=0 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
@@ -382,7 +382,7 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-36 find 7 hosts"
+    rlPhaseStartTest "ipa-host-cli-036: find 7 hosts"
         ipa host-find --sizelimit=7 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
@@ -393,7 +393,7 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-37 find 9 groups"
+    rlPhaseStartTest "ipa-host-cli-037: find 9 hosts"
         ipa host-find --sizelimit=9 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
@@ -404,7 +404,7 @@ rlJournalStart
         fi
     rlPhaseEnd
 
-rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
+rlPhaseStartTest "ipa-host-cli-038: find more hosts than exist"
         ipa host-find --sizelimit=30 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
@@ -415,7 +415,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-39 find hosts - size limit not an integer"
+    rlPhaseStartTest "ipa-host-cli-039: find hosts - size limit not an integer"
         expmsg="ipa: ERROR: invalid 'sizelimit': must be an integer"
         command="ipa host-find --sizelimit=abvd"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
@@ -423,7 +423,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-40 find hosts - time limit 0"
+    rlPhaseStartTest "ipa-host-cli-040: find hosts - time limit 0"
         ipa host-find --timelimit=0 > /tmp/hostfind.out
         result=`cat /tmp/hostfind.out | grep "Number of entries returned"`
         number=`echo $result | cut -d " " -f 5`
@@ -435,7 +435,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlRun "ipa config-mod --searchrecordslimit=100" 0 "set search records limit back to default"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-41 find hosts - time limit not an integer"
+    rlPhaseStartTest "ipa-host-cli-041: find hosts - time limit not an integer"
         expmsg="ipa: ERROR: invalid 'timelimit': must be an integer"
         command="ipa host-find --timelimit=abvd"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - alpha characters."
@@ -443,7 +443,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - special characters."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-42 add Managed By Host"
+    rlPhaseStartTest "ipa-host-cli-042: add Managed By Host"
 	myhost1=mytesthost1.$DOMAIN
 	myhost2=mytesthost2.$DOMAIN
 	addHost $myhost1
@@ -452,12 +452,12 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-43 removed Managed By Host"
+    rlPhaseStartTest "ipa-host-cli-043: removed Managed By Host"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-44 add Multiple Managed By Host"
+    rlPhaseStartTest "ipa-host-cli-044: add Multiple Managed By Host"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
 	myhost3=mytesthost3.$DOMAIN
@@ -466,7 +466,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" \"$myhost1, $myhost2\""
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-45 removed Multiple Managed By Hosts"
+    rlPhaseStartTest "ipa-host-cli-045: removed Multiple Managed By Hosts"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
 	myhost3=mytesthost3.$DOMAIN
@@ -477,7 +477,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	deleteHost $myhost3
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-46 Add host with DNS Record"
+    rlPhaseStartTest "ipa-host-cli-046: Add host with DNS Record"
 	short=myhost
 	myhost=$short.$DOMAIN
 	rzone=`getReverseZone`
@@ -499,7 +499,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	fi	
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-47 Delete host without deleting DNS Record"
+    rlPhaseStartTest "ipa-host-cli-047: Delete host without deleting DNS Record"
 	short=myhost
         myhost=$short.$DOMAIN
 	rlRun "deleteHost $myhost" 0 "Deleting host without deleting DNS entries"
@@ -507,7 +507,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlRun "ipa dnsrecord-find $rzone 99" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-48 Add host without force option - DNS Record Exists"
+    rlPhaseStartTest "ipa-host-cli-048: Add host without force option - DNS Record Exists"
 	short=myhost
         myhost=$short.$DOMAIN
 	rlLog "EXECUTING: ipa host-add $myhost"
@@ -517,7 +517,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "ipa dnsrecord-find $rzone 99" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-49 Delete Host and Update DNS"
+    rlPhaseStartTest "ipa-host-cli-049: Delete Host and Update DNS"
 	short=myhost
         myhost=$short.$DOMAIN
 	ipa host-add --force $myhost
@@ -527,7 +527,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "ipa dnsrecord-show $rzone 99" 2 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-50 Delete Host and Update DNS when DNS entries do not exist"
+    rlPhaseStartTest "ipa-host-cli-050: Delete Host and Update DNS when DNS entries do not exist"
 	short=myhost
         myhost=$short.$DOMAIN
         ipa host-add --force $myhost
@@ -535,7 +535,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlRun "findHost $myhost" 1 "Verifying host was deleted."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-51 Add host with DNS Record --no-reverse"
+    rlPhaseStartTest "ipa-host-cli-051: Add host with DNS Record --no-reverse"
         short=myhost
         myhost=$short.$DOMAIN
         rzone=`getReverseZone`
@@ -557,7 +557,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-52 host name ending in . "
+    rlPhaseStartTest "ipa-host-cli-052: host name ending in . "
 	myhost="myhost.$DOMAIN"
 	rlLog "EXECUTING : ipa host-add --force $myhost."
 	rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
@@ -576,7 +576,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-53 Negative - add host with _"
+    rlPhaseStartTest "ipa-host-cli-053: Negative - add host with _"
         command="ipa host-add host_underscore.$RELM --force"
 		# scott 05/01/2012 - changing expected message since error changed (at least 2.2.0-12):
         #expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
@@ -584,7 +584,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-54 Negative - add host with ~"
+    rlPhaseStartTest "ipa-host-cli-054: Negative - add host with ~"
         command="ipa host-add host~tilda.$RELM --force"
 		# scott 05/01/2012 - changing expected message since error changed (at least 2.2.0-12):
         #expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
@@ -592,7 +592,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-55 Negative - add host with +"
+    rlPhaseStartTest "ipa-host-cli-055: Negative - add host with +"
         command="ipa host-add host+plus.$RELM --force"
 		# scott 05/01/2012 - changing expected message since error changed (at least 2.2.0-12):
         #expmsg="ipa: ERROR: invalid 'hostname': invalid domain-name: only letters, numbers, and - are allowed. - must not be the DNS label character"
@@ -600,7 +600,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-56 search with man-hosts when Managed By a Host"
+    rlPhaseStartTest "ipa-host-cli-056: search with man-hosts when Managed By a Host"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         addHost $myhost1
@@ -613,7 +613,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlAssertGrep "Host name: $myhost1" "/tmp/manbyhosts_find.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-57 search a host when Managed By Host is removed"
+    rlPhaseStartTest "ipa-host-cli-057: search a host when Managed By Host is removed"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
 	rlRun "ipa host-find --man-hosts=$myhost1 > /tmp/manbyhosts_removed.out"
@@ -621,7 +621,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlAssertNotGrep "Host name: $myhost2" "/tmp/manbyhosts_removed.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-58 search a host when Managed by multiple Hosts"
+    rlPhaseStartTest "ipa-host-cli-058: search a host when Managed by multiple Hosts"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         myhost3=mytesthost3.$DOMAIN
@@ -723,7 +723,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlAssertNotGrep "Host name: $myhost1" "/tmp/manbyhosts_myhost1234.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-59 search a host when Multiple Managed By Hosts removed"
+    rlPhaseStartTest "ipa-host-cli-059: search a host when Multiple Managed By Hosts removed"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         myhost3=mytesthost3.$DOMAIN
@@ -754,7 +754,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         deleteHost $myhost4
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-60 search a host when Manages multiple Hosts"
+    rlPhaseStartTest "ipa-host-cli-060: search a host when Manages multiple Hosts"
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         myhost3=mytesthost3.$DOMAIN
@@ -806,14 +806,14 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         deleteHost $myhost4
    rlPhaseEnd
 	
-   rlPhaseStartTest "ipa-host-cli-61 Negative - search with man-hosts when host does not exist"
+   rlPhaseStartTest "ipa-host-cli-061: Negative - search with man-hosts when host does not exist"
         myhost1=mytesthost1.$DOMAIN
 	expmsg="ipa: ERROR: $myhost1: host not found"
         command="ipa host-find --man-hosts=$myhost1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - man-hosts when host does not exist."
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-host-cli-62 search with not-man-hosts when Managed By a Host"
+   rlPhaseStartTest "ipa-host-cli-062: search with not-man-hosts when Managed By a Host"
         myhost1=nmanbyhost1.$DOMAIN
         myhost2=nmanbyhost2.$DOMAIN
         myhost3=nmanbyhost3.$DOMAIN
@@ -842,7 +842,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlAssertGrep "Host name: $myhost3" "/tmp/notmanbyhosts_find_2.out"
     rlPhaseEnd
  
-    rlPhaseStartTest "ipa-host-cli-63 search a host when Managed By Host is removed"
+    rlPhaseStartTest "ipa-host-cli-063: search a host when Managed By Host is removed"
         rlRun "removeHostManagedBy $myhost2 $myhost1" 0 "Removing Managed By Host"
         rlRun "verifyHostAttr $myhost1 \"Managed by\" $myhost1"
         rlRun "ipa host-find --not-man-hosts=$myhost1 > /tmp/notmanbyhosts_removed.out"
@@ -854,7 +854,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlAssertGrep "Host name: $myhost2" "/tmp/notmanbyhosts_removed.out" 
     rlPhaseEnd
  
-    rlPhaseStartTest "ipa-host-cli-64 search with not-man-hosts when host is Managed by multiple Hosts"
+    rlPhaseStartTest "ipa-host-cli-064: search with not-man-hosts when host is Managed by multiple Hosts"
         myhost1=nmanbyhost1.$DOMAIN
         myhost2=nmanbyhost2.$DOMAIN
         myhost3=nmanbyhost3.$DOMAIN
@@ -948,7 +948,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlAssertNotGrep "Host name: $myhost4" "/tmp/notmanbyhosts_myhost1234.out"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-65 search with not-man-by-host when Multiple Managed By Hosts removed"
+    rlPhaseStartTest "ipa-host-cli-065: search with not-man-by-host when Multiple Managed By Hosts removed"
         myhost1=nmanbyhost1.$DOMAIN
         myhost2=nmanbyhost2.$DOMAIN
         myhost3=nmanbyhost3.$DOMAIN
@@ -996,7 +996,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         deleteHost $myhost4
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-66 search with not-man-hosts when Manages multiple Hosts"
+    rlPhaseStartTest "ipa-host-cli-066: search with not-man-hosts when Manages multiple Hosts"
         myhost1=nmanbyhost1.$DOMAIN
         myhost2=nmanbyhost2.$DOMAIN
         myhost3=nmanbyhost3.$DOMAIN
@@ -1047,14 +1047,14 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         deleteHost $myhost4
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-host-cli-67 Negative - search with not-man-hosts when host does not exist"
+   rlPhaseStartTest "ipa-host-cli-067: Negative - search with not-man-hosts when host does not exist"
 	myhost1=notahost
 	expmsg="ipa: ERROR: $myhost1: host not found"
         command="ipa host-find --man-hosts=$myhost1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message - not-man-hosts when host does not exist."
    rlPhaseEnd
 
-   rlPhaseStartTest "ipa-host-cli-68 --pkey-only test of ipa host-find"
+   rlPhaseStartTest "ipa-host-cli-068: --pkey-only test of ipa host-find"
 	ipa_command_to_test="host"
 	pkey_addstringa="--ip-address=10.14.2.3"
 	pkey_addstringb="--ip-address=10.14.2.4"
@@ -1070,7 +1070,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	ipa host-del $pkeyobjb --updatedns
     rlPhaseEnd
 	
-    rlPhaseStartTest "ipa-host-cli-69 Negative - host name ending in . - a host without trailing . already exist"
+    rlPhaseStartTest "ipa-host-cli-069: Negative - host name ending in . - a host without trailing . already exist"
         myhost="myhost.$DOMAIN"
 	expmsg="ipa: ERROR: host with name $myhost already exists"
         command="ipa host-add --force $myhost."
@@ -1088,7 +1088,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
     rlPhaseEnd
 
 	
-    rlPhaseStartTest "ipa-host-cli-70 delete a host name ending in . "
+    rlPhaseStartTest "ipa-host-cli-070: delete a host name ending in . "
         myhost="myhost.$DOMAIN"
         rlLog "EXECUTING : ipa host-del $myhost."
         rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
@@ -1103,7 +1103,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlRun "findHost $myhost" 1 "Verifying host $myhost was deleted."
     rlPhaseEnd
 
-  rlPhaseStartTest "ipa-host-cli-71 host-show when the name ending in . "
+  rlPhaseStartTest "ipa-host-cli-071: host-show when the name ending in . "
         myhost="myhost.$DOMAIN"
         rlLog "EXECUTING : ipa host-show $myhost."
         rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
@@ -1117,7 +1117,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-72 host-add-managedby when the name ending in . "
+    rlPhaseStartTest "ipa-host-cli-072: host-add-managedby when the name ending in . "
 	myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         rlLog "EXECUTING : ipa host-add-managedby --hosts=\"$myhost2\" \"$myhost1.\""
@@ -1141,7 +1141,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "ipa host-del $myhost2" 0 "Cleanup delete test host 2"
     rlPhaseEnd
  
-    rlPhaseStartTest "ipa-host-cli-73 host-remove-managedby when the name ending in . "
+    rlPhaseStartTest "ipa-host-cli-073: host-remove-managedby when the name ending in . "
         myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         rlLog "EXECUTING : ipa host-remove-managedby --hosts=\"$myhost2\" \"$myhost1.\""
@@ -1162,7 +1162,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "ipa host-del $myhost2" 0 "Cleanup delete test host 2"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-74 host-mod when the name ending in . "
+    rlPhaseStartTest "ipa-host-cli-074: host-mod when the name ending in . "
         myhost1=mytesthost1.$DOMAIN
         addHost $myhost1
 	attrToModify="desc"
@@ -1174,7 +1174,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "ipa host-del $myhost1" 0 "Cleanup delete test host"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-75 host-find when the name ending in . "
+    rlPhaseStartTest "ipa-host-cli-075: host-find when the name ending in . "
         myhost=mytesthost.$DOMAIN
         rlLog "EXECUTING : ipa host-find $myhost."
 	rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
@@ -1200,7 +1200,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
         rlRun "ipa host-del $myhost" 0 "Cleanup delete test host"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-76 host-disable when the name ending in . "
+    rlPhaseStartTest "ipa-host-cli-076: host-disable when the name ending in . "
         myhost=mytesthost.$DOMAIN
         rlLog "EXECUTING : ipa host-disable $myhost."
         rlRun "ipa host-add --force $myhost." 0 "Add host with trailing . - dot should be ignored"
@@ -1229,7 +1229,7 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
     rlPhaseEnd
 
     hb=hbruleh
-    rlPhaseStartTest "ipa-host-cli-77 Positive host-find test using --in-hbacrules"
+    rlPhaseStartTest "ipa-host-cli-077: Positive host-find test using --in-hbacrules"
 	myhost1=mytesthost1.$DOMAIN
         myhost2=mytesthost2.$DOMAIN
         addHost $myhost1
@@ -1239,44 +1239,44 @@ rlPhaseStartTest "ipa-host-cli-38 find more hosts than exist"
 	rlRun "ipa host-find --in-hbacrules=$hb | grep $myhost1" 0 "making sure host1 is returned when searching hosts using --in-hbacrules"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-78 Negative host-find test using --in-hbacrules"
+    rlPhaseStartTest "ipa-host-cli-078: Negative host-find test using --in-hbacrules"
 	rlRun "ipa host-find --in-hbacrules=$hb | grep $myhost2" 1 "making sure host2 is not returned when searching hosts using --in-hbacrules"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-79 Positive host-find test using --not-in-hbacrules"
+    rlPhaseStartTest "ipa-host-cli-079: Positive host-find test using --not-in-hbacrules"
 	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $myhost2" 0 "making sure host2 is returned when searching hosts using --not-in-hbacrules"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-80 Negative host-find test using --not-in-hbacrules"
+    rlPhaseStartTest "ipa-host-cli-080: Negative host-find test using --not-in-hbacrules"
 	rlRun "ipa host-find --not-in-hbacrules=$hb | grep $myhost1" 1 "making sure host1 is not returned when searching hosts using --not-in-hbacrules"
 	rlRun "ipa hbacrule-del $hb" 0 "Deleting hbac rule use in previous tests"
     rlPhaseEnd
 
     sru=sruleta
-    rlPhaseStartTest "ipa-host-cli-81 Positive test of search of hosts in a sudorules"
+    rlPhaseStartTest "ipa-host-cli-081: Positive test of search of hosts in a sudorules"
 	rlRun "ipa sudorule-add $sru" 0 "Adding sudorule to test with"
 	rlRun "ipa sudorule-add-host --hosts=$myhost1 $sru" 0 "adding host myhost1 to sudorule sru"
 	rlRun "ipa host-find --in-sudorule=$sru | grep $myhost1" 0 "ensuring that host myhost1 is returned when searching for hosts in a given sudorule"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-82 Negative test of search of hosts in a sudorule"
+    rlPhaseStartTest "ipa-host-cli-082: Negative test of search of hosts in a sudorule"
 	rlRun "ipa host-find --in-sudorule=$sru | grep $myhost2" 1 "ensuring that host myhost2 is notreturned when searching for hosts in a given sudorule"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-83 Positive test of search of hosts not in a sudorule"
+    rlPhaseStartTest "ipa-host-cli-083: Positive test of search of hosts not in a sudorule"
 	rlRun "ipa host-find --not-in-sudorule=$sru | grep $myhost2" 0 "ensuring that host mtyhost2 is returned when searching for hosts not in a given sudorule"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-84 Negative test of search of hosts not in a sudorule"
+    rlPhaseStartTest "ipa-host-cli-084: Negative test of search of hosts not in a sudorule"
 	rlRun "ipa host-find --not-in-sudorule=$sru | grep $myhost1" 1 "ensuring that host myhost1 is notreturned when searching for hosts not in a given sudorule"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-85 Positive test of search of host after it has been removed from the sudorule"
+    rlPhaseStartTest "ipa-host-cli-085: Positive test of search of host after it has been removed from the sudorule"
 	rlRun "ipa sudorule-remove-host --hosts=$myhost1 $sru" 0 "Remove $myhost1 from sudorule $sru"
 	rlRun "ipa host-find --not-in-sudorule=$sru | grep $myhost1" 0 "ensure that $myhost1 comes back from a search excluding sudorule $sru"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-86 Negative test of search of host after it has been removed from the sudorule"
+    rlPhaseStartTest "ipa-host-cli-086: Negative test of search of host after it has been removed from the sudorule"
 	rlRun "ipa host-find --in-sudorule=$sru | grep $myhost1" 1 "ensure that $myhost1 does not come back from a search in sudorule $sru"
         deleteHost $myhost1
         deleteHost $myhost2
