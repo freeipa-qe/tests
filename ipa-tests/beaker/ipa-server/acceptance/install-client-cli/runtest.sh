@@ -47,49 +47,49 @@
 
 PACKAGE="ipa-client"
 SERVICE="ipa_kpasswd"
-HOSTNAME=$(hostname -s)
+HOSTNAME=$(hostname)
 
 ##########################################
 #   test main
 #########################################
 
 rlJournalStart
-   rlPhaseStartTest "Environment Check"
+    rlPhaseStartTest "Environment Check"
         rlLog "Creating tmp directory"
         TmpDir=`mktemp -d`
         pushd $TmpDir
-	setup_iparhts_sync
+        setup_iparhts_sync
         slave_count=$(echo $SLAVE | wc -w)
         echo "Slave count is $slave_count"
         #####################################################################
         #               IS THIS MACHINE A CLIENT?                           #
         #####################################################################
 
-	echo "$CLIENT" | grep "$HOSTNAME"
-	if [ $? -eq 0 ]; then
-           # This machine is a client
-	   rlLog "I am a client"
-	   rlLog "syncing date"
-           ntpdate $NTPSERVER
-           export currenthour=$(date +%H) # Get the current hours to be used in a later test
-           #date --set='-2 hours' # Set the date on this machine back two hours for ipa-client-install to fix later
-           rlLog "Current date is $(date)"
-          if [ $slave_count -eq 3 ];then
-           rlLog "Executing test cases with 1 Master and 3 Replicas"
-           ipaclientinstall
-           clientinstall_primary_server
-           ipa_bug_verification
-          else
-           rlLog "Executing test cases with 1 Master and 1 Replica"
-           ipaclientinstall
-           ipa_bug_verification
-          fi
-           uninstall_fornexttest # Ensure cleanup
-	   rlRun "iparhts-sync-set -s DONE"
-           dynamic_update_client # run client tests covering the dynamic update feature
-	else
-	   rlLog "Not a client, CLIENT is $CLIENT - not running tests"
-	fi
+        echo "$CLIENT" | grep "$HOSTNAME"
+        if [ $? -eq 0 ]; then
+            # This machine is a client
+            rlLog "I am a client"
+            rlLog "syncing date"
+            ntpdate $NTPSERVER
+            export currenthour=$(date +%H) # Get the current hours to be used in a later test
+            #date --set='-2 hours' # Set the date on this machine back two hours for ipa-client-install to fix later
+            rlLog "Current date is $(date)"
+            if [ $slave_count -eq 3 ];then
+                rlLog "Executing test cases with 1 Master and 3 Replicas"
+                ipaclientinstall
+                clientinstall_primary_server
+                ipa_bug_verification
+            else
+                rlLog "Executing test cases with 1 Master and 1 Replica"
+                ipaclientinstall
+                ipa_bug_verification
+            fi
+            uninstall_fornexttest # Ensure cleanup
+            rlRun "iparhts-sync-set -s DONE"
+            dynamic_update_client # run client tests covering the dynamic update feature
+        else
+            rlLog "Not a client, CLIENT is $CLIENT - not running tests"
+        fi
 
         #####################################################################
         #               IS THIS MACHINE A MASTER?                           #
@@ -97,14 +97,14 @@ rlJournalStart
         rc=0
         echo $MASTER | grep $HOSTNAME
         if [ $? -eq 0 ] ; then
-		ipamastersetup
-                rlRun "iparhts-sync-block -s DONE $BEAKERCLIENT"
-		dynamic_update_master # Run portion of tests covering the dynamic update feature
-                                      # AKA Bug https://bugzilla.redhat.com/show_bug.cgi?id=798355 test
-		ipamastercleanup
-                rlPass
+            ipamastersetup
+            rlRun "iparhts-sync-block -s DONE $BEAKERCLIENT"
+            dynamic_update_master # Run portion of tests covering the dynamic update feature
+                                  # AKA Bug https://bugzilla.redhat.com/show_bug.cgi?id=798355 test
+            ipamastercleanup
+            rlPass
         else
-                rlLog "Machine in recipe in not a MASTER"
+            rlLog "Machine in recipe in not a MASTER"
         fi
 
         #####################################################################
@@ -112,27 +112,24 @@ rlJournalStart
         #####################################################################
         rc=0
         for R in $(eval echo $SLAVE); do
-         echo $R | grep $HOSTNAME
-          if [ $? -eq 0 ] ; then
+            echo $R | grep $HOSTNAME
+            if [ $? -eq 0 ] ; then
                 rlRun "iparhts-sync-block -s DONE $BEAKERCLIENT"
                 rlPass
-          else
+            else
                 rlLog "Machine in recipe in not a SLAVE"
-          fi
+            fi
         done
+    rlPhaseEnd
 
-
-   rlPhaseEnd
-
-
-rlPhaseStartCleanup "install-client-cli cleanup"
-     rlRun "popd"
-#     rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
-rlPhaseEnd
+    rlPhaseStartCleanup "install-client-cli cleanup"
+        rlRun "popd"
+        #rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
+    rlPhaseEnd
         
-rlJournalPrintText
-	report=/tmp/rhts.report.$RANDOM.txt
-	makereport $report
-	rhts-submit-log -l $report
-        save_logs
+    rlJournalPrintText
+    report=/tmp/rhts.report.$RANDOM.txt
+    makereport $report
+    rhts-submit-log -l $report
+    save_logs
 rlJournalEnd 
