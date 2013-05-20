@@ -2,10 +2,9 @@ function irm_function_0001()
 {
     tmpout=/tmp/test_${FUNCNAME}.out
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    rlPhaseStartTest "irm_list_pos_0001 - list, no name"
+    rlPhaseStartTest "irm_function_0001 - function, test"
     case "$MYROLE" in
     MASTER_*)
-	rlLog "$MYROLE"
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
         ;;
     REPLICA1_*)

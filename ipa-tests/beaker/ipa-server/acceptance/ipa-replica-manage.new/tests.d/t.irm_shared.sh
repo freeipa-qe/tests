@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # irm_uninstall 
 # irm_install <master> 
 # irm_useradd <server> <username>
@@ -51,11 +53,12 @@ function irm_userchk()
 {
     local runhost=$1
     local user=$2
+    local chkerr=${3:-0}
     if [ -n "$PWOPT" ]; then
         rlRun "ssh $runhost 'echo $ADMINPW| kinit admin'"
     fi
 
-    rlRun "ssh $runhost 'ipa user-show $user'"
+    rlRun "ssh $runhost 'ipa user-show $user'" $chkerr
 
     if [ -n "$PWOPT" ]; then
         rlRun "ssh $runhost 'kdestroy'"
@@ -70,18 +73,32 @@ function irm_check_ruv()
     local ruvprev=""
     local runerrnum=0
 
-    for runhost in $runhosts; do
-        ruvcurr=$(ldapsearch -xLLL -h $runhost -D "$ROOTDN" -w $ROOTDNPWD -b $BASEDN \
-        '(&(objectclass=nstombstone)(nsuniqueid=ffffffff-ffffffff-ffffffff-ffffffff))' \
-        | grep replicageneration|awk '{print $3}') 
-        if [ -n "$ruvprev" -a "$ruvprev" != "$ruvcurr" ]; then
-            runerrnum=$(( runerrnum += 1 ))
-        fi
-        rlLog "RUV for $runhost is $ruvcurr"
+    for runhost1 in $runhosts; do
+        for runhost2 in $runhosts; do
+            ruvcurr=$(ldapsearch -o ldif-wrap=no -xLLL \
+            -h $runhost2 -D "$ROOTDN" -w $ROOTDNPWD -b $BASEDN \
+            '(&(objectclass=nstombstone)(nsuniqueid=ffffffff-ffffffff-ffffffff-ffffffff))' \
+            nsds50ruv| grep $runhost1 | sed 's/^.*} [a-z0-9]* //g')
+            if [ -n "$ruvprev" -a "$ruvprev" != "$ruvcurr" ]; then
+                runerrnum=$(( runerrnum += 1 ))
+            fi
+            rlLog "On $runhost2 RUV MaxCSN for $runhost1 is $ruvcurr"
+        done
+        echo
     done
 
     return $runerrnum 
 }
+#for RUV in $MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4; do 
+#    for SERVER in $MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4; do 
+#        RUVCHK=$(ldapsearch -o ldif-wrap=no -h $SERVER \
+#        -xLLL -D "$ROOTDN" -w $ROOTDNPWD -b $BASEDN \
+#        '(&(objectclass=nstombstone)(nsuniqueid=ffffffff-ffffffff-ffffffff-ffffffff))' \
+#        nsds50ruv|grep $RUV);   echo "$(echo $SERVER|cut -f1 -d.): $RUVCHK"
+#    done
+#    echo 
+#done
+
 
 function irm_check_ruv_sync()
 {
@@ -105,3 +122,24 @@ function irm_check_ruv_sync()
     rlFail "Replicas still out of sync after $i tries.  Errnum: $runerrnum"
     return 1
 }
+
+function irm_rep_pause()
+{
+    local runfrom=$1
+    local runto=$2
+
+    DAYTORUN=$(( $(date +%w) - 1 ))
+
+    REPDN=$(ldapsearch -h $runfrom -o ldif-wrap=no \
+        -x -D "$ROOTDN" -w "$ROOTDNPWD" \
+        -b cn=config "(objectclass=nsds5ReplicationAgreement)" dn cn \
+        |grep dn:.*meTo$runto|sed 's/dn: //')
+
+    unindent <<<"\
+        dn: $REPDN
+        changetype: modify
+        replace: nsds5replicaupdateschedule
+        nsds5replicaupdateschedule: 2358-2359 $DAYTORUN
+    " | ldapmodify -h $runfrom -x -D "$ROOTDN" -w "$ROOTDNPWD"
+} 
+
