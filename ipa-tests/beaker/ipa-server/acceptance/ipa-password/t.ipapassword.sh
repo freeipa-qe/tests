@@ -27,7 +27,6 @@ ipapassword_globalpolicy()
     ipapassword_globalpolicy_minlifetime_lowerbound
     ipapassword_globalpolicy_minlifetime_upperbound
     ipapassword_globalpolicy_minlifetime_negative
-    ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
     ipapassword_globalpolicy_history_default
     ipapassword_globalpolicy_history_lowerbound
     ipapassword_globalpolicy_history_upperbound
@@ -92,6 +91,7 @@ ipapassword_attr()
 ipapassword_bugzillas()
 {
     bz_818836
+    bz_461332 # original ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
 } # Tests for pwpolicy bugzillas
 
 ######################
@@ -416,9 +416,9 @@ ipapassword_globalpolicy_minlifetime_upperbound_logic()
 # Added by mgregg 5-5-11
 # This is a test to ensure that bug https://bugzilla.redhat.com/show_bug.cgi?id=461325 and
 # https://bugzilla.redhat.com/show_bug.cgi?id=461332 are closed
-ipapassword_globalpolicy_minlifetime_greater_maxlife_negative()
+bz_461332()
 {
-	rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_greater_maxlife_negative"
+	rlPhaseStartTest "bug: 461332 ipapassword_globalpolicy_minlifetime_greater_maxlife_negative"
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
 		rlLog "attempt to set minlife greater than maxlife"
