@@ -56,7 +56,9 @@ RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
 IPAhost=`hostname`
 IPAdomain="testrelm.com"
 IPADOMAIN=`echo ${IPAdomain^^}`
+IPA_range="$IPADOMAIN"_id_range
 ADDOMAIN=`echo ${ADdomain^^}`
+AD_range="$ADDOMAIN"_id_range
 IPAhostIP=`ip addr | egrep 'inet ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 srv_name=`hostname -s`
 NBname="TESTRELM"
@@ -85,14 +87,18 @@ DMpswd="Secret123"
 
 IPA_Variables() {
 	# Defining some variables post ipa-adtrust-install	
-	lrid_base=`$ipacmd idrange-show $IPADOMAIN_id_range | grep "First RID of the corresponding RID range:" | awk '{print $NF}'`
-	lbase_id=`$ipacmd idrange-show $IPADOMAIN_id_range | grep 'First Posix ID' | awk '{print $NF}'`
-	lrange_size=`$ipacmd idrange-show $IPADOMAIN_id_range | egrep "Number.*range:" | awk '{print $NF}'`
-	lsecrid_base=`$ipacmd idrange-show $IPADOMAIN_id_range | grep "First RID of the secondary RID range:" | awk '{print $NF}'`
+	lrid_base=`$ipacmd idrange-show $IPA_range | grep "First RID of the corresponding RID range:" | awk '{print $NF}'`
+	lbase_id=`$ipacmd idrange-show $IPA_range | grep 'First Posix ID' | awk '{print $NF}'`
+	lrange_size=`$ipacmd idrange-show $IPA_range | egrep "Number.*range:" | awk '{print $NF}'`
+	lsecrid_base=`$ipacmd idrange-show $IPA_range | grep "First RID of the secondary RID range:" | awk '{print $NF}'`
+        echo "base_id: $lbase_id"
+        echo "range_size: $lrange_size"
+	echo "rid_base: $lrid_base"
+        echo "sec-rid-base: $lsecrid_base"
 }
 
 AD_Variables() {
-	ad_values=(`$ipacmd idrange-show $ADDOMAIN_id_range | awk '{print $NF}'`)
+	ad_values=(`$ipacmd idrange-show $AD_range | awk '{print $NF}'`)
 	adbase_id=`echo ${ad_values[1]}`
 	adrange_size=`echo ${ad_values[2]}`
 	adrid=`echo ${ad_values[3]}`
@@ -151,7 +157,7 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust and idrange Test Cas
 	# Clean up
 	rlRun "popd"
 
-	rlRun "create_ipauser $ipa_user test user $userpw"
+#	rlRun "create_ipauser $ipa_user test user $userpw"
 #	rlRun "create_ipauser $user2 new user $userpw"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 #	rlRun "$ipacmd group-add-member admins --users=$user2" 0 "Adding $user2 to IPA admins group"
@@ -161,7 +167,7 @@ rlPhaseEnd
 Trust_Add() {
 rlPhaseStartSetup " Adding trust with AD domain"
 	rlRun "Add_Trust" 0 "Creating expect script"
-        rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd" 0 "Active Directory Trust added for $ADdomain"
+        rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd" 0 "Active Directory Trust added with $ADdomain"
 rlPhaseEnd
 }
 
@@ -169,7 +175,7 @@ idrange_test_0001() {
 
 rlPhaseStartTest "0001 Find idrange passing a value to --pkey-only"
 	idrange_name=`$ipacmd idrange-find --pkey-only | grep "Range name:" | awk '{print $NF}'`
-	if [ "$idrange_name" = "$IPADOMAIN_id_range" ]; then
+	if [ "$idrange_name" = "$IPA_range" ]; then
 	  rlPass "IDrange find with pkey-only"
 	else
 	  rlFail "IDrange find with pkey-only"
@@ -198,7 +204,7 @@ idrange_test_0004() {
 
 rlPhaseStartTest "0004 Using alphanumeric value and special characters"
 	rlRun "Wrong_Values" 0 "Creating expect script"
-	rlRun "$exp $expfile $lrange rye34 \'r!83&\' 3000 R345 \'r#(26\' 10" 0 "Using alphanumeric value and special characters fail"
+	rlRun "$exp $expfile $lrange rye34 \"r!83&\" 3000 R345 \"r#26\" 10" 0 "Using alphanumeric value and special characters fail"
 rlPhaseEnd
 }
 
@@ -230,23 +236,23 @@ idrange_test_0008() {
 rlPhaseStartTest "0008 Add idrange with existing rid-base and secondary-rid-base values - Ticket # 3086"
 	IPA_Variables
 	New_rid_base=$((lrid_base + lrange_size))
+	echo "New_rid_base: $New_rid_base"
 	New_lbase_id=$((lbase_id + lrange_size))
+	echo "New_lbase_id: $New_lbase_id"
 	New_secrid_base=$((lsecrid_base + lrange_size))
+	echo "New_secrid_base: $New_secrid_base"
 	rlLog "https://fedorahosted.org/freeipa/ticket/3086"
-	rlRun "rid-values=(`$ipacmd idrange-show $IPADOMAIN_id_range | grep "First RID" | awk '{print $NF}'`)"
 	rlRun "IDrange_Add3 primary" 0 "Creating expect script"
-	RID_BASE=`echo ${rid-values[0]}`
-	rlRun "$exp $expfile $RID_BASE $New_secrid_base 2345678 10 $lrange" 1 "Cant use existing rid-base value"
+	rlRun "$exp $expfile $lrid_base $New_secrid_base 2345678 10 $lrange" 1 "Cant use existing rid-base value"
 	rlRun "IDrange_Add3 secondary" 0 "Creating expect script"
-	SEC_RID_BASE=`echo ${rid-values[1]}`
-	rlRun "$exp $expfile $New_rid_base $SEC_RID_BASE 2345678 10 $lrange" 1 "Cant use existing secondary-rid-base value"
+	rlRun "$exp $expfile $New_rid_base $lsecrid_base 2345678 10 $lrange" 1 "Cant use existing secondary-rid-base value"
 rlPhaseEnd
 }
 
 idrange_test_0009() {
 
 rlPhaseStartTest "0009 Add idrange for local domain overlapping existing range"
-	rlRun "BASE_ID=`$ipacmd idrange-show $IPADOMAIN_id_range | grep "First Posix ID" | awk '{print $NF}'`"
+	rlRun "BASE_ID=`$ipacmd idrange-show $IPA_range | grep "First Posix ID" | awk '{print $NF}'`"
 	rlRun "NEW_BASE_ID=`expr $BASE_ID + 50000`"
 	rlRun "IDrange_Add same_startid" 0 "Creating expect script"
 	rlRun "$exp $expfile $lrange $NEW_BASE_ID 10" 1 "Overlapping local idrange not allowed"
@@ -265,7 +271,8 @@ rlPhaseEnd
 idrange_test_0011() {
 
 rlPhaseStartTest "0011 Using dom-sid and secondary-rid-base together"
-	rlRun "Trust_Add" 0 "Trust add between IPA domain and AD domain"
+	rlRun "Trust_Add"
+	sleep 15
 	rlRun "DOM_SID=`$ipacmd trust-find | grep -i \"Identifier\" | awk '{print $NF}'`" 0 "Getting AD Domain SID"
 	rlRun "Dom_Sec_Rid domsec" 0 "Creating expect script"
 	rlRun "$exp $expfile dom-sid $DOM_SID 10000 1549000000 10 $lrange" 1 "dom-sid and secondary-rid-base cannot be used together"
@@ -298,14 +305,14 @@ rlPhaseStartTest "0014 Add idrange with dom-name with invalid value"
 rlPhaseEnd
 }
 
-
 idrange_test_0015() {
 
 rlPhaseStartTest "0015 Add idrange for trusted domain overlapping existing range"
-	rlRun "ADBASE_ID=`$ipacmd idrange-show $ADDOMAIN_id_range | grep "First Posix ID" | awk '{print $NF}'`"
-        rlRun "NEW_ADBASE_ID=`expr $BASE_ID + 50000`"
+	rlRun "ADBASE_ID=`$ipacmd idrange-show $AD_range | grep "First Posix ID" | awk '{print $NF}'`"
+        NEW_ADBASE_ID=$((ADBASE_ID + 50000))
+	rlRun "echo \"New AD Base id: $NEW_ADBASE_ID\""
         rlRun "IDrange_Add same_startid" 0 "Creating expect script"
-        rlRun "$exp $expfile $lrange $NEW_ADBASE_ID 10" 1 "Overlapping local idrange not allowed"
+        rlRun "$exp $expfile $adrange $NEW_ADBASE_ID 10" 1 "Overlapping local idrange not allowed"
 
 rlPhaseEnd
 }
@@ -314,7 +321,7 @@ idrange_test_0016() {
 
 rlPhaseStartTest "0016 Delete IPA server generated local domain range"
 	rlRun "Del_Range" 0 "Creating expect script"
-	rlRun "$exp $expfile $IPADOMAIN_id_range" 0 "IPA server generated local domain range cannot be deleted"
+	rlRun "$exp $expfile $IPA_range" 1 "IPA server generated local domain range cannot be deleted"
 
 rlPhaseEnd
 }
@@ -354,12 +361,12 @@ idrange_test_0020() {
 rlPhaseStartTest "0020 Idrange find with invalid values in options"
 	rlRun "$ipacmd idrange-find --name $norange" 1 "Name $norange does not exist, hence fails"
 	rlRun "$ipacmd idrange-find --dom-sid $norange" 1 "dom-sid $norange is not valid sid, hence fails"
-	rlRun "$ipacmd idrange-find --dom-name $norange" 1 "dom-name $norange is not valid domain, hence fails"
+	rlRun "$ipacmd idrange-find --dom-name $norange" 1 "dom-name $norange is not valid domain, hence fails Ticket #3608"
 	rlRun "IDrange_Find invalid" 0 "Creating expect script"
-	rlRun "$exp $expfile base-id someid00" 1 "Find with --base-id needs valid integer value"
-	rlRun "$exp $expfile range-size somerange45" 1 "Find with --range-size needs valid integer value"
-	rlRun "$exp $expfile rid-base somerid333"  1 "Find with --rid-base needs valid integer value"
-	rlRun "$exp $expfile secondary-rid-base somesrid34" 1 "Find with --secondary-rid-base needs valid integer value"
+	rlRun "$exp $expfile base-id someid00 base_id" 1 "Find with --base-id needs valid integer value"
+	rlRun "$exp $expfile range-size somerange45 range_size" 1 "Find with --range-size needs valid integer value"
+	rlRun "$exp $expfile rid-base somerid333 rid_base"  1 "Find with --rid-base needs valid integer value"
+	rlRun "$exp $expfile secondary-rid-base somesrid34 secondary_rid_base" 1 "Find with --secondary-rid-base needs valid integer value"
 
 rlPhaseEnd
 }
@@ -382,34 +389,25 @@ idrange_test_0022() {
 
 rlPhaseStartTest "0022 Idrange modify with invalid values in options"
 	rlRun "IDrange_Mod invalid" 0 "Creating expect script" 
-	rlRun "$exp $expfile base-id someid00 $ADDOMAIN_id_range" 1 "Mod with --base-id needs valid integer value"
-	rlRun "$exp $expfile range-size somerange45 $ADDOMAIN_id_range" 1 "Mod with --range-size needs valid integer value"
-	rlRun "$exp $expfile rid-base somerid333 $ADDOMAIN_id_range" 1 "Mod with --rid-base needs valid integer value"
-	rlRun "$exp $expfile secondary-rid-base $ADDOMAIN_id_range" 1 "Mod with --secondary-rid-base needs valid integer value"
+	rlRun "$exp $expfile base-id someid00 $AD_range base_id" 1 "Mod with --base-id needs valid integer value"
+	rlRun "$exp $expfile range-size somerange45 $AD_range range_size" 1 "Mod with --range-size needs valid integer value"
+	rlRun "$exp $expfile rid-base somerid333 $AD_range rid_base" 1 "Mod with --rid-base needs valid integer value"
+	rlRun "$exp $expfile secondary-rid-base 32dsed $AD_range secondary_rid_base" 1 "Mod with --secondary-rid-base needs valid integer value"
 	rlRun "IDrange_Mod domsid" 0 "Creating expect script"
-	rlRun "$exp $expfile dom-sid someid00 $ADDOMAIN_id_range" 1 "Mod with --dom-sid needs valid SID value"
+	rlRun "$exp $expfile dom-sid someid00 $AD_range" 1 "Mod with --dom-sid needs valid SID value"
 	rlRun "IDrange_Mod domname" 0 "Creating expect script"
-	rlRun "$exp $expfile dom-name someid00 $ADDOMAIN_id_range" 1 "Mod with --dom-name needs valid domain name"
+	rlRun "$exp $expfile dom-name someid00 $AD_range" 1 "Mod with --dom-name needs valid domain name"
 
 rlPhaseEnd
 }
 
 idrange_test_0023() {
 
-rlPhaseStartTest "0023 Modify local/trusted idrange overlapping existing idrange"
-	IPA_Variables
-	AD_Variables
-	rlRun "IDrange_Add same_startid" 0 "Creating expect script"
-#	rlRun "ADbase_id=`$ipacmd idrange-show $ADDOMAIN_id_range | grep 'First Posix ID' | awk '{print $NF}'`" 0 "Find Base-id of AD range"
-#	rlRun "lbase_id=`$ipacmd idrange-show $IPADOMAIN_id_range | grep 'First Posix ID' | awk '{print $NF}'`" 0 "Find Base-id of local range"
-	if [ $adbase_id -lt $lbase_id ]; then
-	  New_baseid=$((lbase_id - adbase_id + 1))
-	  rlRun "$exp $expfile $ADDOMAIN_id_range $New_baseid 10" 1 "IDrange add with range-size overlapping the other existing range fails"
-	else
-	  New_baseid=$((adbase_id - lbase_id + 1))
-          rlRun "$exp $expfile $IPADOMAIN_id_range $New_baseid 10" 1 "IDrange add with range-size overlapping the other existing range fails"
-	fi
-
+rlPhaseStartTest "0023 Use same rid-base and secondary-rid-value value"
+	base_value="33333333"
+	rlRun "IDrange_Add3 same_value" 0 "Creating expect script"
+	rlRun "$exp $expfile $base_value $base_value 5000 10 $lrange" 1 "Same or overlapping rid and secondary rid base values fail as expected"
+	
 rlPhaseEnd
 }
 
@@ -417,12 +415,11 @@ idrange_test_0024() {
 
 rlPhaseStartTest "0024 Modify local range-size such that an object (uid,gid) falls out of the range"
 	IPA_Variables
-	rlRun "for i in `seq 2 9`; do $ipacmd user-add $user$i --first test$i --last $i; done" 0 "Create IPA users"
-	last_user=`$ipacmd user-find --pkey-only | grep "User login" | tail -1 | awk '{print $NF}'`
-	rlRun "last_uid=`$ipacmd user-show $last_user | grep UID | awk '{print $NF}'`" 0 "$last_user UID found"
+	for i in `seq 1 5`; do $ipacmd user-add "$ipa_user"$i --first test"$i" --last user"$i"; done
+	rlRun "last_uid=`$ipacmd user-show \"$ipa_user\"5 | grep UID | awk '{print $NF}'`" 0 "Find \"$ipa_user\"5 UID"
 	New_range=$((last_uid - lbase_id -1))
 	rlRun "IDrange_Mod outofrange" 0 "Creating expect script"
-	rlRun "$exp $expfile range-size $New_range $IPADOMAIN_id_range" 1 "Range-mod fails if Objects fall out of range"
+	rlRun "$exp $expfile range-size $New_range $IPA_range" 1 "Range-mod fails if Objects fall out of range"
 
 rlPhaseEnd
 }
@@ -506,8 +503,8 @@ idrange_test_0031() {
 rlPhaseStartTest "0031 Find idrange with correct values for options"
 	IPA_Variables
 	AD_Variables
-	rlRun "$ipacmd idrange-find --name $IPADOMAIN_id_range" 0 "idrange find with --name IPA range"
-	rlRun "$ipacmd idrange-find --name $ADDOMAIN_id_range" 0 "idrange find with --name AD range"
+	rlRun "$ipacmd idrange-find --name $IPA_range" 0 "idrange find with --name IPA range"
+	rlRun "$ipacmd idrange-find --name $AD_range" 0 "idrange find with --name AD range"
 	rlRun "$ipacmd idrange-find --base-id $lbase_id" 0 "idrange find with --base-id IPA range"
 	rlRun "$ipacmd idrange-find --base-id $adbase_id" 0 "idrange find with --base-id AD range"
 	rlRun "$ipacmd idrange-find --range-size $lrange_size" 0 "idrange find with --range-size IPA range"
@@ -516,7 +513,7 @@ rlPhaseStartTest "0031 Find idrange with correct values for options"
 	rlRun "$ipacmd idrange-find --rid-base  $adrid" 0 "idrange find with --rid-base AD range"
 	rlRun "$ipacmd idrange-find --secondary-rid-base $lsecrid_base" 0 "idrange find with --secondary-rid-base IPA range"
 	rlRun "$ipacmd idrange-find --dom-sid $AD_SID" 0 "idrange find with --dom-sid"
-	rlRun "$ipacmd idrange-find --dom-sid $AD_SID" 2 "idrange find with --dom-name, no such option Ticket #3608"
+	rlRun "$ipacmd idrange-find --dom-name $ADdomain" 0 "idrange find with --dom-name, no such option Ticket #3608"
 
 rlPhaseEnd
 }
@@ -527,7 +524,7 @@ rlPhaseStartTest "0032 Modify idrange with correct values with options"
 	IPA_Variables
         AD_Variables
 	New_adbase_id=$((adbase_id - 1))
-	rlRun "$ipacmd idrange-mod $ADDOMAIN_id_range --base-id $New_adbase_id | grep \"$New_adbase_id\"" 0 "idrange modify with --base-id"
+	rlRun "$ipacmd idrange-mod $AD_range --base-id $New_adbase_id | grep \"$New_adbase_id\"" 0 "idrange modify with --base-id"
 
 	# Adding a user in AD
         rlRun "ADuser_ldif \"$ADfn\"1 $ADsn \"$aduser\"1 $userpw 512 add" 0 "Generate ldif file to add \"$aduser\"1"
@@ -536,12 +533,12 @@ rlPhaseStartTest "0032 Modify idrange with correct values with options"
 	# Get the uid of user aduser1
 	aduser1_id=`$ID -u "$aduser"1@$ADdomain`
 	New_adrange_size=$((aduser1_id - adbase_id + 1))
-	rlRun "$ipacmd idrange-mod $ADDOMAIN_id_range --range-size $New_adrange_size | grep \"$New_adrange_size\"" 0 "idrange modify with --range-size"
-	rlRun "$ipacmd idrange-mod $ADDOMAIN_id_range --rid-base 222 | grep \" 222\"" 0 "idrange modify with --rid-base"
+	rlRun "$ipacmd idrange-mod $AD_range --range-size $New_adrange_size | grep \"$New_adrange_size\"" 0 "idrange modify with --range-size"
+	rlRun "$ipacmd idrange-mod $AD_range --rid-base 222 | grep \" 222\"" 0 "idrange modify with --rid-base"
 	# Revert the change for test 0034
-	rlRun "$ipacmd idrange-mod $ADDOMAIN_id_range --rid-base 0 | grep \" 0\"" 0 "Reverting the change with --rid-base"
+	rlRun "$ipacmd idrange-mod $AD_range --rid-base 0 | grep \" 0\"" 0 "Reverting the change with --rid-base"
 	New_ridsec_base=$((lsecrid_base - 1))
-	rlRun "$ipacmd idrange-mod $IPADOMAIN_id_range --secondary-rid-base $New_ridsec_base | grep \"$New_ridsec_base\"" 0 "idrange modify with --secondary-rid-base"
+	rlRun "$ipacmd idrange-mod $IPA_range --secondary-rid-base $New_ridsec_base | grep \"$New_ridsec_base\"" 0 "idrange modify with --secondary-rid-base"
 	
 rlPhaseEnd
 }
@@ -561,7 +558,7 @@ rlPhaseStartTest "0033 Deplete trusted domain range, modify range size to use"
 	# Get the uid of user aduser2
 	rlRun "$ID -u \"$aduser\"2@$ADdomain" 1 "No UID for \"$aduser\"2 as expected"
 	New_adrange_size=$((aduser1_id - adbase_id + 2))
-	rlRun "$ipacmd idrange-mod $ADDOMAIN_id_range --range-size $New_adrange_size | grep \"$New_adrange_size\"" 0 "idrange modify range-size for \"$aduser\"2 UID"
+	rlRun "$ipacmd idrange-mod $AD_range --range-size $New_adrange_size | grep \"$New_adrange_size\"" 0 "idrange modify range-size for \"$aduser\"2 UID"
 	rlRun "sleep 20" 0 "Sleeping for 20 sec as sssd (unresoved cache) entry_negative_timeout is 15 sec"
 	rlRun "$ID -u \"$aduser\"2@$ADdomain" 0 "\"$aduser\"2 owns UID as expected after range-size mod"
 
@@ -594,8 +591,8 @@ rlPhaseStartTest "0035 idrange-add/mod with base-id/range-size value 0 Ticket #3
 	rlRun "$exp $expfile base-id 1 range-size $lrange" 0 "Clear error for idrange add with range-size 0"
 	
 	rlRun "Zero_Val mod" 0 "Creating expect script"
-	rlRun "$exp $expfile base-id $ADDOMAIN_id_range" 0 "Clear error for idrange mod with base-id 0"
-	rlRun "$exp $expfile range-size $ADDOMAIN_id_range" 0 "Clear error for idrange mod with range-size 0"
+	rlRun "$exp $expfile base-id $AD_range" 0 "Clear error for idrange mod with base-id 0"
+	rlRun "$exp $expfile range-size $AD_range" 0 "Clear error for idrange mod with range-size 0"
 
 rlPhaseEnd
 }
@@ -604,17 +601,20 @@ idrange_test_0036() {
 
 rlPhaseStartTest "0036 Deplete local range and then add user"
 	IPA_Variables
-	rlRun "create_ipauser \"$ipa_user\"2 test2 user $userpw"
-	ipa_user2id=`$ID -u "$ipa_user"2`
-	new_lrange=$((ipa_user2id - lbase_id + 1))
-	rlRun "$ipacmd idrange-mod $IPADOMAIN_id_range --range_size $new_lrange | grep \" $new_lrange\"" 0 "Local range modify using idrange cli"
+	rlRun "create_ipauser \"$ipa_user\"7 test7 user7 $userpw"
+	sleep 5
+	ipa_user7id=`$ID -u "$ipa_user"7`
+	new_lrange=$((ipa_user7id - lbase_id + 1))
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "$ipacmd idrange-mod $IPA_range --range-size $new_lrange | grep \" $new_lrange\"" 0 "Local range modify using idrange cli"
 	rlLog "Since DNA plugin and idrange work independently, maunally editing DNA plugin setting to reflect range-change Ticket #3609"
-	range_max=$((ipa_user2id + 1))
-	rlRun "DNAmod_ldif \"$DNA_plugin\" dnaMaxValue $range_max" 0 "Generate ldif file to modify DNA plugin"
+	range_max=$((ipa_user7id + 1))
+	rlRun "DNAmod_ldif replace \"$DNA_plugin\" dnaMaxValue $range_max" 0 "Generate ldif file to modify DNA plugin"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f DNAmod.ldif" 0 "Modify range in DNA plugin"
-	rlRun "create_ipauser \"$ipa_user\"3 test3 user $userpw"
+	rlRun "create_ipauser \"$ipa_user\"8 test8 user8 $userpw"
 	rlRun "Add_User" 0 "Creating expect script"
-	rlRun "$exp $expfile \"$ipa_user\"4 test4 user" 1 "User add fails when local range is depleted"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	rlRun "$exp $expfile \"$ipa_user\"9 test9 user9" 1 "User add fails when local range is depleted"
 	
 rlPhaseEnd
 }
@@ -624,15 +624,15 @@ idrange_test_0037() {
 rlPhaseStartTest "0037 Modify local range to use after it is depleted"
 	IPA_Variables
 	rlRun "Add_User" 0 "Creating expect script"
-	rlRun "$exp $expfile \"$ipa_user\"4 test4 user" 1 "User add fails when local range is depleted"
-	ipa_user3id=`$ID -u "$ipa_user"3`
-	new_lrange=$((ipa_user3id - lbase_id + 1))
-	rlRun "$ipacmd idrange-mod $IPADOMAIN_id_range --range_size $new_lrange | grep \" $new_lrange\"" 0 "Local range modify using idrange cli"
+	rlRun "$exp $expfile \"$ipa_user\"9 test9 user9" 1 "User add fails when local range is depleted"
+	ipa_user8id=`$ID -u "$ipa_user"8`
+	new_lrange=$((ipa_user8id - lbase_id + 1))
+	rlRun "$ipacmd idrange-mod $IPA_range --range-size $new_lrange | grep \" $new_lrange\"" 0 "Local range modify using idrange cli"
 	rlLog "Since DNA plugin and idrange work independently, maunally editing DNA plugin setting to reflect range-change Ticket #3609"
-        range_max=$((ipa_user3id + 1))
+        range_max=$((ipa_user8id + 1))
         rlRun "DNAmod_ldif replace \"$DNA_plugin\" dnaMaxValue $range_max" 0 "Generate ldif file to modify range DNA plugin"
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f DNAmod.ldif" 0 "Modify range in DNA plugin"
-        rlRun "create_ipauser \"$ipa_user\"4 test4 user $userpw" 0 "New user add after increasing range size by 1"
+        rlRun "create_ipauser \"$ipa_user\"9 test9 user9 $userpw" 0 "New user add after increasing range size by 1"
 
 rlPhaseEnd
 }
@@ -640,31 +640,28 @@ rlPhaseEnd
 idrange_test_0038() {
 
 rlPhaseStartTest "0038 Add new range to use after it is depleted"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	IPA_Variables
 	rlRun "Add_User" 0 "Creating expect script"
-	rlRun "$exp $expfile \"$ipa_user\"5 test5 user" 1 "User add fails when local range is depleted"
-	ipa_user4id=`$ID -u "$ipa_user"4`
+	rlRun "$exp $expfile \"$ipa_user\"10 test10 user10" 1 "User add fails when local range is depleted"
+	ipa_user9id=`$ID -u "$ipa_user"9`
 	# Adding 3456 as a random difference between old and new range
-	new_base_id=$((ipa_user4id + 3456))
+	new_base_id=$((ipa_user9id + 3456))
 	# Range-size is randomly taken as 5
 	last_base_id=$((new_base_id + 5))
 	# Adding 123 as a random difference between old and new rid and secrid
-	new_rid=$((ipa_user4id - lbase_id + 123))
+	new_rid=$((ipa_user9id - lbase_id + 123))
 	new_secrid=$((lsecrid_base + 123))
 	rlRun "IDrange_Add3 rid_sec" 0 "Creating expect script"
         rlRun "$exp $expfile $new_base_id $new_secrid $new_base_id 5 $lrange" 0 "Add new local idrange"
 	rlLog "Since DNA plugin and idrange work independently, maunally editing DNA plugin setting to reflect range-change Ticket #3609"
 	rlRun "DNAmod_ldif add \"$DNA_plugin\" dnaNextRange $new_base_id $last_base_id" 0 "Generate ldif file to add new range in DNA plugin"
 	rlRun "ldapmodify -x -D \"$DS_binddn\" -w $DMpswd -f DNAmod.ldif" 0 "Add new range in DNA plugin"
-	rlRun "create_ipauser \"$ipa_user\"5 test5 user $userpw" 0 "New user add after adding new range in DNA plugin"
+	rlRun "create_ipauser \"$ipa_user\"10 test10 user10 $userpw" 0 "New user add after adding new range in DNA plugin"
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
+	ipa_user10id=`$ID -u "$ipa_user"10`
+	rlRun "[ $ipa_user10id -eq $new_base_id ]" 0 "New created IPA users use new local idrange"
 
-rlPhaseEnd
-}
-
-idrange_test_0039() {
-
-rlPhaseStartTest "0039 Delete idrange of trusted domain created when trust was established Ticket #3615"
-	
 rlPhaseEnd
 }
 
@@ -672,7 +669,7 @@ rlPhaseEnd
 cleanup() {
 
 rlPhaseStartCleanup "Clean up for trust-cli tests"
-        rlRun "$ipacmd trust-del $ADdomain $ADdomain2" 0 "Delete trusts for cleanup"
+        rlRun "$ipacmd trust-del $ADdomain" 0 "Delete trust for cleanup"
         rlRun "pushd $TmpDir"
         rlRun "ADuserdel_ldif \"$ADfn\"1 $ADsn" 0 "Create ldif file to delete \"$aduser\"1"
         rlRun "ldapmodify -ZZ -h $ADhost -D \"$AD_binddn\" -w $ADpswd -f ADuserdel.ldif" 0 "Delete \"$aduser\"1 from AD"

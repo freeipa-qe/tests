@@ -128,13 +128,13 @@ IDrange_Add() {
 	send -s -- "$var3\r"' >> $expfile
 	if [ "$1" = "same_name" ]; then
 	  echo 'expect {
-	"ipa: ERROR: range with name \"$var1\" already exists" { send_user "\n"; exit 2 } }' >> $expfile
+	"ipa: ERROR: range with name \"$var1\" already exists" { send_user "\nRange Exists\n"; exit 2 } }' >> $expfile
 	elif [ "$1" = "same_startid" ]; then
 	  echo 'expect {
-	ipa: ERROR: Constraint violation: New base range overlaps with existing base range." { send_user "\n"; exit 1 } }' >> $expfile
+	"ipa: ERROR: Constraint violation: New base range overlaps with existing base range." { send_user "\n\nRange Overlaps\n\n"; exit 1 } }' >> $expfile
 	elif [ "$1" = "interactive" ]; then
 	  echo 'expect {
-	"Added ID range*" { send_user "\n" } }' >> $expfile
+	"Added ID range*" { send_user "\nRange Added\n" } }' >> $expfile
 	fi
 }
 
@@ -169,7 +169,7 @@ Wrong_Values() {
 	expect "*must be an integer" { send_user "\nNeeds Integer value\n" } }
         }
 	send -s -- "$var7\r"
-	expect "Added ID range*" { send_user "\n" }' >> $expfile
+	expect "Added ID range*" { send_user "\n" } } }' >> $expfile
 }
 
 IDrange_Add2() {
@@ -184,9 +184,9 @@ IDrange_Add2() {
 	echo 'spawn /bin/bash
         expect "*#"' >> $expfile
 	echo "send \"$ipacmd idrange-add --\$var1 \$var2 --base-id \$var3 --range-size \$var4 \$var5\r\"" >> $expfile
-	echo 'expect {
-	 "ipa: ERROR: invalid 'ID Range setup': Options secondary-rid-base and rid-base must be used together" { send_user "\nBoth options required\n" ; exit 1}
-	}' >> $expfile
+	echo "expect {
+	 \"ipa: ERROR: invalid \'ID Range setup\': Options secondary-rid-base and rid-base must be used together\" { send_user \"\nBoth options required\n\n\" ; exit 1 }
+	}" >> $expfile
 }
 
 IDrange_Add3() {
@@ -201,15 +201,18 @@ IDrange_Add3() {
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
 	echo "send \"$ipacmd idrange-add --rid-base \$var1 --secondary-rid-base \$var2 --base-id \$var3 --range-size \$var4 \$var5\r\"" >> $expfile
-	if [ "$1" -eq "primary" ]; then
+	if [ "$1" = "primary" ]; then
 	  echo 'expect {
 	  "ipa: ERROR: Constraint violation: New primary rid range overlaps with existing primary rid range." { send_user "\nCant use exiting rid-basevalue"; exit 1 } }' >> $expfile
-	elif [ "$1" -eq "secondary" ]; then
+	elif [ "$1" = "secondary" ]; then
 	  echo 'expect {
 	"ipa: ERROR: Constraint violation: New secondary rid range overlaps with existing secondary rid range." { send_user "\nCant use exiting rid values\n"; exit 1 } }' >> $expfile
-	elif [ "$1" -eq "rid_sec" ]; then
+	elif [ "$1" = "rid_sec" ]; then
 	  echo 'expect {
 	  "Added ID range*" { send_user "\nRange added\n"} }' >> $expfile
+	elif [ "$1" = "same_value" ]; then
+	  echo "expect {
+	  \"ipa: ERROR: invalid 'ID Range setup': Primary RID range and secondary RID range cannot overlap\" { send_user \"\n\nCant use same values for rid-base and secondary-rid-base\n\n\"; exit 1 } }" >> $expfile
 	fi
 }
 
@@ -225,29 +228,29 @@ Dom_Sec_Rid() {
         set send_slow {1 .1}' > $expfile
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
-	if [ "$1" -eq "domsec" ]; then
+	if [ "$1" = "domsec" ]; then
 	  echo "send \"$ipacmd idrange-add --\$var1 \$var2 --secondary-rid-base \$var3 --base-id \$var4 --range-size \$var5 \$var6\r\"" >> $expfile
-	  echo 'expect {
-	"ipa: ERROR: invalid 'ID Range setup': Options dom-sid/dom-name and secondary-rid-base cannot be used together" { send_user "\ndom-sid/dom-name dont need secondary-rid-base"; exit 1 }
-	}' >> $expfile
-	elif [ "$1" -eq "domsid" ]; then
+	  echo "expect {
+	\"ipa: ERROR: invalid \'ID Range setup\': Options dom-sid/dom-name and secondary-rid-base cannot be used together\" { send_user \"\n\ndom-sid/dom-name dont need secondary-rid-base\n\n\"; exit 1 }
+	}" >> $expfile
+	elif [ "$1" = "domsid" ]; then
           echo "send \"$ipacmd idrange-add --\$var1 \$var2 --rid-base \$var3 --base-id \$var4 --range-size \$var5 \$var6\r\"" >> $expfile
-	  echo 'expect {
-	"ipa: ERROR: invalid 'domain SID': SID is not recognized as a valid SID for a trusted domain" { send_user "\n\$var2 is not valid sid\n" ; exit 1 }
-	"Added ID range*" { send_user "\nAD range added\n"}
-	}' >> $expfile
-	elif [ "$1" -eq "domname" ]; then
+	  echo "expect {
+	\"ipa: ERROR: invalid \'domain SID\': SID is not recognized as a valid SID for a trusted domain\" { send_user \"\n\n\$var2 is not valid sid\n\n\" ; exit 1 }
+	\"Added ID range*\" { send_user \"\n\nAD range added\n\n\"}
+	}" >> $expfile
+	elif [ "$1" = "domname" ]; then
 	  echo "send \"$ipacmd idrange-add --\$var1 \$var2 --rid-base \$var3 --base-id \$var4 --range-size \$var5 \$var6\r\"" >> $expfile
-	  echo 'expect {
-	  "ipa: ERROR: invalid 'ID Range setup': SID for the specified trusted domain name could not be found. Please specify the SID directly using dom-sid option." { send_user "\n\$var2 is not a valid domain name\n"; exit 1 }
-	  "Added ID range*" { send_user "\nAD range added\n"}
-	}' >> $expfile
-	elif [ "$1" -eq "norid" ]; then
+	  echo "expect {
+	  \"ipa: ERROR: invalid \'ID Range setup\': SID for the specified trusted domain name could not be found. Please specify the SID directly using dom-sid option.\" { send_user \"\n\n\$var2 is not a valid domain name\n\n\"; exit 1 }
+	  \"Added ID range*\" { send_user \"\n\nAD range added\n\n\"}
+	}" >> $expfile
+	elif [ "$1" = "norid" ]; then
 	  echo "send \"$ipacmd idrange-add --\$var1 \$var2 --base-id \$var3 --range-size \$var4 \$var5\r\"" >> $expfile
-	  echo 'expect {
-	  "ipa: ERROR: invalid 'ID Range setup': Options dom-sid/dom-name and rid-base must be used together" { send_user "\nCmd did not prompt for rid-base\n"; exit 1 }
-	  "First RID of the corresponding RID range*" { send_user "\nCmd prompts for rid-base\n"; exit }
-	}' >> $expfile
+	  echo "expect {
+	  \"ipa: ERROR: invalid 'ID Range setup': Options dom-sid/dom-name and rid-base must be used together\" { send_user \"\n\nCmd did not prompt for rid-base\n\n\"; exit 1 }
+	  \"First RID of the corresponding RID range*\" { send_user \"\n\nCmd prompts for rid-base\n\n\"; exit }
+	}" >> $expfile
 	fi
 }
 
@@ -260,7 +263,7 @@ Del_Range() {
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
 	echo "send \"$ipacmd idrange-del \$var1 --continue\r\"" >> $expfile
-	if [ "$1" -eq "contd" ]; then
+	if [ "$1" = "contd" ]; then
 	  echo 'expect {
 	  "*Failed to remove: $var1" { send_user "\n$var1 does not exist\n"; exit 1 } 
 	  "Deleted ID range \"$var1\"" { send_user "\n$var1 deleted\n" }
@@ -275,19 +278,20 @@ IDrange_Find() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
 	set var2 [lindex $argv 1]
+	set var3 [lindex $argv 2]
         set timeout 10
         set send_slow {1 .1}' > $expfile
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
-	if [ "$1" -eq "novalue" ]; then
+	if [ "$1" = "novalue" ]; then
 	  echo "send \"$ipacmd idrange-find --\$var1\r\"" >> $expfile
 	  echo 'expect {
 	"*--$var1 option requires an argument" { send_user "\n"; exit 2 }
 	}' >> $expfile
-	elif [ "$1" -eq "invalid" ]; then
+	elif [ "$1" = "invalid" ]; then
 	  echo "send \"$ipacmd idrange-find --\$var1 \$var2\r\"" >> $expfile
-          echo 'expect {
-	"ipa: ERROR: invalid '$var1': must be an integer" { send_user "\nOption takes integer\n"; exit 1 } }' >> $expfile
+          echo "expect {
+	\"ipa: ERROR: invalid '\$var3': must be an integer\" { send_user \"\n\nOption takes integer\n\n\"; exit 1 } }" >> $expfile
 	fi
 }
 
@@ -296,32 +300,33 @@ rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
         set var2 [lindex $argv 1]
         set var3 [lindex $argv 2]
+        set var4 [lindex $argv 3]
         set timeout 10
         set send_slow {1 .1}' > $expfile
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
-        if [ "$1" -eq "novalue" ]; then
+        if [ "$1" = "novalue" ]; then
           echo "send \"$ipacmd idrange-mod --\$var1\r\"" >> $expfile
           echo 'expect {
         "*--$var1 option requires an argument" { send_user "\n"; exit 2 }
         }' >> $expfile
-	elif [ "$1" -eq "invalid" ]; then
+	elif [ "$1" = "invalid" ]; then
           echo "send \"$ipacmd idrange-mod --\$var1 \$var2 \$var3\r\"" >> $expfile
-          echo 'expect {
-	"ipa: ERROR: invalid '$var1': must be an integer" { send_user "\nOption takes integer\n"; exit 1 } }' >> $expfile
-	elif [ "$1" -eq "domsid" ]; then
+          echo "expect {
+	\"ipa: ERROR: invalid '\$var4': must be an integer\" { send_user \"\n\nOption takes integer\n\n\"; exit 1 } }" >> $expfile
+	elif [ "$1" = "domsid" ]; then
 	  echo "send \"$ipacmd idrange-mod --\$var1 \$var2 \$var3\r\"" >> $expfile
-          echo 'expect {
-	  "ipa: ERROR: invalid 'domain SID': SID is not recognized as a valid SID for a trusted domain" { send_user "\nSID not Valid\n"; exit 1 }
-	  }' >> $expfile
-	elif [ "$1" -eq "domname" ]; then
+          echo "expect {
+	  \"ipa: ERROR: invalid 'domain SID': SID is not recognized as a valid SID for a trusted domain\" { send_user \"\n\nSID not Valid\n\n\"; exit 1 }
+	  }" >> $expfile
+	elif [ "$1" = "domname" ]; then
 	  echo "send \"$ipacmd idrange-mod --\$var1 \$var2 \$var3\r\"" >> $expfile
-          echo 'expect {
-	  "ipa: ERROR: invalid 'ID Range setup': SID for the specified trusted domain name could not be found. Please specify the SID directly using dom-sid option." { send_user "\nDomain name not Valid"; exit 1 } }' >> $expfile
-	elif [ "$1" -eq "outofrange" ]; then
+          echo "expect {
+	  \"ipa: ERROR: invalid 'ID Range setup': SID for the specified trusted domain name could not be found. Please specify the SID directly using dom-sid option.\" { send_user \"\n\nDomain name not Valid\n\n\"; exit 1 } }" >> $expfile
+	elif [ "$1" = "outofrange" ]; then
 	  echo "send \"$ipacmd idrange-mod --\$var1 \$var2 \$var3\r\"" >> $expfile
-          echo 'expect {
-	  "ipa: ERROR: invalid 'ipabaseid,ipaidrangesize': range modification leaving objects with ID out of the defined range is not allowed" { send_user "\nObjects falling out of range\n"; exit 1 } }'  >> $expfile
+          echo "expect {
+	  \"ipa: ERROR: invalid 'ipabaseid,ipaidrangesize': range modification leaving objects with ID out of the defined range is not allowed\" { send_user \"\n\nModifying range will make objects fall out of range\n\n\"; exit 1 } }"  >> $expfile
         fi
 }
 
@@ -334,29 +339,29 @@ Zero_Val() {
         set send_slow {1 .1}' > $expfile
         echo 'spawn /bin/bash
         expect "*#"' >> $expfile
-	if [ "$1" -eq "add" ]; then
+	if [ "$1" = "add" ]; then
 	  echo "send \"$ipacmd idrange-add --\$var1 \$var2 --\$var3 0 \$var4\r\"" >> $expfile
-	elif [ "$1" -eq "mod" ]; then
-	  echo "send \"$ipacmd idrange-mod --\$var1 0 \$var3\r\"" >> $expfile
+	elif [ "$1" = "mod" ]; then
+	  echo "send \"$ipacmd idrange-mod --\$var1 0 \$var2\r\"" >> $expfile
 	fi
 	echo 'expect {
 	"ipa: ERROR: Invalid DN syntax: Range Check error" { send_user "\nCryptic Error\n"; exit 1 } }' >> $expfile
 }
 
 DNAmod_ldif() {
-if [ "$1" -eq "repalce" ]; then
+if [ "$1" = "replace" ]; then
 cat > DNAmod.ldif << EOF
 dn: $2
 changetype: modify
 replace: $3
 $3: $4
 EOF
-elif [ "$1" -eq "add" ]; then
+elif [ "$1" = "add" ]; then
 cat > DNAmod.ldif << EOF
 dn: $2
 changetype: modify
-add: dnaNextRange
-dnaNextRange: $3-$4
+add: $3
+$3: $4-$5
 EOF
 fi
 }
@@ -371,7 +376,7 @@ Add_User() {
         expect "*#"' >> $expfile
 	echo "send \"$ipacmd user-add \$var1 --first \$var2 --last \$var3\r\"" >> $expfile
 	echo 'expect {
-	"ipa: ERROR: Operations error: Allocation of a new value for range cn=posix ids,cn=distributed numeric assignment plugin,cn=plugins,cn=config failed! Unable to proceed." { send_user "\nUser cannot be added as range is deleted\n"; exit 1 } }' >> $expfile
+	"ipa: ERROR: Operations error: Allocation of a new value for range cn=posix ids,cn=distributed numeric assignment plugin,cn=plugins,cn=config failed! Unable to proceed." { send_user "\nUser cannot be added as range is depleted\n"; exit 1 } }' >> $expfile
 }
 
 Interactive_trust() {

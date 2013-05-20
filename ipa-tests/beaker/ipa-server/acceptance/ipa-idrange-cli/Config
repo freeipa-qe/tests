@@ -1,6 +1,6 @@
 ADdomain="adlabs.com"
 ADhost="win-i94qhqmthd4.$ADdomain"
-ADip="10.65.201.187"
+ADip="10.65.207.101"
 ADpswd="Secret123"
 ADdc="DC=adlabs,DC=com"
 ADadmin="administrator"
