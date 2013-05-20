@@ -392,7 +392,7 @@ rlJournalStart
         rlRun "verifyUserAttr $superuser \"State/Province\" MA" 0 "Verify user's state"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-user-cli-mod-047: modify user's postalcode - bug 692945"
+    rlPhaseStartTest "ipa-user-cli-mod-047: modify user's postalcode - bz692945"
         rlRun "ipa user-mod --postalcode=01730 $superuser" 0 "Setting user postalcode - code beginning with 0"
         rlRun "verifyUserAttr $superuser \"ZIP\" 01730" 0 "Verify user's postalcode"
     rlPhaseEnd
