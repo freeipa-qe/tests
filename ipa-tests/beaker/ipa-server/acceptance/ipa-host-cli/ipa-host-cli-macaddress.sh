@@ -61,7 +61,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 ########################################################################
 
  run_host_add_macaddress_tests() {	
-      rlPhaseStartTest "ipa-host-cli-macaddress-startup Install nss-pam-ldapd package, set ethers to ldap and create temp directory."
+      rlPhaseStartSetup "ipa-host-cli-macaddress-startup Install nss-pam-ldapd package, set ethers to ldap and create temp directory."
 	rlRun "yum -y install $ETHER_PACKAGE"
 	rpm -qa | grep $ETHER_PACKAGE
         if [ $? -eq 0 ] ; then
@@ -89,7 +89,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
                 setenforce 0
         fi
  
-     rlPhaseStartTest "ipa-host-cli-94 add a host with --macaddress --force"
+     rlPhaseStartTest "ipa-host-cli-094: add a host with --macaddress --force"
         myhost=mytesthost1.$DOMAIN
 	new_byte6="ff"
 	tmpfile="$tmpDir/hostether_$myhost_94.out"
@@ -114,14 +114,14 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-95 Delete Host"
+    rlPhaseStartTest "ipa-host-cli-095: Delete Host"
 	short=mytesthost1
         myhost=$short.$DOMAIN
 	rlRun "ipa host-del $myhost" 0 "Delete host that was added with --macaddress" 
 	rlRun "findHost $myhost" 1 "Verifying host was deleted."
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-96 Add host with --macaddress and DNS Record"
+    rlPhaseStartTest "ipa-host-cli-096: Add host with --macaddress and DNS Record"
 	short=mytesthost2
 	myhost=$short.$DOMAIN
 	new_byte6="ff"
@@ -162,7 +162,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	fi	
     rlPhaseEnd
   
-    rlPhaseStartTest "ipa-host-cli-97 Delete host that has --macaddress without deleting DNS Record"
+    rlPhaseStartTest "ipa-host-cli-097: Delete host that has --macaddress without deleting DNS Record"
 	short=mytesthost2
         myhost=$short.$DOMAIN
 	rlRun "deleteHost $myhost" 0 "Deleting host without deleting DNS entries"
@@ -171,7 +171,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
 	rlRun "ipa dnsrecord-find $rzone 99" 0 "Checking for reverse DNS entry"
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-98 Add host with --macaddress without force option - DNS Record Exists"
+    rlPhaseStartTest "ipa-host-cli-098: Add host with --macaddress without force option - DNS Record Exists"
 	short=mytesthost2
         myhost=$short.$DOMAIN
 	new_byte6="ff"
@@ -200,7 +200,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-99 Delete Host that has -macaddress and Update DNS"
+    rlPhaseStartTest "ipa-host-cli-099: Delete Host that has -macaddress and Update DNS"
 	short=mytesthost2
         myhost=$short.$DOMAIN
 	rlRun "ipa host-del --updatedns $myhost" 0 "Delete host that has --macaddress and update DNS"
@@ -209,7 +209,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         rlRun "ipa dnsrecord-show $rzone 99" 2 "Checking for reverse DNS entry"
     rlPhaseEnd
  
-    rlPhaseStartTest "ipa-host-cli-100 host-mod of a host with --macaddress "
+    rlPhaseStartTest "ipa-host-cli-100: host-mod of a host with --macaddress "
         myhost=mytesthost1.$DOMAIN
 	attrToModify="macaddress"
         attrToVerify1="MAC address"
@@ -239,7 +239,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-101 setattr --macaddress"
+    rlPhaseStartTest "ipa-host-cli-101: setattr --macaddress"
         myhost=mytesthost1.$DOMAIN
 	attr="macaddress"
 	new_byte6="ff"
@@ -267,7 +267,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-102 setattr --macaddress and addattr on macaddress"
+    rlPhaseStartTest "ipa-host-cli-102: setattr --macaddress and addattr on macaddress"
         myhost=mytesthost1.$DOMAIN
         attr="macaddress"
         new_byte6="ff"
@@ -299,7 +299,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-103 Modify Host with --macaddress - host doesn't Exist"
+    rlPhaseStartTest "ipa-host-cli-103: Modify Host with --macaddress - host doesn't Exist"
 	host1="mytesthost1."$DOMAIN
 	attr="macaddress"
         new_byte6="ff"
@@ -315,7 +315,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-104 addattr --macaddress"
+    rlPhaseStartTest "ipa-host-cli-104: addattr --macaddress"
         myhost=mytesthost1.$DOMAIN
         attr="macaddress"
         new_byte6="ff"
@@ -343,7 +343,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-105 delattr --macaddress"
+    rlPhaseStartTest "ipa-host-cli-105: delattr --macaddress"
         myhost=mytesthost1.$DOMAIN
 		# scott 05/01/2012 - uppercasing FF because delattr here is case sensitive but, the mac from addattr
 		# is being normalized to uppercase.
@@ -384,7 +384,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-106 delattr --macaddress with incorrect value"
+    rlPhaseStartTest "ipa-host-cli-106: delattr --macaddress with incorrect value"
         myhost=mytesthost1.$DOMAIN
         new_byte6="ff"
         tmpfile="$tmpDir/hostether_$myhost_106.out"
@@ -415,7 +415,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-107 Negative - add a host with invalid macaddress"
+    rlPhaseStartTest "ipa-host-cli-107: Negative - add a host with invalid macaddress"
         myhost=mytesthost1.$DOMAIN
         new_byte6="eff"
         host_macaddr="some:value"
@@ -428,7 +428,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."	
     rlPhaseEnd
     
-    rlPhaseStartTest "ipa-host-cli-108 delattr --macaddress with lowercase"
+    rlPhaseStartTest "ipa-host-cli-108: delattr --macaddress with lowercase"
         myhost=mytesthost1.$DOMAIN
         new_byte6="EF"
         tmpfile="$tmpDir/hostether_$myhost_108.out"
@@ -468,7 +468,7 @@ ETHER_PACKAGE="nss-pam-ldapd"
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipa-host-cli-macaddress-cleanup Remove nss-pam-ldapd, nsswitch.conf back on default and remove temp directory."
+    rlPhaseStartCleanup "ipa-host-cli-macaddress-cleanup Remove nss-pam-ldapd, nsswitch.conf back on default and remove temp directory."
 	rlRun "cat /etc/nslcd.conf | sed -e 's/base dc=testrelm,dc=com/base dc=example,dc=com/' >/etc/nslcd.conf.modified2" 0 "Set the base back on default value."
 	rlRun "/bin/mv /etc/nslcd.conf.modified2 /etc/nslcd.conf"
 	rlRun "/sbin/service  nslcd restart" 0 "Restart nslcd service"
