@@ -71,7 +71,7 @@ dnspkey()
 dnspkeysetup()
 {
 
-    rlPhaseStartTest "dns pkey setup"
+    rlPhaseStartSetup "dns pkey setup"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	 rlRun "ipa dnszone-add --name-server=$MASTER. --admin-email=$email --serial=$serial --refresh=$refresh --retry=$retry --expire=$expire --minimum=$minimum --ttl=$ttl $zone" 0 "Add test zone"
     rlPhaseEnd
@@ -79,7 +79,7 @@ dnspkeysetup()
 
 dnspkeytests()
 {
-    rlPhaseStartTest "ipa-dns-pkey-001 --pkey-only test of ipa dnsrecord-find a records"
+    rlPhaseStartTest "ipa-dns-pkey-001: --pkey-only test of ipa dnsrecord-find a records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--a-rec=4.2.2.2"
 		pkey_addstringa="$rec_string $zone"
@@ -93,7 +93,7 @@ dnspkeytests()
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of a records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-pkey-002 --pkey-only test of ipa dnsrecord-find AAAA records"
+	rlPhaseStartTest "ipa-dns-pkey-002: --pkey-only test of ipa dnsrecord-find AAAA records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--aaaa-rec=$aaaa"
 		pkey_addstringa="$rec_string $zone"
@@ -107,7 +107,7 @@ dnspkeytests()
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of AAAA records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-pkey-003 --pkey-only test of ipa dnsrecord-find asfdb records"
+	rlPhaseStartTest "ipa-dns-pkey-003: --pkey-only test of ipa dnsrecord-find asfdb records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--afsdb-rec=0\ $afsdb"
 		pkey_addstringa="$rec_string $zone"
@@ -123,7 +123,7 @@ dnspkeytests()
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of asfdb records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-pkey-004 --pkey-only test of ipa dnsrecord-find cname records"
+	rlPhaseStartTest "ipa-dns-pkey-004: --pkey-only test of ipa dnsrecord-find cname records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--cname-rec=$cname"
 		pkey_addstringa="$rec_string $zone"
@@ -137,7 +137,7 @@ dnspkeytests()
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of cname records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-pkey-005 --pkey-only test of ipa dnsrecord-find txt records"
+	rlPhaseStartTest "ipa-dns-pkey-005: --pkey-only test of ipa dnsrecord-find txt records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--txt-rec=$txt"
 		pkey_addstringa="$rec_string $zone"
@@ -151,7 +151,7 @@ dnspkeytests()
 		rlRun "pkey_return_check_dns" 0 "running checks of --pkey-only of txt records in ipa dnsrecord-find"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-pkey-006 --pkey-only test of ipa dnsrecord-find _srv records"
+	rlPhaseStartTest "ipa-dns-pkey-006: --pkey-only test of ipa dnsrecord-find _srv records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--srv-rec=$srva\ $srv"
 		pkeyobja="ahostf"
@@ -166,7 +166,7 @@ dnspkeytests()
 		ipa $ipa_command_to_test-del --srv-rec=0\ 100\ 389\ why.go.here.com $zone $pkeyobjb
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-pkey-007 --pkey-only test of ipa dnsrecord-find @ records"
+	rlPhaseStartTest "ipa-dns-pkey-007: --pkey-only test of ipa dnsrecord-find @ records"
 		ipa_command_to_test="dnsrecord"
 		pkeyobja="ahostf"
 		pkeyobjb="ahostfb"
@@ -180,7 +180,7 @@ dnspkeytests()
 		ipa $ipa_command_to_test-del --mx-rec=20\ $mxb. $zone @
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-dns-pkey-008 --pkey-only negative test of ipa dnsrecord-find AAAA records"
+	rlPhaseStartTest "ipa-dns-pkey-008: --pkey-only negative test of ipa dnsrecord-find AAAA records"
 		ipa_command_to_test="dnsrecord"
 		rec_string="--aaaa-rec=$aaaa"
 		pkey_addstringa="$rec_string $zone"
@@ -196,7 +196,7 @@ dnspkeytests()
 
 dnskeycleanup()
 {
-    rlPhaseStartTest "dns pkey cleanup"
+    rlPhaseStartCleanup "dns pkey cleanup"
          rlRun "ipa dnszone-del $zone" 0 "Delete test zone"
     rlPhaseEnd
 
