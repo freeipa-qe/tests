@@ -1458,7 +1458,7 @@ netgroup_find_positive()
 	rlPhaseEnd
 		
 
-	rlPhaseStartTest "netgroup_find_positive_cleanup: Cleanup after find positive testing"
+	rlPhaseStartCleanup "netgroup_find_positive_cleanup: Cleanup after find positive testing"
 		rlRun "ipa netgroup-del tngname1"
 		rlRun "ipa netgroup-del tngname2"
 		rlRun "ipa netgroup-del tngname3"
