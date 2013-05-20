@@ -40,8 +40,8 @@
 . ./t.client-install-primary-server.sh
 . ./lib.ipaclientverify.sh
 . ./t.ipa-client-install.bug.sh
-. ./t.ipa-client-install.no.sssd.sh
-. ./t.ipa-client-install.sssd.sh
+. ./t.ipa-client-install.extended.no.sssd.sh
+. ./t.ipa-client-install.extended.sssd.sh
 #. ../quickinstall/install-lib.sh
 . ../quickinstall/ipa-install.sh
 . /opt/rhqa_ipa/lib.ipa-rhts.sh

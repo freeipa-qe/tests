@@ -706,22 +706,22 @@ conf_ntpd="/etc/ntpd.conf"
 CheckConfig() {
     conf="$@"
     rlLog "CheckConfig: $conf"
-    if [ "$conf" = "force_ldap" ]:then
+    if [ "$conf" = "force_ldap" ];then
         checkFileHasLine $conf_openldap "URI ldaps://$MASTER"
         checkFileHasLine $conf_openldap "BASE $BASEDN"
-    elif [ "$conf" = "ssh_trust_dns" ]:then
+    elif [ "$conf" = "ssh_trust_dns" ];then
         checkFileHasLine $conf_ssh_client  "VerifyHostKeyDNS yes"
-    elif [ "$conf" = "no_dns_sshfp" ]:then
+    elif [ "$conf" = "no_dns_sshfp" ];then
         checkFileHasLine $conf_ssh_client  "VerifyHostKeyDNS no"
-    elif [ "$conf" = "primaryServer" ]:then
+    elif [ "$conf" = "primaryServer" ];then
         checkFileHasLine $conf_sssd_client "ipa_server = $MASTER"    
-    elif [ "$conf" = "ntpserver_setting" ]:then
+    elif [ "$conf" = "ntpserver_setting" ];then
         checkFileHasLine $conf_ntpd "server $NTPSERVER"
-    elif [ "$conf" = "ntpserver_disabled" ]:then
+    elif [ "$conf" = "ntpserver_disabled" ];then
         checkServiceStatus "ntpd" "disabled"
-    elif [ "$conf" = "hostname" ]:then
+    elif [ "$conf" = "hostname" ];then
         checkFileHasLine $conf_sssd_client "ipa_hostname = $HOSTNAME"    
-    elif [ "$conf" = "no_krb5_store_password_if_offline" ]:then
+    elif [ "$conf" = "no_krb5_store_password_if_offline" ];then
         checkFileHasLine $conf_sssd_client "krb5_store_password_if_offline = False"    
     else
         rlLog "checkconfig have not implemente [$conf] yet"
