@@ -634,39 +634,97 @@ uninstall_ipa_client(){
     rlRun "ipa-client-install --uninstall -U"
 }
 
-
 #functions for ipa extended test cases
-
 CheckFunction() {
     conf="$@"
     rlLog "CheckFunction: $conf"
 }
 
+checkFileHasLine() {
+    file=$1
+    shift
+    line="$@"
+    local result=""
+    rlLog "[start: checkFileHasLine]: check whether file [$file] contains expected line [$line]"
+    grep \"$line\" $file
+    if [ "$?" = "0" ];then
+        result="good"
+        rlPass "[good] found expected line in file"
+    else
+        result="bad"
+        rlFail "[bad] expected line does not found in file"
+        rlLog "full content of [$file] is below"
+        echo "---------------- beginning of [$file] ----------------------------"
+        cat $file
+        echo "---------------- end of [$file] ------------------------"
+    fi
+    rlLog "[finished: checkFileHasLine]: result=[$result]"
+}
+
+checkServiceStatus() {
+    # this function works across rhel & fedora
+    # status would be: enabled/disabled or active/inactive
+    # service name : since rhel use name like "ntpd" and fedora use "ntpd.service"
+    #                the problem will try be a little smart by check string "service"
+    #                if not found, then it try to insert it automatically under fedora
+    serviceName=$1
+    statusToCheck=$2
+    local returnCode=""
+    local out="/tmp/checkService.$RANDOM"
+    local cmd=""
+    if [ -f /bin/systemd ];then
+        #in Fedora
+        if ! echo $serviceName | grep "service"
+        then
+            serviceName="${serviceName}.service"
+        fi
+        cmd="/bin/systemd status $serviceName"
+    else
+        #in RHEL
+        cmd="service $serviceName status"
+    fi
+    $cmd 2>&1 > $out
+    returnCode=$?
+    grep "statusToCheck" $out
+    if [ "$returnCode" = "0" ] && [ "$?" = "0" ];then
+        rlPass "[good] found the expected status [$statusToCheck] for service [$serviceName]"
+    else
+        rlFail "[bad]  the expected status [$statusToCheck] for service [$serviceName] not found"
+        rlLog "output of /bin/systemd "
+        cat $out
+    fi
+    
+    if [ -f $out ];then
+        rm $out
+    fi
+}
+
+conf_openldap="/etc/openldap/ldap.conf"
+conf_ssh_client="/etc/ssh/ssh_config"
+conf_sssd_client="/etc/sssd/sssd.conf"
+conf_ntpd="/etc/ntpd.conf"
 CheckConfig() {
     conf="$@"
     rlLog "CheckConfig: $conf"
     if [ "$conf" = "force_ldap" ]:then
-        echo "$conf"
-    fi
-
-    if [ "$conf" = "ssh_trust_dns" ]:then
-        echo "$conf"
-    fi
-
-    if [ "$conf" = "primaryServer" ]:then
-        echo "$conf"
-    fi
-
-    if [ "$conf" = "ntpserver_untouched" ]:then
-        echo "$conf"
-    fi
-
-    if [ "$conf" = "ntpserver_disabled" ]:then
-        echo "$conf"
-    fi
-
-    if [ "$conf" = "hostname=ClientHostname" ]:then
-        echo "$conf"
+        checkFileHasLine $conf_openldap "URI ldaps://$MASTER"
+        checkFileHasLine $conf_openldap "BASE $BASEDN"
+    elif [ "$conf" = "ssh_trust_dns" ]:then
+        checkFileHasLine $conf_ssh_client  "VerifyHostKeyDNS yes"
+    elif [ "$conf" = "no_dns_sshfp" ]:then
+        checkFileHasLine $conf_ssh_client  "VerifyHostKeyDNS no"
+    elif [ "$conf" = "primaryServer" ]:then
+        checkFileHasLine $conf_sssd_client "ipa_server = $MASTER"    
+    elif [ "$conf" = "ntpserver_setting" ]:then
+        checkFileHasLine $conf_ntpd "server $NTPSERVER"
+    elif [ "$conf" = "ntpserver_disabled" ]:then
+        checkServiceStatus "ntpd" "disabled"
+    elif [ "$conf" = "hostname" ]:then
+        checkFileHasLine $conf_sssd_client "ipa_hostname = $HOSTNAME"    
+    elif [ "$conf" = "no_krb5_store_password_if_offline" ]:then
+        checkFileHasLine $conf_sssd_client "krb5_store_password_if_offline = False"    
+    else
+        rlLog "checkconfig have not implemente [$conf] yet"
     fi
 }
 

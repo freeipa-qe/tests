@@ -78,15 +78,17 @@ rlJournalStart
             rlLog "Current date is $(date)"
             if [ $slave_count -eq 3 ];then
                 rlLog "Executing test cases with 1 Master and 3 Replicas"
-                ipaclientinstall
-                clientinstall_primary_server
-                ipa_bug_verification
+                # temp comment the next 3 lines out for debugging purpose
+                #ipaclientinstall
+                #clientinstall_primary_server
+                #ipa_bug_verification
                 ipa_client_install_nosssd_option_test
                 ipa_client_install_sssd_option_test
             else
                 rlLog "Executing test cases with 1 Master and 1 Replica"
-                ipaclientinstall
-                ipa_bug_verification
+                # temp comment the next 2 lines out for debugging purpose
+                #ipaclientinstall
+                #ipa_bug_verification
                 ipa_client_install_nosssd_option_test
                 ipa_client_install_sssd_option_test
             fi
