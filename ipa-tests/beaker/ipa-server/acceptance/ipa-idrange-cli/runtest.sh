@@ -96,47 +96,47 @@ rlJournalStart
 #   Sanity Tests
 #########################################
 
-#	idrange_connect() {
-#		"idrange_test_0001"
-#		"idrange_test_0002"
-#		"idrange_test_0003"
-#		"idrange_test_0004"
-#		"idrange_test_0005"
-#		"idrange_test_0006"
-#		"idrange_test_0007"
-#		"idrange_test_0008"
-#		"idrange_test_0009"
-#		"idrange_test_0010"
-#		"idrange_test_0011"
-#		"idrange_test_0012"
-#		"idrange_test_0013"
-#		"idrange_test_0014"
-#		"idrange_test_0015"
-#		"idrange_test_0016"
-#		"idrange_test_0017"
-#		"idrange_test_0018"
-#		"idrange_test_0019"
-#		"idrange_test_0020"
-#		"idrange_test_0021"
-#		"idrange_test_0022"
-#		"idrange_test_0023"
-#		"idrange_test_0024"
-#		"idrange_test_0025"
-#		"idrange_test_0026"
-#		"idrange_test_0027"
-#		"idrange_test_0028"
-#		"idrange_test_0029"
-#		"idrange_test_0030"
-#		"idrange_test_0031"
-#		"idrange_test_0032"
-#		"idrange_test_0033"
-#		"idrange_test_0034"
-#		"idrange_test_0035"
-#		"idrange_test_0036"
-#		"idrange_test_0037"
-#		"idrange_test_0038"
-#		"idrange_test_0039"
-#	}
+	idrange_connect() {
+		"idrange_test_0001"
+		"idrange_test_0002"
+		"idrange_test_0003"
+		"idrange_test_0004"
+		"idrange_test_0005"
+		"idrange_test_0006"
+		"idrange_test_0007"
+		"idrange_test_0008"
+		"idrange_test_0009"
+		"idrange_test_0010"
+		"idrange_test_0011"
+		"idrange_test_0012"
+		"idrange_test_0013"
+		"idrange_test_0014"
+		"idrange_test_0015"
+		"idrange_test_0016"
+		"idrange_test_0017"
+		"idrange_test_0018"
+		"idrange_test_0019"
+		"idrange_test_0020"
+		"idrange_test_0021"
+		"idrange_test_0022"
+		"idrange_test_0023"
+		"idrange_test_0024"
+		"idrange_test_0025"
+		"idrange_test_0026"
+		"idrange_test_0027"
+		"idrange_test_0028"
+		"idrange_test_0029"
+		"idrange_test_0030"
+		"idrange_test_0031"
+		"idrange_test_0032"
+		"idrange_test_0033"
+		"idrange_test_0034"
+		"idrange_test_0035"
+		"idrange_test_0036"
+		"idrange_test_0037"
+		"idrange_test_0038"
+		"idrange_test_0039"
+	}
 
 #	idrange_bug() {
 #		"bz_867442"
@@ -147,7 +147,7 @@ rlJournalStart
 #	setup
 
     # tests start...
-#	idrange_connect
+	idrange_connect
 #	idrange_bug
     # tests end...
 
