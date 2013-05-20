@@ -33,7 +33,7 @@
 
 bugzillas() {
 
-rlPhaseStartTest "BZ 807388 - Error message has not a user friendly 'u' character in it."
+rlPhaseStartTest "ipa-host-bugzilla-001: BZ807388 - Error message has not a user friendly 'u' character in it."
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=807388
 	cmd="ipa host-add --ip-address=2620:52:0:41c9:ffff:ff:fea:98eda mytestIPv6host.$RELM"
 	expmsg="ipa: ERROR: invalid 'ip_address': failed to detect a valid IP address from '2620:52:0:41c9:ffff:ff:fea:98eda'"
@@ -42,7 +42,7 @@ rlPhaseStartTest "BZ 807388 - Error message has not a user friendly 'u' characte
 	ipa host-del mytestIPv6host.$RELM
 rlPhaseEnd
 
-rlPhaseStartTest "BZ 827392 - Random password characters should be limited."
+rlPhaseStartTest "ipa-host-bugzilla-002: BZ827392 - Random password characters should be limited."
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=827392
 	# get the ip address of that interface
 	ipaddr=$(hostname -i)
