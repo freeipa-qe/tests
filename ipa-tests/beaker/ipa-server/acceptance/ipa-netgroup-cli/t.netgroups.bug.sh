@@ -46,7 +46,7 @@ netgroup_bugs()
 
 netgroup_bz_772043()
 {
-	rlPhaseStartTest "netgroup_bz_772043: Adding a netgroup with a + in the name that overlaps hostgroup causes crash"	
+	rlPhaseStartTest "ipa-netgroup-bugzilla-001: bz772043 Adding a netgroup with a + in the name that overlaps hostgroup causes crash"	
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		local compatenabled=$(echo "$ADMINPW"| ipa-compat-manage status|grep "Plugin.*Enabled"|wc -l)
@@ -86,7 +86,7 @@ netgroup_bz_772043()
 
 netgroup_bz_800625()
 {
-	rlPhaseStartTest "netgroup_bz_800625: Bad netgroup name causes ns-slapd to segfault"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-002: bz800625 Bad netgroup name causes ns-slapd to segfault"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		local compatenabled=$(echo "$ADMINPW"| ipa-compat-manage status|grep "Plugin.*Enabled"|wc -l)
@@ -136,7 +136,7 @@ netgroup_bz_800625()
 
 netgroup_bz_788625()
 {
-	rlPhaseStartTest "netgroup_bz_788625: IPA nested netgroups not seen from ypcat"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-003: bz788625 IPA nested netgroups not seen from ypcat"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa netgroup-add netgroup_bz_788625_test1 --desc=netgroup_bz_788625_test1"
@@ -161,7 +161,7 @@ netgroup_bz_788625()
 
 netgroup_bz_772297()
 {
-	rlPhaseStartTest "netgroup_bz_772297: Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-004: bz772297 Fails to update if all nisNetgroupTriple or memberNisNetgroup entries are deleted from a netgroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 
@@ -202,7 +202,7 @@ netgroup_bz_772297()
 
 netgroup_bz_766141()
 {
-	rlPhaseStartTest "netgroup_bz_766141: SSSD should support FreeIPA's internal netgroup representation"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-005: bz766141 SSSD should support FreeIPA's internal netgroup representation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa netgroup-add $FUNCNAME --desc=$FUNCNAME"
@@ -234,7 +234,7 @@ netgroup_bz_766141()
  
 netgroup_bz_767372()
 {
-	rlPhaseStartTest "netgroup_bz_767372: Netgroups compat plugin not reporting users correctly"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-006: bz767372 Netgroups compat plugin not reporting users correctly"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "echo $ADMINPW | ipa-compat-manage enable" 0,2
@@ -263,13 +263,12 @@ netgroup_bz_767372()
 
 netgroup_bz_772163()
 {
-	rlPhaseStartTest "netgroup_bz_772163: Iterator loop reuse cases a tight loop in the native IPA netgroups code"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-007: bz772163 Iterator loop reuse cases a tight loop in the native IPA netgroups code"
 		# Variables
 		local tmpout=/tmp/errormsg.out
 		local timeout=/tmp/timer.$FUNCNAME
 		local ngname=testnetgroup1000
 		local userpre=testuser1000
-
 		# Pre-work
 		rlLog "Adding necessary users and netgroup for test"
 		rlRun "ipa user-add ${userpre}0 --first=first --last=last"
@@ -342,7 +341,7 @@ netgroup_bz_772163()
 
 netgroup_bz_750984()
 {
-	rlPhaseStartTest "netgroup_bz_750984: Inconsistency in error message while adding a duplicate netgroup"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-008: bz750984 Inconsistency in error message while adding a duplicate netgroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		#### test1
@@ -370,7 +369,7 @@ netgroup_bz_750984()
 
 netgroup_bz_796390()
 {
-	rlPhaseStartTest "netgroup_bz_796390: ipa netgroup-add with both --desc and --addattr=description returns internal error"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-009: bz796390 ipa netgroup-add with both --desc and --addattr=description returns internal error"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa netgroup-add netgroup_bz_796390 --desc=desc1 --addattr=description=desc2 > $tmpout 2>&1" 1
@@ -385,7 +384,7 @@ netgroup_bz_796390()
 
 netgroup_bz_797237()
 {
-	rlPhaseStartTest "netgroup_bz_797237: ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-010: bz797237 ipa netgroup-add and netgroup-mod --nisdomain should not allow commas"
 		local tmpout=/tmp/errormsg.out
 		KinitAsAdmin
 		#### test1
@@ -445,7 +444,7 @@ netgroup_bz_797237()
 
 netgroup_bz_797256()
 {
-	rlPhaseStartTest "netgroup_bz_797256: ipa netgroup-add-member --hosts should not allow invalid characters"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-011: bz797256 ipa netgroup-add-member --hosts should not allow invalid characters"
 		local tmpout=/tmp/errormsg.out
 		KinitAsAdmin
 		#### test1
@@ -474,7 +473,7 @@ netgroup_bz_797256()
 
 netgroup_bz_813325()
 {
-	rlPhaseStartTest "netgroup_bz_813325: ipa netgroup-mod addattr and setattr allow invalid characters for externalHost"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-012: bz813325 ipa netgroup-mod addattr and setattr allow invalid characters for externalHost"
 		local tmpout=/tmp/errormsg.out
 		KinitAsAdmin
 		#### test1	
@@ -503,7 +502,7 @@ netgroup_bz_813325()
 
 netgroup_bz_794882()
 {
-	rlPhaseStartTest "netgroup_bz_794882: ipa netgroup-find --hosts=<hostname> not working (for external hosts)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-013: bz794882 ipa netgroup-find --hosts=<hostname> not working (for external hosts)"
 		local tmpout=/tmp/errormsg.out
 		KinitAsAdmin
 		rlRun "ipa host-add ipahost.testrelm.com --force"
@@ -532,7 +531,7 @@ netgroup_bz_798792()
 {
 
 	local tmpout=/tmp/errormsg.out
-	rlPhaseStartTest "netgroup_bz_798792_1: ipa netgroup-find options set to space return internal errors (netgroups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-014: bz798792 ipa netgroup-find options set to space return internal errors (netgroups)"
 		rlRun "ipa netgroup-find --netgroups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -541,7 +540,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_2: ipa netgroup-find options set to space return internal errors (no-netgroups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-015: bz798792 ipa netgroup-find options set to space return internal errors (no-netgroups)"
 		rlRun "ipa netgroup-find --no-netgroups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -550,7 +549,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_3: ipa netgroup-find options set to space return internal errors (users)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-016: bz798792 ipa netgroup-find options set to space return internal errors (users)"
 		rlRun "ipa netgroup-find --users=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -559,7 +558,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_4: ipa netgroup-find options set to space return internal errors (no-users)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-017: bz798792 ipa netgroup-find options set to space return internal errors (no-users)"
 		rlRun "ipa netgroup-find --no-users=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -568,7 +567,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_5: ipa netgroup-find options set to space return internal errors (groups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-018: bz798792 ipa netgroup-find options set to space return internal errors (groups)"
 		rlRun "ipa netgroup-find --groups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -577,7 +576,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_6: ipa netgroup-find options set to space return internal errors (no-groups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-019: bz798792 ipa netgroup-find options set to space return internal errors (no-groups)"
 		rlRun "ipa netgroup-find --no-groups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -586,7 +585,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_7: ipa netgroup-find options set to space return internal errors (hosts)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-020: bz798792 ipa netgroup-find options set to space return internal errors (hosts)"
 		rlRun "ipa netgroup-find --hosts=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -595,7 +594,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_8: ipa netgroup-find options set to space return internal errors (no-hosts)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-021: bz798792 ipa netgroup-find options set to space return internal errors (no-hosts)"
 		rlRun "ipa netgroup-find --no-hosts=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -604,7 +603,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_9: ipa netgroup-find options set to space return internal errors (hostgroups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-022: bz798792 ipa netgroup-find options set to space return internal errors (hostgroups)"
 		rlRun "ipa netgroup-find --hostgroups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -613,7 +612,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_10: ipa netgroup-find options set to space return internal errors (no-hostgroups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-023: bz798792 ipa netgroup-find options set to space return internal errors (no-hostgroups)"
 		rlRun "ipa netgroup-find --no-hostgroups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -622,7 +621,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_11: ipa netgroup-find options set to space return internal errors (in-netgroups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-024: bz798792 ipa netgroup-find options set to space return internal errors (in-netgroups)"
 		rlRun "ipa netgroup-find --in-netgroups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -631,7 +630,7 @@ netgroup_bz_798792()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_798792_12: ipa netgroup-find options set to space return internal errors (not-in-netgroups)"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-025: bz798792 ipa netgroup-find options set to space return internal errors (not-in-netgroups)"
 		rlRun "ipa netgroup-find --not-in-netgroups=\" \" > $tmpout 2>&1" 0
 		if [ $(grep "ipa: ERROR: an internal error has occurred" $tmpout|wc -l) -gt 0 ]; then
 			rlFail "BZ 798792 found...ipa netgroup-find options set to space return internal errors"
@@ -647,25 +646,25 @@ netgroup_bz_815481()
 	# Test for https://bugzilla.redhat.com/show_bug.cgi?id=815481
 	# 815481 -  hostgroup and netgroup names with one letter not allowed
 	
-	rlPhaseStartTest "netgroup_bz_815481_1 Test Adding a single char group named A"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-026: bz815481 Test Adding a single char group named A"
 		rlRun "ipa netgroup-add A --desc=desc1" 0 "Try adding group named A"
 		rlRun "ipa netgroup-find A" 0 "Make sure that the group exists"
 		ipa netgroup-del A
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_815481_2 Test Adding a single char group named a"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-027: bz815481 Test Adding a single char group named a"
 		rlRun "ipa netgroup-add a --desc=desc1" 0 "Try adding group named a"
 		rlRun "ipa netgroup-find a" 0 "Make sure that the group exists"
 		ipa netgroup-del a
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_815481_3 Test Adding a single char group named r"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-028: bz815481 Test Adding a single char group named r"
 		rlRun "ipa netgroup-add r --desc=desc1" 0 "Try adding group named r"
 		rlRun "ipa netgroup-find r" 0 "Make sure that the group exists"
 		ipa netgroup-del r
 	rlPhaseEnd
 
-	rlPhaseStartTest "netgroup_bz_815481_4 Test Adding a single char group named z"
+	rlPhaseStartTest "ipa-netgroup-bugzilla-029: bz815481 Test Adding a single char group named z"
 		rlRun "ipa netgroup-add z --desc=desc1" 0 "Try adding group named z"
 		rlRun "ipa netgroup-find z" 0 "Make sure that the group exists"
 		ipa netgroup-del z
