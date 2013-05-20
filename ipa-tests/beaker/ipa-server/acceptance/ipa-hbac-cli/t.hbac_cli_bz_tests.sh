@@ -95,3 +95,21 @@ bug783286() {
     rlPhaseEnd
 }
 
+bug947900() {
+    rlPhaseStartTest "ipa bug 947900 - source host process support removed from IPA server"
+
+        rlRun "ipa hbacrule-add bug947900"
+        rlRun "ipa hbacrule-add-sourcehost abc.testrelm.com bug947900 > $TmpDir/bug947900.txt 2>&1" 1
+        rlAssertGrep "ipa: ERROR: unknown command 'hbacrule-add-sourcehost'" "$TmpDir/bug947900.txt"
+        rlRun "cat $TmpDir/bug947900.txt"
+
+        rlRun "ipa hbacrule-remove-sourcehost abc.testrelm.com bug947900 > $TmpDir/bug947900.txt 2>&1" 1
+        rlAssertGrep "ipa: ERROR: unknown command 'hbacrule-remove-sourcehost'" "$TmpDir/bug947900.txt"
+        rlRun "cat $TmpDir/bug947900.txt"
+
+        # clean up
+        rlRun "ipa hbacrule-del bug947900"
+
+    rlPhaseEnd
+}
+

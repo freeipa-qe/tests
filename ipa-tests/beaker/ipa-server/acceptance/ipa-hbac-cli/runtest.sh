@@ -462,7 +462,7 @@ rlJournalStart
 
 # Bugzilla automation starts here ... 
 bug783286
-
+bug947900
 
     rlPhaseStartCleanup "ipa-hbacrule-cli-cleanup: Destroying admin credentials."
 	# delete service group
