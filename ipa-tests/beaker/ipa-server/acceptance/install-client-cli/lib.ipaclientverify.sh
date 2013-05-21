@@ -469,9 +469,7 @@ qaExpectedRun()
     if $debug ;then
         echo "--------- expected msg ---------"
         echo "[$expectMsg]"
-        echo "========== execution output ==============="
-        cat $out
-        echo "============== end of output =============="
+        showFileContent $out
     fi
 } 
 
@@ -654,9 +652,7 @@ checkFileContent() {
         result="bad"
         rlFail "[bad] expected line does not found in file"
         rlLog "full content of [$file] is below"
-        echo "---------------- beginning of [$file] ----------------------------"
-        cat $file
-        echo "---------------- end of [$file] ------------------------"
+        showFileContent $file
     fi
     rlLog "[finished: checkFileContent]: result=[$result]"
 }
@@ -685,17 +681,13 @@ checkServiceStatus() {
     fi
     $cmd 2>&1 > $out
     returnCode=$?
-    grep "statusToCheck" $out
+    grep "$statusToCheck" $out
     if [ "$returnCode" = "0" ] && [ "$?" = "0" ];then
         rlPass "[good] found the expected status [$statusToCheck] for service [$serviceName]"
     else
         rlFail "[bad]  the expected status [$statusToCheck] for service [$serviceName] not found"
         rlLog "output of /bin/systemd "
-        cat $out
-    fi
-    
-    if [ -f $out ];then
-        rm $out
+        showFileContent $out
     fi
 }
 
@@ -712,7 +704,17 @@ CheckConfig() {
     elif [ "$conf" = "ssh_trust_dns" ];then
         checkFileContent $conf_ssh_client  "VerifyHostKeyDNS yes"
     elif [ "$conf" = "no_dns_sshfp" ];then
-        checkFileContent $conf_ssh_client  "VerifyHostKeyDNS no"
+        out="/tmp/no.dns.sshfp.check.$RANDOM.txt"
+        rlRun "echo $ADMINPW | kinit $ADMINID" 0 "kinit as admin"
+        ipa host-find $HOSTNAME 2>&1 > $out
+        if grep "SSH public key fingerprint" $out
+        then
+            rlFail "found 'SSH public key fingerprint' when it is NOT expected"
+            showFileContent $out
+        else
+            rlPass "no 'SSH public key fingerprint' found as expected"
+            showFileContent $out
+        fi
     elif [ "$conf" = "primaryServer" ];then
         checkFileContent $conf_sssd_client "ipa_server = $MASTER"    
     elif [ "$conf" = "ntpserver_setting" ];then
@@ -728,3 +730,13 @@ CheckConfig() {
     fi
 }
 
+showFileContent() {
+    file=$1
+    if [ -f $file ];then
+        echo "---------------- beginning of [$file] ----------------------------"
+        cat $file
+        echo "---------------------- end of [$file] ----------------------------"
+    else
+        echo "file [$file] does NOT exist"
+    fi
+}
