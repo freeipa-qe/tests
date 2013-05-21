@@ -134,6 +134,7 @@ installSlave()
         rlRun "echo $MASTERIP" 0 "Master IP"
         rlRun "cat /opt/rhqa_ipa/env.sh" 0 "env.sh"
 	#AddToKnownHosts $MASTERIP
+	AddToKnownHosts $MASTER
 
         rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
         rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
