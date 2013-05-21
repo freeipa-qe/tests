@@ -19,26 +19,26 @@ ipapassword()
 ipapassword_globalpolicy()
 {
     ipapassword_globalpolicy_envsetup
-    ipapassword_globalpolicy_maxlifetime_default
-    ipapassword_globalpolicy_maxlifetime_lowerbound
-    ipapassword_globalpolicy_maxlifetime_upperbound
-    ipapassword_globalpolicy_maxlifetime_negative
-    ipapassword_globalpolicy_minlifetime_default
-    ipapassword_globalpolicy_minlifetime_lowerbound
-    ipapassword_globalpolicy_minlifetime_upperbound
-    ipapassword_globalpolicy_minlifetime_negative
-    ipapassword_globalpolicy_history_default
-    ipapassword_globalpolicy_history_lowerbound
-    ipapassword_globalpolicy_history_upperbound
-    ipapassword_globalpolicy_history_negative
-    ipapassword_globalpolicy_classes_default
-    ipapassword_globalpolicy_classes_lowerbound
-    ipapassword_globalpolicy_classes_upperbound
-    ipapassword_globalpolicy_classes_negative
-    ipapassword_globalpolicy_length_default
-    ipapassword_globalpolicy_length_lowerbound
-    ipapassword_globalpolicy_length_upperbound
-    ipapassword_globalpolicy_length_negative
+    ipapassword_globalpolicy_check_maxlifetime_suggested_value
+    ipapassword_globalpolicy_check_maxlifetime_minimum_value
+    ipapassword_globalpolicy_check_maxlifetime_maximum_value
+    ipapassword_globalpolicy_check_maxlifetime_invalid_value
+    ipapassword_globalpolicy_check_minlifetime_suggested_value
+    ipapassword_globalpolicy_check_minlifetime_minimum_value
+    ipapassword_globalpolicy_check_minlifetime_maximum_value
+    ipapassword_globalpolicy_check_minlifetime_invalid_value
+    ipapassword_globalpolicy_check_history_suggested_value
+    ipapassword_globalpolicy_check_history_minimum_value
+    ipapassword_globalpolicy_check_history_maximum_value
+    ipapassword_globalpolicy_check_history_invalid_value
+    ipapassword_globalpolicy_check_classes_suggested_value
+    ipapassword_globalpolicy_check_classes_minimum_value
+    ipapassword_globalpolicy_check_classes_maximum_value
+    ipapassword_globalpolicy_check_classes_invalid_value
+    ipapassword_globalpolicy_check_length_suggested_value
+    ipapassword_globalpolicy_check_length_minimum_value
+    ipapassword_globalpolicy_check_length_maximum_value
+    ipapassword_globalpolicy_check_length_invalid_value
     ipapassword_globalpolicy_pkey_only
     ipapassword_globalpolicy_envcleanup
 } #ipapassword_globalpolicy
@@ -46,26 +46,26 @@ ipapassword_globalpolicy()
 ipapassword_grouppolicy()
 {
     ipapassword_grouppolicy_envsetup
-    ipapassword_grouppolicy_maxlifetime_default # this one always failed, i couldn't figure it out why
-    ipapassword_grouppolicy_maxlifetime_lowerbound
-    ipapassword_grouppolicy_maxlifetime_upperbound
-    ipapassword_grouppolicy_maxlifetime_negative
-    ipapassword_grouppolicy_minlifetime_default
-    ipapassword_grouppolicy_minlifetime_lowerbound
-    ipapassword_grouppolicy_minlifetime_upperbound
-    ipapassword_grouppolicy_minlifetime_negative
-    ipapassword_grouppolicy_history_default
-    ipapassword_grouppolicy_history_lowerbound
-    ipapassword_grouppolicy_history_upperbound
-    ipapassword_grouppolicy_history_negative
-    ipapassword_grouppolicy_classes_default
-    ipapassword_grouppolicy_classes_lowerbound
-    ipapassword_grouppolicy_classes_upperbound
-    ipapassword_grouppolicy_classes_negative
-    ipapassword_grouppolicy_length_default
-    ipapassword_grouppolicy_length_lowerbound
-    ipapassword_grouppolicy_length_upperbound
-    ipapassword_grouppolicy_length_negative
+    ipapassword_grouppolicy_check_maxlifetime_suggested_value # this one always failed, i couldn't figure it out why
+    ipapassword_grouppolicy_check_maxlifetime_minimum_value
+    ipapassword_grouppolicy_check_maxlifetime_maximum_value
+    ipapassword_grouppolicy_check_maxlifetime_invalid_value
+    ipapassword_grouppolicy_check_minlifetime_suggested_value
+    ipapassword_grouppolicy_check_minlifetime_minimum_value
+    ipapassword_grouppolicy_check_minlifetime_maximum_value
+    ipapassword_grouppolicy_check_minlifetime_invalid_value
+    ipapassword_grouppolicy_check_history_suggested_value
+    ipapassword_grouppolicy_check_history_minimum_value
+    ipapassword_grouppolicy_check_history_maximum_value
+    ipapassword_grouppolicy_check_history_invalid_value
+    ipapassword_grouppolicy_check_classes_suggested_value
+    ipapassword_grouppolicy_check_classes_minimum_value
+    ipapassword_grouppolicy_check_classes_maximum_value
+    ipapassword_grouppolicy_check_classes_invalid_value
+    ipapassword_grouppolicy_check_length_suggested_value
+    ipapassword_grouppolicy_check_length_minimum_value
+    ipapassword_grouppolicy_check_length_maximum_value
+    ipapassword_grouppolicy_check_length_invalid_value
     ipapassword_grouppolicy_envcleanup
 } #ipapassword_grouppolicy
 
@@ -91,7 +91,7 @@ ipapassword_attr()
 ipapassword_bugzillas()
 {
     bz_818836
-    bz_461332 # original ipapassword_globalpolicy_minlifetime_greater_maxlife_negative
+    bz_461332 # original ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value
 } # Tests for pwpolicy bugzillas
 
 ######################
@@ -136,25 +136,25 @@ ipapassword_globalpolicy_envcleanup()
     rlPhaseEnd
 } #ipapassword_globalpolicy_envcleanup
 
-ipapassword_globalpolicy_maxlifetime_default()
+ipapassword_globalpolicy_check_maxlifetime_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_maxlifetime_default"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_maxlifetime_suggested_value"
         add_test_ac
         rlLog "default maxlife : [$globalpw_maxlife]" 
         rlLog "default minlife : [$globalpw_minlife]"
         rlLog "maxlife: when reached, ipa shold prompt for password change"
-        ipapassword_globalpolicy_maxlifetime_default_logic
+        ipapassword_globalpolicy_check_maxlifetime_suggested_value_logic
         del_test_ac
     rlPhaseEnd
-} #ipapassword_globalpolicy_maxlifetime_default
+} #ipapassword_globalpolicy_check_maxlifetime_suggested_value
 
-ipapassword_globalpolicy_maxlifetime_default_logic()
+ipapassword_globalpolicy_check_maxlifetime_suggested_value_logic()
 {
     
     
-        echo "[papassword_globalpolicy_maxlifetime_default] secnario 1: when minlife < system time < maxlife, user kinit should success, no prompt for password change"
+        echo "[papassword_globalpolicy_check_maxlifetime_suggested_value] secnario 1: when minlife < system time < maxlife, user kinit should success, no prompt for password change"
         maxlife=`echo "$globalpw_maxlife * 24 * 60 * 60 " |bc `
         minlife=`echo "$globalpw_minlife * 60 * 60 " |bc`
         midpoint=`echo "($minlife + $maxlife)/2" |bc` 
@@ -169,25 +169,25 @@ ipapassword_globalpolicy_maxlifetime_default_logic()
         ipactl status
         echo "----------------------"
 
-        echo "[papassword_globalpolicy_maxlifetime_default] scenario 2: when system time > maxlife, ipa server should prompt for password change"
+        echo "[papassword_globalpolicy_check_maxlifetime_suggested_value] scenario 2: when system time > maxlife, ipa server should prompt for password change"
         set_systime "+ $midpoint + 60"  # set system time after the max life
         rlRun "$kdestroy"
         kinit_aftermaxlife $testac $testacPW $testacNEWPW
 
     
-} # ipapassword_globalpolicy_maxlifetime_default_logic 
+} # ipapassword_globalpolicy_check_maxlifetime_suggested_value_logic 
 
-ipapassword_globalpolicy_maxlifetime_lowerbound()
+ipapassword_globalpolicy_check_maxlifetime_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_maxlifetime_lowerbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_maxlifetime_minimum_value"
         rlLog "lowerbound of maxlife is the minlife"
-        ipapassword_globalpolicy_maxlifetime_lowerbound_logic
+        ipapassword_globalpolicy_check_maxlifetime_minimum_value_logic
     rlPhaseEnd
-} #ipapassword_globalpolicy_maxlifetime_lowerbound
+} #ipapassword_globalpolicy_check_maxlifetime_minimum_value
 
-ipapassword_globalpolicy_maxlifetime_lowerbound_logic()
+ipapassword_globalpolicy_check_maxlifetime_minimum_value_logic()
 {
     
     
@@ -199,24 +199,24 @@ ipapassword_globalpolicy_maxlifetime_lowerbound_logic()
         rlRun "ipa pwpolicy-mod --maxlife=2" \
                 0 "expect to success since maxlife could = minlife"
     
-} # ipapassword_globalpolicy_maxlifetime_lowerbound_logic 
+} # ipapassword_globalpolicy_check_maxlifetime_minimum_value_logic 
 
-ipapassword_globalpolicy_maxlifetime_upperbound()
+ipapassword_globalpolicy_check_maxlifetime_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_maxlifetime_upperbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_maxlifetime_maximum_value"
         rlLog "the upper bound of maxlife is the max int it can takes"
         Local_KinitAsAdmin
         for max_value in 100 99999
         do
-            ipapassword_globalpolicy_maxlifetime_upperbound_logic $max_value
+            ipapassword_globalpolicy_check_maxlifetime_maximum_value_logic $max_value
         done
         rlRun "$kdestroy"
     rlPhaseEnd
-} #ipapassword_globalpolicy_maxlifetime_upperbound
+} #ipapassword_globalpolicy_check_maxlifetime_maximum_value
 
-ipapassword_globalpolicy_maxlifetime_upperbound_logic()
+ipapassword_globalpolicy_check_maxlifetime_maximum_value_logic()
 {
     
     
@@ -224,44 +224,44 @@ ipapassword_globalpolicy_maxlifetime_upperbound_logic()
         rlRun "ipa pwpolicy-mod --maxlife=$v" \
               0 "set value to [$v], expect to pass"
     
-} # ipapassword_globalpolicy_maxlifetime_upperbound_logic 
+} # ipapassword_globalpolicy_check_maxlifetime_maximum_value_logic 
 
-ipapassword_globalpolicy_maxlifetime_negative()
+ipapassword_globalpolicy_check_maxlifetime_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_maxlifetime_negative"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_maxlifetime_invalid_value"
         rlLog "maxlife can not be non-interget value"
         Local_KinitAsAdmin 
         rlRun "ipa pwpolicy-mod --minlife=0" 0 "set minlife to 0"
         for maxlife_value in -2 abc
         do
-            ipapassword_globalpolicy_maxlifetime_negative_logic $maxlife_value
+            ipapassword_globalpolicy_check_maxlifetime_invalid_value_logic $maxlife_value
         done
     rlPhaseEnd
-} #ipapassword_globalpolicy_maxlifetime_negative
+} #ipapassword_globalpolicy_check_maxlifetime_invalid_value
 
-ipapassword_globalpolicy_maxlifetime_negative_logic()
+ipapassword_globalpolicy_check_maxlifetime_invalid_value_logic()
 {
     
     
         rlRun "ipa pwpolicy-mod --maxlife=$1" 1 "expect to fail for maxlife=[$1]"
     
-} # ipapassword_globalpolicy_maxlifetime_negative_logic 
+} # ipapassword_globalpolicy_check_maxlifetime_invalid_value_logic 
 
-ipapassword_globalpolicy_minlifetime_default()
+ipapassword_globalpolicy_check_minlifetime_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_default"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_minlifetime_suggested_value"
         rlLog "default maxlife : [$globalpw_maxlife]"        
         rlLog "default minlife : [$globalpw_minlife]"        
         rlLog "minlife: when not reached, user can not change password"
-        ipapassword_globalpolicy_minlifetime_default_logic
+        ipapassword_globalpolicy_check_minlifetime_suggested_value_logic
     rlPhaseEnd
-} #ipapassword_globalpolicy_minlifetime_default
+} #ipapassword_globalpolicy_check_minlifetime_suggested_value
 
-ipapassword_globalpolicy_minlifetime_default_logic()
+ipapassword_globalpolicy_check_minlifetime_suggested_value_logic()
 {
     
     
@@ -309,18 +309,18 @@ ipapassword_globalpolicy_minlifetime_default_logic()
         fi
         rm $out
     
-} # ipapassword_globalpolicy_minlifetime_default_logic 
+} # ipapassword_globalpolicy_check_minlifetime_suggested_value_logic 
 
-ipapassword_globalpolicy_minlifetime_lowerbound()
+ipapassword_globalpolicy_check_minlifetime_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_lowerbound"
-        ipapassword_globalpolicy_minlifetime_lowerbound_logic
+    rlPhaseStartTest "ipapassword_globalpolicy_check_minlifetime_minimum_value"
+        ipapassword_globalpolicy_check_minlifetime_minimum_value_logic
     rlPhaseEnd
-} #ipapassword_globalpolicy_minlifetime_lowerbound
+} #ipapassword_globalpolicy_check_minlifetime_minimum_value
 
-ipapassword_globalpolicy_minlifetime_lowerbound_logic()
+ipapassword_globalpolicy_check_minlifetime_minimum_value_logic()
 {
     
     
@@ -368,23 +368,23 @@ ipapassword_globalpolicy_minlifetime_lowerbound_logic()
         fi
         rm $out
     
-} # ipapassword_globalpolicy_minlifetime_lowerbound_logic 
+} # ipapassword_globalpolicy_check_minlifetime_minimum_value_logic 
 
-ipapassword_globalpolicy_minlifetime_upperbound()
+ipapassword_globalpolicy_check_minlifetime_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_upperbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_minlifetime_maximum_value"
         rlLog "upper bound of minlife is maxlife, we have tested already"
         rlLog "default maxlife : [$globalpw_maxlife]"        
         rlLog "default minlife : [$globalpw_minlife]"        
-        ipapassword_globalpolicy_minlifetime_upperbound_logic
+        ipapassword_globalpolicy_check_minlifetime_maximum_value_logic
     rlPhaseEnd
-} #ipapassword_globalpolicy_minlifetime_upperbound
+} #ipapassword_globalpolicy_check_minlifetime_maximum_value
 
-ipapassword_globalpolicy_minlifetime_upperbound_logic()
+ipapassword_globalpolicy_check_minlifetime_maximum_value_logic()
 {
-    rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_upperbound_logic"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_minlifetime_maximum_value_logic"
     
     
         rlLog "reset global pwpolicy"
@@ -411,14 +411,14 @@ ipapassword_globalpolicy_minlifetime_upperbound_logic()
         rlRun "$kdestroy" 0 "clear all kerberos ticket"
     rlPhaseEnd
     
-} # ipapassword_globalpolicy_minlifetime_upperbound_logic 
+} # ipapassword_globalpolicy_check_minlifetime_maximum_value_logic 
 
 # Added by mgregg 5-5-11
 # This is a test to ensure that bug https://bugzilla.redhat.com/show_bug.cgi?id=461325 and
 # https://bugzilla.redhat.com/show_bug.cgi?id=461332 are closed
 bz_461332()
 {
-	rlPhaseStartTest "bug: 461332 ipapassword_globalpolicy_minlifetime_greater_maxlife_negative"
+	rlPhaseStartTest "bug: 461332 ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value"
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
 		rlLog "attempt to set minlife greater than maxlife"
@@ -432,22 +432,22 @@ bz_461332()
 	rlPhaseEnd
 }
 
-ipapassword_globalpolicy_minlifetime_negative()
+ipapassword_globalpolicy_check_minlifetime_invalid_value()
 {
 
  
-    rlPhaseStartTest "ipapassword_globalpolicy_minlifetime_negative"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_minlifetime_invalid_value"
         rlLog "minlife should only accept integer >=0"
         Local_KinitAsAdmin
         reset_global_pwpolicy
         for minlife_value in -2 a
         do
-            ipapassword_globalpolicy_minlifetime_negative_logic $minlife_value
+            ipapassword_globalpolicy_check_minlifetime_invalid_value_logic $minlife_value
         done
     rlPhaseEnd
-} #ipapassword_globalpolicy_minlifetime_negative
+} #ipapassword_globalpolicy_check_minlifetime_invalid_value
 
-ipapassword_globalpolicy_minlifetime_negative_logic()
+ipapassword_globalpolicy_check_minlifetime_invalid_value_logic()
 {
     
     
@@ -455,13 +455,13 @@ ipapassword_globalpolicy_minlifetime_negative_logic()
         rlRun "ipa pwpolicy-mod --minlife=$minvalue" \
               1 "set minlife to [$minvalue] should fail"
     
-} # ipapassword_globalpolicy_minlifetime_negative_logic 
+} # ipapassword_globalpolicy_check_minlifetime_invalid_value_logic 
 
-ipapassword_globalpolicy_history_default()
+ipapassword_globalpolicy_check_history_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_history_default"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_history_suggested_value"
         local out=$TmpdIR/globalpolicyhistorydefault.$RANDOM.out
         rlLog "default behave of history setting test"
         rlRun "rlDistroDiff keyctl"
@@ -476,16 +476,16 @@ ipapassword_globalpolicy_history_default()
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
             add_test_ac
-            ipapassword_globalpolicy_history_default_logic
+            ipapassword_globalpolicy_check_history_suggested_value_logic
             del_test_ac
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_globalpolicy_history_default
+} #ipapassword_globalpolicy_check_history_suggested_value
 
-ipapassword_globalpolicy_history_default_logic()
+ipapassword_globalpolicy_check_history_suggested_value_logic()
 {
     
     
@@ -544,13 +544,13 @@ ipapassword_globalpolicy_history_default_logic()
             fi
         done
     
-} # ipapassword_globalpolicy_history_default_logic 
+} # ipapassword_globalpolicy_check_history_suggested_value_logic 
 
-ipapassword_globalpolicy_history_lowerbound()
+ipapassword_globalpolicy_check_history_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_history_lowerbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_history_minimum_value"
         local out=$TmpDir/globalpolicyhistorylowbound.$RANDOM.out
         lowbound=0
         rlLog "lowerbound of password history is $lowbound"
@@ -568,16 +568,16 @@ ipapassword_globalpolicy_history_lowerbound()
             && [ $history = 0 ]
         then
             add_test_ac
-            ipapassword_globalpolicy_history_lowerbound_logic
+            ipapassword_globalpolicy_check_history_minimum_value_logic
             del_test_ac
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_globalpolicy_history_lowerbound
+} #ipapassword_globalpolicy_check_history_minimum_value
 
-ipapassword_globalpolicy_history_lowerbound_logic()
+ipapassword_globalpolicy_check_history_minimum_value_logic()
 {
     
     
@@ -610,13 +610,13 @@ ipapassword_globalpolicy_history_lowerbound_logic()
             counter=$((counter+1))
         done
     
-} # ipapassword_globalpolicy_history_lowerbound_logic 
+} # ipapassword_globalpolicy_check_history_minimum_value_logic 
 
-ipapassword_globalpolicy_history_upperbound()
+ipapassword_globalpolicy_check_history_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_history_upperbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_history_maximum_value"
         rlLog "there is no real upperbound, just try some randam integers"
         lastvalue=$RANDOM
         max=2 #test 2 times
@@ -627,52 +627,52 @@ ipapassword_globalpolicy_history_upperbound()
         do 
             size=$RANDOM
             if [ $size -ne $lastvalue ]; then
-                ipapassword_globalpolicy_history_upperbound_logic $size
+                ipapassword_globalpolicy_check_history_maximum_value_logic $size
             fi
             lastvalue=$size
             i=$((i+1))
         done
     rlPhaseEnd
-} #ipapassword_globalpolicy_history_upperbound
+} #ipapassword_globalpolicy_check_history_maximum_value
 
-ipapassword_globalpolicy_history_upperbound_logic()
+ipapassword_globalpolicy_check_history_maximum_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod --history=$v" 0 "set password history to integer [$v] should success"
     
-} # ipapassword_globalpolicy_history_upperbound_logic 
+} # ipapassword_globalpolicy_check_history_maximum_value_logic 
 
-ipapassword_globalpolicy_history_negative()
+ipapassword_globalpolicy_check_history_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_history_negative"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_history_invalid_value"
         rlLog "negaive integer and letters are not acceptable for history size"
         testdata="-2 -1 a abc"
         Local_KinitAsAdmin 
         for value in $testdata
         do
-            ipapassword_globalpolicy_history_negative_logic $value
+            ipapassword_globalpolicy_check_history_invalid_value_logic $value
         done
     rlPhaseEnd
-} #ipapassword_globalpolicy_history_negative
+} #ipapassword_globalpolicy_check_history_invalid_value
 
-ipapassword_globalpolicy_history_negative_logic()
+ipapassword_globalpolicy_check_history_invalid_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod --history=$v" 1 "set password history to negative integer or letters [$v] should fail"
     
-} # ipapassword_globalpolicy_history_negative_logic 
+} # ipapassword_globalpolicy_check_history_invalid_value_logic 
 
-ipapassword_globalpolicy_classes_default()
+ipapassword_globalpolicy_check_classes_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_classes_default"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_classes_suggested_value"
         local out=$TmpDir/globalpwclassesdefault.$RANDOM.out
         rlLog "check minimum classes default behave: when classes between [2-4]"
         rlRun "rlDistroDiff keyctl"
@@ -686,14 +686,14 @@ ipapassword_globalpolicy_classes_default()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
-            ipapassword_globalpolicy_classes_default_logic
+            ipapassword_globalpolicy_check_classes_suggested_value_logic
         else
             rlFail "FAIL - can not set precondition for minclasses test"
         fi
     rlPhaseEnd
-} #ipapassword_globalpolicy_classes_default
+} #ipapassword_globalpolicy_check_classes_suggested_value
 
-ipapassword_globalpolicy_classes_default_logic()
+ipapassword_globalpolicy_check_classes_suggested_value_logic()
 {
     
     
@@ -760,13 +760,13 @@ ipapassword_globalpolicy_classes_default_logic()
         done
         rm $out
     
-} # ipapassword_globalpolicy_classes_default_logic 
+} # ipapassword_globalpolicy_check_classes_suggested_value_logic 
 
-ipapassword_globalpolicy_classes_lowerbound()
+ipapassword_globalpolicy_check_classes_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_classes_lowerbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_classes_minimum_value"
         local out=$TmpDir/classeslowerbound.$RANDOM.out
         rlLog "check minimum classes lowbound: 0"
         rlRun "rlDistroDiff keyctl"
@@ -779,14 +779,14 @@ ipapassword_globalpolicy_classes_lowerbound()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
-            ipapassword_globalpolicy_classes_lowerbound_logic
+            ipapassword_globalpolicy_check_classes_minimum_value_logic
         else
             rlFail "FAIL - can not set precondition for minclasses test"
         fi
     rlPhaseEnd
-} #ipapassword_globalpolicy_classes_lowerbound
+} #ipapassword_globalpolicy_check_classes_minimum_value
 
-ipapassword_globalpolicy_classes_lowerbound_logic()
+ipapassword_globalpolicy_check_classes_minimum_value_logic()
 {
     
     
@@ -833,13 +833,13 @@ ipapassword_globalpolicy_classes_lowerbound_logic()
         done
         rm $out
     
-} # ipapassword_globalpolicy_classes_lowerbound_logic 
+} # ipapassword_globalpolicy_check_classes_minimum_value_logic 
 
-ipapassword_globalpolicy_classes_upperbound()
+ipapassword_globalpolicy_check_classes_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_classes_upperbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_classes_maximum_value"
         local out=$TmpDir/pwclassesupperbound.$RANDOM.out
         rlLog "check minimum classes upperbound: >4, it should behave same as 4"
         rlRun "rlDistroDiff keyctl"
@@ -853,15 +853,15 @@ ipapassword_globalpolicy_classes_upperbound()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
-            ipapassword_globalpolicy_classes_upperbound_logic
+            ipapassword_globalpolicy_check_classes_maximum_value_logic
         else
             rlFail "FAIL - can not set precondition for minclasses test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_globalpolicy_classes_upperbound
+} #ipapassword_globalpolicy_check_classes_maximum_value
 
-ipapassword_globalpolicy_classes_upperbound_logic()
+ipapassword_globalpolicy_check_classes_maximum_value_logic()
 {
     
     
@@ -916,13 +916,13 @@ ipapassword_globalpolicy_classes_upperbound_logic()
             rlFail "FAIL - password change to class 5 failed, this is NOT expected"
         fi
     
-} # ipapassword_globalpolicy_classes_upperbound_logic 
+} # ipapassword_globalpolicy_check_classes_maximum_value_logic 
 
-ipapassword_globalpolicy_classes_negative()
+ipapassword_globalpolicy_check_classes_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_classes_negative"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_classes_invalid_value"
         local out=$TmpDir/classesnegative.$RANDOM.out
         rlLog "check minimum classes can not be set to negative integer and letters"
         reset_global_pwpolicy
@@ -930,26 +930,26 @@ ipapassword_globalpolicy_classes_negative()
         do
             rlRun "rlDistroDiff keyctl"
             Local_KinitAsAdmin
-            ipapassword_globalpolicy_classes_negative_logic $class_value
+            ipapassword_globalpolicy_check_classes_invalid_value_logic $class_value
             rlRun "$kdestroy"
         done
     rlPhaseEnd
-} #ipapassword_globalpolicy_classes_negative
+} #ipapassword_globalpolicy_check_classes_invalid_value
 
-ipapassword_globalpolicy_classes_negative_logic()
+ipapassword_globalpolicy_check_classes_invalid_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod --minclasses=$v" 1 "set minclass to [$v] should fail"
     
-} # ipapassword_globalpolicy_classes_negative_logic 
+} # ipapassword_globalpolicy_check_classes_invalid_value_logic 
 
-ipapassword_globalpolicy_length_default()
+ipapassword_globalpolicy_check_length_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_length_default"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_length_suggested_value"
         local out=$TmpDir/pwlengthdefault.$RANDOM.out
         rlLog "check minimum length default behave"
         reset_global_pwpolicy
@@ -967,15 +967,15 @@ ipapassword_globalpolicy_length_default()
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
             add_test_ac
-            ipapassword_globalpolicy_length_default_logic
+            ipapassword_globalpolicy_check_length_suggested_value_logic
             del_test_ac
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
     rlPhaseEnd
-} #ipapassword_globalpolicy_length_default
+} #ipapassword_globalpolicy_check_length_suggested_value
 
-ipapassword_globalpolicy_length_default_logic()
+ipapassword_globalpolicy_check_length_suggested_value_logic()
 {
     
     
@@ -1025,13 +1025,13 @@ ipapassword_globalpolicy_length_default_logic()
             length=$((length+1))
         done
     
-} # ipapassword_globalpolicy_length_default_logic 
+} # ipapassword_globalpolicy_check_length_suggested_value_logic 
 
-ipapassword_globalpolicy_length_lowerbound()
+ipapassword_globalpolicy_check_length_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_length_lowerbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_length_minimum_value"
         local out=$TmpDir/pwlengthlowerbound.$RANDOM.out
         rlLog "minimum length = 0"
         rlLog "check minimum length lowerbound"
@@ -1051,15 +1051,15 @@ ipapassword_globalpolicy_length_lowerbound()
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ] && [ $length = 0 ]
         then
             add_test_ac
-            ipapassword_globalpolicy_length_lowerbound_logic
+            ipapassword_globalpolicy_check_length_minimum_value_logic
             del_test_ac
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
     rlPhaseEnd
-} #ipapassword_globalpolicy_length_lowerbound
+} #ipapassword_globalpolicy_check_length_minimum_value
 
-ipapassword_globalpolicy_length_lowerbound_logic()
+ipapassword_globalpolicy_check_length_minimum_value_logic()
 {
     
     
@@ -1076,13 +1076,13 @@ ipapassword_globalpolicy_length_lowerbound_logic()
             rlPass "password change failed, this is expected"
         fi
     
-} # ipapassword_globalpolicy_length_lowerbound_logic 
+} # ipapassword_globalpolicy_check_length_minimum_value_logic 
 
-ipapassword_globalpolicy_length_upperbound()
+ipapassword_globalpolicy_check_length_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_length_upperbound"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_length_maximum_value"
         local out=$TmpDir/pwlengthupperbounddefault.$RANDOM.out
         rlLog "check upper bound of length setting"
         reset_global_pwpolicy
@@ -1100,16 +1100,16 @@ ipapassword_globalpolicy_length_upperbound()
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
             add_test_ac
-            ipapassword_globalpolicy_length_upperbound_logic
+            ipapassword_globalpolicy_check_length_maximum_value_logic
             del_test_ac
         else
             rlFail "FAIL - can not set precondition for password length upper bound test"
         fi
 
     rlPhaseEnd
-} #ipapassword_globalpolicy_length_upperbound
+} #ipapassword_globalpolicy_check_length_maximum_value
 
-ipapassword_globalpolicy_length_upperbound_logic()
+ipapassword_globalpolicy_check_length_maximum_value_logic()
 {
     
     
@@ -1184,21 +1184,21 @@ ipapassword_globalpolicy_length_upperbound_logic()
         done
         rm $out
     
-} # ipapassword_globalpolicy_length_upperbound_logic 
+} # ipapassword_globalpolicy_check_length_maximum_value_logic 
 
-ipapassword_globalpolicy_length_negative()
+ipapassword_globalpolicy_check_length_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_globalpolicy_length_negative"
+    rlPhaseStartTest "ipapassword_globalpolicy_check_length_invalid_value"
         rlLog "set length to negative integer or letter should fail"
         Local_KinitAsAdmin
         for length_value in -2 a
         do
-            ipapassword_globalpolicy_length_negative_logic $length_value
+            ipapassword_globalpolicy_check_length_invalid_value_logic $length_value
         done
     rlPhaseEnd
-} #ipapassword_globalpolicy_length_negative
+} #ipapassword_globalpolicy_check_length_invalid_value
 
 ipapassword_globalpolicy_pkey_only()
 {
@@ -1220,14 +1220,14 @@ ipapassword_globalpolicy_pkey_only()
     rlPhaseEnd
 }
 
-ipapassword_globalpolicy_length_negative_logic()
+ipapassword_globalpolicy_check_length_invalid_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod --minlength=$v" 1 "expect to fail when minlength=[$v]"
     
-} # ipapassword_globalpolicy_length_negative_logic 
+} # ipapassword_globalpolicy_check_length_invalid_value_logic 
 
 ipapassword_grouppolicy_envsetup()
 {
@@ -1255,16 +1255,16 @@ ipapassword_grouppolicy_envcleanup()
     rlPhaseEnd
 } #ipapassword_grouppolicy_envcleanup
 
-ipapassword_grouppolicy_maxlifetime_default()
+ipapassword_grouppolicy_check_maxlifetime_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_maxlifetime_default"
-        ipapassword_grouppolicy_maxlifetime_default_logic
+    rlPhaseStartTest "ipapassword_grouppolicy_check_maxlifetime_suggested_value"
+        ipapassword_grouppolicy_check_maxlifetime_suggested_value_logic
     rlPhaseEnd
-} #ipapassword_grouppolicy_maxlifetime_default
+} #ipapassword_grouppolicy_check_maxlifetime_suggested_value
 
-ipapassword_grouppolicy_maxlifetime_default_logic()
+ipapassword_grouppolicy_check_maxlifetime_suggested_value_logic()
 {
     
     
@@ -1294,19 +1294,19 @@ ipapassword_grouppolicy_maxlifetime_default_logic()
         #kinit_aftermaxlife $testac $testacPW $testacNEWPW
 
     
-} # ipapassword_grouppolicy_maxlifetime_default_logic 
+} # ipapassword_grouppolicy_check_maxlifetime_suggested_value_logic 
 
-ipapassword_grouppolicy_maxlifetime_lowerbound()
+ipapassword_grouppolicy_check_maxlifetime_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_maxlifetime_lowerbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_maxlifetime_minimum_value"
         rlLog "lowerbound of group pwpolicy maxlife is minlife of same group pwpolicy"
-        ipapassword_grouppolicy_maxlifetime_lowerbound_logic
+        ipapassword_grouppolicy_check_maxlifetime_minimum_value_logic
     rlPhaseEnd
-} #ipapassword_grouppolicy_maxlifetime_lowerbound
+} #ipapassword_grouppolicy_check_maxlifetime_minimum_value
 
-ipapassword_grouppolicy_maxlifetime_lowerbound_logic()
+ipapassword_grouppolicy_check_maxlifetime_minimum_value_logic()
 {
     
     
@@ -1318,25 +1318,25 @@ ipapassword_grouppolicy_maxlifetime_lowerbound_logic()
         rlRun "ipa pwpolicy-mod $testgrp --maxlife=2" \
                 0 "expect to success since maxlife could = minlife"
     
-} # ipapassword_grouppolicy_maxlifetime_lowerbound_logic 
+} # ipapassword_grouppolicy_check_maxlifetime_minimum_value_logic 
 
-ipapassword_grouppolicy_maxlifetime_upperbound()
+ipapassword_grouppolicy_check_maxlifetime_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_maxlifetime_upperbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_maxlifetime_maximum_value"
         local max_value
         rlLog "the upper bound of maxlife is the max int it can takes"
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         for max_value in 100 99999
         do
-            ipapassword_grouppolicy_maxlifetime_upperbound_logic $max_value
+            ipapassword_grouppolicy_check_maxlifetime_maximum_value_logic $max_value
         done
     rlPhaseEnd
-} #ipapassword_grouppolicy_maxlifetime_upperbound
+} #ipapassword_grouppolicy_check_maxlifetime_maximum_value
 
-ipapassword_grouppolicy_maxlifetime_upperbound_logic()
+ipapassword_grouppolicy_check_maxlifetime_maximum_value_logic()
 {
     
     
@@ -1344,38 +1344,38 @@ ipapassword_grouppolicy_maxlifetime_upperbound_logic()
         rlRun "ipa pwpolicy-mod $testgrp --maxlife=$v" \
               0 "set value to [$v], expect to pass"
     
-} # ipapassword_grouppolicy_maxlifetime_upperbound_logic 
+} # ipapassword_grouppolicy_check_maxlifetime_maximum_value_logic 
 
-ipapassword_grouppolicy_maxlifetime_negative()
+ipapassword_grouppolicy_check_maxlifetime_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_maxlifetime_negative"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_maxlifetime_invalid_value"
         rlLog "maxlife can not be non-interget value"
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin 
         rlRun "ipa pwpolicy-mod $testgrp --minlife=0" 0 "set minlife to 0"
         for maxlife_value in -1 abc
         do
-            ipapassword_grouppolicy_maxlifetime_negative_logic $maxlife_value
+            ipapassword_grouppolicy_check_maxlifetime_invalid_value_logic $maxlife_value
         done
         rlRun "$kdestroy"
     rlPhaseEnd
-} #ipapassword_grouppolicy_maxlifetime_negative
+} #ipapassword_grouppolicy_check_maxlifetime_invalid_value
 
-ipapassword_grouppolicy_maxlifetime_negative_logic()
+ipapassword_grouppolicy_check_maxlifetime_invalid_value_logic()
 {
     
     
         rlRun "ipa pwpolicy-mod $testgrp --maxlife=$1" 1 "expect to fail for maxlife=[$1]"
     
-} # ipapassword_grouppolicy_maxlifetime_negative_logic 
+} # ipapassword_grouppolicy_check_maxlifetime_invalid_value_logic 
 
-ipapassword_grouppolicy_minlifetime_default()
+ipapassword_grouppolicy_check_minlifetime_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_minlifetime_default"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_minlifetime_suggested_value"
         rlLog "group maxlife : [$grouppw_maxlife]"        
         rlLog "group minlife : [$grouppw_minlife]"        
         rlLog "minlife: when not reached, user can not change password"
@@ -1384,53 +1384,53 @@ ipapassword_grouppolicy_minlifetime_default()
         add_test_ac 
         append_test_member
         reset_group_pwpolicy
-        ipapassword_grouppolicy_minlifetime_default_logic
+        ipapassword_grouppolicy_check_minlifetime_suggested_value_logic
     rlPhaseEnd
-} #ipapassword_grouppolicy_minlifetime_default
+} #ipapassword_grouppolicy_check_minlifetime_suggested_value
 
-ipapassword_grouppolicy_minlifetime_default_logic()
+ipapassword_grouppolicy_check_minlifetime_suggested_value_logic()
 {
     
     
-        minlife_default $grouppw_maxlife $grouppw_minlife $testgrp 
+        minlife_suggested_value $grouppw_maxlife $grouppw_minlife $testgrp 
     
-} # ipapassword_grouppolicy_minlifetime_default_logic 
+} # ipapassword_grouppolicy_check_minlifetime_suggested_value_logic 
 
-ipapassword_grouppolicy_minlifetime_lowerbound()
+ipapassword_grouppolicy_check_minlifetime_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_minlifetime_lowerbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_minlifetime_minimum_value"
         rlLog "the lowerbound of minlife is 0"
         rlLog "it means we can change password whenever we want"
         add_test_grp
         add_test_ac 
         append_test_member
         reset_group_pwpolicy
-        ipapassword_grouppolicy_minlifetime_lowerbound_logic
+        ipapassword_grouppolicy_check_minlifetime_minimum_value_logic
     rlPhaseEnd
-} #ipapassword_grouppolicy_minlifetime_lowerbound
+} #ipapassword_grouppolicy_check_minlifetime_minimum_value
 
-ipapassword_grouppolicy_minlifetime_lowerbound_logic()
+ipapassword_grouppolicy_check_minlifetime_minimum_value_logic()
 {
     
     
-        minlife_lowerbound $testgrp
+        minlife_minimum_value $testgrp
     
-} # ipapassword_grouppolicy_minlifetime_lowerbound_logic 
+} # ipapassword_grouppolicy_check_minlifetime_minimum_value_logic 
 
-ipapassword_grouppolicy_minlifetime_upperbound()
+ipapassword_grouppolicy_check_minlifetime_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_minlifetime_upperbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_minlifetime_maximum_value"
         rlLog "the upper bound of minlife of group pwpolicy is maxlifetime"
         reset_group_pwpolicy
-        ipapassword_grouppolicy_minlifetime_upperbound_logic
+        ipapassword_grouppolicy_check_minlifetime_maximum_value_logic
     rlPhaseEnd
-} #ipapassword_grouppolicy_minlifetime_upperbound
+} #ipapassword_grouppolicy_check_minlifetime_maximum_value
 
-ipapassword_grouppolicy_minlifetime_upperbound_logic()
+ipapassword_grouppolicy_check_minlifetime_maximum_value_logic()
 {
     
     
@@ -1458,19 +1458,19 @@ ipapassword_grouppolicy_minlifetime_upperbound_logic()
               1 "set minlife should fail when minlife > maxlife"
         rm $out
     
-} # ipapassword_grouppolicy_minlifetime_upperbound_logic 
+} # ipapassword_grouppolicy_check_minlifetime_maximum_value_logic 
 
-ipapassword_grouppolicy_minlifetime_negative()
+ipapassword_grouppolicy_check_minlifetime_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_minlifetime_negative"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_minlifetime_invalid_value"
         rlLog ""
-        ipapassword_grouppolicy_minlifetime_negative_logic
+        ipapassword_grouppolicy_check_minlifetime_invalid_value_logic
     rlPhaseEnd
-} #ipapassword_grouppolicy_minlifetime_negative
+} #ipapassword_grouppolicy_check_minlifetime_invalid_value
 
-ipapassword_grouppolicy_minlifetime_negative_logic()
+ipapassword_grouppolicy_check_minlifetime_invalid_value_logic()
 {
     
     
@@ -1481,14 +1481,14 @@ ipapassword_grouppolicy_minlifetime_negative_logic()
               1 "set minlife should fail when minlife = [$life] "
         done
     
-} # ipapassword_grouppolicy_minlifetime_negative_logic 
+} # ipapassword_grouppolicy_check_minlifetime_invalid_value_logic 
 
-ipapassword_grouppolicy_history_default()
+ipapassword_grouppolicy_check_history_suggested_value()
 {
  
  
     # notes; bug: 810900 , if bug fixed, this test case will report "pass"
-    rlPhaseStartTest "ipapassword_grouppolicy_history_default"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_history_suggested_value"
         local out=$TmpdIR/globalpolicyhistorydefault.$RANDOM.out
         rlLog "default behave of history setting test"
         add_test_ac
@@ -1506,15 +1506,15 @@ ipapassword_grouppolicy_history_default()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] classes=[$classes]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
-            ipapassword_grouppolicy_history_default_logic
+            ipapassword_grouppolicy_check_history_suggested_value_logic
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_grouppolicy_history_default
+} #ipapassword_grouppolicy_check_history_suggested_value
 
-ipapassword_grouppolicy_history_default_logic()
+ipapassword_grouppolicy_check_history_suggested_value_logic()
 {
     
     
@@ -1602,13 +1602,13 @@ ipapassword_grouppolicy_history_default_logic()
         done
         rlLog "test finished"
     
-} # ipapassword_grouppolicy_history_default_logic 
+} # ipapassword_grouppolicy_check_history_suggested_value_logic 
 
-ipapassword_grouppolicy_history_lowerbound()
+ipapassword_grouppolicy_check_history_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_history_lowerbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_history_minimum_value"
         local out=$TmpDir/grouppolicyhistorylowbound.$RANDOM.out
         local lowbound=0
         add_test_ac
@@ -1630,15 +1630,15 @@ ipapassword_grouppolicy_history_lowerbound()
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ] \
             && [ $history = 0 ]
         then
-            ipapassword_grouppolicy_history_lowerbound_logic
+            ipapassword_grouppolicy_check_history_minimum_value_logic
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_grouppolicy_history_lowerbound
+} #ipapassword_grouppolicy_check_history_minimum_value
 
-ipapassword_grouppolicy_history_lowerbound_logic()
+ipapassword_grouppolicy_check_history_minimum_value_logic()
 {
     
     
@@ -1671,13 +1671,13 @@ ipapassword_grouppolicy_history_lowerbound_logic()
             counter=$((counter+1))
         done
     
-} # ipapassword_grouppolicy_history_lowerbound_logic 
+} # ipapassword_grouppolicy_check_history_minimum_value_logic 
 
-ipapassword_grouppolicy_history_upperbound()
+ipapassword_grouppolicy_check_history_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_history_upperbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_history_maximum_value"
         rlLog "there is no real upperbound, just try some randam integers"
         local lastvalue=$RANDOM
         local max=2 #test 2 times
@@ -1688,53 +1688,53 @@ ipapassword_grouppolicy_history_upperbound()
         do 
             size=$RANDOM
             if [ $size -ne $lastvalue ]; then
-                ipapassword_grouppolicy_history_upperbound_logic $size
+                ipapassword_grouppolicy_check_history_maximum_value_logic $size
             fi
             lastvalue=$size
             i=$((i+1))
         done
     rlPhaseEnd
-} #ipapassword_grouppolicy_history_upperbound
+} #ipapassword_grouppolicy_check_history_maximum_value
 
-ipapassword_grouppolicy_history_upperbound_logic()
+ipapassword_grouppolicy_check_history_maximum_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod $testgrp --history=$v" 0 "set password history to integer [$v] should success"
     
-} # ipapassword_grouppolicy_history_upperbound_logic 
+} # ipapassword_grouppolicy_check_history_maximum_value_logic 
 
-ipapassword_grouppolicy_history_negative()
+ipapassword_grouppolicy_check_history_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_history_negative"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_history_invalid_value"
         rlLog "negaive integer and letters are not acceptable for history size"
         local testdata="-2 -1 a abc"
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin 
         for value in $testdata
         do
-            ipapassword_grouppolicy_history_negative_logic $value
+            ipapassword_grouppolicy_check_history_invalid_value_logic $value
         done
     rlPhaseEnd
-} #ipapassword_grouppolicy_history_negative
+} #ipapassword_grouppolicy_check_history_invalid_value
 
-ipapassword_grouppolicy_history_negative_logic()
+ipapassword_grouppolicy_check_history_invalid_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod $testgrp --history=$v" 1 "set password history to negative integer or letters [$v] should fail"
     
-} # ipapassword_grouppolicy_history_negative_logic 
+} # ipapassword_grouppolicy_check_history_invalid_value_logic 
 
-ipapassword_grouppolicy_classes_default()
+ipapassword_grouppolicy_check_classes_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_classes_default"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_classes_suggested_value"
         local out=$TmpDir/grouppwclassesdefault.$RANDOM.out
         rlLog "check minimum classes default behave: when classes between [2-4]"
         add_test_ac
@@ -1752,15 +1752,15 @@ ipapassword_grouppolicy_classes_default()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
-            ipapassword_grouppolicy_classes_default_logic
+            ipapassword_grouppolicy_check_classes_suggested_value_logic
         else
             rlFail "FAIL - can not set precondition for minclasses test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_grouppolicy_classes_default
+} #ipapassword_grouppolicy_check_classes_suggested_value
 
-ipapassword_grouppolicy_classes_default_logic()
+ipapassword_grouppolicy_check_classes_suggested_value_logic()
 {
     
     
@@ -1827,13 +1827,13 @@ ipapassword_grouppolicy_classes_default_logic()
         done
         rm $out
     
-} # ipapassword_grouppolicy_classes_default_logic 
+} # ipapassword_grouppolicy_check_classes_suggested_value_logic 
 
-ipapassword_grouppolicy_classes_lowerbound()
+ipapassword_grouppolicy_check_classes_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_classes_lowerbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_classes_minimum_value"
         local out=$TmpDir/classeslowerbound.$RANDOM.out
         rlLog "check minimum classes lowbound: 0"
         add_test_grp
@@ -1848,15 +1848,15 @@ ipapassword_grouppolicy_classes_lowerbound()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
-            ipapassword_grouppolicy_classes_lowerbound_logic
+            ipapassword_grouppolicy_check_classes_minimum_value_logic
         else
             rlFail "FAIL - can not set precondition for minclasses test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_grouppolicy_classes_lowerbound
+} #ipapassword_grouppolicy_check_classes_minimum_value
 
-ipapassword_grouppolicy_classes_lowerbound_logic()
+ipapassword_grouppolicy_check_classes_minimum_value_logic()
 {
     
     
@@ -1902,13 +1902,13 @@ ipapassword_grouppolicy_classes_lowerbound_logic()
         done
         rm $out
     
-} # ipapassword_grouppolicy_classes_lowerbound_logic 
+} # ipapassword_grouppolicy_check_classes_minimum_value_logic 
 
-ipapassword_grouppolicy_classes_upperbound()
+ipapassword_grouppolicy_check_classes_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_classes_upperbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_classes_maximum_value"
         rlLog "check minimum classes upperbound"
         local out=$TmpDir/pwclassesupperbound.$RANDOM.out
         rlRun "rlDistroDiff keyctl"
@@ -1926,15 +1926,15 @@ ipapassword_grouppolicy_classes_upperbound()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] history=[$history]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $history = 0 ]
         then
-            ipapassword_grouppolicy_classes_upperbound_logic
+            ipapassword_grouppolicy_check_classes_maximum_value_logic
         else
             rlFail "FAIL - can not set precondition for minclasses test"
         fi
         rm $out
     rlPhaseEnd
-} #ipapassword_grouppolicy_classes_upperbound
+} #ipapassword_grouppolicy_check_classes_maximum_value
 
-ipapassword_grouppolicy_classes_upperbound_logic()
+ipapassword_grouppolicy_check_classes_maximum_value_logic()
 {
     
     
@@ -2000,13 +2000,13 @@ ipapassword_grouppolicy_classes_upperbound_logic()
         done
         rm $out
     
-} # ipapassword_grouppolicy_classes_upperbound_logic 
+} # ipapassword_grouppolicy_check_classes_maximum_value_logic 
 
-ipapassword_grouppolicy_classes_negative()
+ipapassword_grouppolicy_check_classes_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_classes_negative"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_classes_invalid_value"
         local out=$TmpDir/classesnegative.$RANDOM.out
         rlLog "check minimum classes can not be set to negative integer and letters"
         add_test_grp
@@ -2015,26 +2015,26 @@ ipapassword_grouppolicy_classes_negative()
         do
             rlRun "rlDistroDiff keyctl"
             Local_KinitAsAdmin
-            ipapassword_grouppolicy_classes_negative_logic $class_value
+            ipapassword_grouppolicy_check_classes_invalid_value_logic $class_value
             rlRun "$kdestroy"
         done
     rlPhaseEnd
-} #ipapassword_grouppolicy_classes_negative
+} #ipapassword_grouppolicy_check_classes_invalid_value
 
-ipapassword_grouppolicy_classes_negative_logic()
+ipapassword_grouppolicy_check_classes_invalid_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod $testgrp --minclasses=$v" 1 "set minclass to [$v] should fail"
     
-} # ipapassword_grouppolicy_classes_negative_logic 
+} # ipapassword_grouppolicy_check_classes_invalid_value_logic 
 
-ipapassword_grouppolicy_length_default()
+ipapassword_grouppolicy_check_length_suggested_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_length_default"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_length_suggested_value"
         local out=$TmpDir/pwlengthdefault.$RANDOM.out
         rlLog "check minimum length default behave"
         add_test_grp
@@ -2052,14 +2052,14 @@ ipapassword_grouppolicy_length_default()
         rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
-            ipapassword_grouppolicy_length_default_logic
+            ipapassword_grouppolicy_check_length_suggested_value_logic
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
     rlPhaseEnd
-} #ipapassword_grouppolicy_length_default
+} #ipapassword_grouppolicy_check_length_suggested_value
 
-ipapassword_grouppolicy_length_default_logic()
+ipapassword_grouppolicy_check_length_suggested_value_logic()
 {
     
     
@@ -2111,13 +2111,13 @@ ipapassword_grouppolicy_length_default_logic()
             rlRun "$kdestroy"
         done
     
-} # ipapassword_grouppolicy_length_default_logic 
+} # ipapassword_grouppolicy_check_length_suggested_value_logic 
 
-ipapassword_grouppolicy_length_lowerbound()
+ipapassword_grouppolicy_check_length_minimum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_length_lowerbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_length_minimum_value"
         local out=$TmpDir/pwlengthlowerbound.$RANDOM.out
         rlLog "minimum length = 0"
         rlLog "check minimum length lowerbound"
@@ -2139,14 +2139,14 @@ ipapassword_grouppolicy_length_lowerbound()
         rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history] minlength=[$length]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ] && [ $length = 0 ]
         then
-            ipapassword_grouppolicy_length_lowerbound_logic
+            ipapassword_grouppolicy_check_length_minimum_value_logic
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
     rlPhaseEnd
-} #ipapassword_grouppolicy_length_lowerbound
+} #ipapassword_grouppolicy_check_length_minimum_value
 
-ipapassword_grouppolicy_length_lowerbound_logic()
+ipapassword_grouppolicy_check_length_minimum_value_logic()
 {
     
     
@@ -2163,13 +2163,13 @@ ipapassword_grouppolicy_length_lowerbound_logic()
             rlPass "password change failed, this is expected"
         fi
     
-} # ipapassword_grouppolicy_length_lowerbound_logic 
+} # ipapassword_grouppolicy_check_length_minimum_value_logic 
 
-ipapassword_grouppolicy_length_upperbound()
+ipapassword_grouppolicy_check_length_maximum_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_length_upperbound"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_length_maximum_value"
         local out=$TmpDir/pwlengthupperbounddefault.$RANDOM.out
         rlLog "check upper bound of length setting"
         add_test_grp
@@ -2187,14 +2187,14 @@ ipapassword_grouppolicy_length_upperbound()
         rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
-            ipapassword_grouppolicy_length_upperbound_logic
+            ipapassword_grouppolicy_check_length_maximum_value_logic
         else
             rlFail "FAIL - can not set precondition for password length upper bound test"
         fi
     rlPhaseEnd
-} #ipapassword_grouppolicy_length_upperbound
+} #ipapassword_grouppolicy_check_length_maximum_value
 
-ipapassword_grouppolicy_length_upperbound_logic()
+ipapassword_grouppolicy_check_length_maximum_value_logic()
 {
     
     
@@ -2274,13 +2274,13 @@ ipapassword_grouppolicy_length_upperbound_logic()
         done
         rm $out
     
-} # ipapassword_grouppolicy_length_upperbound_logic 
+} # ipapassword_grouppolicy_check_length_maximum_value_logic 
 
-ipapassword_grouppolicy_length_negative()
+ipapassword_grouppolicy_check_length_invalid_value()
 {
  
  
-    rlPhaseStartTest "ipapassword_grouppolicy_length_negative"
+    rlPhaseStartTest "ipapassword_grouppolicy_check_length_invalid_value"
         rlLog "set length to negative integer or letter should fail"
         add_test_grp
         reset_group_pwpolicy
@@ -2288,19 +2288,19 @@ ipapassword_grouppolicy_length_negative()
         Local_KinitAsAdmin
         for length_value in -1 abc
         do
-            ipapassword_grouppolicy_length_negative_logic $length_value
+            ipapassword_grouppolicy_check_length_invalid_value_logic $length_value
         done
     rlPhaseEnd
-} #ipapassword_grouppolicy_length_negative
+} #ipapassword_grouppolicy_check_length_invalid_value
 
-ipapassword_grouppolicy_length_negative_logic()
+ipapassword_grouppolicy_check_length_invalid_value_logic()
 {
     
     
         local v=$1
         rlRun "ipa pwpolicy-mod $testgrp --minlength=$v" 1 "expect to fail when minlength=[$v]"
     
-} # ipapassword_grouppolicy_length_negative_logic 
+} # ipapassword_grouppolicy_check_length_invalid_value_logic 
 
 ipapassword_nestedgroup_envsetup()
 {
@@ -2810,15 +2810,15 @@ ipapassword_attr_envcleanup()
 ipapassword_attr_set()
 {
     ipapassword_attr_set_krbMaxPwdLife
-    ipapassword_attr_set_krbMaxPwdLife_negative
+    ipapassword_attr_set_krbMaxPwdLife_invalid_value
     ipapassword_attr_set_krbMinPwdLife
-    ipapassword_attr_set_krbMinPwdLife_negative
+    ipapassword_attr_set_krbMinPwdLife_invalid_value
     ipapassword_attr_set_krbPwdMinDiffChars
-    ipapassword_attr_set_krbPwdMinDiffChars_negative
+    ipapassword_attr_set_krbPwdMinDiffChars_invalid_value
     ipapassword_attr_set_krbPwdMinLength
-    ipapassword_attr_set_krbPwdMinLength_negative
+    ipapassword_attr_set_krbPwdMinLength_invalid_value
     ipapassword_attr_set_krbPwdHistoryLength
-    ipapassword_attr_set_krbPwdHistoryLength_negative
+    ipapassword_attr_set_krbPwdHistoryLength_invalid_value
 } #ipapassword_attr_set
 
 ipapassword_attr_set_krbMaxPwdLife()
@@ -2835,9 +2835,9 @@ ipapassword_attr_set_krbMaxPwdLife()
     rlPhaseEnd
 } #ipapassword_attr_set_krbMaxPwdLife
 
-ipapassword_attr_set_krbMaxPwdLife_negative()
+ipapassword_attr_set_krbMaxPwdLife_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_set_krbMaxPwdLife_negative"
+    rlPhaseStartTest "ipapassword_attr_set_krbMaxPwdLife_invalid_value"
         local attr=krbMaxPwdLife
         local value=`getrandomstring`
         rlRun "rlDistroDiff keyctl"
@@ -2845,7 +2845,7 @@ ipapassword_attr_set_krbMaxPwdLife_negative()
         ipapassword_attr_set_logic $attr $value 1 ""
         rlRun "$kdestroy"
     rlPhaseEnd
-} #ipapassword_attr_set_krbMaxPwdLife_negative
+} #ipapassword_attr_set_krbMaxPwdLife_invalid_value
 
 ipapassword_attr_set_krbMinPwdLife()
 {
@@ -2862,9 +2862,9 @@ ipapassword_attr_set_krbMinPwdLife()
     rlPhaseEnd
 } #ipapassword_attr_set_krbMinPwdLife
 
-ipapassword_attr_set_krbMinPwdLife_negative()
+ipapassword_attr_set_krbMinPwdLife_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_set_krbMinPwdLife_negative"
+    rlPhaseStartTest "ipapassword_attr_set_krbMinPwdLife_invalid_value"
         local attr=krbMinPwdLife
         local value=`getrandomstring`
         rlRun "rlDistroDiff keyctl"
@@ -2873,7 +2873,7 @@ ipapassword_attr_set_krbMinPwdLife_negative()
         rlRun "$kdestroy"
     rlPhaseEnd
 
-} #ipapassword_attr_set_krbMinPwdLife_negative
+} #ipapassword_attr_set_krbMinPwdLife_invalid_value
 
 ipapassword_attr_set_krbPwdMinDiffChars()
 {
@@ -2891,9 +2891,9 @@ ipapassword_attr_set_krbPwdMinDiffChars()
 
 } #ipapassword_attr_set_krbPwdMinDiffChars
 
-ipapassword_attr_set_krbPwdMinDiffChars_negative()
+ipapassword_attr_set_krbPwdMinDiffChars_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinDiffChars_negative"
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinDiffChars_invalid_value"
         local attr=krbPwdMinDiffChars
         local value=`getrandomint 6 50000`
         rlRun "rlDistroDiff keyctl"
@@ -2902,7 +2902,7 @@ ipapassword_attr_set_krbPwdMinDiffChars_negative()
         rlRun "$kdestroy"
     rlPhaseEnd
 
-} #ipapassword_attr_set_krbPwdMinDiffChars_negative
+} #ipapassword_attr_set_krbPwdMinDiffChars_invalid_value
 
 ipapassword_attr_set_krbPwdMinLength()
 {
@@ -2917,9 +2917,9 @@ ipapassword_attr_set_krbPwdMinLength()
 
 } #ipapassword_attr_set_krbPwdMinLength
 
-ipapassword_attr_set_krbPwdMinLength_negative()
+ipapassword_attr_set_krbPwdMinLength_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinLength_negative"
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdMinLength_invalid_value"
         local attr=krbPwdMinLength
         local value=`getrandomstring`
         rlRun "rlDistroDiff keyctl"
@@ -2928,7 +2928,7 @@ ipapassword_attr_set_krbPwdMinLength_negative()
         rlRun "$kdestroy"
     rlPhaseEnd
 
-} #ipapassword_attr_set_krbPwdMinLength_negative
+} #ipapassword_attr_set_krbPwdMinLength_invalid_value
 
 ipapassword_attr_set_krbPwdHistoryLength()
 {
@@ -2943,9 +2943,9 @@ ipapassword_attr_set_krbPwdHistoryLength()
 
 } #ipapassword_attr_set_krbPwdHistoryLength
 
-ipapassword_attr_set_krbPwdHistoryLength_negative()
+ipapassword_attr_set_krbPwdHistoryLength_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_set_krbPwdHistoryLength_negative"
+    rlPhaseStartTest "ipapassword_attr_set_krbPwdHistoryLength_invalid_value"
         local attr=krbPwdHistoryLength
         local value=`getrandomint`
         rlRun "rlDistroDiff keyctl"
@@ -2954,7 +2954,7 @@ ipapassword_attr_set_krbPwdHistoryLength_negative()
         rlRun "$kdestroy"
     rlPhaseEnd
 
-} #ipapassword_attr_set_krbPwdHistoryLength_negative
+} #ipapassword_attr_set_krbPwdHistoryLength_invalid_value
 
 ipapassword_attr_set_logic()
 {
@@ -2989,15 +2989,15 @@ ipapassword_attr_set_logic()
 ipapassword_attr_add()
 {
     ipapassword_attr_add_krbMaxPwdLife
-    ipapassword_attr_add_krbMaxPwdLife_negative
+    ipapassword_attr_add_krbMaxPwdLife_invalid_value
     ipapassword_attr_add_krbMinPwdLife
-    ipapassword_attr_add_krbMinPwdLife_negative
+    ipapassword_attr_add_krbMinPwdLife_invalid_value
     ipapassword_attr_add_krbPwdMinDiffChars
-    ipapassword_attr_add_krbPwdMinDiffChars_negative
+    ipapassword_attr_add_krbPwdMinDiffChars_invalid_value
     ipapassword_attr_add_krbPwdMinLength
-    ipapassword_attr_add_krbPwdMinLength_negative
+    ipapassword_attr_add_krbPwdMinLength_invalid_value
     ipapassword_attr_add_krbPwdHistoryLength
-    ipapassword_attr_add_krbPwdHistoryLength_negative
+    ipapassword_attr_add_krbPwdHistoryLength_invalid_value
 } #ipapassword_attr_add
 
 ipapassword_attr_add_krbMaxPwdLife()
@@ -3014,9 +3014,9 @@ ipapassword_attr_add_krbMaxPwdLife()
     rlPhaseEnd
 } #ipapassword_attr_add_krbMaxPwdLife
 
-ipapassword_attr_add_krbMaxPwdLife_negative()
+ipapassword_attr_add_krbMaxPwdLife_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_add_krbMaxPwdLife_negative"
+    rlPhaseStartTest "ipapassword_attr_add_krbMaxPwdLife_invalid_value"
         local attr=krbMaxPwdLife
         local value=`getrandomstring`
         rlRun "rlDistroDiff keyctl"
@@ -3024,7 +3024,7 @@ ipapassword_attr_add_krbMaxPwdLife_negative()
         ipapassword_attr_add_logic $attr $value $fail ""
         rlRun "$kdestroy"
     rlPhaseEnd
-} #ipapassword_attr_add_krbMaxPwdLife_negative
+} #ipapassword_attr_add_krbMaxPwdLife_invalid_value
 
 ipapassword_attr_add_krbMinPwdLife()
 {
@@ -3041,9 +3041,9 @@ ipapassword_attr_add_krbMinPwdLife()
     rlPhaseEnd
 } #ipapassword_attr_add_krbMinPwdLife
 
-ipapassword_attr_add_krbMinPwdLife_negative()
+ipapassword_attr_add_krbMinPwdLife_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_add_krbMinPwdLife_negative"
+    rlPhaseStartTest "ipapassword_attr_add_krbMinPwdLife_invalid_value"
         local attr=krbMinPwdLife
         local value=`getrandomstring`
         rlRun "rlDistroDiff keyctl"
@@ -3051,7 +3051,7 @@ ipapassword_attr_add_krbMinPwdLife_negative()
         ipapassword_attr_add_logic $attr $value $fail "ipa: ERROR: invalid 'krbminpwdlife': must be an integer"
         rlRun "$kdestroy"
     rlPhaseEnd
-} #ipapassword_attr_add_krbMinPwdLife_negative
+} #ipapassword_attr_add_krbMinPwdLife_invalid_value
 
 ipapassword_attr_add_krbPwdMinDiffChars()
 {
@@ -3066,9 +3066,9 @@ ipapassword_attr_add_krbPwdMinDiffChars()
 
 } #ipapassword_attr_add_krbPwdMinDiffChars
 
-ipapassword_attr_add_krbPwdMinDiffChars_negative()
+ipapassword_attr_add_krbPwdMinDiffChars_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinDiffChars_negative"
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinDiffChars_invalid_value"
         local attr=krbPwdMinDiffChars
         local value=`getrandomint 6 50000`
         rlRun "rlDistroDiff keyctl"
@@ -3077,7 +3077,7 @@ ipapassword_attr_add_krbPwdMinDiffChars_negative()
         rlRun "$kdestroy"
     rlPhaseEnd
 
-} #ipapassword_attr_add_krbPwdMinDiffChars_negative
+} #ipapassword_attr_add_krbPwdMinDiffChars_invalid_value
 
 ipapassword_attr_add_krbPwdMinLength()
 {
@@ -3092,9 +3092,9 @@ ipapassword_attr_add_krbPwdMinLength()
 
 } #ipapassword_attr_add_krbPwdMinLength
 
-ipapassword_attr_add_krbPwdMinLength_negative()
+ipapassword_attr_add_krbPwdMinLength_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinLength_negative"
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdMinLength_invalid_value"
         local attr=krbPwdMinLength
         local value=`getrandomstring`
         rlRun "rlDistroDiff keyctl"
@@ -3103,7 +3103,7 @@ ipapassword_attr_add_krbPwdMinLength_negative()
         rlRun "$kdestroy"
     rlPhaseEnd
 
-} #ipapassword_attr_add_krbPwdMinLength_negative
+} #ipapassword_attr_add_krbPwdMinLength_invalid_value
 
 ipapassword_attr_add_krbPwdHistoryLength()
 {
@@ -3118,9 +3118,9 @@ ipapassword_attr_add_krbPwdHistoryLength()
 
 } #ipapassword_attr_add_krbPwdHistoryLength
 
-ipapassword_attr_add_krbPwdHistoryLength_negative()
+ipapassword_attr_add_krbPwdHistoryLength_invalid_value()
 {
-    rlPhaseStartTest "ipapassword_attr_add_krbPwdHistoryLength_negative"
+    rlPhaseStartTest "ipapassword_attr_add_krbPwdHistoryLength_invalid_value"
         local attr=krbPwdHistoryLength
         local value=`getrandomint`
         rlRun "rlDistroDiff keyctl"
@@ -3129,7 +3129,7 @@ ipapassword_attr_add_krbPwdHistoryLength_negative()
         rlRun "$kdestroy"
     rlPhaseEnd
 
-} #ipapassword_attr_add_krbPwdHistoryLength_negative
+} #ipapassword_attr_add_krbPwdHistoryLength_invalid_value
 
 ipapassword_attr_add_logic()
 {
