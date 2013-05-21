@@ -46,7 +46,7 @@ cert_remove_hold_envcleanup()
 } #envcleanup
 cert_remove_hold_1001()
 { #test_scenario (positive): --certid
-    rlPhaseStartTest "cert_remove_hold_1001"
+    rlPhaseStartTest "cert_remove_hold_1001: when cert revoked as reason 6 cert can remove hold"
         local testID="cert_remove_hold_1001"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
         create_cert
@@ -83,7 +83,7 @@ cert_remove_hold_1001()
 
 cert_remove_hold_1002()
 { #test_scenario (negative): when cert revoked in reason other than 6, remove-hold should fail
-    rlPhaseStartTest "cert_remove_hold_1002"
+    rlPhaseStartTest "cert_remove_hold_1002: when cert revoked not as reason 6 cert cannot remove hold"
         local testID="cert_remove_hold_1002"
         local tmpout=$TmpDir/cert_remove_hold_1002.$RANDOM.out
         rlLog "iterating revokation reason from 0 -> 10 (skip 6) "
@@ -128,7 +128,7 @@ cert_remove_hold_1002()
 
 cert_remove_hold_1003()
 { #test_scenario (negative):  remove-hold <invalid cert id>
-    rlPhaseStartTest "cert_remove_hold_1003"
+    rlPhaseStartTest "cert_remove_hold_1003: remove-hold <invalid cert id>"
         local testID="cert_remove_hold_1003"
         local tmpout=$TmpDir/cert_remove_hold_1001.$RANDOM.out
         KinitAsAdmin
@@ -167,7 +167,7 @@ cert_remove_hold_1003()
 } #cert_remove_hold_1003
 cert_remove_hold_1004()
 { #test_scenario (Negative): Unrevoke a certificate which is not revoked.
-    rlPhaseStartTest "cert_remove_hold_1004"
+    rlPhaseStartTest "cert_remove_hold_1004: Unrevoke a certificate which is not revoked"
         local testID="cert_remove_hold_1004"
         local tmpout=$TmpDir/cert_remove_hold_1004.$RANDOM.out
         create_cert
@@ -237,7 +237,7 @@ cert_request_envcleanup()
 
 cert_request_1001()
 { #test_scenario (negative): --add --principal;negative;STR --request-type;positive;STR
-    rlPhaseStartTest "cert_request_1001"
+    rlPhaseStartTest "cert_request_1001: --add --principal;negative;STR --request-type;positive;STR"
         local testID="cert_request_1001_$RANDOM"
         local tmpout=$TmpDir/cert_request_1001.$RANDOM.out
         local request_type_TestValue="pkcs10" #request-type;positive;STR
@@ -270,7 +270,7 @@ cert_request_1001()
 
 cert_request_1002()
 { #test_scenario (negative): --add --principal;positive;STR --request-type;negative;STR
-    rlPhaseStartTest "cert_request_1002"
+    rlPhaseStartTest "cert_request_1002: --add --principal;positive;STR --request-type;negative;STR"
         local testID="cert_request_1002_$RANDOM"
         local tmpout=$TmpDir/cert_request_1002.$RANDOM.out
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
@@ -291,7 +291,7 @@ cert_request_1002()
 
 cert_request_1003()
 { #test_scenario (positive): --add --principal;positive;STR --request-type;positive;STR
-    rlPhaseStartTest "cert_request_1003"
+    rlPhaseStartTest "cert_request_1003: --add --principal;positive;STR --request-type;positive;STR"
         local testID="cert_request_1003_$RANDOM"
         local tmpout=$TmpDir/cert_request_1003.$RANDOM.out
         local certRequestFile=$TmpDir/certrequest.$RANDOM.certreq.csr
@@ -310,7 +310,7 @@ cert_request_1003()
 
 cert_request_1004()
 { #test_scenario (negative): --principal;negative;STR
-    rlPhaseStartTest "cert_request_1004"
+    rlPhaseStartTest "cert_request_1004: --principal;negative;STR"
         local testID="cert_request_1004_$RANDOM"
         local tmpout=$TmpDir/cert_request_1004.$RANDOM.out
 
@@ -342,7 +342,7 @@ cert_request_1004()
 
 cert_request_1005()
 { #test_scenario (negative): --principal;negative;STR --request-type;positive;STR
-    rlPhaseStartTest "cert_request_1005"
+    rlPhaseStartTest "cert_request_1005: --principal;negative;STR --request-type;positive;STR"
         local testID="cert_request_1005_$RANDOM"
         local tmpout=$TmpDir/cert_request_1005.$RANDOM.out
 
@@ -378,7 +378,7 @@ cert_request_1005()
 
 cert_request_1006()
 { #test_scenario (positive): --principal;positive;STR
-    rlPhaseStartTest "cert_request_1006"
+    rlPhaseStartTest "cert_request_1006: --principal;positive;STR"
         local testID="cert_request_1006_$RANDOM"
         local tmpout=$TmpDir/cert_request_1006.$RANDOM.out
 
@@ -401,7 +401,7 @@ cert_request_1006()
 
 cert_request_1007()
 { #test_scenario (negative): --principal;positive;STR --request-type;negative;STR
-    rlPhaseStartTest "cert_request_1007"
+    rlPhaseStartTest "cert_request_1007: --principal;positive;STR --request-type;negative;STR"
         local testID="cert_request_1007_$RANDOM"
         local tmpout=$TmpDir/cert_request_1007.$RANDOM.out
         KinitAsAdmin
@@ -426,7 +426,7 @@ cert_request_1007()
 
 cert_request_1008()
 { #test_scenario (positive): --principal;positive;STR --request-type;positive;STR
-    rlPhaseStartTest "cert_request_1008"
+    rlPhaseStartTest "cert_request_1008: --principal;positive;STR --request-type;positive;STR"
         local testID="cert_request_1008_$RANDOM"
         local tmpout=$TmpDir/cert_request_1008.$RANDOM.out
         KinitAsAdmin
@@ -449,7 +449,7 @@ cert_request_1008()
 
 cert_request_1009()
 { #test_scenario (negative): use same cert request file and principle twice, the first will be revoked with reason 4
-    rlPhaseStartTest "cert_request_1009"
+    rlPhaseStartTest "cert_request_1009: use same cert request file and principle twice, the first will be revoked with reason 4"
         local testID="cert_request_1009_$RANDOM"
         local tmpout=$TmpDir/cert_request_1009.$RANDOM.out
         local certfile=$TmpDir/cert_request_1009.$RANDOM.certs
@@ -526,7 +526,7 @@ cert_request_1009()
 
 cert_request_1010()
 { #test_scenario (negative): csr given only as argument and service principal does not exists
-    rlPhaseStartTest "cert_request_1010"
+    rlPhaseStartTest "cert_request_1010: csr given only as argument and service principal does not exists"
         local testID="cert_request_1010_$RANDOM"
         local tmpout=$TmpDir/cert_request_1010.$RANDOM.out
         local exp=$TmpDir/cert_request_1010.$RANDOM.exp
@@ -564,7 +564,7 @@ cert_request_1010()
 
 cert_request_1011()
 { #test_scenario (Positive): csr given only as argument after service principal added through ipa service-add
-    rlPhaseStartTest "cert_request_1011"
+    rlPhaseStartTest "cert_request_1011: csr given only as argument after service principal added through ipa service-add"
         local testID="cert_request_1011_$RANDOM"
         local tmpout=$TmpDir/cert_request_1011.$RANDOM.out
         local exp=$TmpDir/cert_request_1011.$RANDOM.exp
@@ -602,7 +602,7 @@ cert_request_1011()
 
 cert_request_1012()
 { #test_scenario (negative): incorrect csr given as argument after service principal added through ipa service-add
-    rlPhaseStartTest "cert_request_1012"
+    rlPhaseStartTest "cert_request_1012: incorrect csr given as argument after service principal added through ipa service-add"
         local testID="cert_request_1012_$RANDOM"
         local tmpout=$TmpDir/cert_request_1012.$RANDOM.out
         local exp=$TmpDir/cert_request_1012.$RANDOM.exp
@@ -642,7 +642,7 @@ cert_request_1012()
 
 cert_request_1013()
 { #test_scenario (positive): csr given as argument along with --add option
-    rlPhaseStartTest "cert_request_1013"
+    rlPhaseStartTest "cert_request_1013: csr given as argument along with --add option"
         local testID="cert_request_1013_$RANDOM"
         local tmpout=$TmpDir/cert_request_1013.$RANDOM.out
         local exp=$TmpDir/cert_request_1013.$RANDOM.exp
@@ -679,7 +679,7 @@ cert_request_1013()
  
 cert_request_1014()
 { #test_scenario (Positive): csr--positive and request-type --positive as arguments 
-    rlPhaseStartTest "cert_request_1014"
+    rlPhaseStartTest "cert_request_1014: csr--positive and request-type --positive as arguments"
         local testID="cert_request_1014_$RANDOM"
         local tmpout=$TmpDir/cert_request_1014.$RANDOM.out
         local exp=$TmpDir/cert_request_1014.$RANDOM.exp
@@ -717,7 +717,7 @@ cert_request_1014()
 
 cert_request_1015()
 { #test_scenario (Positive): csr--positive and request-type --negative as arguments 
-    rlPhaseStartTest "cert_request_1015"
+    rlPhaseStartTest "cert_request_1015: csr--positive and request-type --negative as arguments"
         local testID="cert_request_1015_$RANDOM"
         local tmpout=$TmpDir/cert_request_1015.$RANDOM.out
         local exp=$TmpDir/cert_request_1015.$RANDOM.exp
@@ -755,7 +755,7 @@ cert_request_1015()
 
 cert_request_1016()
 { #test_scenario (Negative): csr--positive , --principal -- negative and request-type --negative as arguments 
-    rlPhaseStartTest "cert_request_1016"
+    rlPhaseStartTest "cert_request_1016: csr--positive , --principal -- negative and request-type --negative as arguments"
         local testID="cert_request_1016_$RANDOM"
         local tmpout=$TmpDir/cert_request_1016.$RANDOM.out
         local exp=$TmpDir/cert_request_1016.$RANDOM.exp
@@ -794,7 +794,7 @@ cert_request_1016()
 
 cert_request_1017()
 { #test_scenario (Positive): key-sizes --3072,4096
-    rlPhaseStartTest "cert_request_1017"
+    rlPhaseStartTest "cert_request_1017: key-sizes --3072,4096"
         local testID="cert_request_1017_$RANDOM"
         local tmpout=$TmpDir/cert_request_1017.$RANDOM.out
         local exp=$TmpDir/cert_request_1017.$RANDOM.exp
@@ -871,7 +871,7 @@ cert_revoke_envcleanup()
 
 cert_revoke_1001()
 { #test_scenario (negative): valid cert id + --revocation-reason;negative;-1,11
-    rlPhaseStartTest "cert_revoke_1001"
+    rlPhaseStartTest "cert_revoke_1001: valid cert id + --revocation-reason;negative;-1,11"
         local testID="cert_revoke_1001"
         local tmpout=$TmpDir/cert_revoke_1001.$RANDOM.out
         local expectedErrMsg="invalid 'revocation_reason': must be an integer"
@@ -902,7 +902,7 @@ cert_revoke_1001()
 
 cert_revoke_1002()
 { #test_scenario (positive): valid cert id (in decimal) + --revocation-reason;positive;0,1,2,3,4,5,6,8,9,10
-    rlPhaseStartTest "cert_revoke_1002"
+    rlPhaseStartTest "cert_revoke_1002: valid cert id (in decimal) + --revocation-reason;positive;0,1,2,3,4,5,6,8,9,10"
         local testID="cert_revoke_1002"
         local tmpout=$TmpDir/certrevoke1002.$RANDOM.out
         for reason in 0 1 2 3 4 5 6 8 9 10
@@ -937,7 +937,7 @@ cert_revoke_1002()
 
 cert_revoke_1003()
 { #test_scenario (negative):revoke a non-exist cert
-    rlPhaseStartTest "cert_revoke_1003"
+    rlPhaseStartTest "cert_revoke_1003: revoke a non-exist cert"
         local testID="cert_revoke_1003"
         KinitAsAdmin
         for invalid_cert in z abc 100abc 10000000000
@@ -950,7 +950,7 @@ cert_revoke_1003()
 
 cert_revoke_1004()
 { #test_scenario (positive): valid cert id (in decimal) + --revocation-reason;positive;0,1,2,3,4,5,6,8,9,10
-    rlPhaseStartTest "cert_revoke_1004"
+    rlPhaseStartTest "cert_revoke_1004: valid cert id (in decimal) + --revocation-reason;positive;0,1,2,3,4,5,6,8,9,10"
         local testID="cert_revoke_1004"
         local tmpout=$TmpDir/certrevoke1004.$RANDOM.out
         for reason in 0 1 2 3 4 5 6 8 9 10
@@ -986,7 +986,7 @@ cert_revoke_1004()
 
 cert_revoke_1005()
 { #test_scenario (positive): without revocation-reason provided
-    rlPhaseStartTest "cert_revoke_1005"
+    rlPhaseStartTest "cert_revoke_1005: without revocation-reason provided"
         local testID="cert_revoke_1005"
         local tmpout=$TmpDir/certrevoke1005.$RANDOM.out
           create_cert
@@ -1019,7 +1019,7 @@ cert_revoke_1005()
 
 cert_revoke_1006()
 { #test_scenario (positive): revoking a revoked certificate 
-    rlPhaseStartTest "cert_revoke_1006"
+    rlPhaseStartTest "cert_revoke_1006: revoking a revoked certificate"
         local testID="cert_revoke_1006"
         local tmpout=$TmpDir/certrevoke1006.$RANDOM.out
           create_cert
@@ -1045,7 +1045,7 @@ cert_revoke_1006()
 
 cert_revoke_1007()
 { #test_scenario (positive): valid cert id + --revocation-reason is 7
-    rlPhaseStartTest "cert_revoke_1007"
+    rlPhaseStartTest "cert_revoke_1007: valid cert id + --revocation-reason is 7"
         local testID="cert_revoke_1007"
         local tmpout=$TmpDir/cert_revoke_1007.$RANDOM.out
         local expectedErrMsg="7 is not a valid revocation reason"
@@ -1073,7 +1073,7 @@ cert_revoke_1007()
 
 cert_revoke_1008()
 { #test_scenario (negative): no cert id provided 
-    rlPhaseStartTest "cert_revoke_1008"
+    rlPhaseStartTest "cert_revoke_1008: no cert id provided"
         local testID="cert_revoke_1008"
         local tmpout=$TmpDir/cert_revoke_1008.$RANDOM.out
         local exp=$TmpDir/createCertRequestFile.$RANDOM.exp # beaker test
@@ -1108,7 +1108,7 @@ cert_revoke_1008()
 
 cert_revoke_1009()
 { #test_scenario (negative): empty --revocation-reason provided
-    rlPhaseStartTest "cert_revoke_1009"
+    rlPhaseStartTest "cert_revoke_1009: empty --revocation-reason provided"
     #    local testID="cert_revoke_1009"
         local tmpout=$TmpDir/cert_revoke_1009.$RANDOM.out
         create_cert
@@ -1168,7 +1168,7 @@ cert_show_envcleanup()
 
 cert_show_1001()
 { #test_scenario (negative): given invalid cert request id
-    rlPhaseStartTest "cert_show_1001"
+    rlPhaseStartTest "cert_show_1001: given invalid cert request id"
         local testID="cert_show_1001"
         local tmpout=$TmpDir/cert_show_1001.$RANDOM.out
         KinitAsAdmin
@@ -1190,7 +1190,7 @@ cert_show_1001()
 
 cert_show_1002()
 { #test_scenario (positive): --out;positive;CertOutFile
-    rlPhaseStartTest "cert_show_1002"
+    rlPhaseStartTest "cert_show_1002: --out;positive;CertOutFile"
         local testID="cert_show_1002"
         local tmpout=$TmpDir/cert_show_1002.$RANDOM.out
         KinitAsAdmin
@@ -1220,7 +1220,7 @@ cert_show_1002()
 
 cert_show_1003()
 { #test_scenario (negative): positive cert id + --out;negative;CertOutFile
-    rlPhaseStartTest "cert_show_1003"
+    rlPhaseStartTest "cert_show_1003: positive cert id + --out;negative;CertOutFile"
         local testID="cert_show_1003"
         local tmpout=$TmpDir/cert_show_1003.$RANDOM.out
         local errcode=0;
@@ -1237,7 +1237,7 @@ cert_show_1003()
 
 cert_show_1004()
 { #test_scenario (negative): serial no--negative ; out--positive
-    rlPhaseStartTest "cert_show_1004"
+    rlPhaseStartTest "cert_show_1004: serial no--negative ; out--positive"
         local testID="cert_show_1004"
         local tmpout=$TmpDir/cert_show_1004.$RANDOM.out
         KinitAsAdmin
@@ -1258,7 +1258,7 @@ cert_show_1004()
 } #cert_show_1004
 cert_show_1005()
 { #test_scenario (positive): revoked certificate is also shown with status revoked.
-    rlPhaseStartTest "cert_show_1005"
+    rlPhaseStartTest "cert_show_1005: revoked certificate is also shown with status revoked"
         local testID="cert_show_1005"
         local tmpout=$TmpDir/certshow1005.$RANDOM.out
          for cert in `cat $certList`;do
@@ -1289,7 +1289,7 @@ cert_show_1005()
 } #cert_show_1005
 cert_show_1006()
 { #test_scenario (negative): given invalid cert request id other than decimal or hexadecimal
-    rlPhaseStartTest "cert_show_1006"
+    rlPhaseStartTest "cert_show_1006: given invalid cert request id other than decimal or hexadecimal"
         local testID="cert_show_1006"
         local tmpout=$TmpDir/cert_show_1006.$RANDOM.out
         KinitAsAdmin
@@ -1335,7 +1335,7 @@ cert_status_envcleanup()
 
 cert_status_1001()
 { #test_scenario (positive): valid cert id
-    rlPhaseStartTest "cert_status_1001"
+    rlPhaseStartTest "cert_status_1001: valid cert id"
         local testID="cert_status_1001"
         local tmpout=$TmpDir/cert_status_1001.$RANDOM.out
         KinitAsAdmin
@@ -1368,7 +1368,7 @@ cert_status_1001()
 
 cert_status_1002()
 { #test_scenario (negative): invalid cert id
-    rlPhaseStartTest "cert_status_1002"
+    rlPhaseStartTest "cert_status_1002: invalid cert id"
         local testID="cert_status_1002"
         local tmpout=$TmpDir/cert_status_1002.$RANDOM.out
         KinitAsAdmin
