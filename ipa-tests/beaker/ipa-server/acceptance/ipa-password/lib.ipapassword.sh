@@ -210,15 +210,15 @@ append_test_user_to_tesst_group()
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     ipa group-show $testgrp > $out
-    if grep "Member users" $out | grep -i "$testac" $out 2>&1 > /dev/null
+    if grep "Member users" $out | grep -i "$testac"  2>&1 > /dev/null
     then
         rlPass "user [$testac] is already member of [$testgrp]"
     else
-        rlLog "add user [$user] as member of grouup [$testgrp]: ipa group-add-member $testgrp --users=$testac"
+        rlLog "add user [$user] as member of group [$testgrp]: ipa group-add-member $testgrp --users=$testac"
         rlRun "ipa group-add-member $testgrp --users=$testac"
     fi
     rlRun "$kdestroy"
-} # add_test_member
+}
 
 append_nested_test_group_to_test_group()
 {

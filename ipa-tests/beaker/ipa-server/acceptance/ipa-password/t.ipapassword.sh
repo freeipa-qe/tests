@@ -418,7 +418,7 @@ ipapassword_globalpolicy_check_minlifetime_maximum_value_logic()
 # https://bugzilla.redhat.com/show_bug.cgi?id=461332 are closed
 bz_461332()
 {
-	rlPhaseStartTest "bug: 461332 ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value"
+	rlPhaseStartTest "Bug 461332 - ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value"
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
 		rlLog "attempt to set minlife greater than maxlife"
