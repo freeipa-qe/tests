@@ -74,6 +74,7 @@ function irm_check_ruv()
     local runerrnum=0
 
     for runhost1 in $runhosts; do
+        ruvprev=""
         for runhost2 in $runhosts; do
             ruvcurr=$(ldapsearch -o ldif-wrap=no -xLLL \
             -h $runhost2 -D "$ROOTDN" -w $ROOTDNPWD -b $BASEDN \
@@ -83,6 +84,7 @@ function irm_check_ruv()
                 runerrnum=$(( runerrnum += 1 ))
             fi
             rlLog "On $runhost2 RUV MaxCSN for $runhost1 is $ruvcurr"
+            ruvprev="$ruvcurr"
         done
         echo
     done
