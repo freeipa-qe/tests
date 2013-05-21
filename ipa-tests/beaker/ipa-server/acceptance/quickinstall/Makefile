@@ -29,7 +29,8 @@ export TESTVERSION=3.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE ipa-install.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE 
+#ipa-install.sh
 
 .PHONY: all install download clean
 

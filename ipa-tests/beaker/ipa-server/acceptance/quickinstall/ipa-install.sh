@@ -1125,6 +1125,15 @@ ipa_install_master()
             cp /var/log/dirsrv/slapd-$INSTANCE/access /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
             rhts-submit-log -l /var/log/dirsrv/slapd-$INSTANCE/access.$DATE
         fi
+
+        rlLog "Enable LDAP Replication Debugging"
+        LLOG=/tmp/ldap.enable.errlog
+        unindent > $LLOG <<<"\
+        dn: cn=config
+        changetype: modify
+        replace: nsslapd-errorlog-level
+        nsslapd-errorlog-level: 8192"
+        rlRun "ldapmodify -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $LLOG"
     fi  
 }
 
@@ -1166,6 +1175,17 @@ ipa_install_replica()
     fi
 
     ipa_install_sssd_workarounds
+
+    if [ $IPADEBUG ]; then
+        rlLog "Enable LDAP Replication Debugging"
+        LLOG=/tmp/ldap.enable.errlog
+        unindent > $LLOG <<<"\
+        dn: cn=config
+        changetype: modify
+        replace: nsslapd-errorlog-level
+        nsslapd-errorlog-level: 8192"
+        rlRun "ldapmodify -x -D \"$ROOTDN\" -w \"$ROOTDNPWD\" -f $LLOG"
+    fi
 }
 
 ipa_install_client()
