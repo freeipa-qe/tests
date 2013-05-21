@@ -12,6 +12,7 @@ ipacert()
     cert_revoke
     cert_show
     cert_status
+    cert_BZ
 } #cert
 
 #############################################
@@ -1411,5 +1412,31 @@ cert_status_1002()
     rlPhaseEnd
 } #cert_status_1002
 
+cert_BZ()
+{
+	KinitAsAdmin # Kinit as admin for good measure
+	csr_no_description_BZ910468 # Test of a bug reporting a internal service error on a bad csr
+}
 
 #END OF TEST CASE for [cert-status]
+
+csr_no_description_BZ910468()
+{
+	rlPhaseStartTest "cert_bz_0001: Internal server error on CSR with no subject hostname BZ910468"
+		ipaddr=$(hostname -i) # Get IP address of this host
+		rlLog "Ip address is $ipaddr"
+		ipoc1=$(echo $ipaddr | cut -d\. -f1)
+		ipoc2=$(echo $ipaddr | cut -d\. -f2)
+		ipoc3=$(echo $ipaddr | cut -d\. -f3)
+		ipoc4=$(echo $ipaddr | cut -d\. -f4)
+		let newip4=$ipoc4+1
+		newip="$ipoc1.$ipoc2.$ipoc3.$newip4"
+		rlLog "creating new host with IP $newip"
+		rlRun "ipa host-add testhostBZ910468.$DOMAIN --ip-address='$newip'" 0 "Creating host to test with this BZ test"
+		csrfile="$TmpDir/example.csr"
+		rm -f $csrfile
+		echo . | openssl req -new -nodes -out $csrfile
+		rlRun "ipa cert-request --add --principal=EXAMPLE/testhostBZ910468.$DOMAIN example.csr"
+		rlRun "ipa host-del testhostBZ910468.$DOMAIN" 0 "Cleaning up host created for this test."
+	rlPhaseEnd
+}
