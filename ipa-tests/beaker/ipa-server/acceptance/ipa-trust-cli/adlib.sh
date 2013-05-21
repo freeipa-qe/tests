@@ -105,6 +105,13 @@ Add_Trust() {
 	elif [ "$1" = "onlyserver" ]; then
 	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --server=\$var4\r\"" >> $expfile
           echo 'expect "Realm name: " { send -s -- "$var1\r" }' >> $expfile
+	elif [ "$1" = "base-id" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --base-id \$var4\r\"" >> $expfile
+	elif [ "$1" = "range" ]; then
+	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --range-size \$var4\r\"" >> $expfile
+	elif [ "$1" = "base_range" ]; then
+	  echo 'set var5 [lindex $argv 4]' >> $expfile
+	  echo "send \"$ipacmd trust-add --type=ad --admin \$var2 --password --base-id \$var4 --range-size \$var5\r\"" >> $expfile
 	else
           echo "send \"$ipacmd trust-add --type=ad \$var1 --admin \$var2 --password\r\"" >> $expfile
 	fi
@@ -115,7 +122,8 @@ Add_Trust() {
 	echo '"Trust status: Established and verified" { send_user "\nTrust added\n"; exit 0 }' >> $expfile
 	echo '"Shared secret for the trust: " { 
 	send -s -- "$var4\r"
-	expect "Trust status: Established and verified" { send_user "\nTrust added with Secret\n"; exit 0 } } }' >> $expfile
+	expect "Trust status: Established and verified" { send_user "\nTrust added with Secret\n"; exit 0 } }
+	"ipa: ERROR: Constraint violation: New base range overlaps with existing base range." { send_user "\nOverlaps existing local range\n"; exit 1 } }' >> $expfile
 	
 }
 
@@ -268,8 +276,6 @@ NBAD_Exp() {
 
 }
 
-
-
 Readd_Exp() {
 
         rm -rf $expfile
@@ -289,11 +295,29 @@ Readd_Exp() {
         echo 'expect "Re-established trust to domain \"$var1\"" {
         send_user "\n\n----Trust re-added as expected----\n\n"; exit 1}' >> $expfile 
 
-        
-
 }
 
+Trust_ID() {
 
-
-
-
+	rm -rf $expfile
+        echo 'set var1 [lindex $argv 0]' > $expfile
+        echo 'set var2 [lindex $argv 1]' >> $expfile
+        echo 'set var3 [lindex $argv 2]' >> $expfile
+        echo 'set var4 [lindex $argv 3]' >> $expfile
+        echo 'set var5 [lindex $argv 4]' >> $expfile
+        echo 'set timeout 20
+        set send_slow {1 .1}' >> $expfile
+	if [ "$1" = "empty" ]; then
+	  echo "spawn $ipacmd trust-add --type=ad \$var1 --admin \$var2 --password --\$var4" >> $expfile
+	  echo "expect {
+	\"ipa: error: --\$var4 option requires an argument\" { send_user \"\n\nOption takes an argument\n\n\"; exit 2 } 
+	  }" >> $expfile
+	elif [ "$1" = "invalid" ]; then
+	  echo "spawn $ipacmd trust-add --type=ad \$var1 --admin \$var2 --password --\$var4 \$var5" >> $expfile
+          echo 'expect "*assword: "
+          send -s -- "$var3\r"' >> $expfile
+	echo "expect {
+	\"*: must be an integer\" { send_user \"\n\nOption takes integer\n\n\"; exit 1 }
+	  }" >> $expfile
+	fi
+}

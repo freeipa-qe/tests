@@ -104,7 +104,6 @@ AD_Variables() {
 	adrid=`echo ${ad_values[3]}`
 	AD_SID=`echo ${ad_values[4]}`
 	New_adbase_id=$((adbase_id + adrange_size))
-# Check this with sbose
 	New_adrid=$((adrid + adrange_size))
 }
 
@@ -121,7 +120,7 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust and idrange Test Cas
 	rlRun "./adsetup.exp add $ADadmin $ADpswd $ADip $IPAdomain $IPAhostIP" 0 "Add conditional forwarder for $ADdomain"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	rlRun "$ipacmd dnszone-add $ADdomain --name-server=$ADhost --admin-email=hostmaster@$ADdomain --force --forwarder=$ADip --forward-policy=only" 0 "Adding forwarder for  $ADdomain"
+	rlRun "$ipacmd dnszone-add $ADdomain --name-server=$ADhost --admin-email=hostmaster@$ADdomain --force --forwarder=$ADip --forward-policy=only --ip-address=$ADip" 0 "Adding forwarder for $ADdomain"
 	sleep 30
 
 	# Deleting samba cache credential. Remove this after https://fedorahosted.org/freeipa/ticket/3479 is resolved

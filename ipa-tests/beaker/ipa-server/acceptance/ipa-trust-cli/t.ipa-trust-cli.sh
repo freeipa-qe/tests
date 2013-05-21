@@ -55,6 +55,12 @@ RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
 
 IPAhost=`hostname`
 IPAdomain="testrelm.com"
+IPADOMAIN=`echo ${IPAdomain^^}`
+IPA_range="$IPADOMAIN"_id_range
+ADDOMAIN=`echo ${ADdomain^^}`
+AD_range="$ADDOMAIN"_id_range
+ADDOMAIN2=`echo ${ADdomain2^^}`
+AD2_range="$ADDOMAIN2"_id_range
 IPAhostIP=`ip addr | egrep 'inet ' | grep "global" | cut -f1 -d/ | awk '{print $NF}'`
 srv_name=`hostname -s`
 NBname="TESTRELM"
@@ -90,8 +96,8 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 	rlRun "./adsetup.exp add $ADadmin2 $ADpswd2 $ADip2 $IPAdomain $IPAhostIP" 0 "Add conditional forwarder for $ADdomain"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
-	rlRun "$ipacmd dnszone-add $ADdomain --name-server=$ADhost --admin-email=hostmaster@$ADdomain --force --forwarder=$ADip --forward-policy=only" 0 "Adding forwarder for  $ADdomain"
-	rlRun "$ipacmd dnszone-add $ADdomain2 --name-server=$ADhost2 --admin-email=hostmaster@$ADdomain2 --force --forwarder=$ADip2 --forward-policy=only" 0 "Adding forwarder for  $ADdomain2"
+	rlRun "$ipacmd dnszone-add $ADdomain --name-server=$ADhost --admin-email=hostmaster@$ADdomain --force --forwarder=$ADip --forward-policy=only --ip-address=$ADip" 0 "Adding forwarder for  $ADdomain"
+	rlRun "$ipacmd dnszone-add $ADdomain2 --name-server=$ADhost2 --admin-email=hostmaster@$ADdomain2 --force --forwarder=$ADip2 --forward-policy=only --ip-address=$ADip2" 0 "Adding forwarder for  $ADdomain2"
 	sleep 30
 
 	# Deleting samba cache credential. Remove this after https://fedorahosted.org/freeipa/ticket/3479 is resolved
@@ -143,6 +149,25 @@ rlPhaseStartSetup "Setup both ADS and IPA Servers for trust"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 	rlRun "$ipacmd group-add-member admins --users=$user2" 0 "Adding $user2 to IPA admins group"
 rlPhaseEnd
+}
+
+IPA_Variables() {
+        # Defining some variables post ipa-adtrust-install      
+	ipa_values=(`$ipacmd idrange-show $IPA_range | awk '{print $NF}'`)
+	lbase_id=`echo ${ipa_values[1]}`
+	lrange_size=`echo ${ipa_values[2]}`
+	lrid_base=`echo ${ipa_values[3]}`
+	lsecrid_base=`echo ${ipa_values[4]}`
+}
+
+AD_Variables() {
+        ad_values=(`$ipacmd idrange-show $AD_range | awk '{print $NF}'`)
+        adbase_id=`echo ${ad_values[1]}`
+        adrange_size=`echo ${ad_values[2]}`
+        adrid=`echo ${ad_values[3]}`
+        AD_SID=`echo ${ad_values[4]}`
+        New_adbase_id=$((adbase_id + adrange_size))
+        New_adrid=$((adrid + adrange_size))
 }
 
 trust_test_0001() {
@@ -287,7 +312,7 @@ rlPhaseEnd
 trust_test_0017() {
 
 rlPhaseStartTest "0017 Provide user with admin rights in --admin option"
-	rlRun "ipa trust-del $ADdomain --continue" 0 "Deleting trust to continue testing"
+	rlRun "$ipacmd trust-del $ADdomain --continue" 0 "Deleting trust to continue testing"
 	rlRun "Add_Trust" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain $aduser2 $userpw" 0 "Trust add for $ADdomain2 by $aduser2 member of administrators group"
 rlPhaseEnd
@@ -406,6 +431,98 @@ trust_test_0031() {
 rlPhaseStartTest "0031 Show trust rights with --rights"
 	rlRun "Trust_Show rights" 0 "Creating expect script"
 	rlRun "$exp $expfile $ADdomain2" 0 "Show access rights"
+rlPhaseEnd
+}
+
+trust_test_0032() {
+
+rlPhaseStartTest "0032 Add trust with invalid values for --base-id"
+	rlRun "Trust_Del multi" 0 "Creating expect script"
+	rlRun "$exp $expfile $ADdomain $ADdomain2" 0 "Delete both trusts for next tests"
+	rlRun "Trust_ID empty" 0 "Creating expect script"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd base-id" 2 "--base-id requires an argument"
+	rlRun "Trust_ID invalid" 0 "Creating expect script"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd base-id sfae32df" 1 "--base-id requires an argument"
+
+rlPhaseEnd
+}
+
+trust_test_0033() {
+
+rlPhaseStartTest "0033 Add trust with invalid values for range-size"
+	rlRun "Trust_ID empty" 0 "Creating expect script"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd range-size" 2 "--range-size requires an argument"
+	rlRun "Trust_ID invalid" 0 "Creating expect script"
+        rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd range-size sfae32df" 1 "--range-size requires an argument"
+
+rlPhaseEnd
+}
+
+trust_test_0034() {
+
+rlPhaseStartTest "0034 Add trust with --base-id overlapping existing range"
+	IPA_Variables
+	# Calulating new base-id for AD range to avoid overlap error
+	new_base_id1=$((lbase_id + 9))
+	new_base_id2=$((lbase_id + lrange_size - 1))
+	new_base_id3=$((lbase_id - 200000 + 1))
+	rlRun "Add_Trust base-id" 0 "Creating expect script"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd $new_base_id1" 1 "base-id $new_base_id1 within existing range fails"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd $new_base_id2" 1 "base-id $new_base_id2 last id of existing range fails"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd $new_base_id3" 1 "base-id $new_base_id3 and default range (200000), making local range first base-id its last id fails"
+
+rlPhaseEnd
+}
+
+trust_test_0035() {
+
+rlPhaseStartTest "0035 Warning needed when re-adding trust with a different range Ticket #3635"
+	rlLog "https://fedorahosted.org/freeipa/ticket/3635"
+	rlLog "Needs code after ticket is resolved"
+	rlRun "$ipacmd idrange-del $AD_range $AD2_range" 0 "Deleting ranges as trusts do not exist"
+
+rlPhaseEnd
+}
+
+trust_test_0036() {
+
+rlPhaseStartTest "0036 Add trust with correct value --base-id"
+	IPA_Variables
+	new_base_id=$((lbase_id - lrange_size))
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd $new_base_id" 0 "Trust added with base-id $new_base_id"
+	AD_Variables
+	rlRun "[ $new_base_id -eq $adbase_id ]" 0 "First Posix ID is $new_base_id"
+	# Test CleanUp
+	rlRun "$ipacmd trust-del $ADdomain" 0 "Deleting trust to continue testing"
+	rlRun "$ipacmd idrange-del $AD_range" 0 "Deleting range to continue testing"
+
+rlPhaseEnd
+}
+
+trust_test_0037() {
+
+rlPhaseStartTest "0037 Add trust with proper range value for --range-size" 
+	new_range="2000"
+	rlRun "Add_Trust range" 0 "Creating expect script"
+	rlRun "$exp $expfile $ADdomain2 $ADadmin2 $ADpswd2 $new_range" 0 "Trust added with range-size $new_range"
+	added_range=`$ipacmd idrange-show $AD2_range | grep "Number of IDs in the range" | awk '{print $NF}'`
+	rlRun "[ $added_range -eq $new_range ]" 0 "Number of IDs in the range is $new_range"
+
+rlPhaseEnd
+}
+
+trust_test_0038() {
+
+rlPhaseStartTest "0038 Add trust with correct values for base-id and range-size"
+	IPA_Variables
+        new_base_id=$((lbase_id - 200000))
+	new_range="3000"
+	rlRun "Add_Trust base_range" 0 "Creating expect script"
+	rlRun "$exp $expfile $ADdomain $ADadmin $ADpswd $new_base_id $new_range" 0 "Trust added with base-id $new_base_id and range-size $new_range"
+	AD_Variables
+	rlRun "[ $new_base_id -eq $adbase_id ]" 0 "Trusted range base-id is $new_base_id"
+	rlRun "[ $new_range -eq $adrange_size ]" 0 "Trusted range size is $new_range"
+
 rlPhaseEnd
 }
 
