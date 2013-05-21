@@ -134,10 +134,10 @@ installSlave()
         rlRun "echo $MASTERIP" 0 "Master IP"
         rlRun "cat /opt/rhqa_ipa/env.sh" 0 "env.sh"
 	#AddToKnownHosts $MASTERIP
-	AddToKnownHosts $MASTER
+	#AddToKnownHosts $MASTER
 
-        rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
-        rlLog "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlRun "sftp -o StrictHostKeyChecking=no root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
+        rlLog "sftp -o StrictHostKeyChecking=no root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
         rlLog "Checking for existance of replica gpg file"
         ls /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg
         if [ $? -ne 0 ] ; then
