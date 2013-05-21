@@ -37,7 +37,7 @@ ipakrblockout()
 
 ipakrblockout_setup()
 {
-   rlPhaseStartTest "Setup - add users and groups"
+   rlPhaseStartSetup "Setup - add users and groups"
 	rlRun "kinitAs $ADMINID $ADMINPW"
   	rlRun "create_ipauser user1$lastoct user1$lastoct user1$lastoct Secret123" 0 "Creating a test user1$lastoct"
 	rlRun "create_ipauser grpuser$lastoct grpuser$lastoct grpuser$lastoct Secret123" 0 "Creating a test user2"
@@ -54,18 +54,17 @@ ipakrblockout_setup()
 #######################
 ipakrblockout_negative()
 {
-	echo "great!"
-#  ipakrblockout_maxfail_negative
-#  ipakrblockout_failinterval_negative
-#  ipakrblockout_lockouttime_negative
+  ipakrblockout_maxfail_negative
+  ipakrblockout_failinterval_negative
+  ipakrblockout_lockouttime_negative
 }
 
 ipakrblockout_positive()
 {
   ipakrblockout_maxfail_positive
-#  ipakrblockout_failinterval_positive
-#  ipakrblockout_lockoutduration_positive
-#  ipakrblockout_grouppolicy
+  ipakrblockout_failinterval_positive
+  ipakrblockout_lockoutduration_positive
+  ipakrblockout_grouppolicy
 }
 
 ###########################
@@ -73,7 +72,7 @@ ipakrblockout_positive()
 ###########################
 ipakrblockout_maxfail_negative()
 {
-    rlPhaseStartTest "Max Failures Negative Test - Negative Numbers"
+    rlPhaseStartTest "ipa-krblockout-001: Max Failures Negative Test - Negative Numbers"
         rlRun "kinitAs $ADMINID $ADMINPW"
 	expmsg="ipa: ERROR: invalid '$maxflag': must be at least 0"        
 
@@ -84,7 +83,7 @@ ipakrblockout_maxfail_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Max Failures Negative Test - Invalid Characters"
+    rlPhaseStartTest "ipa-krblockout-002: Max Failures Negative Test - Invalid Characters"
 	expmsg="ipa: ERROR: invalid '$maxflag': must be an integer"       
         for value in jwy t _
         do
@@ -94,7 +93,7 @@ ipakrblockout_maxfail_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Max Failures Negative Test - setattr - Negative Numbers"
+    rlPhaseStartTest "ipa-krblockout-003: Max Failures Negative Test - setattr - Negative Numbers"
         expmsg="ipa: ERROR: invalid '$maxattr': must be at least 0"
         for value in -3 -25 -93796296
         do
@@ -103,7 +102,7 @@ ipakrblockout_maxfail_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Max Failures Negative Test - setattr - Invalid Characters"
+    rlPhaseStartTest "ipa-krblockout-004: Max Failures Negative Test - setattr - Invalid Characters"
         expmsg="ipa: ERROR: invalid '$maxattr': must be an integer"       
         for value in kihhw y +
         do
@@ -112,13 +111,13 @@ ipakrblockout_maxfail_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Max Failures Negative Test - addattr - Only One Value Allowed"
+    rlPhaseStartTest "ipa-krblockout-005: Max Failures Negative Test - addattr - Only One Value Allowed"
         expmsg="ipa: ERROR: $maxattr: Only one value allowed."
         command="ipa pwpolicy-mod --addattr=$maxattr=1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Expect failure trying to add additional $maxattr attribute"
     rlPhaseEnd
 
-    rlPhaseStartTest "Max Failures Negative Test - Integer to large"
+    rlPhaseStartTest "ipa-krblockout-006: Max Failures Negative Test - Integer to large"
 	expmsg="ipa: ERROR: invalid '$maxflag': can be at most 2147483647"
 	command="ipa pwpolicy-mod --$maxflag=2147483648"
 	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Expect failure trying to set Max Failures to integer too large"
@@ -131,7 +130,7 @@ ipakrblockout_maxfail_negative()
 ################################
 ipakrblockout_failinterval_negative()
 {
-    rlPhaseStartTest "Failure Interval Negative Test - Negative Numbers"
+    rlPhaseStartTest "ipa-krblockout-007: Failure Interval Negative Test - Negative Numbers"
         Local_KinitAsAdmin
         expmsg="ipa: ERROR: invalid '$intervalflag': must be at least 0"
 
@@ -142,7 +141,7 @@ ipakrblockout_failinterval_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Failure Interval Negative Test - Invalid Characters"
+    rlPhaseStartTest "ipa-krblockout-008: Failure Interval Negative Test - Invalid Characters"
         expmsg="ipa: ERROR: invalid '$intervalflag': must be an integer"
         for value in 1avc jsdljo97 B
         do
@@ -152,7 +151,7 @@ ipakrblockout_failinterval_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Failure Interval Negative Test - setattr - Negative Numbers"
+    rlPhaseStartTest "ipa-krblockout-009: Failure Interval Negative Test - setattr - Negative Numbers"
         expmsg="ipa: ERROR: invalid '$intervalattr': must be at least 0"
         for value in -333 -6 -937962967347
         do
@@ -161,7 +160,7 @@ ipakrblockout_failinterval_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Failure Interval Negative Test - setattr - Invalid Characters"
+    rlPhaseStartTest "ipa-krblockout-010: Failure Interval Negative Test - setattr - Invalid Characters"
         expmsg="ipa: ERROR: invalid '$intervalattr': must be an integer"
         for value in joeioi Q -
         do
@@ -170,13 +169,13 @@ ipakrblockout_failinterval_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Failure Interval Negative Test - addattr - Only One Value Allowed"
+    rlPhaseStartTest "ipa-krblockout-011: Failure Interval Negative Test - addattr - Only One Value Allowed"
         expmsg="ipa: ERROR: $intervalattr: Only one value allowed."
         command="ipa pwpolicy-mod --addattr=$intervalattr=1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Expect failure trying to add additional $attr attribute"
     rlPhaseEnd
 
-    rlPhaseStartTest "Failure Interval Negative Test - Integer to large"
+    rlPhaseStartTest "ipa-krblockout-012: Failure Interval Negative Test - Integer to large"
         expmsg="ipa: ERROR: invalid '$intervalflag': can be at most 2147483647"
         command="ipa pwpolicy-mod --$intervalflag=992747483648"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Expect failure trying to set Failure Interval to integer too large"
@@ -188,7 +187,7 @@ ipakrblockout_failinterval_negative()
 ################################
 ipakrblockout_lockouttime_negative()
 {
-    rlPhaseStartTest "Lock Out Time Negative Test - Negative Numbers"
+    rlPhaseStartTest "ipa-krblockout-013: Lock Out Time Negative Test - Negative Numbers"
         Local_KinitAsAdmin
         expmsg="ipa: ERROR: invalid '$locktimeflag': must be at least 0"
 
@@ -199,7 +198,7 @@ ipakrblockout_lockouttime_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Lock Out Time Negative Test - Invalid Characters"
+    rlPhaseStartTest "ipa-krblockout-014: Lock Out Time Negative Test - Invalid Characters"
         expmsg="ipa: ERROR: invalid '$locktimeflag': must be an integer"
         for value in T pdsw oiwiouuiy9869
         do
@@ -209,7 +208,7 @@ ipakrblockout_lockouttime_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Lock Out Time Negative Test - setattr - Negative Numbers"
+    rlPhaseStartTest "ipa-krblockout-015: Lock Out Time Negative Test - setattr - Negative Numbers"
         expmsg="ipa: ERROR: invalid '$locktimeattr': must be at least 0"
         for value in -33 -7 -379346296734
         do
@@ -218,7 +217,7 @@ ipakrblockout_lockouttime_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Lock Out Time Negative Test - setattr - Invalid Characters"
+    rlPhaseStartTest "ipa-krblockout-016: Lock Out Time Negative Test - setattr - Invalid Characters"
         expmsg="ipa: ERROR: invalid '$locktimeattr': must be an integer"
         for value in Y kdihe :
         do
@@ -227,13 +226,13 @@ ipakrblockout_lockouttime_negative()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Lock Out Time Negative Test - addattr - Only One Value Allowed"
+    rlPhaseStartTest "ipa-krblockout-017: Lock Out Time Negative Test - addattr - Only One Value Allowed"
         expmsg="ipa: ERROR: $locktimeattr: Only one value allowed."
         command="ipa pwpolicy-mod --addattr=$locktimeattr=1"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Expect failure trying to add additional $locktimeattr attribute"
     rlPhaseEnd
 
-    rlPhaseStartTest "Max Failures Negative Test - Integer to large"
+    rlPhaseStartTest "ipa-krblockout-018: Max Failures Negative Test - Integer to large"
         expmsg="ipa: ERROR: invalid '$locktimeflag': can be at most 2147483647"
         command="ipa pwpolicy-mod --$locktimeflag=2147483648342"
         rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Expect failure trying to add $locktimeattr attribute with integer too large"
@@ -246,7 +245,7 @@ ipakrblockout_lockouttime_negative()
 ipakrblockout_maxfail_positive()
 {
 
-   rlPhaseStartTest "Verify Valid Max Failures Values"
+   rlPhaseStartTest "ipa-krblockout-019: Verify Valid Max Failures Values"
         rlRun "kinitAs $ADMINID $ADMINPW"
         for value in 3 7 15 33 100 500 6
         do
@@ -261,7 +260,7 @@ ipakrblockout_maxfail_positive()
         done
    rlPhaseEnd
 
-   rlPhaseStartTest "Verify Failure Counter Iteration"
+   rlPhaseStartTest "ipa-krblockout-020: Verify Failure Counter Iteration"
 	for value in 1 2 3 4 5  
 	do
  		rlRun "kinitAs user1$lastoct BADPWD" 1 "Kinit as user with invalid password"
@@ -277,7 +276,7 @@ ipakrblockout_maxfail_positive()
 
    rlPhaseEnd
 
-   rlPhaseStartTest "Verify Failure Counter Reset with Correct Password"    
+   rlPhaseStartTest "ipa-krblockout-021: Verify Failure Counter Reset with Correct Password"    
 	rlRun "kinitAs user1$lastoct Secret123" 0 "Kinit as user with valid password"
         rlRun "kinitAs $ADMINID $ADMINPW"
         count=`ipa user-show --all user1$lastoct | grep $usercountattr | cut -d ':' -f 2`
@@ -289,7 +288,7 @@ ipakrblockout_maxfail_positive()
         fi
    rlPhaseEnd
 
-   rlPhaseStartTest "Verify Failure Counter Reset with Admin Password Reset"
+   rlPhaseStartTest "ipa-krblockout-022: Verify Failure Counter Reset with Admin Password Reset"
 	rlRun "kinitAs user1$lastoct BADPWD" 1 "Kinit as user with invalid password"
 	rlRun "kinitAs $ADMINID $ADMINPW"
         count=`ipa user-show --all user1$lastoct | grep $usercountattr | cut -d ':' -f 2`
@@ -328,7 +327,7 @@ ipakrblockout_maxfail_positive()
         fi
    rlPhaseEnd
 
-   rlPhaseStartTest "Max Failures 0 - ten bad attempts followed by success"
+   rlPhaseStartTest "ipa-krblockout-023: Max Failures 0 - ten bad attempts followed by success"
 	rlRun "kinitAs $ADMINID $ADMINPW"
 	rlRun "create_ipauser user1$lastoct user1$lastoct user1$lastoct Secret123" 0 "Creating a test user1$lastoct"
         # set Max Failures to 0
@@ -376,7 +375,7 @@ ipakrblockout_maxfail_positive()
 	rlRun "ipa pwpolicy-mod --$intervalflag=60" 0 "Setting $intervalflag to value of [60"
    rlPhaseEnd
 
-   rlPhaseStartTest "Max Failures reached and users credentials revoked"
+   rlPhaseStartTest "ipa-krblockout-024: Max Failures reached and users credentials revoked"
 	rlRun "kinitAs $ADMINID $ADMINPW"
         mvalue=3
         rlRun "ipa pwpolicy-mod --$maxflag=$mvalue" 0 "Setting $maxflag to value of [$mvalue]"
@@ -414,7 +413,7 @@ ipakrblockout_maxfail_positive()
 ################################
 ipakrblockout_failinterval_positive()
 {
-    rlPhaseStartTest "Verify Valid Failure Interval Values"
+    rlPhaseStartTest "ipa-krblockout-025: Verify Valid Failure Interval Values"
 	rlRun "kinitAs $ADMINID $ADMINPW"
 	for value in 99 2 800 2000 360 30
         do
@@ -429,7 +428,7 @@ ipakrblockout_failinterval_positive()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Failue Interval - before and after interval expiration - 10 second interval - 1 bad attempt"
+    rlPhaseStartTest "ipa-krblockout-026: Failue Interval - before and after interval expiration - 10 second interval - 1 bad attempt"
 	rlRun "kinitAs $ADMINID $ADMINPW"
         rlRun "create_ipauser user1$lastoct user1$lastoct user1$lastoct Secret123" 0 "Creating a test user1$lastoct"
 	# set interval to 10
@@ -479,7 +478,7 @@ ipakrblockout_failinterval_positive()
 
     rlPhaseEnd
 
-    rlPhaseStartTest "Failure Interval - before and after interval expiration - 30 second interval - 2 bad attempts"
+    rlPhaseStartTest "ipa-krblockout-027: Failure Interval - before and after interval expiration - 30 second interval - 2 bad attempts"
 	# make sure user's counter is 0 to start
 	rlRun "create_ipauser user1$lastoct user1$lastoct user1$lastoct Secret123" 0 "Creating a test user1$lastoct"
         rlRun "kinitAs $ADMINID $ADMINPW"
@@ -536,7 +535,7 @@ ipakrblockout_failinterval_positive()
 ################################
 ipakrblockout_lockoutduration_positive()
 {
-    rlPhaseStartTest "Verify Valid Lockout Duration Values"
+    rlPhaseStartTest "ipa-krblockout-028: Verify Valid Lockout Duration Values"
         rlRun "kinitAs $ADMINID $ADMINPW"
         for value in 4899236 8 360 45 99999 30
         do
@@ -551,7 +550,7 @@ ipakrblockout_lockoutduration_positive()
         done
     rlPhaseEnd
 
-    rlPhaseStartTest "Lock Out Duration - 10 second interval - max failures 3"
+    rlPhaseStartTest "ipa-krblockout-029: Lock Out Duration - 10 second interval - max failures 3"
         rlRun "kinitAs $ADMINID $ADMINPW"
         rlRun "create_ipauser user1$lastoct user1$lastoct user1$lastoct Secret123" 0 "Creating a test user1$lastoct"
         # set interval to 10
@@ -607,7 +606,7 @@ ipakrblockout_lockoutduration_positive()
 ################################
 ipakrblockout_grouppolicy()
 {
-    rlPhaseStartTest "Set up Group policy and verify member's effective policy"
+    rlPhaseStartTest "ipa-krblockout-030: Set up Group policy and verify member's effective policy"
 	rlRun "kinitAs $ADMINID $ADMINPW"
 	# reset global policy
 	ipa pwpolicy-mod --$maxflag=6 --$locktimeflag=600  --$intervalflag=60
@@ -625,7 +624,7 @@ ipakrblockout_grouppolicy()
         rlAssertGrep "$intervallabel: 60" "/tmp/effectivegblpolicy.txt"
     rlPhaseEnd
 
-    rlPhaseStartTest "Group Failures Policy Enforcement - Lock Out"
+    rlPhaseStartTest "ipa-krblockout-031: Group Failures Policy Enforcement - Lock Out"
         for value in 1 2 3 
         do
                 rlRun "kinitAs grpuser$lastoct BADPWD" 1 "Kinit as group policy user with invalid password"
@@ -650,7 +649,7 @@ ipakrblockout_grouppolicy()
 	rlRun "kinitAs grpuser$lastoct Secret123" 0 "Lock out period over - kinit should be successful"
     rlPhaseEnd
 
-    rlPhaseStartTest "Group Failures Policy Enforcement - Failure Interval"
+    rlPhaseStartTest "ipa-krblockout-032: Group Failures Policy Enforcement - Failure Interval"
         for value in 1 2
         do
                 rlRun "kinitAs grpuser$lastoct BADPWD" 1 "Kinit as group policy user with invalid password"
@@ -688,7 +687,7 @@ ipakrblockout_grouppolicy()
 ##################################################
 bz822429()
 {
-    rlPhaseStartTest "bz822429 Failed login count is stuck at 1"
+    rlPhaseStartTest "ipa-krblockout-bugzilla-001: bz822429 Failed login count is stuck at 1"
 	# set policy to max failures of 3
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit As Admin"
 	ipa pwpolicy-mod --$maxflag=4 # setting max failures to 4 to make sure next step passes
@@ -744,7 +743,7 @@ bz822429()
 
 bz759501()
 {
-    rlPhaseStartTest "Bug 759501 user interface does not reflect account inactivation properly."
+    rlPhaseStartTest "ipa-krblockout-bugzilla-002: bz759501 user interface does not reflect account inactivation properly."
 	# Reguarding: http://bugzilla.redhat.com/show_bug.cgi?id=759501
 	# Current test plan:
 	# 1. create user1
@@ -891,7 +890,7 @@ user_status()
 	lockoutduration=$(ipa pwpolicy-show | grep Lockout\ duration | sed s/\ //g | cut -d: -f2)
 	ipa pwpolicy-mod --lockouttime=60
 
-	rlPhaseStartTest "Check setup for user_status tests"
+	rlPhaseStartTest "ipa-krblockout-0Check setup for user_status tests"
 		rlRun "create_ipauser $user1 $user1 $user1 Secret123" 0 "Creating a test $user1"
 		rlRun "create_ipauser $user2 $user2 $user2 Secret123" 0 "Creating a test $user2"
 		rlRun "create_ipauser $user3 $user3 $user3 Secret123" 0 "Creating a test $user3"
@@ -906,7 +905,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "Create sucessful logins on this host for user1"
+	rlPhaseStartTest "ipa-krblockout-userstatus-001: Create sucessful logins on this host for user1"
 		kinitAs $user1 Secret123
 		kinitAs $user1 Secret123
 		kinitAs $user1 Secret123
@@ -920,7 +919,7 @@ user_status()
 		fi
 	rlPhaseEnd
 	
-	rlPhaseStartTest "Create sucessful logins on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-002: Create sucessful logins on other host in test group."
 		ssh root@$otherhost "echo Secret123 | kinit $user1"
 		ssh root@$otherhost "echo Secret123 | kinit $user1"
 		kinitAs $ADMINID $ADMINPW
@@ -933,7 +932,7 @@ user_status()
 		fi
 	rlPhaseEnd
 		
-	rlPhaseStartTest "Make sure that the last login time is in a valid time frame on this server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-003: Make sure that the last login time is in a valid time frame on this server"
 		kinitAs $ADMINID $ADMINPW
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
@@ -952,7 +951,7 @@ user_status()
 	rlPhaseEnd
 
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "Make sure that the last login time is in a valid time frame on other server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-004: Make sure that the last login time is in a valid time frame on other server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
 		kdestroy
@@ -970,7 +969,7 @@ user_status()
 	rlPhaseEnd
 	fi
 	
-	rlPhaseStartTest "Create failed logins on this host for user1"
+	rlPhaseStartTest "ipa-krblockout-userstatus-005: Create failed logins on this host for user1"
 		kdestroy
 		kinitAs $user1 dsfr
 		kinitAs $user1 Secr3
@@ -986,7 +985,7 @@ user_status()
 	rlPhaseEnd
 	
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "Create failed logins for user1 on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-006: Create failed logins for user1 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user1"
 		ssh root@$otherhost "echo mostblarg | kinit $user1"
 		# Check that it seems to be the correct number of logins
@@ -1000,7 +999,7 @@ user_status()
 	rlPhaseEnd
 	fi
 
-	rlPhaseStartTest "Create failed logins on this host for user2"
+	rlPhaseStartTest "ipa-krblockout-userstatus-007: Create failed logins on this host for user2"
 		kinitAs $user2 dsfr
 		kinitAs $user2 Secr3
 		kinitAs $user2 blarg
@@ -1016,7 +1015,7 @@ user_status()
 	rlPhaseEnd
 	
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "Create failed logins for user2 on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-008: Create failed logins for user2 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user2"
 		ssh root@$otherhost "echo mostblarg | kinit $user2"
 		ssh root@$otherhost "echo m | kinit $user2"
@@ -1031,7 +1030,7 @@ user_status()
 	rlPhaseEnd
 	fi
 
-	rlPhaseStartTest "Make sure that the last failed login time is in a valid time frame on this server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-009: Make sure that the last failed login time is in a valid time frame on this server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
 		kinitAs $user1 Sec
@@ -1048,7 +1047,7 @@ user_status()
 	rlPhaseEnd
 
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "Make sure that the last failed login time is in a valid time frame on other server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-010: Make sure that the last failed login time is in a valid time frame on other server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
 		ssh root@$otherhost "echo Sec | kinit $user1"
@@ -1063,7 +1062,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "Create lockout logins for user3 on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-011: Create lockout logins for user3 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user3"
 		ssh root@$otherhost "echo mostblarg | kinit $user3"
 		ssh root@$otherhost "echo m | kinit $user3"
@@ -1081,7 +1080,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "Ensure that user 3 cannot login to other host. That user should be locked out ATM."
+	rlPhaseStartTest "ipa-krblockout-userstatus-012: Ensure that user 3 cannot login to other host. That user should be locked out ATM."
 		ssh root@$otherhost "echo Secret123 | kinit $user3"
 		kinitout=$(ssh root@$otherhost 'klist')
 		echo $kinitout | grep $user3 
@@ -1117,7 +1116,7 @@ user_status()
 		sleep 60
 	fi
 
-	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user3"
+	rlPhaseStartTest "ipa-krblockout-userstatus-013: Verify that the failed login count on the remote server reverts to 0 after a good login of user3"
 		kinitAs $ADMINID $ADMINPW
 		failedthere=$(ipa user-status  $user3 | grep -A 5 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 0 ]; then
@@ -1131,7 +1130,7 @@ rlPhaseEnd
 	ssh root@$otherhost "echo Secret123 | kinit $user3"
 	sleep 30
 
-	rlPhaseStartTest "Make sure that the last good login time on the remote server looks like it's in the correct time window"		
+	rlPhaseStartTest "ipa-krblockout-userstatus-014: Make sure that the last good login time on the remote server looks like it's in the correct time window"		
 		kinitAs $ADMINID $ADMINPW
 		lastgoodlogin=$(ipa user-status  $user3 --all --raw | grep -A 5 $otherhost | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
@@ -1144,7 +1143,7 @@ rlPhaseEnd
 	rlPhaseEnd
 	fi
 	
-	rlPhaseStartTest "Create lockout logins for user4 on this host."
+	rlPhaseStartTest "ipa-krblockout-userstatus-015: Create lockout logins for user4 on this host."
 		kdestroy
 		kinitAs $user4 dsfr
 		kinitAs $user4 dsfuygr
@@ -1164,7 +1163,7 @@ rlPhaseEnd
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "Ensure that user 4 cannot login to this host. That user should be locked out ATM."
+	rlPhaseStartTest "ipa-krblockout-userstatus-016: Ensure that user 4 cannot login to this host. That user should be locked out ATM."
 		kdestroy
 		echo Secret123 | kinit $user4
 		kinitout=$(klist)
@@ -1180,7 +1179,7 @@ rlPhaseEnd
 	# Gather current time for remote server for a later test
 	now=$(ipa user-status  $user4 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 
-	rlPhaseStartTest "make sure that user 4 can login after the lockout interval is expired"
+	rlPhaseStartTest "ipa-krblockout-userstatus-017: make sure that user 4 can login after the lockout interval is expired"
 		# Wait for the needed time to unlock the user
 		echo "Sleeping for 60 seconds"
 		sleep 60
@@ -1196,7 +1195,7 @@ rlPhaseEnd
 	rlPhaseEnd	
 
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "Verify that the failed login count on the remote server reverts to 0 after a good login of user4"
+	rlPhaseStartTest "ipa-krblockout-userstatus-018: Verify that the failed login count on the remote server reverts to 0 after a good login of user4"
 		echo "Other host is $otherhost"
 		failedhere=$(ipa user-status  $user4 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 0 ]; then
@@ -1206,7 +1205,7 @@ rlPhaseEnd
 		fi
 	rlPhaseEnd	
 
-	rlPhaseStartTest "Make sure that the last good login time on the remote server looks like it's in the correct time window"		
+	rlPhaseStartTest "ipa-krblockout-userstatus-019: Make sure that the last good login time on the remote server looks like it's in the correct time window"		
 		kinitAs $ADMINID $ADMINPW
 		lastgoodlogin=$(ipa user-status  $user4 --all --raw | grep -A 5 $hostname | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
@@ -1237,7 +1236,7 @@ rlPhaseEnd
 
 ipakrblockout_cleanup()
 {
-   rlPhaseStartTest "Delete Users and Groups added"
+   rlPhaseStartCleanup "Delete Users and Groups added"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
         rlRun "ipa user-del user1$lastoct" 0 "Deleting test user1$lastoct"
 	rlRun "ipa user-del grpuser$lastoct" 0 "Deleting test grpuser$lastoct"
