@@ -28,7 +28,7 @@ ds-migration-functional()
 
 setup()
 {
-        rlPhaseStartTest "SETUP FUNCTIONAL TESTING"
+        rlPhaseStartSetup "SETUP FUNCTIONAL TESTING"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		rlRun "SetMigrationConfig TRUE" 0 "Set migration mode to TRUE"
         rlPhaseEnd
@@ -40,7 +40,7 @@ setup()
 
 hashedpwdmigration_sssd()
 {
-	rlPhaseStartTest "ds-migration-functional-001 Migrate users with hashed passwords"
+	rlPhaseStartTest "ds-migration-functional-001: Migrate users with hashed passwords"
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --with-compat ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --with-compat ldap://$CLIENT:389" 0
 
@@ -49,7 +49,7 @@ hashedpwdmigration_sssd()
 	rlPhaseEnd
 
                 #sleep 300
-        rlPhaseStartTest "ds-migration-functional-002 SSSD password migration $USER1"
+        rlPhaseStartTest "ds-migration-functional-002: SSSD password migration $USER1"
 		rlRun "ssh_auth_success $USER1 $USER1PWD $HOSTNAME"
 		rlRun "verifyUserAttr $USER1 \"Kerberos keys available\" True" 0 "Verify migrated user $USER1 now has a keytab"
                 if [ $? -eq 1 ] ;then
@@ -63,7 +63,7 @@ hashedpwdmigration_sssd()
 
         rlPhaseEnd
 
-        rlPhaseStartTest "ds-migration-functional-003 SSSD password migration $USER2"
+        rlPhaseStartTest "ds-migration-functional-003: SSSD password migration $USER2"
 		rlRun "ssh_auth_success $USER2 $USER2PWD $HOSTNAME"
 		rlRun "verifyUserAttr $USER2 \"Kerberos keys available\" True" 0 "Verify migrated user $USER2 now has a keytab"
                 if [ $? -eq 1 ] ;then
@@ -76,7 +76,7 @@ hashedpwdmigration_sssd()
                 KinitAsUser $USER2 $USER2PWD
         rlPhaseEnd
 
-        rlPhaseStartTest "ds-migration-functional-004 Cleanup SSSD Migration"
+        rlPhaseStartTest "ds-migration-functional-004: Cleanup SSSD Migration"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 ipa user-del $USER1
 		ipa user-del $USER2
@@ -97,7 +97,7 @@ hashedpwdmigration_sssd()
 
 hashedpwdmigration_http()
 {
-        rlPhaseStartTest "ds-migration-functional-005 Re-Migrate users with hashed passwords"
+        rlPhaseStartTest "ds-migration-functional-005: Re-Migrate users with hashed passwords"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 rlLog "EXECUTING: ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --with-compat ldap://$CLIENT:389"
                 rlRun "echo $ADMINPW | ipa migrate-ds --user-container=\"$USERCONTAINER\" --group-container=\"$GROUPCONTAINER\" --with-compat ldap://$CLIENT:389" 0
@@ -106,7 +106,7 @@ hashedpwdmigration_http()
                 rlRun "verifyUserAttr $USER2 \"Kerberos keys available\" False" 0 "Verify migrated user $USER2 does not have a keytab"
         rlPhaseEnd
 
-        rlPhaseStartTest "ds-migration-functional-006 HTTP password migration $USER1"
+        rlPhaseStartTest "ds-migration-functional-006: HTTP password migration $USER1 bz822608"
                 rlRun "curl -v -e https://$MASTER/ipa/migration/ https://$MASTER/ipa/migration/migration.py --form-string 'username=$USER1' --form-string 'password=$USER1PWD' --cacert $CACERT" 0 "Hitting the migration page via curl"
 		rlRun "verifyUserAttr $USER1 \"Kerberos keys available\" True" 0 "Verify migrated user $USER1 now has a keytab"
                 # https://bugzilla.redhat.com/show_bug.cgi?id=822608
@@ -116,7 +116,7 @@ hashedpwdmigration_http()
                 KinitAsUser $USER1 $USER1PWD 
         rlPhaseEnd
 
-        rlPhaseStartTest "ds-migration-functional-007 HTTP password migration $USER2"
+        rlPhaseStartTest "ds-migration-functional-007: HTTP password migration $USER2"
 		rlRun "curl -v -e https://$MASTER/ipa/migration/ https://$MASTER/ipa/migration/migration.py --form-string 'username=$USER2' --form-string 'password=$USER2PWD' --cacert $CACERT" 0 "Hitting the migration page via curl"
                 rlRun "verifyUserAttr $USER2 \"Kerberos keys available\" True" 0 "Verify migrated user $USER2 now has a keytab"
 		# https://bugzilla.redhat.com/show_bug.cgi?id=822608
@@ -127,7 +127,7 @@ hashedpwdmigration_http()
 
         rlPhaseEnd
 
-        rlPhaseStartTest "ds-migration-functional-008 Cleanup HTTP Migration"
+        rlPhaseStartTest "ds-migration-functional-008: Cleanup HTTP Migration"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 ipa user-del $USER1
                 ipa user-del $USER2
@@ -143,7 +143,7 @@ hashedpwdmigration_http()
 
 cleanup()
 {
-	rlPhaseStartTest "CLEANUP FUNCTIONAL TESTING"
+	rlPhaseStartCleanup "CLEANUP FUNCTIONAL TESTING"
 		rlRun "ssh -o StrictHostKeyChecking=no root@$CLIENT /usr/sbin/remove-ds.pl -i $INSTANCE" 0 "Removing directory server instance"
 		rlRun "SetMigrationConfig FALSE" 0 "Set migration mode to FALSE"
 	rlPhaseEnd
