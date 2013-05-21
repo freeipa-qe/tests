@@ -77,7 +77,7 @@ PACKAGE1="ipa-admintools"
 PACKAGE2="ipa-client"
 
 setup() {
-rlPhaseStartTest "Setup for automount configuration tests"
+rlPhaseStartSetup "Setup for automount configuration tests"
 	# check for packages
 	for item in $PACKAGE1 $PACKAGE2 ; do
         	rpm -qa | grep $item
@@ -104,7 +104,7 @@ rlPhaseEnd
 
 automount_001() {
 
-rlPhaseStartTest "automount_001: Schema file check."
+rlPhaseStartTest "ipa-automount-001: Schema file check."
 	INSTANCE=`echo $RELM | sed 's/\./-/g'`
 	SCHEMAFILE="/etc/dirsrv/slapd-$INSTANCE/schema/60autofs.ldif"
 	rlLog "Schema file :: $SCHEMAFILE"
@@ -115,7 +115,7 @@ rlPhaseEnd
 
 automount_002() {
 
-rlPhaseStartTest "automount_002: ipa help automount."
+rlPhaseStartTest "ipa-automount-002: ipa help automount."
 
 	rlRun "ipa help automount > $TmpDir/automount_002.out 2>&1"
 	rlAssertGrep "Create a named location, \"Baltimore\":" "$TmpDir/automount_002.out"
@@ -172,7 +172,7 @@ rlPhaseEnd
 
 automount_003() {
 
-rlPhaseStartTest "ipa help automountkey-add"
+rlPhaseStartTest "ipa-automount-003: help automountkey-add"
 
 	rlRun "ipa help automountkey-add > $TmpDir/automount_003.out"
 
@@ -193,7 +193,7 @@ rlPhaseEnd
 
 automount_004() {
 
-rlPhaseStartTest "automount_004: ipa help automountkey-del"
+rlPhaseStartTest "ipa-automount-004: ipa help automountkey-del"
 
         rlRun "ipa help automountkey-del > $TmpDir/automount_004.out"
 
@@ -211,7 +211,7 @@ rlPhaseEnd
 
 automount_005() {
 
-rlPhaseStartTest "automount_005: ipa help automountkey-find"
+rlPhaseStartTest "ipa-automount-005: ipa help automountkey-find"
 
 	rlRun "ipa help automountkey-find > $TmpDir/automount_005.out"
 
@@ -232,7 +232,7 @@ rlPhaseEnd
 
 automount_006() {
 
-rlPhaseStartTest "automount_006: ipa help automountkey-mod"
+rlPhaseStartTest "ipa-automount-006: ipa help automountkey-mod"
 
 	rlRun "ipa help automountkey-mod > $TmpDir/automount_006.out 2>&1"
 
@@ -256,7 +256,7 @@ rlPhaseEnd
 
 automount_007() {
 
-rlPhaseStartTest "automount_007: ipa help automountkey-show"
+rlPhaseStartTest "ipa-automount-007: ipa help automountkey-show"
 
 	rlRun "ipa help automountkey-show > $TmpDir/automount_007.out 2>&1"
 
@@ -276,7 +276,7 @@ rlPhaseEnd
 
 automount_008() {
 
-rlPhaseStartTest "automount_008: ipa help automountlocation-add"
+rlPhaseStartTest "ipa-automount-008: ipa help automountlocation-add"
 
 	rlRun "ipa help automountlocation-add > $TmpDir/automount_008.out 2>&1"
 	
@@ -296,7 +296,7 @@ rlPhaseEnd
 
 automount_009() {
 
-rlPhaseStartTest "automount_009: ipa help automountlocation-del"
+rlPhaseStartTest "ipa-automount-009: ipa help automountlocation-del"
 
 	rlRun "ipa help automountlocation-del > $TmpDir/automount_009.out 2>&1"
 
@@ -312,7 +312,7 @@ rlPhaseEnd
 
 automount_010() {
 
-rlPhaseStartTest "automount_010: ipa help automountlocation-find"
+rlPhaseStartTest "ipa-automount-010: ipa help automountlocation-find"
 
 	rlRun "ipa help automountlocation-find > $TmpDir/automount_010.out 2>&1"
 
@@ -333,7 +333,7 @@ rlPhaseEnd
 
 automount_011() {
 
-rlPhaseStartTest "automount_011: ipa help automountlocation-import"
+rlPhaseStartTest "ipa-automount-011: ipa help automountlocation-import"
 
 	rlRun "ipa help automountlocation-import > $TmpDir/automount_011.out 2>&1"
 
@@ -349,7 +349,7 @@ rlPhaseEnd
 
 automount_012() {
 
-rlPhaseStartTest "automount_012: ipa help automountlocation-show"
+rlPhaseStartTest "ipa-automount-012: ipa help automountlocation-show"
 
 	rlRun "ipa help automountlocation-show > $TmpDir/automount_012.out 2>&1"
 
@@ -367,7 +367,7 @@ rlPhaseEnd
 
 automount_013() {
 
-rlPhaseStartTest "automount_013: ipa help automountlocation-tofiles"
+rlPhaseStartTest "ipa-automount-013: ipa help automountlocation-tofiles"
 
 	rlRun "ipa help automountlocation-tofiles > $TmpDir/automount_013.out 2>&1"
 
@@ -382,7 +382,7 @@ rlPhaseEnd
 
 automount_014() {
 
-rlPhaseStartTest "automount_014: ipa help automountmap-add"
+rlPhaseStartTest "ipa-automount-014: ipa help automountmap-add"
 
 	rlRun "ipa help automountmap-add > $TmpDir/automount_014.out  2>&1"
 
@@ -402,7 +402,7 @@ rlPhaseEnd
 
 automount_015() {
 
-rlPhaseStartTest "automount_015: ipa help automountmap-add-indirect"
+rlPhaseStartTest "ipa-automount-015: ipa help automountmap-add-indirect"
 
 	rlRun "ipa help automountmap-add-indirect > $TmpDir/automount_015.out 2>&1"
 
@@ -424,7 +424,7 @@ rlPhaseEnd
 
 automount_016() {
 
-rlPhaseStartTest "automount_016: ipa help automountmap-del"
+rlPhaseStartTest "ipa-automount-016: ipa help automountmap-del"
 
 	rlRun "ipa help automountmap-del > $TmpDir/automount_016.out 2>&1"
 
@@ -440,7 +440,7 @@ rlPhaseEnd
 
 automount_017() {
 
-rlPhaseStartTest "automount_017: ipa help automountmap-find"
+rlPhaseStartTest "ipa-automount-017: ipa help automountmap-find"
 
 	rlRun "ipa help automountmap-find > $TmpDir/automount_017.out 2>&1"
 
@@ -461,7 +461,7 @@ rlPhaseEnd
 
 automount_018() {
 
-rlPhaseStartTest "automount_018: ipa help automountmap-mod"
+rlPhaseStartTest "ipa-automount-018: ipa help automountmap-mod"
 
 	rlRun "ipa help automountmap-mod > $TmpDir/automount_018.out 2>&1"
 
@@ -482,7 +482,7 @@ rlPhaseEnd
 
 automount_019() {
 
-rlPhaseStartTest "automount_019: ipa help automountmap-show"
+rlPhaseStartTest "ipa-automount-019: ipa help automountmap-show"
 
 	rlRun "ipa help automountmap-show > $TmpDir/automount_019.out 2>&1"
 
@@ -504,7 +504,7 @@ rlPhaseEnd
 
 automount_location_add_001() {
 
-rlPhaseStartTest "automount_location_add_001: ipa automountlocation-add LOCATION"
+rlPhaseStartTest "ipa-automount-location-add-001: ipa automountlocation-add LOCATION"
 
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
 
@@ -534,7 +534,7 @@ rlPhaseEnd
 
 automount_location_add_002() {
 
-rlPhaseStartTest "automount_location_add_002: ipa automountlocation-add LOCATION --all"
+rlPhaseStartTest "ipa-automount-location-add-002: ipa automountlocation-add LOCATION --all"
 
 	rlRun "ipa automountlocation-add pune --all > $TmpDir/automount_location_002.out 2>&1"
 
@@ -551,7 +551,7 @@ rlPhaseEnd
 
 automount_location_add_003() {
 
-rlPhaseStartTest "automount_location_add_003: ipa automountlocation-add LOCATION --all --raw"
+rlPhaseStartTest "ipa-automount-location-add-003: ipa automountlocation-add LOCATION --all --raw"
 
 	rlRun "ipa automountlocation-add pune --all --raw > $TmpDir/automount_location_003.out 2>&1"
 
@@ -569,7 +569,7 @@ rlPhaseEnd
 
 automount_location_find_001() {
 
-rlPhaseStartTest "automount_location_find_001: ipa automountlocation-find"
+rlPhaseStartTest "ipa-automount-location-find-001: ipa automountlocation-find"
 
 	rlRun "ipa automountlocation-add pune"
 
@@ -586,7 +586,7 @@ rlPhaseEnd
 
 automount_location_find_002() {
 
-rlPhaseStartTest "automount_location_find_002: ipa automountlocation-find LOCATION"
+rlPhaseStartTest "ipa-automount-location-find-002: ipa automountlocation-find LOCATION"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -602,7 +602,7 @@ rlPhaseEnd
 
 automount_location_find_003() {
 
-rlPhaseStartTest "automount_location_find_003: ipa automountlocation-find --location"
+rlPhaseStartTest "ipa-automount-location-find-003: ipa automountlocation-find --location"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -618,7 +618,7 @@ rlPhaseEnd
 
 automount_location_find_004() {
 
-rlPhaseStartTest "automount_location_find_004: ipa automountlocation-find --location --all"
+rlPhaseStartTest "ipa-automount-location-find-004: ipa automountlocation-find --location --all"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -636,7 +636,7 @@ rlPhaseEnd
 
 automount_location_find_005() {
 
-rlPhaseStartTest "automount_location_find_005: ipa automountlocation-find --location --all --raw"
+rlPhaseStartTest "ipa-automount-location-find-005: ipa automountlocation-find --location --all --raw"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -655,7 +655,7 @@ rlPhaseEnd
 
 automount_location_find_006() {
 
-rlPhaseStartTest "automount_location_find_006: ipa automountlocation-find --pkey-only positive test"
+rlPhaseStartTest "ipa-automount-location-find-006: ipa automountlocation-find --pkey-only positive test"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -671,7 +671,7 @@ rlPhaseEnd
 
 automount_location_show_001() {
 
-rlPhaseStartTest "automount_location_show_001: ipa automountlocation-show LOCATION"
+rlPhaseStartTest "ipa-automount-location-show-001: ipa automountlocation-show LOCATION"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -686,7 +686,7 @@ rlPhaseEnd
 
 automount_location_show_002() {
 
-rlPhaseStartTest "automount_location_show_002: ipa automountlocation-show LOCATION --all"
+rlPhaseStartTest "ipa-automount-location-show-002: ipa automountlocation-show LOCATION --all"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -703,7 +703,7 @@ rlPhaseEnd
 
 automount_location_show_003() {
 
-rlPhaseStartTest "automount_location_show_003: ipa automountlocation-show LOCATION --all --raw"
+rlPhaseStartTest "ipa-automount-location-show-003: ipa automountlocation-show LOCATION --all --raw"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -721,7 +721,7 @@ rlPhaseEnd
 
 automount_location_show_004() {
 
-rlPhaseStartTest "automount_location_show_004: ipa automountlocation-show LOCATION --all --raw --rights"
+rlPhaseStartTest "ipa-automount-location-show-004: ipa automountlocation-show LOCATION --all --raw --rights"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -740,7 +740,7 @@ rlPhaseEnd
 
 automountmap_add_001() {
 
-rlPhaseStartTest "automountmap_add_001: ipa automountmap-add LOCATION MAP"
+rlPhaseStartTest "ipa-automountmap-add-001: ipa automountmap-add LOCATION MAP"
 
 	rlRun "ipa automountlocation-add pune"
 
@@ -756,7 +756,7 @@ rlPhaseEnd
 
 automountmap_add_002() {
 
-rlPhaseStartTest "automountmap_add_002: ipa automountmap-add LOCATION MAP --all"
+rlPhaseStartTest "ipa-automountmap-add-002: ipa automountmap-add LOCATION MAP --all"
 
 	rlRun "ipa automountlocation-add pune"
 
@@ -774,7 +774,7 @@ rlPhaseEnd
 
 automountmap_add_003() {
 
-rlPhaseStartTest "automountmap_add_003: ipa automountmap-add LOCATION MAP --all --raw"
+rlPhaseStartTest "ipa-automountmap-add-003: ipa automountmap-add LOCATION MAP --all --raw"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -793,7 +793,7 @@ rlPhaseEnd
 
 automountmap_add_004() {
 
-rlPhaseStartTest "automountmap_add_004: ipa automountmap-add LOCATION MAP --all --raw --desc"
+rlPhaseStartTest "ipa-automountmap-add-004: ipa automountmap-add LOCATION MAP --all --raw --desc"
 
         rlRun "ipa automountlocation-add pune"
 
@@ -813,7 +813,7 @@ rlPhaseEnd
 
 automountmap_add_005() {
 
-rlPhaseStartTest "automountmap_add_005: ipa automountmap-add-indirect LOCATION MAP --mount"
+rlPhaseStartTest "ipa-automountmap-add-005: ipa automountmap-add-indirect LOCATION MAP --mount"
 
 	rlRun "ipa automountlocation-add pune"
 
@@ -829,7 +829,7 @@ rlPhaseEnd
 
 automountmap_add_006() {
 
-rlPhaseStartTest "automountmap_add_006: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap"
+rlPhaseStartTest "ipa-automountmap-add-006: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap"
 
 	rlRun "ipa automountlocation-add pune"
 	rlRun "ipa automountmap-add pune pune.map"
@@ -846,7 +846,7 @@ rlPhaseEnd
 
 automountmap_add_007() {
 
-rlPhaseStartTest "automountmap_add_007: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap --all"
+rlPhaseStartTest "ipa-automountmap-add-007: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap --all"
 
         rlRun "ipa automountlocation-add pune"
         rlRun "ipa automountmap-add pune pune.map"
@@ -864,7 +864,7 @@ rlPhaseEnd
 
 automountmap_add_008() {
 
-rlPhaseStartTest "automountmap_add_008: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap --all --raw"
+rlPhaseStartTest "ipa-automountmap-add-008: ipa automountmap-add-indirect LOCATION MAP --mount --parentmap --all --raw"
 
 	rlRun "ipa -d automountlocation-add pune"
         rlRun "ipa -d automountmap-add pune pune.map"
@@ -883,7 +883,7 @@ rlPhaseEnd
 
 automountmap_find_001() {
 
-rlPhaseStartTest "automountmap_find_001: ipa automountmap-find AUTOMOUNTLOCATION"
+rlPhaseStartTest "ipa-automountmap-find-001: ipa automountmap-find AUTOMOUNTLOCATION"
 
 	# Setup for automountmap-find.
 	rlRun "ipa automountlocation-add pune"
@@ -907,7 +907,7 @@ rlPhaseEnd
 
 automountmap_find_002() {
 
-rlPhaseStartTest "automountmap_find_002: ipa automountmap-find AUTOMOUNTLOCATION MAP"
+rlPhaseStartTest "ipa-automountmap-find-002: ipa automountmap-find AUTOMOUNTLOCATION MAP"
 
 	rlRun "ipa automountmap-find pune --map=pune.map > $TmpDir/automountmap_find_002.out 2>&1"
 	rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_002.out"
@@ -921,7 +921,7 @@ rlPhaseEnd
 
 automountmap_find_003() {
 
-rlPhaseStartTest "automountmap_find_003: ipa automountmap-find AUTOMOUNTLOCATION MAP --all"
+rlPhaseStartTest "ipa-automountmap-find-003: ipa automountmap-find AUTOMOUNTLOCATION MAP --all"
 
         rlRun "ipa automountmap-find pune --map=pune.map --all > $TmpDir/automountmap_find_003.out 2>&1"
         rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_003.out"
@@ -937,7 +937,7 @@ rlPhaseEnd
 
 automountmap_find_004() {
 
-rlPhaseStartTest "automountmap_find_004: ipa automountmap-find AUTOMOUNTLOCATION MAP --all --raw"
+rlPhaseStartTest "ipa-automountmap-find-004: ipa automountmap-find AUTOMOUNTLOCATION MAP --all --raw"
 
 	rlRun "ipa automountmap-find pune --map=pune.map --all --raw > $TmpDir/automountmap_find_004.out 2>&1"
         rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_004.out"
@@ -954,7 +954,7 @@ rlPhaseEnd
 
 automountmap_find_005() {
 
-rlPhaseStartTest "automountmap_find_005: ipa automountmap-find AUTOMOUNTLOCATION MAP --all --raw --sizelimit"
+rlPhaseStartTest "ipa-automountmap-find-005: ipa automountmap-find AUTOMOUNTLOCATION MAP --all --raw --sizelimit"
 
 	rlRun "ipa automountmap-find pune --all --raw --sizelimit=2 > $TmpDir/automountmap_find_005.out 2>&1"
 
@@ -995,7 +995,7 @@ rlPhaseEnd
 
 automountmap_find_006() {
 
-rlPhaseStartTest "automountmap_find_006: ipa automountmap-find AUTOMOUNTLOCATION MAP --pkey-only positive test."
+rlPhaseStartTest "ipa-automountmap-find-006: ipa automountmap-find AUTOMOUNTLOCATION MAP --pkey-only positive test."
 
 	rlRun "ipa automountmap-find pune --map=pune.map --pkey-only > $TmpDir/automountmap_find_006.out 2>&1"
         rlAssertGrep "1 automount map matched" "$TmpDir/automountmap_find_006.out"
@@ -1012,7 +1012,7 @@ rlPhaseEnd
 
 automountmap_show_001() {
 
-rlPhaseStartTest "automountmap_show_001: ipa automountmap-show LOCATION MAP"
+rlPhaseStartTest "ipa-automountmap-show-001: ipa automountmap-show LOCATION MAP"
 	ipa automountlocation-del pune
 
         # Setup for automountmap-show.
@@ -1030,7 +1030,7 @@ rlPhaseEnd
 
 automountmap_show_002() {
 
-rlPhaseStartTest "automountmap_show_002: ipa automountmap-show LOCATION MAP --all"
+rlPhaseStartTest "ipa-automountmap-show-002: ipa automountmap-show LOCATION MAP --all"
 
 	rlRun "ipa automountmap-show pune pune.map --all > $TmpDir/automountmap_show_002.out 2>&1"
 	rlAssertGrep "dn: automountmapname=pune.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_002.out"
@@ -1045,7 +1045,7 @@ rlPhaseEnd
 
 automountmap_show_003() {
 
-rlPhaseStartTest "automountmap_show_003: ipa automountmap-show LOCATION MAP --all --raw"
+rlPhaseStartTest "ipa-automountmap-show-003: ipa automountmap-show LOCATION MAP --all --raw"
 
 	rlRun "ipa automountmap-show pune pune.map --all --raw > $TmpDir/automountmap_show_003.out 2>&1"
         rlAssertGrep "dn: automountmapname=pune.map,cn=pune,cn=automount,$basedn" "$TmpDir/automountmap_show_003.out"
@@ -1062,7 +1062,7 @@ rlPhaseEnd
 
 automountkey_add_001() {
 
-rlPhaseStartTest "automountkey_add_001: ipa automountkey-add LOCATION MASTERMAP --key --info"
+rlPhaseStartTest "ipa-automountkey-add-001: ipa automountkey-add LOCATION MASTERMAP --key --info"
 
 	rlRun "ipa automountlocation-add baltimore"
 	rlRun "ipa automountmap-add baltimore auto.baltimore"
@@ -1084,7 +1084,7 @@ rlPhaseEnd
 
 automountkey_add_002() {
 
-rlPhaseStartTest "automountkey_add_002: ipa automountkey-add LOCATION MASTERMAP --key --info --all"
+rlPhaseStartTest "ipa-automountkey-add-002: ipa automountkey-add LOCATION MASTERMAP --key --info --all"
 
 	rlRun "ipa automountlocation-add baltimore"
         rlRun "ipa automountmap-add baltimore auto.baltimore"
@@ -1108,7 +1108,7 @@ rlPhaseEnd
 
 automountkey_add_003() {
 
-rlPhaseStartTest "automountkey_add_003: ipa automountkey-add LOCATION MASTERMAP --key --info --all --raw"
+rlPhaseStartTest "ipa-automountkey-add-003: ipa automountkey-add LOCATION MASTERMAP --key --info --all --raw"
 
         rlRun "ipa automountlocation-add baltimore"
         rlRun "ipa automountmap-add baltimore auto.baltimore"
@@ -1132,7 +1132,7 @@ rlPhaseEnd
 
 automountkey_mod_001() {
 
-rlPhaseStartTest "automountkey_mod_001: ipa automountkey-mod LOCATION MAP --key --rename --info --newinfo"
+rlPhaseStartTest "ipa-automountkey-mod-001: ipa automountkey-mod LOCATION MAP --key --rename --info --newinfo"
 
         rlRun "ipa automountlocation-add baltimore"
 	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
@@ -1151,7 +1151,7 @@ rlPhaseEnd
 
 automountkey_mod_002() {
 
-rlPhaseStartTest "automountkey_mod_002: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all"
+rlPhaseStartTest "ipa-automountkey-mod-002: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all"
 
 	rlRun "ipa automountlocation-add baltimore"
         rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
@@ -1171,7 +1171,7 @@ rlPhaseEnd
 
 automountkey_mod_003() {
 
-rlPhaseStartTest "automountkey_mod_003: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all --raw"
+rlPhaseStartTest "ipa-automountkey-mod-003: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all --raw"
 
         rlRun "ipa automountlocation-add baltimore"
         rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
@@ -1191,7 +1191,7 @@ rlPhaseEnd
 
 automountkey_mod_004() {
 
-rlPhaseStartTest "automountkey_mod_004: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all --raw --rights"
+rlPhaseStartTest "ipa-automountkey-mod-004: ipa automountkey-mod LOCATION MAP MAP --key --rename --info --newinfo --all --raw --rights"
 
         rlRun "ipa automountlocation-add baltimore"
         rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
@@ -1212,7 +1212,7 @@ rlPhaseEnd
 
 automountkey_find_001() {
 
-rlPhaseStartTest "automountkey_find_001: ipa automountkey-find LOCATION MAP"
+rlPhaseStartTest "ipa-automountkey-find-001: ipa automountkey-find LOCATION MAP"
 
 	rlRun "ipa automountlocation-add baltimore"
         rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=auto.share"
@@ -1231,7 +1231,7 @@ rlPhaseEnd
 
 automountkey_find_002() {
 
-rlPhaseStartTest "automountkey_find_002: ipa automountkey-find LOCATION MAP --all"
+rlPhaseStartTest "ipa-automountkey-find-002: ipa automountkey-find LOCATION MAP --all"
 
 	rlRun "ipa automountkey-find baltimore auto.master --all > $TmpDir/automountkey_find_002.out 2>&1"
         rlAssertGrep "2 automount keys matched" "$TmpDir/automountkey_find_002.out"
@@ -1254,7 +1254,7 @@ rlPhaseEnd
 
 automountkey_find_003() {
 
-rlPhaseStartTest "automountkey_find_003: ipa automountkey-find LOCATION MAP --all --raw"
+rlPhaseStartTest "ipa-automountkey-find-003: ipa automountkey-find LOCATION MAP --all --raw"
 
 	rlRun "ipa automountkey-find baltimore auto.master --all --raw > $TmpDir/automountkey_find_003.out 2>&1"
         rlAssertGrep "2 automount keys matched" "$TmpDir/automountkey_find_003.out"
@@ -1278,7 +1278,7 @@ rlPhaseEnd
 
 automountkey_find_004() {
 
-rlPhaseStartTest "automountkey_find_004: ipa automountkey-find LOCATION MAP --all --sizelimit"
+rlPhaseStartTest "ipa-automountkey-find-004: ipa automountkey-find LOCATION MAP --all --sizelimit"
 
 	rlRun "ipa automountkey-find baltimore auto.master --all --sizelimit=1 > $TmpDir/automountkey_find_004.out 2>&1"
 	rlAssertGrep "1 automount key matched" "$TmpDir/automountkey_find_004.out"
@@ -1296,7 +1296,7 @@ rlPhaseEnd
 
 automountkey_find_005() {
 
-rlPhaseStartTest "automountkey_find_005: ipa automountkey-find LOCATION MAP --all --key"
+rlPhaseStartTest "ipa-automountkey-find-005: ipa automountkey-find LOCATION MAP --all --key"
 
 	rlRun "ipa automountkey-find baltimore auto.master --all --key=/share > $TmpDir/automountkey_find_005.out 2>&1"
 	rlAssertGrep "1 automount key matched" "$TmpDir/automountkey_find_005.out"
@@ -1311,7 +1311,7 @@ rlPhaseEnd
 
 automountkey_find_006() {
 
-rlPhaseStartTest "automountkey_find_006: ipa automountkey-find LOCATION MAP --all --info"
+rlPhaseStartTest "ipa-automountkey-find-006: ipa automountkey-find LOCATION MAP --all --info"
 
 	rlRun "ipa automountkey-find baltimore auto.master --all --info=auto.share > $TmpDir/automountkey_find_006.out 2>&1"
         rlAssertGrep "1 automount key matched" "$TmpDir/automountkey_find_006.out"
@@ -1326,7 +1326,7 @@ rlPhaseEnd
 
 automountkey_show_001() {
 
-rlPhaseStartTest "automountkey_show_001: ipa automountkey-show LOCATION MAP --key"
+rlPhaseStartTest "ipa-automountkey-show-001: ipa automountkey-show LOCATION MAP --key"
 
         rlRun "ipa automountkey-show baltimore auto.master --key=/share > $TmpDir/automountkey_show_001.out 2>&1"
         rlAssertGrep "Key: /share" "$TmpDir/automountkey_show_001.out"
@@ -1339,7 +1339,7 @@ rlPhaseEnd
 
 automountkey_show_002() {
 
-rlPhaseStartTest "automountkey_show_002: ipa automountkey-show LOCATION MAP --key --info"
+rlPhaseStartTest "ipa-automountkey-show-002: ipa automountkey-show LOCATION MAP --key --info"
 
 	rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share > $TmpDir/automountkey_show_002.out 2>&1"
         rlAssertGrep "Key: /share" "$TmpDir/automountkey_show_002.out"
@@ -1352,7 +1352,7 @@ rlPhaseEnd
 
 automountkey_show_003() {
 
-rlPhaseStartTest "automountkey_show_003: ipa automountkey-show LOCATION MAP --key --info --all"
+rlPhaseStartTest "ipa-automountkey-show-003: ipa automountkey-show LOCATION MAP --key --info --all"
 
 	rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share --all > $TmpDir/automountkey_show_003.out 2>&1"
         rlAssertGrep " dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_show_003.out"
@@ -1368,7 +1368,7 @@ rlPhaseEnd
 
 automountkey_show_004() {
 
-rlPhaseStartTest "automountkey_show_004: ipa automountkey-show LOCATION MAP --key --info --all --raw"
+rlPhaseStartTest "ipa-automountkey-show-004: ipa automountkey-show LOCATION MAP --key --info --all --raw"
 
         rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share --all --raw > $TmpDir/automountkey_show_004.out 2>&1"
         rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_show_004.out"
@@ -1385,7 +1385,7 @@ rlPhaseEnd
 
 automountkey_show_005() {
 
-rlPhaseStartTest "automountkey_show_005: ipa automountkey-show LOCATION MAP --key --info --all --raw --rights"
+rlPhaseStartTest "ipa-automountkey-show-005: ipa automountkey-show LOCATION MAP --key --info --all --raw --rights"
 
         rlRun "ipa automountkey-show baltimore auto.master --key=/share --info=auto.share --all --raw --rights > $TmpDir/automountkey_show_005.out 2>&1"
 	rlAssertGrep "dn: description=/share,automountmapname=auto.master,cn=baltimore,cn=automount,$basedn" "$TmpDir/automountkey_show_005.out"
@@ -1404,7 +1404,7 @@ rlPhaseEnd
 
 automount_location_del_001() {
 
-rlPhaseStartTest "automount_location_del_001: ipa automountlocation-del LOCATION - BZ 723778"
+rlPhaseStartTest "ipa-automountlocation-del-001: ipa automountlocation-del LOCATION - BZ 723778"
 
 	rlRun "ipa automountlocation-add pune"
 	rlRun "ipa automountlocation-del pune > $TmpDir/automount_location_del.out 2>&1"
@@ -1418,7 +1418,7 @@ rlPhaseEnd
 
 automount_location_del_002() {
 
-rlPhaseStartTest "automount_location_del_002: ipa automountlocation-del LOCATION"
+rlPhaseStartTest "ipa-automountlocation-del-002: ipa automountlocation-del LOCATION"
 
 	rlRun "ipa automountlocation-add pune"
 	rlRun "ipa automountlocation-del pune"
@@ -1442,7 +1442,7 @@ rlPhaseEnd
 
 automountkey_del() {
 
-rlPhaseStartTest "automountkey_del: ipa automountkey-del AUTOMOUNTLOCATION AUTOMOUNTMAP"
+rlPhaseStartTest "ipa-automountkey-del-001: ipa automountkey-del AUTOMOUNTLOCATION AUTOMOUNTMAP"
 
 	rlRun "ipa automountlocation-add baltimore"
 	rlRun "ipa automountkey-add baltimore auto.master --key=/share --info=-rw"
@@ -1462,7 +1462,7 @@ rlPhaseEnd
 
 automountmap_del() {
 
-rlPhaseStartTest "automountmap_del: ipa automountmap-del LOCATION MAP"
+rlPhaseStartTest "ipa-automountmap-del-001: ipa automountmap-del LOCATION MAP"
 
         rlRun "ipa automountlocation-add baltimore"
 	rlRun "ipa automountmap-add baltimore auto.map1"
@@ -1485,7 +1485,7 @@ rlPhaseEnd
 
 bz725433() {
 
-rlPhaseStartTest "bz725433: automountmap gets added even though the return code is 1"
+rlPhaseStartTest "ipa-automount-bugzilla-001: bz725433 automountmap gets added even though the return code is 1"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=725433"
 	rlRun "ipa automountlocation-del baltimore"
@@ -1505,7 +1505,7 @@ rlPhaseEnd
 
 bz726725() {
 
-rlPhaseStartTest "bz726725: Error message states 'automountmapautomountmapname' while add/mod/del automountkey with empty automountmap name."
+rlPhaseStartTest "ipa-automount-bugzilla-002: bz726725 Error message states 'automountmapautomountmapname' while add/mod/del automountkey with empty automountmap name."
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=726725"
 
@@ -1531,7 +1531,7 @@ rlPhaseStartTest "bz726725: Error message states 'automountmapautomountmapname' 
 
 bz726722() {
 
-rlPhaseStartTest "bz726722: Error message states 'automountlocationcn' while add/mod/del automountmap or automountkey with empty location."
+rlPhaseStartTest "ipa-automount-bugzilla-003: bz726722 Error message states 'automountlocationcn' while add/mod/del automountmap or automountkey with empty location."
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=726722"
 
@@ -1550,7 +1550,7 @@ rlPhaseStartTest "bz726722: Error message states 'automountlocationcn' while add
 
 
 cleanup() {
-rlPhaseStartTest "Clean up for automount configuration tests"
+rlPhaseStartCleanup "Clean up for automount configuration tests"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
 	rlRun "ipa user-del $user1"
 	sleep 5
