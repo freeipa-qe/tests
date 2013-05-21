@@ -890,7 +890,7 @@ user_status()
 	lockoutduration=$(ipa pwpolicy-show | grep Lockout\ duration | sed s/\ //g | cut -d: -f2)
 	ipa pwpolicy-mod --lockouttime=60
 
-	rlPhaseStartTest "ipa-krblockout-0Check setup for user_status tests"
+	rlPhaseStartTest "ipa-krblockout-userstatus-001: Check setup for user_status tests"
 		rlRun "create_ipauser $user1 $user1 $user1 Secret123" 0 "Creating a test $user1"
 		rlRun "create_ipauser $user2 $user2 $user2 Secret123" 0 "Creating a test $user2"
 		rlRun "create_ipauser $user3 $user3 $user3 Secret123" 0 "Creating a test $user3"
@@ -905,7 +905,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-001: Create sucessful logins on this host for user1"
+	rlPhaseStartTest "ipa-krblockout-userstatus-002: Create sucessful logins on this host for user1"
 		kinitAs $user1 Secret123
 		kinitAs $user1 Secret123
 		kinitAs $user1 Secret123
@@ -919,7 +919,7 @@ user_status()
 		fi
 	rlPhaseEnd
 	
-	rlPhaseStartTest "ipa-krblockout-userstatus-002: Create sucessful logins on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-003: Create sucessful logins on other host in test group."
 		ssh root@$otherhost "echo Secret123 | kinit $user1"
 		ssh root@$otherhost "echo Secret123 | kinit $user1"
 		kinitAs $ADMINID $ADMINPW
@@ -932,7 +932,7 @@ user_status()
 		fi
 	rlPhaseEnd
 		
-	rlPhaseStartTest "ipa-krblockout-userstatus-003: Make sure that the last login time is in a valid time frame on this server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-004: Make sure that the last login time is in a valid time frame on this server"
 		kinitAs $ADMINID $ADMINPW
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
@@ -951,7 +951,7 @@ user_status()
 	rlPhaseEnd
 
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "ipa-krblockout-userstatus-004: Make sure that the last login time is in a valid time frame on other server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-005: Make sure that the last login time is in a valid time frame on other server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
 		kdestroy
@@ -969,7 +969,7 @@ user_status()
 	rlPhaseEnd
 	fi
 	
-	rlPhaseStartTest "ipa-krblockout-userstatus-005: Create failed logins on this host for user1"
+	rlPhaseStartTest "ipa-krblockout-userstatus-006: Create failed logins on this host for user1"
 		kdestroy
 		kinitAs $user1 dsfr
 		kinitAs $user1 Secr3
@@ -985,7 +985,7 @@ user_status()
 	rlPhaseEnd
 	
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "ipa-krblockout-userstatus-006: Create failed logins for user1 on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-007: Create failed logins for user1 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user1"
 		ssh root@$otherhost "echo mostblarg | kinit $user1"
 		# Check that it seems to be the correct number of logins
@@ -999,7 +999,7 @@ user_status()
 	rlPhaseEnd
 	fi
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-007: Create failed logins on this host for user2"
+	rlPhaseStartTest "ipa-krblockout-userstatus-008: Create failed logins on this host for user2"
 		kinitAs $user2 dsfr
 		kinitAs $user2 Secr3
 		kinitAs $user2 blarg
@@ -1015,7 +1015,7 @@ user_status()
 	rlPhaseEnd
 	
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "ipa-krblockout-userstatus-008: Create failed logins for user2 on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-009: Create failed logins for user2 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user2"
 		ssh root@$otherhost "echo mostblarg | kinit $user2"
 		ssh root@$otherhost "echo m | kinit $user2"
@@ -1030,7 +1030,7 @@ user_status()
 	rlPhaseEnd
 	fi
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-009: Make sure that the last failed login time is in a valid time frame on this server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-010: Make sure that the last failed login time is in a valid time frame on this server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
 		kinitAs $user1 Sec
@@ -1047,7 +1047,7 @@ user_status()
 	rlPhaseEnd
 
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "ipa-krblockout-userstatus-010: Make sure that the last failed login time is in a valid time frame on other server"
+	rlPhaseStartTest "ipa-krblockout-userstatus-011: Make sure that the last failed login time is in a valid time frame on other server"
 		now=$(ipa user-status  $user1 --all --raw | grep -A 5 $otherhost | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 1
 		ssh root@$otherhost "echo Sec | kinit $user1"
@@ -1062,7 +1062,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-011: Create lockout logins for user3 on other host in test group."
+	rlPhaseStartTest "ipa-krblockout-userstatus-012: Create lockout logins for user3 on other host in test group."
 		ssh root@$otherhost "echo Sec | kinit $user3"
 		ssh root@$otherhost "echo mostblarg | kinit $user3"
 		ssh root@$otherhost "echo m | kinit $user3"
@@ -1080,7 +1080,7 @@ user_status()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-012: Ensure that user 3 cannot login to other host. That user should be locked out ATM."
+	rlPhaseStartTest "ipa-krblockout-userstatus-013: Ensure that user 3 cannot login to other host. That user should be locked out ATM."
 		ssh root@$otherhost "echo Secret123 | kinit $user3"
 		kinitout=$(ssh root@$otherhost 'klist')
 		echo $kinitout | grep $user3 
@@ -1116,7 +1116,7 @@ user_status()
 		sleep 60
 	fi
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-013: Verify that the failed login count on the remote server reverts to 0 after a good login of user3"
+	rlPhaseStartTest "ipa-krblockout-userstatus-014: Verify that the failed login count on the remote server reverts to 0 after a good login of user3"
 		kinitAs $ADMINID $ADMINPW
 		failedthere=$(ipa user-status  $user3 | grep -A 5 $otherhost | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedthere -ne 0 ]; then
@@ -1130,7 +1130,7 @@ rlPhaseEnd
 	ssh root@$otherhost "echo Secret123 | kinit $user3"
 	sleep 30
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-014: Make sure that the last good login time on the remote server looks like it's in the correct time window"		
+	rlPhaseStartTest "ipa-krblockout-userstatus-015: Make sure that the last good login time on the remote server looks like it's in the correct time window"		
 		kinitAs $ADMINID $ADMINPW
 		lastgoodlogin=$(ipa user-status  $user3 --all --raw | grep -A 5 $otherhost | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
@@ -1143,7 +1143,7 @@ rlPhaseEnd
 	rlPhaseEnd
 	fi
 	
-	rlPhaseStartTest "ipa-krblockout-userstatus-015: Create lockout logins for user4 on this host."
+	rlPhaseStartTest "ipa-krblockout-userstatus-016: Create lockout logins for user4 on this host."
 		kdestroy
 		kinitAs $user4 dsfr
 		kinitAs $user4 dsfuygr
@@ -1163,7 +1163,7 @@ rlPhaseEnd
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-016: Ensure that user 4 cannot login to this host. That user should be locked out ATM."
+	rlPhaseStartTest "ipa-krblockout-userstatus-017: Ensure that user 4 cannot login to this host. That user should be locked out ATM."
 		kdestroy
 		echo Secret123 | kinit $user4
 		kinitout=$(klist)
@@ -1179,7 +1179,7 @@ rlPhaseEnd
 	# Gather current time for remote server for a later test
 	now=$(ipa user-status  $user4 --all --raw | grep -A 5 $hostname | grep now | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-017: make sure that user 4 can login after the lockout interval is expired"
+	rlPhaseStartTest "ipa-krblockout-userstatus-018: make sure that user 4 can login after the lockout interval is expired"
 		# Wait for the needed time to unlock the user
 		echo "Sleeping for 60 seconds"
 		sleep 60
@@ -1195,7 +1195,7 @@ rlPhaseEnd
 	rlPhaseEnd	
 
 	if [ $multi -eq 1 ]; then
-	rlPhaseStartTest "ipa-krblockout-userstatus-018: Verify that the failed login count on the remote server reverts to 0 after a good login of user4"
+	rlPhaseStartTest "ipa-krblockout-userstatus-019: Verify that the failed login count on the remote server reverts to 0 after a good login of user4"
 		echo "Other host is $otherhost"
 		failedhere=$(ipa user-status  $user4 | grep -A 5 $hostname | grep Failed\ logins | sed s/\ //g | cut -d\: -f2)
 		if [ $failedhere -ne 0 ]; then
@@ -1205,7 +1205,7 @@ rlPhaseEnd
 		fi
 	rlPhaseEnd	
 
-	rlPhaseStartTest "ipa-krblockout-userstatus-019: Make sure that the last good login time on the remote server looks like it's in the correct time window"		
+	rlPhaseStartTest "ipa-krblockout-userstatus-020: Make sure that the last good login time on the remote server looks like it's in the correct time window"		
 		kinitAs $ADMINID $ADMINPW
 		lastgoodlogin=$(ipa user-status  $user4 --all --raw | grep -A 5 $hostname | grep lastsuccessful | sed s/\ //g | cut -d\: -f2 | sed s/Z//g)
 		sleep 2
