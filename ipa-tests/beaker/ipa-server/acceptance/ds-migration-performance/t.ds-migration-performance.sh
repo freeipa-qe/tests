@@ -17,7 +17,7 @@ performance()
 
 setup()
 {
-        rlPhaseStartTest "SETUP FUNCTIONAL TESTING"
+        rlPhaseStartSetup "SETUP FUNCTIONAL TESTING"
 		rlLog "Compat Plugin Enabled Mode :: $COMPAT"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
@@ -56,7 +56,7 @@ setup()
 
 perftest()
 {
-	rlPhaseStartTest "Migration 10000 users and 12 groups"
+	rlPhaseStartTest "ipa-migration-performance-001: Migration 10000 users and 12 groups"
 		# record the current free memory
 		prememfree=`free -b | grep Mem: | awk '{print $4}'`
 	
@@ -108,7 +108,7 @@ perftest()
 
 cleanup()
 {
-	rlPhaseStartTest "CLEANUP FUNCTIONAL TESTING"
+	rlPhaseStartCleanup "CLEANUP FUNCTIONAL TESTING"
 		rlRun "ipa config-mod --enable-migration=FALSE" 0 "Set migration mode to FALSE"
 	rlPhaseEnd
 }
