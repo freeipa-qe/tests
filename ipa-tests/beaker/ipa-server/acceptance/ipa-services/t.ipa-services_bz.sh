@@ -14,14 +14,14 @@ service_bugs()
 
 srvsbugsetup()
 {
-   rlPhaseStartTest "kinit as Admin"
+   rlPhaseStartSetup "kinit as Admin"
 	rlRun "kinitAs $ADMINID $ADMINPW"
    rlPhaseEnd
 }
 
 bz800119()
 {
-    rlPhaseStartTest "bz800119 Should not be allowed to run host-disable on an IPA Server or service-disable on an IPA Server service"
+    rlPhaseStartTest "ipa-service-bugzilla-001: bz800119 Should not be allowed to run host-disable on an IPA Server or service-disable on an IPA Server service"
 	expmsg="ipa: ERROR: invalid 'principal': This principal is required by the IPA master"
 	for service in ldap dogtagldap HTTP DNS ; do
 		thisservice="$service/$MASTER@$DOMAIN"
