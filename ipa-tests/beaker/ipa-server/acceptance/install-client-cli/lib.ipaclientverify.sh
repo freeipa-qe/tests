@@ -640,13 +640,13 @@ CheckFunction() {
     rlLog "CheckFunction: $conf"
 }
 
-checkFileHasLine() {
+checkFileContent() {
     file=$1
     shift
     line="$@"
     local result=""
-    rlLog "[start: checkFileHasLine]: check whether file [$file] contains expected line [$line]"
-    grep \"$line\" $file
+    rlLog "[start: checkFileContent]: check whether file [$file] contains expected line [$line]"
+    grep "$line" $file
     if [ "$?" = "0" ];then
         result="good"
         rlPass "[good] found expected line in file"
@@ -658,7 +658,7 @@ checkFileHasLine() {
         cat $file
         echo "---------------- end of [$file] ------------------------"
     fi
-    rlLog "[finished: checkFileHasLine]: result=[$result]"
+    rlLog "[finished: checkFileContent]: result=[$result]"
 }
 
 checkServiceStatus() {
@@ -707,22 +707,22 @@ CheckConfig() {
     conf="$@"
     rlLog "CheckConfig: $conf"
     if [ "$conf" = "force_ldap" ];then
-        checkFileHasLine $conf_openldap "URI ldaps://$MASTER"
-        checkFileHasLine $conf_openldap "BASE $BASEDN"
+        checkFileContent $conf_openldap "URI ldaps://$MASTER"
+        checkFileContent $conf_openldap "BASE $BASEDN"
     elif [ "$conf" = "ssh_trust_dns" ];then
-        checkFileHasLine $conf_ssh_client  "VerifyHostKeyDNS yes"
+        checkFileContent $conf_ssh_client  "VerifyHostKeyDNS yes"
     elif [ "$conf" = "no_dns_sshfp" ];then
-        checkFileHasLine $conf_ssh_client  "VerifyHostKeyDNS no"
+        checkFileContent $conf_ssh_client  "VerifyHostKeyDNS no"
     elif [ "$conf" = "primaryServer" ];then
-        checkFileHasLine $conf_sssd_client "ipa_server = $MASTER"    
+        checkFileContent $conf_sssd_client "ipa_server = $MASTER"    
     elif [ "$conf" = "ntpserver_setting" ];then
-        checkFileHasLine $conf_ntpd "server $NTPSERVER"
+        checkFileContent $conf_ntpd "server $NTPSERVER"
     elif [ "$conf" = "ntpserver_disabled" ];then
         checkServiceStatus "ntpd" "disabled"
     elif [ "$conf" = "hostname" ];then
-        checkFileHasLine $conf_sssd_client "ipa_hostname = $HOSTNAME"    
+        checkFileContent $conf_sssd_client "ipa_hostname = $HOSTNAME"    
     elif [ "$conf" = "no_krb5_store_password_if_offline" ];then
-        checkFileHasLine $conf_sssd_client "krb5_store_password_if_offline = False"    
+        checkFileContent $conf_sssd_client "krb5_store_password_if_offline = False"    
     else
         rlLog "checkconfig have not implemente [$conf] yet"
     fi

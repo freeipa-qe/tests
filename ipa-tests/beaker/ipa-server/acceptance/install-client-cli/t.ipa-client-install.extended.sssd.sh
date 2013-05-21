@@ -1,4 +1,6 @@
 ipa_client_install_sssd_option_test() {
+    rlLog "ensure ipa client is not installed before enter the test script"
+    ipa-client-install --uninstall -U
     ipaclientinstall_sssd_options_0001_test_single_option__permit                      #  Single Option test: --permit
     ipaclientinstall_sssd_options_0002_test_single_option__enable_dns_updates          #  Single Option test: --enable_dns_updates
     ipaclientinstall_sssd_options_0003_test_single_option__no_sssd                     #  Single Option test: --no-sssd
