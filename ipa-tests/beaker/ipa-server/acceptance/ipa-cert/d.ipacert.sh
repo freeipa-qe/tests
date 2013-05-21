@@ -11,7 +11,7 @@ bug_automation()
 bug_866955()
 {
     local bugid="866955"
-    rlPhaseStartSetup "ipa-cert-bugzilla-001: bz$bugid unable to sign certificate request by IPA , when csr has subjectAltnames"
+    rlPhaseStartTest "ipa-cert-bugzilla-001: bz$bugid unable to sign certificate request by IPA , when csr has subjectAltnames"
         local openssl_cnf="$TmpDir/openssl.${bugid}.cnf"
         local altname=`hostname`
         create_openssl_cnf $openssl_cnf $altname
