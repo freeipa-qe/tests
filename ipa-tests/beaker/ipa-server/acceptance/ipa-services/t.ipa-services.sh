@@ -63,13 +63,13 @@ SERVICE=vpn
 TESTHOST=dummy.$DOMAIN
 
 setup() {
-rlPhaseStartTest "Setup for ipa service tests"
+rlPhaseStartSetup "Setup for ipa service tests"
         rlDistroDiff ipa_pkg_check
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user" 
         rlRun "TmpDir=\`mktemp -d\`" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 rlPhaseEnd
-}
+}	
 
 service_add_001() {
 	# ipa service-add : add service for $SERVICE
@@ -936,7 +936,7 @@ rlPhaseEnd
 
 
 cleanup() {
-rlPhaseStartTest "Clean up for ipa services tests"
+rlPhaseStartCleanup "Clean up for ipa services tests"
 	rlRun "kinitAs $ADMINID $ADMINPW" 0
 	rlRun "kdestroy" 0 "Destroying admin credentials."
 
