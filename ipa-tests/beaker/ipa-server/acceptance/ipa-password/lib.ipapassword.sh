@@ -116,7 +116,6 @@ reset_nestedgroup_pwpolicy()
         echo "------------------------------"
     fi
     rlRun "$kdestroy"
-    rm $out
 } # reset_group_pwpolicy
 
 del_group_pwpolicy()
@@ -132,7 +131,6 @@ del_group_pwpolicy()
         echo "not found group password policy: [$grppw], do nothing"
     fi
     rlRun "$kdestroy"
-    rm $out
 } #del_group_pwpolicy
 
 check_existence_of_group_pwpolicy()
@@ -153,7 +151,6 @@ check_existence_of_group_pwpolicy()
         rlRun "$kdestroy"
         return 1
     fi
-    rm $out
 } #check_existence_of_group_pwpolicy
 
 add_test_user()
@@ -225,17 +222,14 @@ check_existence_of_user_account()
         if grep -i "User login: $userlogin$" $out 2>&1 >/dev/null
         then
             echo "[check_existence_of_user_account] check: found [$userlogin]"
-            rm $out
             return 0
         else
             echo "[check_existence_of_user_account] check: not found [$userlogin]"
-            rm $out
             return 1
         fi
     else
         return 1 # when login value not given, return not found
     fi
-    rm $out
 } #check_existence_of_user_account
 
 add_test_group()
@@ -308,11 +302,9 @@ grp_exist()
         if grep -i "Group name: $grp$" $out 2>&1 >/dev/null
         then
             echo "group [$grp] found"
-            rm $out
             return 0
         else
             echo "group [$grp] not found"
-            rm $out
             return 1
         fi
     else
@@ -334,7 +326,6 @@ append_test_user_to_tesst_group()
         rlRun "ipa group-add-member $testgrp --users=$testac"
     fi
     rlRun "$kdestroy"
-    rm $out
 } # add_test_member
 
 append_nested_test_group_to_test_group()
@@ -351,7 +342,6 @@ append_nested_test_group_to_test_group()
               0 "add group [$nestedgrp] as member of [$testgrp]"
         rlRun "$kdestroy"
     fi
-    rm $out
 } # append_nested_test_group_to_test_group
 
 append_test_user_to_nested_test_group()
@@ -380,7 +370,6 @@ append_test_user_to_nested_test_group()
               0 "add [$testac] as member of [$nestedgrp]"
     fi
     rlRun "$kdestroy"
-    rm $out
 } #append_test_user_to_nested_test_group
 
 remove_test_member()
@@ -396,7 +385,6 @@ remove_test_member()
         rlPass "user [$testac] is not member of [$testgrp],do nothing"
     fi
     rlRun "$kdestroy"
-    rm $out
 } # remove_test_member
 
 kinit_aftermaxlife()
@@ -435,8 +423,6 @@ kinit_aftermaxlife()
 
     rlRun "rlDistroDiff keyctl"
     rlRun "echo $newpw | kinit $username" 0 "[kinit_aftermaxlife] after password change prompt, try with the new password [$newpw]"
-    # clean up
-    rm $exp
 } #kinit_aftermaxlife
 
 Local_KinitAsAdmin()
@@ -503,7 +489,6 @@ Local_KinitAsAdmin()
             echo 'expect eof' >> $exp
             /usr/bin/expect $exp 
             cat $exp
-            rm $exp
             # after reset password, test the new password
             $kdestroy
             rlRun "rlDistroDiff keyctl"
@@ -522,7 +507,6 @@ Local_KinitAsAdmin()
     else
         rlFail "FAIL - [Local_KinitAsAdmin] unknow error, return code [$?] not recoginzed"
     fi
-    rm $out
 } #KinitAsAdmin
 
 change_password()
@@ -577,8 +561,6 @@ change_password()
     cat $out
     echo "======================================================="
 
-    rm $out
-    rm $exp
     return $ret
 } #change_password
 
@@ -589,7 +571,6 @@ random_password()
     local outfile=$TmpDir/ramdompassword.$RANDOM.out
     generate_password $classes $length $outfile
     cat $outfile
-    rm $outfile
 } #ramdom_password
 
 generate_password()
@@ -657,7 +638,6 @@ generate_password()
     done
     # if you want to debug, uncomment the next 2 lines
     finalpw=`cat $pwoutfile`
-    rm $pwoutfile
     echo $finalpw
     #echo "generated password : [$randompw] classes=[$classes] length=[$length]"
 } #generate_password
@@ -827,7 +807,6 @@ minlife_lowerbound()
         else
             rlFail "FAIL - can not set pre-condition for minlife lowbound test"
         fi
-        rm $out
     # test logic ends
 } # minlife_lowerbound
 
@@ -885,7 +864,6 @@ delete_all_but_global_pwpolicy()
         rlFail "FAIL - expect [$total] password policy, deleted [$i]"
     fi
     rlRun "$kdestroy"
-    #rm $out
 } # delete_all_but_global_pwpolicy
 
 getrandomstring()
@@ -1002,7 +980,6 @@ Local_FirstKinitAs()
 	cat $expfile
 	echo "------------------------------------------------------------------------"
     /usr/bin/expect $expfile
-    rm $expfile
 	###### kinit as user, use initial password, then change password to desired one
     expfile=/tmp/kinit${RANDOM}.exp
     echo "set timeout 10" > $expfile
@@ -1022,7 +999,6 @@ Local_FirstKinitAs()
     kdestroy
     rlRun "rlDistroDiff keyctl"
     /usr/bin/expect $expfile
-    rm $expfile
     # verify credentials
     klist > $outfile
     grep $username $outfile
