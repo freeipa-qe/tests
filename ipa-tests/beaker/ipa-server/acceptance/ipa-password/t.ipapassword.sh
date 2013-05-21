@@ -141,12 +141,12 @@ ipapassword_globalpolicy_check_maxlifetime_suggested_value()
  
  
     rlPhaseStartTest "ipapassword_globalpolicy_check_maxlifetime_suggested_value"
-        add_test_ac
+        add_test_user
         rlLog "default maxlife : [$globalpw_maxlife]" 
         rlLog "default minlife : [$globalpw_minlife]"
         rlLog "maxlife: when reached, ipa shold prompt for password change"
         ipapassword_globalpolicy_check_maxlifetime_suggested_value_logic
-        del_test_ac
+        del_test_user
     rlPhaseEnd
 } #ipapassword_globalpolicy_check_maxlifetime_suggested_value
 
@@ -159,7 +159,7 @@ ipapassword_globalpolicy_check_maxlifetime_suggested_value_logic()
         minlife=`echo "$globalpw_minlife * 60 * 60 " |bc`
         midpoint=`echo "($minlife + $maxlife)/2" |bc` 
         rlLog "mid point: [$midpoint]"
-        set_systime "+ $midpoint"
+        offset_system_time_ "+ $midpoint"
         rlRun "$kdestroy"
         echo "---- ipactl report before [kinit $testac]---"
         ipactl status
@@ -170,7 +170,7 @@ ipapassword_globalpolicy_check_maxlifetime_suggested_value_logic()
         echo "----------------------"
 
         echo "[papassword_globalpolicy_check_maxlifetime_suggested_value] scenario 2: when system time > maxlife, ipa server should prompt for password change"
-        set_systime "+ $midpoint + 60"  # set system time after the max life
+        offset_system_time_ "+ $midpoint + 60"  # set system time after the max life
         rlRun "$kdestroy"
         kinit_aftermaxlife $testac $testacPW $testacNEWPW
 
@@ -281,9 +281,9 @@ ipapassword_globalpolicy_check_minlifetime_suggested_value_logic()
             ipa pwpolicy-mod --minlife=$life
             life=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2 |xargs echo` # confirm the minlife setting
             rlLog "minlife has been setting to [$life] hours"
-            add_test_ac
+            add_test_user
             rlLog "set system time 2 minute before minlife"
-            set_systime "+ 2*60*60 - 2*60"
+            offset_system_time_ "+ 2*60*60 - 2*60"
             # before minlife, change password should fail
             rlRun "rlDistroDiff keyctl"
             rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "verify password [$testacPW] for user [$testac]"
@@ -295,7 +295,7 @@ ipapassword_globalpolicy_check_minlifetime_suggested_value_logic()
             fi
 
             # after minlife, change passwod should success
-            set_systime "+ 2*60"  # setsystime 2 minutes after
+            offset_system_time_ "+ 2*60"  # setsystime 2 minutes after
             rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "verify password [$testacPW] for user [$testac]"
             change_password $testac $testacPW $dummyPW
             if [ $? = 0 ];then
@@ -303,7 +303,7 @@ ipapassword_globalpolicy_check_minlifetime_suggested_value_logic()
             else
                 rlFail "FAIL - password change failed is not expected"
             fi
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set pre-condition"
         fi
@@ -340,7 +340,7 @@ ipapassword_globalpolicy_check_minlifetime_minimum_value_logic()
         then
             rlRun "ipa pwpolicy-mod --minlife=$lowbound" 0 "set to lowbound should success"
             rlLog "minlife has been setting to [$lowbound] hours"
-            add_test_ac
+            add_test_user
             rlLog "after set minlife to 0, we should be able to change password anytime we wont"
             oldpw=$testacPW
             newpw=$dummyPW
@@ -348,7 +348,7 @@ ipapassword_globalpolicy_check_minlifetime_minimum_value_logic()
             # pushed back total: 0+1+2+4+8+16+32=63 seconds
             for offset in 0 2 8 32
             do
-                set_systime "+ $offset"
+                offset_system_time_ "+ $offset"
                 rlRun "rlDistroDiff keyctl"
                 rlRun "echo $oldpw | kinit $testac 2>&1 >/dev/null" 0 "verify password [$oldpw] for user [$testac]"
                 change_password $testac $oldpw $newpw
@@ -362,7 +362,7 @@ ipapassword_globalpolicy_check_minlifetime_minimum_value_logic()
                     rlFail "FAIL - password change failed is not expected"
                 fi
             done
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set pre-condition for minlife lowbound test"
         fi
@@ -475,9 +475,9 @@ ipapassword_globalpolicy_check_history_suggested_value()
         rlLog "precondition: minlife=[$minlife] minlength=[$length] classes=[$classes]"
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ]
         then
-            add_test_ac
+            add_test_user
             ipapassword_globalpolicy_check_history_suggested_value_logic
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
@@ -567,9 +567,9 @@ ipapassword_globalpolicy_check_history_minimum_value()
         if [ $minlife = 0 ] && [ $length = 0 ] && [ $classes = 1 ] \
             && [ $history = 0 ]
         then
-            add_test_ac
+            add_test_user
             ipapassword_globalpolicy_check_history_minimum_value_logic
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
@@ -709,7 +709,7 @@ ipapassword_globalpolicy_check_classes_suggested_value_logic()
             classes=`grep "classes:" $out | cut -d":" -f2| xargs echo`
             rlRun "$kdestroy" 0 "clear all kerberos tickets"
             if [ $classes -eq $n ];then
-                add_test_ac
+                add_test_user
                 rlLog "Set minclasses to [$n] success, now continue test"
                 rlRun "rlDistroDiff keyctl"
                 rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" \
@@ -753,7 +753,7 @@ ipapassword_globalpolicy_check_classes_suggested_value_logic()
                     fi
                     classLevel=$((classLevel+1))
                 done
-                del_test_ac
+                del_test_user
             else
                 rlFail "FAIL - set minclasses to [$n] failed"
             fi
@@ -805,7 +805,7 @@ ipapassword_globalpolicy_check_classes_minimum_value_logic()
             rlRun "$kdestroy" 0 "clear all kerberos tickets"
             temp=`grep "classes:" $out | cut -d":" -f2| xargs echo`
             if [ $temp = $classLevel ];then
-                add_test_ac
+                add_test_user
                 rlLog "set classes to [$temp] success, test continue"
                 # run same test 2 times, to ensure all password classes covered
                 i=0
@@ -826,7 +826,7 @@ ipapassword_globalpolicy_check_classes_minimum_value_logic()
                     fi
                     i=$((i+1))
                 done
-                del_test_ac
+                del_test_user
             else
                 rlLog "set classes to [$temp] failed, can not continue test"
             fi
@@ -876,7 +876,7 @@ ipapassword_globalpolicy_check_classes_maximum_value_logic()
         #                    user kinit first time with 5 classes password should pass
         #                    as of June 5, 2012, it failes due to bug: 828569
         rlRun "rlDistroDiff keyctl"
-        add_test_ac $pw5Class
+        add_test_user $pw5Class
         if [ $? = 0 ];then
             rlPass "first time kinit with class 5 password success"
         else
@@ -888,7 +888,7 @@ ipapassword_globalpolicy_check_classes_maximum_value_logic()
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         ipa pwpolicy-mod --minclasses=$class4 --minlife=0 --history=0 --minlength=1
-        add_test_ac $pw4Class
+        add_test_user $pw4Class
 
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
@@ -966,9 +966,9 @@ ipapassword_globalpolicy_check_length_suggested_value()
         rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
-            add_test_ac
+            add_test_user
             ipapassword_globalpolicy_check_length_suggested_value_logic
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
@@ -1050,9 +1050,9 @@ ipapassword_globalpolicy_check_length_minimum_value()
         rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history] minlength=[$length]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ] && [ $length = 0 ]
         then
-            add_test_ac
+            add_test_user
             ipapassword_globalpolicy_check_length_minimum_value_logic
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
@@ -1099,9 +1099,9 @@ ipapassword_globalpolicy_check_length_maximum_value()
         rlLog "precondition: minlife=[$minlife] minclasses=[$classes] history=[$history]"
         if [ $minlife = 0 ] && [ $classes = 0 ] && [ $history = 0 ]
         then
-            add_test_ac
+            add_test_user
             ipapassword_globalpolicy_check_length_maximum_value_logic
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set precondition for password length upper bound test"
         fi
@@ -1235,9 +1235,9 @@ ipapassword_grouppolicy_envsetup()
         #environment setup starts here
         rlRun "ipactl restart" 0 "restart all ipa related service to force sync time between kerberos server and other components, specially DS instance"
         reset_global_pwpolicy
-        add_test_grp
-        add_test_ac 
-        append_test_member
+        add_test_group
+        add_test_user 
+        append_test_user_to_tesst_group
         reset_group_pwpolicy
         #environment setup ends   here
     rlPhaseEnd
@@ -1248,8 +1248,8 @@ ipapassword_grouppolicy_envcleanup()
     rlPhaseStartCleanup "ipapassword_grouppolicy_envcleanup"
         #environment cleanup starts here
         remove_test_member
-        del_test_grp
-        del_test_ac
+        del_test_group
+        del_test_user
         reset_global_pwpolicy
         #environment cleanup ends   here
     rlPhaseEnd
@@ -1273,7 +1273,7 @@ ipapassword_grouppolicy_check_maxlifetime_suggested_value_logic()
         local midpoint_in_second=`echo "($minlife_in_second + $maxlife_in_second)/2" |bc` 
 
         rlLog "reset user password to trigger password policy maxlife constrains"
-        set_systime "+ $minlife_in_second"
+        offset_system_time_ "+ $minlife_in_second"
         change_password $testac $testacPW $testacNEWPW
         currentPW=$testacNEWPW
         rlRun "rlDistroDiff keyctl"
@@ -1281,14 +1281,14 @@ ipapassword_grouppolicy_check_maxlifetime_suggested_value_logic()
 
         rlLog "password will not expire before maxlife of group pwpolicy"
         rlLog "maxlife [$grouppw_maxlife] days, minlife [$grouppw_minlife] hours mid point: [$midpoint_in_second] seconds"
-        set_systime "+ $midpoint_in_second"
+        offset_system_time_ "+ $midpoint_in_second"
         rlRun "$kdestroy"
         rlRun "rlDistroDiff keyctl"
         rlRun "echo $currentPW | kinit $testac" 0 "kinit use same password between minlife and max life should success"
         rlRun "$kdestroy"
 
         rlLog "when system time > maxlife, ipa server should prompt for password change"
-        set_systime "+ $maxlife_in_second - $midpoint_in_second + 60"  # set system time after the max life
+        offset_system_time_ "+ $maxlife_in_second - $midpoint_in_second + 60"  # set system time after the max life
         rlRun "rlDistroDiff keyctl"
         rlRun "echo $currentPW | kinit $testac" 1 "kinit after maxlife should fail"
         #kinit_aftermaxlife $testac $testacPW $testacNEWPW
@@ -1380,9 +1380,9 @@ ipapassword_grouppolicy_check_minlifetime_suggested_value()
         rlLog "group minlife : [$grouppw_minlife]"        
         rlLog "minlife: when not reached, user can not change password"
         # the test user account and grouop account is pretty much corrupted after previous test, reset account here
-        add_test_grp
-        add_test_ac 
-        append_test_member
+        add_test_group
+        add_test_user 
+        append_test_user_to_tesst_group
         reset_group_pwpolicy
         ipapassword_grouppolicy_check_minlifetime_suggested_value_logic
     rlPhaseEnd
@@ -1403,9 +1403,9 @@ ipapassword_grouppolicy_check_minlifetime_minimum_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_minlifetime_minimum_value"
         rlLog "the lowerbound of minlife is 0"
         rlLog "it means we can change password whenever we want"
-        add_test_grp
-        add_test_ac 
-        append_test_member
+        add_test_group
+        add_test_user 
+        append_test_user_to_tesst_group
         reset_group_pwpolicy
         ipapassword_grouppolicy_check_minlifetime_minimum_value_logic
     rlPhaseEnd
@@ -1491,9 +1491,9 @@ ipapassword_grouppolicy_check_history_suggested_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_history_suggested_value"
         local out=$TmpdIR/globalpolicyhistorydefault.$RANDOM.out
         rlLog "default behave of history setting test"
-        add_test_ac
-        add_test_grp
-        append_test_member
+        add_test_user
+        add_test_group
+        append_test_user_to_tesst_group
         reset_group_pwpolicy
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
@@ -1611,9 +1611,9 @@ ipapassword_grouppolicy_check_history_minimum_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_history_minimum_value"
         local out=$TmpDir/grouppolicyhistorylowbound.$RANDOM.out
         local lowbound=0
-        add_test_ac
-        add_test_grp
-        append_test_member
+        add_test_user
+        add_test_group
+        append_test_user_to_tesst_group
         reset_group_pwpolicy
         rlLog "lowerbound of password history is $lowbound"
         rlRun "rlDistroDiff keyctl"
@@ -1737,9 +1737,9 @@ ipapassword_grouppolicy_check_classes_suggested_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_classes_suggested_value"
         local out=$TmpDir/grouppwclassesdefault.$RANDOM.out
         rlLog "check minimum classes default behave: when classes between [2-4]"
-        add_test_ac
-        add_test_grp
-        append_test_member
+        add_test_user
+        add_test_group
+        append_test_user_to_tesst_group
         reset_group_pwpolicy
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
@@ -1776,8 +1776,8 @@ ipapassword_grouppolicy_check_classes_suggested_value_logic()
             classes=`grep "classes:" $out | cut -d":" -f2| xargs echo`
             rlRun "$kdestroy" 0 "clear all kerberos tickets"
             if [ $classes -eq $n ];then
-                add_test_ac
-                append_test_member
+                add_test_user
+                append_test_user_to_tesst_group
                 rlLog "Set minclasses to [$n] success, now continue test"
                 rlRun "rlDistroDiff keyctl"
                 rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" \
@@ -1836,7 +1836,7 @@ ipapassword_grouppolicy_check_classes_minimum_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_classes_minimum_value"
         local out=$TmpDir/classeslowerbound.$RANDOM.out
         rlLog "check minimum classes lowbound: 0"
-        add_test_grp
+        add_test_group
         reset_group_pwpolicy
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
@@ -1874,8 +1874,8 @@ ipapassword_grouppolicy_check_classes_minimum_value_logic()
             rlRun "$kdestroy" 0 "clear all kerberos tickets"
             temp=`grep "classes:" $out | cut -d":" -f2| xargs echo`
             if [ $temp = $classLevel ];then
-                add_test_ac
-                append_test_member
+                add_test_user
+                append_test_user_to_tesst_group
                 rlLog "set classes to [$temp] success, test continue"
                 # run same test 2 times, to ensure all password classes covered
                 i=0
@@ -1914,7 +1914,7 @@ ipapassword_grouppolicy_check_classes_maximum_value()
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         rlLog "disable other password policy constrains"
-        add_test_grp
+        add_test_group
         reset_group_pwpolicy
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
@@ -1950,8 +1950,8 @@ ipapassword_grouppolicy_check_classes_maximum_value_logic()
             classes=`grep "classes:" $out | cut -d":" -f2| xargs echo`
             rlRun "$kdestroy" 0 "clear all kerberos tickets"
             if [ $classes -eq $n ];then
-                add_test_ac
-                append_test_member
+                add_test_user
+                append_test_user_to_tesst_group
                 rlLog "Set minclasses to [$n] success, now continue test"
                 rlRun "rlDistroDiff keyctl"
                 rlRun "echo $testacPW | kinit $testac 2>&1 >/dev/null" 0 "get kerberos ticket for current user, prepare for password change"
@@ -2009,7 +2009,7 @@ ipapassword_grouppolicy_check_classes_invalid_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_classes_invalid_value"
         local out=$TmpDir/classesnegative.$RANDOM.out
         rlLog "check minimum classes can not be set to negative integer and letters"
-        add_test_grp
+        add_test_group
         reset_group_pwpolicy
         for class_value in -1 abc
         do
@@ -2037,7 +2037,7 @@ ipapassword_grouppolicy_check_length_suggested_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_length_suggested_value"
         local out=$TmpDir/pwlengthdefault.$RANDOM.out
         rlLog "check minimum length default behave"
-        add_test_grp
+        add_test_group
         reset_group_pwpolicy
         rlLog "disable other password policy constrains"
         rlRun "rlDistroDiff keyctl"
@@ -2069,8 +2069,8 @@ ipapassword_grouppolicy_check_length_suggested_value_logic()
         local pw
         local currentPW=""
         # scenario 1: password change should fail when length < $globalpw_length
-        add_test_ac
-        append_test_member
+        add_test_user
+        append_test_user_to_tesst_group
         currentPW=$testacPW
         while [ $length -lt $grouppw_length ]
         do
@@ -2121,9 +2121,9 @@ ipapassword_grouppolicy_check_length_minimum_value()
         local out=$TmpDir/pwlengthlowerbound.$RANDOM.out
         rlLog "minimum length = 0"
         rlLog "check minimum length lowerbound"
-        add_test_ac
-        add_test_grp
-        append_test_member
+        add_test_user
+        add_test_group
+        append_test_user_to_tesst_group
         reset_group_pwpolicy
         rlLog "disable other password policy constrains"
         rlRun "rlDistroDiff keyctl"
@@ -2172,7 +2172,7 @@ ipapassword_grouppolicy_check_length_maximum_value()
     rlPhaseStartTest "ipapassword_grouppolicy_check_length_maximum_value"
         local out=$TmpDir/pwlengthupperbounddefault.$RANDOM.out
         rlLog "check upper bound of length setting"
-        add_test_grp
+        add_test_group
         reset_group_pwpolicy
         rlLog "disable other password policy constrains"
         rlRun "rlDistroDiff keyctl"
@@ -2201,8 +2201,8 @@ ipapassword_grouppolicy_check_length_maximum_value_logic()
         local out=$TmpDir/grouppwupperbound.$RANDOM.out
         local edge
         local currentPW=$testacPW
-        add_test_ac
-        append_test_member
+        add_test_user
+        append_test_user_to_tesst_group
         rlLog "there is no real upper-bound of password length, I will try some bigger but resonable number here 10, 50, 100"
         for edge in 20 100
         do
@@ -2282,7 +2282,7 @@ ipapassword_grouppolicy_check_length_invalid_value()
  
     rlPhaseStartTest "ipapassword_grouppolicy_check_length_invalid_value"
         rlLog "set length to negative integer or letter should fail"
-        add_test_grp
+        add_test_group
         reset_group_pwpolicy
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
@@ -2353,7 +2353,7 @@ ipapassword_nestedgrouppw_maxlife_conflict()
         currentPW=$testacNEWPW
 
         rlLog "set system one minute after $below, same password should work withoud password change prompt"
-        set_systime "+ $below * 24 * 60 * 60 + 1 * 60" #  if group password is effective policy here, then when below < system time < maxlife : no password prompt
+        offset_system_time_ "+ $below * 24 * 60 * 60 + 1 * 60" #  if group password is effective policy here, then when below < system time < maxlife : no password prompt
         rlRun "rlDistroDiff keyctl"
         if Local_kinit $testac $currentPW
         then
@@ -2363,7 +2363,7 @@ ipapassword_nestedgrouppw_maxlife_conflict()
         fi
 
         rlLog "set clock after maxlife:[$maxlife] system will prompt for password change"
-        set_systime "+ 2 * 24 * 60 * 60 "             # set system time = maxlife + 1 minutes
+        offset_system_time_ "+ 2 * 24 * 60 * 60 "             # set system time = maxlife + 1 minutes
         rlRun "rlDistroDiff keyctl"
         if Local_kinit $testac $currentPW
         then
@@ -2382,13 +2382,13 @@ ipapassword_nestedgrouppw_maxlife_conflict()
         rlRun "$kdestroy"
 
         rlLog "reset the test account"
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
         change_password $testac $testacPW $testacNEWPW  # trigger the password policy 
         currentPW=$testacNEWPW
 
         rlLog "set system one minute before maxlife:[$maxlife], same password should work withoud password change prompt"
-        set_systime "+ $maxlife * 24 * 60 * 60 - 1 * 60"
+        offset_system_time_ "+ $maxlife * 24 * 60 * 60 - 1 * 60"
         rlRun "rlDistroDiff keyctl"
         if Local_kinit $testac $currentPW
         then
@@ -2398,7 +2398,7 @@ ipapassword_nestedgrouppw_maxlife_conflict()
         fi
 
         rlLog "set system time 1 minutes AFTER maxlife"
-        set_systime "+ 2*60"
+        offset_system_time_ "+ 2*60"
         rlRun "rlDistroDiff keyctl"
         if Local_kinit $testac $currentPW
         then
@@ -2443,10 +2443,10 @@ ipapassword_nestedgrouppw_minlife_conflict()
         rlRun "ipa pwpolicy-mod --minlife=$below $nestedgrp"  0 "set minlife to [$below] for [$nestedgrp]"
         rlRun "$kdestroy"
 
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
         currentPW=$testacPW
-        set_systime "+ $minlife * 60 * 60 - 2 * 60" # set system two minutes before minlife
+        offset_system_time_ "+ $minlife * 60 * 60 - 2 * 60" # set system two minutes before minlife
         change_password $testac $currentPW $dummyPW
         if [ $? -eq 0 ];then
             rlFail "FAIL - change password success is not expected"
@@ -2454,7 +2454,7 @@ ipapassword_nestedgrouppw_minlife_conflict()
         else
             rlPass "change password failed is expected"
         fi 
-        set_systime "+ 3 * 60 " # set system one minutes after minlife
+        offset_system_time_ "+ 3 * 60 " # set system one minutes after minlife
         rlRun "rlDistroDiff keyctl"
         rlRun "echo $currentPW | kinit $testac 2>&1 > /dev/null" 0  "check password before test"
         change_password $testac $currentPW "again_Dummy@123"
@@ -2495,8 +2495,8 @@ ipapassword_nestedgrouppw_history_conflict()
         rlRun "ipa pwpolicy-mod --history=$below $nestedgrp"  0 "set history to [$below] for [$nestedgrp]"
         rlRun "$kdestroy"
 
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
         ipapassword_nestedgrouppw_history_conflict_logic $history
 
         # change the history size of nestedgrp pwpolicy to above, and the actual effected historysize should
@@ -2505,8 +2505,8 @@ ipapassword_nestedgrouppw_history_conflict()
         Local_KinitAsAdmin
         rlRun "ipa pwpolicy-mod --history=$above $nestedgrp"  0 "set history to [$above] for [$nestedgrp]"
         rlRun "$kdestroy"
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
     check_log_error "1998-1" /var/log/httpd/error_log "Exception occurred processing WSGI script"
         ipapassword_nestedgrouppw_history_conflict_logic $history
 
@@ -2595,8 +2595,8 @@ ipapassword_nestedgrouppw_classes_conflict()
         rlRun "ipa pwpolicy-mod --minclasses=$below $nestedgrp"  0 "set minclasses to [$below] for [$nestedgrp]"
         rlRun "$kdestroy"
 
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
         ipapassword_nestedgrouppw_classes_conflict_logic $classes
 
         # change the minclasses setting of nestedgrp pwpolicy to above, and the actual effected minclasses should
@@ -2605,8 +2605,8 @@ ipapassword_nestedgrouppw_classes_conflict()
         Local_KinitAsAdmin
         rlRun "ipa pwpolicy-mod --minclasses=$above $nestedgrp"  0 "set classes to [$above] for [$nestedgrp]"
         rlRun "$kdestroy"
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
         ipapassword_nestedgrouppw_classes_conflict_logic $classes
 
     rlPhaseEnd
@@ -2689,8 +2689,8 @@ ipapassword_nestedgrouppw_length_conflict()
         rlRun "ipa pwpolicy-mod --minlength=$below $nestedgrp"  0 "set minlength to [$below] for [$nestedgrp]"
         rlRun "$kdestroy"
 
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
         ipapassword_nestedgrouppw_length_conflict_logic $length
 
         # change the history size of nestedgrp pwpolicy to above, and the actual effected historysize should
@@ -2699,8 +2699,8 @@ ipapassword_nestedgrouppw_length_conflict()
         Local_KinitAsAdmin
         rlRun "ipa pwpolicy-mod --minlength=$above $nestedgrp"  0 "set minlength to [$above] for [$nestedgrp]"
         rlRun "$kdestroy"
-        add_test_ac
-        append_test_nested_ac
+        add_test_user
+        append_test_user_to_nested_test_group
         ipapassword_nestedgrouppw_length_conflict_logic $length
 
     rlPhaseEnd
@@ -2791,7 +2791,7 @@ ipapassword_attr_envsetup()
         #   MAY ( krbMaxPwdLife $ krbMinPwdLife $ krbPwdMinDiffChars 
         #               $ krbPwdMinLength $ krbPwdHistoryLength ) )
         rlRun "ipactl restart" 0 "restart all ipa related service to force sync time between kerberos server and other components, specially DS instance"
-        add_test_grp
+        add_test_group
         reset_group_pwpolicy
         #environment setup ends   here
     rlPhaseEnd
@@ -2802,7 +2802,7 @@ ipapassword_attr_envcleanup()
 {
     rlPhaseStartCleanup "ipapassword_attr_envcleanup"
         #environment cleanup starts here
-        del_test_grp
+        del_test_group
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipapassword_attr_envcleanup

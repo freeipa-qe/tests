@@ -1,17 +1,10 @@
 #######################################
 # lib.ipapassword test
-set_systime_to_testtime()
+offset_system_time_()
 {
-# set system time to a desired test time
-    testtime="$testmonth$testday$testhour$testmin$testsec"
-    set_systime $testtime
-} #set_systime_to_testtime
-
-set_systime()
-{
-#set system time with given string
-# expected input: + 86400 <== set system time to one day later
-#                 - 86400 <== set system time to one day before
+#offset system time with given string
+# expected input: + 86400 <== offset system time to one day later
+#                 - 86400 <== offset system time to one day before
     local offset=$1
     local before=`date`
     local now
@@ -21,73 +14,12 @@ set_systime()
     desiredtime=`echo "$now $offset" | bc`
     date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $desiredtime"`"
     after=`date`
-    echo "[set system time] before set systime [$before]"
-    echo "[set system time] after  set systime [$after]"
-    echo "[set system time] offset [$offset] seconds"
-	echo "[set system time] sleep 3 seconds"
+    echo "[offset system time] before set systime [$before]"
+    echo "[offset system time] after  set systime [$after]"
+    echo "[offset system time] offset [$offset] seconds"
+	echo "[offset system time] sleep 3 seconds"
 	sleep 3
-} # set_systime
-
-restore_systime()
-{
-#restore system time by sync with ntp server
-#    rlRun "service ntpd stop" 0 "Stopping local ntpd service to sync with external source"
-    ntpdate $NTPSERVER
-#    rlRun "service ntpd start" 0 "Starting local ntpd service again"
-} # restore_systime
-
-restart_ipa_passwd()
-{
-# restart ipa passwd to adopt the system time setting
-    rlRun "service ipa_kpasswd restart" 0 "restart ipa_kpasswd"
-} # restart_ipa_passwd
-
-read_pwpolicy()
-{
-#read password policy setting
-    local attr=$1
-    local pwpolicy=$2
-    local out=$TmpDir/read.passwordpolicy.$RANDOM.out
-    local result=""
-    if [ $attr = "history" ];then
-        keyword="History size"
-    elif [ $attr = "length" ];then
-        keyword="Min length"
-    elif [ $attr = "maxlife" ];then
-        keyword="Max lifetime"
-    elif [ $attr = "minlife" ];then
-        keyword="Min lifetime"
-    elif [ $attr = "classes" ];then
-        keyword="Character classes"
-    else
-        keyword="$attr"
-    fi
-    rlRun "rlDistroDiff keyctl"
-    Local_KinitAsAdmin 2>&1 >/dev/null
-    ipa pwpolicy-show $pwpolicy > $out
-    result=`grep -i "$keyword" $out | cut -d":" -f2 | xargs echo`
-    rm $out
-    rlRun $kdestroy 2>&1 >/dev/null
-    echo $result
-} # read_pwpolicy
-
-read_default_policy_setting()
-{
-    rlRun "rlDistroDiff keyctl"
-    Local_KinitAsAdmin
-    local out=$TmpDir/defaultvalues.$RANDOM.txt
-    rlRun "ipa pwpolicy-show > $out" 0 "read global password policy"
-    globalpw_maxlife=`grep "Max lifetime" $out | cut -d":" -f2` # unit is in day
-    globalpw_minlife=`grep "Min lifetime" $out | cut -d":" -f2` # unit is in hour
-    globalpw_history=`grep "History size" $out | cut -d":" -f2`
-    globalpw_classes=`grep "Character classes" $out | cut -d":" -f2`
-    globalpw_length=`grep "Min length" $out | cut -d":" -f2`
-    globalpw_history=`echo $globalpw_history`
-    globalpw_classes=`echo $globalpw_classes`
-    globalpw_length=`echo $globalpw_length`
-    export globalpw_maxlife globalpw_minlife globalpw_history globalpw_classes globalpw_length
-    rm $out
-} # read_default_policy_setting
+} # offset_system_time_
 
 reset_global_pwpolicy()
 {
@@ -112,9 +44,9 @@ reset_group_pwpolicy()
     echo "set group password policy"
     echo "maxlife [$grouppw_maxlife] days, minlife [$grouppw_minlife] hours history [$grouppw_history]" 
     echo "classes [$grouppw_classes], length [$grouppw_length] priority [$grouppw_priority]"
-    grppw_exist $testgrp
+    check_existence_of_group_pwpolicy $testgrp
     if [ $? = 0 ];then
-        del_grppw $testgrp
+        del_group_pwpolicy $testgrp
     fi
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
@@ -152,9 +84,9 @@ reset_nestedgroup_pwpolicy()
     echo "set group password policy"
     echo "maxlife [$nestedpw_maxlife] days, minlife [$nestedpw_minlife] hours history [$nestedpw_history]" 
     echo "classes [$nestedpw_classes], length [$nestedpw_length] priority [$nestedpw_priority]"
-    grppw_exist $nestedgrp
+    check_existence_of_group_pwpolicy $nestedgrp
     if [ $? = 0 ];then
-        del_grppw $nestedgrp 
+        del_group_pwpolicy $nestedgrp 
     fi
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
@@ -187,26 +119,7 @@ reset_nestedgroup_pwpolicy()
     rm $out
 } # reset_group_pwpolicy
 
-
-util_pwpolicy_createnew()
-{ #FIXME: not sure whether i need this one, just add it here for now
-    local out=$TmpDir/util.pwpolicy.createnew.$RANDOM.out
-    local argstring=""
-    #build arguments
-    local policyname=$1
-    shift
-    for arg in "$@";do
-        thisarg="--${arg}"
-        argstring="$argstring $thisarg"
-    done
-    rlRun "rlDistroDiff keyctl"
-    Local_KinitAsAdmin
-    rlRun "ipa pwpolicy-add $policyname $argstring" \
-          0 "create password policy: [$policyname]"
-    rm $out
-} #util_pwpolicy_createnew
-
-del_grppw()
+del_group_pwpolicy()
 {
     local grp=$1
     local out=$TmpDir/grpwpexist.$RANDOM.out
@@ -220,9 +133,9 @@ del_grppw()
     fi
     rlRun "$kdestroy"
     rm $out
-} #del_grppw
+} #del_group_pwpolicy
 
-grppw_exist()
+check_existence_of_group_pwpolicy()
 {
 # return 0 if group pw policy exist
 # return 1 if group pw policy NOT exist
@@ -241,49 +154,49 @@ grppw_exist()
         return 1
     fi
     rm $out
-} #grppw_exist
+} #check_existence_of_group_pwpolicy
 
-add_test_ac()
+add_test_user()
 {
     local password=$1
     if [ "$password" = "" ]
     then
         password=$testacPW
-        echo "[add_test_ac] use default user test account password [$password]"
+        echo "[add_test_user] use default user test account password [$password]"
     else
-        echo "[add_test_ac] set account password to [$password]"
+        echo "[add_test_user] set account password to [$password]"
     fi
         
-    echo "[add_test_ac] check existance of user [$testac]"
-    user_exist $testac
+    echo "[add_test_user] check existance of user [$testac]"
+    check_existence_of_user_account $testac
     if [ $? = 0 ]
     then
-        del_test_ac 
+        del_test_user 
     fi
     rlRun "$kdestroy"
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
-    echo "[add_test_ac] set up test account with inital pw: [$initialpw]"
+    echo "[add_test_user] set up test account with inital pw: [$initialpw]"
  
 	ipa user-add $testac\
     	--first $testacFirst\
         --last  $testacLast\
     # set test account password 
-    echo "[add_test_ac] set initialpw [$initialpw] then change to [$password], by calling FirstKinitAs"
+    echo "[add_test_user] set initialpw [$initialpw] then change to [$password], by calling FirstKinitAs"
     rlRun "rlDistroDiff keyctl"
     Local_FirstKinitAs $testac $initialpw $password
     rc=$?    
     rlRun "$kdestroy"
     return $rc
-} # add_test_ac
+} # add_test_user
 
-del_test_ac()
+del_test_user()
 {
-#    user_exist $testac
+#    check_existence_of_user_account $testac
 #    if [ $? = 0 ]
 #    then
 #        echo "test account found, now delete it"
-        echo "[del_test_ac] delete user: [$testac]"
+        echo "[del_test_user] delete user: [$testac]"
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         ipa user-del $testac
@@ -295,9 +208,9 @@ del_test_ac()
 #
 #    return $rc
 
-} # del_test_ac
+} # del_test_user
 
-user_exist()
+check_existence_of_user_account()
 {
 # return 0 if user exist
 # return 1 if user account does NOT exist
@@ -311,11 +224,11 @@ user_exist()
         rlRun "$kdestroy"
         if grep -i "User login: $userlogin$" $out 2>&1 >/dev/null
         then
-            echo "[user_exist] check: found [$userlogin]"
+            echo "[check_existence_of_user_account] check: found [$userlogin]"
             rm $out
             return 0
         else
-            echo "[user_exist] check: not found [$userlogin]"
+            echo "[check_existence_of_user_account] check: not found [$userlogin]"
             rm $out
             return 1
         fi
@@ -323,19 +236,19 @@ user_exist()
         return 1 # when login value not given, return not found
     fi
     rm $out
-} #user_exist
+} #check_existence_of_user_account
 
-add_test_grp()
+add_test_group()
 {
     grp_exist $testgrp
     if [ $? = 0 ]
     then
-        del_test_grp 
+        del_test_group 
     fi
     add_grp "$testgrp" "test group for group pwpolicy"
-} #add_test_grp
+} #add_test_group
 
-del_test_grp()
+del_test_group()
 {
     grp_exist $testgrp
     if [ $? = 0 ]
@@ -345,9 +258,9 @@ del_test_grp()
     else
         echo "test group [$testgrp] does not exist, do nothing"
     fi
-} #del_test_grp
+} #del_test_group
 
-add_test_nestgrp()
+add_nested_test_group()
 {
     grp_exist $nestedgrp
     if [ $? = 0 ]
@@ -407,7 +320,7 @@ grp_exist()
     fi
 } #grp_exist
 
-append_test_member()
+append_test_user_to_tesst_group()
 {
     local out=$TmpDir/appendtestmember.$RANDOM.out
     rlRun "rlDistroDiff keyctl"
@@ -424,7 +337,7 @@ append_test_member()
     rm $out
 } # add_test_member
 
-append_test_grp()
+append_nested_test_group_to_test_group()
 {
     local out=$TmpDir/appendgrouptogroup.$RANDOM.out
     rlRun "rlDistroDiff keyctl"
@@ -439,9 +352,9 @@ append_test_grp()
         rlRun "$kdestroy"
     fi
     rm $out
-} # append_test_grp
+} # append_nested_test_group_to_test_group
 
-append_test_nested_ac()
+append_test_user_to_nested_test_group()
 {
     local out=$TmpDir/appendnestedac.$RANDOM.out
     rlRun "rlDistroDiff keyctl"
@@ -468,7 +381,7 @@ append_test_nested_ac()
     fi
     rlRun "$kdestroy"
     rm $out
-} #append_test_nested_ac
+} #append_test_user_to_nested_test_group
 
 remove_test_member()
 {
@@ -829,8 +742,8 @@ minlife_default()
         ipa pwpolicy-mod $grp --minlife=$life
         life=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2 |xargs echo` # confirm the minlife setting
         echo "minlife has been setting to [$life] hours"
-        echo "set system time 2 minute before minlife"
-        set_systime "+ 2*60*60 - 2*60"
+        echo "offset system time 2 minute before minlife"
+        offset_system_time_ "+ 2*60*60 - 2*60"
         # before minlife, change password should fail
         rlRun "rlDistroDiff keyctl"
         rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work [$testacPW]"
@@ -844,7 +757,7 @@ minlife_default()
         fi
 
         # after minlife, change passwod should success
-        set_systime "+ 2*60"  # setsystime 2 minutes after
+        offset_system_time_ "+ 2*60"  # setsystime 2 minutes after
         rlRun "rlDistroDiff keyctl"
         rlRun "echo $currentPW | kinit $testac" 0 "make sure currentPW work [$currentPW]"
         newpw=`random_password`
@@ -896,7 +809,7 @@ minlife_lowerbound()
             echo "============================="
             for offset in 0 1 2 4 8 16 32
             do
-                set_systime "+ $offset"
+                offset_system_time_ "+ $offset"
                 rlRun "rlDistroDiff keyctl"
                 rlRun "echo $oldpw | kinit $testac" 0 "make sure currentPW work [$oldpw]"
                 change_password $testac $oldpw $newpw
@@ -910,7 +823,7 @@ minlife_lowerbound()
                     rlFail "FAIL - password change failed is not expected"
                 fi
             done
-            del_test_ac
+            del_test_user
         else
             rlFail "FAIL - can not set pre-condition for minlife lowbound test"
         fi
@@ -920,24 +833,24 @@ minlife_lowerbound()
 
 prepare_nestedgrp_testenv()
 {
-    add_test_grp
-    add_test_nestgrp
-    add_test_ac
-    append_test_grp
-    append_test_nested_ac
+    add_test_group
+    add_nested_test_group
+    add_test_user
+    append_nested_test_group_to_test_group
+    append_test_user_to_nested_test_group
     reset_group_pwpolicy
     reset_nestedgroup_pwpolicy
 } # prepare_nestedgrptestenv
 
 cleanup_nestedgrp_testenv()
 {
-    del_test_ac
-    util_pwpolicy_removeall
+    del_test_user
+    delete_all_but_global_pwpolicy
     del_grp $nestedgrp
     del_grp $testgrp
 } #cleanup_nestedgrp_testenv
 
-util_pwpolicy_removeall()
+delete_all_but_global_pwpolicy()
 {
     local out=$TmpDir/uitl.pwpolicy.removeall.out
     local i=0
@@ -973,7 +886,7 @@ util_pwpolicy_removeall()
     fi
     rlRun "$kdestroy"
     #rm $out
-} # util_pwpolicy_removeall
+} # delete_all_but_global_pwpolicy
 
 getrandomstring()
 {
