@@ -128,7 +128,11 @@ installSlave()
         cd /opt/rhqa_ipa/
         hostname_s=$(hostname -s)
 
+        ipofm=`dig +short $BEAKERMASTER`
+        eval "echo \"export MASTERIP=$ipofm\" >> /opt/rhqa_ipa/env.sh"
+
         rlRun "echo $MASTERIP" 0 "Master IP"
+        rlRun "cat /opt/rhqa_ipa/env.sh" 0 "env.sh"
 	AddToKnownHosts $MASTERIP
 
         rlRun "sftp root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
