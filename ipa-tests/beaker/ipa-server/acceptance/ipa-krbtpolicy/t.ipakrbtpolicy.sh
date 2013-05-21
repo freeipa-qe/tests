@@ -77,7 +77,7 @@ ipakrbt_envcleanup()
 
 ipakrbt_show()
 {
-    rlPhaseStartTest "ipakrbt_show_global"
+    rlPhaseStartTest "ipa-krbtpolicy-001: ipakrbt_show_global"
 	local glifecurrent=`read_maxlife`
 	if [ $glifecurrent -eq $default_maxlife ] ; then
 		rlPass "krbtpolicy-show: global default max ticket life as expect: $glifecurrent"
@@ -93,7 +93,7 @@ ipakrbt_show()
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_show_user"
+    rlPhaseStartTest "ipa-krbtpolicy-002: ipakrbt_show_user"
         local ulifecurrent=`read_maxlife $username`
         if [ $ulifecurrent -eq $default_maxlife ] ; then
                 rlPass "krbtpolicy-show: user [$username] default max ticket life as expect: $ulifecurrent"
@@ -109,7 +109,7 @@ ipakrbt_show()
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_show_all_global - supported encryption"
+    rlPhaseStartTest "ipa-krbtpolicy-003: ipakrbt_show_all_global - supported encryption"
         local out="/tmp/globalkrbt_showall.out"
 	KinitAsAdmin
         rlRun "ipa krbtpolicy-show --all 2>&1 >$out" 0 "Show all for global krbt policy"
@@ -130,7 +130,7 @@ ipakrbt_show()
 
 ipakrbt_functional_maxlife()
 {
-    rlPhaseStartTest "ipakrbt_functional_maxlife_user"
+    rlPhaseStartTest "ipa-krbtpolicy-004: ipakrbt_functional_maxlife_user"
         local delay=60 # set user maxlife of kerberos ticket life to 1 minute for test account
         rlRun "rlDistroDiff keyctl"
         KinitAsAdmin
@@ -145,7 +145,7 @@ ipakrbt_functional_maxlife()
         Kcleanup 
     rlPhaseEnd
 
-rlPhaseStartTest "ipakrbt_functional_maxlife_global"
+rlPhaseStartTest "ipa-krbtpolicy-005: ipakrbt_functional_maxlife_global"
         local delay=30 # set maxlife of kerberos ticket life to 30 for test account
         rlRun "rlDistroDiff keyctl"
         KinitAsAdmin
@@ -166,7 +166,7 @@ rlPhaseStartTest "ipakrbt_functional_maxlife_global"
 
 ipakrbt_functional_maxrenew()
 {
-    rlPhaseStartTest "ipakrbt_functional_maxrenew_user"
+    rlPhaseStartTest "ipa-krbtpolicy-006: ipakrbt_functional_maxrenew_user"
 	ipactl restart
         local maxlife=60
         local renew=90
@@ -197,7 +197,7 @@ ipakrbt_functional_maxrenew()
         Kcleanup
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_functional_maxrenew_global"
+    rlPhaseStartTest "ipa-krbtpolicy-007: ipakrbt_functional_maxrenew_global"
         local maxlife=30
         local renew=60
         rlRun "rlDistroDiff keyctl"
@@ -238,7 +238,7 @@ ipakrbt_functional_maxrenew()
 
 ipakrbt_mod_maxlife()
 {
-    rlPhaseStartTest "ipakrbt_mod_maxlife_user"
+    rlPhaseStartTest "ipa-krbtpolicy-008: ipakrbt_mod_maxlife_user"
         KinitAsAdmin
         maxlife=$RANDOM
         rlRun "ipa krbtpolicy-mod $username --maxlife=$maxlife" 0 "set maxlife=[$maxlife] for [$username]"
@@ -250,7 +250,7 @@ ipakrbt_mod_maxlife()
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_mod_maxlife_global"
+    rlPhaseStartTest "ipa-krbtpolicy-009: ipakrbt_mod_maxlife_global"
         maxlife=$RANDOM
 	KinitAsAdmin
         rlRun "ipa krbtpolicy-mod --maxlife=$maxlife" 0 "set maxlife=[$maxlife] for global policy"
@@ -265,7 +265,7 @@ ipakrbt_mod_maxlife()
 
 ipakrbt_mod_maxlife_negative()
 {
-    rlPhaseStartTest "ipakrbt_mod_maxlife_negative"
+    rlPhaseStartTest "ipa-krbtpolicy-010: ipakrbt_mod_maxlife_negative"
         rlLog "set the maxlife of kerberos ticket"
         KinitAsAdmin
         for value in -1 a ab abc
@@ -278,7 +278,7 @@ ipakrbt_mod_maxlife_negative()
 
 ipakrbt_mod_maxrenew()
 {
-    rlPhaseStartTest "ipakrbt_mod_maxrenew_user"
+    rlPhaseStartTest "ipa-krbtpolicy-011: ipakrbt_mod_maxrenew_user"
         KinitAsAdmin
         maxrenew=$RANDOM
         rlRun "ipa krbtpolicy-mod $username --maxrenew=$maxrenew" 0 "set maxrenew=[$maxrenew] for [$username]"
@@ -290,7 +290,7 @@ ipakrbt_mod_maxrenew()
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_mod_maxrenew_global"
+    rlPhaseStartTest "ipa-krbtpolicy-012: ipakrbt_mod_maxrenew_global"
         maxrenew=$RANDOM
         KinitAsAdmin
         rlRun "ipa krbtpolicy-mod --maxrenew=$maxrenew" 0 "set maxrenew=[$maxrenew] for global policy"
@@ -305,7 +305,7 @@ ipakrbt_mod_maxrenew()
 
 ipakrbt_mod_maxrenew_negative()
 {
-    rlPhaseStartTest "ipakrbt_mod_maxrenew_negative"
+    rlPhaseStartTest "ipa-krbtpolicy-013: ipakrbt_mod_maxrenew_negative"
         rlLog "set max renew life of kerberos ticket negative test case"
         KinitAsAdmin
         for value in -1 a ab abc
@@ -322,7 +322,7 @@ ipakrbt_mod_maxrenew_negative()
 
 ipakrbt_mod_setattr()
 {
-    rlPhaseStartTest "ipakrbt_setattr_maxlife_user"
+    rlPhaseStartTest "ipa-krbtpolicy-014: ipakrbt_setattr_maxlife_user"
         KinitAsAdmin
         maxlife=$RANDOM
         rlRun "ipa krbtpolicy-mod $username --setattr=$maxlifeattr=$maxlife" 0 "set setattr [$maxlifeattr] to [$maxlife] for [$username]"
@@ -334,7 +334,7 @@ ipakrbt_mod_setattr()
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_setattr_maxlife_global"
+    rlPhaseStartTest "ipa-krbtpolicy-015: ipakrbt_setattr_maxlife_global"
         KinitAsAdmin 
         maxlife=$RANDOM
         rlRun "ipa krbtpolicy-mod --setattr=$maxlifeattr=$maxlife" 0 "set setattr [$maxlifeattr] to [$maxlife] for [$username]"
@@ -347,7 +347,7 @@ ipakrbt_mod_setattr()
         fi  
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_setattr_maxrenew_user"
+    rlPhaseStartTest "ipa-krbtpolicy-016: ipakrbt_setattr_maxrenew_user"
         KinitAsAdmin
         maxrenew=$RANDOM
         rlRun "ipa krbtpolicy-mod $username --setattr=$maxrenewattr=$maxrenew" 0 "set setattr [$maxrenewattr] to [$maxrenew] for [$username]"
@@ -359,7 +359,7 @@ ipakrbt_mod_setattr()
         fi
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_setattr_maxrenew_global"
+    rlPhaseStartTest "ipa-krbtpolicy-017: ipakrbt_setattr_maxrenew_global"
         KinitAsAdmin
         maxrenew=$RANDOM
         rlRun "ipa krbtpolicy-mod --setattr=$maxrenewattr=$maxrenew" 0 "set setattr [$maxrenewattr] to [$maxrenew] for [$username]"
@@ -376,7 +376,7 @@ ipakrbt_mod_setattr()
 
 ipakrbt_mod_setattr_negative()
 {
-    rlPhaseStartTest "ipakrbt_mod_setattr_negative"
+    rlPhaseStartTest "ipa-krbtpolicy-018: ipakrbt_mod_setattr_negative"
         KinitAsAdmin
         for value in -1 a ab abc
         do
@@ -389,7 +389,7 @@ ipakrbt_mod_setattr_negative()
 
 ipakrbt_mod_addattr_negative()
 {
-    rlPhaseStartTest "ipakrbt_mod_addattr_maxlife_user_negative"
+    rlPhaseStartTest "ipa-krbtpolicy-019: ipakrbt_mod_addattr_maxlife_user_negative"
         KinitAsAdmin
 	expmsg="krbmaxticketlife: Only one value allowed"
 	rlRun "ipa krbtpolicy-mod $username --addattr=$maxlifeattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for user attribute [$maxlifeattr] should fail with message: \"$expmsg\""
@@ -401,13 +401,13 @@ ipakrbt_mod_addattr_negative()
         rlRun "ipa krbtpolicy-mod --addattr=$maxlifeattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for global policy attribute [$maxlifeattr] should fail with message: \"$expmsg\""
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_mod_addattr_maxrenew_user_negative"
+    rlPhaseStartTest "ipa-krbtpolicy-020: ipakrbt_mod_addattr_maxrenew_user_negative"
         KinitAsAdmin
         expmsg="$maxrenewattr: Only one value allowed"
         rlRun "ipa krbtpolicy-mod $username --addattr=$maxrenewattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for user attribute [$maxlifeattr] should fail with message: \"$expmsg\""
     rlPhaseEnd
 
-    rlPhaseStartTest "ipakrbt_mod_addattr_maxrenew_global_negative"
+    rlPhaseStartTest "ipa-krbtpolicy-021: ipakrbt_mod_addattr_maxrenew_global_negative"
         KinitAsAdmin
         expmsg="$maxrenewattr: Only one value allowed"
         rlRun "ipa krbtpolicy-mod --addattr=$maxrenewattr=100 2>&1 | grep -i '$expmsg' " 0 "addattr for global policy attribute [$maxrenewattr] should fail with message: \"$expmsg\""
@@ -419,7 +419,7 @@ ipakrbt_mod_addattr_negative()
 ###############################################################################################
 ipakrbt_reset_default()
 {
-    rlPhaseStartTest "restore the global krbtpolicy"
+    rlPhaseStartTest "ipa-krbtpolicy-022: restore the global krbtpolicy"
         KinitAsAdmin
         maxlife=$RANDOM
         renew=$RANDOM
@@ -456,7 +456,7 @@ ipakrbt_reset_default()
         fi
     rlPhaseEnd
     
-    rlPhaseStartTest "restore krbtpolicy for given user"
+    rlPhaseStartTest "ipa-krbtpolicy-023: restore krbtpolicy for given user"
         KinitAsAdmin
         maxlife=$RANDOM
         renew=$RANDOM
