@@ -44,10 +44,7 @@ reset_group_pwpolicy()
     echo "set group password policy"
     echo "maxlife [$grouppw_maxlife] days, minlife [$grouppw_minlife] hours history [$grouppw_history]" 
     echo "classes [$grouppw_classes], length [$grouppw_length] priority [$grouppw_priority]"
-    check_existence_of_group_pwpolicy $testgrp
-    if [ $? = 0 ];then
-        del_group_pwpolicy $testgrp
-    fi
+    del_group_pwpolicy $testgrp
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
     ipa pwpolicy-add $testgrp \
@@ -84,10 +81,7 @@ reset_nestedgroup_pwpolicy()
     echo "set group password policy"
     echo "maxlife [$nestedpw_maxlife] days, minlife [$nestedpw_minlife] hours history [$nestedpw_history]" 
     echo "classes [$nestedpw_classes], length [$nestedpw_length] priority [$nestedpw_priority]"
-    check_existence_of_group_pwpolicy $nestedgrp
-    if [ $? = 0 ];then
-        del_group_pwpolicy $nestedgrp 
-    fi
+    del_group_pwpolicy $nestedgrp 
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
     ipa pwpolicy-add $nestedgrp\
@@ -126,32 +120,13 @@ del_group_pwpolicy()
     Local_KinitAsAdmin
     if ipa pwpolicy-find | grep -i $grp  2>&1 >/dev/null
     then
-        rlRun "ipa pwpolicy-del $grp " 0 "delete pwpolicy [$grp]"
+        rlLog "found password policy for group [$grp], now delete it"
+        ipa pwpolicy-del $grp 
     else
-        echo "not found group password policy: [$grppw], do nothing"
+        rlLog "group password policy: [$grp] not found, do nothing"
     fi
-    rlRun "$kdestroy"
+    $kdestroy
 } #del_group_pwpolicy
-
-check_existence_of_group_pwpolicy()
-{
-# return 0 if group pw policy exist
-# return 1 if group pw policy NOT exist
-    local grp=$1
-    local out=$TmpDir/grpwpexist.$RANDOM.out
-    rlRun "rlDistroDiff keyctl"
-    Local_KinitAsAdmin
-    if ipa pwpolicy-find | grep -i $grp  2>&1 >/dev/null
-    then
-        echo "found group password policy: [$grp]"
-        rlRun "$kdestroy"
-        return 0
-    else
-        echo "not found group password policy: [$grp]"
-        rlRun "$kdestroy"
-        return 1
-    fi
-} #check_existence_of_group_pwpolicy
 
 add_test_user()
 {
@@ -163,18 +138,10 @@ add_test_user()
     else
         echo "[add_test_user] set account password to [$password]"
     fi
-        
-    echo "[add_test_user] check existance of user [$testac]"
-    check_existence_of_user_account $testac
-    if [ $? = 0 ]
-    then
-        del_test_user 
-    fi
-    rlRun "$kdestroy"
-    rlRun "rlDistroDiff keyctl"
+    
     Local_KinitAsAdmin
+    ipa user-del $testac
     echo "[add_test_user] set up test account with inital pw: [$initialpw]"
- 
 	ipa user-add $testac\
     	--first $testacFirst\
         --last  $testacLast\
@@ -189,128 +156,53 @@ add_test_user()
 
 del_test_user()
 {
-#    check_existence_of_user_account $testac
-#    if [ $? = 0 ]
-#    then
-#        echo "test account found, now delete it"
-        echo "[del_test_user] delete user: [$testac]"
-        rlRun "rlDistroDiff keyctl"
-        Local_KinitAsAdmin
-        ipa user-del $testac
-#	rc=$?
-#        rlRun "$kdestroy"
-#    else
-#        echo "test account does not exist, do nothing"
-#    fi
-#
-#    return $rc
-
+    echo "[del_test_user] delete user: [$testac]"
+    rlRun "rlDistroDiff keyctl"
+    Local_KinitAsAdmin
+    ipa user-del $testac
+    $kdestroy
 } # del_test_user
-
-check_existence_of_user_account()
-{
-# return 0 if user exist
-# return 1 if user account does NOT exist
-    local userlogin=$1
-    local out=$TmpDir/userexist.$RANDOM.out
-    if [ ! -z "$userlogin" ]
-    then
-        rlRun "rlDistroDiff keyctl"
-        Local_KinitAsAdmin
-        ipa user-find $userlogin > $out
-        rlRun "$kdestroy"
-        if grep -i "User login: $userlogin$" $out 2>&1 >/dev/null
-        then
-            echo "[check_existence_of_user_account] check: found [$userlogin]"
-            return 0
-        else
-            echo "[check_existence_of_user_account] check: not found [$userlogin]"
-            return 1
-        fi
-    else
-        return 1 # when login value not given, return not found
-    fi
-} #check_existence_of_user_account
 
 add_test_group()
 {
-    grp_exist $testgrp
-    if [ $? = 0 ]
-    then
-        del_test_group 
-    fi
-    add_grp "$testgrp" "test group for group pwpolicy"
+    del_test_group 
+    create_brand_new_group "$testgrp" "test group for group pwpolicy"
 } #add_test_group
 
 del_test_group()
 {
-    grp_exist $testgrp
-    if [ $? = 0 ]
-    then
-        echo "test group [$testgrp] exist, now delete it"
-        del_grp "$testgrp"
-    else
-        echo "test group [$testgrp] does not exist, do nothing"
-    fi
+    del_group "$testgrp"
 } #del_test_group
 
 add_nested_test_group()
 {
-    grp_exist $nestedgrp
-    if [ $? = 0 ]
-    then
-        del_grp $nestedgrp
-    fi
-    add_grp "$nestedgrp" "nested test group for group pwpplicy"
+    del_group $nestedgrp # regardless if group exist, just try delete it
+    create_brand_new_group "$nestedgrp" "nested test group for group pwpplicy"
 } #add_test_nestedgrp
 
-add_grp(){
+create_brand_new_group(){
     local grpname=$1
     local desc=$2
     if [ ! -z "$grpname" ];then
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
-        rlRun "ipa group-add $grpname --desc \"$desc\"" 0 "create group [$grpname]"
+        rlRun "ipa group-add $grpname --desc \"$desc\"" 0 "create group [$grpname], desc=[$desc]"
         rlRun "$kdestroy"
     else
         rlFail "FAIL - no group name is given, fail to create group"
     fi
-} # add_grp
+} # create_brand_new_group
 
-del_grp(){
+del_group(){
     local grpname=$1
     if [ ! -z "$grpname" ];then
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
-        rlRun "ipa group-del $grpname" 0 "delete group: [$grpname]"
-        rlRun "$kdestroy"
-    else
-        rlFail "FAIL - no group name is given, fail to delete group"
+        rlLog "delete group [$grpname]"
+        ipa group-del $grpname
+        $kdestroy
     fi
-} #del_grp
-
-grp_exist()
-{
-    local grp=$1
-    local out=$TmpDir/grpexist.$RANDOM.out
-    if [ ! -z "$grp" ]
-    then
-        rlRun "rlDistroDiff keyctl"
-        Local_KinitAsAdmin
-        ipa group-find $grp > $out
-        rlRun "$kdestroy"
-        if grep -i "Group name: $grp$" $out 2>&1 >/dev/null
-        then
-            echo "group [$grp] found"
-            return 0
-        else
-            echo "group [$grp] not found"
-            return 1
-        fi
-    else
-        return 1 # when grp name is not given, return not found
-    fi
-} #grp_exist
+} #del_group
 
 append_test_user_to_tesst_group()
 {
@@ -825,8 +717,8 @@ cleanup_nestedgrp_testenv()
 {
     del_test_user
     delete_all_but_global_pwpolicy
-    del_grp $nestedgrp
-    del_grp $testgrp
+    del_group $nestedgrp
+    del_group $testgrp
 } #cleanup_nestedgrp_testenv
 
 delete_all_but_global_pwpolicy()
