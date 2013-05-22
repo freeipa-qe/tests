@@ -580,7 +580,7 @@ ipaserverinstall_bz827321()
 ####################################################################################
 ipaserverinstall_shorthostname()
 {
-    rlPhaseStartTest "ipa-server-install-027: [Negative] Install with short hostname first in /etc/hosts bz742875"
+    rlPhaseStartTest "ipa-server-install-030: [Negative] Install with short hostname first in /etc/hosts bz742875"
        uninstall_fornexttest
        hostsFileSwithHostForTest
        local tmpout=$TmpDir/ipashorthostnameinstall.out
@@ -600,7 +600,7 @@ ipaserverinstall_shorthostname()
 ipaserverinstall_bz817080()
 {
 	local tmpout=$TmpDir/ipaserverinstall_bz817080.out
-	rlPhaseStartTest "ipa-server-install-028: ipa-server-install --uninstall doesn't clear certmonger dirs, which leads to install failing bz817080"
+	rlPhaseStartTest "ipa-server-install-031: ipa-server-install --uninstall doesn't clear certmonger dirs, which leads to install failing bz817080"
 
 		uninstall_fornexttest
 		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 
@@ -641,7 +641,7 @@ ipaserverinstall_bz817080()
 ipaserverinstall_bz817075()
 {
 	local tmpout=$TmpDir/ipaserverinstall_bz817075.out
-	rlPhaseStartTest "ipa-server-install-029: ipa-server-install s/calculated/determined/ bz817075"
+	rlPhaseStartTest "ipa-server-install-032: ipa-server-install s/calculated/determined/ bz817075"
 		uninstall_fornexttest
 		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=$HOSTNAME -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U > $tmpout 2>&1"
 		rlRun "cat $tmpout"
@@ -658,7 +658,7 @@ ipaserverinstall_bz817075()
 ipaserverinstall_bz815849()
 {
 	local tmpout=$TmpDir/ipaserverinstall_bz815849.out
-	rlPhaseStartTest "ipa-server-install-030: ipa-server-install unhandled exception with unclear error messages (inside DNS check) bz815849"
+	rlPhaseStartTest "ipa-server-install-033: ipa-server-install unhandled exception with unclear error messages (inside DNS check) bz815849"
 		uninstall_fornexttest
 		rlRun "echo '1.2.3.4 foo.$DOMAIN' >> /etc/hosts"
 		rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=foo.$DOMAIN -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U > $tmpout 2>&1" 1
@@ -675,7 +675,7 @@ ipaserverinstall_bz815849()
 ipaserverinstall_bz886091()
 {
         local tmpout=$TmpDir/ipaserverinstall_bz886091.out
-        rlPhaseStartTest "ipa-server-install-031: Disallow root SSH public key authentication bz886091"
+        rlPhaseStartTest "ipa-server-install-034: Disallow root SSH public key authentication bz886091"
                 uninstall_fornexttest
 
                 rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --hostname=`hostname` -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0
@@ -720,7 +720,7 @@ ipaserverinstall_bz886091()
 ####################################################################################
 ipaserverinstall_reversezone()
 {
-    rlPhaseStartTest "ipa-server-install-032: [Positive] Verify reverse zone and idnsUpdatePolicy after Install" 
+    rlPhaseStartTest "ipa-server-install-035: [Positive] Verify reverse zone and idnsUpdatePolicy after Install" 
        uninstall_fornexttest
        local tmpout=$TmpDir/ipaserverinstall_reversezone.out
        rlRun "ipa-server-install --setup-dns --forwarder=$DNSFORWARD --reverse-zone=$reversezone -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U" 0 "Installing ipa server with selfsign " 
@@ -735,7 +735,7 @@ ipaserverinstall_reversezone()
 ####################################################################################
 ipaserverinstall_selfsign()
 {
-    rlPhaseStartTest "ipa-server-install-033: [Positive] Install with selfsign "
+    rlPhaseStartTest "ipa-server-install-036: [Positive] Install with selfsign "
         uninstall_fornexttest
         local tmpout=$TmpDir/ipaserverinstall_selfsign.out
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD --selfsign -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
@@ -752,7 +752,7 @@ ipaserverinstall_selfsign()
 ####################################################################################
 ipaserverinstall_set_cn()
 {
-    rlPhaseStartTest "ipa-server-install-034: [Negative] Install test involving setting the CN subject value [bz 811295]"
+    rlPhaseStartTest "ipa-server-install-037: [Negative] Install test involving setting the CN subject value [bz 811295]"
         uninstall_fornexttest
         rlLog "EXECUTING: ipa-server-install --setup-dns --forwarder=$DNSFORWARD -r $RELM -p $ADMINPW -P $ADMINPW -a $ADMINPW -U --subject CN=Test"
         local tmpout=$TmpDir/ipaserverinstall_cnsubject.out
@@ -768,7 +768,7 @@ ipaserverinstall_set_cn()
 ####################################################################################
 ipaserverinstall_krb5_dependency()
 {
-    rlPhaseStartTest "ipa-server-install-035: [Positive] Ensure that ipa-server krb5-server depends contains both a >= entry and a < entry"
+    rlPhaseStartTest "ipa-server-install-038: [Positive] Ensure that ipa-server krb5-server depends contains both a >= entry and a < entry"
 	rlRun "rpm -q --requires ipa-server | grep krb5-server | grep '>='" 0 "Does the ipa-server package contain a greater than and equal to check on krb5-server"
 	rlRun "rpm -q --requires ipa-server | grep krb5-server | grep '<'" 0 "Does the ipa-server package contain a less than and equal to check on krb5-server"
     rlPhaseEnd
