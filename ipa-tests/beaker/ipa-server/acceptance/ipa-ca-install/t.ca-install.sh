@@ -129,12 +129,18 @@ installSlave()
         hostname_s=$(hostname -s)
 
         ipofm=`dig +short $BEAKERMASTER`
+        ipofs=`dig +short $BEAKERSLAVE`
         export MASTERIP=$ipofm
+        export SLAVEIP=$ipofs
+	eval "echo \"export MASTERIP=$ipofm\" >> /opt/rhqa_ipa/env.sh"
+	eval "echo \"export SLAVEIP=$ipofs\" >> /opt/rhqa_ipa/env.sh"
 
         rlRun "echo $MASTERIP" 0 "Master IP"
+        rlRun "echo $SLAVEIP" 0 "Master IP"
         rlRun "cat /opt/rhqa_ipa/env.sh" 0 "env.sh"
 	#AddToKnownHosts $MASTERIP
 	#AddToKnownHosts $MASTER
+       	rlRun "AddToKnownHosts $MASTER" 0 "Adding master to known hosts"
 
         rlRun "sftp -o StrictHostKeyChecking=no root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg" 0 "Get replica package"
         rlLog "sftp -o StrictHostKeyChecking=no root@$MASTERIP:/var/lib/ipa/replica-info-$hostname_s.$DOMAIN.gpg"
