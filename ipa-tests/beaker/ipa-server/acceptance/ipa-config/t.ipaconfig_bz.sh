@@ -20,7 +20,7 @@ bugzillas()
 
 setup()
 {
-   rlPhaseStartTest "kinit as Admin"
+   rlPhaseStartSetup "kinit as Admin"
 	rlRun "kinitAs $ADMINID $ADMINPW"
    rlPhaseEnd
 }
@@ -28,7 +28,7 @@ setup()
 ipaconfig_bugzillas()
 {
 	# Testcase covering https://fedorahosted.org/freeipa/ticket/2159 - bugzilla 782974
-	rlPhaseStartTest "bz782974 Trace back with empty groupsearch config-mod"
+	rlPhaseStartTest "ipa-config-bugzilla-001: bz782974 Trace back with empty groupsearch config-mod"
 		ipa config-mod --groupsearch= > /tmp/bz782974.txt 2>&1
 		cat /tmp/bz782974.txt | grep "ipa: ERROR: an internal error has occurred"
 		if [ $? -eq 0 ] ; then
@@ -38,13 +38,13 @@ ipaconfig_bugzillas()
 		fi
 	rlPhaseEnd
 
-	rlPhaseStartTest "bz742601 ipa config-mod: update description for --emaildomain"
+	rlPhaseStartTest "ipa-config-bugzilla-002: bz742601 ipa config-mod update description for --emaildomain"
 		rlRun "ipa help config-mod > /tmp/bz742601.out 2>&1" 0
         	rlAssertGrep "\--emaildomain=STR     Default e-mail domain" "/tmp/bz742601.out"
 		rlAssertNotGrep "\--emaildomain=STR     Default e-mail domain for new users" "/tmp/bz742601.out"
 	rlPhaseEnd
 
-	rlPhaseStartTest "bz744205 ipa config-mod user search field blank - an internal error has occurred"
+	rlPhaseStartTest "ipa-config-bugzilla-003: bz744205 ipa config-mod user search field blank - an internal error has occurred"
 		ipa config-mod --usersearch= > /tmp/bz744205.out 2>&1
 		cat /tmp/bz744205.txt | grep "ipa: ERROR: an internal error has occurred"
                 if [ $? -eq 0 ] ; then
@@ -57,7 +57,7 @@ ipaconfig_bugzillas()
         	rlRun "verifyErrorMsg \"$command\" \"$expmsg\"" 0 "Verify expected error message."
  	rlPhaseEnd
 
-	rlPhaseStartTest "bz803836 IPA needs to set the nsslapd-minssf-exclude-rootdse option by default"
+	rlPhaseStartTest "ipa-config-bugzilla-004: bz803836 IPA needs to set the nsslapd-minssf-exclude-rootdse option by default"
 		minssfcfg=`ldapsearch -x -D "cn=Directory Manager" -w $ADMINPW -b "cn=config" | grep minssf-exclude-rootdse | awk '{print $2}'`
 		if [ "$minssfcfg" != "on" ] ; then
 			rlFail "nsslapd-minssf-exclude-rootdse not as expected.  GOT: $minssfcfg EXPECTED: on"
@@ -66,7 +66,7 @@ ipaconfig_bugzillas()
 		fi
         rlPhaseEnd
 
-	rlPhaseStartTest "bz782921 Add central configuration for size and look through limits"
+	rlPhaseStartTest "ipa-config-bugzilla-005: bz782921 Add central configuration for size and look through limits"
                 rlRun "ldapsearch -x -D \"cn=Directory Manager\" -w $ADMINPW -b \"cn=anonymous-limits,cn=etc,$BASEDN\"" 0 "Check for centralized look through limits configuration"
 		nslimits=`ldapsearch -x -D "cn=Directory Manager" -w $ADMINPW -b "cn=config,cn=ldbm database,cn=plugins,cn=config" | grep nsslapd-idlistscanlimit | awk '{print $2}'`
                 if [ "$nslimits" -ne 100000 ] ; then
@@ -76,7 +76,7 @@ ipaconfig_bugzillas()
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "bz797569 embedded carriage returns in a CSV not handled"
+	rlPhaseStartTest "ipa-config-bugzilla-006: bz797569 embedded carriage returns in a CSV not handled"
 		tmpout=/tmp/errormsg.out
 		cat > /tmp/ipa-config-mod-with-newlines.sh <<-EOF
 		ipa config-mod --userobjectclasses="top, person, organizationalperson,
