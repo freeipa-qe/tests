@@ -379,7 +379,7 @@ deletePrivilege()
        privilegeName=$1
         rc=0
 
-        rlLog "Executing: ipa privilege-del $privilegeName"
+        rlLog "Executing: ipa privilege-del \"$privilegeName\""
         ipa privilege-del "$privilegeName"
         rc=$?
         if [ $rc -ne 0 ]; then
@@ -398,17 +398,24 @@ deletePrivilege()
 addPermissionToPrivilege()
 {
   permissionList="$1"
-  privilegeName="${2}"
+  shift
+  while [[ $1 == --permission* ]]
+  do
+     permissionList=$permissionList" "
+     permissionList=$permissionList$1
+     shift
+  done
+  permissionQuotedListTemp=`echo $permissionList | sed 's/--permission=/--permission="/g'`
+  permissionQuotedListTemp2=`echo $permissionQuotedListTemp | sed 's/$/"/g'`
+  permissionQuotedList=`echo $permissionQuotedListTemp2 | sed 's/ --permission=/" --permission=/g'`
 
+  #privilegeName="${1}"
+  privilegeName=$1
+
+  rlLog "PermissionList: $permissionList"
   rc=0
-  rlLog "Executing: ipa privilege-add-permission --permissions=\"$permissionList\" \"$privilegeName\""
-  ipa privilege-add-permission --permissions="$permissionList" "$privilegeName"
+  rlRun "ipa privilege-add-permission $permissionQuotedList  \"$privilegeName\""  
 
-  if [ $rc -ne 0 ] ; then
-    rlLog "There was an error adding  $permissionList to $privilegeName"
-  else
-    rlLog "Added $permissionList to $privilegeName successfully"
-  fi
 }
 
 ############################################################
@@ -421,8 +428,8 @@ removePermissionFromPrivilege()
   privilegeName="${2}"
 
   rc=0
-  rlLog "Executing: ipa privilege-remove-permission --permissions=\"$permissionList\" \"$privilegeName\""
-  ipa privilege-remove-permission --permissions="$permissionList" "$privilegeName"
+  rlLog "Executing: ipa privilege-remove-permission \"$permissionList\" \"$privilegeName\""
+  ipa privilege-remove-permission "$permissionList" $privilegeName
 
   if [ $rc -ne 0 ] ; then
     rlLog "There was an error removing  $permissionList from $privilegeName"
@@ -440,11 +447,21 @@ verifyPrivilegeAttr()
 
    privilegeName=$1
    attribute="$2:"
-   value=$3
+   shift
+   shift
+   value=""
+   while [ "$#" -gt "0" ]
+   do
+      value=$value$1
+      permissionList=$value" "
+      shift
+   done
+   valueToGrep=`echo $value | sed 's/,/, /g'`
    tmpfile=$TmpDir/privilegeshow.out
    rc=0
 
-   rlLog "Executing: ipa privilege-show --all \"$privilegeName\""
+   rlLog "Executing: ipa privilege-show --all \"$privilegeName\" > $tmpfile"
+   ipa privilege-show --all "$privilegeName"
    ipa privilege-show --all "$privilegeName" > $tmpfile
    rc=$?
    if [ $rc -ne 0 ]; then
@@ -452,13 +469,13 @@ verifyPrivilegeAttr()
       return $rc
    fi
 	
-   cat $tmpfile | grep -i "$attribute $value"
+   cat $tmpfile | grep -i "$attribute $valueToGrep"
    rc=$?
    if [ $rc -ne 0 ]; then
-      rlLog "ERROR: ipa privilege \"$privilegeName\" verification failed:  Value of \"$attribute\" != \"$value\""
+      rlLog "ERROR: ipa privilege \"$privilegeName\" verification failed:  Value of $attribute != $value"
       rlLog "ERROR: ipa privilege \"$privilegeName\" verification failed:  it is `cat $tmpfile | grep \"$attribute\"`"
    else
-      rlLog "ipa privilege \"$privilegeName\" Verification successful: Value of \"$attribute\" = \"$value\""
+      rlLog "ipa privilege \"$privilegeName\" Verification successful: Value of $attribute = $value"
    fi
 
    return $rc
