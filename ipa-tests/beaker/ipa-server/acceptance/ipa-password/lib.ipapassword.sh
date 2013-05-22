@@ -1,6 +1,6 @@
 #######################################
 # lib.ipapassword test
-offset_system_time_()
+offset_system_time()
 {
 #offset system time with given string
 # expected input: + 86400 <== offset system time to one day later
@@ -19,7 +19,7 @@ offset_system_time_()
     echo "[offset system time] offset [$offset] seconds"
 	echo "[offset system time] sleep 3 seconds"
 	sleep 3
-} # offset_system_time_
+} # offset_system_time
 
 reset_global_pwpolicy()
 {
@@ -68,9 +68,7 @@ reset_group_pwpolicy()
         rlPass "group pwpolicy has been set"
     else
         rlFail "FAIL - group pwpolicy set failed"
-        echo "------------------------------"
-        cat $out
-        echo "------------------------------"
+        show_file_content $out
     fi
     rlRun "$kdestroy"
 } # reset_group_pwpolicy
@@ -105,9 +103,7 @@ reset_nestedgroup_pwpolicy()
         rlPass "group pwpolicy has been set"
     else
         rlFail "FAIL - group pwpolicy set failed"
-        echo "------------------------------"
-        cat $out
-        echo "------------------------------"
+        show_file_content $out
     fi
     rlRun "$kdestroy"
 } # reset_group_pwpolicy
@@ -293,12 +289,10 @@ kinit_aftermaxlife()
     echo "send -s -- $newpw\r" >> $exp
     echo 'expect eof' >> $exp
     rlRun "$kdestroy"
-
-    echo "====== [kinit_aftermaxlife] exp file ========="
-    cat $exp
+    show_file_content  $exp "[kinit_aftermaxlife] exp file"
     echo "----------- ipactl status -------------------"
     ipactl status
-    echo "=============================================="
+    echo "----------------------------------------------"
     rlRun "/usr/bin/expect $exp " 0 "[kinit_aftermaxlife] ipa server should prompt for password change when system is after maxlife"
     rlRun "$kdestroy"
 
@@ -342,9 +336,7 @@ Local_KinitAsAdmin()
             
         echo "========================================="
         echo "[Local_KinitAsAdmin] password [$pw] failed, check whether it is because password expired"
-        echo "============ output of [echo $pw | kinit $ADMIN] ============="
-        cat $out
-        echo "============================================================"
+        show_file_content $out "output of [echo $pw | kinit $ADMIN]"
         if grep "Password expired" $out 2>&1 >/dev/null
         then
             echo "admin password exipred, do reset process"
@@ -373,7 +365,7 @@ Local_KinitAsAdmin()
             echo "send -s -- $pw\r" >> $exp
             echo 'expect eof' >> $exp
             /usr/bin/expect $exp 
-            cat $exp
+            show_file_content $exp
             # after reset password, test the new password
             $kdestroy
             rlRun "rlDistroDiff keyctl"
@@ -440,11 +432,8 @@ change_password()
     else
         ret=1
     fi
-    echo "===============output of change_password==============="
-    cat $exp
-    echo "------------- [Above: exp ] [ below: output ] --------"
-    cat $out
-    echo "======================================================="
+    show_file_content $exp
+    show_file_content $out
 
     return $ret
 } #change_password
@@ -455,7 +444,7 @@ random_password()
     local length=8
     local outfile=$TmpDir/ramdompassword.$RANDOM.out
     generate_password $classes $length $outfile
-    cat $outfile
+    show_file_content $outfile
 } #ramdom_password
 
 generate_password()
@@ -605,7 +594,7 @@ minlife_default()
         life=`ipa pwpolicy-show | grep "Min lifetime" | cut -d":" -f2 |xargs echo` # confirm the minlife setting
         echo "minlife has been setting to [$life] hours"
         echo "offset system time 2 minute before minlife"
-        offset_system_time_ "+ 2*60*60 - 2*60"
+        offset_system_time "+ 2*60*60 - 2*60"
         # before minlife, change password should fail
         rlRun "rlDistroDiff keyctl"
         rlRun "echo $testacPW | kinit $testac" 0 "make sure currentPW work [$testacPW]"
@@ -619,7 +608,7 @@ minlife_default()
         fi
 
         # after minlife, change passwod should success
-        offset_system_time_ "+ 2*60"  # setsystime 2 minutes after
+        offset_system_time "+ 2*60"  # setsystime 2 minutes after
         rlRun "rlDistroDiff keyctl"
         rlRun "echo $currentPW | kinit $testac" 0 "make sure currentPW work [$currentPW]"
         newpw=`random_password`
@@ -671,7 +660,7 @@ minlife_lowerbound()
             echo "============================="
             for offset in 0 1 2 4 8 16 32
             do
-                offset_system_time_ "+ $offset"
+                offset_system_time "+ $offset"
                 rlRun "rlDistroDiff keyctl"
                 rlRun "echo $oldpw | kinit $testac" 0 "make sure currentPW work [$oldpw]"
                 change_password $testac $oldpw $newpw
@@ -720,9 +709,7 @@ delete_all_but_global_pwpolicy()
     Local_KinitAsAdmin
     #ipa pwpolicy-find | grep -i "group" | grep -v -i "GLOBAL" > $out <<< might trigger error
     ipa pwpolicy-find | grep -i "group" | grep -v -i "global_policy" > $out
-    echo "---- debug: output of pwpolicy-find ------"
-    cat $out
-    echo "------ file [$out]----------"
+    show_file_content $out "output of pwpolicy-find"
     for line in `cat $out`; do
         pwpolicy=`echo $line | cut -d":" -f2 | xargs echo`
         echo "line=[$line], pwpolicy=(($pwpolicy))"
@@ -859,8 +846,7 @@ Local_FirstKinitAs()
 	Local_KinitAsAdmin
     echo ""
 	echo "---- assign initial password [$password] to [$username] as admin -------"
-	cat $expfile
-	echo "------------------------------------------------------------------------"
+	show_file_content $expfile
     /usr/bin/expect $expfile
 	###### kinit as user, use initial password, then change password to desired one
     expfile=/tmp/kinit${RANDOM}.exp
@@ -876,8 +862,7 @@ Local_FirstKinitAs()
     echo "expect eof" >> $expfile
     echo ""
 	echo "---- kinit as user [$username], then change [$password] to [$newpassword] -------"
-	cat $expfile
-	echo "------------------------------------------------------------------------"
+	show_file_content $expfile
     kdestroy
     rlRun "rlDistroDiff keyctl"
     /usr/bin/expect $expfile
@@ -921,10 +906,23 @@ Local_kinit()
     fi
     
     rlLog "[Local kinit: `date`] $msg : user [$user] password [$password]"
-	echo "------exp source file [$expfile]------------"
-	cat $expfile
-	echo "------exp execution output [$out]------------"
-    cat $out
-    echo "------------------------------------------------------"
+	show_file_content $expfile "exp source file [$expfile]"
+    show_file_content $out "exp execution output [$out]"
     return $ret
+}
+
+show_file_content()
+{
+    file=$1
+    title="$2"
+    if [ "$title" = "" ];then
+        title=$file        
+    fi
+    if [ -f $file ];then
+        echo "----------------------- begining of [$title] ---------------------------"
+        cat $file
+        echo "---------------------------- end of [$title] ---------------------------"
+    else
+        echo " ******** NO Such File [$file] **************"
+    fi
 }
