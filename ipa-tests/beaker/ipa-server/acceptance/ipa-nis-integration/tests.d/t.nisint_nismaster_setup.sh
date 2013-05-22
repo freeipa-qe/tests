@@ -95,9 +95,18 @@ nisint_nismaster_envsetup()
 			else
 				rlLog "[ PASS ] BZ 845301 not found -- service iptables stop succeeeded"
 			fi
-		else	
-			rlRun "service iptables stop" 0 "Stop the firewall on the client"
 		fi
+
+                if [ -f /etc/init.d/iptables ]; then
+                 rlRun "service iptables stop"
+                fi
+                if [ -f /etc/init.d/ip6tables ]; then
+                 rlRun "service ip6tables stop"
+                fi
+                if [ -f /usr/lib/systemd/system/firewalld.service ]; then
+                 rlRun "systemctl stop firewalld"
+                fi
+
 		[ -f $tmpout ] && rm -f $tmpout
 	rlPhaseEnd
 }
