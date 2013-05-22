@@ -3178,11 +3178,32 @@ bz_859510()
         append_test_user_to_test_group
         # at this point, there is no group password policy exist
         Local_KinitAsAdmin
-        local offset_1=1
-        local offset_2=10
-        ipa pwpolicy-add $testgrp --maxlife=$offset_1 --lockouttime=0 --history=0 --failinterval=0 --maxfail=0
-        offset_system_time "+ $offset _1* 24 * 3600" # at this point, user password should expired
-        ipa pwpolicy-mod $testgrp --maxlife=$offset_2
+        local maxLife_1=1
+        local maxLife_2=10
+        local offset=$maxLife_1
+        ipa pwpolicy-add $testgrp --maxlife=$maxLife_1
+        offset_system_time "+ $offset * 24 * 3600" # at this point, user password should expired
+        ipa pwpolicy-mod $testgrp --maxlife=$maxLife_2
+        kinit_aftermaxlife $testac $testacPW $testacNEWPW
+        rlLog "if kinit after maxlife success, bug fixed"
+	rlPhaseEnd
+}
+
+bz_891977()
+{
+	rlPhaseStartTest "Bug 891977 - Users cannot change their passwords after password expiry change"
+        # prepare for test environment: set new user & group, add user to group
+        add_test_user
+        add_test_group
+        append_test_user_to_test_group
+        # at this point, there is no group password policy exist
+        Local_KinitAsAdmin
+        local maxLife_small=1
+        local maxLife_big=9999 # the data 9999 is coming from bug report
+        local offset=$maxLife_small
+        ipa pwpolicy-add $testgrp --maxlife=$maxLife_small
+        offset_system_time "+ $offset * 24 * 3600" # at this point, user password should expired
+        ipa pwpolicy-mod $testgrp --maxlife=$maxLife_big
         kinit_aftermaxlife $testac $testacPW $testacNEWPW
         rlLog "if kinit after maxlife success, bug fixed"
 	rlPhaseEnd
