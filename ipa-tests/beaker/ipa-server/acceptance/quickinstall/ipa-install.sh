@@ -213,8 +213,8 @@ ipa_install_set_vars()
 
     # Copy ipa-install.sh to /opt/rhqa_ipa 
     # Some tests like install-server-cli like to call the scipt as a library
-    rm -f /opt/rhqa_ipa/ipa-install.sh
-    cp -a ./ipa-install.sh /opt/rhqa_ipa/.
+    #rm -f /opt/rhqa_ipa/ipa-install.sh
+    #cp -a ./ipa-install.sh /opt/rhqa_ipa/.
  
     rlLog "===================== env|sort =========================="
     rlRun "env|sort"
