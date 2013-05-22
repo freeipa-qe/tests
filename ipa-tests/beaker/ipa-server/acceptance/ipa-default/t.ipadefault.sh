@@ -84,7 +84,7 @@ ipadefault_pwpolicy_all()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipadefault_pwpolicy_all"
+    rlPhaseStartTest "ipa-config-default-001: Password Policy"
         rlLog "check the default settings for global password policy"
         ipadefault_pwpolicy_all_logic
     rlPhaseEnd
@@ -180,7 +180,7 @@ ipadefault_config_all()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipadefault_config_all"
+    rlPhaseStartTest "ipa-config-default-002: General Server Configuration"
         rlLog "check the default settings for general ipa server configuration"
         ipadefault_config_all_logic
     rlPhaseEnd
@@ -260,7 +260,7 @@ ipadefault_krbt_all()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipadefault_krbt_all"
+    rlPhaseStartTest "ipa-config-default-003: Keberos Ticket Policy"
         rlLog "check the default settings for general ipa server krbt policy setting"
         ipadefault_krbt_all_logic
     rlPhaseEnd
