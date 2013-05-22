@@ -79,7 +79,7 @@ delegation_user()
 ######################################################################
 delegation_user_envsetup()
 {
-	rlPhaseStartTest "delegation_user_envsetup "
+	rlPhaseStartSetup "delegation_user_envsetup "
 		KinitAsAdmin
 		create_ipauser man0001 Manager 0001 passw0rd1
 		create_ipauser man0002 Manager 0002 passw0rd2
@@ -98,7 +98,7 @@ delegation_user_envsetup()
 ######################################################################
 delegation_user_envcleanup()
 {
-	rlPhaseStartTest "delegation_user_envcleanup "
+	rlPhaseStartCleanup "delegation_user_envcleanup "
 		KinitAsAdmin
 		ipa user-del man0001
 		ipa user-del man0002
@@ -116,7 +116,7 @@ delegation_user_envcleanup()
 ######################################################################
 delegation_user_1001()
 {
-	rlPhaseStartTest "delegation_user_1001 Fail to change attrs with no delegations for user"
+	rlPhaseStartTest "ipa-delegation-user-1001: Fail to change attrs with no delegations for user"
 		KinitAsUser man0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-mod emp0001  --first=Bad"                      1 "Should not be able to set first for another user"
@@ -144,7 +144,7 @@ delegation_user_1001()
 
 delegation_user_1002()
 {
-	rlPhaseStartTest "delegation_user_1002 Add delegation for managers to change employees address attrs"
+	rlPhaseStartTest "ipa-delegation-user-1002: Add delegation for managers to change employees address attrs"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add addr_change --group=managers --membergroup=employees --attrs=street,l,st,postalcode" \
@@ -155,7 +155,7 @@ delegation_user_1002()
 
 delegation_user_1003()
 {
-	rlPhaseStartTest "delegation_user_1003 Kinit as man0001 and change address attrs of emp0001"
+	rlPhaseStartTest "ipa-delegation-user-1003: Kinit as man0001 and change address attrs of emp0001"
 		KinitAsUser man0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-mod emp0001  --street=Good_Steet_Rd1"
@@ -168,7 +168,7 @@ delegation_user_1003()
 
 delegation_user_1004()
 {
-	rlPhaseStartTest "delegation_user_1004 Su to man0002 and change address attrs of emp0002"
+	rlPhaseStartTest "ipa-delegation-user-1004: Su to man0002 and change address attrs of emp0002"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		#  Positive: Su to man0002 and change address attrs for emp0002
@@ -180,7 +180,7 @@ delegation_user_1004()
 
 delegation_user_1005()
 {
-	rlPhaseStartTest "delegation_user_1005 Add delegation for employees to change managers phone attrs"
+	rlPhaseStartTest "ipa-delegation-user-1005: Add delegation for employees to change managers phone attrs"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add phone_change --group=employees --membergroup=managers --attrs=telephonenumber,mobile,pager,facsimiletelephonenumber" \
@@ -191,7 +191,7 @@ delegation_user_1005()
 
 delegation_user_1006()
 {
-	rlPhaseStartTest "delegation_user_1006 Kinit as employee and change phone attrs of manager"
+	rlPhaseStartTest "ipa-delegation-user-1006: Kinit as employee and change phone attrs of manager"
 		KinitAsUser emp0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-mod man0001  --phone=333-333-3331"
@@ -204,7 +204,7 @@ delegation_user_1006()
 
 delegation_user_1007()
 {
-	rlPhaseStartTest "delegation_user_1007 Su to emp0002 and change phone attrs of man0002"
+	rlPhaseStartTest "ipa-delegation-user-1007: Su to emp0002 and change phone attrs of man0002"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "su - emp0002 -c \"echo passw0rd2|kinit emp0002; ipa user-mod man0002 --phone=333-333-3332 --mobile=333-333-3332 --pager=333-333-3332 --fax=333-333-3332\" > $tmpout 2>&1" \
@@ -215,7 +215,7 @@ delegation_user_1007()
 
 delegation_user_1008()
 {
-	rlPhaseStartTest "delegation_user_1008 Check emp0001's attribute settings"
+	rlPhaseStartTest "ipa-delegation-user-1008: Check emp0001's attribute settings"
 		KinitAsUser emp0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-find emp0001  --street=Good_Steet_Rd1"
@@ -228,7 +228,7 @@ delegation_user_1008()
 
 delegation_user_1009()
 {
-	rlPhaseStartTest "delegation_user_1009 Check emp0002's attribute settings"
+	rlPhaseStartTest "ipa-delegation-user-1009: Check emp0002's attribute settings"
 		KinitAsUser emp0002 passw0rd2
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-find emp0002  --street=Good_Steet_Rd2"
@@ -241,7 +241,7 @@ delegation_user_1009()
 
 delegation_user_1010()
 {
-	rlPhaseStartTest "delegation_user_1010 Check man0001's attribute settings"
+	rlPhaseStartTest "ipa-delegation-user-1010: Check man0001's attribute settings"
 		KinitAsUser man0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-find man0001  --phone=333-333-3331"
@@ -254,7 +254,7 @@ delegation_user_1010()
 
 delegation_user_1011()
 {
-	rlPhaseStartTest "delegation_user_1011 Check man0002's attribute settings"
+	rlPhaseStartTest "ipa-delegation-user-1011: Check man0002's attribute settings"
 		KinitAsUser man0002 passw0rd2
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-find man0002  --phone=333-333-3332"
@@ -267,7 +267,7 @@ delegation_user_1011()
 
 delegation_user_1012()
 {
-	rlPhaseStartTest "delegation_user_1012 Kinit as manager and fail to change phone attrs for employee"
+	rlPhaseStartTest "ipa-delegation-user-1012: Kinit as manager and fail to change phone attrs for employee"
 		KinitAsUser man0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-mod emp0001  --phone=999-999-9991"  1 "man0001 should not be able to change emp0001's --phone"
@@ -280,7 +280,7 @@ delegation_user_1012()
 
 delegation_user_1013()
 {
-	rlPhaseStartTest "delegation_user_1013 Kinit as employee and fail to change address attrs for employee"
+	rlPhaseStartTest "ipa-delegation-user-1013: Kinit as employee and fail to change address attrs for employee"
 		KinitAsUser emp0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-mod emp0002  --street=Bad_Steet_Rd2" 1 "emp0001 should not be able to change emp0002's --street"
@@ -293,7 +293,7 @@ delegation_user_1013()
 
 delegation_user_1014()
 {
-	rlPhaseStartTest "delegation_user_1014 Kinit as manager and fail to change other attrs for employee"
+	rlPhaseStartTest "ipa-delegation-user-1014: Kinit as manager and fail to change other attrs for employee"
 		KinitAsUser man0001 passw0rd1
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa user-mod emp0001  --first=Bad"                      1 "should not be able to set first for emp001"

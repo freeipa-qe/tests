@@ -73,7 +73,7 @@ delegation_find_positive()
 
 delegation_find_positive_envsetup()
 {
-	rlPhaseStartTest "delegation_find_positive_envsetup "
+	rlPhaseStartSetup "delegation_find_positive_envsetup "
 		KinitAsAdmin
 		ipa group-add mg1000 --desc=mg1000
 		ipa group-add gr1000 --desc=gr1000
@@ -83,7 +83,7 @@ delegation_find_positive_envsetup()
 
 delegation_find_positive_envcleanup()
 {
-	rlPhaseStartTest "delegation_find_positive_envcleanup "
+	rlPhaseStartCleanup "delegation_find_positive_envcleanup "
 		KinitAsAdmin
 		ipa delegation-del delegation_find_positive_1000 
 		ipa group-del mg1000
@@ -93,7 +93,7 @@ delegation_find_positive_envcleanup()
 
 delegation_find_positive_1001()
 {
-	rlPhaseStartTest "delegation_find_positive_1001 find all with no criteria"
+	rlPhaseStartTest "ipa-delegation-find-positive-1001: find all with no criteria"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find > $tmpout 2>&1"
@@ -104,7 +104,7 @@ delegation_find_positive_1001()
 
 delegation_find_positive_1002()
 {
-	rlPhaseStartTest "delegation_find_positive_1002 find by name criteria"
+	rlPhaseStartTest "ipa-delegation-find-positive-1002: find by name criteria"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find delegation_find_positive_1000 > $tmpout 2>&1"
@@ -115,7 +115,7 @@ delegation_find_positive_1002()
 
 delegation_find_positive_1003()
 {
-	rlPhaseStartTest "delegation_find_positive_1003 find by partial name criteria"
+	rlPhaseStartTest "ipa-delegation-find-positive-1003: find by partial name criteria"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find delegation_find > $tmpout 2>&1"
@@ -126,7 +126,7 @@ delegation_find_positive_1003()
 
 delegation_find_positive_1004()
 {
-	rlPhaseStartTest "delegation_find_positive_1004 find by name option"
+	rlPhaseStartTest "ipa-delegation-find-positive-1004: find by name option"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name=delegation_find_positive_1000 > $tmpout 2>&1"
@@ -137,7 +137,7 @@ delegation_find_positive_1004()
 
 delegation_find_positive_1005()
 {
-	rlPhaseStartTest "delegation_find_positive_1005 find by membergroup option"
+	rlPhaseStartTest "ipa-delegation-find-positive-1005: find by membergroup option"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 > $tmpout 2>&1"
@@ -148,7 +148,7 @@ delegation_find_positive_1005()
 
 delegation_find_positive_1006()
 {
-	rlPhaseStartTest "delegation_find_positive_1006 find by group option [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-positive-1006: find by group option [BZ 888524]"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group=gr1000 > $tmpout 2>&1"
@@ -159,7 +159,7 @@ delegation_find_positive_1006()
 
 delegation_find_positive_1007()
 {
-	rlPhaseStartTest "delegation_find_positive_1007 find by permissions option"
+	rlPhaseStartTest "ipa-delegation-find-positive-1007: find by permissions option"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=write > $tmpout 2>&1"
@@ -170,7 +170,7 @@ delegation_find_positive_1007()
 
 delegation_find_positive_1008()
 {
-	rlPhaseStartTest "delegation_find_positive_1008 find by attrs option"
+	rlPhaseStartTest "ipa-delegation-find-positive-1008: find by attrs option"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=mobile > $tmpout 2>&1"
@@ -181,7 +181,7 @@ delegation_find_positive_1008()
 
 delegation_find_positive_1009()
 {
-	rlPhaseStartTest "delegation_find_positive_1009 find by membergroup and group options [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-positive-1009: find by membergroup and group options [BZ 888524]"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000  > $tmpout 2>&1"
@@ -192,7 +192,7 @@ delegation_find_positive_1009()
 
 delegation_find_positive_1010()
 {
-	rlPhaseStartTest "delegation_find_positive_1010 find by membergroup, group, and attrs options [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-positive-1010: find by membergroup, group, and attrs options [BZ 888524]"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile  > $tmpout 2>&1"
@@ -203,7 +203,7 @@ delegation_find_positive_1010()
 
 delegation_find_positive_1011()
 {
-	rlPhaseStartTest "delegation_find_positive_1011 find by membergroup, group, attrs, and permissions options [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-positive-1011: find by membergroup, group, attrs, and permissions options [BZ 888524]"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write > $tmpout 2>&1"
@@ -214,7 +214,7 @@ delegation_find_positive_1011()
 
 delegation_find_positive_1012()
 {
-	rlPhaseStartTest "delegation_find_positive_1012 find all with no criteria and --all"
+	rlPhaseStartTest "ipa-delegation-find-positive-1012: find all with no criteria and --all"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --all > $tmpout 2>&1"
@@ -225,7 +225,7 @@ delegation_find_positive_1012()
 
 delegation_find_positive_1013()
 {
-	rlPhaseStartTest "delegation_find_positive_1013 find all with no criteria and --raw"
+	rlPhaseStartTest "ipa-delegation-find-positive-1013: find all with no criteria and --raw"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --raw > $tmpout 2>&1"
@@ -236,7 +236,7 @@ delegation_find_positive_1013()
 
 delegation_find_positive_1014()
 {
-	rlPhaseStartTest "delegation_find_positive_1014 find all with no criteria and --all --raw"
+	rlPhaseStartTest "ipa-delegation-find-positive-1014: find all with no criteria and --all --raw"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --all --raw > $tmpout 2>&1"
@@ -248,7 +248,7 @@ delegation_find_positive_1014()
 # added on 2/1/2012.  function of empty arg changed earlier
 delegation_find_positive_1015()
 {
-	rlPhaseStartTest "delegation_find_positive_1015 find with no value for name"
+	rlPhaseStartTest "ipa-delegation-find-positive-1015: find with no value for name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name= > $tmpout 2>&1 " 0
@@ -260,7 +260,7 @@ delegation_find_positive_1015()
 # added on 2/1/2012.  function of empty arg changed earlier
 delegation_find_positive_1016()
 {
-	rlPhaseStartTest "delegation_find_positive_1016 find with empty name"
+	rlPhaseStartTest "ipa-delegation-find-positive-1016: find with empty name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name=\"\" > $tmpout 2>&1 " 0
@@ -272,7 +272,7 @@ delegation_find_positive_1016()
 # added on 2/1/2012.  function of empty arg changed earlier
 delegation_find_positive_1017()
 {
-	rlPhaseStartTest "delegation_find_positive_1017 find with no value for group"
+	rlPhaseStartTest "ipa-delegation-find-positive-1017: find with no value for group"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group= > $tmpout 2>&1 " 0
@@ -284,7 +284,7 @@ delegation_find_positive_1017()
 # added on 2/1/2012.  function of empty arg changed earlier
 delegation_find_positive_1018()
 {
-	rlPhaseStartTest "delegation_find_positive_1018 find with empty group"
+	rlPhaseStartTest "ipa-delegation-find-positive-1018: find with empty group"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group=\"\" > $tmpout 2>&1 " 0
@@ -296,7 +296,7 @@ delegation_find_positive_1018()
 # added on 3/1/2012.  function to test ipa delegation-find --pkey-only
 delegation_find_positive_1019()
 {
-	rlPhaseStartTest "delegation_find_positive_1019 find with pkey-only specified [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-positive-1019: find with pkey-only specified bz888524"
 		KinitAsAdmin
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Delegation\ name | grep delegation_find_positive_1000" 0 "Making sure that Delegation name is returned with --pkey-only specified"
 	rlPhaseEnd
@@ -305,7 +305,7 @@ delegation_find_positive_1019()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1020()
 {
-	rlPhaseStartTest "delegation_find_positive_1020 find with no value for membergroup (BZ 783473)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1020: find with no value for membergroup bz783473"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup= > $tmpout 2>&1 " 0
@@ -320,7 +320,7 @@ delegation_find_positive_1020()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1021()
 {
-	rlPhaseStartTest "delegation_find_positive_1021 find with empty membergroup (BZ 783475)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1021: find with empty membergroup bz783475"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=\"\" > $tmpout 2>&1 " 0
@@ -335,7 +335,7 @@ delegation_find_positive_1021()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1022()
 {
-	rlPhaseStartTest "delegation_find_positive_1022 find with no value for permissions (BZ 783489)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1022: find with no value for permissions bz783489"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions= > $tmpout 2>&1 " 0
@@ -350,7 +350,7 @@ delegation_find_positive_1022()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1023()
 {
-	rlPhaseStartTest "delegation_find_positive_1023 find with empty permissions (BZ 783489)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1023: find with empty permissions bz783489"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=\"\" > $tmpout 2>&1 " 0
@@ -365,7 +365,7 @@ delegation_find_positive_1023()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1024()
 {
-	rlPhaseStartTest "delegation_find_positive_1024 find with space for permissions (BZ 783489)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1024: find with space for permissions bz783489"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=\" \" > $tmpout 2>&1 " 0
@@ -380,7 +380,7 @@ delegation_find_positive_1024()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1025()
 {
-	rlPhaseStartTest "delegation_find_positive_1025 find with no value for attrs (BZ 783501)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1025: find with no value for attrs bz783501"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs= > $tmpout 2>&1 " 0
@@ -395,7 +395,7 @@ delegation_find_positive_1025()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1026()
 {
-	rlPhaseStartTest "delegation_find_positive_1026 find with empty for attrs (BZ 783501)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1026: find with empty for attrs bz783501"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=\"\" > $tmpout 2>&1 " 0
@@ -410,7 +410,7 @@ delegation_find_positive_1026()
 # added on 4/25/2012.  function of empty arg changed earlier
 delegation_find_positive_1027()
 {
-	rlPhaseStartTest "delegation_find_positive_1027 find with space for attrs (BZ 783501)"
+	rlPhaseStartTest "ipa-delegation-find-positive-1027: find with space for attrs bz783501"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=\" \" > $tmpout 2>&1 " 0
@@ -470,7 +470,7 @@ delegation_find_negative()
 
 delegation_find_negative_envsetup()
 {
-	rlPhaseStartTest "delegation_find_negative_envsetup "
+	rlPhaseStartSetup "delegation_find_negative_envsetup "
 		KinitAsAdmin
 		ipa group-add mg1000 --desc=mg1000
 		ipa group-add gr1000 --desc=gr1000
@@ -480,7 +480,7 @@ delegation_find_negative_envsetup()
 
 delegation_find_negative_envcleanup()
 {
-	rlPhaseStartTest "delegation_find_negative_envcleanup "
+	rlPhaseStartCleanup "delegation_find_negative_envcleanup "
 		KinitAsAdmin
 		ipa delegation-del delegation_find_negative_1000 
 		ipa group-del mg1000
@@ -490,7 +490,7 @@ delegation_find_negative_envcleanup()
 
 delegation_find_negative_1001()
 {
-	rlPhaseStartTest "delegation_find_negative_1001 fail on find with space criteria"
+	rlPhaseStartTest "ipa-delegation-find-negative-1001: fail on find with space criteria"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find \" \" > $tmpout 2>&1 " 1
@@ -501,7 +501,7 @@ delegation_find_negative_1001()
 
 delegation_find_negative_1002()
 {
-	rlPhaseStartTest "delegation_find_negative_1002 fail on find with invalid name criteria"
+	rlPhaseStartTest "ipa-delegation-find-negative-1002: fail on find with invalid name criteria"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find badname > $tmpout 2>&1 " 1
@@ -540,7 +540,7 @@ delegation_find_negative_1002()
 
 delegation_find_negative_1005()
 {
-	rlPhaseStartTest "delegation_find_negative_1005 fail to find with space for name"
+	rlPhaseStartTest "ipa-delegation-find-negative-1005: fail to find with space for name"
 	# This one is now equivalent to a litteral search for a delegation named with a single space
 	# This one should fail with 0 delegations matched.
 		KinitAsAdmin
@@ -553,7 +553,7 @@ delegation_find_negative_1005()
 
 delegation_find_negative_1006()
 {
-	rlPhaseStartTest "delegation_find_negative_1006 fail to find with non-existent name"
+	rlPhaseStartTest "ipa-delegation-find-negative-1006: fail to find with non-existent name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --name=badname > $tmpout 2>&1 " 1
@@ -595,7 +595,7 @@ delegation_find_negative_1006()
 
 delegation_find_negative_1009()
 {
-	rlPhaseStartTest "delegation_find_negative_1009 fail to find with space for membergroup"
+	rlPhaseStartTest "ipa-delegation-find-negative-1009: fail to find with space for membergroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=\" \" > $tmpout 2>&1 " 1
@@ -606,7 +606,7 @@ delegation_find_negative_1009()
 
 delegation_find_negative_1010()
 {
-	rlPhaseStartTest "delegation_find_negative_1010 fail to find with non-existent membergroup"
+	rlPhaseStartTest "ipa-delegation-find-negative-1010: fail to find with non-existent membergroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		# COMMAND TO TEST
@@ -644,7 +644,7 @@ delegation_find_negative_1010()
 
 delegation_find_negative_1013()
 {
-	rlPhaseStartTest "delegation_find_negative_1013 fail to find with space for group [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1013: fail to find with space for group bz888524"
 	# This one is now equivalent to a litteral search for a delegation access group with a single space
 	# This one should fail with 0 delegations matched.
 		KinitAsAdmin
@@ -657,7 +657,7 @@ delegation_find_negative_1013()
 
 delegation_find_negative_1014()
 {
-	rlPhaseStartTest "delegation_find_negative_1014 fail to find with non-existent group [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1014: fail to find with non-existent group bz888524"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --group=badgroup > $tmpout 2>&1 " 1
@@ -713,7 +713,7 @@ delegation_find_negative_1014()
 
 delegation_find_negative_1018()
 {
-	rlPhaseStartTest "delegation_find_negative_1018 fail to find with only invalid permission"
+	rlPhaseStartTest "ipa-delegation-find-negative-1018: fail to find with only invalid permission"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=badperm > $tmpout 2>&1 " 1
@@ -724,7 +724,7 @@ delegation_find_negative_1018()
 
 delegation_find_negative_1019()
 {
-	rlPhaseStartTest "delegation_find_negative_1019 fail to find with one invalid permission"
+	rlPhaseStartTest "ipa-delegation-find-negative-1019: fail to find with one invalid permission"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --permissions=badperm,write > $tmpout 2>&1 " 1
@@ -781,7 +781,7 @@ delegation_find_negative_1019()
 
 delegation_find_negative_1023()
 {
-	rlPhaseStartTest "delegation_find_negative_1023 fail to find with only invalid attr"
+	rlPhaseStartTest "ipa-delegation-find-negative-1023: fail to find with only invalid attr"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=badattr > $tmpout 2>&1 " 1
@@ -792,7 +792,7 @@ delegation_find_negative_1023()
 
 delegation_find_negative_1024()
 {
-	rlPhaseStartTest "delegation_find_negative_1024 fail to find with one invalid attr"
+	rlPhaseStartTest "ipa-delegation-find-negative-1024: fail to find with one invalid attr"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --attrs=badattr,mobile > $tmpout 2>&1 " 1
@@ -804,7 +804,7 @@ delegation_find_negative_1024()
 
 delegation_find_negative_1025()
 {
-	rlPhaseStartTest "delegation_find_negative_1025 fail to find with non-existent membergroup and existing group [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1025: fail to find with non-existent membergroup and existing group bz888524"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=badmg --group=gr1000  > $tmpout 2>&1 " 1
@@ -815,7 +815,7 @@ delegation_find_negative_1025()
 
 delegation_find_negative_1026()
 {
-	rlPhaseStartTest "delegation_find_negative_1026 fail to find with existing membergroup and non-existent group [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1026: fail to find with existing membergroup and non-existent group bz888524"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=badgr  > $tmpout 2>&1 " 1
@@ -827,7 +827,7 @@ delegation_find_negative_1026()
 
 delegation_find_negative_1027()
 {
-	rlPhaseStartTest "delegation_find_negative_1027 fail to find with non-existent membergroup, existing group, and valid attrs [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1027: fail to find with non-existent membergroup, existing group, and valid attrs bz888524"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=badmg --group=gr1000 --attrs=mobile  > $tmpout 2>&1 " 1
@@ -838,7 +838,7 @@ delegation_find_negative_1027()
 
 delegation_find_negative_1028()
 {
-	rlPhaseStartTest "delegation_find_negative_1028 fail to find with existing membergroup, non-existent group, and valid attrs [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1028: fail to find with existing membergroup, non-existent group, and valid attrs bz888524"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=badgr --attrs=mobile  > $tmpout 2>&1 " 1
@@ -849,7 +849,7 @@ delegation_find_negative_1028()
 
 delegation_find_negative_1029()
 {
-	rlPhaseStartTest "delegation_find_negative_1029 fail to find with existing membergroup, existing group, and invalid attrs"
+	rlPhaseStartTest "ipa-delegation-find-negative-1029: fail to find with existing membergroup, existing group, and invalid attrs"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=badattr  > $tmpout 2>&1 " 1
@@ -861,7 +861,7 @@ delegation_find_negative_1029()
 
 delegation_find_negative_1030()
 {
-	rlPhaseStartTest "delegation_find_negative_1030 fail to find with non-existent membergroup, existing group, valid attrs, and valid permissions [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1030: fail to find with non-existent membergroup, existing group, valid attrs, and valid permissions bz888524"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=badmg --group=gr1000 --attrs=mobile --permissions=write > $tmpout 2>&1 " 1
@@ -872,7 +872,7 @@ delegation_find_negative_1030()
 
 delegation_find_negative_1031()
 {
-	rlPhaseStartTest "delegation_find_negative_1031 fail to find with existing membergroup, non-existent group, valid attrs, and valid permissions [BZ 888524]"
+	rlPhaseStartTest "ipa-delegation-find-negative-1031: fail to find with existing membergroup, non-existent group, valid attrs, and valid permissions bz888524"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=badgr --attrs=mobile --permissions=write > $tmpout 2>&1 " 1
@@ -883,7 +883,7 @@ delegation_find_negative_1031()
 
 delegation_find_negative_1032()
 {
-	rlPhaseStartTest "delegation_find_negative_1032 fail to find with existing membergroup, existing group, invalid attrs, and valid permissions"
+	rlPhaseStartTest "ipa-delegation-find-negative-1032: fail to find with existing membergroup, existing group, invalid attrs, and valid permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=badattr --permissions=write > $tmpout 2>&1 " 1
@@ -894,7 +894,7 @@ delegation_find_negative_1032()
 
 delegation_find_negative_1033()
 {
-	rlPhaseStartTest "delegation_find_negative_1033 fail to find with existing membergroup, existing group, valid attrs, and invalid permissions"
+	rlPhaseStartTest "ipa-delegation-find-negative-1033: fail to find with existing membergroup, existing group, valid attrs, and invalid permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		# COMMAND TO TEST
@@ -907,7 +907,7 @@ delegation_find_negative_1033()
 # added on 3/1/2012.  function to test ipa delegation-find --pkey-only
 delegation_find_negative_1034()
 {
-	rlPhaseStartTest "delegation_find_negative_1034 find with pkey-only specified, make sure Permissions does not return"
+	rlPhaseStartTest "ipa-delegation-find-negative-1034: find with pkey-only specified, make sure Permissions does not return"
 		KinitAsAdmin
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Permissions" 1 "Making sure that Permissions is not returned with --pkey-only specified"
 	rlPhaseEnd
@@ -916,7 +916,7 @@ delegation_find_negative_1034()
 # added on 3/1/2012.  function to test ipa delegation-find --pkey-only
 delegation_find_negative_1035()
 {
-	rlPhaseStartTest "delegation_find_negative_1035 find with pkey-only specified, make sure Attributes does not return"
+	rlPhaseStartTest "ipa-delegation-find-negative-1035: find with pkey-only specified, make sure Attributes does not return"
 		KinitAsAdmin
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Attributes" 1 "Making sure that Attributes is not returned with --pkey-only specified"
 	rlPhaseEnd
@@ -925,7 +925,7 @@ delegation_find_negative_1035()
 # added on 3/1/2012.  function to test ipa delegation-find --pkey-only
 delegation_find_negative_1036()
 {
-	rlPhaseStartTest "delegation_find_negative_1036 find with pkey-only specified, make sure Member user group does not return"
+	rlPhaseStartTest "ipa-delegation-find-negative-1036: find with pkey-only specified, make sure Member user group does not return"
 		KinitAsAdmin
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep Member\ user\ group" 1 "Making sure that Member user group is not returned with --pkey-only specified"
 	rlPhaseEnd
@@ -934,7 +934,7 @@ delegation_find_negative_1036()
 # added on 3/1/2012.  function to test ipa delegation-find --pkey-only
 delegation_find_negative_1037()
 {
-	rlPhaseStartTest "delegation_find_negative_1037 find with pkey-only specified, make sure User group does not return"
+	rlPhaseStartTest "ipa-delegation-find-negative-1037: find with pkey-only specified, make sure User group does not return"
 		KinitAsAdmin
 		rlRun "ipa delegation-find --membergroup=mg1000 --group=gr1000 --attrs=mobile --permissions=write --pkey-only | grep User\ group" 1 "Making sure that User group is not returned with --pkey-only specified"
 	rlPhaseEnd

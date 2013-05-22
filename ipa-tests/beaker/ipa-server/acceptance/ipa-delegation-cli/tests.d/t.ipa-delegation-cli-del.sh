@@ -47,7 +47,7 @@ delegation_del_positive()
 
 delegation_del_positive_envsetup()
 {
-	rlPhaseStartTest "delegation_del_positive_envsetup "
+	rlPhaseStartSetup "delegation_del_positive_envsetup "
 		KinitAsAdmin
 		rlRun "ipa delegation-add delegation_del_positive_1001 --membergroup=admins --group=ipausers --attrs=mobile"
 	rlPhaseEnd
@@ -55,14 +55,14 @@ delegation_del_positive_envsetup()
 
 delegation_del_positive_envcleanup()
 {
-	rlPhaseStartTest "delegation_del_positive_envcleanup "
+	rlPhaseStartCleanup "delegation_del_positive_envcleanup "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
 delegation_del_positive_1001()
 {
-	rlPhaseStartTest "delegation_del_positive_1001 delete existing delegation"
+	rlPhaseStartTest "ipa-delegation-del-positive-1001: delete existing delegation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       NAME1
@@ -84,21 +84,21 @@ delegation_del_negative()
 
 delegation_del_negative_envsetup()
 {
-	rlPhaseStartTest "delegation_del_negative_envsetup "
+	rlPhaseStartSetup "delegation_del_negative_envsetup "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
 delegation_del_negative_envcleanup()
 {
-	rlPhaseStartTest "delegation_del_negative_envcleanup "
+	rlPhaseStartCleanup "delegation_del_negative_envcleanup "
 		KinitAsAdmin
 	rlPhaseEnd
 }
 
 delegation_del_negative_1001()
 {
-	rlPhaseStartTest "delegation_del_negative_1001 fail to delete non-existent delegation"
+	rlPhaseStartTest "ipa-delegation-del-negative-1001: fail to delete non-existent delegation"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 #       badname

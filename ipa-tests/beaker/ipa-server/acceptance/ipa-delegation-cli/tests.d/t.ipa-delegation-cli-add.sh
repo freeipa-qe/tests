@@ -51,7 +51,7 @@ delegation_add_positive()
 
 delegation_add_positive_envsetup()
 {
-	rlPhaseStartTest "delegation_add_positive_envsetup "
+	rlPhaseStartSetup "delegation_add_positive_envsetup "
 		KinitAsAdmin
 		for i in $(seq 1001 1005); do
 			rlRun "ipa group-add mg$i --desc=mg$i"
@@ -62,7 +62,7 @@ delegation_add_positive_envsetup()
 
 delegation_add_positive_envcleanup()
 {
-	rlPhaseStartTest "delegation_add_positive_envcleanup Cleanup add positive test settings"
+	rlPhaseStartCleanup "delegation_add_positive_envcleanup Cleanup add positive test settings"
 		KinitAsAdmin
 		for i in $(seq 1001 1005); do
 			rlRun "ipa group-del mg$i"
@@ -74,7 +74,7 @@ delegation_add_positive_envcleanup()
 
 delegation_add_positive_1001()
 {
-	rlPhaseStartTest "delegation_add_positive_1001 add with no permissions"
+	rlPhaseStartTest "ipa-delegation-add-positive-1001: add with no permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1001 --group=gr1001 --attrs=mobile"
@@ -84,7 +84,7 @@ delegation_add_positive_1001()
 
 delegation_add_positive_1002()
 {
-	rlPhaseStartTest "delegation_add_positive_1002 add with permissions write"
+	rlPhaseStartTest "ipa-delegation-add-positive-1002: add with permissions write"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1002 --group=gr1002 --attrs=mobile --permissions=write"
@@ -94,7 +94,7 @@ delegation_add_positive_1002()
 
 delegation_add_positive_1003()
 {
-	rlPhaseStartTest "delegation_add_positive_1003 add with --all"
+	rlPhaseStartTest "ipa-delegation-add-positive-1003: add with --all"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1003 --group=gr1003 --attrs=mobile --all"
@@ -104,7 +104,7 @@ delegation_add_positive_1003()
 
 delegation_add_positive_1004()
 {
-	rlPhaseStartTest "delegation_add_positive_1004 add with --raw"
+	rlPhaseStartTest "ipa-delegation-add-positive-1004: add with --raw"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1004 --group=gr1004 --attrs=mobile --raw"
@@ -114,7 +114,7 @@ delegation_add_positive_1004()
 
 delegation_add_positive_1005()
 {
-	rlPhaseStartTest "delegation_add_positive_1005 add with --all --raw"
+	rlPhaseStartTest "ipa-delegation-add-positive-1005: add with --all --raw"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1005 --group=gr1005 --attrs=mobile --all --raw"
@@ -153,7 +153,7 @@ delegation_add_negative()
 
 delegation_add_negative_envsetup()
 {
-	rlPhaseStartTest "delegation_add_negative_envsetup Setup add positive test dependencies"
+	rlPhaseStartSetup "delegation_add_negative_envsetup Setup add positive test dependencies"
 		KinitAsAdmin
 		for i in $(seq 1001 1019); do
 			rlRun "ipa group-add mg$i --desc=mg$i"
@@ -164,7 +164,7 @@ delegation_add_negative_envsetup()
 
 delegation_add_negative_envcleanup()
 {
-	rlPhaseStartTest "delegation_add_negative_envcleanup Cleanup add negative test settings"
+	rlPhaseStartCleanup "delegation_add_negative_envcleanup Cleanup add negative test settings"
 		KinitAsAdmin
 		for i in $(seq 1001 1019); do
 			rlRun "ipa group-del mg$i"
@@ -179,7 +179,7 @@ delegation_add_negative_envcleanup()
 ######## delegation-add negative membergroup tests
 delegation_add_negative_1001()
 {
-	rlPhaseStartTest "delegation_add_negative_1001 fail on add with existing name"
+	rlPhaseStartTest "ipa-delegation-add-negative-1001: fail on add with existing name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1001 --group=gr1001 --attrs=mobile"
@@ -191,7 +191,7 @@ delegation_add_negative_1001()
 
 delegation_add_negative_1002()
 {
-	rlPhaseStartTest "delegation_add_negative_1002 add with empty name"
+	rlPhaseStartTest "ipa-delegation-add-negative-1002: add with empty name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add \"\" --membergroup=mg1002 --group=gr1002 --attrs=mobile > $tmpout 2>&1" 1
@@ -202,7 +202,7 @@ delegation_add_negative_1002()
 
 delegation_add_negative_1003()
 {
-	rlPhaseStartTest "delegation_add_negative_1003 add with space for name"
+	rlPhaseStartTest "ipa-delegation-add-negative-1003: add with space for name"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add \" \" --membergroup=mg1003 --group=gr1003 --attrs=mobile > $tmpout 2>&1" 1
@@ -214,7 +214,7 @@ delegation_add_negative_1003()
 ######## delegation-add negative membergroup tests
 delegation_add_negative_1004()
 {
-	rlPhaseStartTest "delegation_add_negative_1004 add with empty membergroup"
+	rlPhaseStartTest "ipa-delegation-add-negative-1004: add with empty membergroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=\"\" --group=gr1004 --attrs=mobile > $tmpout 2>&1" 1
@@ -225,7 +225,7 @@ delegation_add_negative_1004()
 
 delegation_add_negative_1005()
 {
-	rlPhaseStartTest "delegation_add_negative_1005 add with space for membergroup"
+	rlPhaseStartTest "ipa-delegation-add-negative-1005: add with space for membergroup"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=\" \" --group=gr1005 --attrs=mobile > $tmpout 2>&1" 1
@@ -236,7 +236,7 @@ delegation_add_negative_1005()
 
 delegation_add_negative_1006() #BZ 783307 -- ipa delegation-add is not failing when membergroup does not exist
 {
-	rlPhaseStartTest "delegation_add_negative_1006 add with missing membergroup (BZ 783307)"
+	rlPhaseStartTest "ipa-delegation-add-negative-1006: add with missing membergroup bz783307"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=badgroup --group=gr1006 --attrs=mobile > $tmpout 2>&1" 2
@@ -252,7 +252,7 @@ delegation_add_negative_1006() #BZ 783307 -- ipa delegation-add is not failing w
 ######## delegation-add negative group tests
 delegation_add_negative_1007()
 {
-	rlPhaseStartTest "delegation_add_negative_1007 add with empty group"
+	rlPhaseStartTest "ipa-delegation-add-negative-1007: add with empty group"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1007 --group=\"\" --attrs=mobile > $tmpout 2>&1" 1
@@ -263,7 +263,7 @@ delegation_add_negative_1007()
 
 delegation_add_negative_1008()
 {
-	rlPhaseStartTest "delegation_add_negative_1008 add with space for group"
+	rlPhaseStartTest "ipa-delegation-add-negative-1008: add with space for group"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1008 --group=\" \" --attrs=mobile > $tmpout 2>&1" 1
@@ -274,7 +274,7 @@ delegation_add_negative_1008()
 
 delegation_add_negative_1009()
 {
-	rlPhaseStartTest "delegation_add_negative_1009 add with missing group"
+	rlPhaseStartTest "ipa-delegation-add-negative-1009: add with missing group"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1009 --group=badgroup --attrs=mobile > $tmpout 2>&1" 2
@@ -286,7 +286,7 @@ delegation_add_negative_1009()
 ######## delegation-add negative attrs tests
 delegation_add_negative_1010()
 {
-	rlPhaseStartTest "delegation_add_negative_1010 add with empty attrs"
+	rlPhaseStartTest "ipa-delegation-add-negative-1010: add with empty attrs"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1010 --group=gr1010 --attrs=\"\" > $tmpout 2>&1" 1
@@ -297,7 +297,7 @@ delegation_add_negative_1010()
 
 delegation_add_negative_1011()
 {
-	rlPhaseStartTest "delegation_add_negative_1011 add with space for attrs"
+	rlPhaseStartTest "ipa-delegation-add-negative-1011: add with space for attrs"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1011 --group=gr1011 --attrs=\" \" > $tmpout 2>&1" 1
@@ -308,7 +308,7 @@ delegation_add_negative_1011()
 
 delegation_add_negative_1012()
 {
-	rlPhaseStartTest "delegation_add_negative_1012 add with space comma for attrs"
+	rlPhaseStartTest "ipa-delegation-add-negative-1012: add with space comma for attrs"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1012 --group=gr1012 --attrs=\" ,\" > $tmpout 2>&1" 1
@@ -319,7 +319,7 @@ delegation_add_negative_1012()
 
 delegation_add_negative_1013()
 {
-	rlPhaseStartTest "delegation_add_negative_1013 add with only bad attr"
+	rlPhaseStartTest "ipa-delegation-add-negative-1013: add with only bad attr"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1013 --group=gr1013 --attrs=badattr > $tmpout 2>&1" 1
@@ -330,7 +330,7 @@ delegation_add_negative_1013()
 
 delegation_add_negative_1014()
 {
-	rlPhaseStartTest "delegation_add_negative_1014 add with one bad attr"
+	rlPhaseStartTest "ipa-delegation-add-negative-1014: add with one bad attr"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1014 --group=gr1014 --attrs=badattr,mobile > $tmpout 2>&1" 1
@@ -342,7 +342,7 @@ delegation_add_negative_1014()
 ######## delegation-add negative permissions tests
 delegation_add_negative_1015()
 {
-	rlPhaseStartTest "delegation_add_negative_1015 add with empty permissions"
+	rlPhaseStartTest "ipa-delegation-add-negative-1015: add with empty permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1015 --group=gr1015 --attrs=mobile --permissions=\"\" > $tmpout 2>&1" 1
@@ -353,7 +353,7 @@ delegation_add_negative_1015()
 
 delegation_add_negative_1016()
 {
-	rlPhaseStartTest "delegation_add_negative_1016 add with space for permissions"
+	rlPhaseStartTest "ipa-delegation-add-negative-1016: add with space for permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1016 --group=gr1016 --attrs=mobile --permissions=\" \" > $tmpout 2>&1" 1
@@ -364,7 +364,7 @@ delegation_add_negative_1016()
 
 delegation_add_negative_1017()
 {
-	rlPhaseStartTest "delegation_add_negative_1017 add with space comma for permissions"
+	rlPhaseStartTest "ipa-delegation-add-negative-1017: add with space comma for permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1017 --group=gr1017 --attrs=mobile --permissions=\" ,\" > $tmpout 2>&1" 1
@@ -375,7 +375,7 @@ delegation_add_negative_1017()
 
 delegation_add_negative_1018()
 {
-	rlPhaseStartTest "delegation_add_negative_1018 add with only invalid permissions"
+	rlPhaseStartTest "ipa-delegation-add-negative-1018: add with only invalid permissions"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1018 --group=gr1018 --attrs=mobile --permissions=badperm > $tmpout 2>&1" 1
@@ -386,7 +386,7 @@ delegation_add_negative_1018()
 
 delegation_add_negative_1019()
 {
-	rlPhaseStartTest "delegation_add_negative_1019 add with one invalid permission"
+	rlPhaseStartTest "ipa-delegation-add-negative-1019: add with one invalid permission"
 		KinitAsAdmin
 		local tmpout=$TmpDir/$FUNCNAME.$RANDOM.out
 		rlRun "ipa delegation-add $FUNCNAME --membergroup=mg1019 --group=gr1019 --attrs=mobile --permissions=badperm,write > $tmpout 2>&1" 1
