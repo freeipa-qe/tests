@@ -522,12 +522,12 @@ function irm_forcesync_neg_0007()
     case "$MYROLE" in
     MASTER_*)
         # Setup
-        rlRun "ipa-replica-manage $PWOPT del $REPLICA1"
+        rlRun "ipa-replica-manage $PWOPT del $REPLICA1 -f -c"
 
         # Test
         rlRun "ipa-replica-manage $PWOPT force-sync --from $REPLICA1 > $tmpout 2>&1" 1
         rlRun "cat $tmpout"
-        rlAssertGrep "'$MASTER' has no replication agreement for '$REPLICA1'" $tmpout
+        rlAssertGrep "Unknown host $REPLICA1" $tmpout
 
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
@@ -573,7 +573,7 @@ function irm_forcesync_neg_0008()
     case "$MYROLE" in
     MASTER_*)
         # Setup
-        rlRun "ipa-replica-manage $PWOPT del $REPLICA1"
+        rlRun "ipa-replica-manage $PWOPT del $REPLICA1 -f -c"
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR2"
