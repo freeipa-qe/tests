@@ -44,7 +44,7 @@ reset_group_pwpolicy()
     echo "set group password policy"
     echo "maxlife [$grouppw_maxlife] days, minlife [$grouppw_minlife] hours history [$grouppw_history]" 
     echo "classes [$grouppw_classes], length [$grouppw_length] priority [$grouppw_priority]"
-    del_group_pwpolicy $testgrp
+    delete_group_pwpolicy $testgrp
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
     ipa pwpolicy-add $testgrp \
@@ -81,7 +81,7 @@ reset_nestedgroup_pwpolicy()
     echo "set group password policy"
     echo "maxlife [$nestedpw_maxlife] days, minlife [$nestedpw_minlife] hours history [$nestedpw_history]" 
     echo "classes [$nestedpw_classes], length [$nestedpw_length] priority [$nestedpw_priority]"
-    del_group_pwpolicy $nestedgrp 
+    delete_group_pwpolicy $nestedgrp 
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin 
     ipa pwpolicy-add $nestedgrp\
@@ -112,21 +112,14 @@ reset_nestedgroup_pwpolicy()
     rlRun "$kdestroy"
 } # reset_group_pwpolicy
 
-del_group_pwpolicy()
+delete_group_pwpolicy()
 {
     local grp=$1
-    local out=$TmpDir/grpwpexist.$RANDOM.out
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
-    if ipa pwpolicy-find | grep -i $grp  2>&1 >/dev/null
-    then
-        rlLog "found password policy for group [$grp], now delete it"
-        ipa pwpolicy-del $grp 
-    else
-        rlLog "group password policy: [$grp] not found, do nothing"
-    fi
+    ipa pwpolicy-del $grp 
     $kdestroy
-} #del_group_pwpolicy
+} #delete_group_pwpolicy
 
 add_test_user()
 {
@@ -154,29 +147,29 @@ add_test_user()
     return $rc
 } # add_test_user
 
-del_test_user()
+delete_test_user()
 {
-    echo "[del_test_user] delete user: [$testac]"
+    echo "[delete_test_user] delete user: [$testac]"
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
     ipa user-del $testac
     $kdestroy
-} # del_test_user
+} # delete_test_user
 
 add_test_group()
 {
-    del_test_group 
+    delete_test_group 
     create_brand_new_group "$testgrp" "test group for group pwpolicy"
 } #add_test_group
 
-del_test_group()
+delete_test_group()
 {
-    del_group "$testgrp"
-} #del_test_group
+    delete_group "$testgrp"
+} #delete_test_group
 
 add_nested_test_group()
 {
-    del_group $nestedgrp # regardless if group exist, just try delete it
+    delete_group $nestedgrp # regardless if group exist, just try delete it
     create_brand_new_group "$nestedgrp" "nested test group for group pwpplicy"
 } #add_test_nestedgrp
 
@@ -193,7 +186,7 @@ create_brand_new_group(){
     fi
 } # create_brand_new_group
 
-del_group(){
+delete_group(){
     local grpname=$1
     if [ ! -z "$grpname" ];then
         rlRun "rlDistroDiff keyctl"
@@ -202,7 +195,7 @@ del_group(){
         ipa group-del $grpname
         $kdestroy
     fi
-} #del_group
+} #delete_group
 
 append_test_user_to_tesst_group()
 {
@@ -264,7 +257,7 @@ append_test_user_to_nested_test_group()
     rlRun "$kdestroy"
 } #append_test_user_to_nested_test_group
 
-remove_test_member()
+remove_test_member_from_test_group()
 {
     local out=$TmpDir/removetestmember.$RANDOM.out
     rlRun "rlDistroDiff keyctl"
@@ -277,7 +270,7 @@ remove_test_member()
         rlPass "user [$testac] is not member of [$testgrp],do nothing"
     fi
     rlRun "$kdestroy"
-} # remove_test_member
+} # remove_test_member_from_test_group
 
 kinit_aftermaxlife()
 {
@@ -581,9 +574,6 @@ get_random()
     echo -n "${l}" >> $outf 
 } #get_random
 
-#####################################################################
-#####################################################################
-#####################################################################
 minlife_default()
 {
     local maxlife=$1
@@ -695,7 +685,7 @@ minlife_lowerbound()
                     rlFail "FAIL - password change failed is not expected"
                 fi
             done
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set pre-condition for minlife lowbound test"
         fi
@@ -715,10 +705,10 @@ prepare_nestedgrp_testenv()
 
 cleanup_nestedgrp_testenv()
 {
-    del_test_user
+    delete_test_user
     delete_all_but_global_pwpolicy
-    del_group $nestedgrp
-    del_group $testgrp
+    delete_group $nestedgrp
+    delete_group $testgrp
 } #cleanup_nestedgrp_testenv
 
 delete_all_but_global_pwpolicy()

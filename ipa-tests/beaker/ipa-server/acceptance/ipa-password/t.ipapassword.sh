@@ -146,7 +146,7 @@ ipapassword_globalpolicy_check_maxlifetime_suggested_value()
         rlLog "default minlife : [$globalpw_minlife]"
         rlLog "maxlife: when reached, ipa shold prompt for password change"
         ipapassword_globalpolicy_check_maxlifetime_suggested_value_logic
-        del_test_user
+        delete_test_user
     rlPhaseEnd
 } #ipapassword_globalpolicy_check_maxlifetime_suggested_value
 
@@ -303,7 +303,7 @@ ipapassword_globalpolicy_check_minlifetime_suggested_value_logic()
             else
                 rlFail "FAIL - password change failed is not expected"
             fi
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set pre-condition"
         fi
@@ -362,7 +362,7 @@ ipapassword_globalpolicy_check_minlifetime_minimum_value_logic()
                     rlFail "FAIL - password change failed is not expected"
                 fi
             done
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set pre-condition for minlife lowbound test"
         fi
@@ -477,7 +477,7 @@ ipapassword_globalpolicy_check_history_suggested_value()
         then
             add_test_user
             ipapassword_globalpolicy_check_history_suggested_value_logic
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
@@ -569,7 +569,7 @@ ipapassword_globalpolicy_check_history_minimum_value()
         then
             add_test_user
             ipapassword_globalpolicy_check_history_minimum_value_logic
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set precondition for history test"
         fi
@@ -753,7 +753,7 @@ ipapassword_globalpolicy_check_classes_suggested_value_logic()
                     fi
                     classLevel=$((classLevel+1))
                 done
-                del_test_user
+                delete_test_user
             else
                 rlFail "FAIL - set minclasses to [$n] failed"
             fi
@@ -826,7 +826,7 @@ ipapassword_globalpolicy_check_classes_minimum_value_logic()
                     fi
                     i=$((i+1))
                 done
-                del_test_user
+                delete_test_user
             else
                 rlLog "set classes to [$temp] failed, can not continue test"
             fi
@@ -968,7 +968,7 @@ ipapassword_globalpolicy_check_length_suggested_value()
         then
             add_test_user
             ipapassword_globalpolicy_check_length_suggested_value_logic
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
@@ -1052,7 +1052,7 @@ ipapassword_globalpolicy_check_length_minimum_value()
         then
             add_test_user
             ipapassword_globalpolicy_check_length_minimum_value_logic
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set precondition for password length test"
         fi
@@ -1101,7 +1101,7 @@ ipapassword_globalpolicy_check_length_maximum_value()
         then
             add_test_user
             ipapassword_globalpolicy_check_length_maximum_value_logic
-            del_test_user
+            delete_test_user
         else
             rlFail "FAIL - can not set precondition for password length upper bound test"
         fi
@@ -1247,9 +1247,9 @@ ipapassword_grouppolicy_envcleanup()
 {
     rlPhaseStartCleanup "ipapassword_grouppolicy_envcleanup"
         #environment cleanup starts here
-        remove_test_member
-        del_test_group
-        del_test_user
+        remove_test_member_from_test_group
+        delete_test_group
+        delete_test_user
         reset_global_pwpolicy
         #environment cleanup ends   here
     rlPhaseEnd
@@ -2802,7 +2802,7 @@ ipapassword_attr_envcleanup()
 {
     rlPhaseStartCleanup "ipapassword_attr_envcleanup"
         #environment cleanup starts here
-        del_test_group
+        delete_test_group
         #environment cleanup ends   here
     rlPhaseEnd
 } #ipapassword_attr_envcleanup
