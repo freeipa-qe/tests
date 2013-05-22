@@ -92,6 +92,7 @@ ipapassword_bugzillas()
 {
     bz_818836
     bz_461332 # original ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value
+    bz_854321
 } # Tests for pwpolicy bugzillas
 
 ######################
@@ -409,24 +410,6 @@ ipapassword_globalpolicy_check_minlifetime_maximum_value_logic()
     
 } # ipapassword_globalpolicy_check_minlifetime_maximum_value_logic 
 
-# Added by mgregg 5-5-11
-# This is a test to ensure that bug https://bugzilla.redhat.com/show_bug.cgi?id=461325 and
-# https://bugzilla.redhat.com/show_bug.cgi?id=461332 are closed
-bz_461332()
-{
-	rlPhaseStartTest "Bug 461332 - ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value"
-        rlRun "rlDistroDiff keyctl"
-        Local_KinitAsAdmin
-		rlLog "attempt to set minlife greater than maxlife"
-		rlRun "ipa pwpolicy-mod --maxlife=5" 0 "set pw maxlife to 5 days"
-		rlRun "ipa pwpolicy-show | grep Max\ life | grep 5" 0 "ensure that the maxlife seems to be 5 days"
-		rlRun "ipa pwpolicy-mod --minlife=150" 1 "ensure that we are unable to set the minlife to a value over 5 days"
-		rlRun "ipa pwpolicy-mod --minlife=200" 1 "ensure that we are unable to set the minlife to a value over 5 days"
-		rlRun "ipa pwpolicy-mod --minlife=300" 1 "ensure that we are unable to set the minlife to a value over 5 days"
-		rlLog "reset global pwpolicy"
-        reset_global_pwpolicy
-	rlPhaseEnd
-}
 
 ipapassword_globalpolicy_check_minlifetime_invalid_value()
 {
@@ -3135,3 +3118,58 @@ bz_818836()
 	rlPhaseEnd
 } #bz_818836
 
+# Added by mgregg 5-5-11
+# This is a test to ensure that bug https://bugzilla.redhat.com/show_bug.cgi?id=461325 and
+# https://bugzilla.redhat.com/show_bug.cgi?id=461332 are closed
+bz_461332()
+{
+	rlPhaseStartTest "Bug 461332 - ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value"
+        rlRun "rlDistroDiff keyctl"
+        Local_KinitAsAdmin
+		rlLog "attempt to set minlife greater than maxlife"
+		rlRun "ipa pwpolicy-mod --maxlife=5" 0 "set pw maxlife to 5 days"
+		rlRun "ipa pwpolicy-show | grep Max\ life | grep 5" 0 "ensure that the maxlife seems to be 5 days"
+		rlRun "ipa pwpolicy-mod --minlife=150" 1 "ensure that we are unable to set the minlife to a value over 5 days"
+		rlRun "ipa pwpolicy-mod --minlife=200" 1 "ensure that we are unable to set the minlife to a value over 5 days"
+		rlRun "ipa pwpolicy-mod --minlife=300" 1 "ensure that we are unable to set the minlife to a value over 5 days"
+		rlLog "reset global pwpolicy"
+        reset_global_pwpolicy
+	rlPhaseEnd
+}
+
+bz_854321()
+{
+	rlPhaseStartTest "Bug 854321 - Password policies are sorted lexicographically instead of numerically"
+        rlLog "create group in expected order , check if they match expected sorting order"
+        groups="bz_854321_a00a bz_854321_0aa0 bz_854321_00aa"
+        priorities="55 56 57"
+        expectedOrderFile="/tmp/bz_854321.$RANDOM.expected.order"
+        actualOrderFile="/tmp/bz_854321.$RANDOM.actual.order"
+        Local_KinitAsAdmin
+        echo "test data: groups=[$groups]"
+        for order in 1 2 3
+        do
+            groupName=`echo $groups | cut -d" " -f $order`
+            groupPriority=`echo $priorities| cut -d" " -f $order`
+            ipa group-add $groupName --desc="set priority to $groupPriority"
+            ipa pwpolicy-add $groupName --priority=$groupPriority
+            echo " $groupName" >> $expectedOrderFile
+        done
+        show_file_content $expectedOrderFile "expected order"
+        ipa pwpolicy-find | grep "Group: bz_854321" | cut -d":" -f2 > $actualOrderFile
+        show_file_content $actualOrderFile "actual order"
+        if diff $actualOrderFile $expectedOrderFile
+        then
+            rlPass "[good] Password policy output in priority order is expected"
+        else
+            rlFail "[bad] Password policy output in unexpected order"
+        fi
+        ipa group-del $groups
+	rlPhaseEnd
+}
+
+bz_859510()
+{
+	rlPhaseStartTest "Bug 859510 - Expired IPA password changes fail if pwpolicy expiration time is changed after expiration"
+	rlPhaseEnd
+}
