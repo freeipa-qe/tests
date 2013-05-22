@@ -93,6 +93,7 @@ ipapassword_bugzillas()
     bz_818836
     bz_461332 # original ipapassword_globalpolicy_check_minlifetime_greater_maxlife_invalid_value
     bz_854321
+    bz_859510
 } # Tests for pwpolicy bugzillas
 
 ######################
