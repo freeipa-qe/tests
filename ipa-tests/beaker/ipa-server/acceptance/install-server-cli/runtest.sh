@@ -41,19 +41,17 @@
 #. ../quickinstall/install-lib.sh
 . /opt/rhqa_ipa/install-lib.sh
 
-
-PACKAGE="ipa-client"
-SERVICE="ipa_kpasswd"
-
 ##########################################
 #   test main
 #########################################
 
 rlJournalStart
-   rlPhaseStartTest "Environment Check"
+   rlPhaseStartSetup "Environment Check"
         rlLog "Creating tmp directory"
         TmpDir=`mktemp -d`
         pushd $TmpDir
+   rlPhaseEnd
+
 	echo "$MASTER" | grep "$HOSTNAME"
 	if [ $? -eq 0 ]; then
            # This machine is a master
@@ -62,7 +60,6 @@ rlJournalStart
 	else
 	   rlLog "Not a master, MASTER is $MASTER - not running tests"
 	fi
-   rlPhaseEnd
 
 rlPhaseStartCleanup "install-server-cli cleanup"
      rlRun "popd"
