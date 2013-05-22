@@ -193,7 +193,7 @@ delete_group(){
     fi
 } #delete_group
 
-append_test_user_to_tesst_group()
+append_test_user_to_test_group()
 {
     local out=$TmpDir/appendtestmember.$RANDOM.out
     rlRun "rlDistroDiff keyctl"
@@ -294,12 +294,7 @@ kinit_aftermaxlife()
     ipactl status
     echo "----------------------------------------------"
     rlRun "/usr/bin/expect $exp " 0 "[kinit_aftermaxlife] ipa server should prompt for password change when system is after maxlife"
-    rlRun "$kdestroy"
-
-    echo "====== [kinit_aftermaxlife] ipactl status after run exp file ========="
-    ipactl status
-    echo "=============================================="
-
+    $kdestroy
     rlRun "rlDistroDiff keyctl"
     rlRun "echo $newpw | kinit $username" 0 "[kinit_aftermaxlife] after password change prompt, try with the new password [$newpw]"
 } #kinit_aftermaxlife
