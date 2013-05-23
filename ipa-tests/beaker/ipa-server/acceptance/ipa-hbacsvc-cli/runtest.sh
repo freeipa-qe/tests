@@ -251,34 +251,34 @@ rlJournalStart
 
     # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
     hbacrule="svhbac"
-    rlPhaseStartTest "ipa-hbacsvc-cli-023: Positive test of hbacsvc-find using --in-hbacrule"
+    rlPhaseStartTest "ipa-hbacsvc-cli-023: Positive test of hbacsvc-find using --in-hbacrule bz801235"
 	rlRun "ipa hbacrule-add $hbacrule" 0 "Adding hbac rule for testing with user-find"
 	rlRun "ipa hbacrule-add-service --hbacsvcs=$service1 $hbacrule" 0 "Adding service service1 to hbacrule"
 	rlRun "ipa hbacsvc-find --in-hbacrule=$hbacrule | grep $service1" 0 "making sure that service 1 is returned when searching for services in the hbacrule"
     rlPhaseEnd
 
     # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
-    rlPhaseStartTest "ipa-hbacsvc-cli-024: Negative test of hbacsvc-find using --in-hbacrule"
+    rlPhaseStartTest "ipa-hbacsvc-cli-024: Negative test of hbacsvc-find using --in-hbacrule bz801235"
 	rlRun "ipa hbacsvc-find --in-hbacrule=$hbacrule | grep $service2" 1 "making sure that service 2 is not returned when searching for services in the hbacrule"
     rlPhaseEnd
 
     # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
-    rlPhaseStartTest "ipa-hbacsvc-cli-025: Positive test of hbacsvc-find using --not-in-hbacrule"
+    rlPhaseStartTest "ipa-hbacsvc-cli-025: Positive test of hbacsvc-find using --not-in-hbacrule bz801235"
 	rlRun "ipa hbacsvc-find --not-in-hbacrule=$hbacrule | grep $service2" 0 "making sure that service 2 is returned when searching for services not in the hbacrule"
     rlPhaseEnd
 
     # The following test will nor pass until https://bugzilla.redhat.com/show_bug.cgi?id=801235 is resolved
-    rlPhaseStartTest "ipa-hbacsvc-cli-026: Positive test of hbacsvc-find using --not-in-hbacrule"
+    rlPhaseStartTest "ipa-hbacsvc-cli-026: Positive test of hbacsvc-find using --not-in-hbacrule bz801235"
 	rlRun "ipa hbacsvc-find --not-in-hbacrule=$hbacrule | grep $service1" 1 "making sure that service 1 is not returned when searching for services not in the hbacrule"
     rlPhaseEnd
 
     # Verifying https://bugzilla.redhat.com/show_bug.cgi?id=896589 
-    rlPhaseStartTest "ipa-hbacsvc-cli-027: crond into the list of hbac-services in default install"
+    rlPhaseStartTest "ipa-hbacsvc-cli-027: crond into the list of hbac-services in default install bz896589"
 	rlRun "ipa hbacsvc-show crond | grep crond" 0 "crond has been added into the list of hbac-services in default install"
     rlPhaseEnd
     
     # Verifying https://bugzilla.redhat.com/show_bug.cgi?id=950018 
-    rlPhaseStartTest "ipa-hbacsvc-cli-028:  Fix of help docstring for hbacsvcgroup"
+    rlPhaseStartTest "ipa-hbacsvc-cli-028:  Fix of help docstring for hbacsvcgroup bz950018"
        
 	rlRun "ipa help hbacsvcgroup > $TmpDir/output-28.txt" 0 "help text output"
         rlRun "cat $TmpDir/output-28.txt"
