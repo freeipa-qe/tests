@@ -3486,7 +3486,7 @@ hbacsvc_client2_035() {
 
 hbacsvc_master_bug736314() {
 
-        rlPhaseStartTest "ipa-hbacsvc-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-bugzila-001: bz736314 user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 		user736314="user736314"
 		rlRun "create_ipauser $user736314 $user736314 $user736314 $userpw"
@@ -3531,7 +3531,7 @@ hbacsvc_master_bug736314_cleanup() {
 
 hbacsvc_client_bug736314() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client1-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client1-bugzilla-002: bz736314 user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
 
                 #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "rm -rf /var/lib/sss/db/*" 0 "clearing sssd cache"
@@ -3546,7 +3546,7 @@ hbacsvc_client_bug736314() {
 
 hbacsvc_client2_bug736314() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-bug736314: user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
+        rlPhaseStartTest "ipa-hbacsvc-client2-bugzilla-003: bz736314 user736314 part of rule736314 is allowed to access $MASTER from $CLIENT"
 
 #                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "rm -rf /var/lib/sss/db/*" 0 "clearing sssd cache"
@@ -3570,7 +3570,7 @@ hbacsvc_master_bug782927() {
                 sleep 5
                 export user782927=user782927
 
-        rlPhaseStartTest "ipa-hbacsvc-782927: Test --sizelimit option to hbactest"
+        rlPhaseStartTest "ipa-hbacsvc-bugzilla-004: bz782927 Test --sizelimit option to hbactest"
 
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -3615,7 +3615,7 @@ hbacsvc_master_bug772852() {
 		sleep 5
 		export user772852=user772852
 
-        rlPhaseStartTest "ipa-hbacsvc-772852: \"Unresolved rules in --rules\" error message is displayed even if the hbacrule is specified using the --rules option."
+        rlPhaseStartTest "ipa-hbacsvc-bugzilla-005: bz772852 \"Unresolved rules in --rules\" error message is displayed even if the hbacrule is specified using the --rules option."
 
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
 
@@ -3655,7 +3655,7 @@ hbacsvc_master_bug772852() {
 
 hbacsvc_master_bug766876() {
 
-        rlPhaseStartTest "ipa-hbacsvc-bug766876: [RFE] Make HBAC srchost processing optional - Case 1"
+        rlPhaseStartTest "ipa-hbacsvc-bugzilla-006: bz766876 [RFE] Make HBAC srchost processing optional - Case 1"
 	
 		rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=766876"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -3678,7 +3678,7 @@ hbacsvc_master_bug766876() {
 
 hbacsvc_client_bug766876() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client-bug766876: ipa_hbac_support_srchost is set to false - Case 1"
+        rlPhaseStartTest "ipa-hbacsvc-client-bugzilla-007: bz766876 ipa_hbac_support_srchost is set to false - Case 1"
 
                 #rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "rm -rf /var/lib/sss/db/*" 0 "clearing sssd cache"
@@ -3694,7 +3694,7 @@ hbacsvc_client_bug766876() {
 
 hbacsvc_client2_bug766876() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-bug766876: ipa_hbac_support_srchost is set to false - Case 1"
+        rlPhaseStartTest "ipa-hbacsvc-client2-bugzilla-008: bz766876 ipa_hbac_support_srchost is set to false - Case 1"
 
 #                rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
                 rlRun "rm -rf /var/lib/sss/db/*" 0 "clearing sssd cache"
@@ -3711,7 +3711,7 @@ hbacsvc_client2_bug766876() {
 
 hbacsvc_master_bug766876_2() {
 
-        rlPhaseStartTest "ipa-hbacsvc-bug766876: [RFE] Make HBAC srchost processing optional - Case 2"
+        rlPhaseStartTest "ipa-hbacsvc-bugzilla-009: bz766876 [RFE] Make HBAC srchost processing optional - Case 2"
 
                 rlLog "Verifies bug https://bugzilla.redhat.com/show_bug.cgi?id=766876"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Kinit as admin user"
@@ -3734,7 +3734,7 @@ hbacsvc_master_bug766876_2() {
 
 hbacsvc_client_bug766876_2() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client-bug766876_2: ipa_hbac_support_srchost is set to true - Case 2"
+        rlPhaseStartTest "ipa-hbacsvc-client-bugzilla-010: bz798317 ipa_hbac_support_srchost is set to true - Case 2"
 
 
 		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=798317"
@@ -3748,7 +3748,7 @@ hbacsvc_client_bug766876_2() {
 
 hbacsvc_client2_bug766876_2() {
 
-        rlPhaseStartTest "ipa-hbacsvc-client2-bug766876_2: ipa_hbac_support_srchost is set to true - Case 2"
+        rlPhaseStartTest "ipa-hbacsvc-client2-bugzilla-011: bz798317 ipa_hbac_support_srchost is set to true - Case 2"
 
 		sleep 10
                 rlRun "ssh_auth_failure user766876 testpw123@ipa.com $MASTER"
@@ -3765,7 +3765,7 @@ hbacsvc_master_bug801769() {
                 sleep 5
                 export user801769=user801769
 
-        rlPhaseStartTest "ipa-hbacsvc-801769: Bug 801769 - hbactest returns failure when hostgroups are chained"
+        rlPhaseStartTest "ipa-hbacsvc-bugzilla-012: bz801769 - hbactest returns failure when hostgroups are chained"
 
 		rlLog "Verifies https://bugzilla.redhat.com/show_bug.cgi?id=801769"
 		rlLog "Closes https://engineering.redhat.com/trac/ipa-tests/ticket/394"
@@ -3810,7 +3810,7 @@ hbacsvc_master_bug771706() {
 		export user771706=user771706	
                 export userpw=testpw123@ipa.com
 
-        rlPhaseStartTest "ipa-hbacsvc-771706: Bug 771706 - sssd_be crashes during auth when there exists empty service group or hostgroup in an hbacrule."
+        rlPhaseStartTest "ipa-hbacsvc-bugzilla-013: bz771706 sssd_be crashes during auth when there exists empty service group or hostgroup in an hbacrule."
 
 		rlLog "verifies https://bugzilla.redhat.com/show_bug.cgi?id=771706"
 		rlLog "closed https://engineering.redhat.com/trac/ipa-tests/ticket/284"
