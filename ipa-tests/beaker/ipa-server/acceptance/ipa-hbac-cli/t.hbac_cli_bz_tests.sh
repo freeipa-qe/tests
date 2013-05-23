@@ -53,7 +53,7 @@ servicegroup="remote_access"
 ########################################################################
 
 bug783286() {
-    rlPhaseStartTest "ipa bug 783286 - Setting HBAC/SUDO category to Anyone doesn't remove users/groups"
+    rlPhaseStartTest "ipa-hbac-bugzilla-001: bz783286 - Setting HBAC/SUDO category to Anyone doesn't remove users/groups"
 
         rlRun "echo Secret123 | ipa user-add $user1 --first=$user1 --last=r --password"
         rlRun "ipa group-add group1 --desc=group1"
@@ -96,7 +96,7 @@ bug783286() {
 }
 
 bug947900() {
-    rlPhaseStartTest "ipa bug 947900 - source host process support removed from IPA server"
+    rlPhaseStartTest "ipa-hbac-bugzilla-002: bz947900 - source host process support removed from IPA server"
 
         rlRun "ipa hbacrule-add bug947900"
         rlRun "ipa hbacrule-add-sourcehost abc.testrelm.com bug947900 > $TmpDir/bug947900.txt 2>&1" 1
