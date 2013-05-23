@@ -11,6 +11,10 @@ default_config_sizelimit="100"
 default_config_usersearchfields="uid,givenname,sn,telephonenumber,ou,title"
 default_config_groupsearchfields="cn,description"
 default_config_migrationmode="FALSE"
+
+
+host=`hostname`
+realm=`hostname|cut -f2-3 -d.|sed 's/\(.*\)/\U\1/'`
 ######################
 # test suite         #
 ######################
@@ -50,6 +54,8 @@ ipaconfig_mod()
     ipaconfig_mod_emaildomain_default
     ipaconfig_mod_emaildomain_negative
     ipaconfig_mod_pwdexpiration
+    ipaconfig_mod_default_pac_type_default
+    ipaconfig_mod_default_pac_type_negative
     ipaconfig_mod_envcleanup
 } #ipaconfig_mod
 
@@ -130,33 +136,65 @@ ipaconfig_show_default()
 # non-loop data : 
     rlPhaseStartTest "ipa-config-show-001: Verify Default Settings"
         rlLog "this is to test for defult behavior"
-        ipaconfig_show_default_logic
+        ipaconfig_show_default_nooption
+	ipaconfig_show_default_alloption
+	ipaconfig_show_default_rawoption
+	ipaconfig_show_default_pac_type
+	ipaconfig_show_default_pac_type_raw
     rlPhaseEnd
 } #ipaconfig_show_default
 
-ipaconfig_show_default_logic()
+ipaconfig_show_default_nooption()
 {
     # accept parameters: NONE
     # test logic starts
-        rlLog "test for --all option"
+        rlLog "test for no option"
         local out=$TmpDir/ipaconfig.show.all.$RANDOM.out
-        kinitAs $ADMINID $ADMINPW 
-        rlRun "ipa config-show --all > $out" 0 "save show --all in [$out]"
+        KinitAsAdmin
+        rlRun "ipa config-show  > $out" 0 "save show  in [$out]"
         string_exist_infile "Maximum username length:" $out
         string_exist_infile "Home directory base:" $out
         string_exist_infile "Default shell:" $out
         string_exist_infile "Default users group:" $out
-        string_exist_infile "Default e-mail domain:" $out
         string_exist_infile "Search time limit:" $out
         string_exist_infile "Search size limit:" $out
         string_exist_infile "User search fields:" $out
         string_exist_infile "Group search fields:" $out
         string_exist_infile "Enable migration mode:" $out
         string_exist_infile "Certificate Subject base:" $out
-        string_exist_infile "Password plugin features:" $out
         string_exist_infile "Password Expiration Notification (days):" $out
-        rm $out; 
+	string_exist_infile "Password plugin features:" $out
+        string_exist_infile "SELinux user map order:" $out
+        string_exist_infile "Default SELinux user:" $out
+	string_exist_infile "Default PAC types:" $out
+	rm $out;
+}
+	
+ipaconfig_show_default_alloption()
+{
+	rlLog "test for --all option"
+        local out=$TmpDir/ipaconfig.show.all.$RANDOM.out
+        rlRun "ipa config-show --all > $out" 0 "save show --all in [$out]"
+        string_exist_infile "Maximum username length:" $out
+        string_exist_infile "Home directory base:" $out
+        string_exist_infile "Default shell:" $out
+        string_exist_infile "Default users group:" $out
+        string_exist_infile "Search time limit:" $out
+        string_exist_infile "Search size limit:" $out
+        string_exist_infile "User search fields:" $out
+        string_exist_infile "Group search fields:" $out
+        string_exist_infile "Enable migration mode:" $out
+        string_exist_infile "Certificate Subject base:" $out
+	string_exist_infile "Password Expiration Notification (days):" $out
+        string_exist_infile "Password plugin features:" $out
+        string_exist_infile "SELinux user map order:" $out
+        string_exist_infile "Default SELinux user:" $out
+        string_exist_infile "Default PAC types:" $out
+	rm $out; 
+}
 
+ipaconfig_show_default_rawoption()
+{
         rlLog "test for --raw option"
         local out=$TmpDir/ipaconfig.show.raw.$RANDOM.out
         rlRun "ipa config-show --raw > $out" 0 "save show --raw in [$out]" 
@@ -170,11 +208,49 @@ ipaconfig_show_default_logic()
         string_exist_infile "ipagroupsearchfields:" $out
         string_exist_infile "ipamigrationenabled:" $out
         string_exist_infile "ipacertificatesubjectbase:" $out
-
-        clear_kticket
-        rm $out; 
+	string_exist_infile "ipapwdexpadvnotify:" $out
+        string_exist_infile "ipaconfigstring:" $out
+	string_exist_infile "ipaselinuxusermaporder:" $out
+	string_exist_infile "ipaselinuxusermapdefault:" $out
+	string_exist_infile "ipakrbauthzdata:" $out
+	rm $out;
+	clear_kticket
     # test logic ends
 } # ipaconfig_show_default_logic 
+
+ipaconfig_show_default_pac_type()
+{
+        rlLog "check default pac type"
+	KinitAsAdmin
+        expected_pac1="  Default PAC types: MS-PAC, nfs:NONE"
+	expected_pac2="  Default PAC types: nfs:NONE, MS-PAC"
+        actual_pac=`ipa config-show|grep "Default PAC types:"`
+   	if [ "$actual_pac" = "$expected_pac1" ] || [ "$actual_pac" = "$expected_pac2" ];then
+	        rlPass "default pac types shown as expected"
+        else
+                rlFail "default pac types not shown"
+        fi
+}
+
+ipaconfig_show_default_pac_type_raw()
+{
+        rlLog "check default pac type with raw option"
+        touch muliline
+	echo "  ipakrbauthzdata: MS-PAC">>multiline
+	echo "  ipakrbauthzdata: nfs:NONE">>multiline
+	expected_pac1=`cat multiline`
+	echo "  ipakrbauthzdata: nfs:NONE">multiline
+	echo "  ipakrbauthzdata: MS-PAC">>multiline
+	expected_pac2=`cat multiline`
+        rm -f multiline
+        actual_pac=`ipa config-show --raw|grep "ipakrbauthzdata:"`
+        if [ "$actual_pac" = "$expected_pac1" ] || [ "$actual_pac" = "$expected_pac2" ] ;then
+                rlPass "default pac types shown as expected"
+        else
+                rlFail "default pac types not shown"
+        fi
+        clear_kticket
+}
 
 ipaconfig_show_negative()
 {
@@ -577,7 +653,128 @@ ipaconfig_mod_emaildomain_negative_logic()
     # test logic starts
         rlPass "NO NEGATIVE TESTS"
     # test logic ends
-} # ipaconfig_mod_emaildomain_negative_logic 
+} # ipaconfig_mod_emaildomain_negative_logic
+
+ipaconfig_mod_default_pac_type_default()
+{
+
+    rlPhaseStartTest "ipa-config-mod-013: Pac Type "
+	rlLog "this is to test for defult behavior"
+	ipaconfig_mod_default_pac_type_default_nfsnone
+	ipaconfig_mod_default_pac_type_default_pad
+	ipaconfig_mod_default_pac_type_default_mspac
+	ipaconfig_mod_default_pac_type_default_removeall
+	ipaconfig_mod_default_pac_type_default_addmultiple
+    rlPhaseEnd
+}
+ 
+ipaconfig_mod_default_pac_type_default_nfsnone()
+{
+    	KinitAsAdmin
+	rlRun "ipa config-mod --pac-type=nfs:NONE" 0 "change default pac type to nfs:NONE"
+	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+	kvno host/$host@$realm
+	size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+	size3=`expr $size2 - $size1`
+	if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
+		rlPass "expected size change for credential cache"
+	else
+		rlFail "size change not in the expected range"
+	fi
+	clear_kticket
+}
+
+ipaconfig_mod_default_pac_type_default_pad()
+{
+        KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=PAD" 0 "change default pac type to nfs:NONE"
+        size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        kvno host/$host@$realm
+        size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        size3=`expr $size2 - $size1`
+        if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
+                rlPass "expected size change for credential cache"
+        else
+                rlFail "size change not in the expected range"
+        fi
+        clear_kticket
+}
+
+ipaconfig_mod_default_pac_type_default_mspac()
+{
+        KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=MS-PAC" 0 "change default pac type to nfs:NONE"
+        size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        kvno host/$host@$realm
+        size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        size3=`expr $size2 - $size1`
+        if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
+                rlPass "expected size change for credential cache"
+        else
+                rlFail "size change not in the expected range"
+        fi
+        clear_kticket
+}
+
+ipaconfig_mod_default_pac_type_default_removeall()
+{
+
+	KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=" 0 "remove default pac type"
+	rlRun "ipa config-show|grep 'Default PAC types:'" 1 "verify the default pac types are removed"
+        clear_kticket
+}
+
+ipaconfig_mod_default_pac_type_default_addmultiple()
+{
+        KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC" 0 "add mulitple default pac type"
+        clear_kticket
+}
+
+
+ipaconfig_mod_default_pac_type_negative()
+{
+    rlPhaseStartTest "ipa-config-mod-014: Pac Type negative"
+        rlLog "negative test case"
+	KinitAsAdmin
+        ipaconfig_mod_default_pac_type_negative_random
+        ipaconfig_mod_default_pac_type_negative_nfsmspac
+        ipaconfig_mod_default_pac_type_negative_nfspad
+	ipaconfig_mod_default_pac_type_negative_noinput
+	ipaconfig_mod_default_pac_type_negative_nochange
+  	clear_kticket
+ 
+     rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_negative_random()
+{
+	random=`make_8bitString`
+        rlRun "ipa config-mod --pac-type=$random" 1 "change default pac type to some random value"
+}
+
+ipaconfig_mod_default_pac_type_negative_nfsmspac()
+{
+        rlRun "ipa config-mod --pac-type=nfs:MS-PAC" 1 "change default  pac type to nonexistent nfs:MS-PAC"
+}
+
+ipaconfig_mod_default_pac_type_negative_nfspad()
+{
+        rlRun "ipa config-mod --pac-type=nfs:PAD" 1 "change default pac type to nonexistent nfs:PAD"
+}
+
+ipaconfig_mod_default_pac_type_negative_noinput()
+{
+        rlRun "ipa config-mod --pac-type" 2 "no input for pac type option"
+}
+
+ipaconfig_mod_default_pac_type_negative_nochange()
+{
+	rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC" 0 "change default pac type to nfs:NONE and MS-PAC"
+	rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC" 1 "rechange default pac type to nfs:NONE and MS-PAC"	
+}
+
 
 ipaconfig_searchlimit_envsetup()
 {
@@ -601,7 +798,7 @@ ipaconfig_searchlimit_timelimit_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-013: Searchlimit and Timelimit"
+    rlPhaseStartTest "ipa-config-mod-015: Searchlimit and Timelimit"
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
@@ -633,7 +830,7 @@ ipaconfig_searchlimit_timelimit_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-014: Searchlimit and Timelimit negative"
+    rlPhaseStartTest "ipa-config-mod-016: Searchlimit and Timelimit negative"
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
@@ -665,7 +862,7 @@ ipaconfig_searchlimit_recordslimit_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-015: Searchlimit and Recordslimit"
+    rlPhaseStartTest "ipa-config-mod-017: Searchlimit and Recordslimit"
         rlLog "this is to test for default behavior"
         KinitAsAdmin
         for value in 0 10 97 10000 100
@@ -721,7 +918,7 @@ ipaconfig_searchlimit_recordslimit_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-016: Searchlimit and Recordslimit negative"
+    rlPhaseStartTest "ipa-config-mod-018: Searchlimit and Recordslimit negative"
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.searchrecordlimit.$RANDOM.out
         KinitAsAdmin
@@ -760,7 +957,7 @@ ipaconfig_searchfields_envsetup()
 ipaconfig_ticket_2159()
 {
 	# Testcase covering https://fedorahosted.org/freeipa/ticket/2159
-	rlPhaseStartTest "ipa-config-mod-017: Exception why removing all values in config plugin bz782974"
+	rlPhaseStartTest "ipa-config-mod-019: Exception why removing all values in config plugin bz782974"
 		ipa config-mod --groupsearch= &> /opt/rhqa_ipa/2159out.txt
 		rlRun "grep Traceback  /opt/rhqa_ipa/2159out.txt" 1 "Making sure that running a empty groupsearch did not return a exception"
 	rlPhaseEnd
@@ -779,7 +976,7 @@ ipaconfig_searchfields_userfields_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-018: User Search Fields"
+    rlPhaseStartTest "ipa-config-mod-020: User Search Fields"
         rlLog "this is to test for default behavior"
         local out=$TmpDir/searchfields.userfields.$RANDOM.out
         # setup special account for this test
@@ -828,7 +1025,7 @@ ipaconfig_searchfields_userfields_negative()
 {
     # accept parameters: NONE
     # test logic starts
-    rlPhaseStartTest "ipa-config-mod-019: User Search Fields negative"
+    rlPhaseStartTest "ipa-config-mod-021: User Search Fields negative"
     # add invalid search field to default user search fields
 	rlLog "Add field bogus to user search fields"
  	ipa config-mod --usersearch="${default_config_usersearchfields},bogus"
@@ -847,7 +1044,7 @@ ipaconfig_searchfields_groupfields_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-020: Group Search Fields"
+    rlPhaseStartTest "ipa-config-mod-022: Group Search Fields"
         rlLog "this is to test for default behavior"
         local out=$TmpDir/searchfields.groupfields.$RANDOM.out
         # setup special account for this test
@@ -894,7 +1091,7 @@ ipaconfig_searchfields_groupfields_negative()
 {
     # accept parameters: NONE
     # test logic starts
-    rlPhaseStartTest "ipa-config-mod-021: Group Search Fields negative"
+    rlPhaseStartTest "ipa-config-mod-023: Group Search Fields negative"
     # add invalid search field to default group search fields
         rlLog "Add field bogus to group search fields"
         ipa config-mod --groupsearch="${default_config_groupsearchfields},bogus"
@@ -931,7 +1128,7 @@ ipaconfig_server_enablemigration()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-022: Enable Migration"
+    rlPhaseStartTest "ipa-config-mod-024: Enable Migration"
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.enablemigration.$RANDOM.out
         KinitAsAdmin
@@ -981,7 +1178,7 @@ ipaconfig_server_enablemigration_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-023: Enable Migration negative"
+    rlPhaseStartTest "ipa-config-mod-025: Enable Migration negative"
         rlLog "negative test case"
         for value in T F a -1 
         do
@@ -1002,7 +1199,7 @@ ipaconfig_server_subject()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-024: CA Subject Base"
+    rlPhaseStartTest "ipa-config-mod-026: CA Subject Base"
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.subject.$RANDOM.out
         KinitAsAdmin
@@ -1031,7 +1228,7 @@ ipaconfig_server_subject_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-025: CA Subject Base negative"
+    rlPhaseStartTest "ipa-config-mod-027: CA Subject Base negative"
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.subject.negative.$RANDOM.out
         KinitAsAdmin
