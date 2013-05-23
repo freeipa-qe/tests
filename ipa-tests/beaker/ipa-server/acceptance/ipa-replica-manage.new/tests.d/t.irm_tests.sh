@@ -41,18 +41,18 @@ irm_run()
     irm_forcesync_neg_0007 # forcesync fail, with no agreement
     irm_forcesync_neg_0008 # forcesync fail, with no agreement, remote
 
-    # irm_reinitialize_pos_0001 # reinitialize, master from replica1 [BZ#831661]
-    # irm_reinitialize_pos_0002 # reinitialize, replica2 from master, remote [BZ#831661]
-    # irm_reinitialize_pos_0003 # reinitialize, replica3 from replica2 [BZ#831661]
-    # irm_reinitialize_pos_0004 # reinitialize, replica4 from replica3, remote [BZ#831661]
-    # irm_reinitialize_neg_0001 # reinitialize fail, without --from
-    # irm_reinitialize_neg_0002 # reinitialize fail, without --from, remote
-    # irm_reinitialize_neg_0003 # reinitialize fail, from self
-    # irm_reinitialize_neg_0004 # reinitialize fail, from self, remote
-    # irm_reinitialize_neg_0005 # reinitialize fail, from non-existent replica
-    # irm_reinitialize_neg_0006 # reinitialize fail, from non-existent replica, remote
-    # irm_reinitialize_neg_0007 # reinitialize fail, with no agreement
-    # irm_reinitialize_neg_0008 # reinitialize fail, with no agreement, remote
+    irm_reinitialize_pos_0001 # reinitialize, master from replica1 [BZ#831661]
+    irm_reinitialize_pos_0002 # reinitialize, replica2 from master, remote [BZ#831661]
+    irm_reinitialize_pos_0003 # reinitialize, replica3 from replica2 [BZ#831661]
+    irm_reinitialize_pos_0004 # reinitialize, replica4 from replica3, remote [BZ#831661]
+    irm_reinitialize_neg_0001 # reinitialize fail, without --from
+    irm_reinitialize_neg_0002 # reinitialize fail, without --from, remote
+    irm_reinitialize_neg_0003 # reinitialize fail, from self
+    irm_reinitialize_neg_0004 # reinitialize fail, from self, remote
+    irm_reinitialize_neg_0005 # reinitialize fail, from non-existent replica
+    irm_reinitialize_neg_0006 # reinitialize fail, from non-existent replica, remote
+    irm_reinitialize_neg_0007 # reinitialize fail, with no agreement
+    irm_reinitialize_neg_0008 # reinitialize fail, with no agreement, remote
 
     # irm_del_pos_0001 # del, replica4
     # irm_del_pos_0002 # del, replica4, remote
