@@ -57,7 +57,7 @@ selfservice_add_envcleanup()
 
 selfservice_add_1001() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
-	rlPhaseStartTest "selfservice_add_1001 [positive test] --all"
+	rlPhaseStartTest "ipa-selfservice-add-1001: [positive test] --all"
 		local testID="selfservice_add_1001"
 		local tmpout=$TmpDir/selfservice_add_1001.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -70,7 +70,7 @@ selfservice_add_1001() ### prompts for input...not a valid non-interactive test.
 
 selfservice_add_1002()
 {
-	rlPhaseStartTest "selfservice_add_1002 [negative test] --all --attrs;negative;LIST --permissions;positive;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-add-1002: [negative test] --all --attrs;negative;LIST --permissions;positive;LIST --raw"
 		local testID="selfservice_add_1002"
 		local tmpout=$TmpDir/selfservice_add_1002.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -87,7 +87,7 @@ selfservice_add_1002()
 
 selfservice_add_1003()
 {
-	rlPhaseStartTest "selfservice_add_1003 [negative test] --all --attrs;positive;LIST --permissions;negative;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-add-1003: [negative test] --all --attrs;positive;LIST --permissions;negative;LIST --raw"
 		local testID="selfservice_add_1003"
 		local tmpout=$TmpDir/selfservice_add_1003.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -104,7 +104,7 @@ selfservice_add_1003()
 
 selfservice_add_1004() #BZ 772106 -- ipa selfservice-add --raw returns "internal error" message
 {
-	rlPhaseStartTest "selfservice_add_1004 [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-add-1004: [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw bz772106"
 		local testID="selfservice_add_1004"
 		local tmpout=$TmpDir/selfservice_add_1004.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -128,7 +128,7 @@ selfservice_add_1004() #BZ 772106 -- ipa selfservice-add --raw returns "internal
 
 selfservice_add_1005()
 {
-	rlPhaseStartTest "selfservice_add_1005 [negative test] --attrs;negative;LIST"
+	rlPhaseStartTest "ipa-selfservice-add-1005: [negative test] --attrs;negative;LIST"
 		local testID="selfservice_add_1005"
 		local tmpout=$TmpDir/selfservice_add_1005.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -144,7 +144,7 @@ selfservice_add_1005()
 
 selfservice_add_1006()
 {
-	rlPhaseStartTest "selfservice_add_1006 [positive test] --attrs;positive;LIST"
+	rlPhaseStartTest "ipa-selfservice-add-1006: [positive test] --attrs;positive;LIST"
 		local testID="selfservice_add_1006"
 		local tmpout=$TmpDir/selfservice_add_1006.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -158,7 +158,7 @@ selfservice_add_1006()
 
 selfservice_add_1007() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
-	rlPhaseStartTest "selfservice_add_1007 [negative test] --permissions;negative;LIST"
+	rlPhaseStartTest "ipa-selfservice-add-1007: [negative test] --permissions;negative;LIST"
 		local testID="selfservice_add_1007"
 		local tmpout=$TmpDir/selfservice_add_1007.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -174,7 +174,7 @@ selfservice_add_1007() ### prompts for input...not a valid non-interactive test.
 
 selfservice_add_1008() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
-	rlPhaseStartTest "selfservice_add_1008 [positive test] --permissions;positive;LIST"
+	rlPhaseStartTest "ipa-selfservice-add-1008: [positive test] --permissions;positive;LIST"
 		local testID="selfservice_add_1008"
 		local tmpout=$TmpDir/selfservice_add_1008.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -188,7 +188,7 @@ selfservice_add_1008() ### prompts for input...not a valid non-interactive test.
 
 selfservice_add_1009() ### prompts for input...not a valid non-interactive test...requires --attrs=
 {
-	rlPhaseStartTest "selfservice_add_1009 [positive test] --raw"
+	rlPhaseStartTest "ipa-selfservice-add-1009: [positive test] --raw"
 		local testID="selfservice_add_1009"
 		local tmpout=$TmpDir/selfservice_add_1009.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -236,7 +236,7 @@ selfservice_del_envcleanup()
 
 selfservice_del_1001()
 {
-	rlPhaseStartTest "selfservice_del_1001 [positive test]"
+	rlPhaseStartTest "ipa-selfservice-del-1001: [positive test]"
 		local testID="selfservice_del_1001"
 		local tmpout=$TmpDir/selfservice_find_1001.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -249,7 +249,7 @@ selfservice_del_1001()
 
 selfservice_del_1002()
 {
-	rlPhaseStartTest "selfservice_del_1002 [negative test] "
+	rlPhaseStartTest "ipa-selfservice-del-1002: [negative test] "
 		local testID="selfservice_del_1002"
 		local tmpout=$TmpDir/selfservice_del_1002.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -317,7 +317,7 @@ selfservice_find_envcleanup()
 
 selfservice_find_1001()
 {
-	rlPhaseStartTest "selfservice_find_1001 [positive test] --all"
+	rlPhaseStartTest "ipa-selfservice-find-1001: [positive test] --all"
 		local testID="selfservice_find_1001"
 		local tmpout=$TmpDir/selfservice_find_1001.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -330,7 +330,7 @@ selfservice_find_1001()
 
 selfservice_find_1002()
 {
-	rlPhaseStartTest "selfservice_find_1002 [negative test] --all --attrs;negative;LIST --name;positive;STR --permissions;positive;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-find-1002: [negative test] --all --attrs;negative;LIST --name;positive;STR --permissions;positive;LIST --raw"
 		local testID="selfservice_find_1002"
 		local tmpout=$TmpDir/selfservice_find_1002.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -350,7 +350,7 @@ selfservice_find_1002()
 
 selfservice_find_1003()
 {
-	rlPhaseStartTest "selfservice_find_1003 [negative test] --all --attrs;positive;LIST --name;negative;STR --permissions;positive;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-find-1003: [negative test] --all --attrs;positive;LIST --name;negative;STR --permissions;positive;LIST --raw"
 		local testID="selfservice_find_1003"
 		local tmpout=$TmpDir/selfservice_find_1003.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -369,7 +369,7 @@ selfservice_find_1003()
 
 selfservice_find_1004() # BZ 747693 -- ipa selfservice-find --raw returns "internal error" 
 {
-	rlPhaseStartTest "selfservice_find_1004 [negative test] --all --attrs;positive;LIST --name;positive;STR --permissions;negative;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-find-1004: [negative test] --all --attrs;positive;LIST --name;positive;STR --permissions;negative;LIST --raw bz747693"
 		local testID="selfservice_find_1004"
 		local tmpout=$TmpDir/selfservice_find_1004.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -390,7 +390,7 @@ selfservice_find_1004() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 
 selfservice_find_1005() # BZ 747693 -- ipa selfservice-find --raw returns "internal error" 
 {
-	rlPhaseStartTest "selfservice_find_1005 [positive test] --all --attrs;positive;LIST --name;positive;STR --permissions;positive;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-find-1005: [positive test] --all --attrs;positive;LIST --name;positive;STR --permissions;positive;LIST --raw bz747693"
 		local testID="selfservice_find_1005"
 		local tmpout=$TmpDir/selfservice_find_1005.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -413,7 +413,7 @@ selfservice_find_1005() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 
 selfservice_find_1006()
 {
-	rlPhaseStartTest "selfservice_find_1006 [negative test] --attrs;negative;LIST"
+	rlPhaseStartTest "ipa-selfservice-find-1006: [negative test] --attrs;negative;LIST"
 		local testID="selfservice_find_1006"
 		local tmpout=$TmpDir/selfservice_find_1006.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -432,7 +432,7 @@ selfservice_find_1006()
 
 selfservice_find_1007()
 {
-	rlPhaseStartTest "selfservice_find_1007 [positive test] --attrs;positive;LIST"
+	rlPhaseStartTest "ipa-selfservice-find-1007: [positive test] --attrs;positive;LIST"
 		local testID="selfservice_find_1007"
 		local tmpout=$TmpDir/selfservice_find_1007.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -447,7 +447,7 @@ selfservice_find_1007()
 
 selfservice_find_1008()
 {
-	rlPhaseStartTest "selfservice_find_1008 [negative test] --name;negative;STR"
+	rlPhaseStartTest "ipa-selfservice-find-1008: [negative test] --name;negative;STR"
 		local testID="selfservice_find_1008"
 		local tmpout=$TmpDir/selfservice_find_1008.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -464,7 +464,7 @@ selfservice_find_1008()
 
 selfservice_find_1009()
 {
-	rlPhaseStartTest "selfservice_find_1009 [positive test] --name;positive;STR"
+	rlPhaseStartTest "ipa-selfservice-find-1009: [positive test] --name;positive;STR"
 		local testID="selfservice_find_1009"
 		local tmpout=$TmpDir/selfservice_find_1009.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -478,7 +478,7 @@ selfservice_find_1009()
 
 selfservice_find_1010()
 {
-	rlPhaseStartTest "selfservice_find_1010 [negative test] --permissions;negative;LIST"
+	rlPhaseStartTest "ipa-selfservice-find-1010: [negative test] --permissions;negative;LIST"
 		local testID="selfservice_find_1010"
 		local tmpout=$TmpDir/selfservice_find_1010.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -494,7 +494,7 @@ selfservice_find_1010()
 
 selfservice_find_1011()
 {
-	rlPhaseStartTest "selfservice_find_1011 [positive test] --permissions;positive;LIST"
+	rlPhaseStartTest "ipa-selfservice-find-1011: [positive test] --permissions;positive;LIST"
 		local testID="selfservice_find_1011"
 		local tmpout=$TmpDir/selfservice_find_1011.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -509,7 +509,7 @@ selfservice_find_1011()
 
 selfservice_find_1012() # BZ 747693 -- ipa selfservice-find --raw returns "internal error"
 {
-	rlPhaseStartTest "selfservice_find_1012 [positive test] --raw"
+	rlPhaseStartTest "ipa-selfservice-find-1012: [positive test] --raw bz747693"
 		local testID="selfservice_find_1012"
 		local tmpout=$TmpDir/selfservice_find_1012.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -528,7 +528,7 @@ selfservice_find_1012() # BZ 747693 -- ipa selfservice-find --raw returns "inter
 
 selfservice_find_1013()
 {
-	rlPhaseStartTest "selfservice_find_1013 --pkey-only [positive test]"
+	rlPhaseStartTest "ipa-selfservice-find-1013: --pkey-only [positive test]"
                 rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
 		attrs_TestValue="telephonenumber,mobile,pager,facsimiletelephonenumber" #attrs;positive;LIST
@@ -596,7 +596,7 @@ selfservice_mod_envcleanup()
 
 selfservice_mod_1001() ### prompts for input...not a valid non-interactive test...requires --attrs= or --permissions
 {
-	rlPhaseStartTest "selfservice_mod_1001 [positive test] --all"
+	rlPhaseStartTest "ipa-selfservice-mod-1001: [positive test] --all"
 		local testID="selfservice_mod_1001"
 		local tmpout=$TmpDir/selfservice_mod_1001.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -609,7 +609,7 @@ selfservice_mod_1001() ### prompts for input...not a valid non-interactive test.
 
 selfservice_mod_1002()
 {
-	rlPhaseStartTest "selfservice_mod_1002 [negative test] --all --attrs;negative;LIST --permissions;positive;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-mod-1002: [negative test] --all --attrs;negative;LIST --permissions;positive;LIST --raw"
 		local testID="selfservice_mod_1002"
 		local tmpout=$TmpDir/selfservice_mod_1002.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -626,7 +626,7 @@ selfservice_mod_1002()
 
 selfservice_mod_1003()
 {
-	rlPhaseStartTest "selfservice_mod_1003 [negative test] --all --attrs;positive;LIST --permissions;negative;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-mod-1003: [negative test] --all --attrs;positive;LIST --permissions;negative;LIST --raw"
 		local testID="selfservice_mod_1003"
 		local tmpout=$TmpDir/selfservice_mod_1003.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -646,7 +646,7 @@ selfservice_mod_1003()
 
 selfservice_mod_1004() # BZ 772675 -- ipa selfservice-mod --raw returns "internal error" message
 {
-	rlPhaseStartTest "selfservice_mod_1004 [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw"
+	rlPhaseStartTest "ipa-selfservice-mod-1004: [positive test] --all --attrs;positive;LIST --permissions;positive;LIST --raw bz772675"
 		local testID="selfservice_mod_1004"
 		local tmpout=$TmpDir/selfservice_mod_1004.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -667,7 +667,7 @@ selfservice_mod_1004() # BZ 772675 -- ipa selfservice-mod --raw returns "interna
 
 selfservice_mod_1005() # BZ 747741 -- command: ipa selfservice-mod : provide wrong attr for --attrs delete a selfservice permission
 {
-	rlPhaseStartTest "selfservice_mod_1005 [negative test] --attrs;negative;LIST"
+	rlPhaseStartTest "ipa-selfservice-mod-1005: [negative test] --attrs;negative;LIST bz747741"
 		local testID="selfservice_mod_1005"
                 rlRun "rlDistroDiff keyctl"
 		KinitAsAdmin
@@ -686,7 +686,7 @@ selfservice_mod_1005() # BZ 747741 -- command: ipa selfservice-mod : provide wro
 
 selfservice_mod_1006()
 {
-	rlPhaseStartTest "selfservice_mod_1006 [positive test] --attrs;positive;LIST"
+	rlPhaseStartTest "ipa-selfservice-mod-1006: [positive test] --attrs;positive;LIST"
 		local testID="selfservice_mod_1006"
 		local tmpout=$TmpDir/selfservice_mod_1006.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -702,7 +702,7 @@ selfservice_mod_1006()
 
 selfservice_mod_1007() 
 {
-	rlPhaseStartTest "selfservice_mod_1007 [negative test] --permissions;negative;LIST"
+	rlPhaseStartTest "ipa-selfservice-mod-1007: [negative test] --permissions;negative;LIST"
 		local testID="selfservice_mod_1007"
 		local tmpout=$TmpDir/selfservice_mod_1007.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -721,7 +721,7 @@ selfservice_mod_1007()
 
 selfservice_mod_1008() 
 {
-	rlPhaseStartTest "selfservice_mod_1008 [positive test] --permissions;positive;LIST"
+	rlPhaseStartTest "ipa-selfservice-mod-1008: [positive test] --permissions;positive;LIST"
 		local testID="selfservice_mod_1008"
 		local tmpout=$TmpDir/selfservice_mod_1008.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -737,7 +737,7 @@ selfservice_mod_1008()
 
 selfservice_mod_1009() ### prompts for input...not a valid non-interactive test...requires --attrs= or --permissions
 {
-	rlPhaseStartTest "selfservice_mod_1009 [positive test] --raw"
+	rlPhaseStartTest "ipa-selfservice-mod-1009: [positive test] --raw"
 		local testID="selfservice_mod_1009"
 		local tmpout=$TmpDir/selfservice_mod_1009.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -792,7 +792,7 @@ selfservice_show_envcleanup()
 
 selfservice_show_1001()
 {
-	rlPhaseStartTest "selfservice_show_1001 [positive test] --all"
+	rlPhaseStartTest "ipa-selfservice-show-1001: [positive test] --all"
 		local testID="selfservice_show_1001"
 		local tmpout=$TmpDir/selfservice_show_1001.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -805,7 +805,7 @@ selfservice_show_1001()
 
 selfservice_show_1002()
 {
-	rlPhaseStartTest "selfservice_show_1002 [positive test] --all --raw"
+	rlPhaseStartTest "ipa-selfservice-show-1002: [positive test] --all --raw"
 		local testID="selfservice_show_1002"
 		local tmpout=$TmpDir/selfservice_show_1002.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
@@ -818,7 +818,7 @@ selfservice_show_1002()
 
 selfservice_show_1003()
 {
-	rlPhaseStartTest "selfservice_show_1003 [positive test] --raw"
+	rlPhaseStartTest "ipa-selfservice-show-1003: [positive test] --raw"
 		local testID="selfservice_show_1003"
 		local tmpout=$TmpDir/selfservice_show_1003.$RANDOM.out
                 rlRun "rlDistroDiff keyctl"
