@@ -51,7 +51,7 @@ FEDLIST="freeipa-admintools freeipa-client httpd mod_nss mod_auth_kerb 389-ds-ba
 #   test main 
 #########################################
 rlJournalStart
-  rlPhaseStartTest "Machine environment check"
+  rlPhaseStartSetup "Machine environment check"
 
         #####################################################################
         #               IS THIS MACHINE A CLIENT?                           #

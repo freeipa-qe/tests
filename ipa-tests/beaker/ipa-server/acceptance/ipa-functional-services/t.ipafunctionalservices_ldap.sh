@@ -42,12 +42,6 @@ ldap_testsetup()
     setup_ldap
 }
 
-#ldap_testcleanup()
-#{
-#    cleanup_ldap
-#    cleanup_ipa_ldap
-#}
-
 ipafunctionalservices_ldap()
 {
     ldap_tests
@@ -64,7 +58,7 @@ revoke_ldapcert()
 
 setup_ipa_ldap()
 {
-	rlPhaseStartTest "SETUP IPA server - LDAP"
+	rlPhaseStartSetup "SETUP IPA server - LDAP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 # create a test ldap user
                 rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER echo 123passworD | ipa user-add --first=ldapuser1 --last=ldapuser1 --password ldapuser1" 0 "Creating a test ldap user"
@@ -106,7 +100,7 @@ setup_ipa_ldap()
 
 setup_ldap()
 {
-	rlPhaseStartTest "SETUP LDAP server"
+	rlPhaseStartSetup "SETUP LDAP server"
 		cd /etc/dirsrv
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		rlRun "ipa-getkeytab -s $MASTER -k $LDAPKEYTAB -p $LDAPPRINC" 0 "Get keytab for this host's ldap service"
@@ -295,7 +289,7 @@ EOF
 ldap_tests()
 {
 
-        rlPhaseStartTest "Check master ldap configuration"
+        rlPhaseStartTest "ipa-functionalservices-ldap-000: Check master ldap configuration"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
                 minssf=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b "cn=config" | grep nsslapd-minssf:`
                 rlLog "Master minssf configuration: $minssf"
@@ -303,7 +297,7 @@ ldap_tests()
                 rlLog "Master anonymous access configuration: $anonaccess"
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-001 Access LDAP service with valid credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-001: Access LDAP service with valid credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
 		klist
 		klist -ekt $LDAPKEYTAB
@@ -311,7 +305,7 @@ ldap_tests()
 		rlRun "ldapsearch -d1 -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
 	rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-002 Access LDAP service with out credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-002: Access LDAP service with out credentials"
         
         rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -h $HOSTNAME -p $LDAPPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
@@ -324,13 +318,13 @@ ldap_tests()
 		fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-003 Access LDAPS service with credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-003: Access LDAPS service with credentials"
 		rlRun "kinitAs ldapuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b  \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn"
                 rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn" 0 "Verify ldapsearch with valid credentials"
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-004 Access LDAPS service without credentials"
+	rlPhaseStartTest "ipa-functionalservices-ldap-004: Access LDAPS service without credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"ou=people,$BASEDN\" \"(uid=*)\" dn"
                 rlRun "ldapsearch -H ldaps://$HOSTNAME:$LDAPSPORT -Y GSSAPI -s sub -b \"uid=ldapuser1,$BASEDN\" \"(uid=*)\" dn > /tmp/ldapsearch_008.out 2>&1" 254 "Verify ldapsearch with valid credentials"
@@ -342,7 +336,7 @@ ldap_tests()
                 fi
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-ldap-005 LDAPS simple bind"
+	rlPhaseStartTest "ipa-functionalservices-ldap-005: LDAPS simple bind"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\""
                 rlRun "ldapsearch -x -H ldaps://$HOSTNAME:$LDAPSPORT -D \"cn=Directory Manager\" -w $ADMINPW -b \"o=sasl.com\"" 0 "Verify ldapsearch SSL Simple Bind"
@@ -351,7 +345,7 @@ ldap_tests()
 
 revoke_cert()
 {
-        rlPhaseStartTest "ipa-functionalservices-ldap-006 Revoke certificate"
+        rlPhaseStartTest "ipa-functionalservices-ldap-006: Revoke certificate"
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		# revoke the HTTP server's certificate - first need the certificate's serial number
                 rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-show --all $LDAPPRINC > /tmp/certout.txt"
@@ -367,24 +361,3 @@ revoke_cert()
         rlPhaseEnd
 }
 
-#cleanup_ldap()
-#{
-#	rlPhaseStartTest "CLEANUP LDAP Server"
-#		rlRun "semanage port -d -t ldap_port_t -p tcp $LDAPSPORT" 0 "Semanage - remove LDAP SSL port"
-#		rlRun "/usr/sbin/remove-ds.pl -i SLAPD-instance1" 0 "Removing directory server instance"
-#	rlPhaseEnd
-#}
-
-#cleanup_ipa_ldap()
-#{
-#	rlPhaseStartTest "CLEANUP IPA Server - LDAP"
-#		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-#		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER ipa user-del ldapuser1" 0 "Delete the ldap test user"
-#		rlRun "ipa-rmkeytab -p $LDAPPRINC -k $LDAPKEYTAB" 0 "removing http keytab"
-#		rlRun "rm -rf $LDAPKEYTAB" 0 "removing ldap keytab file"
-#		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-del $LDAPPRINC" 0 "Remove the LDAP service for this client host"
-		# restore ldap configuration file
- #               cp -f /etc/openldap/ldap.conf.orig /etc/openldap/ldap.conf
-#		rm -rf /etc/openldap/ldap.conf.orig
-#	rlPhaseEnd
-#}

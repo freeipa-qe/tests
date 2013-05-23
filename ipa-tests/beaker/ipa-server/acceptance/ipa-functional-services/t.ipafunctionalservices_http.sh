@@ -25,15 +25,7 @@ http_testsetup()
 ipafunctionalservices_http()
 {
     http_tests
-    cleanup_http
-    cleanup_ipa_http
 } 
-
-#http_testcleanup()
-#{
-#    cleanup_http
-#    cleanup_ipa_http
-#}
 
 disable_httpservice()
 {
@@ -46,7 +38,7 @@ disable_httpservice()
 
 setup_ipa_http()
 {
-	rlPhaseStartTest "SETUP IPA server - HTTP"
+	rlPhaseStartSetup "SETUP IPA server - HTTP"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"	
 		# create a test http user
 		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER echo 123passworD | ipa user-add --first=httpuser1 --last=httpuser1 --password httpuser1 " 0 "Creating a test http user"
@@ -88,7 +80,7 @@ setup_ipa_http()
 
 setup_http()
 {
-	rlPhaseStartTest "SETUP HTTP server"
+	rlPhaseStartSetup "SETUP HTTP server"
 		service httpd stop
 		rlLog "Setting up $HTTPKRBCFG  ..............."
 		rm -rf $HTTPKRBCFG
@@ -161,7 +153,7 @@ setup_http()
 http_tests()
 {
 
-	rlPhaseStartTest "Check master ldap configuration"
+	rlPhaseStartTest "ipa-functionalservices-http-000: Check master ldap configuration"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		minssf=`ldapsearch -h $MASTER -p 389 -Y GSSAPI -b "cn=config" | grep nsslapd-minssf:`
 		rlLog "Master minssf configuration: $minssf"
@@ -169,7 +161,7 @@ http_tests()
 		rlLog "Master anonymous access configuration: $anonaccess"
 	rlPhaseEnd
 
-        rlPhaseStartTest "ipa-functionalservices-http-001 Access HTTP service with valid credentials"
+        rlPhaseStartTest "ipa-functionalservices-http-001: Access HTTP service with valid credentials"
                 rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: curl -v --negotiate -u: http://$HOSTNAME/ipatest/"
                 curl -v --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_001.out 2>&1
@@ -183,7 +175,7 @@ http_tests()
                 fi
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-functionalservices-http-002 Access HTTP service with out credentials"
+        rlPhaseStartTest "ipa-functionalservices-http-002: Access HTTP service with out credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: curl -v --negotiate -u: http://$HOSTNAME/ipatest/"
                 curl -v --negotiate -u: http://$HOSTNAME/ipatest/ > /tmp/curl_002.out 2>&1
@@ -192,7 +184,7 @@ http_tests()
 		rlAssertGrep "401 Authorization Required" "/tmp/curl_002.out"
         rlPhaseEnd
 
-	rlPhaseStartTest "ipa-functionalservices-http-003 Access HTTPS service with valid credentials"
+	rlPhaseStartTest "ipa-functionalservices-http-003: Access HTTPS service with valid credentials"
                 rlRun "kinitAs httpuser1 Secret123" 0 "kinit as user to get valid credentials"
                 rlLog "Executing: curl -v --negotiate --cacert \"/etc/ipa/ca.crt\" -u: https://${HOSTNAME}:8443/ipatest/"
                 curl -v --negotiate --cacert "/etc/ipa/ca.crt" -u: https://${HOSTNAME}:8443/ipatest/ > /tmp/curl_003.out 2>&1
@@ -201,7 +193,7 @@ http_tests()
                 rlAssertGrep "404 Not Found" "/tmp/curl_003.out"
         rlPhaseEnd
 
-        rlPhaseStartTest "ipa-functionalservices-http-004 Access HTTPS service with out credentials"
+        rlPhaseStartTest "ipa-functionalservices-http-004: Access HTTPS service with out credentials"
                 rlRun "kdestroy" 0 "destroy kerberos credentials"
                 rlLog "Executing: curl -v --negotiate --cacert \"/etc/ipa/ca.crt\" -u: https://${HOSTNAME}:8443/ipatest/"
                 curl -v --negotiate --cacert "/etc/ipa/ca.crt" -u: https://${HOSTNAME}:8443/ipatest/ > /tmp/curl_004.out 2>&1
@@ -214,7 +206,7 @@ http_tests()
 
 disable_service()
 {
-	rlPhaseStartTest "ipa-functionalservices-http-005 Disable Service"
+	rlPhaseStartTest "ipa-functionalservices-http-005: Disable Service"
 		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-disable $HTTPPRINC > /tmp/disable_service.out 2>&1" 0 "Disable HTTP service for this client host"
 		sftp admin@$MASTER:/tmp/disable_service.out /tmp/disable_service.out
@@ -235,39 +227,5 @@ disable_service()
 	rlPhaseEnd
 }
 
-#cleanup_http()
-#{
-#	rlPhaseStartTest "CLEANUP HTTP Server"
-#		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-#		cd /etc/httpd/alias/
-		# remove cert files
-#		rm -rf $HOSTNAME.csr ca.crt $HOSTNAME.crt
-
-		# remove the certificates from the web server's database
-#		cd /etc/httpd/alias/
-#		rlRun "certutil -d . -D -n $HOSTNAME" 0 "Remove $HOSTNAME certificate from web server certificate database."
-#		rlRun "certutil -d . -D -n \"IPA CA\"" 0 "Remove IPA CA certificate from web server certificate database."	
-
-		# delete the krb config file
-#		rlRun "rm -rf $HTTPKRBCFG" 0 "Delete the KRB config file"
-
-		# restore nss.conf
-#		cp -f /etc/httpd/conf.d/nss.conf.orig /etc/httpd/conf.d/nss.conf
-#		rlRun "service httpd restart" 0 "Restarting apache server"
-#	rlPhaseEnd
-#}
-
-#cleanup_ipa_http()
-#{
-#	rlPhaseStartTest "CLEANUP IPA Server - HTTP"
-#		rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
-#		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER ipa user-del httpuser1" 0 "Delete the http test user"
-#		rlRun "service httpd stop" 0 "stopping apache server"
-#		rlRun "ipa-rmkeytab -p $HTTPPRINC -k $HTTPKEYTAB" 0 "removing http keytab"
-		# delete keytab file
-#                rlRun "rm -rf $HTTPKEYTAB" 0 "Delete the HTTP keytab file"
-#		rlRun "ssh -o GSSAPIAuthentication=yes -o GSSAPIDelegateCredentials=yes -o StrictHostKeyChecking=no admin@$MASTER ipa service-del $HTTPPRINC" 0 "Remove the HTTP service for this client host"
-#	rlPhaseEnd
-#}
 	
 
