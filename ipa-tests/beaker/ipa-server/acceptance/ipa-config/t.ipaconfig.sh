@@ -146,8 +146,6 @@ ipaconfig_show_default()
 
 ipaconfig_show_default_nooption()
 {
-    # accept parameters: NONE
-    # test logic starts
         rlLog "test for no option"
         local out=$TmpDir/ipaconfig.show.all.$RANDOM.out
         KinitAsAdmin
@@ -215,8 +213,7 @@ ipaconfig_show_default_rawoption()
 	string_exist_infile "ipakrbauthzdata:" $out
 	rm $out;
 	clear_kticket
-    # test logic ends
-} # ipaconfig_show_default_logic 
+}  
 
 ipaconfig_show_default_pac_type()
 {
