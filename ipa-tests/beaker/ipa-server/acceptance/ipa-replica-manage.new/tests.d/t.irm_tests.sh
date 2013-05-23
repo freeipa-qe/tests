@@ -21,25 +21,25 @@ irm_run()
     irm_disconnect_neg_0005 # disconnect fail, after already disconnected
     irm_disconnect_neg_0006 # disconnect fail, after already disconnected, remote
 
-    # irm_connect_pos_0001 # connect, replica1 to replica4
-    # irm_connect_pos_0002 # connect, replica1 to replica4, remote
-    # irm_connect_neg_0001 # connect fail, existing agreement
-    # irm_connect_neg_0002 # connect fail, existing agreement, remote
+    irm_connect_pos_0001 # connect, replica1 to replica4
+    irm_connect_pos_0002 # connect, replica1 to replica4, remote
+    irm_connect_neg_0001 # connect fail, existing agreement
+    irm_connect_neg_0002 # connect fail, existing agreement, remote
 
-    # irm_forcesync_pos_0001 # forcesync, master from replica1
-    # irm_forcesync_pos_0002 # forcesync, master from replica1, remote
-    # irm_forcesync_pos_0003 # forcesync, replica2 from replica3
-    # irm_forcesync_pos_0004 # forcesync, replica2 from replica3, remote
-    # irm_forcesync_pos_0005 # forcesync, replica3 from replica4
-    # irm_forcesync_pos_0006 # forcesync, replica3 from replica4, remote
-    # irm_forcesync_neg_0001 # forcesync fail, without --from
-    # irm_forcesync_neg_0002 # forcesync fail, without --from, remote
-    # irm_forcesync_neg_0003 # forcesync fail, from self
-    # irm_forcesync_neg_0004 # forcesync fail, from self, remote
-    # irm_forcesync_neg_0005 # forcesync fail, from non-existent replica
-    # irm_forcesync_neg_0006 # forcesync fail, from non-existent replica, remote
-    # irm_forcesync_neg_0007 # forcesync fail, with no agreement
-    # irm_forcesync_neg_0008 # forcesync fail, with no agreement, remote
+    irm_forcesync_pos_0001 # forcesync, master from replica1
+    irm_forcesync_pos_0002 # forcesync, master from replica1, remote
+    irm_forcesync_pos_0003 # forcesync, replica2 from replica3
+    irm_forcesync_pos_0004 # forcesync, replica2 from replica3, remote
+    irm_forcesync_pos_0005 # forcesync, replica3 from replica4
+    irm_forcesync_pos_0006 # forcesync, replica3 from replica4, remote
+    irm_forcesync_neg_0001 # forcesync fail, without --from
+    irm_forcesync_neg_0002 # forcesync fail, without --from, remote
+    irm_forcesync_neg_0003 # forcesync fail, from self
+    irm_forcesync_neg_0004 # forcesync fail, from self, remote
+    irm_forcesync_neg_0005 # forcesync fail, from non-existent replica
+    irm_forcesync_neg_0006 # forcesync fail, from non-existent replica, remote
+    irm_forcesync_neg_0007 # forcesync fail, with no agreement
+    irm_forcesync_neg_0008 # forcesync fail, with no agreement, remote
 
     # irm_reinitialize_pos_0001 # reinitialize, master from replica1 [BZ#831661]
     # irm_reinitialize_pos_0002 # reinitialize, replica2 from master, remote [BZ#831661]
