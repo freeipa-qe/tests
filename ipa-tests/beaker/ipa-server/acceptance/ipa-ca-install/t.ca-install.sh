@@ -182,6 +182,7 @@ installCA()
 
    rlPhaseStartTest "Installing CA Replica with --no-host-dns option"
 
+	rlRun "service ipa status"
 	rlRun "mv /etc/hosts /var/tmp/"
 	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/hosts
 
