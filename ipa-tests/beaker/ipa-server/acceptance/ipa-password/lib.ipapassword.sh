@@ -1,5 +1,6 @@
-#######################################
-# lib.ipapassword test
+# lib.ipapassword test required by t.ipapassword.sh
+# by yzhang@redhat.com
+
 offset_system_time()
 {
 #offset system time with given string
@@ -35,8 +36,7 @@ reset_global_pwpolicy()
                      --minclasses=$globalpw_classes \
                      --minlength=$globalpw_length 
     echo "reset finished"
-    rlRun "$kdestroy"
-} #reset_pwpolicy_to_default
+} #reset_pwpolicy_to
 
 reset_group_pwpolicy()
 {
@@ -70,7 +70,6 @@ reset_group_pwpolicy()
         rlFail "FAIL - group pwpolicy set failed"
         show_file_content $out
     fi
-    rlRun "$kdestroy"
 } # reset_group_pwpolicy
 
 reset_nestedgroup_pwpolicy()
@@ -100,12 +99,11 @@ reset_nestedgroup_pwpolicy()
       && [ $history = $nestedpw_history ] && [ $classes = $nestedpw_classes ] \
       && [ $length = $nestedpw_length ] && [ $priority = $nestedpw_priority ]
     then
-        rlPass "group pwpolicy has been set"
+        rlPass "group pwpolicy has been reset"
     else
-        rlFail "FAIL - group pwpolicy set failed"
+        rlFail "FAIL - group pwpolicy reset failed"
         show_file_content $out
     fi
-    rlRun "$kdestroy"
 } # reset_group_pwpolicy
 
 delete_group_pwpolicy()
@@ -131,15 +129,12 @@ add_test_user()
     Local_KinitAsAdmin
     ipa user-del $testac
     echo "[add_test_user] set up test account with inital pw: [$initialpw]"
-	ipa user-add $testac\
-    	--first $testacFirst\
-        --last  $testacLast\
+	ipa user-add $testac --first $testacFirst --last  $testacLast
     # set test account password 
     echo "[add_test_user] set initialpw [$initialpw] then change to [$password], by calling FirstKinitAs"
     rlRun "rlDistroDiff keyctl"
     Local_FirstKinitAs $testac $initialpw $password
     rc=$?    
-    rlRun "$kdestroy"
     return $rc
 } # add_test_user
 
@@ -176,7 +171,6 @@ create_brand_new_group(){
         rlRun "rlDistroDiff keyctl"
         Local_KinitAsAdmin
         rlRun "ipa group-add $grpname --desc \"$desc\"" 0 "create group [$grpname], desc=[$desc]"
-        rlRun "$kdestroy"
     else
         rlFail "FAIL - no group name is given, fail to create group"
     fi
@@ -206,7 +200,6 @@ append_test_user_to_test_group()
         rlLog "add user [$user] as member of group [$testgrp]: ipa group-add-member $testgrp --users=$testac"
         rlRun "ipa group-add-member $testgrp --users=$testac"
     fi
-    rlRun "$kdestroy"
 }
 
 append_nested_test_group_to_test_group()
@@ -221,7 +214,6 @@ append_nested_test_group_to_test_group()
     else
         rlRun "ipa group-add-member --groups=$nestedgrp $testgrp"\
               0 "add group [$nestedgrp] as member of [$testgrp]"
-        rlRun "$kdestroy"
     fi
 } # append_nested_test_group_to_test_group
 
@@ -250,7 +242,6 @@ append_test_user_to_nested_test_group()
         rlRun "ipa group-add-member $nestedgrp --users=$testac"\
               0 "add [$testac] as member of [$nestedgrp]"
     fi
-    rlRun "$kdestroy"
 } #append_test_user_to_nested_test_group
 
 remove_test_member_from_test_group()
@@ -265,7 +256,6 @@ remove_test_member_from_test_group()
     else
         rlPass "user [$testac] is not member of [$testgrp],do nothing"
     fi
-    rlRun "$kdestroy"
 } # remove_test_member_from_test_group
 
 kinit_aftermaxlife()
@@ -288,7 +278,6 @@ kinit_aftermaxlife()
     echo 'expect "Enter it again: "' >> $exp
     echo "send -s -- $newpw\r" >> $exp
     echo 'expect eof' >> $exp
-    rlRun "$kdestroy"
     show_file_content  $exp "[kinit_aftermaxlife] exp file"
     echo "----------- ipactl status -------------------"
     ipactl status
@@ -368,7 +357,7 @@ Local_KinitAsAdmin()
             if [ $? = 1 ];then
                 rlFail "FAIL - [Local_KinitAsAdmin] reset password back to original [$pw] failed"
             fi
-            ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes           
+            ipa pwpolicy-mod --maxfail=0 --failinterval=0 --lockouttime=0 --minlife=$min --history=$history --minclasses=$classes
             rlPass "[Local_KinitAsAdmin] set admin password back to [$pw] success -- after set to temp"
         elif grep "Password incorrect while getting initial credentials" $out 2>&1 >/dev/null
         then
@@ -392,8 +381,6 @@ change_password()
     local exp=$TmpDir/changepassword.$RANDOM.exp
     local ret
     echo "[change_password] change password for user: [$userlogin] [$currentpw] --> [$newpw]"
-    #rlRun "echo \"$currentpw\" | kinit $userlogin" \
-    #      0 "current pw [$currentpw] has to work before we continue"
     if klist | grep -i "Default principal: $userlogin" 2>&1 >/dev/null
     then
         echo "[change_password] found kerberos for user [$userlogin], test continue"
@@ -429,7 +416,6 @@ change_password()
     fi
     show_file_content $exp
     show_file_content $out
-
     return $ret
 } #change_password
 
@@ -467,22 +453,6 @@ generate_password()
     else 
         selectedclasses="lowerl upperl digit special eightbits"
     fi
-        
-#    while [ $i -lt $classes ]
-#    do
-#        number=$RANDOM
-#        let "number %= 5"
-#        number=$((number+1)) #get random number in [1,2,3,4,5]
-#        field=`echo $allclasses | cut -d" " -f$number`
-#        #echo "num[$number],field=[$field]"
-#        if  echo $selectedclasses| grep $field 2>&1 >/dev/null
-#        then
-#            continue
-#        else
-#            selectedclasses="$selectedclasses $field"
-#            i=$((i+1))
-#        fi
-#    done
     # up to here, we might have: selectedclasses= lowerl upperl special
     i=$classes
     field="" #this is just a symble reuse, it has no relation with previous value
@@ -495,7 +465,6 @@ generate_password()
         i=$((i+1))
     done
     # up to here, we might have: selectedclasses= lowerl upperl special lowerl upperl
-    #echo "selectedclasses=[$selectedclasses]"
     # it is possible length<class, in this case we have to fulfill length requirement
     i=0
     for class in $selectedclasses
@@ -702,7 +671,6 @@ delete_all_but_global_pwpolicy()
     local list=""
     rlRun "rlDistroDiff keyctl"
     Local_KinitAsAdmin
-    #ipa pwpolicy-find | grep -i "group" | grep -v -i "GLOBAL" > $out <<< might trigger error
     ipa pwpolicy-find | grep -i "group" | grep -v -i "global_policy" > $out
     show_file_content $out "output of pwpolicy-find"
     for line in `cat $out`; do
@@ -727,7 +695,6 @@ delete_all_but_global_pwpolicy()
     else
         rlFail "FAIL - expect [$total] password policy, deleted [$i]"
     fi
-    rlRun "$kdestroy"
 } # delete_all_but_global_pwpolicy
 
 getrandomstring()
@@ -808,7 +775,6 @@ check_log_error(){
     local logfile=$2
     local msg=$3
     echo "****** check log error #$serial **********"
-    #if sudo tail -n3 /var/log/dirsrv/slapd-YZHANG-REDHAT-COM/errors | grep "file ipapwd_common.c" 
     if sudo tail -n30 $logfile | grep "$msg"
     then
         echo "*  logfile: [$logfile]"
@@ -837,7 +803,7 @@ Local_FirstKinitAs()
 	echo "expect \"Enter New Password again to verify: \"" >> $expfile
 	echo "send -s -- $password\r" >> $expfile
 	echo "expect eof" >> $expfile
-        rlRun "rlDistroDiff keyctl"
+    rlRun "rlDistroDiff keyctl"
 	Local_KinitAsAdmin
     echo ""
 	echo "---- assign initial password [$password] to [$username] as admin -------"
