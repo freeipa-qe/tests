@@ -54,12 +54,19 @@ irm_run()
     irm_reinitialize_neg_0007 # reinitialize fail, with no agreement
     irm_reinitialize_neg_0008 # reinitialize fail, with no agreement, remote
 
-    # irm_del_pos_0001 # del, replica4
-    # irm_del_pos_0002 # del, replica4, remote
-    # irm_del_neg_0001 # del fail, with disconnected agreement
-    # irm_del_neg_0002 # del fail, with disconnected agreement, remote
-    # irm_del_neg_0003 # del fail, already deleted agreement [BZ#754524]
-    # irm_del_neg_0004 # del fail, already deleted agreement, remote [BZ#754524]
-    # irm_del_neg_0005 # del fail, non-existent replica
-    # irm_del_neg_0006 # del fail, non-existent replica, remote
+    irm_del_pos_0001 # del, replica4
+    irm_del_pos_0002 # del, replica4, remote
+    irm_del_neg_0001 # del fail, with disconnected agreement
+    irm_del_neg_0002 # del fail, with disconnected agreement, remote
+    irm_del_neg_0003 # del fail, already deleted agreement [BZ#754524]
+    irm_del_neg_0004 # del fail, already deleted agreement, remote [BZ#754524]
+    irm_del_neg_0005 # del fail, non-existent replica
+    irm_del_neg_0006 # del fail, non-existent replica, remote
+
+    irm_func_0001 # list open ended environment
+    irm_func_0002 # connect replica1 and replic4
+    irm_func_0003 # disconnect replica2 and replica3
+    irm_func_0004 # connect replica2 and replica3, remote
+    irm_func_0005 # disconnect replica1 and replica4, remote
+
 }
