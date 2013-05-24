@@ -237,8 +237,12 @@ echo 'expect eof ' >> $expfile
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
         rlRun "/bin/bash /opt/rhqa_ipa/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
 
+        rlRun "cat /var/log/ipareplica-ca-install.log" 0 "ipa replica CA debug log"
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 
+	if [ -f /var/log/ipareplica-ca-install.log ]; then
+		rhts-submit-log -l /var/log/ipareplica-ca-install.log
+	fi
 
 	sleep 5
 	rlRun "service ipa status"
