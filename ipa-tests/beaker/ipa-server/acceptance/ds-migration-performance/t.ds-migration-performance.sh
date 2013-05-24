@@ -22,10 +22,18 @@ setup()
                 rlRun "kinitAs $ADMINID $ADMINPW" 0 "Get administrator credentials"
 
 		# turn up the memory cache size
-		service dirsrv stop
+                if [ "$FLAVOR" == "Fedora" ] ; then
+                 rlRun "systemctl stop dirsrv.target" 0 "Restarting directory server for ssl changes"
+                else
+                 rlRun "service dirsrv stop" 0 "Restarting directory server for ssl changes"
+                fi
 		cp /etc/dirsrv/slapd-$IPAINSTANCE/dse.ldif /tmp/dse.ldif
 		cat /tmp/dse.ldif | sed 's/10485760/20971520/g' > /etc/dirsrv/slapd-$IPAINSTANCE/dse.ldif
-		service dirsrv start
+                if [ "$FLAVOR" == "Fedora" ] ; then
+                 rlRun "systemctl start dirsrv.target" 0 "Restarting directory server for ssl changes"
+                else
+                 rlRun "service dirsrv start" 0 "Restarting directory server for ssl changes"
+                fi
 		cat /etc/dirsrv/slapd-$IPAINSTANCE/dse.ldif | grep 20971520
 
                 rlRun "ipa config-mod --enable-migration=TRUE" 0 "Set migration mode to TRUE"
