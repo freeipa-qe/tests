@@ -321,3 +321,22 @@ Trust_ID() {
 	  }" >> $expfile
 	fi
 }
+
+IPA_Variables() {
+        # Defining some variables post ipa-adtrust-install      
+	ipa_values=(`$ipacmd idrange-show $IPA_range | awk '{print $NF}'`)
+	lbase_id=`echo ${ipa_values[1]}`
+	lrange_size=`echo ${ipa_values[2]}`
+	lrid_base=`echo ${ipa_values[3]}`
+	lsecrid_base=`echo ${ipa_values[4]}`
+}
+
+AD_Variables() {
+        ad_values=(`$ipacmd idrange-show $AD_range | awk '{print $NF}'`)
+        adbase_id=`echo ${ad_values[1]}`
+        adrange_size=`echo ${ad_values[2]}`
+        adrid=`echo ${ad_values[3]}`
+        AD_SID=`echo ${ad_values[4]}`
+        New_adbase_id=$((adbase_id + adrange_size))
+        New_adrid=$((adrid + adrange_size))
+}
