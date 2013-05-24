@@ -65,8 +65,8 @@ rlJournalStart
     rlPhaseEnd
 
     # r2d2_test_starts
-    rlRun "set > $TmpDir/outfileset.txt" 0 "set"
-    rlRun "env > $TmpDir/outfileenv.txt" 0 "env"
+    set > $TmpDir/outfileset.txt
+    env > $TmpDir/outfileenv.txt
     ipa_sessions_cli
     # r2d2_test_ends
 
@@ -75,6 +75,8 @@ rlJournalStart
 #        rlRun "rm -r $TmpDir" 0 "Removing tmp directory"
     rlPhaseEnd
 
-    makereport
-rlJournalEnd
- 
+   rlJournalPrintText
+   report=$TmpDir/rhts.report.$RANDOM.txt
+   makereport $report
+   rhts-submit-log -l $report
+rlJournalEnd 
