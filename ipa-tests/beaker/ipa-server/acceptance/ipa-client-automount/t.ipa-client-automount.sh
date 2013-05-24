@@ -59,28 +59,28 @@ clientautomount_script_install_and_uninstall()
 
 install_without_user_interruption()
 {
-    rlPhaseStartTest "install without user interruption"
+    rlPhaseStartTest "ipa-client-automount-001: install without user interruption"
         rlPass "this scenario will be covered by test set: clientautomount_script_install_option_combinations, there is no need to test here"
     rlPhaseEnd
 }
 
 install_with_user_interruption()
 {
-    rlPhaseStartTest "negative test user interrupt installation"
+    rlPhaseStartTest "ipa-client-automount-002: negative test user interrupt installation"
         rlPass "test case is not ready, this might end up be a manual test cases"
     rlPhaseEnd
 }
 
 install_while_communication_blocked()
 {
-    rlPhaseStartTest "negative test ports blocked while install"
+    rlPhaseStartTest "ipa-client-automount-003: negative test ports blocked while install"
         rlPass "test case is not ready, this might end up be a manual test cases"
     rlPhaseEnd
 }
 
 install_then_uninstall()
 {
-    rlPhaseStartTest "install then uninstall"
+    rlPhaseStartTest "ipa-client-automount-004: install then uninstall"
         clean_up_automount_installation
         # install
         ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U
@@ -93,7 +93,7 @@ install_then_uninstall()
 
 reinstall_after_uninstall_use_same_ipa_server_and_automount_location()
 {
-    rlPhaseStartTest "reinstall after uninstall, use same ipa server and automount location"
+    rlPhaseStartTest "ipa-client-automount-005: reinstall after uninstall, use same ipa server and automount location"
         clean_up_automount_installation
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U" 
         check_autofs_sssd_configuration "configured"
@@ -108,7 +108,7 @@ reinstall_after_uninstall_use_same_ipa_server_and_automount_location()
 
 reinstall_after_uninstall_use_different_ipa_server_and_automount_location()
 {
-    rlPhaseStartTest "reinstall after uninstall, use different ipa server, use same automount location"
+    rlPhaseStartTest "ipa-client-automount-006: reinstall after uninstall, use different ipa server, use same automount location"
         clean_up_automount_installation
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U" 
         check_autofs_sssd_configuration "configured"
@@ -124,7 +124,7 @@ reinstall_after_uninstall_use_different_ipa_server_and_automount_location()
 
 reinstall_without_uninstall_use_same_ipa_server_and_automount_location()
 {
-    rlPhaseStartTest "reinstall without uninstall first, use same ipa server and automount location"
+    rlPhaseStartTest "ipa-client-automount-007: reinstall without uninstall first, use same ipa server and automount location"
         clean_up_automount_installation
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U" 
         check_autofs_sssd_configuration "configured"
@@ -134,7 +134,7 @@ reinstall_without_uninstall_use_same_ipa_server_and_automount_location()
 
 reinstall_without_uninstall_use_different_ipa_server_and_automount_location()
 {
-    rlPhaseStartTest "reinstall without uninstall first, use different ipa server and automount location"
+    rlPhaseStartTest "ipa-client-automount-008: reinstall without uninstall first, use different ipa server and automount location"
         clean_up_automount_installation
         currentIPAServer=$ipaServerMaster
         currentLocation=$automountLocationA
@@ -148,7 +148,7 @@ reinstall_without_uninstall_use_different_ipa_server_and_automount_location()
 
 repeat_install_uninstall_end_with_uninstall_use_same_ipa_server_and_automount_location()
 {
-    rlPhaseStartTest "repeated install and uninstall, last action=Uninstall, use same set of ipa server and automount location"
+    rlPhaseStartTest "ipa-client-automount-009: repeated install and uninstall, last action=Uninstall, use same set of ipa server and automount location"
         clean_up_automount_installation
         currentIPAServer=$ipaServerMaster
         currentLocation=$automountLocationA
@@ -166,7 +166,7 @@ repeat_install_uninstall_end_with_uninstall_use_same_ipa_server_and_automount_lo
 
 repeat_install_uninstall_end_with_install_use_same_ipa_server_and_automount_location()
 {
-    rlPhaseStartTest "repeated install and uninstall, last action=Install, use same ipa server server and automount location"
+    rlPhaseStartTest "ipa-client-automount-010: repeated install and uninstall, last action=Install, use same ipa server server and automount location"
         clean_up_automount_installation
         local counter=0
         while [ $counter -lt 2 ];do
@@ -183,7 +183,7 @@ repeat_install_uninstall_end_with_install_use_same_ipa_server_and_automount_loca
 
 repeat_install_uninstall_end_with_uninstall_use_different_ipa_server_same_automount_location()
 {
-    rlPhaseStartTest "repeated install and uninstall, last action=Uninstall, use different ipa server, use same automount location"
+    rlPhaseStartTest "ipa-client-automount-011: repeated install and uninstall, last action=Uninstall, use different ipa server, use same automount location"
         clean_up_automount_installation
         local counter=0
         currentIPAServer=$ipaServerMaster
@@ -205,7 +205,7 @@ repeat_install_uninstall_end_with_uninstall_use_different_ipa_server_same_automo
 
 repeat_install_uninstall_end_with_uninstall_use_same_ipa_server_different_automount_location()
 {
-    rlPhaseStartTest "repeated install and uninstall, last action=Uninstall, use same ipa server, use different automount location"
+    rlPhaseStartTest "ipa-client-automount-012: repeated install and uninstall, last action=Uninstall, use same ipa server, use different automount location"
         clean_up_automount_installation
         local counter=0
         currentLocation=$automountLocationA
@@ -227,7 +227,7 @@ repeat_install_uninstall_end_with_uninstall_use_same_ipa_server_different_automo
 
 repeat_install_uninstall_end_with_install_use_different_ipa_server_same_automount_location()
 {
-    rlPhaseStartTest "repeated install and uninstall, last action=Install, use same ipa server, use same automount location"
+    rlPhaseStartTest "ipa-client-automount-013: repeated install and uninstall, last action=Install, use same ipa server, use same automount location"
         clean_up_automount_installation
         local counter=0
         currentIPAServer=$ipaServerMaster
@@ -247,7 +247,7 @@ repeat_install_uninstall_end_with_install_use_different_ipa_server_same_automoun
 
 repeat_install_uninstall_end_with_install_use_same_ipa_server_different_automount_location()
 {
-    rlPhaseStartTest "repeated install and uninstall, last action=Install, use same ipa server, use different automount location"
+    rlPhaseStartTest "ipa-client-automount-014: repeated install and uninstall, last action=Install, use same ipa server, use different automount location"
         clean_up_automount_installation
         currentLocation=$automountLocationA
         local counter=0
@@ -296,28 +296,28 @@ clientautomount_script_install_option_combinations()
 
 install_as_non_root()
 {
-    rlPhaseStartTest "negative test install as non-root user"
+    rlPhaseStartTest "ipa-client-automount-015: negative test install as non-root user"
         rlPass "test case is not ready, this might end up be a manual test cases"
     rlPhaseEnd
 }
 
 install_with_no_option_used()
 {
-    rlPhaseStartTest "simple install, no option used (use DNS _SRV_ auto-discovery)"
+    rlPhaseStartTest "ipa-client-automount-016: simple install, no option used (use DNS _SRV_ auto-discovery)"
         rlPass "test case is not ready, this might end up be a manual test cases"
     rlPhaseEnd
 }
 
 install__no_sssd()
 {
-    rlPhaseStartTest "install with --no-sssd option, no other option used, (use DNS _SRV_ auto-discovery"
+    rlPhaseStartTest "ipa-client-automount-017: install with --no-sssd option, no other option used, (use DNS _SRV_ auto-discovery"
         rlPass "test case is not ready, this might end up be a manual test cases"
     rlPhaseEnd
 }
 
 install_option__help()
 {
-    rlPhaseStartTest "install option, check --help or -h , help message"
+    rlPhaseStartTest "ipa-client-automount-018: install option, check --help or -h , help message"
         clean_up_automount_installation
         local temp=$TmpDir/helpmsg.$RANDOM.txt
         # check option --help
@@ -343,7 +343,7 @@ install_option__help()
 
 install_option__server_valid()
 {
-    rlPhaseStartTest "install option single, --server <valid ipa server>"
+    rlPhaseStartTest "ipa-client-automount-019: install option single, --server <valid ipa server>"
         clean_up_automount_installation
         currentLocation="default"
         rlRun "ipa-client-automount --server=$currentIPAServer -U" 0 "install should success as valid ipa server used"
@@ -353,7 +353,7 @@ install_option__server_valid()
 
 install_option__server_invalid()
 {
-    rlPhaseStartTest "negative test install option, --server <invalid ipa server>"
+    rlPhaseStartTest "ipa-client-automount-020: negative test install option, --server <invalid ipa server>"
         clean_up_automount_installation
         currentLocation="default"
         local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
@@ -364,7 +364,7 @@ install_option__server_invalid()
 
 install_option__location_valid()
 {
-    rlPhaseStartTest "install option single, --location <valid automount location>"
+    rlPhaseStartTest "ipa-client-automount-021: install option single, --location <valid automount location>"
         clean_up_automount_installation
         rlRun "ipa-client-automount --location=$currentLocation -U" 0 "install should success as valid location used"
         check_autofs_sssd_configuration "configured"
@@ -373,7 +373,7 @@ install_option__location_valid()
 
 install_option__location_invalid()
 {
-    rlPhaseStartTest "negative test install option single, --location <invalid automount location>"
+    rlPhaseStartTest "ipa-client-automount-022: negative test install option single, --location <invalid automount location>"
         clean_up_automount_installation
         local invalidLocation="invalid_Automount_Location_$RANDOM"
         rlRun "ipa-client-automount --location=$invalidLocation -U" 1 "install should ail as invalid location used"
@@ -383,7 +383,7 @@ install_option__location_invalid()
 
 install_option__server_valid__location_valid()
 {
-    rlPhaseStartTest "install option combined, --server <valid> --location <valid>"
+    rlPhaseStartTest "ipa-client-automount-023: install option combined, --server <valid> --location <valid>"
         clean_up_automount_installation
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U"
         check_autofs_sssd_configuration "configured"
@@ -393,7 +393,7 @@ install_option__server_valid__location_valid()
 install_option__server_valid__location_invalid()
 {
     clean_up_automount_installation
-    rlPhaseStartTest "install option combined, --server <valid> --location <invalid>"
+    rlPhaseStartTest "ipa-client-automount-024: install option combined, --server <valid> --location <invalid>"
         local invalidLocation="invalid_Automount_Location_$RANDOM"
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$invalidLocation -U" 1 "invalid location used, install should fail"
         check_autofs_sssd_configuration "not_configured"
@@ -402,7 +402,7 @@ install_option__server_valid__location_invalid()
 
 install_option__server_invalid__location_valid()
 {
-    rlPhaseStartTest "negative test install option combined, --server <invalid> --location <valid>"
+    rlPhaseStartTest "ipa-client-automount-025: negative test install option combined, --server <invalid> --location <valid>"
         clean_up_automount_installation
         local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
         rlRun "ipa-client-automount --server=$invalidIPAServer --location=$currentLocation -U" 1 "install should fail as invalid ipa server used"
@@ -412,7 +412,7 @@ install_option__server_invalid__location_valid()
 
 install_option__server_invalid__location_invalid()
 {
-    rlPhaseStartTest "negative test install option combined, --server <invalid> --location <invalid>"
+    rlPhaseStartTest "ipa-client-automount-026: negative test install option combined, --server <invalid> --location <invalid>"
         clean_up_automount_installation
         local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
         local invalidLocation="invalid_Automount_Location_$RANDOM"
@@ -423,7 +423,7 @@ install_option__server_invalid__location_invalid()
 
 install_option__server_valid__location_valid__unattended()
 {
-    rlPhaseStartTest "install option combined, --server <valid> --location <valid> --U (unattended)"
+    rlPhaseStartTest "ipa-client-automount-027: install option combined, --server <valid> --location <valid> --U (unattended)"
         clean_up_automount_installation
         rlRun "ipa-client-automount --server=$currentIPAServer --location=$currentLocation -U"
         check_autofs_sssd_configuration "configured"
@@ -432,7 +432,7 @@ install_option__server_valid__location_valid__unattended()
 
 install_option__server_valid__no_sssd()
 {
-    rlPhaseStartTest "install option, --no-sssd + --server <valid>"
+    rlPhaseStartTest "ipa-client-automount-028: install option, --no-sssd + --server <valid>"
         clean_up_automount_installation
         currentLocation="default"
         rlRun "ipa-client-automount --no-sssd --server=$currentIPAServer -U"
@@ -444,7 +444,7 @@ install_option__server_valid__no_sssd()
 
 install_option__location_valid__no_sssd()
 {
-    rlPhaseStartTest "install option, --no-sssd + --location <valid>"
+    rlPhaseStartTest "ipa-client-automount-029: install option, --no-sssd + --location <valid>"
         clean_up_automount_installation
         rlRun "ipa-client-automount --no-sssd --location=$currentLocation -U"
         LDAP_URI="LDAP_URI=ldap:///${suffix}"
@@ -455,7 +455,7 @@ install_option__location_valid__no_sssd()
 
 install_option__server_valid__location_valid__no_sssd()
 {
-    rlPhaseStartTest "install option, --no-sssd + --server <valid> --location <valid>"
+    rlPhaseStartTest "ipa-client-automount-030: install option, --no-sssd + --server <valid> --location <valid>"
         clean_up_automount_installation
         rlRun "ipa-client-automount --no-sssd --server=$currentIPAServer --location=$currentLocation -U"
         LDAP_URI="LDAP_URI=ldap://${currentIPAServer}"
@@ -466,7 +466,7 @@ install_option__server_valid__location_valid__no_sssd()
 
 install_option__server_invalid__location_invalid__no_sssd()
 {
-    rlPhaseStartTest "negative test install option, --no-sssd + --server <invalid> --location <invalid>"
+    rlPhaseStartTest "ipa-client-automount-031: negative test install option, --no-sssd + --server <invalid> --location <invalid>"
         clean_up_automount_installation
         local invalidIPAServer="invalid.$RANDOM.ipa.server.com"
         local invalidLocation="invalid_Automount_Location_$RANDOM"
@@ -504,7 +504,7 @@ setup_testing_environment()
 {
     local serverEnv=$1
     local nfsConfiguration=$2
-    rlPhaseStartTest "autofs functional test env setup, [$serverEnv] - [$nfsConfiguration]"
+    rlPhaseStartSetup "autofs functional test env setup, [$serverEnv] - [$nfsConfiguration]"
         echo "::::::: configuration: server [$serverEnv], nfs [$nfsConfiguration] :::::::"
         setup_server $serverEnv
         setup_nfs $nfsConfiguration
@@ -586,7 +586,7 @@ basic_autofs_functional_test()
 
 test_direct_map()
 {
-    rlPhaseStartTest "autofs functional test direct map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
+    rlPhaseStartTest "ipa-client-automount-032: autofs functional test direct map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Direct_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
         autofsTopDir="/ipashare_${RANDOM}"
@@ -606,7 +606,7 @@ test_direct_map()
 
 test_indirect_map()
 {
-    rlPhaseStartTest "autofs functional test indirect map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
+    rlPhaseStartTest "ipa-client-automount-033: autofs functional test indirect map with sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
         autofsTopDir="/ipashare_${RANDOM}"
@@ -627,7 +627,7 @@ test_indirect_map()
 
 test_indirect_map_using_wildcard()
 {
-    rlPhaseStartTest "autofs functional test add indirect map using wild card and with sssd[$current_serverEnv] + [$current_nfsConfiguration]"
+    rlPhaseStartTest "ipa-client-automount-034: autofs functional test add indirect map using wild card and with sssd[$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_use_sssd_${RANDOM}"
         currentLocation=$automounLocation
         autofsTopDir="/ipashare_${RANDOM}"
@@ -646,7 +646,7 @@ test_indirect_map_using_wildcard()
 
 test_direct_map_use_no_sssd()
 {
-    rlPhaseStartTest "autofs functional test direct map use no sssed [$current_serverEnv] + [$current_nfsConfiguration]"
+    rlPhaseStartTest "ipa-client-automount-035: autofs functional test direct map use no sssed [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Direct_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
         autofsTopDir="/ipashare_${RANDOM}"
@@ -665,7 +665,7 @@ test_direct_map_use_no_sssd()
 
 test_indirect_map_use_no_sssd()
 {
-    rlPhaseStartTest "autofs functional test indirect map use no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
+    rlPhaseStartTest "ipa-client-automount-036: autofs functional test indirect map use no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
         autofsTopDir="/ipashare_${RANDOM}"
@@ -685,7 +685,7 @@ test_indirect_map_use_no_sssd()
 
 test_indirect_map_using_wildcard_use_no_sssd()
 {
-    rlPhaseStartTest "autofs functional test add indirect map using wild card and no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
+    rlPhaseStartTest "ipa-client-automount-037: autofs functional test add indirect map using wild card and no sssd [$current_serverEnv] + [$current_nfsConfiguration]"
         local automounLocation="Indirect_no_sssd_${RANDOM}"
         currentLocation=$automounLocation
         autofsTopDir="/ipashare_${RANDOM}"
@@ -742,7 +742,7 @@ clientautomount_autofs_functional_test_offline()
 
 test_direct_map_offline()
 {
-    rlPhaseStartTest "autofs functional test offline -- direct map"
+    rlPhaseStartTest "ipa-client-automount-038: autofs functional test offline -- direct map"
         local automounLocation="direct_map_${RANDOM}"
         currentLocation=$automounLocation
 
@@ -781,7 +781,7 @@ test_direct_map_offline()
 
 test_indirect_map_offline()
 {
-    rlPhaseStartTest "autofs functional test offline -- indirect map"
+    rlPhaseStartTest "ipa-client-automount-039: autofs functional test offline -- indirect map"
         local automounLocation="indirect_map_${RANDOM}"
         currentLocation=$automounLocation
      
@@ -825,7 +825,7 @@ test_indirect_map_offline()
 
 test_indirect_map_using_wildcard_offline()
 {
-    rlPhaseStartTest "autofs functional test offline -- indirect map with wildcard"
+    rlPhaseStartTest "ipa-client-automount-040: autofs functional test offline -- indirect map with wildcard"
         local automounLocation="indirect_map_wildcard_${RANDOM}"
         currentLocation=$automounLocation
      
