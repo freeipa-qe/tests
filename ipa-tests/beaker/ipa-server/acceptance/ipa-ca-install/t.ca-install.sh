@@ -227,6 +227,8 @@ echo 'expect eof ' >> $expfile
 
 	rlRun "nslookup $MASTER"
 	rlRun "nslookup $SLAVE"
+	rlRun "service ipa restart"
+	rlRun "service ipa status"
 	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=757681"
