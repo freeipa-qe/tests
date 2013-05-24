@@ -20,7 +20,7 @@ realm=`hostname|cut -f2-3 -d.|sed 's/\(.*\)/\U\1/'`
 ######################
 ipaconfig()
 {
-    ipaconfig_envsetup
+#    ipaconfig_envsetup
     ipaconfig_show
     ipaconfig_mod
     ipaconfig_searchlimit
@@ -219,10 +219,11 @@ ipaconfig_show_default_pac_type()
 {
         rlLog "check default pac type"
 	KinitAsAdmin
-        expected_pac1="  Default PAC types: MS-PAC, nfs:NONE"
-	expected_pac2="  Default PAC types: nfs:NONE, MS-PAC"
+        expected_pac1="Default PAC types: MS-PAC, nfs:NONE"
+	expected_pac2="Default PAC types: nfs:NONE, MS-PAC"
         actual_pac=`ipa config-show|grep "Default PAC types:"`
-   	if [ "$actual_pac" = "$expected_pac1" ] || [ "$actual_pac" = "$expected_pac2" ];then
+	actual_pac_nospace=`echo "$actual_pac"|sed -e 's/^[ \t]*//'`
+	if [ "$actual_pac_nospace" = "$expected_pac1" ] || [ "$actual_pac_nospace" = "$expected_pac2" ];then
 	        rlPass "default pac types shown as expected"
         else
                 rlFail "default pac types not shown"
@@ -233,15 +234,16 @@ ipaconfig_show_default_pac_type_raw()
 {
         rlLog "check default pac type with raw option"
         touch muliline
-	echo "  ipakrbauthzdata: MS-PAC">>multiline
-	echo "  ipakrbauthzdata: nfs:NONE">>multiline
+	echo "ipakrbauthzdata: MS-PAC">>multiline
+	echo "ipakrbauthzdata: nfs:NONE">>multiline
 	expected_pac1=`cat multiline`
-	echo "  ipakrbauthzdata: nfs:NONE">multiline
-	echo "  ipakrbauthzdata: MS-PAC">>multiline
+	echo "ipakrbauthzdata: nfs:NONE">multiline
+	echo "ipakrbauthzdata: MS-PAC">>multiline
 	expected_pac2=`cat multiline`
         rm -f multiline
         actual_pac=`ipa config-show --raw|grep "ipakrbauthzdata:"`
-        if [ "$actual_pac" = "$expected_pac1" ] || [ "$actual_pac" = "$expected_pac2" ] ;then
+	actual_pac_nospace=`echo "$actual_pac"|sed -e 's/^[ \t]*//'`
+	if [ "$actual_pac_nospace" = "$expected_pac1" ] || [ "$actual_pac_nospace" = "$expected_pac2" ] ;then
                 rlPass "default pac types shown as expected"
         else
                 rlFail "default pac types not shown"
@@ -287,7 +289,7 @@ ipaconfig_mod_pwdexpiration()
             sleep 2
             value=`ipa config-show | grep "Password Expiration Notification" | cut -d ":" -f 2`
 	    # trim white space
-	    value=`echo $value`
+	
 	    if [ $value -ne $item ] ; then
 		rlFail "Password Exipration Notification not as expected.  GOT: $value  Expected: $item"
 	    else
@@ -669,6 +671,8 @@ ipaconfig_mod_default_pac_type_default_nfsnone()
 {
     	KinitAsAdmin
 	rlRun "ipa config-mod --pac-type=nfs:NONE" 0 "change default pac type to nfs:NONE"
+	initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+	FirstKinitAs testuser $initpassword "Secret123"
 	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
 	kvno host/$host@$realm
 	size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
@@ -678,6 +682,8 @@ ipaconfig_mod_default_pac_type_default_nfsnone()
 	else
 		rlFail "size change not in the expected range"
 	fi
+	KinitAsAdmin
+	rlRun "ipa user-del testuser" 0 "delete the test user"
 	clear_kticket
 }
 
@@ -685,7 +691,9 @@ ipaconfig_mod_default_pac_type_default_pad()
 {
         KinitAsAdmin
         rlRun "ipa config-mod --pac-type=PAD" 0 "change default pac type to nfs:NONE"
-        size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+        FirstKinitAs testuser $initpassword "Secret123"
+	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
         kvno host/$host@$realm
         size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
         size3=`expr $size2 - $size1`
@@ -694,6 +702,8 @@ ipaconfig_mod_default_pac_type_default_pad()
         else
                 rlFail "size change not in the expected range"
         fi
+	KinitAsAdmin
+	rlRun "ipa user-del testuser" 0 "delete the test user"
         clear_kticket
 }
 
@@ -701,7 +711,9 @@ ipaconfig_mod_default_pac_type_default_mspac()
 {
         KinitAsAdmin
         rlRun "ipa config-mod --pac-type=MS-PAC" 0 "change default pac type to nfs:NONE"
-        size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+        FirstKinitAs testuser $initpassword "Secret123"
+	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
         kvno host/$host@$realm
         size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
         size3=`expr $size2 - $size1`
@@ -710,6 +722,8 @@ ipaconfig_mod_default_pac_type_default_mspac()
         else
                 rlFail "size change not in the expected range"
         fi
+	KinitAsAdmin
+	rlRun "ipa user-del testuser" 0 "delete the test user"
         clear_kticket
 }
 
@@ -725,7 +739,7 @@ ipaconfig_mod_default_pac_type_default_removeall()
 ipaconfig_mod_default_pac_type_default_addmultiple()
 {
         KinitAsAdmin
-        rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC" 0 "add mulitple default pac type"
+        rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=PAD" 0 "add mulitple default pac type"
         clear_kticket
 }
 
