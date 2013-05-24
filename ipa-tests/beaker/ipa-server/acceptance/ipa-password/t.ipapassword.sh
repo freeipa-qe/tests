@@ -2751,7 +2751,7 @@ bz_859510()
         local maxLife_1=1
         local maxLife_2=10
         local offset=$maxLife_1
-        ipa pwpolicy-add $testgrp --maxlife=$maxLife_1
+        ipa pwpolicy-add $testgrp --maxlife=$maxLife_1 --priority=35
         offset_system_time "+ $offset * 24 * 3600" # at this point, user password should expired
         ipa pwpolicy-mod $testgrp --maxlife=$maxLife_2
         kinit_aftermaxlife $testac $testacPW $testacNEWPW
@@ -2771,7 +2771,7 @@ bz_891977()
         local maxLife_small=1
         local maxLife_big=9999 # the data 9999 is coming from bug report
         local offset=$maxLife_small
-        ipa pwpolicy-add $testgrp --maxlife=$maxLife_small
+        ipa pwpolicy-add $testgrp --maxlife=$maxLife_small --priority=36
         offset_system_time "+ $offset * 24 * 3600" # at this point, user password should expired
         ipa pwpolicy-mod $testgrp --maxlife=$maxLife_big
         kinit_aftermaxlife $testac $testacPW $testacNEWPW
