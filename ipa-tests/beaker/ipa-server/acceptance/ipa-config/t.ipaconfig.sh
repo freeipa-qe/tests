@@ -20,7 +20,7 @@ realm=`hostname|cut -f2-3 -d.|sed 's/\(.*\)/\U\1/'`
 ######################
 ipaconfig()
 {
-#    ipaconfig_envsetup
+    ipaconfig_envsetup
     ipaconfig_show
     ipaconfig_mod
     ipaconfig_searchlimit
