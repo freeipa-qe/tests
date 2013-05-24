@@ -75,7 +75,7 @@ ipa_ssh_user_func_envsetup()
 	TESTUSER="sshuser1"
 	TESTUSERPW="passw0rd1"
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_envsetup - Setup environment for IPA User Functional tests"
+	rlPhaseStartSetup "ipa_ssh_user_func_envsetup - Setup environment for IPA User Functional tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
 		fi
@@ -144,7 +144,7 @@ ipa_ssh_user_func_0001()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0001 - User creates and uploads own keys"
+	rlPhaseStartTest "ipa_ssh_user_func_0001: User creates and uploads own keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -175,7 +175,7 @@ ipa_ssh_user_func_0002()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0002 - User ssh to host with keys"
+	rlPhaseStartTest "ipa_ssh_user_func_0002: User ssh to host with keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -206,7 +206,7 @@ ipa_ssh_user_func_0003()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0003 - User deletes own key(s)"
+	rlPhaseStartTest "ipa_ssh_user_func_0003: User deletes own key(s)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -241,7 +241,7 @@ ipa_ssh_user_func_0004()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0004 - Admin revokes/removes keys uploaded by user"
+	rlPhaseStartTest "ipa_ssh_user_func_0004: Admin revokes/removes keys uploaded by user"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -270,7 +270,7 @@ ipa_ssh_user_func_0005()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0005 - User creates key with passphrase and ssh to host"
+	rlPhaseStartTest "ipa_ssh_user_func_0005: User creates key with passphrase and ssh to host"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -308,7 +308,7 @@ ipa_ssh_user_func_0006()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0006 - user runs user-mod to upload keys after user-disable"
+	rlPhaseStartTest "ipa_ssh_user_func_0006: user runs user-mod to upload keys after user-disable"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -336,7 +336,7 @@ ipa_ssh_user_func_0007()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0007 - user attempts to ssh with keys after user-disbable"
+	rlPhaseStartTest "ipa_ssh_user_func_0007: user attempts to ssh with keys after user-disbable"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -364,7 +364,7 @@ ipa_ssh_user_func_0008()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0008 - user runs user-mod to upload keys after user account locked"
+	rlPhaseStartTest "ipa_ssh_user_func_0008: user runs user-mod to upload keys after user account locked"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -392,7 +392,7 @@ ipa_ssh_user_func_0009()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_user_func_0009 - user attempts to ssh with keys after user account locked"
+	rlPhaseStartTest "ipa_ssh_user_func_0009: user attempts to ssh with keys after user account locked"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"

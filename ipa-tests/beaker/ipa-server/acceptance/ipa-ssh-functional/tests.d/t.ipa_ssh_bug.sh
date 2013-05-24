@@ -48,7 +48,7 @@
 ipa_ssh_bug_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	rlPhaseStartTest "ipa_ssh_bug_envsetup - Setup environment for IPA Bug Tests"
+	rlPhaseStartSetup "ipa_ssh_bug_envsetup - Setup environment for IPA Bug Tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
 		fi
@@ -106,7 +106,7 @@ ipa_ssh_bug_bz799928()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_bug_bz799928 - Hash the hostname/port information in the known_hosts file."
+	rlPhaseStartTest "ipa_ssh_bug_0001: bz799928 Hash the hostname/port information in the known_hosts file."
 		case "$MYROLE" in
 		MASTER*)
 			rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -164,7 +164,7 @@ ipa_ssh_bug_bz801719()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	MYREPLICA1_IP=$(dig +short $(eval echo \$BEAKERREPLICA1_env${MYENV}))
-	rlPhaseStartTest "ipa_ssh_bug_bz801719 - Error looking up public keys while ssh to replica using IP address"
+	rlPhaseStartTest "ipa_ssh_bug_0002: bz801719 Error looking up public keys while ssh to replica using IP address"
 		case "$MYROLE" in
 		MASTER*)
 			rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -212,7 +212,7 @@ ipa_ssh_bug_bz870060()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
 	MYREPLICA1=$(echo $(eval echo \$BEAKERREPLICA1_env${MYENV})|cut -f1 -d.).$DOMAIN
-	rlPhaseStartTest "ipa_ssh_bug_bz870060 - SSH host keys are not being removed from the cache"
+	rlPhaseStartTest "ipa_ssh_bug_0003: bz870060 SSH host keys are not being removed from the cache"
 		case "$MYROLE" in
 		MASTER*)
 			rlLog "Machine in recipe is MASTER ($(hostname))"

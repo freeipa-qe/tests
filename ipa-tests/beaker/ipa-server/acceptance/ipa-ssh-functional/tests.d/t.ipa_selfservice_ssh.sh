@@ -62,7 +62,7 @@ ipa_selfservice_ssh_envsetup()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	TESTUSER="selfservuser1"
 	TESTUSERPW="passw0rd1"
-	rlPhaseStartTest "ipa_selfservice_ssh_envsetup - Setup environment for IPA selfservice sshpubkey tests"
+	rlPhaseStartSetup "ipa_selfservice_ssh_envsetup - Setup environment for IPA selfservice sshpubkey tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
 		fi
@@ -131,7 +131,7 @@ ipa_selfservice_ssh_0001()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_selfservice_ssh_0001 - confirm selfservice rule exists"
+	rlPhaseStartTest "ipa_selfservice_ssh_0001: confirm selfservice rule exists"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -162,7 +162,7 @@ ipa_selfservice_ssh_0002()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_selfservice_ssh_0002 - delete selfservice rule and confirm user cannot upload own keys"
+	rlPhaseStartTest "ipa_selfservice_ssh_0002: delete selfservice rule and confirm user cannot upload own keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -195,7 +195,7 @@ ipa_selfservice_ssh_0003()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_selfservice_ssh_0003 - re-add selfservice rule and confirm user can upload keys again"
+	rlPhaseStartTest "ipa_selfservice_ssh_0003: re-add selfservice rule and confirm user can upload keys again"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"

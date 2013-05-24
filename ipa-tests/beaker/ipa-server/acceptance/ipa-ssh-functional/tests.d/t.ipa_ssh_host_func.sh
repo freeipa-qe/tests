@@ -79,7 +79,7 @@ ipa_ssh_host_func_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_envsetup - Setup environment for IPA User Functional tests"
+	rlPhaseStartSetup "ipa_ssh_host_func_envsetup - Setup environment for IPA User Functional tests"
 		rlLog "===================================================================="
 		env|sort
 		rlLog "===================================================================="
@@ -131,7 +131,7 @@ ipa_ssh_host_func_0001()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERCLIENT1_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0001 - New client added and host keys uploaded automatically to DNS"
+	rlPhaseStartTest "ipa_ssh_host_func_0001: New client added and host keys uploaded automatically to DNS"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -185,7 +185,7 @@ ipa_ssh_host_func_0002()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0002 - User ssh to client and sees valid keys match from DNS"
+	rlPhaseStartTest "ipa_ssh_host_func_0002: User ssh to client and sees valid keys match from DNS"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -255,7 +255,7 @@ ipa_ssh_host_func_0003()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0003 - Admin revokes/removes host keys"
+	rlPhaseStartTest "ipa_ssh_host_func_0003: Admin revokes/removes host keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -295,7 +295,7 @@ ipa_ssh_host_func_0004()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0004 - User does not see key match from DNS"
+	rlPhaseStartTest "ipa_ssh_host_func_0004: User does not see key match from DNS"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -341,7 +341,7 @@ ipa_ssh_host_func_0005()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0005 - Admin re-adds keys"
+	rlPhaseStartTest "ipa_ssh_host_func_0005: Admin re-adds keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -394,7 +394,7 @@ ipa_ssh_host_func_0006()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERCLIENT1_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0006 - Host replaces keys"
+	rlPhaseStartTest "ipa_ssh_host_func_0006: Host replaces keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -432,7 +432,7 @@ ipa_ssh_host_func_0007()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0007 - User gets error/warning about key mismatch"
+	rlPhaseStartTest "ipa_ssh_host_func_0007: User gets error/warning about key mismatch"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -482,7 +482,7 @@ ipa_ssh_host_func_0008()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0008 - host-mod add keys after host-disable"
+	rlPhaseStartTest "ipa_ssh_host_func_0008: host-mod add keys after host-disable"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -536,7 +536,7 @@ ipa_ssh_host_func_0009()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0009 - ssh to/from host after host-disable"
+	rlPhaseStartTest "ipa_ssh_host_func_0009: ssh to/from host after host-disable"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -581,7 +581,7 @@ ipa_ssh_host_func_0010()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0010 - host-mod add keys after host-del"
+	rlPhaseStartTest "ipa_ssh_host_func_0010: host-mod add keys after host-del"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"
@@ -624,7 +624,7 @@ ipa_ssh_host_func_0011()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_ssh_host_func_0011 - ssh to/from host after host-del"
+	rlPhaseStartTest "ipa_ssh_host_func_0011: ssh to/from host after host-del"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($(hostname))"

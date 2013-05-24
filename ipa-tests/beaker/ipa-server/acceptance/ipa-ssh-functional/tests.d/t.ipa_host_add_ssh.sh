@@ -87,7 +87,7 @@ ipa_host_add_ssh_run()
 ipa_host_add_ssh_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	rlPhaseStartTest "ipa_host_add_ssh_envsetup - Setup environment for IPA host-add sshpubkey Tests"
+	rlPhaseStartSetup "ipa_host_add_ssh_envsetup - Setup environment for IPA host-add sshpubkey Tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
 		fi
@@ -155,7 +155,7 @@ ipa_host_add_ssh_positive_0001()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/'|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_positive_0001 - Add host with empty key field"
+	rlPhaseStartTest "ipa_host_add_ssh_positive_0001: Add host with empty key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -190,7 +190,7 @@ ipa_host_add_ssh_positive_0002()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_positive_0002 - Add host with blank key field"
+	rlPhaseStartTest "ipa_host_add_ssh_positive_0002: Add host with blank key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -225,7 +225,7 @@ ipa_host_add_ssh_positive_0003()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_positive_0003 - Add host with one valid key"
+	rlPhaseStartTest "ipa_host_add_ssh_positive_0003: Add host with one valid key"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -262,7 +262,7 @@ ipa_host_add_ssh_positive_0004()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_positive_0004 - Add host with two valid keys"
+	rlPhaseStartTest "ipa_host_add_ssh_positive_0004: Add host with two valid keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -306,7 +306,7 @@ ipa_host_add_ssh_positive_0005()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_positive_0005 - Add host with many (15) valid keys"
+	rlPhaseStartTest "ipa_host_add_ssh_positive_0005: Add host with many (15) valid keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -350,7 +350,7 @@ ipa_host_add_ssh_positive_0006()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_positive_0006 - Add host with space in key field"
+	rlPhaseStartTest "ipa_host_add_ssh_positive_0006: Add host with space in key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -385,7 +385,7 @@ ipa_host_add_ssh_negative_0001()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0001 - Fail to add host with Missing equal signs at end of Key field"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0001: Fail to add host with Missing equal signs at end of Key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -419,7 +419,7 @@ ipa_host_add_ssh_negative_0002()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0002 - Fail to add host with Invalid Key Only"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0002: Fail to add host with Invalid Key Only"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -453,7 +453,7 @@ ipa_host_add_ssh_negative_0003()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0003 - Fail to add host with Invalid Key First of two"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0003: Fail to add host with Invalid Key First of two"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -487,7 +487,7 @@ ipa_host_add_ssh_negative_0004()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0004 - Fail to add host with Invalid Key First of N"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0004: Fail to add host with Invalid Key First of N"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -525,7 +525,7 @@ ipa_host_add_ssh_negative_0005()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0005 - Fail to add host with Invalid Key Second of two"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0005: Fail to add host with Invalid Key Second of two"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -559,7 +559,7 @@ ipa_host_add_ssh_negative_0006()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0006 - Fail to add host with Invalid Key in Middle (Second of three)"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0006: Fail to add host with Invalid Key in Middle (Second of three)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -594,7 +594,7 @@ ipa_host_add_ssh_negative_0007()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0007 - Fail to add host with Invalid Key Last (Third of three)"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0007: Fail to add host with Invalid Key Last (Third of three)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -629,7 +629,7 @@ ipa_host_add_ssh_negative_0008()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_negative_0008 - Fail to add user with SAME Valid Key"
+	rlPhaseStartTest "ipa_host_add_ssh_negative_0008: Fail to add user with SAME Valid Key"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -663,7 +663,7 @@ ipa_host_add_ssh_envcleanup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_add_ssh_envcleanup - clean up test environment"
+	rlPhaseStartCleanup "ipa_host_add_ssh_envcleanup - clean up test environment"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"

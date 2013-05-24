@@ -72,7 +72,7 @@ ipa_delegation_ssh_envsetup()
 	TESTGROUP2="delegatgroup2"
 	TESTUSERPW="passw0rd1"
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_envsetup - Setup environment for IPA delegation sshpubkey tests"
+	rlPhaseStartSetup "ipa_delegation_ssh_envsetup - Setup environment for IPA delegation sshpubkey tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
 		fi
@@ -148,7 +148,7 @@ ipa_delegation_ssh_0001()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_0001 - add delegation for user to modify ipasshpubkey"
+	rlPhaseStartTest "ipa_delegation_ssh_0001: add delegation for user to modify ipasshpubkey"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -182,7 +182,7 @@ ipa_delegation_ssh_0002()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_0002 - user upload keys for other user"
+	rlPhaseStartTest "ipa_delegation_ssh_0002: user upload keys for other user"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -219,7 +219,7 @@ ipa_delegation_ssh_0003()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_0003 - user delete keys for other user"
+	rlPhaseStartTest "ipa_delegation_ssh_0003: user delete keys for other user"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -255,7 +255,7 @@ ipa_delegation_ssh_0004()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_0004 - user fail to upload keys when doesn't have permission"
+	rlPhaseStartTest "ipa_delegation_ssh_0004: user fail to upload keys when doesn't have permission"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -294,7 +294,7 @@ ipa_delegation_ssh_0005()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_0005 - delete delegation for user to modify ipasshpubkey"
+	rlPhaseStartTest "ipa_delegation_ssh_0005: delete delegation for user to modify ipasshpubkey"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -324,7 +324,7 @@ ipa_delegation_ssh_0006()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_0006 - user can no longer upload keys for other user after delete"
+	rlPhaseStartTest "ipa_delegation_ssh_0006: user can no longer upload keys for other user after delete"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -364,7 +364,7 @@ ipa_delegation_ssh_0007()
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_delegation_ssh_0007 - admin forbid a user from uploading keys (even with selfservice in place)"
+	rlPhaseStartTest "ipa_delegation_ssh_0007: admin forbid a user from uploading keys (even with selfservice in place)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"

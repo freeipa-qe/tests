@@ -87,7 +87,7 @@ ipa_host_mod_ssh_run()
 ipa_host_mod_ssh_envsetup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
-	rlPhaseStartTest "ipa_host_mod_ssh_envsetup - Setup environment for IPA host-mod sshpubkey Tests"
+	rlPhaseStartSetup "ipa_host_mod_ssh_envsetup - Setup environment for IPA host-mod sshpubkey Tests"
 		if [ -z "$MYENV" ]; then
 			MYENV=1
 		fi
@@ -157,7 +157,7 @@ ipa_host_mod_ssh_positive_0001()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/'|sed 's/^[0]*//')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_positive_0001 - Mod host with empty key field"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0001: Mod host with empty key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -195,7 +195,7 @@ ipa_host_mod_ssh_positive_0002()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_positive_0002 - Mod host with blank key field"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0002: Mod host with blank key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -233,7 +233,7 @@ ipa_host_mod_ssh_positive_0003()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_positive_0003 - Mod host with one valid key"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0003: Mod host with one valid key"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -272,7 +272,7 @@ ipa_host_mod_ssh_positive_0004()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_positive_0004 - Mod host with two valid keys"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0004: Mod host with two valid keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -319,7 +319,7 @@ ipa_host_mod_ssh_positive_0005()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_positive_0005 - Mod host with many (15) valid keys"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0005: Mod host with many (15) valid keys"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -365,7 +365,7 @@ ipa_host_mod_ssh_positive_0006()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_positive_0006 - Mod host with space in key field"
+	rlPhaseStartTest "ipa_host_mod_ssh_positive_0006: Mod host with space in key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -403,7 +403,7 @@ ipa_host_mod_ssh_negative_0001()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0001 - Fail to mod host with Missing equal signs at end of Key field"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0001: Fail to mod host with Missing equal signs at end of Key field"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -441,7 +441,7 @@ ipa_host_mod_ssh_negative_0002()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0002 - Fail to mod host with Invalid Key Only"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0002: Fail to mod host with Invalid Key Only"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -475,7 +475,7 @@ ipa_host_mod_ssh_negative_0003()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0003 - Fail to mod host with Invalid Key First of two"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0003: Fail to mod host with Invalid Key First of two"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -509,7 +509,7 @@ ipa_host_mod_ssh_negative_0004()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0004 - Fail to mod host with Invalid Key First of N"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0004: Fail to mod host with Invalid Key First of N"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -547,7 +547,7 @@ ipa_host_mod_ssh_negative_0005()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0005 - Fail to mod host with Invalid Key Second of two"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0005: Fail to mod host with Invalid Key Second of two"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -581,7 +581,7 @@ ipa_host_mod_ssh_negative_0006()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0006 - Fail to mod host with Invalid Key in Middle (Second of three)"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0006: Fail to mod host with Invalid Key in Middle (Second of three)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -617,7 +617,7 @@ ipa_host_mod_ssh_negative_0007()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0007 - Fail to mod host with Invalid Key Last (Third of three)"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0007: Fail to mod host with Invalid Key Last (Third of three)"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -653,7 +653,7 @@ ipa_host_mod_ssh_negative_0008()
 	NUMBER=$(echo $FUNCNAME|sed 's/[a-Z_]*\([0-9]*$\)/\1/')
 	SMALLNUMBER=$(echo ${NUMBER}|sed 's/^[0]*//')
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_negative_0008 - Fail to mod host with SAME Valid Key"
+	rlPhaseStartTest "ipa_host_mod_ssh_negative_0008: Fail to mod host with SAME Valid Key"
 	case "$MYROLE" in
 	MASTER*)
 		rlLog "Machine in recipe is MASTER ($MASTER)"
@@ -684,7 +684,7 @@ ipa_host_mod_ssh_envcleanup()
 {
 	TESTCOUNT=$(( TESTCOUNT += 1 ))
 	BKRRUNHOST=$(eval echo \$BEAKERMASTER_env${MYENV})
-	rlPhaseStartTest "ipa_host_mod_ssh_envcleanup - clean up test environment"
+	rlPhaseStartCleanup "ipa_host_mod_ssh_envcleanup - clean up test environment"
 	case "$MYROLE" in
 	"MASTER")
 		rlLog "Machine in recipe is MASTER ($MASTER)"
