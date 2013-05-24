@@ -85,28 +85,6 @@ DS_binddn="CN=Directory Manager"
 DNA_plugin="cn=Posix IDs,cn=Distributed Numeric Assignment Plugin,cn=plugins,cn=config"
 DMpswd="Secret123"
 
-IPA_Variables() {
-	# Defining some variables post ipa-adtrust-install	
-	lrid_base=`$ipacmd idrange-show $IPA_range | grep "First RID of the corresponding RID range:" | awk '{print $NF}'`
-	lbase_id=`$ipacmd idrange-show $IPA_range | grep 'First Posix ID' | awk '{print $NF}'`
-	lrange_size=`$ipacmd idrange-show $IPA_range | egrep "Number.*range:" | awk '{print $NF}'`
-	lsecrid_base=`$ipacmd idrange-show $IPA_range | grep "First RID of the secondary RID range:" | awk '{print $NF}'`
-        echo "base_id: $lbase_id"
-        echo "range_size: $lrange_size"
-	echo "rid_base: $lrid_base"
-        echo "sec-rid-base: $lsecrid_base"
-}
-
-AD_Variables() {
-	ad_values=(`$ipacmd idrange-show $AD_range | awk '{print $NF}'`)
-	adbase_id=`echo ${ad_values[1]}`
-	adrange_size=`echo ${ad_values[2]}`
-	adrid=`echo ${ad_values[3]}`
-	AD_SID=`echo ${ad_values[4]}`
-	New_adbase_id=$((adbase_id + adrange_size))
-	New_adrid=$((adrid + adrange_size))
-}
-
 setup() {
 rlPhaseStartSetup "Setup both ADS and IPA Servers for trust and idrange Test Cases"
 	# check for packages
@@ -519,7 +497,7 @@ rlPhaseEnd
 
 idrange_test_0032() {
 
-rlPhaseStartTest "0032 Modify idrange with correct values with options"
+rlPhaseStartTest "0032 Modify idrange with correct values in options"
 	IPA_Variables
         AD_Variables
 	New_adbase_id=$((adbase_id - 1))

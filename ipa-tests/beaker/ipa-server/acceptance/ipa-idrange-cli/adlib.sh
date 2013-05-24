@@ -110,6 +110,33 @@ Add_Trust() {
 	
 }
 
+#IPA_Variables() {
+#	# Defining some variables post ipa-adtrust-install	
+#	lrid_base=`$ipacmd idrange-show $IPA_range | grep "First RID of the corresponding RID range:" | awk '{print $NF}'`
+#	lbase_id=`$ipacmd idrange-show $IPA_range | grep 'First Posix ID' | awk '{print $NF}'`
+#	lrange_size=`$ipacmd idrange-show $IPA_range | egrep "Number.*range:" | awk '{print $NF}'`
+#	lsecrid_base=`$ipacmd idrange-show $IPA_range | grep "First RID of the secondary RID range:" | awk '{print $NF}'`
+#}
+
+IPA_Variables() {
+        # Defining some variables post ipa-adtrust-install      
+        ipa_values=(`$ipacmd idrange-show $IPA_range | awk '{print $NF}'`)
+        lbase_id=`echo ${ipa_values[1]}`
+        lrange_size=`echo ${ipa_values[2]}`
+        lrid_base=`echo ${ipa_values[3]}`
+        lsecrid_base=`echo ${ipa_values[4]}`
+}
+
+AD_Variables() {
+	ad_values=(`$ipacmd idrange-show $AD_range | awk '{print $NF}'`)
+	adbase_id=`echo ${ad_values[1]}`
+	adrange_size=`echo ${ad_values[2]}`
+	adrid=`echo ${ad_values[3]}`
+	AD_SID=`echo ${ad_values[4]}`
+	New_adbase_id=$((adbase_id + adrange_size))
+	New_adrid=$((adrid + adrange_size))
+}
+
 IDrange_Add() {
 	rm -rf $expfile
         echo 'set var1 [lindex $argv 0]
