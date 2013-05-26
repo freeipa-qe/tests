@@ -328,7 +328,7 @@ public class HBACTests extends SahiTestScript {
 		HBACTasks.modifyHBACRuleGeneralSection(sahiTasks, cn, description);
 		
 		//verify changes	
-		//HBACTasks.verifyHBACRuleGeneralSection(sahiTasks, cn, description);
+		HBACTasks.verifyHBACRuleGeneralSection(sahiTasks, cn, description);
 	}
 	
 	
