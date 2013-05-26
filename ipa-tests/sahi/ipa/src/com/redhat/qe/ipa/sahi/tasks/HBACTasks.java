@@ -169,19 +169,19 @@ public class HBACTasks {
 	 * @param cn - the rule to modify for
 	 */
 	public static void modifyHBACRuleGeneralSection(SahiTasks sahiTasks, String cn, String description) {
-		/*sahiTasks.link(cn).click();
+		sahiTasks.link(cn).click();
 		
 		sahiTasks.textarea("description").setValue(description);
-		sahiTasks.radio("ipaenabledflag-1-0").click();
+		//sahiTasks.radio("ipaenabledflag-1-0").click();
 		
 		sahiTasks.span("Update").click();
-		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content")).click();*/
+		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content nav-space-3")).click();
 		
 		
 		sahiTasks.link(cn).click();
 		
-		//Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
-		//Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-0").checked(), "Verified rule is disabled");
+		Assert.assertTrue(sahiTasks.textarea("description").containsText(description), "Verified description is set correctly");
+	//	Assert.assertTrue(sahiTasks.radio("ipaenabledflag-1-0").checked(), "Verified rule is disabled");
 		
 		sahiTasks.select("action").choose("Disable");
 		sahiTasks.span("Apply").click();
@@ -194,10 +194,10 @@ public class HBACTasks {
 		sahiTasks.link("HBAC Rules").in(sahiTasks.div("content nav-space-3")).click();
 		//sahiTasks.link("Sudo Rules[1]").click();
 		Assert.assertTrue(sahiTasks.div("Enabled").exists(),"Verify rule is enabled sucessfully");
-		sahiTasks.link(cn).click();
-		sahiTasks.select("action").choose("Delete");
-		sahiTasks.span("Apply").click();
-		Assert.assertFalse(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " deleted successfully");
+		//sahiTasks.link(cn).click();
+		//sahiTasks.select("action").choose("Delete");
+		//sahiTasks.span("Apply").click();
+		//sAssert.assertFalse(sahiTasks.link(cn).exists(), "Verify Rule " + cn + " deleted successfully");
 		
 		
 		
