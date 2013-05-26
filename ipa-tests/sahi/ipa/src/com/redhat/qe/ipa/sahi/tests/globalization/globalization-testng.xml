@@ -4,15 +4,15 @@
 		<groups>
 			<run> 
 			<include name="setup" />
-		   <!-- <include name="userTests_Add" />
+		    <include name="userTests_Add" />
 			<include name="user_modify" />
 			<include name="user_modify_negative" />
 			<include name="userTests_Delete" />
 			
 			<include name="userGroup" />
-			<include name="host_Add" />-->
+			<include name="host_Add" />
 			<include name="hostGroup" />
-			<!--<include name="netGroup" />
+			<include name="netGroup" />
 			<include name="service_Add" />
 			<include name="DNSZone_Add" />
 			
@@ -30,7 +30,7 @@
 			<include name="RBAC" />
 			<include name="selfservice" />
 			<include name="delegation" />
-			<include name="configuration" />-->
+			<include name="configuration" />
 			
 			
 			
