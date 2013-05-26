@@ -1,17 +1,44 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="IPAGlobalizationTestSuite">	
-	<test name="Globalization Tests">
+<suite name="GlobalizationTestSuite">	
+	<test name="IPAGlobalization Tests">
 		<groups>
 			<run> 
-				<include name="init" />
-				<include name="add" /> 
-				<!--<include name="modify" />-->
-				<include name="delete" />
-				<include name="report" />
+			<include name="setup" />
+		   <!-- <include name="userTests_Add" />
+			<include name="user_modify" />
+			<include name="user_modify_negative" />
+			<include name="userTests_Delete" />
+			
+			<include name="userGroup" />
+			<include name="host_Add" />-->
+			<include name="hostGroup" />
+			<!--<include name="netGroup" />
+			<include name="service_Add" />
+			<include name="DNSZone_Add" />
+			
+			<include name="hbacRule" />
+			<include name="hbacService" />
+			<include name="hbacServiceGroup" />
+			
+			<include name="sudoRule" />
+			<include name="sudoCommand" />
+			<include name="sudoCommandGroup" />
+			
+			<include name="Automount" />
+			<include name="selinuxUserMap" />
+			<include name="automember" />
+			<include name="RBAC" />
+			<include name="selfservice" />
+			<include name="delegation" />
+			<include name="configuration" />-->
+			
+			
+			
+			
 			</run>
 		</groups>
 		<classes>
-			<class name="com.redhat.qe.ipa.sahi.tests.globalization.GlobalizationWebAutomation" />
+			<class name="com.redhat.qe.ipa.sahi.tests.globalization.Globalization" />
 		</classes>
 	</test> 
 	<listeners>        
