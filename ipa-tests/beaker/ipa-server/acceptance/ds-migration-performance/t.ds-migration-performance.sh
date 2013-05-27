@@ -44,14 +44,24 @@ setup()
 			echo $ADMINPW | ipa-compat-manage status | grep Enabled
 			if [ $? -eq 0 ] ; then
 				rlRun "echo $ADMINPW | ipa-compat-manage disable" 0 "Turn off compat plugin"
-				rlRun "service dirsrv restart" 0 "Restart directory server"
+				#rlRun "service dirsrv restart" 0 "Restart directory server"
+                                if [ "$FLAVOR" == "Fedora" ] ; then
+                                 rlRun "systemctl start dirsrv.target" 0 "Restarting directory server for ssl changes"
+                                else
+                                 rlRun "service dirsrv start" 0 "Restarting directory server for ssl changes"
+                                fi
 			fi
 		else
 			rlLog "Test Running with compat plugin Enabled"
 			echo $ADMINPW | ipa-compat-manage status | grep Disabled
 			if [ $? -eq 0 ] ; then
 				rlRun "echo $ADMINPW | ipa-compat-manage enable" 0 "Turning on compat plugin"
-				rlRun "service dirsrv restart" 0 "Restart directory server"
+				#rlRun "service dirsrv restart" 0 "Restart directory server"
+                                if [ "$FLAVOR" == "Fedora" ] ; then
+                                 rlRun "systemctl start dirsrv.target" 0 "Restarting directory server for ssl changes"
+                                else
+                                 rlRun "service dirsrv start" 0 "Restarting directory server for ssl changes"
+                                fi
 			fi
 		fi
 			
