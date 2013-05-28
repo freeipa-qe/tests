@@ -690,7 +690,7 @@ ipaconfig_mod_default_pac_type_default_nfsnone()
 ipaconfig_mod_default_pac_type_default_pad()
 {
         KinitAsAdmin
-        rlRun "ipa config-mod --pac-type=PAD" 0 "change default pac type to nfs:NONE"
+        rlRun "ipa config-mod --pac-type=PAD" 0 "change default pac type to PAD"
         initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
         FirstKinitAs testuser $initpassword "Secret123"
 	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
@@ -710,7 +710,7 @@ ipaconfig_mod_default_pac_type_default_pad()
 ipaconfig_mod_default_pac_type_default_mspac()
 {
         KinitAsAdmin
-        rlRun "ipa config-mod --pac-type=MS-PAC" 0 "change default pac type to nfs:NONE"
+        rlRun "ipa config-mod --pac-type=MS-PAC" 0 "change default pac type to MS-PAC"
         initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
         FirstKinitAs testuser $initpassword "Secret123"
 	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
