@@ -49,7 +49,9 @@
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage.new">
-				<params/>
+                <params>
+                    <param name="KILLTIMEOVERRIDE" value="84600"/>
+                </params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="TREE2 REPLICA1">
@@ -98,7 +100,9 @@
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage.new">
-				<params/>
+                <params>
+                    <param name="KILLTIMEOVERRIDE" value="84600"/>
+                </params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="TREE2 REPLICA2">
@@ -147,7 +151,9 @@
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage.new">
-				<params/>
+                <params>
+                    <param name="KILLTIMEOVERRIDE" value="84600"/>
+                </params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="TREE2 REPLICA3">
@@ -196,7 +202,9 @@
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage.new">
-				<params/>
+                <params>
+                    <param name="KILLTIMEOVERRIDE" value="84600"/>
+                </params>
 			</task>
 		</recipe>
 		<recipe kernel_options="" kernel_options_post="" ks_meta="" role="REPLICA" whiteboard="TREE2 REPLICA4">
@@ -245,7 +253,9 @@
 				</params>
 			</task>
 			<task name="/CoreOS/ipa-server/rhel70-ipa/acceptance/ipa-replica-manage.new">
-				<params/>
+                <params>
+                    <param name="KILLTIMEOVERRIDE" value="84600"/>
+                </params>
 			</task>
 		</recipe>
 	</recipeSet>
