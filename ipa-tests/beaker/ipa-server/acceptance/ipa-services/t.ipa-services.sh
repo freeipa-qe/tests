@@ -45,7 +45,6 @@
 . /usr/share/beakerlib/beakerlib.sh
 . /opt/rhqa_ipa/ipa-server-shared.sh
 . /opt/rhqa_ipa/env.sh
-
 ########################################################################
 # Test Suite Globals
 ########################################################################
@@ -56,6 +55,8 @@ RELM=`echo $RELM | tr "[a-z]" "[A-Z]"`
 user1="user1"
 user2="user2"
 userpw="Secret123"
+host=`hostname`
+realm=`hostname|cut -f2-3 -d.|sed 's/\(.*\)/\U\1/'` 
 
 TMP_KEYTAB="/opt/krb5.keytab"
 SERVICE=vpn
@@ -642,6 +643,14 @@ rlPhaseStartTest "service_find_009: --pkey-only test of service"
 rlPhaseEnd
 }
 
+service_find_010() {
+
+rlPhaseStartTest "service_find_010: check default pac type for services"
+	rlRun "ipa service-find|grep 'PAC type:'" 1 "no service has pac type defined by defualt"
+rlPhaseEnd	
+}
+
+
 service_mod_001() {
 
 	# ipa service-mod check help
@@ -789,6 +798,119 @@ rlPhaseStartTest "service_mod_007: ipa service-mod: modifying the service with -
         rlRun "ipa service-del $SERVICE/$HOSTNAME@$RELM"
 	ipa host-del $TESTHOST
 rlPhaseEnd
+}
+
+service_mod_008() {
+rlPhaseStartTest "service_mod_008:pac type env set up :add nfs service and get keytab"
+	KinitAsAdmin
+	rlRun "ipa service-add nfs/$host@$realm" 0 "nfs service add as expected"
+	rlRun "ipa-getkeytab -s $host -p nfs/$host@$realm -k /tmp/nfs.keytab" 0 "get nfs keytab"
+rlPhaseEnd
+}
+
+service_mod_009() {
+rlPhaseStartTest "service_mod_009: add pac type for a service to NONE overriding default pac type MS-PAC from config-show"
+	KinitAsAdmin
+        rlRun "ipa service-mod ldap/$host@$realm --pac-type=NONE" 0 "change ldap pac type to NONE"
+	initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+	FirstKinitAs testuser $initpassword "Secret123"
+	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+	kvno ldap/$host@$realm
+	size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+	size3=`expr $size2 - $size1`
+	if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then 
+		rlPass "expected size change for credential cache" 
+	else
+		rlFail "size change not in the expected range"
+	fi
+	KinitAsAdmin
+	rlRun "ipa user-del testuser" 0 "delete the test user" 
+	kdestroy	
+rlPhaseEnd
+}
+
+service_mod_010() {
+rlPhaseStartTest "service_mod_010: add pac type for nfs service to MS-PAC overriding default nfs:NONE from config-show"
+        KinitAsAdmin
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type=MS-PAC" 0 "change nfs pac type to MS-PAC"
+        initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+        FirstKinitAs testuser $initpassword "Secret123"
+        size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        kvno nfs/$host@$realm
+        size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        size3=`expr $size2 - $size1`
+	echo $size3
+        if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
+                rlPass "expected size change for credential cache"
+        else
+                rlFail "size change not in the expected range"
+        fi
+        KinitAsAdmin
+        rlRun "ipa user-del testuser" 0 "delete the test user"
+        kdestroy
+rlPhaseEnd
+}
+
+service_mod_011() {
+rlPhaseStartTest "service_mod_011: add multiple pac type for a service"
+	KinitAsAdmin
+	rlRun "ipa service-mod nfs/$host@$realm --pac-type=MS-PAC --pac-type=PAD" 0 "change nfs pac type to MS-PAC and PAD"
+	expected_pac="PAC type: MS-PAC, PAD"
+	actual_pac=`ipa service-show nfs/$host@$realm|grep "PAC type:"|sed -e 's/^[ \t]*//'`
+	if [ "$actual_pac" = "$expected_pac" ];then
+		rlPass "pac types shown as expected"
+	else
+		rlFail "default pac types not shown"
+	fi 
+rlPhaseEnd
+}
+
+service_mod_012() {
+rlPhaseStartTest "service_mod_012: add multiple pac type for a service including NONE"
+        KinitAsAdmin
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type=MS-PAC --pac-type=NONE" 1 "NONE value cannot be combined with other PAC types"
+rlPhaseEnd
+}
+
+service_mod_013() {
+rlPhaseStartTest "service_mod_013: add same pac type for a service that already has it"
+        KinitAsAdmin
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type=PAD" 0 "pac type added as expected"
+	rlRun "ipa service-mod nfs/$host@$realm --pac-type=PAD" 1 "readd same pac type,no modifications has been made"
+rlPhaseEnd
+}
+
+service_mod_014() {
+rlPhaseStartTest "service_mod_014: give random value pac type for a particular service"
+        KinitAsAdmin
+        random=`cat /dev/urandom| tr -dc '0-9a-zA-Z!@#$%^*_+-'|head -c 8`
+        rlRun "ipa service-mod nfs/$hostname --pac-type=$random" 1 "change default pac type to some random value"
+rlPhaseEnd
+}
+
+service_mod_015() {
+rlPhaseStartTest "service_mod_015: add pac type with no input"
+        KinitAsAdmin
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type" 2 "pac type option needs input"
+rlPhaseEnd
+}
+
+service_mod_016() {
+rlPhaseStartTest "service_mod_016: remove all pac type for a service"
+        KinitAsAdmin
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type=" 0 "pac type removed as expected"
+        rlRun "ipa service-mod ldap/$host@$realm --pac-type=" 0 "pac type removed as expected"
+        rlRun "ipa service-show nfs/$host@$realm|grep 'PAC type:'" 1 "verify pac type is removed"
+	rlRun "ipa service-show ldap/$host@$realm|grep 'PAC type:'" 1 "verify pac type is removed"
+rlPhaseEnd
+}
+
+service_mod_017() {
+rlPhaseStartTest "service_mod_017 : pac type env clean up ,delete nfs service"
+	KinitAsAdmin
+	rlRun "ipa service-del nfs/$host@$realm" 0 "nfs service removed as expected "
+	kdestroy
+rlPhaseEnd 
 }
 
 service_remove_host_001() {
