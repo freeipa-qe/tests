@@ -102,6 +102,7 @@ service-find()
 	"service_find_007"
 	"service_find_008"
 	"service_find_009"
+	"service_find_010"
 }
 
 service-mod()
@@ -113,6 +114,16 @@ service-mod()
 	"service_mod_005"
 	"service_mod_006"
 	"service_mod_007"
+	"service_mod_008"
+	"service_mod_009"
+	"service_mod_010"
+        "service_mod_011"
+        "service_mod_012"
+        "service_mod_013"
+        "service_mod_014"
+        "service_mod_015"
+	"service_mod_016"
+	"service_mod_017"
 }
 
 service-remove-host()
