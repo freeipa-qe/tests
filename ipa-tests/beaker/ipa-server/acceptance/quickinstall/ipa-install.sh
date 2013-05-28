@@ -1024,7 +1024,7 @@ ipa_install_prep()
     ipa_install_prep_pkgInstalls
 
     ipa_install_bz962513_workarounds
-    ipa_install_openldap_workarounds
+    #ipa_install_openldap_workarounds
 
     ipa_install_prep_setTime
 
