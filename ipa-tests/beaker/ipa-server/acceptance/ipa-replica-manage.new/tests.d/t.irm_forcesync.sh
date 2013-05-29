@@ -535,7 +535,6 @@ function irm_forcesync_neg_0007()
         rlRun "cat $tmpout"
         rlAssertGrep "Unknown host $REPLICA1" $tmpout
 
-
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR1"
         ;;
@@ -543,6 +542,9 @@ function irm_forcesync_neg_0007()
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
 
         # Cleanup
+        rlRun "ssh $MASTER \"ipactl stop\""
+        rlRun "ssh $MASTER \"ipactl start\""
+        rlRun "ssh $MASTER \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
         irm_uninstall 
         irm_install $MASTER
 
@@ -590,6 +592,9 @@ function irm_forcesync_neg_0008()
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR2"
 
         # Cleanup
+        rlRun "ssh $MASTER \"ipactl stop\""
+        rlRun "ssh $MASTER \"ipactl start\""
+        rlRun "ssh $MASTER \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
         irm_uninstall 
         irm_install $MASTER
 
@@ -601,7 +606,7 @@ function irm_forcesync_neg_0008()
         # Test
         rlRun "ipa-replica-manage $PWOPT -H $MASTER force-sync --from $REPLICA1 > $tmpout 2>&1" 1
         rlRun "cat $tmpout"
-        rlAssertGrep "'$MASTER' has no replication agreement for '$REPLICA1'" $tmpout
+        rlAssertGrep "Unknown host $REPLICA1" $tmpout
 
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR2"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR1"

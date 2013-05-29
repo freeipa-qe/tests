@@ -31,7 +31,7 @@ function irm_disconnect_pos_0001()
         rlRun "ipa-replica-manage $PWOPT connect $MASTER $REPLICA2"
         rlRun "ssh $REPLICA2 \"ipactl stop\""
         rlRun "ssh $REPLICA2 \"ipactl start\""
-        rlRun "ipa-replica-manage $PWOPT -H $REPLICA2 re-initialize --from $MASTER"
+        rlRun "ssh $REPLICA2 \"ipa-replica-manage $PWOPT re-initialize --from $MASTER\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
@@ -86,7 +86,7 @@ function irm_disconnect_pos_0002()
         rlRun "ipa-replica-manage $PWOPT connect $MASTER $REPLICA2"
         rlRun "ssh $REPLICA2 \"ipactl stop\""
         rlRun "ssh $REPLICA2 \"ipactl start\""
-        rlRun "ipa-replica-manage $PWOPT -H $REPLICA2 re-initialize --from $MASTER"
+        rlRun "ssh $REPLICA2 \"ipa-replica-manage $PWOPT re-initialize --from $MASTER\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
@@ -279,10 +279,10 @@ function irm_disconnect_neg_0005()
         rlRun "ipa-replica-manage $PWOPT connect $REPLICA3 $REPLICA4"
         rlRun "ssh $REPLICA3 \"ipactl stop\""
         rlRun "ssh $REPLICA3 \"ipactl start\""
-        rlRun "ipa-replica-manage $PWOPT -H $REPLICA3 re-initialize --from $REPLICA2"
+        rlRun "ssh $REPLICA3 \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
         rlRun "ssh $REPLICA4 \"ipactl stop\""
         rlRun "ssh $REPLICA4 \"ipactl start\""
-        rlRun "ipa-replica-manage $PWOPT -H $REPLICA4 re-initialize --from $REPLICA3"
+        rlRun "ssh $REPLICA4 \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA3\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
@@ -331,10 +331,10 @@ function irm_disconnect_neg_0006()
         rlRun "ipa-replica-manage $PWOPT connect $REPLICA3 $REPLICA4"
         rlRun "ssh $REPLICA3 \"ipactl stop\""
         rlRun "ssh $REPLICA3 \"ipactl start\""
-        rlRun "ipa-replica-manage $PWOPT -H $REPLICA3 re-initialize --from $REPLICA2"
+        rlRun "ssh $REPLICA3 \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
         rlRun "ssh $REPLICA4 \"ipactl stop\""
         rlRun "ssh $REPLICA4 \"ipactl start\""
-        rlRun "ipa-replica-manage $PWOPT -H $REPLICA4 re-initialize --from $REPLICA3"
+        rlRun "ssh $REPLICA4 \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA3\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
