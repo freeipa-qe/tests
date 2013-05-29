@@ -608,7 +608,7 @@ function irm_forcesync_neg_0008()
         rlRun "cat $tmpout"
         rlAssertGrep "Unknown host $REPLICA1" $tmpout
 
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR2"
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR2"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR1"
         ;;
     REPLICA3_*)
