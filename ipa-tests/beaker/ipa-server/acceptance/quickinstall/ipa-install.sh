@@ -576,7 +576,7 @@ ipa_install_topo_tree2()
     
     # R1
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    rlPhaseStartTest "ipa_install_topo_tree1_replica1 - install Replica1 in Tree1 Topology"
+    rlPhaseStartTest "ipa_install_topo_tree2_replica1 - install Replica1 in Tree2 Topology"
         if [ "$(hostname -s)" = "$(echo $MYBR1|cut -f1 -d.)" ]; then
             ipa_install_replica $MYBM1
             rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR1.1' -m $MYBR1"  
@@ -587,7 +587,7 @@ ipa_install_topo_tree2()
     
     # R2
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    rlPhaseStartTest "ipa_install_topo_tree1_replica2 - install Replica2 in Tree1 Topology"
+    rlPhaseStartTest "ipa_install_topo_tree2_replica2 - install Replica2 in Tree2 Topology"
         if [ "$(hostname -s)" = "$(echo $MYBR2|cut -f1 -d.)" ]; then
             ipa_install_replica $MYBM1
             rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR2.2' -m $MYBR2"  
@@ -598,7 +598,7 @@ ipa_install_topo_tree2()
     
     # R3
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    rlPhaseStartTest "ipa_install_topo_tree1_replica3 - install Replica3 in Tree1 Topology"
+    rlPhaseStartTest "ipa_install_topo_tree2_replica3 - install Replica3 in Tree2 Topology"
         if [ "$(hostname -s)" = "$(echo $MYBR3|cut -f1 -d.)" ]; then
             ipa_install_replica $MYBR2
             rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR3.3' -m $MYBR3"  
@@ -609,7 +609,7 @@ ipa_install_topo_tree2()
     
     # R4
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    rlPhaseStartTest "ipa_install_topo_tree1_replica4 - install Replica4 in Tree1 Topology"
+    rlPhaseStartTest "ipa_install_topo_tree2_replica4 - install Replica4 in Tree2 Topology"
         if [ "$(hostname -s)" = "$(echo $MYBR4|cut -f1 -d.)" ]; then
             ipa_install_replica $MYBR3
             rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.$MYBR4.4' -m $MYBR4"  
