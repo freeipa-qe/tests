@@ -21,6 +21,7 @@ function irm_forcesync_pos_0001()
         rlAssertGrep "Deleting schedule.*from agreement" $tmpout
 
         irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
+        rlRun "sleep 60"
         irm_userchk $MASTER $testuser 
         irm_userchk $REPLICA1 $testuser
         irm_userchk $REPLICA2 $testuser
@@ -72,6 +73,7 @@ function irm_forcesync_pos_0002()
         rlAssertGrep "Deleting schedule.*from agreement" $tmpout
 
         irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
+        rlRun "sleep 60"
         irm_userchk $MASTER $testuser 
         irm_userchk $REPLICA1 $testuser
         irm_userchk $REPLICA2 $testuser
@@ -130,6 +132,7 @@ function irm_forcesync_pos_0003()
         rlAssertGrep "Deleting schedule.*from agreement" $tmpout
 
         irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
+        rlRun "sleep 60"
         irm_userchk $MASTER $testuser 
         irm_userchk $REPLICA1 $testuser
         irm_userchk $REPLICA2 $testuser
@@ -182,6 +185,7 @@ function irm_forcesync_pos_0004()
         rlAssertGrep "Deleting schedule.*from agreement" $tmpout
 
         irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
+        rlRun "sleep 60"
         irm_userchk $MASTER $testuser 
         irm_userchk $REPLICA1 $testuser
         irm_userchk $REPLICA2 $testuser
@@ -236,6 +240,7 @@ function irm_forcesync_pos_0005()
         rlAssertGrep "Deleting schedule.*from agreement" $tmpout
 
         irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
+        rlRun "sleep 60"
         irm_userchk $MASTER $testuser 
         irm_userchk $REPLICA1 $testuser
         irm_userchk $REPLICA2 $testuser
@@ -287,6 +292,7 @@ function irm_forcesync_pos_0006()
         rlAssertGrep "Deleting schedule.*from agreement" $tmpout
 
         irm_check_ruv_sync "$MASTER $REPLICA1 $REPLICA2 $REPLICA3 $REPLICA4"
+        rlRun "sleep 60"
         irm_userchk $MASTER $testuser 
         irm_userchk $REPLICA1 $testuser
         irm_userchk $REPLICA2 $testuser
