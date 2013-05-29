@@ -387,8 +387,8 @@ EOF
         rlFileBackup "/etc/resolv.conf"
         rlRun "echo -e \"search testrelm.com\nnameserver 10.16.65.2\" > /etc/resolv.conf" 0 "Create a resolv.conf file pointing to IPA DNS"
         cat /etc/resolv.conf
-        rlRun "ldapmodify -x -D \"$DS_binddn\" -w Secret123 -h $MASTER -f $tmpDir/rootdse.ldif" 0 "Setting nsslapd-allow-anonymous-access to rootdse on $MASTER"
-        rlRun "ipa-client-install -p admin -w Secret123 --mkhomedir -dd -U"
+        rlRun "ldapmodify -x -D \"$DS_binddn\" -w $ADMINPW -h $MASTER -f $tmpDir/rootdse.ldif" 0 "Setting nsslapd-allow-anonymous-access to rootdse on $MASTER"
+        rlRun "ipa-client-install -p admin -w $ADMINPW --mkhomedir -dd -U"
         rlAssertGrep "Client configuration complete." "$ipalog"
         # Clean Up
         rm -fr $tmpDir
