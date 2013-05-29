@@ -29,7 +29,7 @@ export TESTVERSION=3.1
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipacert.sh lib.ipacert.sh buglib.ipacert.sh d.ipacert.sh
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.ipacert.sh lib.ipacert.sh buglib.ipacert.sh t.ipacert.bug.sh
 
 .PHONY: all install download clean
 

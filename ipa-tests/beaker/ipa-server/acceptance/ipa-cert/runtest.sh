@@ -41,7 +41,7 @@
 
 # Include test case file
 . ./t.ipacert.sh
-. ./d.ipacert.sh
+. ./t.ipacert.bug.sh
 
 ########### temp fix ########
 bugfix()
