@@ -79,13 +79,13 @@ function irm_reinitialize_pos_0003()
     rlPhaseStartTest "irm_reinitialize_pos_0003: reinitialize, replica3 from replica2 [BZ831661]"
     case "$MYROLE" in
     MASTER_*)
-        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     REPLICA1_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     REPLICA2_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     REPLICA3_*)
         rlRun "ipa-replica-manage $PWOPT re-initialize --from=$REPLICA2 > $tmpout 2>&1"
@@ -93,10 +93,10 @@ function irm_reinitialize_pos_0003()
         rlAssertGrep "Update succeeded" $tmpout
         irm_userchk $REPLICA3 admin
 
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BR3"
         ;;
     REPLICA4_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     *)
     esac
@@ -114,13 +114,13 @@ function irm_reinitialize_pos_0004()
     rlPhaseStartTest "irm_reinitialize_pos_0004: reinitialize, replica4 from replica3, remote [BZ831661]"
     case "$MYROLE" in
     MASTER_*)
-        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     REPLICA1_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     REPLICA2_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     REPLICA3_*)
         rlRun "ipa-replica-manage $PWOPT -H $REPLICA4 re-initialize --from=$REPLICA3 > $tmpout 2>&1"
@@ -128,10 +128,10 @@ function irm_reinitialize_pos_0004()
         rlAssertGrep "Update succeeded" $tmpout
         irm_userchk $REPLICA4 admin
 
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BR3"
         ;;
     REPLICA4_*)
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
+        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR3"
         ;;
     *)
     esac
@@ -429,7 +429,7 @@ function irm_reinitialize_neg_0008()
         rlRun "cat $tmpout"
         rlAssertGrep "Unknown host $REPLICA1" $tmpout
 
-        rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR2"
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR2"
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.2' $MY_BR1"
         ;;
     REPLICA3_*)
