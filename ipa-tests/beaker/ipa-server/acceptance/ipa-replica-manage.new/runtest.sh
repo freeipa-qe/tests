@@ -83,6 +83,7 @@ rlJournalStart
         else
             rlLog "Zeroing PWOPT and running kinit to ensure password is not used"
             PWOPT=""
+            KinitAsAdmin
         fi
         rlRun "AddToKnownHosts $MY_BM"
         rlRun "AddToKnownHosts $MY_BR1"

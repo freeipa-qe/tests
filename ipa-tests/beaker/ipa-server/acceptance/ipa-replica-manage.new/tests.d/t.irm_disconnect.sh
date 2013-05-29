@@ -29,6 +29,8 @@ function irm_disconnect_pos_0001()
         # Cleanup
         irm_userdel $MASTER $testuser
         rlRun "ipa-replica-manage $PWOPT connect $MASTER $REPLICA2"
+        rlRun "ssh $REPLICA2 \"ipactl stop\""
+        rlRun "ssh $REPLICA2 \"ipactl start\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
@@ -81,6 +83,8 @@ function irm_disconnect_pos_0002()
         # Cleanup
         irm_userdel $MASTER $testuser
         rlRun "ipa-replica-manage $PWOPT connect $MASTER $REPLICA2"
+        rlRun "ssh $REPLICA2 \"ipactl stop\""
+        rlRun "ssh $REPLICA2 \"ipactl start\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
@@ -271,6 +275,10 @@ function irm_disconnect_neg_0005()
 
         # Cleanup
         rlRun "ipa-replica-manage $PWOPT connect $REPLICA3 $REPLICA4"
+        rlRun "ssh $REPLICA3 \"ipactl stop\""
+        rlRun "ssh $REPLICA3 \"ipactl start\""
+        rlRun "ssh $REPLICA4 \"ipactl stop\""
+        rlRun "ssh $REPLICA4 \"ipactl start\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
@@ -317,6 +325,10 @@ function irm_disconnect_neg_0006()
 
         # Cleanup
         rlRun "ipa-replica-manage $PWOPT connect $REPLICA3 $REPLICA4"
+        rlRun "ssh $REPLICA3 \"ipactl stop\""
+        rlRun "ssh $REPLICA3 \"ipactl start\""
+        rlRun "ssh $REPLICA4 \"ipactl stop\""
+        rlRun "ssh $REPLICA4 \"ipactl start\""
         rlRun "ipa-replica-manage $PWOPT disconnect $REPLICA1 $REPLICA4"      
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BM"
