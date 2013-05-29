@@ -78,8 +78,6 @@ installMaster()
         rlRun "appendEnv" 0 "Append the machine information to the env.sh with the information for the machines in the recipe set"
 
         # stop the firewall
-        service iptables stop
-        service ip6tables stop
 
    rlPhaseEnd
 
@@ -182,7 +180,6 @@ installCA()
 
    rlPhaseStartTest "Installing CA Replica with --no-host-dns option"
 
-	rlRun "service ipa status"
 	rlRun "mv /etc/hosts /var/tmp/"
 	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/hosts
 
@@ -213,23 +210,22 @@ echo "send \"service named restart\"" >> $expfile
 echo 'send "\r"' >> $expfile
 echo 'expect eof ' >> $expfile
 
-        rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
-        rlRun "cat $expfile"
-        rlRun "cat $expout"
+        #rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
+        #rlRun "cat $expfile"
+        #rlRun "cat $expout"
 
-	rlRun "cat /etc/resolv.conf"
-	echo "nameserver	$MASTERIP" > /etc/resolv.conf
-	rlRun "cat /etc/resolv.conf"
+	#rlRun "cat /etc/resolv.conf"
+	#echo "nameserver	$MASTERIP" > /etc/resolv.conf
+	#rlRun "cat /etc/resolv.conf"
 
+        rlRun "service named stop" 0 "Stopping named service"
+	rlRun "nslookup $MASTER" 1
+	rlRun "nslookup $SLAVE" 1
 	echo "$MASTERIP		$MASTER" >> /etc/hosts
 	echo "$SLAVEIP		$SLAVE" >> /etc/hosts
 	rlRun "cat /etc/hosts"
-
-	rlRun "nslookup $MASTER"
-	rlRun "nslookup $SLAVE"
-	rlRun "service ipa restart"
-	rlRun "service ipa status"
-	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+	
+        rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=757681"
 	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
@@ -271,12 +267,6 @@ echo 'sleep 3' >> $expfile
 echo 'expect "*: "' >> $expfile
 echo "send \"$ADMINPW\"" >> $expfile
 echo 'send "\r"' >> $expfile
-echo 'expect "#: "' >> $expfile
-echo "send \"ipa dnsrecord-add $FORWARD_ZONE `hostname -s` --a-record=$SLAVEIP\"" >> $expfile
-echo 'send "\r"' >> $expfile
-echo 'expect "#: "' >> $expfile
-echo "send \"ipa dnsrecord-add $REV_ZONE $PTR_NAME --ptr-hostname=$SLAVE\"" >> $expfile
-echo 'send "\r"' >> $expfile
 echo 'expect eof ' >> $expfile
 
 	rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
@@ -286,6 +276,8 @@ echo 'expect eof ' >> $expfile
 	rlRun "mv /etc/hosts /tmp/"
 	rlRun "mv /var/tmp/hosts /etc/hosts" 0 " Restoring /etc/hosts"
 	rlRun "cat /etc/hosts"
+        rlRun "service named start" 0 "Starting named service"
+        echo "nameserver $MASTERIP" > /etc/resolv.conf
 	rlRun "cat /etc/resolv.conf"
 
         echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
