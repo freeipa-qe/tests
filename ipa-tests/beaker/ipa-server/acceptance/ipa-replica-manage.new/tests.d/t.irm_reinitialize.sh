@@ -362,6 +362,10 @@ function irm_reinitialize_neg_0007()
     REPLICA1_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
 
+        # Cleanup
+        rlRun "ssh $MASTER \"ipactl stop\""
+        rlRun "ssh $MASTER \"ipactl start\""
+        rlRun "ssh $MASTER \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
         irm_uninstall
         irm_install $MASTER
         
@@ -409,6 +413,9 @@ function irm_reinitialize_neg_0008()
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR2"
 
         # Cleanup
+        rlRun "ssh $MASTER \"ipactl stop\""
+        rlRun "ssh $MASTER \"ipactl start\""
+        rlRun "ssh $MASTER \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
         irm_uninstall 
         irm_install $MASTER
 
