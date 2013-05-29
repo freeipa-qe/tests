@@ -364,6 +364,39 @@ ipaclientinstall_bugcheck_767725()
         rlPhaseEnd
 }
 
+ipaclientinstall_bugcheck_952741() {
+        # Added by Steeve
+rlPhaseStartTest "unattended ipa-client installation fails when anonymous access to LDAP is disabled on IPA servers bz952741"
+        #UnInstalling client
+        uninstall_fornexttest
+        ipalog=/var/log/ipaclient-install.log
+        rm -f $ipalog
+        tmpDir=`mktemp -d`
+        cat > $tmpDir/rootdse.ldif << EOF
+        dn: cn=config
+        changetype: modify
+        replace: nsslapd-allow-anonymous-access
+        nsslapd-allow-anonymous-access: rootdse
+EOF
+        rpm1="openldap-clients"
+        rlCheckRpm "$rpm1"
+        if [ $? -ne 0 ]; then
+           rlRun "yum install -y $rpm1"
+        fi
+        DS_binddn="CN=Directory Manager"
+        rlFileBackup "/etc/resolv.conf"
+        rlRun "echo -e \"search testrelm.com\nnameserver 10.16.65.2\" > /etc/resolv.conf" 0 "Create a resolv.conf file pointing to IPA DNS"
+        cat /etc/resolv.conf
+        rlRun "ldapmodify -x -D \"$DS_binddn\" -w Secret123 -h $MASTER -f $tmpDir/rootdse.ldif" 0 "Setting nsslapd-allow-anonymous-access to rootdse on $MASTER"
+        rlRun "ipa-client-install -p admin -w Secret123 --mkhomedir -dd -U"
+        rlAssertGrep "Client configuration complete." "$ipalog"
+        # Clean Up
+        rm -fr $tmpDir
+        rlFileRestore "/etc/resolv.conf"
+
+rlPhaseEnd
+}
+
 ipa_bug_verification(){
     ipa-client-install --uninstall -U
     bug_833505

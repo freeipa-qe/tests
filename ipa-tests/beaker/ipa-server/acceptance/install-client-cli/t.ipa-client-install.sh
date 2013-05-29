@@ -119,6 +119,9 @@ ipaclientinstall()
     # Bug 817030 - ipa-client-install sets "KerberosAuthenticate no" in sshd.conf 
     ipaclientinstall_bugcheck_817030
 
+    # Bug 952741 - unattended ipa-client installation fails when anonymous access to LDAP is disabled on IPA servers
+    ipaclientinstall_bugcheck_952741
+
     # Bug 767725 - GSS-TSIG DNS updates should update reverse entries as well
     ipaclientinstall_bugcheck_767725
 
