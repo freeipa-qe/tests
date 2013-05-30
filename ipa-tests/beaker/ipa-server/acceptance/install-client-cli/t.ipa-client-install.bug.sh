@@ -384,8 +384,9 @@ EOF
            rlRun "yum install -y $rpm1"
         fi
         DS_binddn="CN=Directory Manager"
+	relm=${RELM,,}
         rlFileBackup "/etc/resolv.conf"
-        rlRun "echo -e \"search testrelm.com\nnameserver 10.16.65.2\" > /etc/resolv.conf" 0 "Create a resolv.conf file pointing to IPA DNS"
+        rlRun "echo -e \"search $relm\nnameserver $MASTERIP\" > /etc/resolv.conf" 0 "Create a resolv.conf file pointing to IPA DNS"
         cat /etc/resolv.conf
         rlRun "ldapmodify -x -D \"$DS_binddn\" -w $ADMINPW -h $MASTER -f $tmpDir/rootdse.ldif" 0 "Setting nsslapd-allow-anonymous-access to rootdse on $MASTER"
         rlRun "ipa-client-install -p admin -w $ADMINPW --mkhomedir -dd -U"
