@@ -469,7 +469,7 @@ qaExpectedRun()
     if $debug ;then
         echo "--------- expected msg ---------"
         echo "[$expectMsg]"
-        showFileContent $out
+        show_file_content $out
     fi
 } 
 
@@ -632,18 +632,12 @@ uninstall_ipa_client(){
     rlRun "ipa-client-install --uninstall -U"
 }
 
-#functions for ipa extended test cases
-CheckFunction() {
-    conf="$@"
-    rlLog "CheckFunction: $conf"
-}
-
-checkFileContent() {
+verify_file_contains_string() {
     file=$1
     shift
     line="$@"
     local result=""
-    rlLog "[start: checkFileContent]: check whether file [$file] contains expected line [$line]"
+    rlLog "[start: verify_file_contains_string]: check whether file [$file] contains expected line [$line]"
     grep "$line" $file
     if [ "$?" = "0" ];then
         result="good"
@@ -652,12 +646,49 @@ checkFileContent() {
         result="bad"
         rlFail "[bad] expected line does not found in file"
         rlLog "full content of [$file] is below"
-        showFileContent $file
+        show_file_content $file
     fi
-    rlLog "[finished: checkFileContent]: result=[$result]"
+    rlLog "[finished: verify_file_contains_string]: result=[$result]"
 }
 
-checkServiceStatus() {
+verify_file_does_not_contains_string() {
+    file=$1
+    shift
+    line="$@"
+    local result=""
+    rlLog "[start: verify_file_does_not_contains_string]: check whether [$file] does NOT contains [$line]"
+    grep -v "$line" $file
+    if [ "$?" = "0" ];then
+        result="good"
+        rlPass "[$result] [$file] does NOT contain string [$line] as expected"
+    else
+        result="bad"
+        rlFail "[$result] expected string [$line] found in [$file] is NOT expected"
+        show_file_content $file
+    fi
+    rlLog "[finished: verify_file_contains_string]: result=[$result]"
+}
+
+verify_file_contains_string() {
+    file=$1
+    shift
+    line="$@"
+    local result=""
+    rlLog "[start: verify_file_contains_string]: check whether file [$file] contains expected line [$line]"
+    grep "$line" $file
+    if [ "$?" = "0" ];then
+        result="good"
+        rlPass "[good] found expected line in file"
+    else
+        result="bad"
+        rlFail "[bad] expected line does not found in file"
+        rlLog "full content of [$file] is below"
+        show_file_content $file
+    fi
+    rlLog "[finished: verify_file_contains_string]: result=[$result]"
+}
+
+check_service_status() {
     # this function works across rhel & fedora
     # status would be: enabled/disabled or active/inactive
     # service name : since rhel use name like "ntpd" and fedora use "ntpd.service"
@@ -687,50 +718,92 @@ checkServiceStatus() {
     else
         rlFail "[bad]  the expected status [$statusToCheck] for service [$serviceName] not found"
         rlLog "output of /bin/systemd "
-        showFileContent $out
+        show_file_content $out
     fi
 }
 
 conf_openldap="/etc/openldap/ldap.conf"
 conf_ssh_client="/etc/ssh/ssh_config"
+conf_ssh_server="/etc/ssh/sshd_config"
 conf_sssd_client="/etc/sssd/sssd.conf"
 conf_ntpd="/etc/ntpd.conf"
+conf_pam_system_auth="/etc/pam.d/system-auth"
+conf_authconfig="/etc/sysconfig/authconfig"
+conf_nsswitch="/etc/nsswitch.conf"
+
 CheckConfig() {
     conf="$@"
     rlLog "CheckConfig: $conf"
     if [ "$conf" = "force_ldap" ];then
-        checkFileContent $conf_openldap "URI ldaps://$MASTER"
-        checkFileContent $conf_openldap "BASE $BASEDN"
+        verify_file_contains_string $conf_openldap "URI ldaps://$MASTER"
+        verify_file_contains_string $conf_openldap "BASE $BASEDN"
     elif [ "$conf" = "ssh_trust_dns" ];then
-        checkFileContent $conf_ssh_client  "VerifyHostKeyDNS yes"
+        verify_file_contains_string $conf_ssh_client  "VerifyHostKeyDNS yes"
+    elif [ "$conf" = "dns_sshfp" ];then
+        out="/tmp/no.dns.sshfp.check.$RANDOM.txt"
+        nslookup -query=SSHFP $HOSTNAME > $out
+        if grep "$HOSTNAME rdata_44" $out
+        then
+            rlPass "'SSH public key fingerprint' found as expected"
+        else
+            rlFail "not found 'SSH public key fingerprint'"
+        fi
     elif [ "$conf" = "no_dns_sshfp" ];then
         out="/tmp/no.dns.sshfp.check.$RANDOM.txt"
-        rlRun "echo $ADMINPW | kinit $ADMINID" 0 "kinit as admin"
-        ipa host-find $HOSTNAME 2>&1 > $out
-        if grep "SSH public key fingerprint" $out
+        nslookup -query=SSHFP $HOSTNAME > $out
+        if grep "$HOSTNAME rdata_44" $out
         then
             rlFail "found 'SSH public key fingerprint' when it is NOT expected"
-            showFileContent $out
         else
             rlPass "no 'SSH public key fingerprint' found as expected"
-            showFileContent $out
         fi
     elif [ "$conf" = "primaryServer" ];then
-        checkFileContent $conf_sssd_client "ipa_server = $MASTER"    
+        verify_file_contains_string $conf_sssd_client "ipa_server = $MASTER"    
     elif [ "$conf" = "ntpserver_setting" ];then
-        checkFileContent $conf_ntpd "server $NTPSERVER"
+        verify_file_contains_string $conf_ntpd "server $NTPSERVER"
     elif [ "$conf" = "ntpserver_disabled" ];then
-        checkServiceStatus "ntpd" "disabled"
+        check_service_status "ntpd" "disabled"
     elif [ "$conf" = "hostname" ];then
-        checkFileContent $conf_sssd_client "ipa_hostname = $HOSTNAME"    
+        verify_file_contains_string $conf_sssd_client "ipa_hostname = $HOSTNAME"    
     elif [ "$conf" = "no_krb5_store_password_if_offline" ];then
-        checkFileContent $conf_sssd_client "krb5_store_password_if_offline = False"    
+        verify_file_contains_string $conf_sssd_client "krb5_store_password_if_offline = False"    
+    elif [ "$conf" = "enable_dns_updates" ];then
+        verify_file_contains_string $conf_sssd_client "ipa_dyndns_update = True"    
+    elif [ "$conf" = "no_ac" ];then
+        verify_file_contains_string $conf_authconfig "USESSSDAUTH=no"    
+        verify_file_contains_string $conf_authconfig "USESSSD=no"    
+        verify_file_does_not_contains_string $conf_nsswitch "sss"    
+    elif [ "$conf" = "make_home_dir" ];then
+        # when --mkhomedir flag is given, we expect pam configuration to take care of this
+        # the configuration files that make this happen is mainly "/etc/pam.d/system-auth"
+        # but other files, like system-auth-ac, smartcard-auth(-ac), password-auth(-ac),
+        # are all have the same configuration -- yzhang 2013.5.30
+        if grep "session     optional      pam_oddjob_mkhomedir.so" $conf_pam_system_auth
+        then
+            rlPass "detected pam configuration for mkhomedir in [$conf_pam_system_auth]"
+        else
+            rlFail "no mkhomedir configuration found in [$conf_pam_system_auth]"
+        fi
+        show_file_content $conf_pam_system_auth
+    elif [ "$conf" = "ntpserver_untouched" ];then
+        rlLog "verify: ntpserver_untouched"
+    elif [ "$conf" = "no_ssh" ];then
+        verify_file_contains_string $conf_sssd_client "services = nss, pam"
+        verify_file_does_not_contains_string $conf_sssd_client "services = nss, pam, ssh"
+        verify_file_does_not_contains_string $conf_ssh_client "GlobalKnownHostsFile /var/lib/sss/pubconf/known_hosts"
+        verify_file_does_not_contains_string $conf_ssh_client "ProxyCommand /usr/bin/sss_ssh_knownhostsproxy -p %p %h"
+    elif [ "$conf" = "no_sshd" ];then
+        verify_file_does_not_contains_string $conf_ssh_server "AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys"
+    elif [ "$conf" = "permit" ];then
+        verify_file_contains_string $conf_sssd_client "access_provider = permit"
+    elif [ "$conf" = "preserv_sssd" ];then
+        rlFail "verify: preserv_sssd have't implemented yet"
     else
-        rlLog "checkconfig have not implemente [$conf] yet"
+        rlFail "checkconfig have not implemente [$conf] yet"
     fi
 }
 
-showFileContent() {
+show_file_content() {
     file=$1
     if [ -f $file ];then
         echo "---------------- beginning of [$file] ----------------------------"

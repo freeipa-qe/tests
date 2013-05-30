@@ -78,7 +78,7 @@ ipaclientinstall_non_sssd_option_0005_test_single_option__mkhomedir(){
         rlLog " Single Option test: --mkhomedir"
         rlLog "Test Data: --domain:$DOMAIN --principal:$ADMINID --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --mkhomedir "
         rlRun "ipa-client-install --domain=$DOMAIN --principal=$ADMINID --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --mkhomedir"  
-        CheckFunction make_home_dir  # Verify for: --mkhomedir
+        CheckConfig make_home_dir  # Verify for: --mkhomedir
         rlRun "ipa-client-install --uninstall -U" 0 "uninstall ipa client"
     rlPhaseEnd
 }
@@ -158,11 +158,12 @@ ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__
         rlLog " Multi Options test: --fixed-primary,--force,--force-ntpd,--hostname,--mkhomedir,--no-dns-sshfp,--noac"
         rlLog "Test Data: --domain:$DOMAIN --principal:$ADMINID --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --fixed-primary --force --force-ntpd --hostname:$HOSTNAME --mkhomedir --no-dns-sshfp --noac "
         rlRun "ipa-client-install --domain=$DOMAIN --principal=$ADMINID --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --fixed-primary --force --force-ntpd --hostname=$HOSTNAME --mkhomedir --no-dns-sshfp --noac"  
+        CheckConfig dns_sshfp           # Verify sshfp when no flag "--no-dns-sshfp" is given
         CheckConfig primaryServer       # Verify for: --fixed-primary  
         CheckConfig force_ldap          # Verify for: --force  
         CheckConfig ntpserver_disabled  # Verify for: --force-ntpd  
         CheckConfig hostname            # Verify for: --hostname  
-        CheckFunction make_home_dir     # Verify for: --mkhomedir
+        CheckConfig make_home_dir     # Verify for: --mkhomedir
         rlRun "ipa-client-install --uninstall -U" 0 "uninstall ipa client"
     rlPhaseEnd
 }
@@ -176,7 +177,7 @@ ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__
         CheckConfig force_ldap          # Verify for: --force  
         CheckConfig ntpserver_disabled  # Verify for: --force-ntpd  
         CheckConfig hostname            # Verify for: --hostname  
-        CheckFunction make_home_dir     # Verify for: --mkhomedir
+        CheckConfig make_home_dir     # Verify for: --mkhomedir
         rlRun "ipa-client-install --uninstall -U" 0 "uninstall ipa client"
     rlPhaseEnd
 }
