@@ -419,7 +419,7 @@ function irm_reinitialize_neg_0008()
         irm_uninstall 
         irm_install $MASTER
 
-        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR1"
+        rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.2' -m $MY_BR1"
         ;;
     REPLICA2_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BM"
