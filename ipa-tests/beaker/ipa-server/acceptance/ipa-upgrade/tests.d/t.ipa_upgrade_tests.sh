@@ -334,11 +334,11 @@ ipa_upgrade_master_replica_client_nodns()
             THISAAAA="$(dig +short $THISHOST aaaa)"
             rlLog "First remove IP entry from /etc/hosts if found."
             rlRun "sed -i '/$THISA/d' /etc/hosts"
-            # removing check for AAAA as it seems there are some lab DNS 
-            # issues that can be resolved here by using /etc/hosts entries
-            if [ -n "$THISA" ]; then
-            #if [ -n "$THISAAAA" -a -n "$THISA" ]; then
-                #rlLog "$THISHOST has AAAA record.  Adding A to /etc/hosts"
+            ## removing check for AAAA as it seems there are some lab DNS 
+            ## issues that can be resolved here by using /etc/hosts entries
+            #if [ -n "$THISA" ]; then
+            if [ -n "$THISAAAA" -a -n "$THISA" ]; then
+                rlLog "$THISHOST has AAAA record.  Adding A to /etc/hosts"
                 rlRun "echo \"$THISA $THISHOST\" >> /etc/hosts" 
             fi
         done
