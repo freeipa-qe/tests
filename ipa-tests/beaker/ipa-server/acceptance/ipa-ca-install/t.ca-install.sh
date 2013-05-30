@@ -231,6 +231,7 @@ echo 'expect eof ' >> $expfile
 
 	rlLog "Verifying bug https://bugzilla.redhat.com/show_bug.cgi?id=757681"
 	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
+	#echo "coverage run -a /usr/sbin/ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended --no-host-dns /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
         chmod 755 /opt/rhqa_ipa/replica-ca-install.bash
         rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
         rlRun "/bin/bash /opt/rhqa_ipa/replica-ca-install.bash" 0 "CA Replica installation with --no-host-dns"
@@ -289,6 +290,56 @@ echo 'expect eof ' >> $expfile
 
 	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
 	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
+	#echo "coverage run -a /usr/sbin/ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-conncheck --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
+	chmod 755 /opt/rhqa_ipa/replica-ca-install.bash
+	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+	rlRun "/bin/bash /opt/rhqa_ipa/replica-ca-install.bash" 0 "CA Replica installation"
+
+	if [ -f /var/log/ipareplica-ca-install.log ]; then
+		rhts-submit-log -l /var/log/ipareplica-ca-install.log
+	fi
+
+	rlRun "ipa-server-install --uninstall -U"
+rlPhaseEnd
+
+	rlPhaseStartTest "Installing CA Replica with --skip-schema-check option"
+
+expfile=/tmp/remote_exec.exp
+expout=/tmp/remote_exec.out
+
+rm -rf $expfile $expout
+
+echo 'set timeout 30
+set send_slow {1 .1}' > $expfile
+echo "spawn ssh -l root $MASTERIP" >> $expfile
+echo 'match_max 100000' >> $expfile
+echo 'sleep 2' >> $expfile
+echo 'expect "#: "' >> $expfile
+echo "send \"ipa-replica-manage del $SLAVE --force\"" >> $expfile
+echo 'send "\r"' >> $expfile
+echo 'sleep 3' >> $expfile
+echo 'expect "*: "' >> $expfile
+echo "send \"$ADMINPW\"" >> $expfile
+echo 'send "\r"' >> $expfile
+echo 'expect eof ' >> $expfile
+
+	rlRun "/usr/bin/expect $expfile >> $expout 2>&1"
+	rlRun "cat $expfile"
+	rlRun "cat $expout"
+
+	rlRun "cat /etc/hosts"
+        echo "nameserver $MASTERIP" > /etc/resolv.conf
+	rlRun "cat /etc/resolv.conf"
+
+        echo "ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-install.bash
+        chmod 755 /opt/rhqa_ipa/replica-install.bash
+        rlLog "EXECUTING: ipa-replica-install -U --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+        rlRun "/bin/bash /opt/rhqa_ipa/replica-install.bash" 0 "Replica installation"
+        rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
+
+	rlLog "Executing: ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-schema-check --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
+	echo "ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-schema-check --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
+	#echo "coverage run -a /usr/sbin/ipa-ca-install -p $ADMINPW -w $ADMINPW --skip-schema-check --unattended /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg" > /opt/rhqa_ipa/replica-ca-install.bash
 	chmod 755 /opt/rhqa_ipa/replica-ca-install.bash
 	rlRun "kinitAs $ADMINID $ADMINPW" 0 "Testing kinit as admin"
 	rlRun "/bin/bash /opt/rhqa_ipa/replica-ca-install.bash" 0 "CA Replica installation"
@@ -298,4 +349,5 @@ echo 'expect eof ' >> $expfile
 	fi
 
 rlPhaseEnd
+
 }
