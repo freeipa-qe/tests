@@ -362,18 +362,7 @@ makereport()
     echo "===========================[$report]===============================" >> $report
     echo "[`date`] test summary report saved as: $report"
     echo ""
-    if [ "$COVERAGE_RUN" = "yes" ]; then
-        pushd $(dirname $COVERAGE_FILE)
-        echo "===========================[COVERAGE_SUMMARY]===============================" >> $report
-        coverage combine
-        coverage report >> $report
-        echo "===========================[COVERAGE_SUMMARY]===============================" >> $report
-        coverage html -d report
-        TARFILE=$(basename $(dirname $COVERAGE_FILE)).tgz
-        tar zcvf $TARFILE report >/dev/null 2>&1
-        rhts-submit-log  -l $TARFILE
-        popd
-    fi
+    ipa_coverage_makereport $report
     cat $report
 } #makereport
 
@@ -1269,6 +1258,35 @@ function ipa_coverage_archive()
     SSHPATH=/qa/archive/ipa/coverage
     ARCHIVESRC=$1
 
-    rlRun "scp -i $SSHKEY -R $ARCHIVESRC $SSHUSER@$SSHHOST:$SSHPATH"
+    rlRun "scp -i $SSHKEY -r $ARCHIVESRC $SSHUSER@$SSHHOST:$SSHPATH"
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ipa_coverage_archive <file|dir>
+# - archive file/dir to wiki
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+function ipa_coverage_makereport()
+{
+    if [ $# -gt 0 ]; then
+        thisreport=${1}
+    else
+        thisreport=/tmp/this.coverage.report
+    fi
+    if [ "$COVERAGE_RUN" = "yes" ]; then
+        pushd $(dirname $COVERAGE_FILE)
+        echo "===========================[COVERAGE_SUMMARY]===============================" >> summary
+        coverage combine
+        coverage report >> summary
+        echo "===========================[COVERAGE_SUMMARY]===============================" >> summary
+        coverage html -d report
+        TARFILE=$(basename $(dirname $COVERAGE_FILE)).tgz
+        tar zcvf $TARFILE report >/dev/null 2>&1
+        rhts-submit-log  -l $TARFILE
+        pushd ..
+        ipa_coverage_archive $(basename $(dirname $COVERAGE_FILE))
+        popd
+        popd
+        cat summary >> $thisreport
+    fi
 }
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #

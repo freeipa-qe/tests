@@ -89,6 +89,7 @@ run: $(FILES) build
 	cp -f ./id_rsa_global /opt/rhqa_ipa/.
 	cp -f ./known_hosts /opt/rhqa_ipa/.
 	cp -f ./id_dsa-wiki-beaker_archive /opt/rhqa_ipa/.
+	chmod 600 /opt/rhqa_ipa/id_dsa-wiki-beaker_archive
 	chmod 755 /opt/rhqa_ipa/*.sh
 	chmod 600 /root/.ssh
 	chmod 600 /root/.ssh/id*
