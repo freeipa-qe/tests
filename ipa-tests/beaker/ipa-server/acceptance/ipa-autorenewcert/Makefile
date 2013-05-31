@@ -29,7 +29,7 @@ export TESTVERSION=3.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE t.autorenewcert.sh lib.autorenewcert.sh d.autorenewcert.sh certfunctions.pl countlist.pl difflist.pl grouplist.pl readCert.pl readLoadedCert.pl readRenewalCert.pl readRenewalCertsInLDAP.pl sortlist.pl convertTime.pl
+FILES=$(METADATA) runtest.sh Makefile PURPOSE t.autorenewcert.sh t.autorenewcert.bug.sh lib.autorenewcert.sh d.autorenewcert.sh certfunctions.pl countlist.pl difflist.pl grouplist.pl readCert.pl readLoadedCert.pl readRenewalCert.pl readRenewalCertsInLDAP.pl sortlist.pl convertTime.pl
 
 .PHONY: all install download clean
 
