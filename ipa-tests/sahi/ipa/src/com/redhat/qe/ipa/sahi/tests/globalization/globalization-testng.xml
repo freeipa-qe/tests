@@ -5,7 +5,8 @@
 			<run> 
 			<include name="setup" />
 		    <include name="userTests_Add" />
-			<include name="user_modify" />
+		    <include name="user_passwordReset" />
+	        <include name="user_modify" />
 			<include name="user_modify_negative" />
 			<include name="userTests_Delete" />
 			
@@ -31,9 +32,6 @@
 			<include name="selfservice" />
 			<include name="delegation" />
 			<include name="configuration" />
-			
-			
-			
 			
 			</run>
 		</groups>
