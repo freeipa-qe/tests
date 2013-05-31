@@ -633,9 +633,9 @@ uninstall_ipa_client(){
 }
 
 verify_file_contains_string() {
-    file=$1
+    local file=$1
     shift
-    line="$@"
+    local line="$@"
     local result=""
     rlLog "[start: verify_file_contains_string]: check whether file [$file] contains expected line [$line]"
     grep "$line" $file
@@ -646,15 +646,15 @@ verify_file_contains_string() {
         result="bad"
         rlFail "[bad] expected line does not found in file"
         rlLog "full content of [$file] is below"
-        show_file_content $file
     fi
+    show_file_content $file
     rlLog "[finished: verify_file_contains_string]: result=[$result]"
 }
 
 verify_file_does_not_contains_string() {
-    file=$1
+    local file=$1
     shift
-    line="$@"
+    local line="$@"
     local result=""
     rlLog "[start: verify_file_does_not_contains_string]: check whether [$file] does NOT contains [$line]"
     grep -v "$line" $file
@@ -664,8 +664,8 @@ verify_file_does_not_contains_string() {
     else
         result="bad"
         rlFail "[$result] expected string [$line] found in [$file] is NOT expected"
-        show_file_content $file
     fi
+    show_file_content $file
     rlLog "[finished: verify_file_contains_string]: result=[$result]"
 }
 
@@ -810,6 +810,6 @@ show_file_content() {
         cat $file
         echo "---------------------- end of [$file] ----------------------------"
     else
-        echo "file [$file] does NOT exist"
+        echo "=================  file [$file] does NOT exist ================= "
     fi
 }
