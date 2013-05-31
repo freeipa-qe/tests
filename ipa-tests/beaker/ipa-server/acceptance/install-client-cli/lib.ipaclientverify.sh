@@ -638,7 +638,7 @@ verify_file_contains_string() {
     local line="$@"
     local result=""
     rlLog "[start: verify_file_contains_string]: check whether file [$file] contains expected line [$line]"
-    grep "$line" $file
+    grep -v "^#" $file | grep "$line"
     if [ "$?" = "0" ];then
         result="good"
         rlPass "[good] found expected line in file"
@@ -657,7 +657,7 @@ verify_file_does_not_contains_string() {
     local line="$@"
     local result=""
     rlLog "[start: verify_file_does_not_contains_string]: check whether [$file] does NOT contains [$line]"
-    grep -v "$line" $file
+    grep -v "^#" $file | grep "$line"
     if [ "$?" = "0" ];then
         result="good"
         rlPass "[$result] [$file] does NOT contain string [$line] as expected"
@@ -669,25 +669,6 @@ verify_file_does_not_contains_string() {
     rlLog "[finished: verify_file_contains_string]: result=[$result]"
 }
 
-verify_file_contains_string() {
-    file=$1
-    shift
-    line="$@"
-    local result=""
-    rlLog "[start: verify_file_contains_string]: check whether file [$file] contains expected line [$line]"
-    grep "$line" $file
-    if [ "$?" = "0" ];then
-        result="good"
-        rlPass "[good] found expected line in file"
-    else
-        result="bad"
-        rlFail "[bad] expected line does not found in file"
-        rlLog "full content of [$file] is below"
-        show_file_content $file
-    fi
-    rlLog "[finished: verify_file_contains_string]: result=[$result]"
-}
-
 check_service_status() {
     # this function works across rhel & fedora
     # status would be: enabled/disabled or active/inactive
@@ -696,20 +677,22 @@ check_service_status() {
     #                if not found, then it try to insert it automatically under fedora
     serviceName=$1
     statusToCheck=$2
+    rlLog "[check_service_status]: serviceName=[$serviceName], statusToCheck=[$statusToCheck]"
     local returnCode=""
     local out="/tmp/checkService.$RANDOM"
     local cmd=""
-    if [ -f /bin/systemd ];then
+    if [ -f /usr/bin/systemctl ];then
         #in Fedora
         if ! echo $serviceName | grep "service"
         then
             serviceName="${serviceName}.service"
         fi
-        cmd="/bin/systemd status $serviceName"
+        cmd="/usr/bin/systemctl status $serviceName"
     else
         #in RHEL
         cmd="service $serviceName status"
     fi
+    rlLog "status check command is [$cmd]"
     $cmd 2>&1 > $out
     returnCode=$?
     grep "$statusToCheck" $out
@@ -747,7 +730,7 @@ CheckConfig() {
         then
             rlPass "'SSH public key fingerprint' found as expected"
         else
-            rlFail "not found 'SSH public key fingerprint'"
+            rlFail "not found 'SSH public key fingerprint' as expected"
         fi
     elif [ "$conf" = "no_dns_sshfp" ];then
         out="/tmp/no.dns.sshfp.check.$RANDOM.txt"
@@ -758,6 +741,7 @@ CheckConfig() {
         else
             rlPass "no 'SSH public key fingerprint' found as expected"
         fi
+        show_file_content $out
     elif [ "$conf" = "primaryServer" ];then
         verify_file_contains_string $conf_sssd_client "ipa_server = $MASTER"    
     elif [ "$conf" = "ntpserver_setting" ];then
@@ -770,9 +754,8 @@ CheckConfig() {
         verify_file_contains_string $conf_sssd_client "krb5_store_password_if_offline = False"    
     elif [ "$conf" = "enable_dns_updates" ];then
         verify_file_contains_string $conf_sssd_client "ipa_dyndns_update = True"    
-    elif [ "$conf" = "no_ac" ];then
+    elif [ "$conf" = "noac" ];then
         verify_file_contains_string $conf_authconfig "USESSSDAUTH=no"    
-        verify_file_contains_string $conf_authconfig "USESSSD=no"    
         verify_file_does_not_contains_string $conf_nsswitch "sss"    
     elif [ "$conf" = "make_home_dir" ];then
         # when --mkhomedir flag is given, we expect pam configuration to take care of this
@@ -784,6 +767,10 @@ CheckConfig() {
             rlPass "detected pam configuration for mkhomedir in [$conf_pam_system_auth]"
         else
             rlFail "no mkhomedir configuration found in [$conf_pam_system_auth]"
+            echo "check mkhomedir in the whole /etc/pam.d/ directory"
+            echo "=================================================="
+            grep "mkhomedir" /etc/pam.d/* 
+            echo "=================================================="
         fi
         show_file_content $conf_pam_system_auth
     elif [ "$conf" = "ntpserver_untouched" ];then
