@@ -51,6 +51,8 @@ rlJournalStart
         rlRun "ls /opt/rhqa_ipa" 0 "Listing files in /opt/rhqa_ipa"
         rlRun "env|sort"
 
+        ipa_coverage_install
+
     rlPhaseEnd
 
     rlJournalPrintText

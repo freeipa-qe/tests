@@ -28,7 +28,7 @@ export TESTVERSION=3.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh ipa-hostgroup-cli-lib.sh ipa-service-cli-lib.sh ipa-netgroup-cli-lib.sh ipa-hbac-cli-lib.sh lib.user-cli.sh ipa-automember-cli-lib.sh Makefile PURPOSE set-root-pw.exp nis.sh id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh id_rsa_global.pub id_rsa_global known_hosts lib.ds-migration.sh ipa-rbac-cli-lib.sh ipa-selinuxusermap-cli-lib.sh ipa-install.sh install-lib.sh lib.ipa-rhts.sh
+FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh ipa-hostgroup-cli-lib.sh ipa-service-cli-lib.sh ipa-netgroup-cli-lib.sh ipa-hbac-cli-lib.sh lib.user-cli.sh ipa-automember-cli-lib.sh Makefile PURPOSE set-root-pw.exp nis.sh id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh id_rsa_global.pub id_rsa_global known_hosts lib.ds-migration.sh ipa-rbac-cli-lib.sh ipa-selinuxusermap-cli-lib.sh ipa-install.sh install-lib.sh lib.ipa-rhts.sh coverage-3.6.tar.gz
 
 .PHONY: all install download clean
 
@@ -73,6 +73,8 @@ run: $(FILES) build
 	cp ./install-lib.sh /opt/rhqa_ipa/.
 	rm -f /opt/rhqa_ipa/set-root-pw.exp
 	cp ./set-root-pw.exp /opt/rhqa_ipa/.
+	rm -f /opt/rhqa_ipa/coverage-3.6.tar.gz
+	cp ./coverage-3.6.tar.gz /opt/rhqa_ipa/.
 	rm -f /opt/rhqa_ipa/id_rsa*
 	cp ./id_rsa* /opt/rhqa_ipa/.
 	mkdir -p /root/.ssh

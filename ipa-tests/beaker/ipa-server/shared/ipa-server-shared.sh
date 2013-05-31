@@ -30,6 +30,7 @@
 #   submit_logs
 #	rlDistroDiff
 #   unindent
+#   ipa_coverage_install
 ######################################################################
 cat /etc/redhat-release | grep "5\.[0-9]"
 if [ $? -eq 0 ] ; then
@@ -362,6 +363,18 @@ makereport()
     cat $report
     echo "[`date`] test summary report saved as: $report"
     echo ""
+    if [ "$COVERAGE_RUN" = "yes" ]; then
+        pushd $(dirname $COVERAGE_FILE)
+        echo "===========================[COVERAGE_SUMMARY]===============================" >> $report
+        coverage combine
+        coverage report >> $report
+        echo "===========================[COVERAGE_SUMMARY]===============================" >> $report
+        coverage html -d report
+        TARFILE=$(basename $(dirname $COVERAGE_FILE)).tgz
+        tar zcvf $TARFILE report
+        rhts-submit-log  -l $TARFILE
+        popd
+    fi
 } #makereport
 
 ############################################################################
@@ -1207,6 +1220,35 @@ rlDistroDiff() {
 function unindent()
 { 
     sed -e 's/^[[:space:]]*//'
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ipa_coverage_install <TESTID>
+# - installs the code coverage python libraries and software
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+ipa_coverage_install()
+{
+    COVERAGE_FILE=/tmp/coverage.$1/.coverage
+    mkdir $(dirname $COVERAGE_FILE)
+    if [ "$COVERAGE_RUN" = "yes" ]; then
+        COVERAGE="coverage run -a --source=ipalib,ipapython,ipaclient,ipaserver"
+    else
+        COVERAGE=""
+    fi
+    rlRun "sed -i '/COVERAGE_RUN=/d' /opt/rhqa_ipa/env.sh"
+    rlRun "sed -i '/COVERAGE=/d' /opt/rhqa_ipa/env.sh"
+    rlRun "sed -i '/COVERAGE_FILE=/d' /opt/rhqa_ipa/env.sh"
+    rlRun "echo \"export COVERAGE_RUN=$COVERAGE_RUN\" >> /opt/rhqa_ipa/env.sh"
+    rlRun "echo \"export COVERAGE=\\\"$COVERAGE\\\"\" >> /opt/rhqa_ipa/env.sh"
+    rlRun "echo \"export COVERAGE_FILE=$COVERAGE_FILE\" >> /opt/rhqa_ipa/env.sh"
+    rlLog "Installing code coverage software"
+    rlRun "yum -y install python-setuptools"
+    rlRun "pushd /opt/rhqa_ipa"
+    rlRun "tar zxvf coverage-3.6.tar.gz"
+    rlRun "pushd coverage-3.6"
+    rlRun "python setup.py install"
+    rlRun "popd"
+    rlRun "popd"
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
