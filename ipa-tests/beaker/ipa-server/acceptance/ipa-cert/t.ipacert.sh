@@ -1440,3 +1440,76 @@ csr_no_description_BZ910468()
 		rlRun "ipa host-del testhostBZ910468.$DOMAIN" 0 "Cleaning up host created for this test."
 	rlPhaseEnd
 }
+
+export certhost="clicerttesthost.$DOMAIN"
+
+# Start IPA Cert Find CLI tests
+cert_find()
+{
+	KinitAsAdmin # Kinit as admin for good measure
+
+	cert_find_startup
+	cert_find_serial_min
+
+	rlRun "ipa host-del $certhost" 0 "Cleaning up created host."
+}
+
+# Setup section for the cert-find section
+cert_find_startup()
+{
+	# Create a host to work with
+	ipaddr=$(hostname -i) # Get IP address of this host
+	rlLog "Ip address is $ipaddr"
+	ipoc1=$(echo $ipaddr | cut -d\. -f1)
+	ipoc2=$(echo $ipaddr | cut -d\. -f2)
+	ipoc3=$(echo $ipaddr | cut -d\. -f3)
+	ipoc4=$(echo $ipaddr | cut -d\. -f4)
+	let newip4=$ipoc4+2
+	newip="$ipoc1.$ipoc2.$ipoc3.$newip4"
+	
+	rlLog "creating new host with IP $newip"
+	rlRun "ipa host-add $certhost --ip-address='$newip'" 0 "Creating host to test with this BZ test"
+
+	# Create a bunch of certs to work with
+	current_certs=$(ipa cert-find --all | grep Serial\ number: | wc -l)
+	rlLog "Current certs on system is $current_certs"
+	# Create CSR config file
+	echo '[ req ]
+default_bits = 2048
+default_keyfile = teste.key
+distinguished_name = test_key_file
+prompt = no
+output_password = ..
+
+[ test_key_file ]
+C = US
+ST = CA
+L = SFO
+O = RedHat Technology
+OU = RedHat IT' > /opt/rhqa_ipa/cert-req.conf
+	echo "CN = $certhost" >> /opt/rhqa_ipa/cert-req.conf
+	while [ $current_certs -lt 26 ]; do
+		rlRun "openssl req -new -set_serial -config ./opt/rhqa_ipa/cert-req.conf -out /opt/rhqa_ipa/cert-req.csr" 0 "Create a new CSR to work with"
+		rlRun "ipa cert-request --add --principal=EXAMPLE/$certhost /opt/rhqa_ipa/cert-req.csr" 0 "Request the csr into IPA"
+		let current_certs = $current_certs + 1;
+	done
+}
+
+cert_find_serial_min()
+{
+	rlPhaseStartTest "cert_find_001: Positive test of Serial number find min"
+		foundcerts=$(ipa cert-find --min-serial-number=15| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs"
+		rlRun "echo $foundcerts | grep 11" 0 "Making sure that the correct number of certs was returned."
+	rlPhaseEnd
+}
+
+#    Serial number range (min/max/none)
+#        Serial number range in Hexadecimal (min/max/none) 
+#    Issued On
+#    revoked certificates
+#    subject
+#    valid not after from
+#    valid not after to
+#    valid not before from
+#    valid not before to 
