@@ -9,6 +9,24 @@ import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
 public class GlobalizationTasks {
 	private static Logger log = Logger.getLogger(GlobalizationTasks.class.getName());
 	
+	public static void modifyUser_passwordReset(SahiTasks sahiTasks, String uid, String password,String expectedmsg){
+		//click on user to edit
+				sahiTasks.link(uid).click();
+				sahiTasks.link("Reset Password").click();
+				sahiTasks.password("password1").setValue(password);
+				sahiTasks.password("password2").setValue(password);
+				sahiTasks.button("Reset Password").click();
+				if (sahiTasks.div(expectedmsg).exists())
+				 {
+					log.info("Rest Password rejects UTF-8 string :: ExpectedError ::"+expectedmsg );
+					sahiTasks.button("Cancel").click();
+					sahiTasks.button("Cancel").click();					
+				}
+				sahiTasks.link("Users").in(sahiTasks.div("content")).click();
+				
+	}
+
+	
 	public static void modifyUserSettings(SahiTasks sahiTasks,String uid ,String givenname,String sn, String initials,String street,String city,String state,String carlicense) 
 	{
 		sahiTasks.link(uid).click();
@@ -23,7 +41,6 @@ public class GlobalizationTasks {
 		sahiTasks.link("Update").click();
 		sahiTasks.link("Users").in(sahiTasks.div("content")).click();
 	}
-	
 	
 	public static void verifyUserSettings(SahiTasks sahiTasks,String uid ,String givenname,String sn, String initials,String street,String city,String state,String carlicense){
 		//click on user to edit
@@ -174,13 +191,37 @@ public class GlobalizationTasks {
 			sahiTasks.textarea("description").setValue(description);
 			sahiTasks.span("Update").click();
 		}
+		public static void automemberusergroup_Condition(SahiTasks sahiTasks,String attribute,String expression) {
+			sahiTasks.span("Add").near(sahiTasks.heading2("Inclusive")).click();
+			sahiTasks.select("key").choose(attribute);
+			sahiTasks.textbox("automemberinclusiveregex").setValue(expression);
+			sahiTasks.button("Add").click();
+		}
+		//automemberhostgroup_Condition
+		public static void automemberhostgroup_Condition(SahiTasks sahiTasks,String attribute,String expression) {
+			sahiTasks.span("Add").near(sahiTasks.heading2("Exclusive")).click();
+			sahiTasks.select("key").choose(attribute);
+			sahiTasks.textbox("automemberexclusiveregex").setValue(expression);
+			sahiTasks.button("Add").click();
+		}
 		//rbacRuleDeleteSingle
 		public static void rbacDelete(SahiTasks sahiTasks,String name,String buttonToClick) {
 				sahiTasks.checkbox(name).click();
 				sahiTasks.link("Delete").click();
 				sahiTasks.button(buttonToClick).click();
 		}
-		
+		public static void rbacpermission(SahiTasks sahiTasks,String cn,String expectedErrorMsg) {
+			sahiTasks.span("Add").click();
+			sahiTasks.textbox("cn").setValue(cn);
+			sahiTasks.checkbox("permissions").click();
+            sahiTasks.select("target").choose("Target group");
+			sahiTasks.span("icon combobox-icon").click();
+			sahiTasks.select("list").choose("admins");
+			sahiTasks.button("Add").click();
+			if (sahiTasks.span(expectedErrorMsg).exists()){
+				sahiTasks.button("Cancel").click();	}
+		}
+
 		public static void selfservice(SahiTasks sahiTasks,String name,String cn,String expectedErrorMsg) {
 			sahiTasks.span("Add").click();
 			sahiTasks.textbox("aciname").setValue(name); 
