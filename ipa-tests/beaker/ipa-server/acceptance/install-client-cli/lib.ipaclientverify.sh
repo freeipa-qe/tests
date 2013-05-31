@@ -658,7 +658,7 @@ verify_file_does_not_contains_string() {
     local result=""
     rlLog "[start: verify_file_does_not_contains_string]: check whether [$file] does NOT contains [$line]"
     grep -v "^#" $file | grep "$line"
-    if [ "$?" = "0" ];then
+    if [ "$?" = "1" ];then
         result="good"
         rlPass "[$result] [$file] does NOT contain string [$line] as expected"
     else
@@ -744,13 +744,13 @@ CheckConfig() {
         show_file_content $out
     elif [ "$conf" = "primaryServer" ];then
         verify_file_contains_string $conf_sssd_client "ipa_server = $MASTER"    
-    elif [ "$conf" = "ntpserver_setting" ];then
+    elif [ "$conf" = "ntpserver_setting server $NTPSERVER" ];then
         verify_file_contains_string $conf_ntpd "server $NTPSERVER"
     elif [ "$conf" = "ntpserver_disabled" ];then
         check_service_status "ntpd" "disabled"
     elif [ "$conf" = "hostname" ];then
         verify_file_contains_string $conf_sssd_client "ipa_hostname = $HOSTNAME"    
-    elif [ "$conf" = "no_krb5_offline_password" ];then
+    elif [ "$conf" = "no_krb5_offline_passwords" ];then
         verify_file_contains_string $conf_sssd_client "krb5_store_password_if_offline = False"    
     elif [ "$conf" = "enable_dns_updates" ];then
         verify_file_contains_string $conf_sssd_client "ipa_dyndns_update = True"    
