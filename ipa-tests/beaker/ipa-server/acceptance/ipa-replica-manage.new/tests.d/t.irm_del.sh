@@ -87,7 +87,7 @@ function irm_del_pos_0002()
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.0' $MY_BR2"
         # Cleanup
         irm_uninstall
-        irm_install $REPLICA1
+        irm_install $MASTER
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR1"
         ;;
