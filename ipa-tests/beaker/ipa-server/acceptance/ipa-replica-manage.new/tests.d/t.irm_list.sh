@@ -153,12 +153,12 @@ function irm_list_pos_0004()
     rlPhaseEnd
 }
 
-# irm_list_pos_0005 # list, with name, remote
-function irm_list_pos_0004()
+# irm_list_pos_0005 # list, with name, with verbose, remote
+function irm_list_pos_0005()
 {
     tmpout=/tmp/test_${FUNCNAME}.out
     TESTCOUNT=$(( TESTCOUNT += 1 ))
-    rlPhaseStartTest "irm_list_pos_0004: list, with name, with verbose"
+    rlPhaseStartTest "irm_list_pos_0005: list, with name, with verbose, remote"
     case "$MYROLE" in
     MASTER_*)
         rlRun "rhts-sync-block -s '$TESTCOUNT.$FUNCNAME.1' $MY_BR4"
