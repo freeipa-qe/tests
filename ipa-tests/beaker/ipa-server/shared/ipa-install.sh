@@ -1024,7 +1024,7 @@ ipa_install_prep()
     ipa_install_prep_pkgInstalls
 
     ipa_install_bz962513_workarounds
-    ipa_install_openldap_workarounds
+    #ipa_install_openldap_workarounds
 
     ipa_install_prep_setTime
 
@@ -1084,7 +1084,7 @@ ipa_install_master()
     if [ -z "$IPA_SERVER_OPTIONS" ]; then
         IPA_SERVER_OPTIONS="--setup-dns --forwarder=$DNSFORWARD --hostname=$hostname_s.$DOMAIN -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     fi
-    rlRun "ipa-server-install $IPA_SERVER_OPTIONS"
+    rlRun "$COVERAGE /usr/sbin/ipa-server-install $IPA_SERVER_OPTIONS"
 
     if [ $? -gt 0 ]; then
         rlRun "submit_log /var/log/ipaserver-install.log"
@@ -1168,7 +1168,7 @@ ipa_install_replica()
     if [ -z "$IPA_REPLICA_OPTIONS" ];then
         IPA_REPLICA_OPTIONS="-U --setup-ca --setup-dns --forwarder=$DNSFORWARD -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$hostname_s.$DOMAIN.gpg"
     fi
-    rlRun "ipa-replica-install $IPA_REPLICA_OPTIONS"
+    rlRun "$COVERAGE /usr/sbin/ipa-replica-install $IPA_REPLICA_OPTIONS"
     if [ $? -gt 0 ]; then
         rlRun "submit_log /var/log/ipareplica-install.log"
         rlRun "submit_log /var/log/ipareplica-conncheck.log"
@@ -1204,7 +1204,7 @@ ipa_install_client()
     if [ -z "$IPA_CLIENT_OPTIONS" ]; then
         IPA_CLIENT_OPTIONS="-U --domain=$DOMAIN --realm=$RELM -p $ADMINID -w $ADMINPW --server=$(echo $MYMASTER|cut -f1 -d.).$DOMAIN"
     fi
-    rlRun "ipa-client-install $IPA_CLIENT_OPTIONS"
+    rlRun "$COVERAGE /usr/sbin/ipa-client-install $IPA_CLIENT_OPTIONS"
     if [ $? -gt 0 ]; then
         rlRun "submit_log /var/log/ipaclient-install.log"
     fi
