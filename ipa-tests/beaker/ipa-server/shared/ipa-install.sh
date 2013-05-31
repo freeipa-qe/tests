@@ -217,9 +217,9 @@ ipa_install_set_vars()
     #cp -a ./ipa-install.sh /opt/rhqa_ipa/.
  
     rlLog "===================== env|sort =========================="
-    rlRun "env|sort"
+    env|sort 
     rlLog "===================== env.sh   =========================="
-    rlRun "cat /opt/rhqa_ipa/env.sh"
+    cat /opt/rhqa_ipa/env.sh
     rlLog "==============================================="
 }
 
