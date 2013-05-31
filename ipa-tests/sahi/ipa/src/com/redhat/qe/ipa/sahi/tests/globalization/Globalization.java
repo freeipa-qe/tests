@@ -27,6 +27,7 @@ import com.redhat.qe.ipa.sahi.tasks.HBACTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostTasks;
 import com.redhat.qe.ipa.sahi.tasks.HostgroupTasks;
 import com.redhat.qe.ipa.sahi.tasks.NetgroupTasks;
+import com.redhat.qe.ipa.sahi.tasks.PermissionTasks;
 import com.redhat.qe.ipa.sahi.tasks.PrivilegeTasks;
 import com.redhat.qe.ipa.sahi.tasks.RoleTasks;
 import com.redhat.qe.ipa.sahi.tasks.SahiTasks;
@@ -105,7 +106,7 @@ public class Globalization extends SahiTestScript{
 			log.fine("ExpectedUID: " + expectedUID);}		
 		//new user can be added now
 		UserTasks.createUser(sahiTasks, uid, givenname, sn, newPassword, verifyPassword, "Add");		
-		if(testName.endsWith("negative"))
+		if(testName.endsWith("negative")||testName.endsWith("tkt3640"))
 		{
 			if (sahiTasks.span(expectedmsg).exists())
 			{	log.info ("Required field msg appears :: ExpectedError ::"+expectedmsg);
@@ -119,12 +120,18 @@ public class Globalization extends SahiTestScript{
 			}
 			Assert.assertFalse(sahiTasks.link(expectedUID).exists(), "User ID or Password rejected UTF-8 string");}
 		else
-			//verify user was added successfully with UTF-8 string
 			Assert.assertTrue(sahiTasks.link(expectedUID).exists(), "Added user " + expectedUID + "  successfully with UTF-8 string");
 	}
+	@Test (groups={"user_passwordReset"}, description="Reset user password",
+			dataProvider="getUserPwdObjects",dependsOnGroups={"userTests_Add"})	
+	public void userPwdReset(String testName, String uid, String password,String expectedmsg ) throws Exception 
+	{
+		GlobalizationTasks.modifyUser_passwordReset(sahiTasks,uid, password,expectedmsg);
+			
+	}
 
-	@Test (groups={"user_modify"}, description="Add valid users",
-			dataProvider="getUserSettingObjects",dependsOnGroups={"userTests_Add"})	
+	@Test (groups={"user_modify"}, description="modify valid users",
+			dataProvider="getUserSettingObjects",dependsOnGroups={"user_passwordReset"})	
 	public void userModify(String testName, String uid, String givenname, String sn, String initials, String street, String city, String state, String carlicense ) throws Exception 
 	{
 		GlobalizationTasks.modifyUserSettings(sahiTasks,uid, givenname, sn, initials, street, city, state, carlicense);
@@ -368,7 +375,7 @@ public class Globalization extends SahiTestScript{
 	}
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~POLICY AUTOMEMBER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	@Test (groups={"automember"},dataProvider="getAutomemberObjects",dependsOnGroups="selinuxUserMap")	
-	public void testAutomember(String testName, String groupName,String description) throws Exception {
+	public void testAutomember(String testName, String groupName,String description,String attribute, String expression) throws Exception {
 		if(testName.contains("automemberusergrouprule")){
 			sahiTasks.navigateTo(commonTasks.automemberUserGroupPage, true);
 			Assert.assertFalse(sahiTasks.link(groupName).exists(), "Verify automember " + groupName + " doesn't already exist");
@@ -377,6 +384,13 @@ public class Globalization extends SahiTestScript{
 			sahiTasks.link("User group rules").in(sahiTasks.div("content nav-space-3")).click();
 			//verify automember was added successfully 
 			Assert.assertTrue(sahiTasks.link(groupName).exists(), "Added automember " + groupName + "  successfully with UTF-8 description");}
+		if(testName.contains("automemberusergroup_condition")){
+			sahiTasks.link(groupName).click();
+	       	Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Not Exist Before Add");
+	    	GlobalizationTasks.automemberusergroup_Condition(sahiTasks,attribute,expression);
+	    	Assert.assertTrue(sahiTasks.div(attribute).exists(), "Verified Condition Added Successfully");
+	    	sahiTasks.link("User group rules").in(sahiTasks.div("content nav-space-3")).click();
+		}
 		if(testName.contains("delete_automemberusergroup")){
 			CommonTasks.search(sahiTasks,groupName);
 			Assert.assertTrue(sahiTasks.link(groupName).exists(),"automember rule exists before delete");
@@ -390,6 +404,13 @@ public class Globalization extends SahiTestScript{
 			GlobalizationTasks.Automember(sahiTasks, hostgroup,description);	
 			sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
 			Assert.assertTrue(sahiTasks.link(hostgroup).exists(), "Added automember " + hostgroup + "  successfully with UTF-8 description");}
+		if(testName.contains("automemberhostgroup_condition")){
+			sahiTasks.link(groupName).click();
+			Assert.assertFalse(sahiTasks.div(attribute).exists(), "Verified Condition Not Exist Before Add");
+	       	GlobalizationTasks.automemberhostgroup_Condition(sahiTasks,attribute,expression);
+	    	Assert.assertTrue(sahiTasks.div(attribute).exists(), "Verified Condition Added Successfully");
+	    	sahiTasks.link("Host group rules").in(sahiTasks.div("content nav-space-3")).click();
+			}
 		if(testName.contains("delete_automemberhostgroup")){
 			CommonTasks.search(sahiTasks,hostgroup);
 			Assert.assertTrue(sahiTasks.link(hostgroup).exists(),"automember rule exists before delete");
@@ -400,7 +421,7 @@ public class Globalization extends SahiTestScript{
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SERVICE RBAC~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	@Test (groups={"RBAC"}, description="Add Role",dataProvider="roleObjects",dependsOnGroups="automember")	
-	public void testRBACRole(String testName, String name, String description) throws Exception {
+	public void testRBACRole(String testName, String name, String description,String expectedErrorMsg) throws Exception {
 		if(testName.contains("add_rbacrule")){
 			sahiTasks.navigateTo(commonTasks.rolePage, true);
 			//verify role doesn't exist
@@ -432,14 +453,24 @@ public class Globalization extends SahiTestScript{
 			Assert.assertFalse(sahiTasks.link(name).exists(),"privilege deleted");
 			CommonTasks.clearSearch(sahiTasks);
 		}
+		if(testName.contains("add_rbacpermission")){
+			sahiTasks.navigateTo(commonTasks.permissionPage, true);
+			Assert.assertFalse(sahiTasks.link(name).exists(), "Verify permission " + name + " doesn't already exist");
+			//new permission can be added now
+			GlobalizationTasks.rbacpermission(sahiTasks, name, expectedErrorMsg);
+			//verify permission was added successfully
+			CommonTasks.search(sahiTasks, name);
+			Assert.assertFalse(sahiTasks.link(name).exists(), " permission name Rejects UTF-8 string :: " + name );
+			CommonTasks.clearSearch(sahiTasks);
+		}
 	}
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SERVICE SELFSERVICE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	@Test (groups={"selfservice"}, description="Add service",dataProvider="selfserviceObjects",dependsOnGroups="RBAC")	
 	public void selfservice(String testName, String name, String cn,String expectedErrorMsg) throws Exception {
 		sahiTasks.navigateTo(commonTasks.selfservicepermissionPage, true);
-		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify service " + name + " doesn't already exist");
+		Assert.assertFalse(sahiTasks.link(name).exists(), "Verify self-service " + name + " doesn't already exist");
 		GlobalizationTasks.selfservice(sahiTasks,name,cn,expectedErrorMsg);
-		Assert.assertFalse(sahiTasks.link(name).exists(), "service rejeced UTF-8 string");
+		Assert.assertFalse(sahiTasks.link(name).exists(), "self-service rejeced UTF-8 string");
 	}
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SERVICE DELEGATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 	@Test (groups={"delegation"}, description=" Add and delete",dataProvider="getDelegationObjects",dependsOnGroups="selfservice")	
@@ -480,7 +511,18 @@ public class Globalization extends SahiTestScript{
 		//										testname			uid              			givenname			sn   		newpassword 		verifypassword			exceptedmsg1
 		ll.add(Arrays.asList(new Object[]{ "add_user_positive",   "user001",          			"ವರುಣ್",			   "ಮೈಲಾರಯ್ಯ",            "password",		        "password",         ""  } ));
 		ll.add(Arrays.asList(new Object[]{ "add_user_negative",   "user001negative世界", 		"世界",				"世界",         "",					  "",               "may only include letters, numbers, _, -, . and $"	 } ));
-		ll.add(Arrays.asList(new Object[]{ "add_user_password_negative","user2", 			   	"Test2",			"User2",	  "世界",	      	      "世界",            "Constraint violation: The value is not 7-bit clean: 世界"	 } ));
+		ll.add(Arrays.asList(new Object[]{ "add_user_password_negative_tkt3640","user2", 			   	"Test2",			"User2",	  "世界",	      	      "世界",            "Constraint violation: The value is not 7-bit clean: 世界"	 } ));
+		return ll;	
+	}
+	
+	@DataProvider(name="getUserPwdObjects")
+	public Object[][] getUserPwdObjects() {
+		return TestNGUtils.convertListOfListsTo2dArray(createUserPwdObjects());
+	}
+	protected List<List<Object>> createUserPwdObjects() {		
+		List<List<Object>> ll = new ArrayList<List<Object>>();
+		//										testname			uid                		newpassword 		verifypassword			exceptedmsg1
+		ll.add(Arrays.asList(new Object[]{ "modify_reset_password_negative_tkt3640",   "user001",         "ವರುಣ್",		                "Constraint violation: Failed to update password"  } ));
 		return ll;	
 	}
 
@@ -516,7 +558,7 @@ public class Globalization extends SahiTestScript{
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 
 		//										testname					uid              		
-		ll.add(Arrays.asList(new Object[]{ "delete_user_positive",			"user001"     } ));
+		ll.add(Arrays.asList(new Object[]{ "delete_user",			"user001"     } ));
 
 		return ll;	
 	}
@@ -718,10 +760,12 @@ public class Globalization extends SahiTestScript{
 	protected List<List<Object>> createAutomemberObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		//									testName		 					   groupName			
-		ll.add(Arrays.asList(new Object[]{ "modify_automemberusergrouprule_positive",   groupname, "automember பயனர் குழு விளக்கம்"} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_automemberusergroup",   groupname, ""} ));
-		ll.add(Arrays.asList(new Object[]{ "modify_automemberhostgrouprule_positive",   hostgroup, "automember హోస్ట్ గ్రూప్ వివరణ"} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_automemberhostgroup",   hostgroup, ""} ));
+		ll.add(Arrays.asList(new Object[]{ "modify_automemberusergrouprule_positive",   groupname, "automember பயனர் குழு விளக்கம்","",""} ));
+		ll.add(Arrays.asList(new Object[]{ "automemberusergroup_condition_positive",groupname, "",    "cn",       "ಎಂಎಂ"} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_automemberusergroup",   groupname, "","",""} ));
+		ll.add(Arrays.asList(new Object[]{ "modify_automemberhostgrouprule_positive",   hostgroup, "automember హోస్ట్ గ్రూప్ వివరణ","",""} ));
+		ll.add(Arrays.asList(new Object[]{ "automemberhostgroup_condition_positive",hostgroup, "",    "cn",       "ಎಂಎಂ"} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_automemberhostgroup",   hostgroup, "","",""} ));
 		return ll;	
 	}
 	@DataProvider(name="roleObjects")
@@ -731,10 +775,11 @@ public class Globalization extends SahiTestScript{
 	protected List<List<Object>> createroleObjects() {		
 		List<List<Object>> ll = new ArrayList<List<Object>>();
 		//									testName		 					   groupName			
-		ll.add(Arrays.asList(new Object[]{ "add_rbacrule_positive",   "role资源001", "description role资源001"} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_rbacrule",   "role资源001", ""} ));
-		ll.add(Arrays.asList(new Object[]{ "add_rbacprivilege_positive",   "privilege资源001", "description privilege资源001"} ));
-		ll.add(Arrays.asList(new Object[]{ "delete_rbacprivilege",   "privilege资源001", ""} ));
+		ll.add(Arrays.asList(new Object[]{ "add_rbacrule_positive",   "role资源001", "description role资源001",""} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_rbacrule",   "role资源001", "",""} ));
+		ll.add(Arrays.asList(new Object[]{ "add_rbacprivilege_positive",   "privilege资源001", "description privilege资源001",""} ));
+		ll.add(Arrays.asList(new Object[]{ "delete_rbacprivilege",   "privilege资源001", "",""} ));
+		ll.add(Arrays.asList(new Object[]{ "add_rbacpermission_negative","Permission资源001","","May only contain letters, numbers, -, _, and space"}));
 
 		return ll;
 	}
