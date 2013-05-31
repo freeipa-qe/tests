@@ -191,3 +191,39 @@ qaRun()
     fi
     rm $errout
 } #qaRun
+
+# Copied from ipa-autorenewcert/lib.autorenewcert.sh
+convert_utc_date_to_epoch(){
+    date -d "$@ UTC" "+%s"
+}
+
+convert_date_to_epoch(){
+    date -d "$@" "+%s"
+}
+
+convert_epoch_to_date(){
+    perl -e "print scalar localtime($1)"
+}
+
+adjust_system_time(){
+	local adjustTo=$1
+	local label=$2
+	rlLog"adjust_system_time to $adjustTo $label"
+	echo "[adjust_system_time] ($label) : current [`date`]" 
+	echo "[adjust_system_time] ($label) : given [$adjustTo]" `convert_epoch_to_date $adjustTo`
+	local before=`date`
+	logger "************************ Before: `date` *************************"
+	logger "*****       time adjusted by adjust_system_time()             *****"
+	date "+%a %b %e %H:%M:%S %Y" -s "`perl -le "print scalar localtime $adjustTo"`" 2>&1 > /dev/null
+	logger "************************ After : `date` *************************"
+	if [ "$?" = "0" ];then
+		local after=`date`
+		rlPass "adjust ($label) [$before]=>[$after] done"
+		echo "[adjust_system_time] finished: current [`date`]" 
+		else
+		local after=`date`
+		rlFail "change system date to ($label) failed, current data: [`date`]"
+	fi
+}
+
+
