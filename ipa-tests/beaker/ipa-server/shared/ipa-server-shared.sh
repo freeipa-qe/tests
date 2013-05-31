@@ -1227,7 +1227,7 @@ function unindent()
 # ipa_coverage_install <TESTID>
 # - installs the code coverage python libraries and software
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-ipa_coverage_install()
+function ipa_coverage_install()
 {
     if [ "$COVERAGE_RUN" = "yes" ]; then
         #COVERAGE="coverage run -a --source=ipalib,ipapython,ipaclient,ipaserver"
@@ -1251,4 +1251,24 @@ ipa_coverage_install()
     fi
 }
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ipa_coverage_archive <file|dir>
+# - archive file/dir to wiki
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+function ipa_coverage_archive()
+{
+    if [ $# -le 0 ]; then
+        echo "Usage: ipa_coverage_archive <file|dir>"
+        return 1
+    fi
+
+    QALIBDIR=/opt/rhqa_ipa
+    SSHKEY=${QALIBDIR}/id_dsa-wiki-beaker_archive
+    SSHUSER=beaker_archive
+    SSHHOST=wiki.idm.lab.bos.redhat.com
+    SSHPATH=/qa/archive/ipa/coverage
+    ARCHIVESRC=$1
+
+    rlRun "scp -i $SSHKEY -R $ARCHIVESRC $SSHUSER@$SSHHOST:$SSHPATH"
+}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
