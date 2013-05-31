@@ -1278,6 +1278,7 @@ function ipa_coverage_makereport()
         coverage combine
         coverage report >> summary
         echo "===========================[COVERAGE_SUMMARY]===============================" >> summary
+        cat summary >> $thisreport
         coverage html -d report
         TARFILE=/var/tmp/$(basename $(dirname $COVERAGE_FILE)).tgz
         tar zcvf $TARFILE report >/dev/null 2>&1
@@ -1286,7 +1287,6 @@ function ipa_coverage_makereport()
         ipa_coverage_archive $(basename $(dirname $COVERAGE_FILE))
         popd
         popd
-        cat summary >> $thisreport
     fi
 }
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
