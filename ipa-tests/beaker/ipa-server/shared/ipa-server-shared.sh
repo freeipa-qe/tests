@@ -1228,28 +1228,26 @@ function unindent()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 ipa_coverage_install()
 {
-    COVERAGE_FILE=/tmp/coverage.$1/.coverage
-    mkdir $(dirname $COVERAGE_FILE)
     if [ "$COVERAGE_RUN" = "yes" ]; then
         #COVERAGE="coverage run -a --source=ipalib,ipapython,ipaclient,ipaserver"
         COVERAGE="coverage run -a"
-    else
-        COVERAGE=""
+        COVERAGE_FILE=/tmp/coverage.$1/.coverage
+        mkdir $(dirname $COVERAGE_FILE)
+        rlRun "sed -i '/COVERAGE_RUN=/d' /opt/rhqa_ipa/env.sh"
+        rlRun "sed -i '/COVERAGE=/d' /opt/rhqa_ipa/env.sh"
+        rlRun "sed -i '/COVERAGE_FILE=/d' /opt/rhqa_ipa/env.sh"
+        rlRun "echo \"export COVERAGE_RUN=$COVERAGE_RUN\" >> /opt/rhqa_ipa/env.sh"
+        rlRun "echo \"export COVERAGE=\\\"$COVERAGE\\\"\" >> /opt/rhqa_ipa/env.sh"
+        rlRun "echo \"export COVERAGE_FILE=$COVERAGE_FILE\" >> /opt/rhqa_ipa/env.sh"
+        rlLog "Installing code coverage software"
+        rlRun "yum -y install python-setuptools"
+        rlRun "pushd /opt/rhqa_ipa"
+        rlRun "tar zxvf coverage-3.6.tar.gz"
+        rlRun "pushd coverage-3.6"
+        rlRun "python setup.py install"
+        rlRun "popd"
+        rlRun "popd"
     fi
-    rlRun "sed -i '/COVERAGE_RUN=/d' /opt/rhqa_ipa/env.sh"
-    rlRun "sed -i '/COVERAGE=/d' /opt/rhqa_ipa/env.sh"
-    rlRun "sed -i '/COVERAGE_FILE=/d' /opt/rhqa_ipa/env.sh"
-    rlRun "echo \"export COVERAGE_RUN=$COVERAGE_RUN\" >> /opt/rhqa_ipa/env.sh"
-    rlRun "echo \"export COVERAGE=\\\"$COVERAGE\\\"\" >> /opt/rhqa_ipa/env.sh"
-    rlRun "echo \"export COVERAGE_FILE=$COVERAGE_FILE\" >> /opt/rhqa_ipa/env.sh"
-    rlLog "Installing code coverage software"
-    rlRun "yum -y install python-setuptools"
-    rlRun "pushd /opt/rhqa_ipa"
-    rlRun "tar zxvf coverage-3.6.tar.gz"
-    rlRun "pushd coverage-3.6"
-    rlRun "python setup.py install"
-    rlRun "popd"
-    rlRun "popd"
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
