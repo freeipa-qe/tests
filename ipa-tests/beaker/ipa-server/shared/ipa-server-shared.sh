@@ -360,7 +360,6 @@ makereport()
     echo "" >> $report
     rlJournalPrintText | grep "RESULT" | grep "\[  ABORT   \]"| sed -e 's/:/ /g' -e 's/RESULT//g' >> $report
     echo "===========================[$report]===============================" >> $report
-    cat $report
     echo "[`date`] test summary report saved as: $report"
     echo ""
     if [ "$COVERAGE_RUN" = "yes" ]; then
@@ -371,10 +370,11 @@ makereport()
         echo "===========================[COVERAGE_SUMMARY]===============================" >> $report
         coverage html -d report
         TARFILE=$(basename $(dirname $COVERAGE_FILE)).tgz
-        tar zcvf $TARFILE report
+        tar zcvf $TARFILE report >/dev/null 2>&1
         rhts-submit-log  -l $TARFILE
         popd
     fi
+    cat $report
 } #makereport
 
 ############################################################################
