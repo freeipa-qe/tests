@@ -28,17 +28,19 @@ bug_866955()
 bug_964128() {
 
 rlPhaseStartTest "LDAP upload CA cert sometimes double-encodes the value bz964128"
-	Sfile1="$TmpDir/sfile1"
-	Sfile2="$TmpDir/sfile2"
-	DS_binddn="CN=Directory Manager"
-	Base_DN="cn=CAcert,cn=ipa,cn=etc,dc=testrelm,dc=com"
-	rlRun "ldapsearch -x -D \"$DS_binddn\" -w $ADMINPW -b \"$Base_DN\" > $Sfile1" 0 "ldapsearch for Cert"
-	rlRun "ldapdelete -x -D \"$DS_binddn\" -w $ADMINPW \"$Base_DN\"" 0 "ldap delete cert"
-	rlRun "ldapsearch -x -D \"$DS_binddn\" -w $ADMINPW -b \"$Base_DN\"" 32 "Making sure cert is deleted"
-	rlRun "echo $ADMINPW | ipa-ldap-updater --plugins" 0 "Running ldap-updater with --plugins"
-	rlRun "ldapsearch -x -D \"$DS_binddn\" -w $ADMINPW -b \"$Base_DN\" > $Sfile2" 0 "ldapsearch for Cert after ldap-updater"
-	rlAssertNotDiffer "$Sfile1" "$Sfile2"
-	[ $? -eq 0 ] && rlPass "CA cert is not double-encoded"
-	
+        Sfile1="$TmpDir/sfile1"
+        Sfile2="$TmpDir/sfile2"
+        DS_binddn="CN=Directory Manager"
+        Base_DN="cn=CACert,cn=ipa,cn=etc,dc=testrelm,dc=com"
+        rlRun "ldapsearch -x -D \"$DS_binddn\" -w $ADMINPW -h $MASTER -b \"$Base_DN\" | sed -ne '/cACertificate;binary/,/# search result/p' > $Sfile1" 0 "ldapsearch for Cert"
+        rlRun "cat $Sfile1" 0 "Cert before deletion"
+        rlRun "ldapdelete -x -D \"$DS_binddn\" -w $ADMINPW \"$Base_DN\"" 0 "ldap delete cert"
+        rlRun "ldapsearch -x -D \"$DS_binddn\" -w $ADMINPW -b \"$Base_DN\"" 32 "Making sure cert is deleted"
+        rlRun "echo $ADMINPW | ipa-ldap-updater --plugins" 0 "Running ldap-updater with --plugins"
+        rlRun "ldapsearch -x -D \"$DS_binddn\" -w $ADMINPW -h $MASTER -b \"$Base_DN\" | sed -ne '/cACertificate;binary/,/# search result/p' > $Sfile2" 0 "ldapsearch for Cert after ldap-updater"
+        rlRun "cat $Sfile2" 0 "Cert after deletion"
+        rlAssertNotDiffer "$Sfile1" "$Sfile2"
+        [ $? -eq 0 ] && rlPass "CA cert is not double-encoded"
+
 rlPhaseEnd
 }

@@ -1196,3 +1196,25 @@ list_certutil_status()
     certutil -L -d  /var/lib/$CAINSTANCE/alias -n "auditSigningCert cert-pki-ca"
     echo "======= report date [`date`] ========="
 }
+
+certutil_attributes()
+{
+    local label=$1
+    local file=$2
+    echo "============ ($label) ==============="   
+    echo " certutil -L -d /var/lib/$CAINSTANCE/alias for each cert"
+    for cert in $cert_list
+    do
+      certutil -L -d /var/lib/$CAINSTANCE/alias | grep $cert | awk '{print $1" "$2" "$3}' | sort | uniq >> $file
+    done
+    cat $file
+    echo "======= report date [`date`] ========="
+}
+
+adjust_to_renew() {
+   local currentdate=`date`
+   rlRun "echo \"Current date and time: $currentdate\""
+   local Certrnwdate="`certutil -L -d /var/lib/pki-ca/alias -n "Server-Cert cert-pki-ca" | grep -i "Not After" | awk '{print $5" "$6" "$7" "$8}'` yesterday"
+   rlRun "date -s \"$Certrnwdate\"" 0 "Date reset to 1 day before certificate expiry"
+   rlRun "echo \"New date and time: `date`\""
+}

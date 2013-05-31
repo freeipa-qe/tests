@@ -815,3 +815,12 @@ show_file_content() {
         echo "=================  file [$file] does NOT exist ================= "
     fi
 }
+
+Rootdse_ldif() {
+cat > $tmpDir/rootdse.ldif << EOF
+dn: cn=config
+changetype: modify
+replace: nsslapd-allow-anonymous-access
+nsslapd-allow-anonymous-access: rootdse
+EOF
+}

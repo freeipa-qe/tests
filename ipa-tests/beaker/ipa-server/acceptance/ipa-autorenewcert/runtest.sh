@@ -41,6 +41,7 @@
 
 # Include test case file
 . ./t.autorenewcert.sh
+. ./t.autorenewcert.bug.sh
 
 PACKAGELIST="ipa-server perl-TimeDate perl-LDAP"
 
@@ -65,6 +66,7 @@ rlJournalStart
     # r2d2_test_starts
     verify_root_ca_cert_lifetime
     main_autorenewcert_test
+    Bug_Check
     # r2d2_test_ends
 
     rlPhaseStartCleanup "autorenewcert cleanup"
@@ -74,6 +76,3 @@ rlJournalStart
 
     makereport
 rlJournalEnd
-
-
- 

@@ -372,12 +372,7 @@ rlPhaseStartTest "unattended ipa-client installation fails when anonymous access
         ipalog=/var/log/ipaclient-install.log
         rm -f $ipalog
         tmpDir=`mktemp -d`
-        cat > $tmpDir/rootdse.ldif << EOF
-        dn: cn=config
-        changetype: modify
-        replace: nsslapd-allow-anonymous-access
-        nsslapd-allow-anonymous-access: rootdse
-EOF
+	Rootdse_ldif
         rpm1="openldap-clients"
         rlCheckRpm "$rpm1"
         if [ $? -ne 0 ]; then
