@@ -1231,7 +1231,8 @@ ipa_coverage_install()
     COVERAGE_FILE=/tmp/coverage.$1/.coverage
     mkdir $(dirname $COVERAGE_FILE)
     if [ "$COVERAGE_RUN" = "yes" ]; then
-        COVERAGE="coverage run -a --source=ipalib,ipapython,ipaclient,ipaserver"
+        #COVERAGE="coverage run -a --source=ipalib,ipapython,ipaclient,ipaserver"
+        COVERAGE="coverage run -a"
     else
         COVERAGE=""
     fi
