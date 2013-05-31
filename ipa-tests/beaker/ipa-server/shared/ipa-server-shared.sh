@@ -1279,10 +1279,9 @@ function ipa_coverage_makereport()
         coverage report >> summary
         echo "===========================[COVERAGE_SUMMARY]===============================" >> summary
         coverage html -d report
-        TARFILE=$(basename $(dirname $COVERAGE_FILE)).tgz
+        TARFILE=/var/tmp/$(basename $(dirname $COVERAGE_FILE)).tgz
         tar zcvf $TARFILE report >/dev/null 2>&1
         rhts-submit-log  -l $TARFILE
-        rm $TARFILE
         pushd ..
         ipa_coverage_archive $(basename $(dirname $COVERAGE_FILE))
         popd
