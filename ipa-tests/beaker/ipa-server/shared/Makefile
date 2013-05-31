@@ -84,6 +84,7 @@ run: $(FILES) build
 	cp ./id_dsa* /root/.ssh/.
 	cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 	cat /root/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys2
+	cat ./known_hosts >> /root/.ssh/known_hosts
 	cp -f ./id_rsa_global.pub /opt/rhqa_ipa/.
 	cp -f ./id_rsa_global /opt/rhqa_ipa/.
 	cp -f ./known_hosts /opt/rhqa_ipa/.
