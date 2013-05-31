@@ -7,12 +7,13 @@
 
 ipacert()
 {
-    cert_remove_hold
-    cert_request
-    cert_revoke
-    cert_show
-    cert_status
-    cert_BZ
+	cert_remove_hold
+	cert_request
+	cert_revoke
+	cert_show
+	cert_status
+	cert_find
+	cert_BZ
 } #cert
 
 #############################################
@@ -1446,17 +1447,24 @@ export certhost="clicerttesthost.$DOMAIN"
 # Start IPA Cert Find CLI tests
 cert_find()
 {
-	KinitAsAdmin # Kinit as admin for good measure
-
 	cert_find_startup
 	cert_find_serial_min
+	cert_find_cleanup
+}
 
-	rlRun "ipa host-del $certhost" 0 "Cleaning up created host."
+# Cleanup section for ipa cert_find
+cert_find_cleanup()
+{
+	rlPhaseStartTest "cert-find cleanup"
+		rlRun "ipa host-del $certhost" 0 "Cleaning up created host."
+	rlPhaseEnd
 }
 
 # Setup section for the cert-find section
 cert_find_startup()
 {
+	rlPhaseStartTest "ipa cert-find startup"
+	KinitAsAdmin # Kinit as admin for good measure
 	# Create a host to work with
 	ipaddr=$(hostname -i) # Get IP address of this host
 	rlLog "Ip address is $ipaddr"
@@ -1464,10 +1472,15 @@ cert_find_startup()
 	ipoc2=$(echo $ipaddr | cut -d\. -f2)
 	ipoc3=$(echo $ipaddr | cut -d\. -f3)
 	ipoc4=$(echo $ipaddr | cut -d\. -f4)
-	let newip4=$ipoc4+2
+	let newip4=$ipoc4+3
 	newip="$ipoc1.$ipoc2.$ipoc3.$newip4"
 	
 	rlLog "creating new host with IP $newip"
+	# Cleanup DNS before we begin
+	ipa dnsrecord-del --del-all $DOMAIN clicerttesthost
+	ipa dnsrecord-del --del-all $ipoc3.$ipoc2.$ipoc1.in-addr.arpa $newip4
+	ipa host-del $certhost
+	echo "ipa host-add $certhost --ip-address='$newip"
 	rlRun "ipa host-add $certhost --ip-address='$newip'" 0 "Creating host to test with this BZ test"
 
 	# Create a bunch of certs to work with
@@ -1488,19 +1501,66 @@ L = SFO
 O = RedHat Technology
 OU = RedHat IT' > /opt/rhqa_ipa/cert-req.conf
 	echo "CN = $certhost" >> /opt/rhqa_ipa/cert-req.conf
-	while [ $current_certs -lt 26 ]; do
-		rlRun "openssl req -new -set_serial -config ./opt/rhqa_ipa/cert-req.conf -out /opt/rhqa_ipa/cert-req.csr" 0 "Create a new CSR to work with"
+	while [ $current_certs -lt 41 ]; do
+		echo "openssl req -new -config /opt/rhqa_ipa/cert-req.conf -out /opt/rhqa_ipa/cert-req.csr"
+		rlRun "openssl req -new -config /opt/rhqa_ipa/cert-req.conf -out /opt/rhqa_ipa/cert-req.csr" 0 "Create a new CSR to work with"
+		echo "ipa cert-request --add --principal=EXAMPLE/$certhost /opt/rhqa_ipa/cert-req.csr"
 		rlRun "ipa cert-request --add --principal=EXAMPLE/$certhost /opt/rhqa_ipa/cert-req.csr" 0 "Request the csr into IPA"
-		let current_certs = $current_certs + 1;
+		let current_certs=$current_certs+1;
 	done
+	rlPhaseEnd
 }
 
 cert_find_serial_min()
 {
 	rlPhaseStartTest "cert_find_001: Positive test of Serial number find min"
+		# Positive Tests
+		foundcerts=$(ipa cert-find --min-serial-number=25| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 17"
+		rlRun "echo $foundcerts | grep 17" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --min-serial-number=35| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 7"
+		rlRun "echo $foundcerts | grep 7" 0 "Making sure that the correct number of certs was returned."
+
 		foundcerts=$(ipa cert-find --min-serial-number=15| grep Serial\ number: | wc -l) # This should match 11 certs
-		rlLog "Found $foundcerts certs"
-		rlRun "echo $foundcerts | grep 11" 0 "Making sure that the correct number of certs was returned."
+		rlLog "Found $foundcerts certs, expected 27"
+		rlRun "echo $foundcerts | grep 27" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --min-serial-number=41| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 1"
+		rlRun "echo $foundcerts | grep 1" 0 "Making sure that the correct number of certs was returned."
+
+		# Positive texts by Hex number
+		foundcerts=$(ipa cert-find --min-serial-number=0xA| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 32"
+		rlRun "echo $foundcerts | grep 32" 0 "Making sure that the correct number of certs was returned."
+		
+		foundcerts=$(ipa cert-find --min-serial-number=0x22| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 8"
+		rlRun "echo $foundcerts | grep 8" 0 "Making sure that the correct number of certs was returned."
+
+		# Negative Tests
+		foundcerts=$(ipa cert-find --min-serial-number=42| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 0"
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --min-serial-number=50| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 0"
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --min-serial-number=100| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 0"
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --min-serial-number=0xFF| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 0"
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --min-serial-number=0xDF| grep Serial\ number: | wc -l) # This should match 11 certs
+		rlLog "Found $foundcerts certs, expected 0"
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+
 	rlPhaseEnd
 }
 
