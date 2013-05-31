@@ -61,6 +61,7 @@ rlJournalStart
         rlRun "cp ./ipa-install.sh $TmpDir"
         rlRun "pushd $TmpDir"
         rlRun "yum -y install bind-utils"
+        ipa_coverage_install quickinstall
         ipa_install_set_vars
     rlPhaseEnd
 
