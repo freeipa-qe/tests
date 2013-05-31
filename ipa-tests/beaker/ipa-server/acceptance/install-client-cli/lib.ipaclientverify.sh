@@ -741,7 +741,8 @@ CheckConfig() {
         verify_file_contains_string $conf_ssh_client  "VerifyHostKeyDNS yes"
     elif [ "$conf" = "dns_sshfp" ];then
         out="/tmp/no.dns.sshfp.check.$RANDOM.txt"
-        nslookup -query=SSHFP $HOSTNAME > $out
+        nslookup -query=SSHFP $HOSTNAME 2>&1 > $out
+        show_file_content $out
         if grep "$HOSTNAME rdata_44" $out
         then
             rlPass "'SSH public key fingerprint' found as expected"
@@ -750,7 +751,7 @@ CheckConfig() {
         fi
     elif [ "$conf" = "no_dns_sshfp" ];then
         out="/tmp/no.dns.sshfp.check.$RANDOM.txt"
-        nslookup -query=SSHFP $HOSTNAME > $out
+        nslookup -query=SSHFP $HOSTNAME 2>&1 > $out
         if grep "$HOSTNAME rdata_44" $out
         then
             rlFail "found 'SSH public key fingerprint' when it is NOT expected"
@@ -765,7 +766,7 @@ CheckConfig() {
         check_service_status "ntpd" "disabled"
     elif [ "$conf" = "hostname" ];then
         verify_file_contains_string $conf_sssd_client "ipa_hostname = $HOSTNAME"    
-    elif [ "$conf" = "no_krb5_store_password_if_offline" ];then
+    elif [ "$conf" = "no_krb5_offline_password" ];then
         verify_file_contains_string $conf_sssd_client "krb5_store_password_if_offline = False"    
     elif [ "$conf" = "enable_dns_updates" ];then
         verify_file_contains_string $conf_sssd_client "ipa_dyndns_update = True"    
@@ -808,6 +809,7 @@ show_file_content() {
     if [ -f $file ];then
         echo "---------------- beginning of [$file] ----------------------------"
         cat $file
+        echo ""
         echo "---------------------- end of [$file] ----------------------------"
     else
         echo "=================  file [$file] does NOT exist ================= "
