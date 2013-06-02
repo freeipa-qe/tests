@@ -121,6 +121,7 @@ function irm_forcesync_pos_0003()
         # Setup
         irm_rep_pause $REPLICA3 $REPLICA2
         testuser="testuser$(date +%H%M%S)"
+        rlRun "ipa-replica-manage $PWOPT force-sync --from $MASTER"
         irm_useradd $REPLICA3 $testuser
         irm_userchk $REPLICA3 $testuser
         irm_userchk $REPLICA2 $testuser 2
@@ -173,6 +174,7 @@ function irm_forcesync_pos_0004()
     REPLICA2_*)
         # Setup
         irm_rep_pause $REPLICA2 $REPLICA3
+        rlRun "ipa-replica-manage $PWOPT force-sync --from $MASTER"
         testuser="testuser$(date +%H%M%S)"
         irm_useradd $REPLICA2 $testuser
         irm_userchk $REPLICA2 $testuser
@@ -228,6 +230,7 @@ function irm_forcesync_pos_0005()
     REPLICA3_*)
         # Setup
         irm_rep_pause $REPLICA4 $REPLICA3
+        rlRun "ipa-replica-manage $PWOPT force-sync --from $REPLICA2"
         testuser="testuser$(date +%H%M%S)"
         irm_useradd $REPLICA4 $testuser
         irm_userchk $REPLICA4 $testuser
