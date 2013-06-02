@@ -709,7 +709,7 @@ conf_openldap="/etc/openldap/ldap.conf"
 conf_ssh_client="/etc/ssh/ssh_config"
 conf_ssh_server="/etc/ssh/sshd_config"
 conf_sssd_client="/etc/sssd/sssd.conf"
-conf_ntpd="/etc/ntpd.conf"
+conf_ntpd="/etc/ntp.conf"
 conf_pam_system_auth="/etc/pam.d/system-auth"
 conf_authconfig="/etc/sysconfig/authconfig"
 conf_nsswitch="/etc/nsswitch.conf"
@@ -786,13 +786,19 @@ CheckConfig() {
         verify_file_contains_string $conf_sssd_client "access_provider = permit"
     elif [ "$conf" = "preserv_sssd" ];then
         rlFail "verify: preserv_sssd have't implemented yet"
+    elif [ "$conf" = "no_sssd" ];then
+        if [ -f $conf_sssd_client ];then
+            rlFail "sssd client conf file [$conf_sssd_client] found, this is not expected, test failed"
+        else
+            rlPass "no sssd client conf file [$conf_sssd_client] found as expected, test pass"
+        fi
     else
         rlFail "checkconfig have not implemente [$conf] yet"
     fi
 }
 
 show_file_content() {
-    file=$1
+   file=$1
     if [ -f $file ];then
         echo "---------------- beginning of [$file] ----------------------------"
         cat $file

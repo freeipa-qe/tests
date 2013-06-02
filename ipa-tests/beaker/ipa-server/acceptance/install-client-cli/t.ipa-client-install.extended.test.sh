@@ -24,13 +24,13 @@ ipaclientinstall_non_sssd_single_option_test() {
     ipaclientinstall_non_sssd_option_0008_test_single_option__no_ssh        #  Single Option test: --no-ssh
     ipaclientinstall_non_sssd_option_0009_test_single_option__no_sshd       #  Single Option test: --no-sshd
     ipaclientinstall_non_sssd_option_0010_test_single_option__noac          #  Single Option test: --noac
-    ipaclientinstall_non_sssd_option_0011_test_single_option__ntp_server    #  Single Option test: --ntp-server
+    ipaclientinstall_non_sssd_option_0011_test_single_option__ntp_server    #  Single Option test: --ntp-server --force-ntpd (this is required by --ntp-server)
     ipaclientinstall_non_sssd_option_0012_test_single_option__ssh_trust_dns #  Single Option test: --ssh-trust-dns
 }
 
 ipaclientinstall_non_sssd_multiple_options_test() {
     ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__hostname__mkhomedir__no_dns_sshfp__noac        #  Multi Options test: --fixed-primary,--force,--force-ntpd,--hostname,--mkhomedir,--no-dns-sshfp,--noac
-    ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__hostname__mkhomedir__no_dns_sshfp__ntp_server  #  Multi Options test: --fixed-primary,--force,--force-ntpd,--hostname,--mkhomedir,--no-dns-sshfp,--ntp-server
+    ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__hostname__mkhomedir__no_dns_sshfp__ntp_server  #  Multi Options test: --fixed-primary,--force,--force-ntpd,--hostname,--mkhomedir,--no-dns-sshfp,--ntp-server --force-ntpd (this is required by --ntp-server)
 }
 
 ipaclientinstall_non_sssd_option_0001_test_single_option__fixed_primary(){
@@ -135,9 +135,9 @@ ipaclientinstall_non_sssd_option_0010_test_single_option__noac(){
 
 ipaclientinstall_non_sssd_option_0011_test_single_option__ntp_server(){
     rlPhaseStartTest "ipaclientinstall_non_sssd_option_0011_test_single_option__ntp_server"
-        rlLog " Single Option test: --ntp-server"
-        rlLog "Test Data: --domain:$DOMAIN --principal:$ADMINID --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --ntp-server:$NTPSERVER "
-        rlRun "ipa-client-install --domain=$DOMAIN --principal=$ADMINID --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --ntp-server=$NTPSERVER"
+        rlLog " Single Option test: --ntp-server --force-ntpd (this is required by ntp-server option, otherwise, the single option --ntp-server won't have effect to system"
+        rlLog "Test Data: --domain:$DOMAIN --principal:$ADMINID --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --ntp-server:$NTPSERVER --force-ntpd"
+        rlRun "ipa-client-install --domain=$DOMAIN --principal=$ADMINID --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --ntp-server=$NTPSERVER --force-ntpd"
         CheckConfig ntpserver_setting "server $NTPSERVER"
         rlRun "ipa-client-install --uninstall -U" 0 "uninstall ipa client"
     rlPhaseEnd
@@ -171,9 +171,9 @@ ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__
 
 ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__hostname__mkhomedir__no_dns_sshfp__ntp_server(){
     rlPhaseStartTest "ipaclientinstall_no_sssd_option_combination___fixed_primary__force__force_ntpd__hostname__mkhomedir__no_dns_sshfp__ntp_server"
-        rlLog " Multi Options test: --fixed-primary,--force,--force-ntpd,--hostname,--mkhomedir,--no-dns-sshfp,--ntp-server"
-        rlLog "Test Data: --domain:$DOMAIN --principal:$ADMINID --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --fixed-primary --force --force-ntpd --hostname:$HOSTNAME --mkhomedir --no-dns-sshfp --ntp-server:$NTPSERVER "
-        rlRun "ipa-client-install --domain=$DOMAIN --principal=$ADMINID --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --fixed-primary --force --force-ntpd --hostname=$HOSTNAME --mkhomedir --no-dns-sshfp --ntp-server=$NTPSERVER"  
+        rlLog " Multi Options test: --fixed-primary,--force,--force-ntpd,--hostname,--mkhomedir,--no-dns-sshfp,--ntp-server --force-ntpd"
+        rlLog "Test Data: --domain:$DOMAIN --principal:$ADMINID --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --fixed-primary --force --force-ntpd --hostname:$HOSTNAME --mkhomedir --no-dns-sshfp --ntp-server:$NTPSERVER  --force-ntpd"
+        rlRun "ipa-client-install --domain=$DOMAIN --principal=$ADMINID --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --fixed-primary --force --force-ntpd --hostname=$HOSTNAME --mkhomedir --no-dns-sshfp --ntp-server=$NTPSERVER --force-ntpd"  
         CheckConfig no_dns_sshfp        # Verify sshfp when no flag "--no-dns-sshfp" is given
         CheckConfig primaryServer       # Verify for: --fixed-primary  
         CheckConfig force_ldap          # Verify for: --force  
