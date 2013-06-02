@@ -751,7 +751,7 @@ CheckConfig() {
     elif [ "$conf" = "hostname" ];then
         verify_file_contains_string $conf_sssd_client "ipa_hostname = $HOSTNAME"    
     elif [ "$conf" = "no_krb5_offline_passwords" ];then
-        verify_file_contains_string $conf_sssd_client "krb5_store_password_if_offline = False"    
+        verify_file_does_not_contains_string $conf_sssd_client "krb5_store_password_if_offline = True"
     elif [ "$conf" = "enable_dns_updates" ];then
         verify_file_contains_string $conf_sssd_client "ipa_dyndns_update = True"    
     elif [ "$conf" = "noac" ];then
@@ -777,7 +777,6 @@ CheckConfig() {
         rlLog "verify: ntpserver_untouched"
     elif [ "$conf" = "no_ssh" ];then
         verify_file_contains_string $conf_sssd_client "services = nss, pam"
-        verify_file_does_not_contains_string $conf_sssd_client "services = nss, pam, ssh"
         verify_file_does_not_contains_string $conf_ssh_client "GlobalKnownHostsFile /var/lib/sss/pubconf/known_hosts"
         verify_file_does_not_contains_string $conf_ssh_client "ProxyCommand /usr/bin/sss_ssh_knownhostsproxy -p %p %h"
     elif [ "$conf" = "no_sshd" ];then
