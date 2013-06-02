@@ -52,6 +52,13 @@ ipa_upgrade_install_master()
         rlLog "Machine in recipe is MASTER"
         ipa_install_master
 
+        rlRun "echo $ADMINPW|kinit admin"
+        if [ $? -ne 0 ]; then
+            rlLog "Install failed...try uninstalling and re-installing"
+            ipa_quick_uninstall
+            ipa_install_master
+        fi
+
         rlLog "Enable LDAP Replication Debugging"
         LLOG=/tmp/ldap.enable.errlog
         unindent > $LLOG <<<"\
@@ -90,6 +97,13 @@ ipa_upgrade_install_replica()
     REPLICA*)
         rlLog "Machine in recipe is REPLICA"
         ipa_install_replica $MASTER
+
+        rlRun "echo $ADMINPW|kinit admin"
+        if [ $? -ne 0 ]; then
+            rlLog "Install failed...try uninstalling and re-installing"
+            ipa_quick_uninstall
+            ipa_install_replica $MASTER
+        fi
 
         rlLog "Enable LDAP Replication Debugging"
         LLOG=/tmp/ldap.enable.errlog
@@ -145,6 +159,13 @@ ipa_upgrade_install_client()
         fi
 
         ipa_install_client $MASTER
+
+        rlRun "echo $ADMINPW|kinit admin"
+        if [ $? -ne 0 ]; then
+            rlLog "Install failed...try uninstalling and re-installing"
+            ipa_quick_uninstall
+            ipa_install_client $MASTER
+        fi
 
         #if [ ! -f /etc/sssd/sssd.conf.backup.getent ]; then
         #    rlRun "cp -f /etc/sssd/sssd.conf /etc/sssd/sssd.conf.backup.getent"
