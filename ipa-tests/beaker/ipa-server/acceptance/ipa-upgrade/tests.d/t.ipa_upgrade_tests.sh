@@ -67,7 +67,7 @@ ipa_upgrade_master_replica_client_all()
             rlFail "Bug 949885 hit and data checks will fail until replica upgraded"
         fi
         rlLog "DEBUG SLEEPING to see if this is hitting BZ 949885"
-        rlRun "sleep 1000000"
+        sleep 86400
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
     rlPhaseEnd
 
@@ -326,7 +326,7 @@ ipa_upgrade_master_replica_client_nodns()
 
     IPA_SERVER_OPTIONS="-U --hostname=$MYBEAKERMASTER -r $RELM -n $DOMAIN -p $ADMINPW -P $ADMINPW -a $ADMINPW -U"
     IPA_REPLICA_OPTIONS="-U -w $ADMINPW -p $ADMINPW /opt/rhqa_ipa/replica-info-$MYBEAKERREPLICA1.gpg"
-    IPA_CLIENT_OPTIONS="-d -U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER --domain=$DOMAIN"
+    IPA_CLIENT_OPTIONS="-U --realm=$RELM -p $ADMINID -w $ADMINPW --server=$MYBEAKERMASTER --domain=$DOMAIN"
 
     rlPhaseStartSetup "ipa_upgrade_master_replica_client_nodns_setup: setup to test without dns for master, then replica, then client"
         rlRun "env|sort"
