@@ -66,8 +66,8 @@ ipa_upgrade_master_replica_client_all()
             rlFail "Skipping ipa_upgrade_data_check $MYBEAKERREPLICA1 $LATESTVER old"
             rlFail "Bug 949885 hit and data checks will fail until replica upgraded"
         fi
-        rlLog "DEBUG SLEEPING to see if this is hitting BZ 949885"
-        sleep 86400
+        #rlLog "DEBUG SLEEPING to see if this is hitting BZ 949885"
+        #sleep 86400
         ipa_upgrade_data_check $MYBEAKERCLIENT $LATESTVER old
     rlPhaseEnd
 
