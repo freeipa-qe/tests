@@ -59,8 +59,8 @@ function irm_del_pos_0001()
         # Cleanup
         irm_uninstall
         irm_install $REPLICA3
-        irm_userdel $testuser1
-        irm_userdel $testuser2
+        irm_userdel $REPLICA4 $testuser1
+        irm_userdel $REPLICA4 $testuser2
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR4"
         ;;
@@ -98,8 +98,8 @@ function irm_del_pos_0002()
         # Cleanup
         irm_uninstall
         irm_install $MASTER
-        irm_userdel $testuser1
-        irm_userdel $testuser2
+        irm_userdel $REPLICA1 $testuser1
+        irm_userdel $REPLICA1 $testuser2
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR1"
         ;;
