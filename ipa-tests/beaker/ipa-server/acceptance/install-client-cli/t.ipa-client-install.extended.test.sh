@@ -2,6 +2,7 @@
 # extended test for ipa-client-install
 
 ipa_client_install_extended_test() {
+    ipa_client_install_test_for_system_restoration_after_uninstall
     ipa_client_install_nosssd_option_test
     ipa_client_install_sssd_option_test
 }
@@ -26,6 +27,38 @@ ipaclientinstall_non_sssd_single_option_test() {
     ipaclientinstall_non_sssd_option_0010_test_single_option__noac          #  Single Option test: --noac
     ipaclientinstall_non_sssd_option_0011_test_single_option__ntp_server    #  Single Option test: --ntp-server --force-ntpd (this is required by --ntp-server)
     ipaclientinstall_non_sssd_option_0012_test_single_option__ssh_trust_dns #  Single Option test: --ssh-trust-dns
+}
+
+ipa_client_install_test_for_system_restoration_after_uninstall() {
+    rlPhaseStartTest "ipa_client_install_test_for_system_restoration_after_uninstall"
+        local reserve_dir="/root/test_conf_reserve.$RANDOM"
+        local all_conf_files="$conf_openldap $conf_ssh_client $conf_ssh_server $conf_sssd_client $conf_ntpd $conf_pam_system_auth $conf_authconfig $conf_nsswitch"
+        mkdir -p $reserve_dir
+        rlLog "reserve system file before test , reserve dir = [$reserve_dir]"
+        for conf_file in $all_conf_files
+        do
+            fileName=`basename $conf_file`
+            cp -v -f $conf_file $reserve_dir/$fileName
+        done
+        rlLog "Test Data: --domain:$DOMAIN --principal:$ADMINID --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --ntp-server=$NTPSERVER --mkhomedir --force"
+        rlRun "ipa-client-install --domain=$DOMAIN --principal=$ADMINID --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --ntp-server=$NTPSERVER --mkhomedir --force "  
+        rlLog "expect all confiruation files in [$all_conf_files] are modified, now do uninstall"
+        rlRun "ipa-client-install --uninstall -U" 0 "uninstall ipa client"
+        rlLog "uninstall finished, now check the conf files are all back to original"
+        for conf_file in $all_conf_files
+        do
+            fileName=`basename $conf_file`
+            rlLog "compare file [$conf_file] with [$reserve_dir/$fileName]"
+            if diff $conf_file $reserve_dir/$fileName
+            then
+                rlPass "[$conf_file] is restored, good"
+            else
+                rlFail "[$conf_file] is not restored, bad"
+                show_file_content $conf_file
+                show_file_content $reserve_dir/$fileName
+            fi
+        done
+    rlPhaseEnd
 }
 
 ipaclientinstall_non_sssd_multiple_options_test() {

@@ -774,7 +774,7 @@ CheckConfig() {
         fi
         show_file_content $conf_pam_system_auth
     elif [ "$conf" = "ntpserver_untouched" ];then
-        rlLog "verify: ntpserver_untouched"
+        verify_file_does_not_contains_string $conf_ntpd "server $NTPSERVER"
     elif [ "$conf" = "no_ssh" ];then
         verify_file_contains_string $conf_sssd_client "services = nss, pam"
         verify_file_does_not_contains_string $conf_ssh_client "GlobalKnownHostsFile /var/lib/sss/pubconf/known_hosts"
@@ -784,7 +784,7 @@ CheckConfig() {
     elif [ "$conf" = "permit" ];then
         verify_file_contains_string $conf_sssd_client "access_provider = permit"
     elif [ "$conf" = "preserv_sssd" ];then
-        rlFail "verify: preserv_sssd have't implemented yet"
+        rlFail "verify: preserv_sssd has design issue, freeipa trac ticket: https://fedorahosted.org/freeipa/ticket/3682"
     elif [ "$conf" = "no_sssd" ];then
         if [ -f $conf_sssd_client ];then
             rlFail "sssd client conf file [$conf_sssd_client] found, this is not expected, test failed"

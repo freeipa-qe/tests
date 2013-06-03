@@ -79,15 +79,15 @@ rlJournalStart
             if [ $slave_count -eq 3 ];then
                 rlLog "Executing test cases with 1 Master and 3 Replicas"
                 # temp comment the next 3 lines out for debugging purpose
-                ipaclientinstall
-                clientinstall_primary_server
-                ipa_bug_verification
+                #ipaclientinstall
+                #clientinstall_primary_server
+                #ipa_bug_verification
                 ipa_client_install_extended_test
             else
                 rlLog "Executing test cases with 1 Master and 1 Replica"
                 # temp comment the next 2 lines out for debugging purpose
-                ipaclientinstall
-                ipa_bug_verification
+                #ipaclientinstall
+                #ipa_bug_verification
                 ipa_client_install_extended_test
             fi
             uninstall_fornexttest # Ensure cleanup
