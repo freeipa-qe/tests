@@ -1288,10 +1288,11 @@ ipaconfig_mod_default_pac_type_negative_noinput()
 {
     rlPhaseStartTest "ipa-config-mod-034: Pac Type negative Add With No Input"
         rlLog "negative:add pac type with no input"
-        rlRun "ipa config-mod --pac-type" 2 "no input for pac type option"
+        expmsg="ipa: error: --pac-type option requires an argument"
+	rlRun "verifyErrorMsg \"ipi config-mod --pac-type\" \"$expmsg\"" 0 "verify no input for pac type option"
+	
     rlPhaseEnd
 }
-
 
 ipaconfig_mod_default_pac_type_negative_nochange()
 {
