@@ -20,13 +20,13 @@ realm=`hostname|cut -f2-3 -d.|sed 's/\(.*\)/\U\1/'`
 ######################
 ipaconfig()
 {
-#    ipaconfig_envsetup
+    ipaconfig_envsetup
     ipaconfig_show
     ipaconfig_mod
- #   ipaconfig_searchlimit
-  #  ipaconfig_searchfields
-   # ipaconfig_server
-    #ipaconfig_envcleanup
+    ipaconfig_searchlimit
+    ipaconfig_searchfields
+    ipaconfig_server
+    ipaconfig_envcleanup
 } # ipaconfig
 
 ######################
@@ -43,18 +43,18 @@ ipaconfig_show()
 
 ipaconfig_mod()
 {
- #   ipaconfig_mod_envsetup
- #   ipaconfig_mod_maxusername_default
- #   ipaconfig_mod_maxusername_negative
- #   ipaconfig_mod_homedirectory_default
- #   ipaconfig_mod_homedirectory_negative
- #   ipaconfig_mod_defaultshell_default
- #   ipaconfig_mod_defaultshell_negative
- #   ipaconfig_mod_defaultgroup_default
- #   ipaconfig_mod_defaultgroup_negative
- #   ipaconfig_mod_emaildomain_default
- #   ipaconfig_mod_emaildomain_negative
- #   ipaconfig_mod_pwdexpiration
+    ipaconfig_mod_envsetup
+    ipaconfig_mod_maxusername_default
+    ipaconfig_mod_maxusername_negative
+    ipaconfig_mod_homedirectory_default
+    ipaconfig_mod_homedirectory_negative
+    ipaconfig_mod_defaultshell_default
+    ipaconfig_mod_defaultshell_negative
+    ipaconfig_mod_defaultgroup_default
+    ipaconfig_mod_defaultgroup_negative
+    ipaconfig_mod_emaildomain_default
+    ipaconfig_mod_emaildomain_negative
+    ipaconfig_mod_pwdexpiration
     ipaconfig_mod_default_pac_type_default
     ipaconfig_mod_default_pac_type_negative
  #   ipaconfig_mod_envcleanup
