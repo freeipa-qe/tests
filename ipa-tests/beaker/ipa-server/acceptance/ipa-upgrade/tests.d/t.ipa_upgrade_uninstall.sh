@@ -142,7 +142,7 @@ ipa_upgrade_uninstall_client()
             fi
         else
             #[ -n "$MYBEAKERCLIENT" ] && CLIENT="$(echo $MYBEAKERCLIENT|cut -f1 -d.).${DOMAIN}"
-            rlRun "ipa host-del $CLIENT"
+            rlRun "ipa host-del $CLIENT_S.$DOMAIN"
         fi
         rlRun "rhts-sync-set -s '$FUNCNAME.$TESTCOUNT.2' -m $MYBEAKERMASTER"
         ;;
