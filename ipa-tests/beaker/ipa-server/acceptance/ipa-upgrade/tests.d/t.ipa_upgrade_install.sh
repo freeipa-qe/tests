@@ -87,6 +87,10 @@ ipa_upgrade_install_master()
 
 ipa_upgrade_install_replica()
 {
+    if [ "$USEDNS" != "yes" ]; then
+        ORIGMASTER=$MASTER
+        MASTER=$MYBEAKERMASTER
+    fi
     TESTCOUNT=$(( TESTCOUNT += 1 ))
     rlLog "ipa_upgrade_install_replica: Install and configure IPA Replica for Upgrade tests"
     case "$MYROLE" in
@@ -133,10 +137,18 @@ ipa_upgrade_install_replica()
         rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
         ;;
     esac
+
+    if [ "$USEDNS" != "yes" ]; then
+        MASTER=$ORIGMASTER
+    fi
 }
 
 ipa_upgrade_install_client()
 {
+    if [ "$USEDNS" != "yes" ]; then
+        ORIGMASTER=$MASTER
+        MASTER=$MYBEAKERMASTER
+    fi
     TESTCOUNT=$(( TESTCOUNT += 1 ))
     rlLog "ipa_upgrade_install_client: Install and configure IPA Client for Upgrade tests"
     case "$MYROLE" in
@@ -182,4 +194,8 @@ ipa_upgrade_install_client()
         rlLog "Machine in recipe is not a known ROLE...set MYROLE variable"
         ;;
     esac
+
+    if [ "$USEDNS" != "yes" ]; then
+        MASTER=$ORIGMASTER
+    fi
 }
