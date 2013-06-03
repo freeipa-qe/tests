@@ -2,14 +2,16 @@
 # extended test for ipa-client-install
 
 ipa_client_install_extended_test() {
-    ipa_client_install_test_for_system_restoration_after_uninstall
+    # env setup for the rest of test cases
+    rlLog "ensure ipa client is not installed before enter the test script"
+    ipa-client-install --uninstall -U
+
     ipa_client_install_nosssd_option_test
     ipa_client_install_sssd_option_test
+    ipa_client_install_test_for_system_restoration_after_uninstall
 }
 
 ipa_client_install_nosssd_option_test() {
-    rlLog "ensure ipa client is not installed before enter the test script"
-    ipa-client-install --uninstall -U
     ipaclientinstall_non_sssd_single_option_test
     ipaclientinstall_non_sssd_multiple_options_test
 }
