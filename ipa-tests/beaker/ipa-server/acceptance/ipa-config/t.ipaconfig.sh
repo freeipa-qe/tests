@@ -57,7 +57,7 @@ ipaconfig_mod()
     ipaconfig_mod_pwdexpiration
     ipaconfig_mod_default_pac_type_default
     ipaconfig_mod_default_pac_type_negative
- #   ipaconfig_mod_envcleanup
+    ipaconfig_mod_envcleanup
 } #ipaconfig_mod
 
 ipaconfig_searchlimit()
@@ -1288,9 +1288,8 @@ ipaconfig_mod_default_pac_type_negative_noinput()
 {
     rlPhaseStartTest "ipa-config-mod-034: Pac Type negative Add With No Input"
         rlLog "negative:add pac type with no input"
-        expmsg="ipa: error: --pac-type option requires an argument"
-	rlRun "verifyErrorMsg \"ipi config-mod --pac-type\" \"$expmsg\"" 0 "verify no input for pac type option"
-	
+	rlRun "ipa config-mod --pac-type > $TmpDir/config_mod_034.txt 2>&1" 2 "no input for pac type"
+	rlAssertGrep  "ipa: error: --pac-type option requires an argument" "$TmpDir/config_mod_034.txt"
     rlPhaseEnd
 }
 
