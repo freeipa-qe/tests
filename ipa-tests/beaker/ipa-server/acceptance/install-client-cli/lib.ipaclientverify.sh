@@ -783,6 +783,8 @@ CheckConfig() {
         verify_file_does_not_contains_string $conf_ssh_server "AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys"
     elif [ "$conf" = "permit" ];then
         verify_file_contains_string $conf_sssd_client "access_provider = permit"
+    elif [ "$conf" = "enable_dns_update" ];then
+        verify_file_contains_string $conf_sssd_client "ipa_dyndns_update = True"
     elif [ "$conf" = "preserv_sssd" ];then
         rlFail "verify: preserv_sssd has design issue, freeipa trac ticket: https://fedorahosted.org/freeipa/ticket/3682"
     elif [ "$conf" = "no_sssd" ];then

@@ -226,6 +226,7 @@ ipa_client_install_sssd_option_test() {
     ipaclientinstall_sssd_options_0003_test_single_option__no_sssd                     #  Single Option test: --no-sssd
     ipaclientinstall_sssd_options_0004_test_single_option__no_krb5_offline_passwords   #  Single Option test: --no-krb5-offline-passwords
     ipaclientinstall_sssd_options_0005_test_single_option__preserve_sssd               #  Single Option test: --preserve-sssd
+    ipaclientinstall_sssd_options_0006_test_single_option__enable-dns-updates          #  Single Option test: --enable-dns-updates
 
 }
 
@@ -279,4 +280,12 @@ ipaclientinstall_sssd_options_0005_test_single_option__preserve_sssd(){
     rlPhaseEnd
 }
 
-
+ipaclientinstall_sssd_options_0006_test_single_option__enable_dns_updates(){
+    rlPhaseStartTest "ipaclientinstall_sssd_options_0006_test_single_option__enable_dns_updates"
+        rlLog " Single Option test: --enable-dns-updates"
+        rlLog "Test Data: --server:$MASTER --password:$ADMINPW --unattended --realm:$RELM --domain:$DOMAIN --principal:$ADMINID --enable-dns-updates"
+        rlRun "ipa-client-install --server=$MASTER --password=$ADMINPW --unattended --realm=$RELM --domain=$DOMAIN --principal=$ADMINID --enable-dns-updates"  
+        CheckConfig enable_dns_update # Verify for: --enable-dns-updates
+        rlRun "ipa-client-install --uninstall -U" 0 "uninstall ipa client"
+    rlPhaseEnd
+}
