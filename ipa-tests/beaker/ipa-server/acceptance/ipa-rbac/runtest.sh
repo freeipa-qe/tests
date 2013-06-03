@@ -72,10 +72,10 @@ rlJournalStart
         rlRun "pushd $TmpDir"
     rlPhaseEnd
 
-      ipapermissionTests
+#      ipapermissionTests
       ipaprivilegeTests
-      iparoleTests
-      ipaRBACFunctionalTests
+#      iparoleTests
+#      ipaRBACFunctionalTests
 
     rlPhaseStartCleanup "ipa rbac cleanup"
        rlRun "popd"
