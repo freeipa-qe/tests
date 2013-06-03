@@ -98,7 +98,6 @@ function irm_del_pos_0002()
         # Cleanup
         irm_uninstall
         irm_install $MASTER
-        irm_userdel $REPLICA1 $testuser1
         irm_userdel $REPLICA1 $testuser2
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.1' -m $MY_BR1"

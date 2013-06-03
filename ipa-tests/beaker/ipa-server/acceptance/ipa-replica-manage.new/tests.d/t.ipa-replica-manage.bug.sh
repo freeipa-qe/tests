@@ -137,3 +137,18 @@ irm_bugcheck_823657()
         rlPass "BZ 823657 not found."
     fi
 }
+
+irm_bugcheck_970225()
+{
+    if [ $# -lt 1 ]; then
+        echo "Usage: irm_bugcheck_970225 <user-add output file>"
+        return 1
+    fi
+    local tmpout=$1
+    local logfile=/var/log/dirsrv/slapd-$(echo $RELM|sed 's/\./-/g')/errors
+    rlAssertNotGrep "Allocation of a new value for range.*failed"  $tmpout
+    rlAssertNotGrep "dna-plugin.*Failed to fetch replication agreement for range" $logfile
+    if [ $? -eq 1 ]; then
+        rlFail "BZ 970225 found...DNA plugin failed to fetch replication agreement"
+    fi
+}

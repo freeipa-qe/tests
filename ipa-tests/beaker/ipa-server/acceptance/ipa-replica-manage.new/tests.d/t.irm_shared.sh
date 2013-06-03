@@ -23,11 +23,13 @@ function irm_useradd()
 {
     local runhost=$1
     local user=$2
+    tmpout=/tmp/output.$FUNCNAME
     if [ -n "$PWOPT" ]; then
         rlRun "ssh $runhost 'echo $ADMINPW| kinit admin'"
     fi
 
-    rlRun "ssh $runhost 'ipa user-add $user --first=test --last=user'"
+    rlRun "ssh $runhost 'ipa user-add $user --first=test --last=user' > $tmpout 2>&1"
+    irm_bugcheck_970225 $tmpout
 
     if [ -n "$PWOPT" ]; then
         rlRun "ssh $runhost 'kdestroy'"
