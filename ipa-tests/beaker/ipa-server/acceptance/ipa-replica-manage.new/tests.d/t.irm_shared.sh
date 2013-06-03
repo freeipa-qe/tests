@@ -147,6 +147,9 @@ function irm_rep_pause()
     local runto=$2
 
     DAYTORUN=$(( $(date +%w) - 1 ))
+    if [ $DAYTORUN -eq -1 ]; then
+        DAYTORUN=6
+    fi
 
     REPDN=$(ldapsearch -h $runfrom -o ldif-wrap=no \
         -x -D "$ROOTDN" -w "$ROOTDNPWD" \
