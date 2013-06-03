@@ -181,7 +181,8 @@ function irm_func_0004()
     rlPhaseStartTest "irm_func_0004: connect replica2 and replica3, remote"
     case "$MYROLE" in
     MASTER_*)
-        rlRun "ipa-replica-manage $PWOPT -H $REPLICA2 connect $REPLICA3 > $tmpout 2>&1"
+        rlRun "ipa-replica-manage $PWOPT -H $REPLICA2 list $REPLICA2"
+        rlRun "ipa-replica-manage $PWOPT -H $REPLICA2 connect $REPLICA2 $REPLICA3 > $tmpout 2>&1"
         rlRun "cat $tmpout"
         rlAssertGrep "Connected '$REPLICA2' to '$REPLICA3'" $tmpout
         
