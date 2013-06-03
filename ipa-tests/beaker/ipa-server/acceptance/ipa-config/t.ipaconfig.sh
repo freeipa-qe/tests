@@ -20,13 +20,13 @@ realm=`hostname|cut -f2-3 -d.|sed 's/\(.*\)/\U\1/'`
 ######################
 ipaconfig()
 {
-    ipaconfig_envsetup
+#    ipaconfig_envsetup
     ipaconfig_show
     ipaconfig_mod
-    ipaconfig_searchlimit
-    ipaconfig_searchfields
-    ipaconfig_server
-    ipaconfig_envcleanup
+ #   ipaconfig_searchlimit
+  #  ipaconfig_searchfields
+   # ipaconfig_server
+    #ipaconfig_envcleanup
 } # ipaconfig
 
 ######################
@@ -37,26 +37,27 @@ ipaconfig_show()
     ipaconfig_show_envsetup
     ipaconfig_show_default
     ipaconfig_show_negative
+    ipaconfig_show_pac
     ipaconfig_show_envcleanup
 } #ipaconfig_show
 
 ipaconfig_mod()
 {
-    ipaconfig_mod_envsetup
-    ipaconfig_mod_maxusername_default
-    ipaconfig_mod_maxusername_negative
-    ipaconfig_mod_homedirectory_default
-    ipaconfig_mod_homedirectory_negative
-    ipaconfig_mod_defaultshell_default
-    ipaconfig_mod_defaultshell_negative
-    ipaconfig_mod_defaultgroup_default
-    ipaconfig_mod_defaultgroup_negative
-    ipaconfig_mod_emaildomain_default
-    ipaconfig_mod_emaildomain_negative
-    ipaconfig_mod_pwdexpiration
+ #   ipaconfig_mod_envsetup
+ #   ipaconfig_mod_maxusername_default
+ #   ipaconfig_mod_maxusername_negative
+ #   ipaconfig_mod_homedirectory_default
+ #   ipaconfig_mod_homedirectory_negative
+ #   ipaconfig_mod_defaultshell_default
+ #   ipaconfig_mod_defaultshell_negative
+ #   ipaconfig_mod_defaultgroup_default
+ #   ipaconfig_mod_defaultgroup_negative
+ #   ipaconfig_mod_emaildomain_default
+ #   ipaconfig_mod_emaildomain_negative
+ #   ipaconfig_mod_pwdexpiration
     ipaconfig_mod_default_pac_type_default
     ipaconfig_mod_default_pac_type_negative
-    ipaconfig_mod_envcleanup
+ #   ipaconfig_mod_envcleanup
 } #ipaconfig_mod
 
 ipaconfig_searchlimit()
@@ -139,8 +140,6 @@ ipaconfig_show_default()
         ipaconfig_show_default_nooption
 	ipaconfig_show_default_alloption
 	ipaconfig_show_default_rawoption
-	ipaconfig_show_default_pac_type
-	ipaconfig_show_default_pac_type_raw
     rlPhaseEnd
 } #ipaconfig_show_default
 
@@ -215,42 +214,6 @@ ipaconfig_show_default_rawoption()
 	clear_kticket
 }  
 
-ipaconfig_show_default_pac_type()
-{
-        rlLog "check default pac type"
-	KinitAsAdmin
-        expected_pac1="Default PAC types: MS-PAC, nfs:NONE"
-	expected_pac2="Default PAC types: nfs:NONE, MS-PAC"
-        actual_pac=`ipa config-show|grep "Default PAC types:"`
-	actual_pac_nospace=`echo "$actual_pac"|sed -e 's/^[ \t]*//'`
-	if [ "$actual_pac_nospace" = "$expected_pac1" ] || [ "$actual_pac_nospace" = "$expected_pac2" ];then
-	        rlPass "default pac types shown as expected"
-        else
-                rlFail "default pac types not shown"
-        fi
-}
-
-ipaconfig_show_default_pac_type_raw()
-{
-        rlLog "check default pac type with raw option"
-        touch muliline
-	echo "ipakrbauthzdata: MS-PAC">>multiline
-	echo "ipakrbauthzdata: nfs:NONE">>multiline
-	expected_pac1=`cat multiline`
-	echo "ipakrbauthzdata: nfs:NONE">multiline
-	echo "ipakrbauthzdata: MS-PAC">>multiline
-	expected_pac2=`cat multiline`
-        rm -f multiline
-        actual_pac=`ipa config-show --raw|grep "ipakrbauthzdata:"`
-	actual_pac_nospace=`echo "$actual_pac"|sed -e 's/^[ \t]*//'`
-	if [ "$actual_pac_nospace" = "$expected_pac1" ] || [ "$actual_pac_nospace" = "$expected_pac2" ] ;then
-                rlPass "default pac types shown as expected"
-        else
-                rlFail "default pac types not shown"
-        fi
-        clear_kticket
-}
-
 ipaconfig_show_negative()
 {
 # looped data   : 
@@ -269,6 +232,53 @@ ipaconfig_show_negative_logic()
         rlRun "ipa config-show" 1 "only ipa user can do config-show"
     # test logic ends
 } # ipaconfig_show_negative_logic 
+
+
+ipaconfig_show_pac()
+{
+        ipaconfig_show_default_pac_type
+        ipaconfig_show_default_pac_type_raw
+}
+
+ipaconfig_show_default_pac_type()
+{
+    rlPhaseStartTest "ipa-config-show-003: Verify default pac type"
+        rlLog "check default pac type"
+        KinitAsAdmin
+        expected_pac1="Default PAC types: MS-PAC, nfs:NONE"
+        expected_pac2="Default PAC types: nfs:NONE, MS-PAC"
+        actual_pac=`ipa config-show|grep "Default PAC types:"`
+        actual_pac_nospace=`echo "$actual_pac"|sed -e 's/^[ \t]*//'`
+        if [ "$actual_pac_nospace" = "$expected_pac1" ] || [ "$actual_pac_nospace" = "$expected_pac2" ];then
+                rlPass "default pac types shown as expected"
+        else
+                rlFail "default pac types not shown"
+        fi
+    rlPhaseEnd
+}
+
+ipaconfig_show_default_pac_type_raw()
+{
+    rlPhaseStartTest "ipa-config-show-004: Verify default pac type with raw option"
+        rlLog "check default pac type with raw option"
+        touch muliline
+        echo "ipakrbauthzdata: MS-PAC">>multiline
+        echo "ipakrbauthzdata: nfs:NONE">>multiline
+        expected_pac1=`cat multiline`
+        echo "ipakrbauthzdata: nfs:NONE">multiline
+        echo "ipakrbauthzdata: MS-PAC">>multiline
+        expected_pac2=`cat multiline`
+        rm -f multiline
+        actual_pac=`ipa config-show --raw|grep "ipakrbauthzdata:"`
+        actual_pac_nospace=`echo "$actual_pac"|sed -e 's/^[ \t]*//'`
+        if [ "$actual_pac_nospace" = "$expected_pac1" ] || [ "$actual_pac_nospace" = "$expected_pac2" ] ;then
+                rlPass "default pac types shown as expected"
+        else
+                rlFail "default pac types not shown"
+        fi
+        clear_kticket
+    rlPhaseEnd
+}
 
 ipaconfig_mod_envsetup()
 {
@@ -654,139 +664,6 @@ ipaconfig_mod_emaildomain_negative_logic()
     # test logic ends
 } # ipaconfig_mod_emaildomain_negative_logic
 
-ipaconfig_mod_default_pac_type_default()
-{
-
-    rlPhaseStartTest "ipa-config-mod-013: Pac Type "
-	rlLog "this is to test for defult behavior"
-	ipaconfig_mod_default_pac_type_default_nfsnone
-	ipaconfig_mod_default_pac_type_default_pad
-	ipaconfig_mod_default_pac_type_default_mspac
-	ipaconfig_mod_default_pac_type_default_removeall
-	ipaconfig_mod_default_pac_type_default_addmultiple
-    rlPhaseEnd
-}
- 
-ipaconfig_mod_default_pac_type_default_nfsnone()
-{
-    	KinitAsAdmin
-	rlRun "ipa config-mod --pac-type=nfs:NONE" 0 "change default pac type to nfs:NONE"
-	initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
-	FirstKinitAs testuser $initpassword "Secret123"
-	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
-	kvno host/$host@$realm
-	size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
-	size3=`expr $size2 - $size1`
-	if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
-		rlPass "expected size change for credential cache"
-	else
-		rlFail "size change not in the expected range"
-	fi
-	KinitAsAdmin
-	rlRun "ipa user-del testuser" 0 "delete the test user"
-	clear_kticket
-}
-
-ipaconfig_mod_default_pac_type_default_pad()
-{
-        KinitAsAdmin
-        rlRun "ipa config-mod --pac-type=PAD" 0 "change default pac type to PAD"
-        initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
-        FirstKinitAs testuser $initpassword "Secret123"
-	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
-        kvno host/$host@$realm
-        size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
-        size3=`expr $size2 - $size1`
-        if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
-                rlPass "expected size change for credential cache"
-        else
-                rlFail "size change not in the expected range"
-        fi
-	KinitAsAdmin
-	rlRun "ipa user-del testuser" 0 "delete the test user"
-        clear_kticket
-}
-
-ipaconfig_mod_default_pac_type_default_mspac()
-{
-        KinitAsAdmin
-        rlRun "ipa config-mod --pac-type=MS-PAC" 0 "change default pac type to MS-PAC"
-        initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
-        FirstKinitAs testuser $initpassword "Secret123"
-	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
-        kvno host/$host@$realm
-        size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
-        size3=`expr $size2 - $size1`
-        if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
-                rlPass "expected size change for credential cache"
-        else
-                rlFail "size change not in the expected range"
-        fi
-	KinitAsAdmin
-	rlRun "ipa user-del testuser" 0 "delete the test user"
-        clear_kticket
-}
-
-ipaconfig_mod_default_pac_type_default_removeall()
-{
-
-	KinitAsAdmin
-        rlRun "ipa config-mod --pac-type=" 0 "remove default pac type"
-	rlRun "ipa config-show|grep 'Default PAC types:'" 1 "verify the default pac types are removed"
-        clear_kticket
-}
-
-ipaconfig_mod_default_pac_type_default_addmultiple()
-{
-        KinitAsAdmin
-        rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=PAD" 0 "add mulitple default pac type"
-        clear_kticket
-}
-
-
-ipaconfig_mod_default_pac_type_negative()
-{
-    rlPhaseStartTest "ipa-config-mod-014: Pac Type negative"
-        rlLog "negative test case"
-	KinitAsAdmin
-        ipaconfig_mod_default_pac_type_negative_random
-        ipaconfig_mod_default_pac_type_negative_nfsmspac
-        ipaconfig_mod_default_pac_type_negative_nfspad
-	ipaconfig_mod_default_pac_type_negative_noinput
-	ipaconfig_mod_default_pac_type_negative_nochange
-  	clear_kticket
- 
-     rlPhaseEnd
-}
-
-ipaconfig_mod_default_pac_type_negative_random()
-{
-	random=`make_8bitString`
-        rlRun "ipa config-mod --pac-type=$random" 1 "change default pac type to some random value"
-}
-
-ipaconfig_mod_default_pac_type_negative_nfsmspac()
-{
-        rlRun "ipa config-mod --pac-type=nfs:MS-PAC" 1 "change default  pac type to nonexistent nfs:MS-PAC"
-}
-
-ipaconfig_mod_default_pac_type_negative_nfspad()
-{
-        rlRun "ipa config-mod --pac-type=nfs:PAD" 1 "change default pac type to nonexistent nfs:PAD"
-}
-
-ipaconfig_mod_default_pac_type_negative_noinput()
-{
-        rlRun "ipa config-mod --pac-type" 2 "no input for pac type option"
-}
-
-ipaconfig_mod_default_pac_type_negative_nochange()
-{
-	rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC" 0 "change default pac type to nfs:NONE and MS-PAC"
-	rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC" 1 "rechange default pac type to nfs:NONE and MS-PAC"	
-}
-
-
 ipaconfig_searchlimit_envsetup()
 {
     rlPhaseStartSetup "ipaconfig_searchlimit_envsetup"
@@ -809,7 +686,7 @@ ipaconfig_searchlimit_timelimit_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-015: Searchlimit and Timelimit"
+    rlPhaseStartTest "ipa-config-mod-013: Searchlimit and Timelimit"
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
@@ -841,7 +718,7 @@ ipaconfig_searchlimit_timelimit_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-016: Searchlimit and Timelimit negative"
+    rlPhaseStartTest "ipa-config-mod-014: Searchlimit and Timelimit negative"
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.searchtimelimit.$RANDOM.out
         KinitAsAdmin
@@ -873,7 +750,7 @@ ipaconfig_searchlimit_recordslimit_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-017: Searchlimit and Recordslimit"
+    rlPhaseStartTest "ipa-config-mod-015: Searchlimit and Recordslimit"
         rlLog "this is to test for default behavior"
         KinitAsAdmin
         for value in 0 10 97 10000 100
@@ -929,7 +806,7 @@ ipaconfig_searchlimit_recordslimit_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-018: Searchlimit and Recordslimit negative"
+    rlPhaseStartTest "ipa-config-mod-016: Searchlimit and Recordslimit negative"
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.searchrecordlimit.$RANDOM.out
         KinitAsAdmin
@@ -968,7 +845,7 @@ ipaconfig_searchfields_envsetup()
 ipaconfig_ticket_2159()
 {
 	# Testcase covering https://fedorahosted.org/freeipa/ticket/2159
-	rlPhaseStartTest "ipa-config-mod-019: Exception why removing all values in config plugin bz782974"
+	rlPhaseStartTest "ipa-config-mod-017: Exception why removing all values in config plugin bz782974"
 		ipa config-mod --groupsearch= &> /opt/rhqa_ipa/2159out.txt
 		rlRun "grep Traceback  /opt/rhqa_ipa/2159out.txt" 1 "Making sure that running a empty groupsearch did not return a exception"
 	rlPhaseEnd
@@ -987,7 +864,7 @@ ipaconfig_searchfields_userfields_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-020: User Search Fields"
+    rlPhaseStartTest "ipa-config-mod-018: User Search Fields"
         rlLog "this is to test for default behavior"
         local out=$TmpDir/searchfields.userfields.$RANDOM.out
         # setup special account for this test
@@ -1036,7 +913,7 @@ ipaconfig_searchfields_userfields_negative()
 {
     # accept parameters: NONE
     # test logic starts
-    rlPhaseStartTest "ipa-config-mod-021: User Search Fields negative"
+    rlPhaseStartTest "ipa-config-mod-019: User Search Fields negative"
     # add invalid search field to default user search fields
 	rlLog "Add field bogus to user search fields"
  	ipa config-mod --usersearch="${default_config_usersearchfields},bogus"
@@ -1055,7 +932,7 @@ ipaconfig_searchfields_groupfields_default()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-022: Group Search Fields"
+    rlPhaseStartTest "ipa-config-mod-020: Group Search Fields"
         rlLog "this is to test for default behavior"
         local out=$TmpDir/searchfields.groupfields.$RANDOM.out
         # setup special account for this test
@@ -1102,7 +979,7 @@ ipaconfig_searchfields_groupfields_negative()
 {
     # accept parameters: NONE
     # test logic starts
-    rlPhaseStartTest "ipa-config-mod-023: Group Search Fields negative"
+    rlPhaseStartTest "ipa-config-mod-021: Group Search Fields negative"
     # add invalid search field to default group search fields
         rlLog "Add field bogus to group search fields"
         ipa config-mod --groupsearch="${default_config_groupsearchfields},bogus"
@@ -1139,7 +1016,7 @@ ipaconfig_server_enablemigration()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-024: Enable Migration"
+    rlPhaseStartTest "ipa-config-mod-022: Enable Migration"
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.enablemigration.$RANDOM.out
         KinitAsAdmin
@@ -1189,7 +1066,7 @@ ipaconfig_server_enablemigration_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-025: Enable Migration negative"
+    rlPhaseStartTest "ipa-config-mod-023: Enable Migration negative"
         rlLog "negative test case"
         for value in T F a -1 
         do
@@ -1210,7 +1087,7 @@ ipaconfig_server_subject()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-026: CA Subject Base"
+    rlPhaseStartTest "ipa-config-mod-024: CA Subject Base"
         rlLog "this is to test for default behavior"
         out=$TmpDir/ipaconfig.subject.$RANDOM.out
         KinitAsAdmin
@@ -1239,7 +1116,7 @@ ipaconfig_server_subject_negative()
 {
 # looped data   : 
 # non-loop data : 
-    rlPhaseStartTest "ipa-config-mod-027: CA Subject Base negative"
+    rlPhaseStartTest "ipa-config-mod-025: CA Subject Base negative"
         rlLog "negative test case"
         out=$TmpDir/ipaconfig.subject.negative.$RANDOM.out
         KinitAsAdmin
@@ -1262,4 +1139,167 @@ ipaconfig_server_subject_negative_logic()
     # test logic starts
         rlPass "NO NEGATIVE TESTS"
     # test logic ends
-} # ipaconfig_server_subject_negative_logic 
+} # ipaconfig_server_subject_negative_logic
+
+ 
+ipaconfig_mod_default_pac_type_default()
+{
+	ipaconfig_mod_default_pac_type_default_nfsnone
+	ipaconfig_mod_default_pac_type_default_pad
+	ipaconfig_mod_default_pac_type_default_mspac
+	ipaconfig_mod_default_pac_type_default_removeall
+	ipaconfig_mod_default_pac_type_default_addmultiple
+}
+ 
+ipaconfig_mod_default_pac_type_default_nfsnone()
+{
+    rlPhaseStartTest "ipa-config-mod-026: Pac Type Change To nfs:NONE"
+	rlLog "change pac type to nfs:NONE ,verify the credential cache size change"
+    	KinitAsAdmin
+	rlRun "ipa config-mod --pac-type=nfs:NONE" 0 "change default pac type to nfs:NONE"
+	initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+	FirstKinitAs testuser $initpassword "Secret123"
+	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+	kvno host/$host@$realm
+	size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+	size3=`expr $size2 - $size1`
+	if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
+		rlPass "expected size change for credential cache"
+	else
+		rlFail "size change not in the expected range"
+	fi
+	KinitAsAdmin
+	rlRun "ipa user-del testuser" 0 "delete the test user"
+	clear_kticket
+    rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_default_pad()
+{
+    rlPhaseStartTest "ipa-config-mod-027: Pac Type Change To PAD"
+	rlLog "change pac type to PAD ,verify the credential cache size change"
+        KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=PAD" 0 "change default pac type to PAD"
+        initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+        FirstKinitAs testuser $initpassword "Secret123"
+	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        kvno host/$host@$realm
+        size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        size3=`expr $size2 - $size1`
+        if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
+                rlPass "expected size change for credential cache"
+        else
+                rlFail "size change not in the expected range"
+        fi
+	KinitAsAdmin
+	rlRun "ipa user-del testuser" 0 "delete the test user"
+        clear_kticket
+    rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_default_mspac()
+{
+    rlPhaseStartTest "ipa-config-mod-028: Pac Type Change To MS-PAC"
+	rlLog "change pac type to PAD ,verify the credential cache size change"
+        KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=MS-PAC" 0 "change default pac type to MS-PAC"
+        initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
+        FirstKinitAs testuser $initpassword "Secret123"
+	size1=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        kvno host/$host@$realm
+        size2=`ls -l /tmp/krb5cc_0|cut -d" " -f5`
+        size3=`expr $size2 - $size1`
+        if [ "$size3" -gt "400" ] && [ "$size3" -lt "600" ];then
+                rlPass "expected size change for credential cache"
+        else
+                rlFail "size change not in the expected range"
+        fi
+	KinitAsAdmin
+	rlRun "ipa user-del testuser" 0 "delete the test user"
+        clear_kticket
+    rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_default_removeall()
+{
+
+    rlPhaseStartTest "ipa-config-mod-029: Remove All Pac Type "
+	rlLog "remove all default pac type"
+	KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=" 0 "remove default pac type"
+	rlRun "ipa config-show|grep 'Default PAC types:'" 1 "verify the default pac types are removed"
+        clear_kticket
+    rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_default_addmultiple()
+{
+    rlPhaseStartTest "ipa-config-mod-030:Add Multiple Pac Type"
+	rlLog "add multiple default pac type"
+        KinitAsAdmin
+        rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=PAD" 0 "add mulitple default pac type"
+	rlRun "ipa config-show|grep 'Default PAC types: nfs:NONE, PAD'" 0 "verify the default pac types are added"
+        clear_kticket
+    rlPhaseEnd
+}
+
+
+ipaconfig_mod_default_pac_type_negative()
+{
+	KinitAsAdmin
+        ipaconfig_mod_default_pac_type_negative_random
+        ipaconfig_mod_default_pac_type_negative_nfsmspac
+        ipaconfig_mod_default_pac_type_negative_nfspad
+	ipaconfig_mod_default_pac_type_negative_noinput
+	ipaconfig_mod_default_pac_type_negative_nochange
+  	clear_kticket
+}
+
+ipaconfig_mod_default_pac_type_negative_random()
+{
+    rlPhaseStartTest "ipa-config-mod-031: Pac Type negative Add Random Value "
+        rlLog "negative:change default pac type to some random value "
+	random=`make_8bitString`
+        rlRun "ipa config-mod --pac-type=$random" 1 "change default pac type to some random value"
+	random_pac="Default PAC types: $random"
+	rlRun "ipa config-show|grep \"random_pac \"" 1 "verify the default random pac type was not added"
+    rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_negative_nfsmspac()
+{
+    rlPhaseStartTest "ipa-config-mod-032: Pac Type negative Add Nonexistent nfs:MS-PAC"
+        rlLog "negative:add nonexistent pac type nfs:MS-PAC"
+        rlRun "ipa config-mod --pac-type=nfs:MS-PAC" 1 "change default  pac type to nonexistent nfs:MS-PAC"
+        rlRun "ipa config-show|grep nfs:MS-PAC" 1 "verify the default nonexistent pac type was not added"
+    rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_negative_nfspad()
+{
+    rlPhaseStartTest "ipa-config-mod-033: Pac Type negative Add Nonexistent nfs:PAD"
+        rlLog "negative:add nonexistent pac type nfs:PAD"
+        rlRun "ipa config-mod --pac-type=nfs:PAD" 1 "change default pac type to nonexistent nfs:PAD"
+        rlRun "ipa config-show|grep nfs:PAD" 1 "verify the default nonexistent pac type was not added"
+    rlPhaseEnd
+}
+
+ipaconfig_mod_default_pac_type_negative_noinput()
+{
+    rlPhaseStartTest "ipa-config-mod-034: Pac Type negative Add With No Input"
+        rlLog "negative:add pac type with no input"
+        rlRun "ipa config-mod --pac-type" 2 "no input for pac type option"
+    rlPhaseEnd
+}
+
+
+ipaconfig_mod_default_pac_type_negative_nochange()
+{
+    rlPhaseStartTest "ipa-config-mod-035: Pac Type negative No Change"
+        rlLog "negative:change pac type to it already is"
+	rlRun "ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC" 0 "change default pac type to nfs:NONE and MS-PAC"
+	expmsg="ipa: ERROR: no modifications to be performed"	
+	rlRun "verifyErrorMsg \"ipa config-mod --pac-type=nfs:NONE --pac-type=MS-PAC\" \"$expmsg\"" 0 "rechange default pac type to nfs:NONE and MS-PAC,verify the expected error message"
+    rlPhaseEnd
+}
+
