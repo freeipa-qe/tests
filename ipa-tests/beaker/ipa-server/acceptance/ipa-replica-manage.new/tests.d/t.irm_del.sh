@@ -166,6 +166,8 @@ function irm_del_neg_0001()
 
         # Cleanup
         rlRun "ipa-replica-manage $PWOPT connect $REPLICA2 $REPLICA3"
+        rlRun "ipactl stop"
+        rlRun "ipactl start"
         rlRun "ssh $REPLICA3 \"ipactl stop\""
         rlRun "ssh $REPLICA3 \"ipactl start\""
         rlRun "ssh $REPLICA3 \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
@@ -226,9 +228,11 @@ function irm_del_neg_0002()
 
         # Cleanup
         rlRun "ipa-replica-manage $PWOPT connect $REPLICA2 $REPLICA3"
+        rlRun "ipactl stop"
+        rlRun "ipactl start"
         rlRun "ssh $REPLICA3 \"ipactl stop\""
         rlRun "ssh $REPLICA3 \"ipactl start\""
-        rlRun "ssh $REPLICA3 \"ipa-replica-manage $PWOPT re-initialize --from $REPLICA2\""
+        rlRun "ssh $REPLICA3 \"ipa-replica-manage -p $ADMINPW re-initialize --from $REPLICA2\""
 
         rlRun "rhts-sync-set -s '$TESTCOUNT.$FUNCNAME.0' -m $MY_BR2"
         ;;
