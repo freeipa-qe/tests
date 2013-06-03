@@ -42,6 +42,10 @@ rlJournalStart
         /sbin/restorecon -v /root/.ssh/authorized_keys
         /sbin/restorecon -v /root/.ssh/authorized_keys2
         
+        # Attempting workaround to avoid DNS server 10.16.101.41
+        cp /etc/resolv.conf /etc/resolv.conf.10.16.101.41
+        sed -i 's/10.16.101.41/10.11.5.19/g' /etc/resolv.conf
+
         DNSFORWARD=$(grep nameserver /etc/resolv.conf |grep -v "^[ \t]*#"|head -1|awk '{print $2}')
         if [ -z ${DNSFORWARD} ]; then 
             DNSFORWARD=10.11.5.19
