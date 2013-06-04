@@ -28,7 +28,7 @@ export TESTVERSION=3.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) ipa-server-shared.sh runtest.sh ipa-host-cli-lib.sh ipa-group-cli-lib.sh ipa-hostgroup-cli-lib.sh ipa-service-cli-lib.sh ipa-netgroup-cli-lib.sh ipa-hbac-cli-lib.sh lib.user-cli.sh ipa-automember-cli-lib.sh Makefile PURPOSE set-root-pw.exp nis.sh id_rsa.pub id_rsa id_dsa.pub id_dsa env.sh id_rsa_global.pub id_rsa_global known_hosts lib.ds-migration.sh ipa-rbac-cli-lib.sh ipa-selinuxusermap-cli-lib.sh ipa-install.sh install-lib.sh lib.ipa-rhts.sh coverage-3.6.tar.gz id_dsa-wiki-beaker_archive
+FILES=$(METADATA) ipa-server-shared.sh runtest.sh
 
 .PHONY: all install download clean
 
@@ -43,58 +43,58 @@ run: $(FILES) build
 	cp ./ipa-server-shared.sh /opt/rhqa_ipa/.
 	rm -f /opt/rhqa_ipa/ipa-install.sh
 	cp ./ipa-install.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-host-cli-lib.sh
-	cp ./ipa-host-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-hostgroup-cli-lib.sh
-	cp ./ipa-hostgroup-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-netgroup-cli-lib.sh
-	cp ./ipa-netgroup-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-group-cli-lib.sh
-	cp ./ipa-group-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-hbac-cli-lib.sh
-	cp ./ipa-hbac-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-automember-cli-lib.sh
-	cp ./ipa-automember-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/lib.ds-migration.sh
-	cp ./lib.ds-migration.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/lib.user-cli.sh
-	cp ./lib.user-cli.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-service-cli-lib.sh
-	cp ./ipa-service-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/nis.sh
-	cp ./nis.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/lib.ipa-rhts.sh
-	cp ./lib.ipa-rhts.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-rbac-cli-lib.sh
-	cp ./ipa-rbac-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/ipa-selinuxusermap-cli-lib.sh
-	cp ./ipa-selinuxusermap-cli-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/install-lib.sh
-	cp ./install-lib.sh /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/set-root-pw.exp
-	cp ./set-root-pw.exp /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/coverage-3.6.tar.gz
-	cp ./coverage-3.6.tar.gz /opt/rhqa_ipa/.
-	rm -f /opt/rhqa_ipa/id_rsa*
-	cp ./id_rsa* /opt/rhqa_ipa/.
-	mkdir -p /root/.ssh
-	cp ./id_rsa* /root/.ssh/.
-	rm -f /opt/rhqa_ipa/id_dsa*
-	cp ./id_dsa* /opt/rhqa_ipa/.
-	cp ./id_dsa* /root/.ssh/.
-	cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-	cat /root/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys2
-	cat ./known_hosts >> /root/.ssh/known_hosts
-	cp -f ./id_rsa_global.pub /opt/rhqa_ipa/.
-	cp -f ./id_rsa_global /opt/rhqa_ipa/.
-	cp -f ./known_hosts /opt/rhqa_ipa/.
-	cp -f ./id_dsa-wiki-beaker_archive /opt/rhqa_ipa/.
-	chmod 600 /opt/rhqa_ipa/id_dsa-wiki-beaker_archive
-	chmod 755 /opt/rhqa_ipa/*.sh
-	chmod 600 /root/.ssh
-	chmod 600 /root/.ssh/id*
-	chmod 600 /root/.ssh/authorized_keys
-	chmod 600 /root/.ssh/authorized_keys2
+#	rm -f /opt/rhqa_ipa/ipa-host-cli-lib.sh
+#	cp ./ipa-host-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-hostgroup-cli-lib.sh
+#	cp ./ipa-hostgroup-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-netgroup-cli-lib.sh
+#	cp ./ipa-netgroup-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-group-cli-lib.sh
+#	cp ./ipa-group-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-hbac-cli-lib.sh
+#	cp ./ipa-hbac-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-automember-cli-lib.sh
+#	cp ./ipa-automember-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/lib.ds-migration.sh
+#	cp ./lib.ds-migration.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/lib.user-cli.sh
+#	cp ./lib.user-cli.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-service-cli-lib.sh
+#	cp ./ipa-service-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/nis.sh
+#	cp ./nis.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/lib.ipa-rhts.sh
+#	cp ./lib.ipa-rhts.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-rbac-cli-lib.sh
+#	cp ./ipa-rbac-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/ipa-selinuxusermap-cli-lib.sh
+#	cp ./ipa-selinuxusermap-cli-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/install-lib.sh
+#	cp ./install-lib.sh /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/set-root-pw.exp
+#	cp ./set-root-pw.exp /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/coverage-3.6.tar.gz
+#	cp ./coverage-3.6.tar.gz /opt/rhqa_ipa/.
+#	rm -f /opt/rhqa_ipa/id_rsa*
+#	cp ./id_rsa* /opt/rhqa_ipa/.
+#	mkdir -p /root/.ssh
+#	cp ./id_rsa* /root/.ssh/.
+#	rm -f /opt/rhqa_ipa/id_dsa*
+#	cp ./id_dsa* /opt/rhqa_ipa/.
+#	cp ./id_dsa* /root/.ssh/.
+#	cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+#	cat /root/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys2
+#	cat ./known_hosts >> /root/.ssh/known_hosts
+#	cp -f ./id_rsa_global.pub /opt/rhqa_ipa/.
+#	cp -f ./id_rsa_global /opt/rhqa_ipa/.
+#	cp -f ./known_hosts /opt/rhqa_ipa/.
+#	cp -f ./id_dsa-wiki-beaker_archive /opt/rhqa_ipa/.
+#	chmod 600 /opt/rhqa_ipa/id_dsa-wiki-beaker_archive
+#	chmod 755 /opt/rhqa_ipa/*.sh
+#	chmod 600 /root/.ssh
+#	chmod 600 /root/.ssh/id*
+#	chmod 600 /root/.ssh/authorized_keys
+#	chmod 600 /root/.ssh/authorized_keys2
 	./runtest.sh
 
 build: $(BUILT_FILES)
