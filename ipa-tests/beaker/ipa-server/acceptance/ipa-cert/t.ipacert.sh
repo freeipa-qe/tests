@@ -7,13 +7,13 @@
 
 ipacert()
 {
-#	cert_remove_hold
-#	cert_request
-#	cert_revoke
-#	cert_show
-#	cert_status
+	cert_remove_hold
+	cert_request
+	cert_revoke
+	cert_show
+	cert_status
 	cert_find
-#	cert_BZ
+	cert_BZ
 } #cert
 
 #############################################
@@ -1438,7 +1438,7 @@ csr_no_description_BZ910468()
 		rm -f $csrfile
 		echo . | openssl req -new -nodes -out $csrfile
 		rlRun "ipa cert-request --add --principal=EXAMPLE/testhostBZ910468.$DOMAIN example.csr"
-		rlRun "ipa host-del testhostBZ910468.$DOMAIN" 0 "Cleaning up host created for this test."
+		rlRun "ipa host-del --updatedns testhostBZ910468.$DOMAIN" 0 "Cleaning up host created for this test."
 	rlPhaseEnd
 }
 
@@ -1448,9 +1448,12 @@ export certhost="clicerttesthost.$DOMAIN"
 # This section covered here: https://engineering.redhat.com/trac/ipa-tests/wiki/Proposed_ipa_cert_cli_additions_5_2013
 cert_find()
 {
-	cert_find_startup
+	rlPhaseStartTest "ipa cert-find startup"
+		cert_find_startup $certhost 3
+	rlPhaseEnd
 	cert_find_serial_min
 	cert_find_serial_max
+	cert_find_subject
 	cert_find_cleanup
 }
 
@@ -1458,14 +1461,15 @@ cert_find()
 cert_find_cleanup()
 {
 	rlPhaseStartTest "cert-find cleanup"
-		rlRun "ipa host-del $certhost" 0 "Cleaning up created host."
+		rlRun "ipa host-del --updatedns $certhost" 0 "Cleaning up created host."
 	rlPhaseEnd
 }
 
 # Setup section for the cert-find section
 cert_find_startup()
 {
-	rlPhaseStartTest "ipa cert-find startup"
+	inhost=$1
+	incrimentnum=$2
 	KinitAsAdmin # Kinit as admin for good measure
 	# Create a host to work with
 	ipaddr=$(hostname -i) # Get IP address of this host
@@ -1474,16 +1478,17 @@ cert_find_startup()
 	ipoc2=$(echo $ipaddr | cut -d\. -f2)
 	ipoc3=$(echo $ipaddr | cut -d\. -f3)
 	ipoc4=$(echo $ipaddr | cut -d\. -f4)
-	let newip4=$ipoc4+3
+	let newip4=$ipoc4+$incrimentnum
 	newip="$ipoc1.$ipoc2.$ipoc3.$newip4"
 	
 	rlLog "creating new host with IP $newip"
-	# Cleanup DNS before we begin
-	ipa dnsrecord-del --del-all $DOMAIN clicerttesthost
-	ipa dnsrecord-del --del-all $ipoc3.$ipoc2.$ipoc1.in-addr.arpa $newip4
-	ipa host-del $certhost
-	echo "ipa host-add $certhost --ip-address='$newip"
-	rlRun "ipa host-add $certhost --ip-address='$newip'" 0 "Creating host to test with this BZ test"
+	# Cleanup DNS for incoming host before we begin
+	inhost_short=$(echo $1 | cut -d\. -f1)
+	ipa dnsrecord-del --del-all $DOMAIN $inhost_short &> /dev/null
+	ipa dnsrecord-del --del-all $ipoc3.$ipoc2.$ipoc1.in-addr.arpa $newip4 &> /dev/null
+	ipa host-del --updatedns $inhost &> /dev/null
+	echo "ipa host-add $inhost --ip-address='$newip'"
+	rlRun "ipa host-add $inhost --ip-address='$newip'" 0 "Creating host to test with this BZ test"
 
 	# Create a bunch of certs to work with
 	current_certs=$(ipa cert-find --all | grep Serial\ number: | wc -l)
@@ -1506,16 +1511,16 @@ C = US
 ST = CA
 L = SFO
 O = RedHat Technology
-OU = RedHat IT' > /opt/rhqa_ipa/cert-req.conf
-	echo "CN = $certhost" >> /opt/rhqa_ipa/cert-req.conf
+OU = RedHat IT' > /opt/rhqa_ipa/$inhost-cert-req.conf
+	echo "CN = $inhost" >> /opt/rhqa_ipa/$inhost-cert-req.conf
 	while [ $current_certs -lt 41 ]; do
-		echo "openssl req -new -config /opt/rhqa_ipa/cert-req.conf -out /opt/rhqa_ipa/cert-req.csr"
-		rlRun "openssl req -new -config /opt/rhqa_ipa/cert-req.conf -out /opt/rhqa_ipa/cert-req.csr" 0 "Create a new CSR to work with"
-		echo "ipa cert-request --add --principal=EXAMPLE/$certhost /opt/rhqa_ipa/cert-req.csr"
-		rlRun "ipa cert-request --add --principal=EXAMPLE/$certhost /opt/rhqa_ipa/cert-req.csr" 0 "Request the csr into IPA"
+		csrfile="/opt/rhqa_ipa/$inhost-cert-req.csr"
+		echo "openssl req -new -config /opt/rhqa_ipa/$inhost-cert-req.conf -out $csrfile"
+		rlRun "openssl req -new -config /opt/rhqa_ipa/$inhost-cert-req.conf -out $csrfile" 0 "Create a new CSR to work with"
+		echo "ipa cert-request --add --principal=EXAMPLE/$inhost $csrfile"
+		rlRun "ipa cert-request --add --principal=EXAMPLE/$inhost $csrfile" 0 "Request the csr into IPA"
 		let current_certs=$current_certs+1;
 	done
-	rlPhaseEnd
 }
 
 cert_find_serial_min()
@@ -1559,21 +1564,21 @@ cert_find_serial_min()
 		rlLog "Found $foundcerts certs, expected $certs"
 		rlRun "echo $foundcerts | grep $certs" 0 "Making sure that the correct number of certs was returned."
 
-		foundcerts=$(ipa cert-find --min-serial-number=50| grep Serial\ number: | wc -l) 
+		foundcerts=$(ipa cert-find --min-serial-number=80| grep Serial\ number: | wc -l) 
 		rlLog "Found $foundcerts certs, expected 0"
-		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned min serial 50."
 
 		foundcerts=$(ipa cert-find --min-serial-number=100| grep Serial\ number: | wc -l) 
 		rlLog "Found $foundcerts certs, expected 0"
-		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned for min serial 100."
 
 		foundcerts=$(ipa cert-find --min-serial-number=0xFF| grep Serial\ number: | wc -l)
 		rlLog "Found $foundcerts certs, expected 0"
-		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned for min serial 0xFF."
 
 		foundcerts=$(ipa cert-find --min-serial-number=0xDF| grep Serial\ number: | wc -l) 
 		rlLog "Found $foundcerts certs, expected 0"
-		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned for min serial 0xDF."
 
 	rlPhaseEnd
 }
@@ -1615,11 +1620,100 @@ cert_find_serial_max()
 	rlPhaseEnd
 }
 
+# To be used in the cert_find_subject test
+pop_cert_find_host()
+{
+	inhost=$1
+	echo '[ req ]
+default_bits = 2048
+default_keyfile = teste.key
+distinguished_name = test_key_file
+prompt = no
+output_password = ..
+
+[ test_key_file ]
+C = US
+ST = CA
+L = SFO
+O = RedHat Technology
+OU = RedHat IT' > /opt/rhqa_ipa/$inhost-cert-req.conf
+	echo "CN = $inhost" >> /opt/rhqa_ipa/$inhost-cert-req.conf
+	csrfile="/opt/rhqa_ipa/$inhost-cert-req.csr"
+	echo "openssl req -new -config /opt/rhqa_ipa/$inhost-cert-req.conf -out $csrfile"
+	rlRun "openssl req -new -config /opt/rhqa_ipa/$inhost-cert-req.conf -out $csrfile" 0 "Create a new CSR to work withnhost"
+	echo "ipa cert-request --add --principal=EXAMPLE/$inhost $csrfile"
+	rlRun "ipa cert-request --add --principal=EXAMPLE/$inhost $csrfile" 0 "Request the csr into IPA"
+}
+
+#    subject
+cert_find_subject()
+{
+	rlPhaseStartTest "cert_find_003: Positive and Negative tests of Serial number find by subject"
+		# Setup for this test
+		subhost1="subjecthost$RANDOM.$DOMAIN"
+		subhost2="subjecthost$RANDOM.$DOMAIN"
+		subhost3="subjecthost$RANDOM.$DOMAIN"
+		subhost4="subjecthost$RANDOM.$DOMAIN"
+		subhost5="subjecthost$RANDOM.$DOMAIN"
+		cert_find_startup $subhost1 4
+		cert_find_startup $subhost2 5
+		cert_find_startup $subhost3 6
+		cert_find_startup $subhost4 7
+		cert_find_startup $subhost5 8
+		pop_cert_find_host $subhost1
+		pop_cert_find_host $subhost2
+		pop_cert_find_host $subhost3
+		pop_cert_find_host $subhost4
+		pop_cert_find_host $subhost5
+
+		# Positive tests
+		foundcerts=$(ipa cert-find --subject="$subhost1" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected 1"
+		rlRun "echo $foundcerts | grep 1" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --subject="$subhost2" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected 1"
+		rlRun "echo $foundcerts | grep 1" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --subject="$subhost3" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected 1"
+		rlRun "echo $foundcerts | grep 1" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --subject="$subhost4" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected 1"
+		rlRun "echo $foundcerts | grep 1" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --subject="$subhost5" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected 1"
+		rlRun "echo $foundcerts | grep 1" 0 "Making sure that the correct number of certs was returned."
+
+		current_certs=$(ipa cert-find --all | grep Serial\ number: | wc -l)
+		foundcerts=$(ipa cert-find --subject="$DOMAIN" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected $current_certs"
+		rlRun "echo $foundcerts | grep $current_certs" 0 "Making sure that the correct number of certs was returned when searching for all by subject."
+
+		# Negative tests
+		foundcerts=$(ipa cert-find --subject="badhost.$DOMAIN" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected 0"
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+
+		foundcerts=$(ipa cert-find --subject="nothing11.$DOMAIN" | grep Serial\ number: | wc -l)
+		rlLog "Found $foundcerts certs, expected 0"
+		rlRun "echo $foundcerts | grep 0" 0 "Making sure that the correct number of certs was returned."
+
+		# Cleanup for subject test section
+		rlRun "ipa host-del --updatedns $subhost1" 0 "Cleaning up created host."
+		rlRun "ipa host-del --updatedns $subhost2" 0 "Cleaning up created host."
+		rlRun "ipa host-del --updatedns $subhost3" 0 "Cleaning up created host."
+		rlRun "ipa host-del --updatedns $subhost4" 0 "Cleaning up created host."
+		rlRun "ipa host-del --updatedns $subhost5" 0 "Cleaning up created host."
+	rlPhaseEnd
+}
+
 #    Serial number range (min/max/none)
 #        Serial number range in Hexadecimal (min/max/none) 
 #    Issued On
 #    revoked certificates
-#    subject
 #    valid not after from
 #    valid not after to
 #    valid not before from
