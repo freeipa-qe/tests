@@ -1,3 +1,0 @@
-PURPOSE of /CoreOS/ipa-server/acceptance/install-client-cli
-Description: Install tests of a IPA CLIENT. ipa-server/acceptance/install needs to have been run first.
-Author: Namita Krishnan <namita.krishnan@redhat.com>

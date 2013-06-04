@@ -1,4 +1,0 @@
-spawn -noecho ipa-client-install --server=rhel61-server.testrelm --domain=testrelm
-expect "*: "
-send -- "\r"
-expect eof

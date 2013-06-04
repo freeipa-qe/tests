@@ -1,8 +1,0 @@
-HTTP/1.1 200 Success
-Date: Thu, 29 Mar 2012 01:11:14 GMT
-Server: Apache/2.2.15 (Red Hat)
-Set-Cookie: ipa_session=0e1fb49d65d46c237e9f3584c96467e1; httponly; Path=/ipa; secure
-Content-Length: 0
-Connection: close
-Content-Type: text/plain; charset=UTF-8
-

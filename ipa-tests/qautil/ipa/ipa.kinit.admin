@@ -1,7 +1,0 @@
-#!/bin/sh
-
-echo "try to execute:
-	echo redhat123 | kinit admin"
-echo redhat123 | kinit admin > /dev/null 2>&1
-echo "show ticket"
-klist | grep "admin"

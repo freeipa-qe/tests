@@ -1,6 +1,0 @@
-#testsuite: ipadefault
-    ## testset: _pwpolicy
-        ### testcase: _all
-            #### comment : 
-            #### data-loop:
-            #### data-no-loop:

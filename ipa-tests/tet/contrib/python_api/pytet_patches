@@ -1,3 +1,0 @@
-# Patch 1
-/result = (char \*)tet_getvar(arg1);/a\
-    if (result == NULL) goto fail;

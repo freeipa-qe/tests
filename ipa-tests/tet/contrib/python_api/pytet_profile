@@ -1,3 +1,0 @@
-export TET_ROOT=<location of the TET installation>
-export PYTHONPATH=<location of the PyTET installation>
-export PATH=$PATH:$TET_ROOT/bin

@@ -1,3 +1,0 @@
-PURPOSE of /CoreOS/sssd/ipa-server/repoclone
-Description: Clones the current daily repo and replicates it to a network location.
-Author: Michael Gregg <mgregg@redhat.com>

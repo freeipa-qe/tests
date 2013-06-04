@@ -1,5 +1,0 @@
-bkr job-submit bkr-upgrade-incremental.xml
-bkr job-submit bkr-upgrade-nodns.xml
-bkr job-submit bkr-upgrade-normal.xml
-bkr job-submit bkr-upgrade-parallel.xml
-bkr job-submit bkr-upgrade-reverse.xml

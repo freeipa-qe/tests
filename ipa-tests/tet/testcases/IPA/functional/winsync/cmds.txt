@@ -1,8 +1,0 @@
-# it works good with win2003.rhqa.net , this command was send from
-# server32.rhqa.net
- /usr/lib*/mozldap/ldapsearch -h win2003.rhqa.net -p 389 -D "cn=administrator,cn=users,dc=rhqa,dc=net" -w redhat -b "cn=users,dc=rhqa,dc=net" "" "*" 
-
-ipa-replica-manage add --winsync --binddn cn=administrator,cn=users,dc=rhqa,dc=net --bindpw redhat --cacert /export/share/testcase-ipa/functional/winsync/certs/win2003-ad-cert.cer win2003.rhqa.net -v
-
-
-ipa-moduser --addattr "telephonenumber=650-123-4567" $USER

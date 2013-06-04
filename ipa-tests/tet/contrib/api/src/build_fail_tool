@@ -1,9 +1,0 @@
-#!/bin/sh
-TTY=`tty`
-OUTPUT=${OUTPUT:-$TTY}
-echo "$OUTPUT" | grep -i "not a tty"
-if [ $? = 0 ] ; then 
-	OUTPUT=tty.output
-fi
-echo "Build Failed for $*" >>$OUTPUT 2>&1
-exit 1

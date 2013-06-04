@@ -1,7 +1,0 @@
-ADdomain="adrelm.com"
-ADhost="squab.$ADdomain"
-ADip="10.65.207.213"
-ADpswd="Secret123"
-ADdc="DC=adrelm,DC=com"
-ADadmin="administrator"
-msifile="RedHat-PassSync-1.1.4-x86_64.msi"

@@ -1,6 +1,0 @@
-[ds81_x86_64]
-name=ds81_x86_64
-baseurl=http://porkchop.devel.redhat.com/devel/candidate-trees/latest-RHEL5.3-DSRV-8.1/8.1/x86_64/os/RedHat/RPMS/
-enabled=1
-gpgcheck=0
-

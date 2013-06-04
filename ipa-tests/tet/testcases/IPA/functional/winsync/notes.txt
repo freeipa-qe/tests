@@ -1,4 +1,0 @@
-* enable replication logging is a must. otherwise, debugging would be very hard
-* on AD side, userAccountControl fields: 
-** 66048 = Account Enabled     
-** 66050 = Account Disabled

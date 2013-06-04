@@ -1,5 +1,0 @@
-[ipa-v2-daily-x86_64]
-name=ipa-v2-daily-x86_64
-baseurl=http://porkchop.devel.redhat.com/nightly/latest-RHEL5.4-IPA-2.0/2.0/x86_64/os/IPA
-enabled=1
-gpgcheck=0 

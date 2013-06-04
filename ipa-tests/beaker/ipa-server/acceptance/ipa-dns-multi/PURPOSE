@@ -1,3 +1,0 @@
-PURPOSE of /CoreOS/tests/Regression/ipa-nis
-Description: Test running various DNS tests in a enviroment comtaining two masters.
-Author: Michael Gregg <mgregg@redhat.com>

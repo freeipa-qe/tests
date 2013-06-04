@@ -1,7 +1,0 @@
-#!/bin/sh
-
-echo "inject a lot of users and groups with ipa.inject.user.grp script "
-echo "use default: 10 layers, 2 groups per layer, 10 users per group."
-echo "total 20 groups, 200 users"
-
-ipa.inject.user.grp  10 2 10

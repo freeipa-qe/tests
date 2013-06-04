@@ -1,7 +1,0 @@
-       --passsync=PASSSYNC_PWD
-	      Password for the IPA system user used by	the  Windows  PassSync
-	      plugin  to synchronize passwords. Required when using --winsync.
-	      This does not mean you have to use the PassSync service.
-
-  --passsync=PASSSYNC   Password for the IPA system user used by the Windows
-                        PassSync plugin to synchronize passwords
