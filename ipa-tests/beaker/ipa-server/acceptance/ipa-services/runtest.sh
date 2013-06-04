@@ -114,6 +114,7 @@ service-mod()
 	"service_mod_005"
 	"service_mod_006"
 	"service_mod_007"
+	"service_mod_pac_env_setup"
 	"service_mod_008"
 	"service_mod_009"
 	"service_mod_010"
@@ -122,8 +123,7 @@ service-mod()
         "service_mod_013"
         "service_mod_014"
         "service_mod_015"
-	"service_mod_016"
-	"service_mod_017"
+	"service_mod_pac_env_cleanup"
 }
 
 service-remove-host()
