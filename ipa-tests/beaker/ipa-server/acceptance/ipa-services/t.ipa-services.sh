@@ -800,16 +800,16 @@ rlPhaseStartTest "service_mod_007: ipa service-mod: modifying the service with -
 rlPhaseEnd
 }
 
-service_mod_008() {
-rlPhaseStartTest "service_mod_008:pac type env set up :add nfs service and get keytab"
+service_mod_pac_env_setup() {
+rlPhaseStartSetup "service_mod_pac_env set up :add nfs service and get keytab"
 	KinitAsAdmin
 	rlRun "ipa service-add nfs/$host@$realm" 0 "nfs service add as expected"
 	rlRun "ipa-getkeytab -s $host -p nfs/$host@$realm -k /tmp/nfs.keytab" 0 "get nfs keytab"
 rlPhaseEnd
 }
 
-service_mod_009() {
-rlPhaseStartTest "service_mod_009: add pac type for a service to NONE overriding default pac type MS-PAC from config-show"
+service_mod_008() {
+rlPhaseStartTest "service_mod_008: add pac type for a service to NONE overriding default pac type MS-PAC from config-show"
 	KinitAsAdmin
         rlRun "ipa service-mod ldap/$host@$realm --pac-type=NONE" 0 "change ldap pac type to NONE"
 	initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
@@ -829,8 +829,8 @@ rlPhaseStartTest "service_mod_009: add pac type for a service to NONE overriding
 rlPhaseEnd
 }
 
-service_mod_010() {
-rlPhaseStartTest "service_mod_010: add pac type for nfs service to MS-PAC overriding default nfs:NONE from config-show"
+service_mod_009() {
+rlPhaseStartTest "service_mod_009: add pac type for nfs service to MS-PAC overriding default nfs:NONE from config-show"
         KinitAsAdmin
         rlRun "ipa service-mod nfs/$host@$realm --pac-type=MS-PAC" 0 "change nfs pac type to MS-PAC"
         initpassword=`ipa user-add --first firstname --last lastname --random testuser | grep "Random password"| cut -d: -f2 | sed s/\ //g`
@@ -851,8 +851,8 @@ rlPhaseStartTest "service_mod_010: add pac type for nfs service to MS-PAC overri
 rlPhaseEnd
 }
 
-service_mod_011() {
-rlPhaseStartTest "service_mod_011: add multiple pac type for a service"
+service_mod_010() {
+rlPhaseStartTest "service_mod_010: add multiple pac type for a service"
 	KinitAsAdmin
 	rlRun "ipa service-mod nfs/$host@$realm --pac-type=MS-PAC --pac-type=PAD" 0 "change nfs pac type to MS-PAC and PAD"
 	expected_pac="PAC type: MS-PAC, PAD"
@@ -865,38 +865,42 @@ rlPhaseStartTest "service_mod_011: add multiple pac type for a service"
 rlPhaseEnd
 }
 
-service_mod_012() {
-rlPhaseStartTest "service_mod_012: add multiple pac type for a service including NONE"
+service_mod_011() {
+rlPhaseStartTest "service_mod_011: add multiple pac type for a service including NONE"
         KinitAsAdmin
-        rlRun "ipa service-mod nfs/$host@$realm --pac-type=MS-PAC --pac-type=NONE" 1 "NONE value cannot be combined with other PAC types"
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type=MS-PAC --pac-type=NONE > $TmpDir/service_mod_011.txt 2>&1" 1 "verigy NONE value cannot be combined with other PAC types"
+        rlAssertGrep  "ipa: ERROR: invalid 'ipakrbauthzdata': NONE value cannot be combined with other PAC types" "$TmpDir/service_mod_011.txt"
+rlPhaseEnd
+}
+
+service_mod_012() {
+rlPhaseStartTest "service_mod_012: add same pac type for a service that already has it"
+        KinitAsAdmin
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type=PAD" 0 "pac type added as expected"
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type=PAD > $TmpDir/service_mod_012.txt 2>&1" 1 "verify cannot add same pac type"
+        rlAssertGrep  "ipa: ERROR: no modifications to be performed" "$TmpDir/service_mod_012.txt"
 rlPhaseEnd
 }
 
 service_mod_013() {
-rlPhaseStartTest "service_mod_013: add same pac type for a service that already has it"
+rlPhaseStartTest "service_mod_013: give random value pac type for a particular service"
         KinitAsAdmin
-        rlRun "ipa service-mod nfs/$host@$realm --pac-type=PAD" 0 "pac type added as expected"
-	rlRun "ipa service-mod nfs/$host@$realm --pac-type=PAD" 1 "readd same pac type,no modifications has been made"
+        random=`cat /dev/urandom| tr -dc '0-9a-zA-Z!@#$%^*_+-'|head -c 8`
+        rlRun "ipa service-mod nfs/$hostname --pac-type=$random" 1 "change default pac type to some random value"
+	rlRun "ipa service-show nfs/$host@$realm|grep $random" 1 "verify random value cannot be added as a pac type"
 rlPhaseEnd
 }
 
 service_mod_014() {
-rlPhaseStartTest "service_mod_014: give random value pac type for a particular service"
+rlPhaseStartTest "service_mod_014: add pac type with no input"
         KinitAsAdmin
-        random=`cat /dev/urandom| tr -dc '0-9a-zA-Z!@#$%^*_+-'|head -c 8`
-        rlRun "ipa service-mod nfs/$hostname --pac-type=$random" 1 "change default pac type to some random value"
+        rlRun "ipa service-mod nfs/$host@$realm --pac-type > $TmpDir/service_mod_014.txt 2>&1" 2 "no input for pac type"
+        rlAssertGrep  "ipa: error: --pac-type option requires an argument" "$TmpDir/service_mod_014.txt"
 rlPhaseEnd
 }
 
 service_mod_015() {
-rlPhaseStartTest "service_mod_015: add pac type with no input"
-        KinitAsAdmin
-        rlRun "ipa service-mod nfs/$host@$realm --pac-type" 2 "pac type option needs input"
-rlPhaseEnd
-}
-
-service_mod_016() {
-rlPhaseStartTest "service_mod_016: remove all pac type for a service"
+rlPhaseStartTest "service_mod_015: remove all pac type for a service"
         KinitAsAdmin
         rlRun "ipa service-mod nfs/$host@$realm --pac-type=" 0 "pac type removed as expected"
         rlRun "ipa service-mod ldap/$host@$realm --pac-type=" 0 "pac type removed as expected"
@@ -905,8 +909,8 @@ rlPhaseStartTest "service_mod_016: remove all pac type for a service"
 rlPhaseEnd
 }
 
-service_mod_017() {
-rlPhaseStartTest "service_mod_017 : pac type env clean up ,delete nfs service"
+service_mod_pac_env_cleanup() {
+rlPhaseStartCleanup "service_mod_pac_env_cleanup : pac type env clean up ,delete nfs service"
 	KinitAsAdmin
 	rlRun "ipa service-del nfs/$host@$realm" 0 "nfs service removed as expected "
 	kdestroy
