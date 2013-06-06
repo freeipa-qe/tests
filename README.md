@@ -15,7 +15,7 @@ baseurl=http://beaker.engineering.redhat.com/harness/RedHatEnterpriseLinux6/
 enabled=1
 gpgcheck=0
 
-2) # yum install subversion expect beah rhts-test-env beakerlib beakerlib-redhat
+2) # yum install expect beah rhts-test-env beakerlib beakerlib-redhat
 3) # git clone https://github.com/freeipa/tests.git 
 4) # export MASTER=`hostname`  
 5) if you are intending on installing a slave and you want the replica package prepared  
@@ -41,7 +41,7 @@ baseurl=http://beaker.engineering.redhat.com/harness/RedHatEnterpriseLinux6/
 enabled=1
 gpgcheck=0
 
-2) # yum install subversion expect beah rhts-test-env beakerlib beakerlib-redhat
+2) # yum install expect beah rhts-test-env beakerlib beakerlib-redhat
 3) # git clone https://github.com/freeipa/tests.git 
 4) # export MASTER=masters.fqdn.name  
 5) # export SLAVE=slaves.fqdn.name
@@ -64,7 +64,7 @@ baseurl=http://beaker.engineering.redhat.com/harness/RedHatEnterpriseLinux6/
 enabled=1
 gpgcheck=0
 
-2) # yum install subversion expect beah rhts-test-env beakerlib beakerlib-redhat
+2) # yum install expect beah rhts-test-env beakerlib beakerlib-redhat
 3) # git clone https://github.com/freeipa/tests.git 
 4) # export MASTER=masters.fqdn.name  
 5) # export CLIENT=clients.fqdn.name
