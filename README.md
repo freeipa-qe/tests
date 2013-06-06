@@ -1,10 +1,10 @@
-For your IPA environment if you want master, slave and client ... reserve all the machines or have them available in advance (either x86_64 or 1386 - only arches supported). [[BR]]
+For your freeIPA environment if you want master, slave and client ... reserve all the machines or have them available in advance (either x86_64 or 1386 - only arches supported). [[BR]]
 
 To get the repo for the rhts and beaker rpms ... [Beaker User Guide](https://engineering.redhat.com/trac/rhat/wiki/BeakerUserGuide)
 
 If required to use the development repositories depending on where we are in the devel cycle :: [IPA Development Repos](https://wiki.idm.lab.bos.redhat.com/export/idmwiki/IPA_Devel_Repos)
 
-## INSTALLING A MASTER
+# INSTALLING A MASTER
 ssh as root to the new master machine!  
 
 ```
@@ -30,7 +30,7 @@ gpgcheck=0
 
 This will install master on this machine with dogtag and dns.  Feel free to dig through the scripts to see what has to be done to install!
 
-## INSTALLING A SLAVE 
+# INSTALLING A SLAVE 
 ssh as root to the new slave machine!
 
 ```
@@ -53,7 +53,7 @@ gpgcheck=0
 10) # make run
 ```
 
-## INSTALLING A CLIENT 
+# INSTALLING A CLIENT 
 ssh as root to the new client machine!
 
 ```
